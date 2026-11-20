@@ -1,7 +1,80 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "[학부] 2026학년도 겨울 계절학기 폐강교과목 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368061&article.offset=0&articleLimit=10&no=338",
+   "postedAt": "2026-11-19",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-20",
+   "desc": "학수번호 교과목명 과학,기술과사회 ※ 수강신청 취소 및 변경기간: 2026.12.7.(월) 09:00~2026.12.9.(수) 15:00 ( 기존 신청학점 내에서만 변경/취소 가능 ) 수강신청 취소 및 변경기간…"
+  },
+  {
+   "title": "[안전팀] 겨울철 화재가 아닌 경우 발생하는 경보 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368063&article.offset=0&articleLimit=10&no=337",
+   "postedAt": "2026-11-20",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-20",
+   "desc": "교내의 화재경보시스템은 강의실 , 사무실 , 복도 , 계단 등에 설치된 화재감지기와 자동으로 연동되어 화재감지기 경보( 경종 및 싸이렌) 가 울리는 시스템 입니다 . 화재감지기는 화재발생 시 열이나 연기를 감지하여…"
+  },
+  {
+   "title": "[학생지원팀/외교부] 외교부 해외안전여행 앱, 영사안전콜센터 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368054&article.offset=0&articleLimit=10&no=335",
+   "postedAt": "2026-11-19",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-20",
+   "desc": "외교부는 국민들의 안전한 해외 방문·체류를 위해 해외안전여행 홈페이지 및 앱 등을 통해 안전 정보를 제공하고 있다고 하니, 해외 방문 및 체류 계획이 있는 학생은 아래 내용과 첨부파일을 참고하여 안전한 해외여행…"
+  },
+  {
+   "title": "[연장][채용] 데이터사이언스대학원 행정실 계약직원 모집(~11/24까지)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368053&article.offset=0&articleLimit=10&no=334",
+   "postedAt": "2026-11-19",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-20",
+   "desc": "이화여자대학교 데이터사이언스대학원 행정실에서는 아래와 같이 계약직원을 모집하오니 관심있는 분들의 많은 지원 바랍니다."
+  },
+  {
+   "title": "[정보인프라팀] 방화벽 장비 점검에 따른 인터넷 서비스 간헐적 중지 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368040&article.offset=0&articleLimit=10&no=332",
+   "postedAt": "2026-11-19",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-20",
+   "desc": "안녕하세요. 정보인프라팀입니다. 아래의 작업일정 기간에 방화벽 장비 점검으로 인해 인터넷 서비스가 간헐적으로 중지되오니 이용에 참고하시기 바랍니다."
+  },
+  {
+   "title": "[학생지원팀/교육부] 공정한 대학수학능력시험 운영 확보를 위한 위급재난문자 발송 관련 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368038&article.offset=0&articleLimit=10&no=331",
+   "postedAt": "2026-11-19",
+   "kind": "생활",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-20",
+   "desc": "정부는 수능 부정행위 방지와 공정한 시험 운영을 확보하기 위하여 「2027학년도 대학수학능력시험」 당일 경보음을 동반한 '위급재난문자'를 발송할 예정입니다."
+  },
+  {
+   "title": "[채용] 멀티스케일 물질 및 시스템 연구소(IMMS)-연구사업팀장 채용 공고",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368035&article.offset=0&articleLimit=10&no=330",
+   "postedAt": "2026-11-18",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-20"
+  },
   {
    "title": "2027학년도 수시모집 논술고사 시행에 따른 교내 차량 전면 통제 안내 (11.28.(토)~29.(일))",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367962&article.offset=0&articleLimit=10&no=343",
@@ -53,70 +126,6 @@
    "src": "ec6597da",
    "foundAt": "2026-11-19",
    "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
-  },
-  {
-   "title": "[학부] 2026학년도 겨울 계절학기 폐강교과목 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368061&article.offset=0&articleLimit=10&no=342",
-   "postedAt": "2026-11-19",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-19",
-   "desc": "학수번호 교과목명 과학,기술과사회 ※ 수강신청 취소 및 변경기간: 2026.12.7.(월) 09:00~2026.12.9.(수) 15:00 ( 기존 신청학점 내에서만 변경/취소 가능 ) 수강신청 취소 및 변경기간…"
-  },
-  {
-   "title": "[학생지원팀/외교부] 외교부 해외안전여행 앱, 영사안전콜센터 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368054&article.offset=0&articleLimit=10&no=340",
-   "postedAt": "2026-11-19",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-19",
-   "desc": "외교부는 국민들의 안전한 해외 방문·체류를 위해 해외안전여행 홈페이지 및 앱 등을 통해 안전 정보를 제공하고 있다고 하니, 해외 방문 및 체류 계획이 있는 학생은 아래 내용과 첨부파일을 참고하여 안전한 해외여행…"
-  },
-  {
-   "title": "[연장][채용] 데이터사이언스대학원 행정실 계약직원 모집(~11/24까지)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368053&article.offset=0&articleLimit=10&no=339",
-   "postedAt": "2026-11-19",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-19",
-   "desc": "이화여자대학교 데이터사이언스대학원 행정실에서는 아래와 같이 계약직원을 모집하오니 관심있는 분들의 많은 지원 바랍니다."
-  },
-  {
-   "title": "[정보인프라팀] 방화벽 장비 점검에 따른 인터넷 서비스 간헐적 중지 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368040&article.offset=0&articleLimit=10&no=337",
-   "postedAt": "2026-11-19",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-19",
-   "desc": "안녕하세요. 정보인프라팀입니다. 아래의 작업일정 기간에 방화벽 장비 점검으로 인해 인터넷 서비스가 간헐적으로 중지되오니 이용에 참고하시기 바랍니다."
-  },
-  {
-   "title": "[학생지원팀/교육부] 공정한 대학수학능력시험 운영 확보를 위한 위급재난문자 발송 관련 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368038&article.offset=0&articleLimit=10&no=336",
-   "postedAt": "2026-11-19",
-   "kind": "생활",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-19",
-   "thumb": "data/news/img/d950eb47657afc61.webp",
-   "desc": "정부는 수능 부정행위 방지와 공정한 시험 운영을 확보하기 위하여 「2027학년도 대학수학능력시험」 당일 경보음을 동반한 '위급재난문자'를 발송할 예정입니다."
-  },
-  {
-   "title": "[채용] 멀티스케일 물질 및 시스템 연구소(IMMS)-연구사업팀장 채용 공고",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368035&article.offset=0&articleLimit=10&no=335",
-   "postedAt": "2026-11-18",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-19"
   },
   {
    "title": "[이화유럽인문코어프로그램] 주경철 교수 강연「바다와 역사, 새로운 기억 새로운 상상」",
@@ -410,17 +419,6 @@
    "src": "ec6597da",
    "foundAt": "2026-11-15",
    "desc": "이화여자대학교 안전팀 사무실에서 근무할 계약직원(행정)을 다음과 같이 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
-  },
-  {
-   "title": "[중앙도서관] 2027년 2월 졸업 석·박사학위논문 온라인 제출 사전 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367922&article.offset=0&articleLimit=10&no=319",
-   "postedAt": "2026-11-12",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-15",
-   "desc": "■ 제출기간 : 2026. 12. 21.(월) ~ 12. 28.(월) ■ 제출방법 : 온라인 제출 (완제본 책자 제출 없음)"
   }
  ]
 }

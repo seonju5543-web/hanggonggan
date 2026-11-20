@@ -1,7 +1,29 @@
 {
  "school": "숭실대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "기타 숭실연합종강예배 안내",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EC%97%B0%ED%95%A9%EC%A2%85%EA%B0%95%EC%98%88%EB%B0%B0-%EC%95%88%EB%82%B411%EC%9B%94-30%EC%9D%BC&keyword",
+   "postedAt": "2026-11-20",
+   "kind": "학사",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-20",
+   "thumb": "data/news/img/36f294718d1353bf.webp",
+   "desc": "숭실연합종강예배에 숭실가족 여러분들을 초대합니다. 1. 날짜: 2026년 11월 30일(월)"
+  },
+  {
+   "title": "기타 숭실가족수요예배 안내(11월 25일)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EA%B0%80%EC%A1%B1%EC%88%98%EC%9A%94%EC%98%88%EB%B0%B0-%EC%95%88%EB%82%B411%EC%9B%94-25%EC%9D%BC&keyword",
+   "postedAt": "2026-11-20",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-20",
+   "desc": "주님께서 주시는 평안의 자리로 숭실가족 여러분들을 초대합니다. 많은 관심과 기도, 그리고 참여를 부탁드립니다."
+  },
   {
    "title": "봉사 해외선교봉사 (IMPACT 41기) 추가 모집",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%ED%95%B4%EC%99%B8%EC%84%A0%EA%B5%90%EB%B4%89%EC%82%AC-impact-41%EA%B8%B0-%EC%B6%94%EA%B0%80-%EB%AA%A8%EC%A7%91-2&keyword",
@@ -398,28 +420,6 @@
    "src": "3b348584",
    "foundAt": "2026-10-30",
    "desc": "숭실대학교 산학협력단에서 ‘진리와 봉사’의 교훈을 바탕으로 다음과 같이 역량 있는 인재를 모집합니다. ▪ 임용분야 및 인원 채용분야 채용인원 프로젝트계약직 일반행정 – 서울시 지역혁신중심대학지원체계(앵커) 사업"
-  },
-  {
-   "title": "채용 숭실대학교 산학협력단 프로젝트계약직 직원 채용 공고(창업지원)",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EB%8B%A8-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EC%B1%84%EC%9A%A9-15&keyword",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-30",
-   "desc": "숭실대학교 산학협력단 변리사 채용 공고(앵커사업) 다음글 HOT 공지사항 2026학년도 겨울계절제 수업 일정 안내(수정)"
-  },
-  {
-   "title": "채용 숭실대학교 산학협력단 계약직 직원 채용 공고(연구관리팀)",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EB%8B%A8-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0%EC%97%B0%EA%B5%AC-32&keyword",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-30",
-   "desc": "HOT 공지사항 2026학년도 겨울계절제 수업 일정 안내(수정)"
   }
  ]
 }

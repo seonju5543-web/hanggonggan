@@ -28,6 +28,7 @@ import { cleanAttachName, attachExt, loadFormRules } from './form-rules.mjs';
 import { resolveJsDownload, isHtmlPayload } from './attachment-link.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { attachmentText } from './attachment-text.mjs';
+import { SOFFICE_TIMEOUT_MS } from './soffice.mjs';   // 변환 한 곳의 시한(2026-11-20 soffice.mjs 로 모임) — 파일 하나 최대 시간에 넣는다
 
 /* form-pdf.mjs 는 불러오는 순간 본편이 돈다 — 순수 함수만 쓰도록 표시를 먼저 세우고 동적으로 부른다(deepfetch 와 같은 길) */
 process.env.FORM_PDF_AS_LIB = '1';
@@ -41,7 +42,7 @@ export const REST_DAYS = 3;          // 받기·변환에 실패한 첨부는 �
 export const FETCH_TIMEOUT_MS = 30000;
 export const TEXT_TIMEOUT_MS = 20000;   // 글자 대조의 두 도구(hwp-bodytext.py · pdftotext) — 평소 1초 안에 끝난다
 /* 파일 하나의 최대 시간(초) = 받기 + 변환 + 글자 뽑기 둘 — 예산 검사와 관문 「공고문 PDF 사본 — 배선」 ④가 같은 숫자를 쓴다 */
-export const FILE_MAX_SEC = (FETCH_TIMEOUT_MS + FP.SOFFICE_TIMEOUT_MS + 2 * TEXT_TIMEOUT_MS) / 1000;
+export const FILE_MAX_SEC = (FETCH_TIMEOUT_MS + SOFFICE_TIMEOUT_MS + 2 * TEXT_TIMEOUT_MS) / 1000;
 /* 변환 시간 예산(초) — deep-fetch 단계 시한 안에 스스로 끝낸다 · 넘으면 남은 것은 다음 실행이 잇는다(form-pdf 와 같은 셈) */
 export const BUDGET_SEC = Number(process.env.DOC_PDF_BUDGET_SEC || 240);
 const MAX_FETCH_BYTES = 15 * 1024 * 1024;
