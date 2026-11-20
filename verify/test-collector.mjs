@@ -17428,8 +17428,8 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
         [threw, /^오류\(RangeError/.test(((idx11.tried || {})['r1|공고문.hwp'] || {}).why || ''), Object.keys(idx11.items).length, fs.existsSync(path.join(tmpRepo, 'data', 'docs-pdf', 'r1')), !!r11],
         ['', true, 0, false, true]);
 
-      /* ⑫ 글자가 빠지면 표 줄 높이를 풀어 한 번 더 (2026-11-20 첫 실행 — 「글자 빠짐」 4개 · 표의 마지막 줄이 접혀 글자가 잘렸다 · soffice.mjs sofficeToPdfRelaxed).
-         가짜: 평소 사본(out.pdf)은 80% · 표 줄을 푼 사본(out-relaxed.pdf)은 전부. 스크립트 주소 공고(r9)는 빼고 본다 */
+      /* ⑫ 글자가 빠지면 높이 고정 글상자를 풀어 한 번 더 (2026-11-20 첫 실행 — 「글자 빠짐」 · 표가 높이 고정 틀에 갇혀 넘친 줄이 잘렸다 · soffice.mjs sofficeToPdfRelaxed).
+         가짜: 평소 사본(out.pdf)은 첫 줄만 · 틀을 푼 사본(out-relaxed.pdf)은 전부. 스크립트 주소 공고(r9)는 빼고 본다 */
       put('data/registered.json', JSON.stringify({ items: [{ id: 'r1', name: '가 장학', deadline: '2026-12-31', sourceUrl: 'https://x.ac.kr/v?id=1', attachments: [{ name: '공고문.hwp', url: 'https://x.ac.kr/f/1' }] }] }));
       put('data/kosaf-open.json', JSON.stringify({ items: [] }));
       /* 원본 두 줄 — 평소 사본에는 첫 줄만(둘째 줄이 통째로 빠진다 · 74자 중 56자 = 75.6%) */
@@ -17438,24 +17438,24 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       const twoWay = (p) => (/out-relaxed\.pdf$/.test(p) ? T2 : LOSSY);
       base.origText = () => T2;
       const relaxCalls = [];
-      const relaxOk = (src, work) => { relaxCalls.push(path.basename(src)); fs.mkdirSync(work, { recursive: true }); const made = path.join(work, 'src.pdf'); fs.writeFileSync(made, '%PDF-1.4 loose'); return { ok: true, made, rows: 7 }; };
+      const relaxOk = (src, work) => { relaxCalls.push(path.basename(src)); fs.mkdirSync(work, { recursive: true }); const made = path.join(work, 'src.pdf'); fs.writeFileSync(made, '%PDF-1.4 loose'); return { ok: true, made, boxes: 7 }; };
       const fresh = () => put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
       fresh(); respond = () => ({ ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
       const r12 = await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: twoWay, relax: relaxOk });
       const e12 = (readIdx().items.r1 || [])[0] || {};
-      eq('⑫ 평소 사본에서 글자가 빠지면 표 줄을 풀어 다시 바꾸고 더 많이 남은 쪽을 싣는다 — 대조 1 · 푼 줄 수 · 판 번호 · 리포트에 한 줄',
-        [r12.done.length, r12.failed.length, e12.kept, e12.rows, e12.mk === DP.MAKER, relaxCalls.length, /줄 높이를 풀어 다시 바꾼 사본 1개/.test(readText(path.join(tmpRepo, 'collector', 'doc-pdf-report.md')))],
+      eq('⑫ 평소 사본에서 글자가 빠지면 글상자를 풀어 다시 바꾸고 더 많이 남은 쪽을 싣는다 — 대조 1 · 푼 틀 수 · 판 번호 · 리포트에 한 줄',
+        [r12.done.length, r12.failed.length, e12.kept, e12.boxes, e12.mk === DP.MAKER, relaxCalls.length, /틀을 풀어 다시 바꾼 사본 1개/.test(readText(path.join(tmpRepo, 'collector', 'doc-pdf-report.md')))],
         [1, 0, 1, 7, true, 1, true]);
       relaxCalls.length = 0; fresh();
       await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: () => T2, relax: relaxOk });
-      eq('  글자가 다 남은 사본은 다시 가지 않는다(평소 길 그대로 — 쪽 모양이 바뀌지 않는다)', [relaxCalls.length, ((readIdx().items.r1 || [])[0] || {}).rows], [0, undefined]);
+      eq('  글자가 다 남은 사본은 다시 가지 않는다(평소 길 그대로 — 쪽 모양이 바뀌지 않는다)', [relaxCalls.length, ((readIdx().items.r1 || [])[0] || {}).boxes], [0, undefined]);
       fresh();
       const r12b = await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: () => LOSSY, relax: relaxOk });
       const rep12b = readText(path.join(tmpRepo, 'collector', 'doc-pdf-report.md'));
       eq('  풀어도 모자라면 버린다 — 「글자 빠짐(75%)」 · 리포트에 **빠진 원본 줄**이 그대로(왜 빠졌는지 다시 캐지 않게) · 실패 장부에 판 번호',
         [r12b.failed.map((f) => f.why), /빠진 줄: 「거너더러머버서어저처커터퍼허 2026」/.test(rep12b), ((readIdx().tried || {})['r1|공고문.hwp'] || {}).mk === DP.MAKER], [['글자 빠짐(75%)'], true, true]);
       fresh();
-      const r12c = await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: twoWay, relax: () => ({ ok: false, why: '높이가 고정된 표 줄 없음' }) });
+      const r12c = await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: twoWay, relax: () => ({ ok: false, why: '높이가 고정된 글상자 없음' }) });
       eq('  풀 줄이 없으면(변환기가 못 하면) 평소 사본으로 판정한다 — 던지지 않는다', r12c.failed.map((f) => f.why), ['글자 빠짐(75%)']);
       /* ⑬ 판 번호(MAKER) — 만드는 법이 바뀌면 글자가 덜 남은 사본과 쉬던 실패만 다시 · 다 남은 사본은 받지도 않는다(학교를 다시 두드리지 않는다) */
       const oldEntry = (kept, mk) => ({ items: { r1: [{ file: 'r1/1-공고문.pdf', name: '공고문.hwp', pages: 1, bytes: 13, fonts: FPm.FONT_STAMP, kept, ...(mk ? { mk } : {}), at: '2026-11-20' }] }, tried: {} });
@@ -17483,42 +17483,62 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       const keepDir = path.join(tmpRepo, 'probe-out');
       const lines = [];
       const pr = await DP.runDocProbe({ ...base, today: '2026-12-06', ids: ['r1'], keepDir, pdfText: twoWay, relax: relaxOk, log: (s) => lines.push(s) });
-      eq('⑯ 진단 모드 — 색인·리포트·사본 폴더를 안 건드리고 · 두 길(평소 75.6% · 표 줄 풂 100%)과 빠진 줄을 찍고 · 재료는 keepDir 에',
+      eq('⑯ 진단 모드 — 색인·리포트·사본 폴더를 안 건드리고 · 두 길(평소 75.6% · 글상자 풂 100%)과 빠진 줄을 찍고 · 재료는 keepDir 에',
         [idxText() === beforeProbe, fs.existsSync(path.join(tmpRepo, 'collector', 'doc-pdf-report.md')), fs.existsSync(path.join(tmpRepo, 'data', 'docs-pdf', 'r1')),
-          pr.map((x) => [x.id, x.ok, x.kept, x.tries.map((t) => t.how)]), lines.some((s) => /평소: 75\.6%.*빠진 줄: 「거너더러/.test(s)), lines.some((s) => /표 줄 7곳 풂: 100%/.test(s)),
+          pr.map((x) => [x.id, x.ok, x.kept, x.tries.map((t) => t.how)]), lines.some((s) => /평소: 75\.6%.*빠진 줄: 「거너더러/.test(s)), lines.some((s) => /글상자 7곳 풂: 100%/.test(s)),
           fs.existsSync(path.join(keepDir, 'r1-1', 'out.pdf')) && fs.existsSync(path.join(keepDir, 'r1-1', 'out-relaxed.pdf'))],
-        [true, false, false, [['r1', true, 1, ['평소', '표 줄 7곳 풂']]], true, true, true]);
+        [true, false, false, [['r1', true, 1, ['평소', '글상자 7곳 풂']]], true, true, true]);
       const prNone = await DP.runDocProbe({ ...base, today: '2026-12-06', ids: [], log: () => {} });
       eq('  id 를 안 주면 실패 장부의 「글자 빠짐」과 글자가 덜 남은 사본만 고른다(지금은 없음 → 0개)', prNone.length, 0);
       fs.rmSync(tmpRepo, { recursive: true, force: true });
     }
   }
-  /* ⑰ 표 줄 높이 풀기 — 가짜 변환기로 진짜 함수를 돌린다: 원본 → 중간 꼴(fodt)에서 '딱 이만큼'(style:row-height)을 '적어도 이만큼'(style:min-row-height)으로 → PDF */
+  /* ⑰ 높이 고정 글상자 풀기 — 가짜 변환기로 진짜 함수를 돌린다: 원본 → 중간 꼴(fodt)에서 틀의 '딱 이만큼'(frame svg:height)을 '적어도 이만큼'(text-box fo:min-height)으로 → PDF.
+       틀 꼴은 진단(doc-pdf-probe 2026-11-20)이 남긴 귀농인 시행지침 중간 꼴 그대로 — 표를 품은 Frame8 이 높이 7.589in 로 고정돼 넘친 두 줄이 잘렸다 */
   {
     const SO = await import('../collector/soffice.mjs');
-    eq('⑰ 줄 높이 글자만 바꾼다 — 고정 높이 둘을 풀고 이미 풀린 줄·다른 글자는 그대로',
-      SO.relaxRowHeights('<a style:row-height="1.2cm" fo:keep-together="auto"/><b style:min-row-height="2cm"/><c style:row-height="0.4cm"/><d fo:row-height="x"/>'),
-      '<a style:min-row-height="1.2cm" fo:keep-together="auto"/><b style:min-row-height="2cm"/><c style:min-row-height="0.4cm"/><d fo:row-height="x"/>');
+    const FRAME8 = '<draw:frame draw:style-name="fr1" draw:name="Frame8" text:anchor-type="as-char" svg:width="6.6925in" svg:height="7.589in">\n<draw:text-box><table:table table:name="Table16"/></draw:text-box></draw:frame>';
+    const PIC = '<draw:frame draw:name="그림1" svg:width="2in" svg:height="1in"><draw:image xlink:href="a.png"/></draw:frame>';
+    const GROWS = '<draw:frame draw:name="Frame2" svg:width="2in" svg:height="1in"><draw:text-box fo:min-height="1in"><text:p/></draw:text-box></draw:frame>';
+    const relaxed = SO.relaxFrameHeights(`<office>${FRAME8}${PIC}${GROWS}<r style:min-row-height="0.3in"/></office>`);
+    eq('⑰ 높이 고정 글상자만 푼다 — 틀의 svg:height 를 떼고 text-box 에 fo:min-height 로(LibreOffice 가 자라는 틀을 적는 꼴) · 그림 틀·이미 자라는 틀·표 줄은 그대로 · 한 번 더 불러도 0',
+      [relaxed.boxes, relaxed.xml.includes('<draw:frame draw:style-name="fr1" draw:name="Frame8" text:anchor-type="as-char" svg:width="6.6925in">\n<draw:text-box fo:min-height="7.589in"><table:table table:name="Table16"/>'),
+        relaxed.xml.includes(PIC), relaxed.xml.includes(GROWS), relaxed.xml.includes('<r style:min-row-height="0.3in"/>'), SO.relaxFrameHeights(relaxed.xml).boxes],
+      [1, true, true, true, true, 0]);
     const box = fs.mkdtempSync(path.join(os.tmpdir(), 'soffice-fake-'));
     const fake = path.join(box, 'soffice');
-    /* 가짜 변환기: --convert-to fodt 면 고정 높이 줄 둘이 든 XML 을, pdf 면 받은 파일을 그대로 품은 「PDF」를 낸다(무엇이 넘어왔는지 보려고) · NOROWS 면 고정 줄 없는 XML */
+    /* 가짜 변환기: --convert-to fodt 면 높이 고정 글상자 둘이 든 XML 을, pdf 면 받은 파일을 그대로 품은 「PDF」를 낸다(무엇이 넘어왔는지 보려고) · NOBOX 면 글상자 없는 XML */
     fs.writeFileSync(fake, ['#!/bin/sh', 'to=""; out=""; src=""',
       'while [ $# -gt 0 ]; do case "$1" in --convert-to) to="$2"; shift;; --outdir) out="$2"; shift;; --*|-env:*) ;; *) src="$1";; esac; shift; done',
       'base=$(basename "$src"); base="${base%.*}"',
-      'if [ "$to" = "fodt" ]; then if [ -n "$NOROWS" ]; then printf \'<office><r style:min-row-height="1cm"/></office>\' > "$out/$base.fodt"; else printf \'<office><r style:row-height="1cm"/><r style:row-height="2cm"/></office>\' > "$out/$base.fodt"; fi',
+      'if [ "$to" = "fodt" ]; then if [ -n "$NOBOX" ]; then printf \'<office><r style:min-row-height="1cm"/></office>\' > "$out/$base.fodt"; else printf \'<office><draw:frame draw:name="F1" svg:height="1in"><draw:text-box>a</draw:text-box></draw:frame><draw:frame draw:name="F2" svg:height="2in"><draw:text-box>b</draw:text-box></draw:frame></office>\' > "$out/$base.fodt"; fi',
       'else printf \'%%PDF-1.4 \' > "$out/$base.pdf"; cat "$src" >> "$out/$base.pdf"; fi'].join('\n'));
     fs.chmodSync(fake, 0o755);
     const srcDoc = path.join(box, 'src.hwp'); fs.writeFileSync(srcDoc, 'HWP');
     const rr = SO.sofficeToPdfRelaxed(srcDoc, path.join(box, 'w1'), { soffice: fake });
     const madeText = rr.ok ? readText(rr.made) : '';
-    eq('  두 번 간다 — 중간 꼴의 고정 줄 2곳을 풀어 다시 바꾼 PDF 가 나온다(둘째 변환이 받은 글자에 고정 높이가 없다)',
-      [rr.ok, rr.rows, /^%PDF/.test(madeText), (madeText.match(/style:min-row-height=/g) || []).length, /style:row-height=/.test(madeText)], [true, 2, true, 2, false]);
-    process.env.NOROWS = '1';
+    eq('  두 번 간다 — 중간 꼴의 높이 고정 글상자 2곳을 풀어 다시 바꾼 PDF 가 나온다(둘째 변환이 받은 글자에 고정 높이가 없다)',
+      [rr.ok, rr.boxes, /^%PDF/.test(madeText), (madeText.match(/<draw:text-box fo:min-height="[12]in">/g) || []).length, /svg:height=/.test(madeText)], [true, 2, true, 2, false]);
+    process.env.NOBOX = '1';
     const rn = SO.sofficeToPdfRelaxed(srcDoc, path.join(box, 'w2'), { soffice: fake });
-    delete process.env.NOROWS;
-    eq('  풀 줄이 없으면 다시 바꾸지 않는다(이유를 돌려준다) · 변환기가 없으면 평소 길과 같은 말', [rn.ok, rn.why, SO.sofficeToPdfRelaxed(srcDoc, path.join(box, 'w3'), { soffice: path.join(box, 'none') }).why],
-      [false, '높이가 고정된 표 줄 없음', `변환기 없음(${path.join(box, 'none')})`]);
+    delete process.env.NOBOX;
+    eq('  풀 틀이 없으면 다시 바꾸지 않는다(이유를 돌려준다) · 변환기가 없으면 평소 길과 같은 말', [rn.ok, rn.why, SO.sofficeToPdfRelaxed(srcDoc, path.join(box, 'w3'), { soffice: path.join(box, 'none') }).why],
+      [false, '높이가 고정된 글상자 없음', `변환기 없음(${path.join(box, 'none')})`]);
     fs.rmSync(box, { recursive: true, force: true });
+  }
+  /* ⑱ 배포용 문서(잠긴 한글) — 본문 뽑기가 읽는 것은 안내 문구 한 줄이다. 그것과 대조하면 틀린 「글자 빠짐」(이공계 환수 업무처리기준.hwp 90% · PDF 30쪽은 멀쩡했다) → 잴 수 없음으로 */
+  {
+    process.env.DOC_PDF_AS_LIB = '1';
+    const DPl = await import('../collector/doc-pdf.mjs');
+    const NOTE = '이 문서는 상위 버전의 배포용 문서입니다. 문서를 읽으려면 최신 버전의 글 또는 글 전용 뷰어가 필요합니다.(주의! 현재 상태에서 문서를 저장하는 경우 원래 문서의 내용이 사라집니다.)';
+    eq('⑱ 배포용 문서의 안내 문구는 원본 글자가 아니다 — 그 한 줄이면 잴 수 없음 · 보통 본문·그 문장을 인용한 긴 본문·빈 글은 아니다',
+      [DPl.isLockedNotice(NOTE), DPl.isLockedNotice('2026년도 장학생 선발 공고\n지원 자격은 다음과 같다'), DPl.isLockedNotice(`${NOTE}\n${'가나다라마바사 '.repeat(80)}`), DPl.isLockedNotice(''), DPl.isLockedNotice(null)],
+      [true, false, false, false, false]);
+    const dps = readText(new URL('../collector/doc-pdf.mjs', import.meta.url));
+    eq('  한글 원본 글자를 읽는 자리(defaultOrigText)가 그 판정을 거친다 — 안내 문구면 빈 글(= 대조 안 함 · 사본은 둔다)',
+      /const t = attachmentText\(src\);\s*\n\s*return isLockedNotice\(t\) \? '' : t;/.test(dps), true);
+    eq('  안내 문구와 멀쩡한 PDF 를 대조하면 기준 아래로 나온다(그래서 걸러야 한다) · 걸러 빈 글이면 잴 수 없음(null)',
+      [DPl.keptRatio(NOTE, '2026년도 이공계 우수학생 국가장학사업 환수 업무처리기준(안) 학생의 가능성을 키우는 교육지원으로 미래인재 양성') < DPl.KEEP_MIN, DPl.keptRatio('', '아무 글')], [true, null]);
   }
 }
 
@@ -17559,7 +17579,7 @@ console.log('■ 공고문 PDF 사본 — 배선(deep-fetch 보강 단계 · 경
   const fileMax = Number((await import('../collector/doc-pdf.mjs')).FILE_MAX_SEC) || 999;
   eq(`④ 시한 셈 — 단계 ${docMin}분 ≥ 예산 ${budget}초 + 파일 하나 최대 ${fileMax}초(받기·변환·글자 뽑기 둘) + 설치 여유 180초 · 작업 상한 ${jobCap}분 ≥ 54 + 새 단계 시한`,
     [docMin * 60 >= budget + fileMax + 180, jobCap >= 54 + docMin], [true, true]);
-  /* 글자가 빠져 표 줄을 풀어 다시 가는 길(2026-11-20)은 **같은 예산 안에서** 따로 잰다 — 파일 하나의 시간에 더하면 파일 하나가 예산보다 길어져
+  /* 글자가 빠져 높이 고정 글상자를 풀어 다시 가는 길(2026-11-20)은 **같은 예산 안에서** 따로 잰다 — 파일 하나의 시간에 더하면 파일 하나가 예산보다 길어져
      아무것도 시작하지 못한다(이 관문이 한 번 잡았다: 파일 하나 270초 > 예산 150초 → 바꿈 0). 예산은 두 숫자보다 커야 시작할 수 있다 */
   const DPt = await import('../collector/doc-pdf.mjs');
   const dpSrc = readText(new URL('../collector/doc-pdf.mjs', import.meta.url));

@@ -17,8 +17,9 @@
 
    🔴 한 번 바꾼 첨부는 다시 받지 않는다(같은 이름·파일·글꼴 도장이면 건너뜀) · 실패는 사흘 쉰다(같은 학교를 매일 두드리지 않는다).
    🔴 DOC_PDF_AS_LIB=1 이면 본편을 건너뛴다(관문이 함수만 부른다). DOC_PDF_ROOT 로 저장소를 바꿔 끼운다(관문 임시 폴더).
-   🔴 글자가 빠지면(2026-11-20 첫 실행 — 표의 줄이 접혀 글자가 잘렸다) 표 줄 높이를 풀어 한 번 더 바꿔 더 많이 남은 쪽을 쓴다(convertChecked ·
+   🔴 글자가 빠지면(2026-11-20 첫 실행 — 표가 높이 고정 틀에 갇혀 넘친 줄이 잘렸다) 틀의 높이를 풀어 한 번 더 바꿔 더 많이 남은 쪽을 쓴다(convertChecked ·
       soffice.mjs sofficeToPdfRelaxed). 그래도 모자라면 버리고, 리포트에 **빠진 원본 줄**을 적는다(missingLines).
+   🔴 배포용 문서(잠긴 한글)는 원본 글자를 못 읽는다 — 본문 자리에 안내 문구 한 줄뿐이라 그것과 대조하면 틀린 「글자 빠짐」이 된다(isLockedNotice · 잴 수 없음으로 둔다).
    실행: node collector/doc-pdf.mjs [--dry] [--today=YYYY-MM-DD]
    진단: node collector/doc-pdf.mjs --probe[=공고 id,…]  — 저장 없이 두 길의 결과를 찍는다(.github/workflows/doc-pdf-probe.yml)
    ============================================================ */
@@ -31,7 +32,7 @@ import { cleanAttachName, attachExt, loadFormRules } from './form-rules.mjs';
 import { resolveJsDownload, isHtmlPayload } from './attachment-link.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { attachmentText } from './attachment-text.mjs';
-import { SOFFICE_TIMEOUT_MS, sofficeToPdfRelaxed } from './soffice.mjs';   // 변환 한 곳의 시한·표 줄 높이를 풀어 다시 바꾸기(2026-11-20 soffice.mjs 로 모임)
+import { SOFFICE_TIMEOUT_MS, sofficeToPdfRelaxed } from './soffice.mjs';   // 변환 한 곳의 시한·높이 고정 글상자를 풀어 다시 바꾸기(2026-11-20 soffice.mjs 로 모임)
 
 /* form-pdf.mjs 는 불러오는 순간 본편이 돈다 — 순수 함수만 쓰도록 표시를 먼저 세우고 동적으로 부른다(deepfetch 와 같은 길) */
 process.env.FORM_PDF_AS_LIB = '1';
@@ -43,13 +44,14 @@ export const KEEP_MIN = 0.98;        // 원본 글자 중 PDF 에 남아야 하�
 export const MIN_CHARS = 50;         // 이보다 원본 글자가 적으면 잴 수 없다(그림 문서) — 사본은 두고 리포트에 센다
 export const REST_DAYS = 3;          // 받기·변환에 실패한 첨부는 사흘 쉰다
 /* 만드는 법의 판 번호 — 올리면 **글자가 덜 남은 사본과 쉬고 있는 실패만** 다음 실행에 다시 만든다(다 남은 사본은 안 건드린다 · 학교를 다시 두드리지 않는다).
-   2 = 글자가 빠지면 표 줄 높이를 풀어 다시 바꾼다 · `javascript:` 호출 속 절대 주소를 푼다(2026-11-20 — 첫 실행의 못 바꾼 7개) */
-export const MAKER = 2;
+   3 = 글자가 빠지면 높이 고정 글상자를 풀어 다시 바꾼다 · 배포용 문서는 잴 수 없음으로 · `javascript:` 호출 속 절대 주소를 푼다(2026-11-20 — 첫 실행의 못 바꾼 7개 ·
+       2 는 같은 날 표 줄 높이를 풀던 판 — 진단에서 풀 줄이 0곳으로 나와 버렸다) */
+export const MAKER = 3;
 export const FETCH_TIMEOUT_MS = 30000;
 export const TEXT_TIMEOUT_MS = 20000;   // 글자 대조의 두 도구(hwp-bodytext.py · pdftotext) — 평소 1초 안에 끝난다
 /* 파일 하나의 최대 시간(초) = 받기 + 변환 + 글자 뽑기 둘 — 예산 검사와 관문 「공고문 PDF 사본 — 배선」 ④가 같은 숫자를 쓴다 */
 export const FILE_MAX_SEC = (FETCH_TIMEOUT_MS + SOFFICE_TIMEOUT_MS + 2 * TEXT_TIMEOUT_MS) / 1000;
-/* 글자가 빠져 표 줄 높이를 풀어 다시 갈 때 더 드는 최대 시간(초) = 변환 둘(원본 → 중간 꼴 → PDF) + 글자 뽑기 하나.
+/* 글자가 빠져 높이 고정 글상자를 풀어 다시 갈 때 더 드는 최대 시간(초) = 변환 둘(원본 → 중간 꼴 → PDF) + 글자 뽑기 하나.
    🔴 파일 하나의 시간에 더하지 않고 **따로 잰다**(mayRelax) — 더하면 파일 하나가 예산보다 길어져 아무것도 시작하지 못한다(관문이 잡았다).
       남은 예산이 이보다 적으면 다시 가지 않고 판 번호를 안 적어 다음 실행이 잇는다 */
 export const RELAX_MAX_SEC = (2 * SOFFICE_TIMEOUT_MS + TEXT_TIMEOUT_MS) / 1000;
@@ -142,13 +144,19 @@ export function resting(tried, key, today, restDays = REST_DAYS) {
 }
 
 /* ── 글자 뽑기 (글자 대조의 두 쪽) ───────────────────────────────────────────── */
+/* 배포용 문서(한글의 「배포용 문서로 저장」 — 본문이 따로 잠겨 있다)에서 본문 뽑기(hwp-bodytext.py)가 읽는 것은 본문 자리에 놓인 안내 문구 한 줄뿐이다:
+   「이 문서는 상위 버전의 배포용 문서입니다. 문서를 읽으려면 최신 버전의 글 또는 글 전용 뷰어가 필요합니다.(주의! …)」.
+   2026-11-20 첫 실행: 이공계 우수학생 국가장학사업 환수 업무처리기준.hwp 가 「글자 빠짐(90%)」 — PDF 는 30쪽이 멀쩡했고(변환기는 잠긴 본문을 연다),
+   대조한 '원본'이 그 문구 한 줄이었다(흔한 글자라 90%가 우연히 맞았다). 문구가 있고 글이 짧을 때만 — 긴 본문에 그 문장이 인용된 문서는 그대로 잰다 */
+export const isLockedNotice = (text) => { const s = String(text || ''); return s.length < 400 && /이 문서는 상위 버전의 배포용 문서입니다/.test(s); };
 /** 원본 글자 — HWP 는 hwp-bodytext.py 가 본문을 <파일>.body.txt 로 남기게 한 뒤 attachmentText 로 읽는다(그 함수가 .body.txt 를 먼저 본다).
  *  HWPX·DOCX 는 attachmentText 가 바로 읽는다 · 그 밖(.doc)은 '' — 잴 수 없다. 🔴 늘 임시 폴더의 사본에 부른다(저장소에 .body.txt 를 흘리지 않게) */
 export function defaultOrigText(src) {
   const ext = (String(src).match(/\.(\w+)$/) || [, ''])[1].toLowerCase();
   if (ext === 'hwp') {
     spawnSync('python3', [path.join(HERE, 'hwp-bodytext.py'), path.dirname(src)], { encoding: 'utf8', timeout: TEXT_TIMEOUT_MS });
-    return attachmentText(src);
+    const t = attachmentText(src);
+    return isLockedNotice(t) ? '' : t;   // 배포용 문서 — 읽은 것이 본문이 아니라 안내 문구다(잴 수 없음)
   }
   return ext === 'hwpx' || ext === 'docx' ? attachmentText(src) : '';
 }
@@ -187,9 +195,9 @@ async function obtainSrc({ t, f, root, work, fetchImpl }) {
   return { src };
 }
 
-/* 바꾸고 잰다 — 평소 길로 한 번, **글자가 빠졌으면** 표 줄 높이를 풀어 한 번 더 가서 더 많이 남은 쪽을 고른다(soffice.mjs sofficeToPdfRelaxed 머리말).
+/* 바꾸고 잰다 — 평소 길로 한 번, **글자가 빠졌으면** 높이 고정 글상자를 풀어 한 번 더 가서 더 많이 남은 쪽을 고른다(soffice.mjs sofficeToPdfRelaxed 머리말).
    글자가 다 남은 사본(대부분)은 평소 길 그대로다 — 쪽 모양이 바뀌지 않는다. 진단 모드(--probe)가 같은 함수를 부른다(두 길의 결과 tries 를 그대로 찍는다).
-   돌려주는 것: { ok: false, why } | { ok: true, pdf, r, ratio, rows?, later?, orig, text, tries: [{ how, ratio?, pages?, miss?, why? }] }
+   돌려주는 것: { ok: false, why } | { ok: true, pdf, r, ratio, boxes?, later?, orig, text, tries: [{ how, ratio?, pages?, miss?, why? }] }
      later — 글자가 빠졌는데 남은 예산이 모자라(mayRelax) 다시 가지 못했다. 부른 쪽이 판 번호(MAKER)를 안 적어 다음 실행이 잇는다 */
 function convertChecked({ src, work, name, convert, relax, origText, pdfText, mayRelax = () => true }) {
   const soffice = process.env.DOC_PDF_SOFFICE || process.env.FORM_PDF_SOFFICE || 'soffice';
@@ -202,7 +210,7 @@ function convertChecked({ src, work, name, convert, relax, origText, pdfText, ma
   const tries = [{ how: '평소', ratio: best.ratio, pages: r.pages, miss: missingLines(orig, text, 6) }];
   if (best.ratio != null && best.ratio < 1 && !mayRelax()) {
     best.later = true;
-    tries.push({ how: '표 줄 풂', why: '남은 예산이 모자라 다음 실행으로' });
+    tries.push({ how: '글상자 풂', why: '남은 예산이 모자라 다음 실행으로' });
   } else if (best.ratio != null && best.ratio < 1) {
     const loose = relax(src, path.join(work, 'loose'), { soffice });
     const second = path.join(work, 'out-relaxed.pdf');
@@ -210,9 +218,9 @@ function convertChecked({ src, work, name, convert, relax, origText, pdfText, ma
     if (r2 && r2.ok) {
       const text2 = pdfText(second);
       const ratio2 = keptRatio(orig, text2);
-      tries.push({ how: `표 줄 ${loose.rows}곳 풂`, ratio: ratio2, pages: r2.pages, miss: missingLines(orig, text2, 6) });
-      if (ratio2 != null && ratio2 > best.ratio) best = { pdf: second, r: r2, text: text2, ratio: ratio2, rows: loose.rows };
-    } else tries.push({ how: '표 줄 풂', why: (loose && !loose.ok && loose.why) || (r2 && r2.why) || '못 함' });
+      tries.push({ how: `글상자 ${loose.boxes}곳 풂`, ratio: ratio2, pages: r2.pages, miss: missingLines(orig, text2, 6) });
+      if (ratio2 != null && ratio2 > best.ratio) best = { pdf: second, r: r2, text: text2, ratio: ratio2, boxes: loose.boxes };
+    } else tries.push({ how: '글상자 풂', why: (loose && !loose.ok && loose.why) || (r2 && r2.why) || '못 함' });
   }
   return { ok: true, ...best, orig, tries };
 }
@@ -229,7 +237,7 @@ async function makeOne({ t, f, file, root, outDir, today, fetchImpl, convert, re
     fs.mkdirSync(path.dirname(out), { recursive: true });
     fs.copyFileSync(c.pdf, out);   // 임시 폴더와 저장소가 다른 디스크일 수 있어 옮기기(rename) 대신 복사
     /* 판 번호(mk)는 이 판의 길을 끝까지 간 사본에만 — 예산이 모자라 다시 가지 못한 사본(later)은 안 적어 다음 실행이 다시 만든다 */
-    return { ok: true, entry: { file, name: f.name, pages: c.r.pages, bytes: c.r.bytes, fonts: FP.FONT_STAMP, kept: c.ratio == null ? null : Math.round(c.ratio * 1000) / 1000, ...(c.rows ? { rows: c.rows } : {}), ...(c.later ? {} : { mk: MAKER }), at: today } };
+    return { ok: true, entry: { file, name: f.name, pages: c.r.pages, bytes: c.r.bytes, fonts: FP.FONT_STAMP, kept: c.ratio == null ? null : Math.round(c.ratio * 1000) / 1000, ...(c.boxes ? { boxes: c.boxes } : {}), ...(c.later ? {} : { mk: MAKER }), at: today } };
   } catch (e) {
     const why = [e && e.name, e && e.cause && (e.cause.code || e.cause.message), e && e.message].filter(Boolean).join(' · ').replace(/\s+/g, ' ').slice(0, 100);
     return { ok: false, why: `오류(${why || '알 수 없음'})` };
@@ -257,9 +265,9 @@ export function buildDocReport({ today, targets, done, failed, skipped, rested, 
   const bucket = new Map();
   for (const k of kept) { const b = k == null ? '대조 안 함' : `${Math.floor(k * 100)}%`; bucket.set(b, (bucket.get(b) || 0) + 1); }
   if (kept.length) L.push(`앱에 나가는 사본 ${kept.length}개의 글자 대조 — ${[...bucket].sort((a, b) => b[0].localeCompare(a[0], 'ko', { numeric: true })).map(([b, n]) => `${b} ${n}`).join(' · ')}`, '');
-  /* 평소 길로는 글자가 빠져 표 줄 높이를 풀어 다시 바꾼 사본(soffice.mjs sofficeToPdfRelaxed) — 지금 앱에 나가는 것 전체에서 센다 */
-  const loosened = Object.values(index.items || {}).flat().filter((e) => e && e.rows).length;
-  if (loosened) L.push(`그중 표의 줄이 접혀 글자가 잘리던 것을 줄 높이를 풀어 다시 바꾼 사본 ${loosened}개`, '');
+  /* 평소 길로는 글자가 빠져 높이 고정 글상자를 풀어 다시 바꾼 사본(soffice.mjs sofficeToPdfRelaxed) — 지금 앱에 나가는 것 전체에서 센다 */
+  const loosened = Object.values(index.items || {}).flat().filter((e) => e && e.boxes).length;
+  if (loosened) L.push(`그중 표가 높이 고정 틀에 갇혀 글자가 잘리던 것을 틀을 풀어 다시 바꾼 사본 ${loosened}개`, '');
   if (failed.length) {
     const by = new Map();
     for (const f of failed) { const k = f.why.replace(/\(\d+%\)$/, '(…%)').replace(/\(\d+KB\)$/, '(…KB)'); by.set(k, (by.get(k) || 0) + 1); }
@@ -269,7 +277,7 @@ export function buildDocReport({ today, targets, done, failed, skipped, rested, 
     failed.slice(0, 30).forEach((f) => L.push(`  - ${f.id} · ${f.name} — ${f.why}${(f.miss || []).length ? ` · 빠진 줄: ${f.miss.map((m) => `「${m}」`).join(' ')}` : ''}`));
     L.push('');
   }
-  if (unchecked.length) { L.push(`### 글자 대조를 못 한 사본 — ${unchecked.length}개 (그림 문서·.doc·PDF 글자 도구 없음 · 사본은 둠)`); unchecked.slice(0, 30).forEach((u) => L.push(`- ${u.id} · ${u.name}`)); L.push(''); }
+  if (unchecked.length) { L.push(`### 글자 대조를 못 한 사본 — ${unchecked.length}개 (그림 문서·.doc·배포용 한글·PDF 글자 도구 없음 · 사본은 둠)`); unchecked.slice(0, 30).forEach((u) => L.push(`- ${u.id} · ${u.name}`)); L.push(''); }
   if (dropped.length) { L.push(`### 마감이 지나 지운 공고 — ${dropped.length}건`); dropped.slice(0, 30).forEach((d) => L.push(`- ${d}`)); L.push(''); }
   return L.join('\n');
 }
@@ -304,7 +312,7 @@ export async function runDocPdf({ root, today, dry = false, budgetSec = BUDGET_S
   const t0 = Date.now();
   /* 🔴 남은 예산이 파일 하나의 최대 시간(받기 + 변환)보다 적으면 시작하지 않는다 — 단계 시한에 끊기지 않게(form-pdf 11-19 사고와 같은 셈) */
   const overBudget = () => (Date.now() - t0) / 1000 + FILE_MAX_SEC > budgetSec;
-  /* 표 줄을 풀어 다시 가는 길도 같은 예산 안에서 — 남은 시간이 그 길의 최대 시간보다 적으면 가지 않는다(다음 실행이 잇는다) */
+  /* 글상자를 풀어 다시 가는 길도 같은 예산 안에서 — 남은 시간이 그 길의 최대 시간보다 적으면 가지 않는다(다음 실행이 잇는다) */
   const mayRelax = () => (Date.now() - t0) / 1000 + RELAX_MAX_SEC <= budgetSec;
   /* 🔴 넘어져도 지금까지 바꾼 것은 남는다 — 색인은 파일 하나 끝날 때마다 쓴다 */
   const flush = () => { if (dry) return; fs.mkdirSync(outDir, { recursive: true }); index.updatedAt = today; fs.writeFileSync(indexPath, JSON.stringify(index, null, 1) + '\n'); };
@@ -330,7 +338,7 @@ export async function runDocPdf({ root, today, dry = false, budgetSec = BUDGET_S
       if (r.ok) {
         next.push(r.entry);
         delete index.tried[key];
-        done.push({ id: t.id, name: f.name, rows: r.entry.rows || 0 });
+        done.push({ id: t.id, name: f.name, boxes: r.entry.boxes || 0 });
         if (r.entry.kept == null) unchecked.push({ id: t.id, name: f.name });
       } else {
         index.tried[key] = { at: today, why: r.why, ...(r.later ? {} : { mk: MAKER }) };   // 예산이 모자라 다시 가지 못한 실패는 쉬지 않는다(다음 실행이 바로 잇는다)
@@ -365,7 +373,7 @@ export async function runDocPdf({ root, today, dry = false, budgetSec = BUDGET_S
 
 /* ── 진단 모드 (--probe) ──────────────────────────────────────────────────────
    「이 파일은 왜 PDF 로 안 바뀌나 · 무엇이 빠지나」를 진짜 변환기로 본다(개발 컴퓨터에는 변환기가 없다 — doc-pdf-probe.yml 이 클라우드에서 돌린다).
-   🔴 data/ 에 아무것도 쓰지 않는다 · 쉼도 건너뛴다 — 결과(원본 · 평소 사본 · 표 줄을 푼 사본 · 중간 꼴 fodt)는 keepDir 에만 남긴다(워크플로가 아티팩트로 올린다).
+   🔴 data/ 에 아무것도 쓰지 않는다 · 쉼도 건너뛴다 — 결과(원본 · 평소 사본 · 글상자를 푼 사본 · 중간 꼴 fodt)는 keepDir 에만 남긴다(워크플로가 아티팩트로 올린다).
    대상: ids(공고 id) — 비우면 실패 장부의 「글자 빠짐」과, 글자가 덜 남은 채 나가 있는 사본. 본편과 같은 함수(obtainSrc · convertChecked)를 부른다 */
 export async function runDocProbe({ root, today, ids = [], keepDir = '', fetchImpl = fetch, convert = FP.convertOne, relax = sofficeToPdfRelaxed,
   origText = defaultOrigText, pdfText = defaultPdfText, isApplicationForm = null, log = console.log } = {}) {

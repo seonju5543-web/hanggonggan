@@ -40,26 +40,32 @@ export function sofficeToPdf(src, work, { soffice = 'soffice' } = {}) {
   return sofficeConvert(src, work, 'pdf', { soffice });
 }
 
-/* ── 표 줄 높이를 풀어 다시 바꾸기 (2026-11-20 · 공고문 PDF 로봇 첫 실행 — 「글자 빠짐」 4개의 원인) ─────────────────────
-   실측: 귀농인 자녀 학자금 시행지침(hwpx)의 PDF 9쪽에서 평가표 마지막 줄(「기타여건 15점」 · 원본 글자의 1.9%)이 높이 0 에 가깝게 접혀 글자가 표 밖으로 잘렸다.
-   한글은 칸 높이를 '적어도 이만큼'으로 쓰고 글이 넘치면 칸이 자라는데, 가져오기 확장이 그 높이를 '딱 이만큼'으로 옮기면 넘친 글이 잘린다.
-   그래서 한 번 더 간다: 원본 → 한 장짜리 열린 문서(fodt · XML 한 파일이라 압축을 풀 일이 없다) → 표 줄의 '딱 이만큼'(style:row-height)을
-   '적어도 이만큼'(style:min-row-height)으로 → PDF. 글이 칸에 들어가는 줄은 높이가 그대로라 쪽 모양이 안 바뀐다.
+/* ── 높이가 고정된 글상자를 풀어 다시 바꾸기 (2026-11-20 · 공고문 PDF 로봇 첫 실행 — 「글자 빠짐」의 원인) ─────────────────────
+   실측(진단 doc-pdf-probe · 중간 꼴을 열어 봄): 귀농인 자녀 학자금 시행지침(hwpx)의 PDF 9쪽에서 평가표 마지막 두 줄(「기타여건 15점」 · 원본 글자의 1.9%)이 사라졌다.
+   가져오기 확장(H2Orestart)은 글자처럼 놓인 표·글상자를 **높이가 고정된 틀**(`<draw:frame … svg:height="7.589in"><draw:text-box>`)에 넣는데,
+   우리 글꼴로 그리면 표가 그 높이보다 길어져 넘친 줄이 틀 밖으로 잘린다. 글자는 중간 꼴(fodt)까지 100% 있고 PDF 로 그릴 때만 빠졌다(통영시 저소득 공고 3곳 96%도 같은 꼴 —
+   글자가 빠진 파일은 전부 이런 틀이 6~8개였다). 처음 세운 가설(표 줄 높이 고정 `style:row-height`)은 진단에서 0곳으로 나와 버렸다 — 줄은 이미 '적어도 이만큼'이었다.
+   그래서 한 번 더 간다: 원본 → 한 장짜리 열린 문서(fodt · XML 한 파일이라 압축을 풀 일이 없다) → 틀의 '딱 이만큼'(frame 의 svg:height)을
+   '적어도 이만큼'(text-box 의 fo:min-height — LibreOffice 가 자라는 틀을 저장하는 꼴 그대로)으로 → PDF. 글이 틀에 들어가는 문서는 모양이 안 바뀐다.
    🔴 평소 길을 바꾸지 않는다 — 부르는 쪽(doc-pdf)이 **글자가 빠졌을 때만** 이 길로 다시 가서 더 많이 남은 쪽을 쓴다(신청서·쪽 그림 로봇은 안 부른다).
-   돌려주는 것: { ok: true, made, rows } | { ok: false, why } — rows 는 높이를 푼 표 줄 모양의 수(0 이면 풀 것이 없어 다시 바꾸지 않는다) */
-export const FIXED_ROW = /\bstyle:row-height="/g;
-export const relaxRowHeights = (fodt) => String(fodt || '').replace(FIXED_ROW, 'style:min-row-height="');
+   돌려주는 것: { ok: true, made, boxes } | { ok: false, why } — boxes 는 높이를 푼 틀의 수(0 이면 풀 것이 없어 다시 바꾸지 않는다) */
+const FIXED_BOX = /<draw:frame\b([^>]*?)\s+svg:height="([^"]+)"([^>]*)>(\s*)<draw:text-box\b(?![^>]*\bfo:min-height=)([^>]*)>/g;
+/** 중간 꼴(fodt)에서 높이가 고정된 글상자 틀을 자라는 틀로 — { xml, boxes }. 그림 틀·이미 자라는 틀·다른 글자는 그대로 */
+export function relaxFrameHeights(fodt) {
+  let boxes = 0;
+  const xml = String(fodt || '').replace(FIXED_BOX, (m, a, h, b, ws, c) => { boxes += 1; return `<draw:frame${a}${b}>${ws}<draw:text-box fo:min-height="${h}"${c}>`; });
+  return { xml, boxes };
+}
 export function sofficeToPdfRelaxed(src, work, { soffice = 'soffice' } = {}) {
   fs.mkdirSync(work, { recursive: true });
   const flat = sofficeConvert(src, work, 'fodt', { soffice });
   if (!flat.ok) return flat;
-  const xml = fs.readFileSync(flat.made, 'utf8');
-  const rows = (xml.match(FIXED_ROW) || []).length;
-  if (!rows) return { ok: false, why: '높이가 고정된 표 줄 없음' };
+  const { xml, boxes } = relaxFrameHeights(fs.readFileSync(flat.made, 'utf8'));
+  if (!boxes) return { ok: false, why: '높이가 고정된 글상자 없음' };
   const dir = path.join(work, 'relaxed');
   fs.mkdirSync(dir, { recursive: true });
   const loose = path.join(dir, path.basename(flat.made));
-  fs.writeFileSync(loose, relaxRowHeights(xml));
+  fs.writeFileSync(loose, xml);
   const pdf = sofficeConvert(loose, dir, 'pdf', { soffice });
-  return pdf.ok ? { ok: true, made: pdf.made, rows } : pdf;
+  return pdf.ok ? { ok: true, made: pdf.made, boxes } : pdf;
 }
