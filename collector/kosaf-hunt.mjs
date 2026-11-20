@@ -39,7 +39,8 @@ import { extractLinks, extractDatedRows } from './board-links.mjs';
 import { pickMenuLinks, scoreBoardPage, metaRefreshTarget, isNoticeLike } from './find-boards.mjs';
 import { netReason } from './fetch-board.mjs';
 import { makeBudget, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
-import { readIndexData, buildIndex, pickKosafPost, hostAllowed, hostOf, normCandUrl, looksLikePost, candId, loadCandidates } from './link-candidates.mjs';
+import { readIndexData, buildIndex, pickKosafPost, scoreKosafPost, hostAllowed, hostOf, normCandUrl, looksLikePost, looksLikePostLoose, candId, loadCandidates } from './link-candidates.mjs';
+import { titleFingerprint } from './detail-url.mjs';
 import { urlKey } from './url-key.mjs';
 
 const require = createRequire(import.meta.url);
@@ -59,18 +60,34 @@ const SEARCH_URL = 'https://naverapihub.apigw.ntruss.com/search/v1/webkr';
 const NOTE = '층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.';
 
 /* ── 순수 함수 ──────────────────────────────────────────────────────── */
-/** 바로잡기(fix)가 이미 그 회차를 가리키는가 — 앱(source-link.js ⑥)과 같은 열쇠·회차 규칙 */
-export function hasUsableFix(t, fixes) {
-  const f = (fixes || {})[`id:kosaf-${t.key}`];
-  return !!(f && f.url && SL.fixUrlUsable(f.url) && (!f.round || f.round === (t.deadline || '')));
+/** 앱이 이미 그 회차의 개별 글로 보내는가 — **앱의 규칙 그대로**(source-link.js ⑥ linkFixFor: 사람 바로잡기 data/link-fixes.json 이 먼저 ·
+    로봇 바로잡기 data/link-check.json · 층2는 회차(round)가 마감과 같을 때만).
+    🔴 2026-11-20 실측: 예전엔 로봇 장부(link-check.json)만 봐서, 사람이 이미 원문을 넣은 공고 43/46건에 날마다 검색 상한(40번)을 다 썼다
+       ('40번 물어 글 0건' 사흘). KOSAF 마감이 바뀌면(새 회차) 옛 바로잡기는 안 맞아 저절로 다시 대상이 된다.
+    fixes = 로봇 fix · human = 사람 fix — 모듈 상태를 쓰고 되돌린다(publishFix 와 같은 버릇) */
+export function hasUsableFix(t, fixes, human = {}) {
+  if (!t || !t.appItem) return false;
+  SL.setLinkChecks({ fix: fixes || {} });
+  SL.setLinkFixes({ fix: human || {} });
+  try { return !!SL.linkFixFor(t.appItem); } finally { SL.setLinkChecks(null); SL.setLinkFixes(null); }
+}
+/** 한국장학재단 자체 사업(isKosafOwnOrg · 데이터의 org 로만) — 회차 글이 따로 없고 원문은 재단 누리집의 그 사업 안내 쪽이다.
+    KOSAF 가 적은 주소가 kosaf.go.kr 의 **글 꼴**(사업 안내 쪽)이면 검색하지 않고 그 주소를 후보(source data)로 바로 적는다 —
+    확인 로봇이 같은 날 학생처럼 열어 사업 이름·사업 기간을 보고 판정한다(등록되자마자 원문 · 2026-11-20). 첫 화면 꼴은 적지 않는다 */
+export function kosafOwnLine(t, { today = '' } = {}) {
+  if (!t || !t.kosafOwn || !t.raw) return null;
+  const u = normCandUrl(SL.decodeUrlEntities(t.raw));
+  if (!/(^|\.)kosaf\.go\.kr$/i.test(hostOf(u)) || SL.linkShape(u) !== 'page' || !SL.fixUrlUsable(u)) return null;
+  return { target: { ds: 'kosaf', key: t.key }, url: u, title: t.program || '', source: 'data', by: BY, addedAt: today,
+    note: 'KOSAF 가 적은 한국장학재단 사업 안내 쪽 — 자체 사업이라 그 쪽이 원문 후보' };
 }
 /** 사냥할 층2 대상 — 마감 전 · 회차 있음 · 아직 개별 글이 없음 → 재단 호스트별 묶음 */
-export function huntTargets(index, { today = '', fixes = {}, only = '' } = {}) {
+export function huntTargets(index, { today = '', fixes = {}, human = {}, only = '' } = {}) {
   const groups = new Map();
   for (const t of (index && index.targets) || []) {
     if (t.ds !== 'kosaf' || !t.round || !t.raw) continue;
     if (t.deadline && today && t.deadline < today) continue;
-    if (hasUsableFix(t, fixes)) continue;
+    if (hasUsableFix(t, fixes, human)) continue;
     const host = hostOf(t.raw);
     if (!host || (only && !host.includes(String(only).toLowerCase()))) continue;
     if (!groups.has(host)) groups.set(host, { host, home: t.raw, org: t.org || '', targets: [] });
@@ -140,20 +157,45 @@ export function searchQuery(t) {
   const org = String((t && t.org) || '').trim(); const prog = String((t && t.program) || '').trim();
   return [org, prog && org && prog.includes(org) ? '' : prog, '공고'].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
-/** 네이버 검색 응답 → 글 줄 — 그 재단 사이트의 글 주소만 · 제목의 <b> 강조·기호를 걷는다 */
-export function searchRows(json, allowed) {
+/** 둘째 물을 말 — KOSAF 에 올라온 공고문 파일 이름(확장자·끝 꼬리 「(15)」·「ver-1.5」·날짜 도장·「공고문」을 뗀 것).
+    2026-11-20 실측: 정답 글 55건 중 첫 말로 6건, 파일 이름으로 7건, 둘 중 하나로 12건이 검색 결과에 있었다(「재단+해+장학생 선발」은 더한 것이 없고
+    남의 사업 보도자료만 끌어와 쓰지 않는다). 첫 말과 같으면 한 번만 묻는다 */
+export function searchQueries(t) {
+  const first = searchQuery(t);
+  const a = String(((t && t.attachTitles) || [])[0] || '')
+    .replace(/\.[a-z0-9]{2,5}$/i, '')
+    .replace(/\(\s*\d{1,3}\s*\)|ver[-_ .]?\d+(?:\.\d+)*/gi, ' ')
+    .replace(/(?<![\d년.])\d{4,8}\s*$/, ' ')
+    .replace(/\s*공고문\s*$/, ' ')
+    .replace(/\s+/g, ' ').trim();
+  const out = [first];
+  if (a.length >= 8 && titleFingerprint(a) !== titleFingerprint(first)) out.push(a);
+  return out.filter(Boolean);
+}
+/** 네이버 검색 응답 → 글 줄 — 그 재단 사이트의 글 주소만 · 제목의 <b> 강조·기호를 걷는다 ·
+    요약(description)은 snippet 으로 남긴다 — 검색 제목은 대개 그 쪽의 뭉뚱그린 창 제목(「공지사항 - 일신문화재단」)이고 진짜 글 제목·첨부 이름은
+    요약에 있다(2026-11-20 실측). 🔴 snippet 은 글을 **고르는** 데만 쓴다(scoreKosafPost) — 확인 로봇에 넘기는 제목은 검색 제목 그대로다 */
+export function searchRows(json, allowed, t = null) {
   const items = json && Array.isArray(json.items) ? json.items : [];
   const clean = (x) => SL.decodeUrlEntities(String(x || '').replace(/<[^>]*>/g, '')).replace(/&(quot|#39|apos|amp|lt|gt);/g, (m, k) => ({ quot: '"', '#39': "'", apos: "'", amp: '&', lt: '<', gt: '>' })[k]).replace(/\s+/g, ' ').trim();
   const seen = new Set(); const out = [];
   for (const it of items) {
     const u = normCandUrl(SL.decodeUrlEntities(String((it && it.link) || '')));
     const title = clean(it && it.title);
-    if (!title || !/^https?:/i.test(u) || !hostAllowed(u, allowed) || SL.linkShape(u) !== 'page' || !looksLikePost(u)) continue;
+    const snippet = clean(it && it.description);
+    if (!title || !/^https?:/i.test(u) || !hostAllowed(u, allowed) || SL.linkShape(u) !== 'page') continue;
+    /* 경로만으로 된 글 꼴은 그 사업·재단 이름으로 3점 이상 받은 검색 줄만(looksLikePostLoose · 2026-11-20) */
+    if (!looksLikePost(u) && !(t && looksLikePostLoose(u) && looseHitOk(t, { url: u, title, snippet }))) continue;
     const k = urlKey(u);
     if (seen.has(k)) continue;
-    seen.add(k); out.push({ url: u, title });
+    seen.add(k);
+    out.push(snippet ? { url: u, title, snippet } : { url: u, title });
   }
   return out;
+}
+function looseHitOk(t, row) {
+  const r = scoreKosafPost(t, row);
+  return r.score >= 3 && r.why.some((w) => /^(?:사업 이름|재단 이름)/.test(w));
 }
 /** 검색할 공고 — 오늘 홈페이지 길로 못 고른 것(leftover) + **오늘 홈페이지를 안 연** 공고 가운데 글 후보(url 줄)가 아직 없는 것.
     🔴 2026-11-18: 검색이 '오늘 홈페이지를 다시 본 재단'(3일에 한 번)에만 붙어 있어, 열쇠가 들어온 뒤에도 하루 몇 곳만 물었다 —
@@ -161,10 +203,17 @@ export function searchRows(json, allowed) {
     · 오늘 연 공고(crawledKeys)만 뺀다 — 예산에 잘려 못 연 재단의 공고는 검색이 받는다.
     · 뒤쪽은 **오래 안 물은 것부터**(searchedAt · 장부 searched) — 대상이 상한(SEARCH_MAX)보다 많으면 늘 같은 꼬리가 밀린다(리뷰 11-18: 63건 vs 60).
     · 같은 공고 묶음(alsoCodes)은 하나만 묻는다 — 둘 다 물으면 한 주소에 줄이 둘 생긴다(한 주소 한 줄 · huntLines 와 같은 규칙). */
-export function searchQueue(groups, crawledKeys, leftover, prevItems, searchedAt = {}) {
+/*  · (2026-11-20) 확인 로봇이 이번 회차에 이미 **거절한** url 줄(rejected · 「마감이 다름」 말고)은 글 후보로 치지 않는다 — 그 줄이 남아 있는 한
+      공고가 검색에서 빠져 재단을 다시 보는 날(3일 넘게)까지 기다렸다(ikef wr_id=102 「다른 글이 열림」). rejected = Set('<코드>|<주소 열쇠>') */
+export function searchQueue(groups, crawledKeys, leftover, prevItems, searchedAt = {}, rejected = new Set()) {
   const crawled = crawledKeys instanceof Set ? crawledKeys : new Set(crawledKeys || []);
   const hasUrl = new Set();
-  for (const l of prevItems || []) if (l && l.url) for (const k of [l.target && l.target.key, ...(l.also || [])]) hasUrl.add(String(k || '').replace(/^kosaf-/, ''));
+  for (const l of prevItems || []) {
+    if (!l || !l.url) continue;
+    const key = String((l.target && l.target.key) || '').replace(/^kosaf-/, '');
+    if (rejected.has(`${key}|${urlKey(normCandUrl(l.url))}`)) continue;
+    for (const k of [key, ...(l.also || [])]) hasUrl.add(String(k || '').replace(/^kosaf-/, ''));
+  }
   const rest = [];
   for (const g of groups || []) for (const t of g.targets) if (!crawled.has(t.key) && !hasUrl.has(String(t.key))) rest.push(t);
   const when = (t) => String((searchedAt || {})[t.key] || '');
@@ -174,6 +223,17 @@ export function searchQueue(groups, crawledKeys, leftover, prevItems, searchedAt
     if (covered.has(String(t.key))) continue;
     for (const k of [t.key, ...(t.alsoCodes || [])]) covered.add(String(k));
     out.push(t);
+  }
+  return out;
+}
+/** 확인 로봇이 이번 회차에 거절로 끝낸 층2 후보 — Set('<코드>|<주소 열쇠>') · 「마감이 다름」은 뺀다(KOSAF 마감이 고쳐지면 다시 맞을 수 있다) */
+export function rejectedCandKeys(candState, index) {
+  const out = new Set();
+  for (const e of Object.values(candState || {})) {
+    if (!e || e.ds !== 'kosaf' || e.status !== 'rejected' || !e.url || /마감이 다름/.test(String(e.why || ''))) continue;
+    const t = index && index.find ? index.find({ ds: 'kosaf', key: String(e.key) }) : null;
+    if (!t || !e.round || e.round !== (t.deadline || '')) continue;
+    out.add(`${e.key}|${urlKey(normCandUrl(e.url))}`);
   }
   return out;
 }
@@ -303,15 +363,23 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
   const idxData = readIndexData(root);
   const index = buildIndex(idxData);
   const fixes = (readJ('data/link-check.json', {}).fix) || {};
-  const groups = huntTargets(index, { today, fixes, only });
-  const liveKeys = new Set(huntTargets(index, { today, fixes }).flatMap((g) => g.targets.map((t) => t.key)));   // 🔴 only 로 좁혀도 다른 재단의 줄은 지우지 않는다
+  const human = (readJ('data/link-fixes.json', {}).fix) || {};   // 사람이 넣은 원문(앱이 늘 먼저 쓴다) — 이미 원문이 있는 공고에 검색을 쓰지 않는다
+  const allGroups = huntTargets(index, { today, fixes, human, only });
+  const liveKeys = new Set(huntTargets(index, { today, fixes, human }).flatMap((g) => g.targets.map((t) => t.key)));   // 🔴 only 로 좁혀도 다른 재단의 줄은 지우지 않는다
+  /* 한국장학재단 자체 사업 — 사업 안내 쪽 주소를 바로 후보로(검색·홈페이지 뒤지기 없이) */
+  const ownLines = [];
+  for (const g of allGroups) for (const t of g.targets) { const l = kosafOwnLine(t, { today }); if (l) ownLines.push(l); }
+  const ownKeys = new Set(ownLines.map((l) => l.target.key));
+  const groups = allGroups.map((g) => ({ ...g, targets: g.targets.filter((t) => !ownKeys.has(t.key)) })).filter((g) => g.targets.length);
+  const rejected = rejectedCandKeys(readJ('collector/link-candidates-state.json', {}), index);
   const state = readJ('collector/kosaf-hunt-state.json', { v: 1, hosts: {} });
   const prevFile = readJ('collector/kosaf-hunt.json', { v: 1, note: NOTE, items: [] });
   const cfg = readJ('collector/external-sources.json', { sources: [], parked: [] });
   const budget = makeBudget(BUDGET_MS);
   const daysAgo = (d) => (d ? Math.floor((Date.parse(today) - Date.parse(d)) / 86400000) : Infinity);
   const due = groups.filter((g) => all || daysAgo((state.hosts[g.host] || {}).checkedAt) >= RETRY_DAYS);
-  const huntedKeys = new Set(); const newLines = []; const report = [];
+  const huntedKeys = new Set(ownKeys); const newLines = [...ownLines]; const report = [];
+  if (ownLines.length) report.push(`- 🏛️ **한국장학재단 자체 사업** ${ownLines.length}건 — KOSAF 가 적은 사업 안내 쪽을 바로 후보로(확인 로봇이 학생처럼 열어 사업 기간을 본다)`);
   const stats = { groups: groups.length, due: due.length, hunted: 0, found: 0, boardLines: 0, boardsAdded: 0, boardsFilled: 0, noPage: 0, nothing: 0 };
   const keys = searchKeys(); const leftover = [];   // 홈페이지 길로 글을 못 고른 공고 — ⑤ 검색 길이 받는다
   const searchedAt = { ...(state.searched || {}) };   // 공고마다 마지막으로 검색에 물은 날 — 상한에 걸리면 오래 안 물은 것부터(searchQueue)
@@ -352,18 +420,24 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
   if (!keys) sstat.why = '꺼짐(열쇠 없음 — GitHub Secrets NAVER_CLIENT_ID · NAVER_CLIENT_SECRET)';
   else {
     const searched = [];
-    for (const t of searchQueue(groups, huntedKeys, leftover, prevFile.items, searchedAt)) {
-      if (sstat.asked >= SEARCH_MAX) { sstat.why = `상한 ${SEARCH_MAX}번 — 나머지는 다음 실행(오래 안 물은 것부터)`; break; }
-      if (!budget.hasRoom(PAGE_MS)) { sstat.why = '예산이 다 됨 — 나머지는 다음 실행'; break; }
-      if (sstat.failed >= 3) { sstat.why = '검색 실패가 3번 — 이번 실행은 멈춤(열쇠·한도를 확인)'; break; }
-      const q = searchQuery(t);
-      sstat.asked += 1;
-      for (const k of [t.key, ...(t.alsoCodes || [])]) searchedAt[k] = today;   // 묶음은 한 번 물으면 다 물은 것
-      let json = null;
-      try { json = await naverSearch(keys, q); } catch (e) { sstat.failed += 1; log(`  검색 실패: ${q} — ${String((e && e.message) || e).slice(0, 60)}`); continue; }
-      const line = searchLine(t, searchRows(json, t.allowed), q, { today });
-      if (line) { newLines.push(line); sstat.found += 1; searched.push(`  - ${t.program || t.key} → ${line.title} (${line.note.replace(/^네이버 검색에서 고름 — /, '')})\n    ${line.url}`); }
-      await new Promise((r) => setTimeout(r, 300));
+    let stop = false;
+    for (const t of searchQueue(groups, huntedKeys, leftover, prevFile.items, searchedAt, rejected)) {
+      if (stop) break;
+      /* 첫 말로 못 고르면 공고문 파일 이름으로 한 번 더(searchQueries) — 둘째 말도 상한(SEARCH_MAX)에 센다 */
+      for (const q of searchQueries(t)) {
+        if (sstat.asked >= SEARCH_MAX) { sstat.why = `상한 ${SEARCH_MAX}번 — 나머지는 다음 실행(오래 안 물은 것부터)`; stop = true; break; }
+        if (!budget.hasRoom(PAGE_MS)) { sstat.why = '예산이 다 됨 — 나머지는 다음 실행'; stop = true; break; }
+        if (sstat.failed >= 3) { sstat.why = '검색 실패가 3번 — 이번 실행은 멈춤(열쇠·한도를 확인)'; stop = true; break; }
+        sstat.asked += 1;
+        for (const k of [t.key, ...(t.alsoCodes || [])]) searchedAt[k] = today;   // 묶음은 한 번 물으면 다 물은 것(실제로 물었을 때만 적는다)
+        let json = null;
+        try { json = await naverSearch(keys, q); } catch (e) { sstat.failed += 1; log(`  검색 실패: ${q} — ${String((e && e.message) || e).slice(0, 60)}`); continue; }
+        await new Promise((r) => setTimeout(r, 300));
+        const line = searchLine(t, searchRows(json, t.allowed, t), q, { today });
+        if (!line || rejected.has(`${t.key}|${urlKey(line.url)}`)) continue;   // 이번 회차에 이미 거절된 주소는 다시 적지 않는다
+        newLines.push(line); sstat.found += 1; searched.push(`  - ${t.program || t.key} → ${line.title} (${line.note.replace(/^네이버 검색에서 고름 — /, '')})\n    ${line.url}`);
+        break;
+      }
     }
     if (searched.length) R(`- 🔎 **네이버 검색으로 고른 글** ${searched.length}건\n${searched.join('\n')}`);
   }

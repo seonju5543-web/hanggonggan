@@ -46,6 +46,11 @@ export default async function gate(eq, ctx) {
   eq('  한국장학재단 자체 사업(kosafOwn)만 사업 안내 쪽을 받는다 — 같은 주소도 받음 · 첫 화면은 여전히 막음 · 표시 없으면 막음 · 표시가 true 아니면 막음 · 남의 사이트는 같은 주소면 막음',
     [own(kp, kp).errors, /첫 화면|kosaf/.test(own('https://www.kosaf.go.kr/index.html').errors.join()), /kosaf\.go\.kr/.test(errs(kp, kp)), /kosaf\.go\.kr/.test(own(kp, kp, 'yes').errors.join()), /같은 주소/.test(own('https://a.kr/view.do?id=3', 'https://a.kr/view.do?id=3').errors.join())],
     [[], true, true, true, true]);
+  /* (2026-11-20) 「한국장학재단 자체 사업인가」는 한 곳(isKosafOwnOrg) — 관리자 저장 길과 확인 로봇이 같이 쓴다(둘이 갈라지면 한쪽만 사업 안내를 원문으로 받는다) */
+  eq('  isKosafOwnOrg — 데이터의 org 가 한국장학재단일 때만 · 이름이 비슷한 남의 재단은 아니다 · 저장 길(admin-apply)이 이 함수를 부른다',
+    [LF.isKosafOwnOrg('(재)한국장학재단'), LF.isKosafOwnOrg('재단법인 한국장학재단'), LF.isKosafOwnOrg('한국장학재단 한국사무소'), LF.isKosafOwnOrg('한국교육재단 한국사무소'), LF.isKosafOwnOrg(''),
+      /const kosafOwn = ds === 'kosaf' && isKosafOwnOrg\(it\.org\)/.test(fs.readFileSync(new URL('../../tools/admin-apply.mjs', import.meta.url), 'utf8'))],
+    [true, true, false, false, false, true]);
   const other = chk('https://b.or.kr/notice/view?no=5', 'https://a.kr/bbs/list.do#n-x');
   const root = chk('https://maicon.kr/', 'https://a.kr/bbs/list.do#n-x');
   eq('  경고(받되 한 번 더 확인) — 지금 링크와 다른 사이트 · 맨 도메인(공모전 전용 사이트만)',

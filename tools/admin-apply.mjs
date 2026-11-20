@@ -25,7 +25,7 @@ import { periodAfterDeadline, amountAfterValue, needsBulkExpect, cleanExcerpts, 
 import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
 import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)
 import { urlKey } from '../collector/url-key.mjs';
-import { AGGREGATOR_RE, checkFixUrl, fixKeyFor, linkItemOf, FIX_DATASETS, FIX_TEXT_MAX } from '../collector/link-fix.mjs';   // 원문 바로잡기 받아도 되는가 — 관리자 화면과 같은 파일
+import { AGGREGATOR_RE, checkFixUrl, isKosafOwnOrg, fixKeyFor, linkItemOf, FIX_DATASETS, FIX_TEXT_MAX } from '../collector/link-fix.mjs';   // 원문 바로잡기 받아도 되는가 — 관리자 화면과 같은 파일
 
 /* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
    저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
@@ -1161,7 +1161,7 @@ switch (action) {
       if (current !== from && !payload.force) fail(`그 사이 로봇이 주소를 바꿨습니다: 현재 ${current || '(주소 없음)'} — 화면을 새로 고쳐 다시 확인해 주세요`);
       const name = it.name || it.title || it.id || it.code || '';
       /* 한국장학재단이 직접 주는 사업만 재단의 사업 안내 쪽을 받는다(collector/link-fix.mjs kosafOwn) — 주는 곳은 데이터의 org 로 본다(요청이 준 값을 믿지 않는다) */
-      const kosafOwn = ds === 'kosaf' && /^(\(재\)|재단법인\s*)?한국장학재단$/.test(String(it.org || '').trim());
+      const kosafOwn = ds === 'kosaf' && isKosafOwnOrg(it.org);
       const chk = checkFixUrl(fx.url, { from: current, L: SL, downloadRe: ENTRY_RULES.DOWNLOAD_URL, kosafOwn });
       if (chk.errors.length) fail(`${String(name).slice(0, 40)} — ${chk.errors.join(' · ')}`);
       const key = fixKeyFor(ds, it, SL);
