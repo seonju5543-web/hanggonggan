@@ -509,15 +509,27 @@ async function ask(page, q) {
     const open = { vv: [0, fake.height], sheet: rect('#chat-sheet'), head: rect('.chat-head'), input: rect('#chat-input') };
     fake.offsetTop = 120; chatFitKeyboard();                      // 사파리가 보이는 칸을 밀어 올린 경우
     const panned = { vv: [120, 120 + fake.height], sheet: rect('#chat-sheet'), input: rect('#chat-input') };
+    /* 🔴 실기기(아이폰 홈 화면 앱 · 2026-11-20 개발자 화면 녹화)에서는 키보드가 올라오면 **innerHeight 도 같이 줄었다** —
+       '가린 높이 = innerHeight − 보이는 칸'으로 재던 첫 수리가 0 을 얻어 아무것도 안 했고, 시트는 dvh(키보드 무관) 그대로
+       78% 높이라 아래(추천 칩·입력 칸)가 키보드 뒤로 들어가 사파리가 화면을 밀어 올렸다. 그 경우를 따로 흉내 낸다. */
+    const realIH = Object.getOwnPropertyDescriptor(window, 'innerHeight');
+    const fullH = innerHeight;
+    fake.height = fullH; fake.offsetTop = 0; chatFitKeyboard();          // 키보드 닫힌 상태를 한 번 본다(기준 높이)
+    Object.defineProperty(window, 'innerHeight', { get: () => fullH - 336, configurable: true });
+    fake.height = fullH - 336; fake.offsetTop = 0; chatFitKeyboard();
+    const shrunk = { vv: [0, fake.height], sheet: rect('#chat-sheet'), head: rect('.chat-head'), input: rect('#chat-input'), chips: getComputedStyle(document.querySelector('#chat-chips')).display };
+    if (realIH) Object.defineProperty(window, 'innerHeight', realIH); else delete window.innerHeight;
     fake.height = innerHeight; fake.offsetTop = 0; chatFitKeyboard();   // 키보드가 내려감
-    const closed = { sheet: rect('#chat-sheet'), inline: document.querySelector('#chat-sheet').style.bottom };
+    const closed = { sheet: rect('#chat-sheet'), inline: document.querySelector('#chat-sheet').style.bottom + document.querySelector('#chat-sheet').style.top };
     if (real) Object.defineProperty(window, 'visualViewport', real); else delete window.visualViewport;
-    return { open, panned, closed };
+    return { open, panned, shrunk, closed };
   });
   const inside = (box, vv) => box.top >= vv[0] - 1 && box.bottom <= vv[1] + 1;
   ok(inside(kb.open.sheet, kb.open.vv) && inside(kb.open.input, kb.open.vv) && inside(kb.open.head, kb.open.vv),
     '키보드가 올라오면 시트(머리말·입력 칸까지)가 보이는 칸 안에 들어온다', kb.open);
   ok(inside(kb.panned.sheet, kb.panned.vv) && inside(kb.panned.input, kb.panned.vv), '사파리가 화면을 밀어 올려도 보이는 칸 안이다', kb.panned);
+  ok(inside(kb.shrunk.sheet, kb.shrunk.vv) && inside(kb.shrunk.head, kb.shrunk.vv) && inside(kb.shrunk.input, kb.shrunk.vv) && kb.shrunk.chips === 'none',
+    '🔴 아이폰처럼 화면 높이(innerHeight)까지 같이 줄어도 시트가 보이는 칸 안이고 추천 칩 줄은 접힌다', kb.shrunk);
   ok(kb.closed.inline === '' && kb.closed.sheet.bottom >= 843, '키보드가 내려가면 원래 자리로 돌아간다', kb.closed);
 
   console.log('\n[8] 콘솔 오류');

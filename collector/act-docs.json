@@ -303,10 +303,6 @@
   "at": "2026-11-18",
   "tries": 1
  },
- "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141929&article.offset=0&articleLimit=10": {
-  "at": "2026-11-18",
-  "tries": 1
- },
  "https://youth.chungnam.go.kr/web/main/customSupp/M030-02/view?bizId=A20260309CT000000000003021": {
   "at": "2026-11-18",
   "tries": 1
@@ -356,6 +352,18 @@
   "tries": 1
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521260": {
+  "at": "2026-11-20",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/272294/artclView.do": {
+  "at": "2026-11-20",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/272293/artclView.do": {
+  "at": "2026-11-20",
+  "tries": 1
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171774&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
   "at": "2026-11-20",
   "tries": 1
  }

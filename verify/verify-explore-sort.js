@@ -294,6 +294,32 @@ const PROFILE = {
   eq('  정렬 버튼은 보인다 (등록 공고가 함께 있으므로)', nt.정렬버튼, true);
   eq('  마감일을 모르므로 「마감 임박」이라고 하지 않는다', nt.임박배지, 0);
   eq('  카드가 교내/교외를 말하지 않는다', nt.종류말함, 0);
+  /* 🔴 **그 카드를 누르면 원문으로 나가지 않고 시트가 열린다** (2026-11-20 개발자 지적: 장학금 찾기 '교내' 를 누르면
+     *"카드가 안 열리고 그대로 원문 링크로 들어가지는"*). 정적 관문(test-collector)은 글자만 본다 — 실제로 눌러 본다.
+     원문은 시트 「원문」 절에 심은 주소 그대로 있어야 한다(sourceLink 한 곳을 거친다) */
+  {
+    const before = page.url();
+    const pages0 = page.context().pages().length;
+    const tapped = await page.evaluate(() => {
+      const c = [...document.querySelectorAll('#explore-list .notice-card[data-board]')].find((e) => /검사용 교내 가족장학금/.test(e.textContent));
+      if (c) c.click();
+      return !!c;   // 못 찾으면(카드가 다시 링크로 돌아가면) 아래가 ✕ 로 말한다
+    });
+    await page.waitForTimeout(500);
+    const sh = await page.evaluate(() => {
+      const s = document.querySelector('#detail-sheet');
+      return {
+        열림: !!(s && !s.hidden && s.classList.contains('show')),   // openSheetShell 이 거는 표시
+        제목: ((s && s.querySelector('.sheet-title')) || {}).textContent || '',
+        원문: ((s && s.querySelector('.sheet-source a')) || {}).href || '',
+      };
+    });
+    eq('🔴 교내 칸 게시판 글 카드를 누르면 상세 시트가 열린다 (원문으로 나가지 않는다)',
+      [tapped, sh.열림, sh.제목.includes('검사용 교내 가족장학금'), sh.원문, page.url() === before, page.context().pages().length === pages0],
+      [true, true, true, 'https://example.ac.kr/notice/2', true, true]);
+    await page.evaluate(() => closeSheet());
+    await page.waitForTimeout(300);
+  }
   /* 🔴 교내 등록분이 0건일 때 **'없어요' 로만 끝내지 않는다** — 학교에 교내 장학금이 없다는
      뜻으로 읽힌다. 우리가 아직 안 읽었을 뿐이므로 어디를 보면 되는지(홈) 말한다.
      🔴 **등록분을 실제로 0건으로 만들어 재야 한다** — 이 프로필에는 교내 등록 공고가

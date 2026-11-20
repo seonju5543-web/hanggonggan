@@ -209,7 +209,8 @@ function renderAmountDetail(keepScroll) {
           ? `금액을 못 읽은 ${bill.assumed.length}건은 어림잡아 더함`
           : `금액을 읽은 공고만 합산${bill.unknown.length ? ` · 못 읽은 ${bill.unknown.length}건 제외` : ''}`}</p>
       </div>
-      ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
+      ${/* 첫 갈래 이름 '합산' → '자격 요건 매칭' (2026-11-20 개발자 지시 — 이 갈래는 자격이 맞아 더한 공고들이다 · 갈래 수는 그대로 넷) */ ''}
+      ${grp('자격 요건 매칭', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
         bill.added.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))).join(''),
         '합산할 공고가 아직 없어요')}
       ${grp('중복 수혜 불가', `${bill.onlyOne.length + bill.dropped.length}건 중 ${bill.onlyOne.length}건`,

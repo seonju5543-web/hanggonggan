@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: david/friendly-euler-w6o3wu
-메모: 2026-11-20 #2 — 재단 글 사냥꾼을 수확 로봇 직후에도 돌린다(새 공고가 실리자마자 원문 찾기)
+branch: david/elegant-cannon-2vtxj3
+메모: 2026-11-20 #3 — 금액 상세 「합산」→「자격 요건 매칭」 · 금액 색 하나로(추정 주황 없앰)

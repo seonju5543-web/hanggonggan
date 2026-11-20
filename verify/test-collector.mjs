@@ -3604,6 +3604,12 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
   eq('  학교가 [교내] 라고 적어 둔 게시판 글은 "교내" 칸에도 온다',
     /boardNoticesInSchool\(\)/.test(exploreFn), true);
   eq('    그 카드도 같은 그림을 쓴다 (베끼지 않는다)', /noticeCardHtml/.test(exploreFn), true);
+  /* 🔴 **그 칸의 게시판 글 카드도 눌러서 시트를 연다** (2026-11-20 개발자 지적: 장학금 찾기 '교내' 를 누르면
+     *"카드가 안 열리고 그대로 원문 링크로 들어가지는"* — 같은 칸의 등록 카드는 전부 시트를 연다). 원문은 시트 「원문」 절이 준다 */
+  eq('    그 카드는 원문으로 나가지 않고 시트를 연다 (sheet 표식)', /noticeCardHtml\(n, \{ sheet: true \}\)/.test(exploreFn), true);
+  eq('      시트 표식이면 링크(href)가 아니라 단추(data-board)다', /o\.sheet \? ` type="button" data-board=/.test(liveFn) && /const tag = o\.sheet \? 'button' : 'a'/.test(liveFn), true);
+  eq('      누르면 openBoardDetail 이 그 글을 시트로 연다', /closest\('\[data-board\]'\);\s*if \(card\) openBoardDetail\(card\.dataset\.board\)/.test(app), true);
+  eq('      시트도 홈과 같은 목록에서 글을 찾는다', /boardNoticesForMe\(\)\.find\(/.test(cutFnApp('openBoardDetail')), true);
   /* 판정을 새로 만들지 않는다 — `noticeKind` 한 곳(로봇·앱이 같이 쓴다) */
   const inSchoolFn = cutFnApp('boardNoticesInSchool');
   eq('    판정은 공용 noticeKind 하나다', /noticeKind\(n\.title\) === '교내'/.test(inSchoolFn), true);
@@ -3723,7 +3729,7 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     const appSrc = appSource();
     const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
     const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
-    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 카드 한 자리 — 활동 시트의 기간 토막 줄은 2026-11-02 승인 시안으로 없어졌다)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/(?:esc|tidyChars)\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s\) \{\n  let t = hintText\(s\)/.test(appSrc)], [true, 1, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다 · 활동 시트는 hintText 위에 tidyChars(2026-10-15)
+    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 카드 한 자리 — 활동 시트의 기간 토막 줄은 2026-11-02 승인 시안으로 없어졌다)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/(?:esc|tidyChars)\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s, max = 44\) \{[^\n]*\n  let t = hintText\(s\)/.test(appSrc)], [true, 1, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다 · 활동 시트는 hintText 위에 tidyChars(2026-10-15)
     /* 리뷰(10-03) — 여기서 hintText 를 따로 지어 재면 앱의 것이 바뀌어도 모른다 → 앱 소스의 그 줄들(ENTITIES·ENTITY_RE·unent·PARTIAL_ENTITY_END·hintText)을 떼어 실행한다 */
     const line = (re) => (appSrc.match(re) || [''])[0];
     const unentSrc = (() => { const at = appSrc.indexOf('function unent('); return at < 0 ? '' : appSrc.slice(at, appSrc.indexOf('\n}', at) + 2); })();
@@ -8175,10 +8181,17 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
 
   // ① 갈래 넷 — 이름은 개발자가 '명사형으로 조이기'로 정한 것이다
   //    넷째 '금액 미확인' → '금액을 못 읽은 공고' (2026-11-15 · 개발자 결정 11-02 '미확인'류 글자 없음 — 히어로 아랫줄 「금액을 못 읽은 n건」과 같은 말 · 갈래 수는 그대로 넷)
-  for (const t of ['합산', '중복 수혜 불가', '등록금 비율 환산', '금액을 못 읽은 공고']) {
+  //    첫째 '합산' → '자격 요건 매칭' (2026-11-20 개발자 지시)
+  for (const t of ['자격 요건 매칭', '중복 수혜 불가', '등록금 비율 환산', '금액을 못 읽은 공고']) {
     eq(`갈래 '${t}' 가 있다`, body.includes(`grp('${t}'`), true);
   }
   eq('제목은 금액 상세다', body.includes('금액 상세'), true);
+  /* 금액 색은 하나 (2026-11-20 개발자 지시) — 추정값만 다른 색이면 다른 종류의 돈처럼 읽힌다. 추정은 「약」 글자가 말한다 */
+  {
+    const css = readText(new URL('../style.css', import.meta.url));
+    const colorOf = (t) => [...css.matchAll(/([^{}]*)\{([^}]*)\}/g)].filter((m) => m[1].split(',').some((s) => s.trim() === `.ad-val.${t}`)).map((m) => (m[2].match(/(?:^|;)\s*color:\s*([^;]+)/) || [])[1]).filter(Boolean).pop();
+    eq('  금액 색이 하나다 — on · est · off 가 같은 색', new Set(['on', 'est', 'off'].map(colorOf)).size, 1);
+  }
 
   /* 🔴 **추정값을 확정값처럼 적지 않는다** (2026-09-11 코드 리뷰에서 잡았다).
      2026-09-10 수리로 비율형이 이중수혜 갈래를 거치게 되면서 같은 공고가 `added`(또는

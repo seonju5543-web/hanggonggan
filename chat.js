@@ -1444,20 +1444,39 @@ async function chatSend(q) {
    visualViewport 가 알려 주는 **키보드를 뺀 실제 보이는 칸**에 시트 바닥과 높이를 맞춘다.
    ⚠️ 키보드가 화면을 줄여 주는 브라우저(가린 높이 0)에서는 아무것도 안 한다 — CSS 그대로.
    ⚠️ 닫을 때 반드시 되돌린다(chatClose) — 남기면 다음에 열 때 시트가 공중에 뜬다. */
-const CHAT_KBD_MIN = 80;   // 이보다 적게 가리면 키보드가 아니다(주소창이 접히는 정도)
-function chatFitKeyboard() {
-  const sheet = document.querySelector('#chat-sheet');
-  if (!sheet || sheet.hidden) return;
+const CHAT_KBD_MIN = 80;   // 이보다 적게 줄면 키보드가 아니다(주소창이 접히는 정도)
+/* 🔴 키보드를 **'보이는 칸이 얼마나 줄었나'** 로 안다 (2026-11-20 개발자 화면 녹화로 다시 고침).
+   첫 수리는 `innerHeight − 보이는 칸` 으로 쟀는데, 아이폰 홈 화면 앱에서는 키보드가 올라오면 **innerHeight 도 같이 줄어**
+   그 차이가 0 이었다 → 아무것도 안 하고, 시트는 dvh(키보드와 무관) 78% 그대로라 추천 칩·입력 칸이 키보드 뒤로 들어가
+   사파리가 화면을 통째로 밀어 올렸다(머리말이 위로 사라지고, 입력 칸과 키보드 사이에 빈 띠).
+   그래서 **키보드가 없을 때 본 가장 큰 보이는 높이**(chatVvBase)를 기준으로 삼고, 시트는 바닥이 아니라 **위치(top)를
+   보이는 칸 좌표로** 놓는다 — innerHeight 가 줄든 안 줄든, 화면이 밀렸든(offsetTop) 같은 식이 맞다. */
+let chatVvBase = 0;
+function chatNoteBase() {
   const vv = window.visualViewport;
   if (!vv) return;
-  const covered = Math.round(window.innerHeight - (vv.offsetTop + vv.height));
-  if (covered > CHAT_KBD_MIN) {
+  const a = document.activeElement;
+  const typing = a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);
+  /* 입력 중이 아닐 때 본 높이만 기준이 된다 — 화면을 돌리면 작아질 수 있으니 그때는 새로 잰다 */
+  if (!typing) chatVvBase = Math.round(vv.height);
+  else chatVvBase = Math.max(chatVvBase, Math.round(vv.height));
+}
+function chatFitKeyboard() {
+  const sheet = document.querySelector('#chat-sheet');
+  const vv = window.visualViewport;
+  if (!vv) return;
+  chatNoteBase();
+  if (!sheet || sheet.hidden) return;
+  const base = Math.max(chatVvBase, Math.round(vv.height));
+  const shrunk = base - Math.round(vv.height);
+  if (shrunk > CHAT_KBD_MIN) {
     sheet.classList.add('kbd-open');
-    sheet.style.bottom = covered + 'px';
     /* 보이는 칸을 거의 다 쓴다 — 위로 8px 은 뒤 화면이 보여 '떠 있는 시트'로 읽히게 */
     const h = Math.max(220, Math.round(vv.height - 8));
     sheet.style.height = h + 'px';
     sheet.style.maxHeight = h + 'px';
+    sheet.style.top = Math.round(vv.offsetTop + vv.height - h) + 'px';   // 보이는 칸 바닥에 시트 바닥을 붙인다
+    sheet.style.bottom = 'auto';
   } else {
     chatUnfitKeyboard(sheet);
   }
@@ -1468,6 +1487,7 @@ function chatUnfitKeyboard(sheet) {
   const el = sheet || document.querySelector('#chat-sheet');
   if (!el) return;
   el.classList.remove('kbd-open');
+  el.style.top = '';
   el.style.bottom = '';
   el.style.height = '';
   el.style.maxHeight = '';
@@ -1492,6 +1512,7 @@ function chatOpen(prefill) {
   }
   chatRender();
 
+  chatNoteBase();          // 키보드가 올라오기 전의 보이는 높이를 기준으로 적어 둔다(chatFitKeyboard)
   back.hidden = false;
   sheet.hidden = false;
   requestAnimationFrame(() => {
