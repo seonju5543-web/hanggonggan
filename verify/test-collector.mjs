@@ -6435,6 +6435,21 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     /* 과기정통부(2026-10-16 · 정책브리핑 공모 글의 보도자료 첨부가 0건이었다) — 호출이 onclick 에 있고 단추 글자는 `다운로드` 뿐, 파일 이름은 앞 요소에 */
     const msit = 'https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433';
     eq('과기정통부 fn_download(번호, 순번, 확장자) → /ssm/file/fileDown.do', AL.resolveJsDownload("javascript:fn_download('54098', '1', 'hwpx');", msit), 'https://www.msit.go.kr/ssm/file/fileDown.do?atchFileNo=54098&fileOrd=1');
+    /* 서울시립대 장학 게시판 (2026-11-21 · 언론인회 장학금의 신청서·자기소개서를 누르면 공고 화면이 다시 열렸다) — filedown(날짜, 글 번호, 파일 순번)은 숨은 폼을
+       /scholarship/download.do 로 GET 한다 · 게시판 번호(brdBbsseq)는 공고 주소에서 읽는다. 쿠키 없는 새 요청으로 두 파일(HWP 12.8KB · 17.4KB)이 받아졌다 */
+    const uos = 'https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&';
+    const UOS_FILE = (n) => `https://scholarship.uos.ac.kr/scholarship/download.do?brdBbsseq=1&brdDate=20261105&brdSeq=1&filSeq=${n}`;
+    eq('서울시립대 장학 게시판 filedown(날짜, 글 번호, 파일 순번) → /scholarship/download.do(게시판 번호는 공고 주소에서) · `;return false;` 꼬리가 붙어도',
+      [AL.resolveJsDownload("javascript:filedown('20261105', '1','2');return false;", uos), AL.resolveJsDownload("javascript:filedown('20261105','1','1')", uos)], [UOS_FILE(2), UOS_FILE(1)]);
+    eq('  🔴 공고 주소에 게시판 번호가 없으면 풀지 않는다(짐작하지 않는다) · 다른 사이트의 같은 이름 함수·날짜 꼴이 아닌 호출·인자 둘뿐인 호출도 모른다',
+      [AL.resolveJsDownload("javascript:filedown('20261105','1','2')", 'https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1'),
+        AL.resolveJsDownload("javascript:filedown('20261105','1','2')", 'https://www.other.ac.kr/view.do?brdBbsseq=1'),
+        AL.resolveJsDownload("javascript:filedown('abc','1','2')", uos), AL.resolveJsDownload("javascript:filedown('20261105','1')", uos)],
+      [null, null, null, null]);
+    eq('  상세 HTML 의 `href="#" onclick="filedown(…)"` 두 줄이 이름과 받을 주소로 읽힌다(그 공고 화면의 실제 꼴)',
+      AL.detailAttachments('<div style="width:540px;"><a href="#" onclick="filedown(\'20261105\', \'1\',\'1\');return false;" class="filedown"> 자기소개서_기본형 (1).hwp </a><br/>'
+        + '<a href="#" onclick="filedown(\'20261105\', \'1\',\'2\');return false;" class="filedown"> 발전기금 장학생 신청서(2026년2학기) (1).hwp </a><br/></div>', uos),
+      [{ name: '자기소개서_기본형 (1).hwp', url: UOS_FILE(1) }, { name: '발전기금 장학생 신청서(2026년2학기) (1).hwp', url: UOS_FILE(2) }]);
     eq('  onclick 호출 + 앞 요소의 파일 이름 — href 가 void 여도 첨부가 된다 · 모르는 onclick(getExtension_path) 은 첨부가 아니다',
       AL.detailAttachments('<li><a title="파일명" class="ico_file_hwp">260615 조간 (보도) 과기정통부 공모전 개최.(수정).hwpx</a> <span><a href="javascript:void(0);" onclick="fn_download(\'54098\', \'1\', \'hwpx\');" class="down">다운로드</a> <a href="javascript:void(0);" onclick="getExtension_path(\'54098\', \'1\');">바로보기</a></span></li>', msit),
       [{ name: '260615 조간 (보도) 과기정통부 공모전 개최.(수정).hwpx', url: 'https://www.msit.go.kr/ssm/file/fileDown.do?atchFileNo=54098&fileOrd=1' }]);
