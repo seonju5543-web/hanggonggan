@@ -288,7 +288,7 @@ for (const t of targets) {
       if (!(await freshContext())) { log('브라우저를 다시 띄우지 못함 — 여기까지 저장하고 멈춘다'); break; }
       continue;
     }
-    /* 🔴 **한 공고에 절대 시한** (2026-10-04 · 자격요건 로봇 첫 클라우드 실행): 예산은 '시작 전'에만 봤다 —
+    /* 🔴 **한 공고에 절대 시한** (2026-10-04 · 원문 받기 로봇 첫 클라우드 실행): 예산은 '시작 전'에만 봤다 —
        넷째 공고에서 브라우저 호출 하나가 돌아오지 않아 10분을 서 있다가 단계 시한(11분)에 잘렸고,
        saveAll 까지 못 가 **이미 받은 3건도 잃었다.** 시한이 지나면 그 페이지를 버리고 다음으로 간다
        (harvest-budget withDeadline — 수집기와 같은 규칙).
@@ -396,7 +396,7 @@ for (const t of targets) {
       return { text: '', finalUrl: '', found: [], seenNames: [], error: String(e.message) };
     } })();
     const timedOut = await withDeadline(read, PAGE_MS) === TIMED_OUT;
-  page.close().catch(() => {});   // 기다리지 않는다 — 멈춘 페이지는 닫기도 멈출 수 있다 (들여쓰기 두 칸은 test-collector 「자격요건 로봇」 글자 검사가 찾는 꼴)
+  page.close().catch(() => {});   // 기다리지 않는다 — 멈춘 페이지는 닫기도 멈출 수 있다 (들여쓰기 두 칸은 test-collector 「원문 받기 로봇」 글자 검사가 찾는 꼴)
     if (timedOut) {
       hung += 1;
       /* 첨부만 살피러 간 공고는 본문 칸(실패 횟수·쉼 시계)을 건드리지 않고 첨부 쪽 횟수만 센다(리뷰 2 — 본문 칸을 세면 본문의 쉼이 영영 안 끝난다) */

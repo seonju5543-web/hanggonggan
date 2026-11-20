@@ -487,7 +487,7 @@ async function downloadEligDocs() {
      실측: 넘기려던 공고 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268). */
   /* 고르기는 elig-targets.mjs 한 곳 (2026-10-05 · UI-12) — 줄이 돈다(시도한 날 `at`) · 금액·마감만 빈 공고도 · 안 보이는 공고는 안 받는다 */
   const { pickEligTargets, pickAttachBacklog, pickDocAttachments, repeatedBodyImages } = await import('./elig-targets.mjs');
-  /* '학생 화면에 아직 있나'는 자격요건 로봇과 같은 판정 한 곳(rescue-plan.mjs closedForStudents — 마감(한국 날짜) 전 · notStale) — 2026-10-05 병합 때
+  /* '학생 화면에 아직 있나'는 원문 받기 로봇과 같은 판정 한 곳(rescue-plan.mjs closedForStudents — 마감(한국 날짜) 전 · notStale) — 2026-10-05 병합 때
      여기 따로 적혀 있던 같은 식을 이것으로 바꿨다(둘이 갈라지면 한 로봇은 받고 다른 로봇은 안 여는 공고가 생긴다) */
   const { closedForStudents } = await import('./rescue-plan.mjs');
   const today = kstToday();

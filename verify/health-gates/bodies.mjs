@@ -1,6 +1,6 @@
-/* 「로봇·도구 점검 관문」 bodies 묶음 — 자격요건 로봇 · 본문 · 첨부 · OCR (2026-10-04 대대적 점검)
+/* 「로봇·도구 점검 관문」 bodies 묶음 — 원문 받기 로봇 · 본문 · 첨부 · OCR (2026-10-04 대대적 점검)
    잰다:
-     ① 자격요건 로봇(rescue-bodies.mjs) — **진짜 파일을 임시 폴더에서 가짜 브라우저로 돌린다** (bodies-1·bodies-4)
+     ① 원문 받기 로봇(rescue-bodies.mjs) — **진짜 파일을 임시 폴더에서 가짜 브라우저로 돌린다** (bodies-1·bodies-4)
         ⓐ 대상 거르기·차례: 이레 안에 본문을 확보한 공고 · 마감 지난 공고 · 오래돼 내려간 공고 · 자격 줄 있는 공고는 빠지고,
            덜 해 본 것 → 한 번도 못 받은 것 먼저 (rescue-plan.mjs 순수 함수 + 로봇의 미리보기 '차례' 줄)
         ⓑ 한 공고가 멈춰도(시한) 다음 공고로 간다 · 시한 뒤 늦게 끝난 읽기가 registered.json 을 몰래 바꾸지 않는다 ·
@@ -582,7 +582,7 @@ export default async function bodies(eq, ctx) {
     const none = await runAlert(null);
     eq('  실패 알림을 진짜로 돌리면 — 오늘 리포트는 붙이고 · 옛 판(9-30) 리포트는 안 붙이고 그 날짜를 적고 · 리포트가 없어도 이슈는 생긴다 · 셋 다 실행 로그 주소 (bodies-7)',
       [/오늘표본공고/.test(fresh), /옛표본공고/.test(stale), /2026-09-30 판이라 붙이지 않았습니다/.test(stale), /리포트가 없습니다/.test(none),
-        [fresh, stale, none].every((b) => b.includes(runUrl)), /^🚨 자격요건 로봇/.test(fresh)],
+        [fresh, stale, none].every((b) => b.includes(runUrl)), /^🚨 원문 받기 로봇/.test(fresh)],
       [true, false, true, true, true, true]);
     const closed = [];
     const commented = [];

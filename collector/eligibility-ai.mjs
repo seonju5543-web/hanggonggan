@@ -29,10 +29,10 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
-import { closedForStudents } from './rescue-plan.mjs';   // 학생 화면에서 내려간 공고(마감 지남·오래됨) 판정 — 자격요건 로봇과 같은 한 곳
+import { closedForStudents } from './rescue-plan.mjs';   // 학생 화면에서 내려간 공고(마감 지남·오래됨) 판정 — 원문 받기 로봇과 같은 한 곳
 import { makeStripper } from './page-boilerplate.mjs';
 /* 🔴 마감 지난 공고에 돈을 쓰지 않는다 (2026-10-29 개발자 지시로 돌린 시범 3건이 **전부 마감 지난 공고**였다 — 신문고(재난)·대전청년내일재단 10-08·고졸 후학습자 09-30 ·
-   후보 29건 중 6건이 그랬다). 날짜는 KST 로(자격요건 로봇과 같다) */
+   후보 29건 중 6건이 그랬다). 날짜는 KST 로(원문 받기 로봇과 같다) */
 const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 import { attachmentText, readable } from './attachment-text.mjs';
 

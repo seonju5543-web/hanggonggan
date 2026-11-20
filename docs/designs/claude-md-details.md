@@ -54,7 +54,7 @@ CLAUDE.md 가 60KB 천장 가까이 붙어 있어, 긴 항목은 거기에 🔴 
 |---|---|
 | `collector/collect-news.mjs` `find-news-boards.mjs` `news-kind.mjs` `collect-news-thumbs.mjs` `news-thumb.mjs` | 교내 소식 로봇(따로 돈다) · 공지 게시판 찾기(출처 `news-sources.json` · 후보는 웹 검색 + `evidence`) · 실을지·갈래 판정 한 곳 · 사진 썸네일 단계·고르기 한 곳 |
 | `collector/activity-docs.mjs` | 대외활동 자격 **출처만** 늘리는 곳 — 본문 → 요강 페이지 → HWP·DOCX → 그림·PDF(PaddleOCR `collector/paddle-ocr.py`) → 유료 AI(꺼짐). 🔴 자격 줄 고르기는 늘 `activityDetails` 하나 · 남의 글 막기는 `ownsImageText` · 받은 파일은 커밋 안 함 · 관문 「대외활동·공모전 — 첨부·포스터 읽기」 |
-| `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml` · 진짜 크롬 · 하루 두 번) — 장학 본문 재수집 + 대외활동 `activity-docs.mjs --browser`. 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
+| `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **원문 받기 로봇**(`.github/workflows/rescue-bodies.yml` · 진짜 크롬 · 하루 두 번) — 장학 본문 재수집 + 대외활동 `activity-docs.mjs --browser`. 🔴 진짜 브라우저로 원문을 받는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다 · 자격 판정은 유료 확인 — 2026-11-20) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
 | `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 → 재단 개별 공고 후보(재단 홈페이지를 뒤져 `kosaf-hunt.json` 에 · 확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
 
 ## 아키텍처 표 (원문 행 · 둘째 묶음)

@@ -8,7 +8,7 @@
 # 🔴 수집 로봇과 **다른 대기줄**이다. 같은 줄에 넣으면 GitHub이 대기 중인 예약 수집을
 #    취소해 그날 수집분이 조용히 사라진다(deploy-sync·main-guard를 따로 둔 것과 같은 함정).
 
-# 🔴 2026-10-04 「자격요건 로봇」으로 키웠다 (개발자 지시 — *"진짜 브라우저로 열어야 되는 장학금 공모전 대외활동 공고는 다 이걸로 돌리도록 해.
+# 🔴 2026-10-04 「원문 받기 로봇」으로 키웠다 (개발자 지시 — *"진짜 브라우저로 열어야 되는 장학금 공모전 대외활동 공고는 다 이걸로 돌리도록 해.
 #    로봇은 시간초과등 오류 안나게"*). 진짜 크롬으로 자격을 찾는 로봇은 **이것 하나**다 — 같은 일을 하는 로봇을 하나 더 만들면
 #    같은 공고를 두 로봇이 두드린다. 수집 로봇(장학공고 수집 · 브라우저형 수집)과는 대기줄·시간대·쓰는 파일이 다 따로다.
 #      ① 장학 — 등록 공고 본문 재수집(collector/rescue-bodies.mjs · 그대로)
@@ -17,7 +17,7 @@
 #    🔴 시간 초과 대비: 단계마다 자기 예산(env) < 단계 시한 < 작업 시한 · 글마다 저장 · 보강 단계는 continue-on-error.
 #    ⚠️ 파일 이름(rescue-bodies.yml)은 관리자 화면 버튼이 부르므로 그대로 둔다.
 
-name: 자격요건 로봇 (진짜 브라우저)
+name: 원문 받기 로봇 (진짜 브라우저)
 
 on:
   workflow_dispatch:
@@ -119,7 +119,7 @@ jobs:
           title: 🚨 포스터 글자 읽기(PaddleOCR)가 설치되지 않아요
           label: paddle-ocr
           body: |
-            자격요건 로봇(진짜 브라우저)의 포스터 글자 읽기(PaddleOCR) 설치가 실패했습니다. 포스터뿐인 활동 글의 자격이 읽히지 않습니다.
+            원문 받기 로봇(진짜 브라우저)의 포스터 글자 읽기(PaddleOCR) 설치가 실패했습니다. 포스터뿐인 활동 글의 자격이 읽히지 않습니다.
             러너 파이썬 판과 paddlepaddle 바퀴(cp39~cp313)가 맞는지 워크플로의 setup-python 을 보세요. 실행: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       - name: ✅ PaddleOCR 회복 — 경보 닫기
         if: always() && steps.paddle.outputs.failed == 'no'
@@ -178,7 +178,7 @@ jobs:
           git add data/registered.json
           true
           if ! git diff --cached --quiet; then
-            git commit -m "자격요건 로봇: 장학 본문 재수집 · 대외활동 브라우저 자격"
+            git commit -m "원문 받기 로봇: 장학 본문 재수집 · 대외활동 브라우저 자격"
             pushed=0
             for i in 1 2 3; do
               if git push; then pushed=1; break; fi
@@ -263,8 +263,8 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner, repo: context.repo.repo,
               labels: ['rescue-bodies'],
-              title: `🚨 자격요건 로봇 (진짜 브라우저) 실패 — ${today}`,
-              body: ['자격요건 로봇이 끝까지 성공하지 못했습니다. 예: 진짜 크롬 설치 실패 · 재수집 단계가 감시 타이머에 멈춤·시한에 잘림·넘어짐 · 데이터 관문 · 저장 실패 · 작업 시한 취소 등 — 어느 것인지는 실행 로그에 있습니다.',
+              title: `🚨 원문 받기 로봇 (진짜 브라우저) 실패 — ${today}`,
+              body: ['원문 받기 로봇이 끝까지 성공하지 못했습니다. 예: 진짜 크롬 설치 실패 · 재수집 단계가 감시 타이머에 멈춤·시한에 잘림·넘어짐 · 데이터 관문 · 저장 실패 · 작업 시한 취소 등 — 어느 것인지는 실행 로그에 있습니다.',
                 `실행 로그: ${runUrl}`, '', ...part].join('\n'),
             });
 

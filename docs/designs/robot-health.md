@@ -41,9 +41,9 @@
 - 🔴 **메우기의 장부 원천은 9-30 사고 창까지만**(`FEED_HEAL_SINCE`~`FEED_HEAL_UNTIL` · `healFromLedger`) — 그 뒤 장부 글은 링크 사냥꾼이 합친 옛 판일 수 있다(같은 장학금 카드 두 장 · 2026-10-11 가천·고려 실측).
   날을 늘리지 말고 다른 사고 창은 `collector/heal-feed.mjs --since= --until=` 로 한 번 돌린다 · 주소를 고치며 notices.json 을 합치는 로봇은 `patchUrlsBySchool` 에 바뀐 주소(`movedNoticeUrls`)를 넘긴다. 관문 feed ①ⓗⓘ · links ⑧.
 
-## 자격요건 로봇 · 본문 · 첨부 · OCR (bodies)
+## 원문 받기 로봇 · 본문 · 첨부 · OCR (bodies)
 
-- **자격요건 로봇(`collector/rescue-bodies.mjs`)은 단계 시한 전에 스스로 끝난다** — 한 공고 절대 시한 · 공고마다 저장 · 감시 타이머(예산 + 한 공고 시한 + 30초 → 저장 후 종료 1) ·
+- **원문 받기 로봇(`collector/rescue-bodies.mjs`)은 단계 시한 전에 스스로 끝난다** — 한 공고 절대 시한 · 공고마다 저장 · 감시 타이머(예산 + 한 공고 시한 + 30초 → 저장 후 종료 1) ·
   저장은 `collector/write-atomic.mjs`(임시 파일 → 이름 바꾸기). 대상·차례·장부 규칙은 `collector/rescue-plan.mjs` 한 곳(로봇은 불러오면 돌아 관문이 못 부른다). 관문 bodies ①.
 - 🔴 `continue-on-error` 단계가 잘려도 작업은 초록이다 — 그런 핵심 단계는 저장 **뒤**에 `steps.<id>.outcome != 'success'` 로 실패를 남기고,
   실패 알림은 **이번 실행** 리포트만 붙인다(옛 판을 붙이면 다른 날 일로 읽힌다). 관문 bodies ①ⓒ.

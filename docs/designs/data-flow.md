@@ -59,6 +59,10 @@ notices.json 의 새 공고
    └─ collector/link-hunter.mjs      원문 주소를 못 찾은 것 전담 (느려도 정확하게)
 ```
 
+🔴 **유료 관문 (2026-11-20 · `docs/designs/paid-gate-pipeline.md`)** — 자동 등록분은 `paidGate` 를 달고 숨은 채 원문을 받는다 →
+`collector/card-read.mjs`(읽기 → 고치기 → 사실 검사) 를 통과해 `data/card-read.json` 에 실려야 학생 화면에 나온다(`match-engine.js` `publishedList`) →
+신청서 PDF 뒤 `collector/final-review.mjs` 가 문서·카드를 원문과 맞춰 보고만 한다(`collector/final-review.json` → 관리자 「할 일」).
+
 🔴 **저장 직전에 데이터 관문**(`verify/audit-data.js`)이 선다. 통과 못 하면 **그 실행이 새로
 등록한 것만 골라 되돌리고**(`revert-auto.mjs`) 리포트에 🚨 를 남긴다. 잘못된 공고가 앱에 하루도 못 나간다.
 

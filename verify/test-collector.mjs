@@ -14488,7 +14488,7 @@ console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 
     [false, 2, [true, true, true]]);
 }
 
-console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외활동 (2026-10-04 개발자 "진짜 브라우저로 열어야 되는 공고는 다 이걸로 · 시간초과 등 오류 안 나게")');
+console.log('\n■ 원문 받기 로봇 (진짜 브라우저) — 장학·대외활동 (2026-10-04 개발자 "진짜 브라우저로 열어야 되는 공고는 다 이걸로 · 시간초과 등 오류 안 나게")');
 {
   /* 왜 있나 — 진짜 크롬으로 자격을 찾는 로봇은 하나(rescue-bodies.yml)다. 수집 로봇과 겹치지 않게: 대기줄·시간대·쓰는 파일이 따로이고,
      data/activities.json 은 브라우저 로봇이 쓰지 않는다(수집 로봇·공공 API 로봇이 이미 쓴다 — 셋이 쓰면 push 가 부딪힌다). */
@@ -14541,11 +14541,11 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
   const ia = wf.indexOf('activity-docs.mjs --fetch --browser'), io = wf.indexOf('paddle-ocr.py collector/act-files'), ip = wf.indexOf('activity-docs.mjs --apply --browser'), ig = wf.indexOf('- name: 데이터 관문');
   eq('② 워크플로 — 이름 · 장학 → 활동 받기 → 글자 읽기 → 고르기 → 관문 순 · 단계마다 시한 · 작업 시한 > 단계 합 + 3 · 장부 저장 · 하루 두 번',
-    [/^name: 자격요건 로봇 \(진짜 브라우저\)$/m.test(wf), wf.indexOf('rescue-bodies.mjs --write') < ia && ia < io && io < ip && ip < ig, caps.length >= 6, job > caps.reduce((a, b) => a + b, 0) + 3,
+    [/^name: 원문 받기 로봇 \(진짜 브라우저\)$/m.test(wf), wf.indexOf('rescue-bodies.mjs --write') < ia && ia < io && io < ip && ip < ig, caps.length >= 6, job > caps.reduce((a, b) => a + b, 0) + 3,
       /git add collector\/act-browser\.json/.test(wf), (wf.match(/- cron:/g) || []).length, /git add data\/activities\.json/.test(wf)],
     [true, true, true, true, true, 2, false]);
   eq('  수집 로봇과 다른 대기줄 · 배포 동기화가 새 이름을 본다 · 관리자 버튼 이름',
-    [/group: rescue-bodies/.test(wf), /'자격요건 로봇 \(진짜 브라우저\)'/.test(readText(new URL('../.github/workflows/deploy-sync.yml', import.meta.url))), /n: '자격요건 로봇'/.test(readText(new URL('../_admin/admin.js', import.meta.url)))], [true, true, true]);
+    [/group: rescue-bodies/.test(wf), /'원문 받기 로봇 \(진짜 브라우저\)'/.test(readText(new URL('../.github/workflows/deploy-sync.yml', import.meta.url))), /n: '원문 받기 로봇'/.test(readText(new URL('../_admin/admin.js', import.meta.url)))], [true, true, true]);
   /* 공공 API — 간헐 장애에 그날 글이 빠지지 않게 */
   const oa = readText(new URL('../collector/open-api.mjs', import.meta.url));
   const ow = readText(new URL('../.github/workflows/open-api.yml', import.meta.url));
