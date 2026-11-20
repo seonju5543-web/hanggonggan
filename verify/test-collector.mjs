@@ -17203,5 +17203,53 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
     [/Mascot\.syncHome\(state\.profile && state\.profile\.school\)/.test(appSource()), /Mascot\.syncApps\(apps\.length > 0 && !calMode\)/.test(appSource())], [true, true]);
 }
 
+console.log('\n■ 대장님 말귀 — 오타·변형 알아듣기 · 공고 한 건의 칸 (2026-11-20 개발자 지시)');
+{
+  /* 개발자 지시: "입력된 값을 1000-10000개 수준으로 늘려서 … 오타를 내거나 같은 의미에서 변형된 말을 해도 알아듣고 …
+     ~공고의 지원자격을 알려줘 / ~공고의 원문 링크는 뭐야?" — 말귀는 chat-nlu.js · 지식은 chat-kb.js · 답은 chat.js.
+     🔴 모르는 말은 안 알아듣는 쪽이 맞다 — 아래 '새면 안 되는 질문'이 인사·사용법 답으로 가면 빨간불(chat.js 머리말 「못 찾으면 못 찾았다」). */
+  const req = createRequire(import.meta.url);
+  const N = req('../chat-nlu.js');
+  const K = req('../chat-kb.js');
+  const idx = N.nluBuildIndex(K.kbIntents());
+  const cnt = K.kbCount();
+  eq('학습 문장 수가 1,000~10,000 사이다 (개발자 지시 · 주제×묻는 꼴 곱 포함)', cnt >= 1000 && cnt <= 10000, true);
+  eq('  의도 이름이 겹치지 않는다', K.CHAT_KB.length === new Set(K.CHAT_KB.map((it) => it.id)).size, true);
+  const kbSrc = readText(new URL('../chat-kb.js', import.meta.url));
+  const chatSrc = readText(new URL('../chat.js', import.meta.url));
+  const dynNames = [...new Set(K.CHAT_KB.filter((it) => it.dyn).map((it) => it.dyn))];
+  eq('  dyn 의도마다 chat.js CHAT_DYN 에 만드는 함수가 있다', dynNames.filter((d) => !new RegExp(`\\n  ${d}: `).test(chatSrc.slice(chatSrc.indexOf('const CHAT_DYN')))), []);
+  eq('  고정 답이 가리키는 행동(act)은 chat.js chatDoAction 이 아는 것뿐이다',
+    [...new Set((kbSrc.match(/act: '([a-z]+)/g) || []).map((x) => x.slice(6)))].filter((a) => !new RegExp(`'${a}:?'`).test(chatSrc.slice(chatSrc.indexOf('function chatDoAction'), chatSrc.indexOf('async function chatSend')))), []);
+  const want = [
+    ['안녕하세여', 'greet'], ['ㅎㅇ', 'greet'], ['안뇽하세요 대장님', 'greet'], ['고마어', 'thanks'], ['ㄱㅅ', 'thanks'], ['넌 누구냐', 'who'],
+    ['마깜 임박한거', 'dyn.deadline'], ['서루 뭐 준비해', 'dyn.documents'], ['서류함 어케 써', 'app.wallet'], ['서류 보관함 어디잇어', 'app.wallet'],
+    ['알람이 안와여', 'app.notify'], ['푸쉬 알림 설정', 'app.notify'], ['로그인 꼭 해야대?', 'app.login'], ['휴지통어디', 'app.trash'],
+    ['적합도 계산 어케해', 'app.fit'], ['교내교외 차이', 'app.kind'], ['국장 신청방법', 'gk.kosaf'], ['이중수혜 되나', 'gk.dup'],
+    ['홈화면에 추가하는법', 'app.install'], ['홈에 금액은 뭐야', 'app.home.amount'], ['저장한거 어디서봐', 'app.saved'], ['제출했어요 버튼 어딨어', 'app.submitted'],
+    ['등본 어디서 떼', 'dyn.docissue'], ['이번주 마감', 'dyn.today'], ['공모전 추천해줘', 'dyn.activities'], ['원문 확인은 어디서 해?', 'app.source'],
+  ];
+  const got = want.map(([q]) => { const r = N.nluClassify(idx, q); return r && (r.score >= 0.86 || (r.score >= 0.8 && r.margin >= 0.1) || (r.score >= 0.74 && r.margin >= 0.04)) ? r.id : null; });
+  eq('  오타·띄어쓰기·말끝이 달라도 같은 의도로 알아듣는다 (' + want.length + '문장)', want.map(([q], i) => (got[i] === want[i][1] ? '' : `${q} → ${got[i]}`)).filter(Boolean), []);
+  /* 새면 안 되는 질문 — 공고 낱말·엉뚱한 말이 인사·사용법으로 답해지면 '아는 척'이다(verify-chat 의 쿼카 질문과 같은 자리) */
+  const neg = ['쿼카 사육 지원금 있어?', 'ㅁㄴㅇㄹ 쿼카 사육', '기숙사', '기숙사비 지원금', '유흥수 장학금 자격', '삼성 장학금', '이공계 장학금'];
+  eq('  공고 낱말·엉뚱한 말은 지식 답으로 새지 않는다(답하는 문턱·되묻는 문턱 둘 다 아래)', neg.filter((q) => { const r = N.nluClassify(idx, q); return r && (r.score >= 0.74 || (r.score >= 0.62 && r.margin >= 0.15)); }), []);
+  /* 공고 한 건의 칸 */
+  eq('  묻는 칸을 가른다 — 자격·링크·마감·금액·서류·신청 방법·문의·인원·중복',
+    ['유흥수 장학금 지원 자격 알려줘', '유흥수장학금 원문 링크 뭐야', '마감 언제까지야', '얼마 줘?', '제출 서류 뭐야', '어케 신청해', '문의처', '몇명 뽑아', '중복 돼?'].map(N.nluField),
+    ['elig', 'link', 'deadline', 'amount', 'documents', 'how', 'contact', 'count', 'dup']);
+  const names = [{ key: 'a', names: ['유흥수 장학금 (한국외대 융합일본지역학부)'] }, { key: 'b', names: ['국가장학금 Ⅰ유형'] }, { key: 'c', names: ['2026 국세청 근로 · 자녀 장려 장학생 선발 안내'] }, { key: 'd', names: ['경기대학교 KGU 창업준비 아카데미 모집'] }, { key: 'e', names: ['농어촌 기본소득 우수모델을 찾습니다'] }];
+  const top = (q) => { const r = N.nluFindByName(q, names, 1)[0]; return r && r.score >= 0.8 ? r.key : null; };
+  eq('  공고 이름은 오타·로마 숫자·남은 말에도 찾는다 (유흥슈·1유형·국세쳥·몇명 뽑아)', ['유흥슈 장학금 링크', '국가장학금 1유형 자격', '국세쳥 장학생 마감', '유흥수 장학금 몇명 뽑아'].map(top), ['a', 'b', 'c', 'a']);
+  eq('  🔴 짧은 토막·남은 말로는 엉뚱한 이름을 고르지 않는다 (2026-11-20 실측: `드림`→공모전 · `준비해`→창업준비 아카데미)', ['드림 장학금 링크', '서류 뭐 준비해?', '장학금 자격 알려줘', '원문 확인은 어디서 해?'].map(top), [null, null, null, null]);
+  eq('  위기의 말은 오타·띄어쓰기에 상관없이 먼저 잡는다(장학금 이야기 대신 상담 번호)', ['죽고 싶어', '죽고싶다', '자살하고 싶어', '살기 싫어'].map(N.nluCrisis).concat(N.nluCrisis('죽을 만큼 바빠')), [true, true, true, true, false]);
+  eq('  chat.js 가 칸 답·지식 답을 경로에 둔다(칸 → 지식 → 기존 규칙 → 검색 → 되묻기) · index.html·sw.js 가 두 파일을 chat.js 보다 먼저 싣는다',
+    [/const field = chatAnswerField\(s\);/.test(chatSrc), /chatKbClassify\(s\)/.test(chatSrc),
+      (() => { const h = readText(new URL('../index.html', import.meta.url)); const a = h.indexOf('src="chat-nlu.js"'), b = h.indexOf('src="chat-kb.js"'), c = h.indexOf('src="chat.js"'); return a > 0 && a < b && b < c; })(),
+      /'chat-nlu\.js', 'chat-kb\.js', 'chat\.js'/.test(readText(new URL('../sw.js', import.meta.url)))],
+    [true, true, true, true]);
+  eq('  🔴 일반 질문(`서류 뭐 준비해?`)에는 본문에만 낱말이 든 공고 하나를 고르지 않는다 — 이름에서 찾은 것만(chatNameHit)', /if \(hit && chatNameHit\(hit, q\)\)/.test(chatSrc), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
