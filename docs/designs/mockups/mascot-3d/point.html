@@ -60,7 +60,7 @@
 <body>
 <div class="wrap">
   <h1>가리키는 마스코트 시안</h1>
-  <p class="lead">마스코트가 오른쪽에서 왼쪽 안내 문구를 <strong>가리킵니다</strong>. 차례는 신청 가능 공고 → 그 공고를 신청했을 때의 금액 → 마감 임박이에요. 줄을 누르거나 마스코트를 누르면 다음 안내로 넘어가고, 글자와 캐릭터가 같이 움직여요. 가만히 두면 3.4초마다 저절로 넘어갑니다.</p>
+  <p class="lead">마스코트가 오른쪽에서 왼쪽 안내 문구를 <strong>가리킵니다</strong>. 차례는 매칭된 공고 → 그 공고를 신청했을 때의 금액 → 마감 임박이에요. 줄을 누르거나 마스코트를 누르면 다음 안내로 넘어가고, 글자와 캐릭터가 같이 움직여요. 가만히 두면 3.4초마다 저절로 넘어갑니다.</p>
   <p class="nogl" id="nogl">이 화면에서는 3D(WebGL)가 켜지지 않았어요.</p>
   <div class="ctl"><span>학교</span><select class="pick" id="pick" aria-label="학교 고르기"></select></div>
   <div class="ctl" aria-label="금액 이름표 후보 (앱에는 없음)"><span>금액 이름표</span>
@@ -74,9 +74,9 @@
       <svg class="ray" id="ray" aria-hidden="true"><line id="ray-line" x1="0" y1="0" x2="0" y2="0"/></svg>
       <div class="lines" id="lines" role="list">
         <span class="bar" id="bar"></span>
-        <!-- 차례(2026-11-20 개발자 지시): 신청 가능 공고 → 그 공고를 신청했을 때의 금액 → 마감 임박. 이름표는 문장이 아니라 낱말 -->
-        <button class="ln" data-i="0" role="listitem"><small>신청 가능 공고</small><b data-to="16" data-fmt="cnt">16건</b></button>
-        <button class="ln" data-i="1" role="listitem"><small id="amt-label">수령 가능액</small><b data-to="3644" data-fmt="won">최대 3,644만원</b></button>
+        <!-- 차례(2026-11-20 개발자 지시): 매칭된 공고 → 그 공고를 신청했을 때의 금액 → 마감 임박. 이름표는 문장이 아니라 낱말 -->
+        <button class="ln" data-i="0" role="listitem"><small>매칭된 공고</small><b data-to="16" data-fmt="cnt">16건</b></button>
+        <button class="ln" data-i="1" role="listitem"><small id="amt-label">수령 가능액</small><b data-to="3644" data-fmt="won">3,644만원</b></button>
         <button class="ln" data-i="2" role="listitem"><small>마감 임박</small><b data-to="5" data-fmt="cnt">5건</b></button>
       </div>
       <button class="stage" id="stage" aria-label="마스코트 — 누르면 다음 안내로"><canvas></canvas></button>
@@ -92,7 +92,7 @@
       <li>그 상태가 바뀌면 한꺼번에: 줄이 커지고 숫자가 0부터 올라가고 · 왼쪽 막대가 그 줄로 옮겨 가고 · 마스코트가 그 줄을 보며 팔을 뻗고 한 번 뜁니다.</li>
       <li>세 숫자는 <strong>늘 다 보여요</strong>. 작게 보이는 줄도 읽을 수 있고, 가리키는 것은 강조일 뿐입니다.</li>
       <li>마스코트를 누르면 동전이 나오면서 다음 줄로, 옆으로 끌면 돌아갑니다.</li>
-      <li>이름표는 문장이 아니라 낱말로 — 신청 가능 공고 · 수령 가능액(후보 셋 중 고르기) · 마감 임박. 숫자는 올려 주신 화면의 것이에요.</li>
+      <li>이름표는 문장이 아니라 낱말로 — 매칭된 공고 · 수령 가능액(후보 셋 중 고르기 · '최대'는 뺌 — 11-20 개발자 결정) · 마감 임박. 숫자는 올려 주신 화면의 것이에요.</li>
     </ul>
   </div>
 </div>
@@ -113,7 +113,7 @@
   if (!window.K) { $('nogl').style.display = 'block'; return; }
   const { Stage, MASCOTS, ORDER, REDUCED, clamp } = K;
   const lines = [...document.querySelectorAll('.ln')], dots = [...$('dots').children];
-  const FMT = { won: (n) => '최대 ' + n.toLocaleString('ko-KR') + '만원', cnt: (n) => n.toLocaleString('ko-KR') + '건' };
+  const FMT = { won: (n) => n.toLocaleString('ko-KR') + '만원', cnt: (n) => n.toLocaleString('ko-KR') + '건' };
   let active = -1, timer = 0, holdUntil = 0;
 
   const stage = Stage($('stage'), { coins: 8, spread: 1.4, jump: 0.3, camY: 1.4, lookY: 1.18, dist: 5.3,
