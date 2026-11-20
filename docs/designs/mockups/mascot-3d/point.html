@@ -22,6 +22,9 @@
   h1 { font-size: 20px; margin: 0 0 6px; letter-spacing: -0.03em; }
   .lead { margin: 0 0 14px; color: var(--sub); font-size: 14px; line-height: 1.55; }
   .ctl { display: flex; gap: 8px; align-items: center; margin: 0 0 10px; font-size: 12px; color: var(--weak); }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 11px; font-size: 12.5px; font-weight: 600; color: var(--sub); cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .ctl { flex-wrap: wrap; }
   .pick { font-size: 14px; font-weight: 600; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: #fff; max-width: 100%; }
   .phone { background: var(--bg); border-radius: 30px; padding: 22px 0 22px 20px; box-shadow: 0 1px 2px rgba(58,48,28,.05), 0 14px 36px rgba(58,48,28,.12); overflow: hidden; }
 
@@ -57,18 +60,24 @@
 <body>
 <div class="wrap">
   <h1>가리키는 마스코트 시안</h1>
-  <p class="lead">마스코트가 오른쪽에서 왼쪽 안내 문구를 <strong>가리킵니다</strong>. 줄을 누르거나 마스코트를 누르면 다음 안내로 넘어가고, 글자와 캐릭터가 같이 움직여요. 가만히 두면 3.4초마다 저절로 넘어갑니다.</p>
+  <p class="lead">마스코트가 오른쪽에서 왼쪽 안내 문구를 <strong>가리킵니다</strong>. 차례는 신청 가능 공고 → 그 공고를 신청했을 때의 금액 → 마감 임박이에요. 줄을 누르거나 마스코트를 누르면 다음 안내로 넘어가고, 글자와 캐릭터가 같이 움직여요. 가만히 두면 3.4초마다 저절로 넘어갑니다.</p>
   <p class="nogl" id="nogl">이 화면에서는 3D(WebGL)가 켜지지 않았어요.</p>
   <div class="ctl"><span>학교</span><select class="pick" id="pick" aria-label="학교 고르기"></select></div>
+  <div class="ctl" aria-label="금액 이름표 후보 (앱에는 없음)"><span>금액 이름표</span>
+    <button class="chip" data-label="수령 가능액" aria-pressed="true">수령 가능액</button>
+    <button class="chip" data-label="예상 장학금" aria-pressed="false">예상 장학금</button>
+    <button class="chip" data-label="장학금 합계" aria-pressed="false">장학금 합계</button>
+  </div>
 
   <div class="phone">
     <div class="hero" id="hero">
       <svg class="ray" id="ray" aria-hidden="true"><line id="ray-line" x1="0" y1="0" x2="0" y2="0"/></svg>
       <div class="lines" id="lines" role="list">
         <span class="bar" id="bar"></span>
-        <button class="ln" data-i="0" role="listitem"><small>지금 신청할 수 있는 장학금</small><b data-to="3644" data-fmt="won">최대 3,644만원</b></button>
-        <button class="ln" data-i="1" role="listitem"><small>신청할 수 있는 공고</small><b data-to="16" data-fmt="cnt">16건</b></button>
-        <button class="ln" data-i="2" role="listitem"><small>마감이 가까운 공고</small><b data-to="5" data-fmt="cnt">5건</b></button>
+        <!-- 차례(2026-11-20 개발자 지시): 신청 가능 공고 → 그 공고를 신청했을 때의 금액 → 마감 임박. 이름표는 문장이 아니라 낱말 -->
+        <button class="ln" data-i="0" role="listitem"><small>신청 가능 공고</small><b data-to="16" data-fmt="cnt">16건</b></button>
+        <button class="ln" data-i="1" role="listitem"><small id="amt-label">수령 가능액</small><b data-to="3644" data-fmt="won">최대 3,644만원</b></button>
+        <button class="ln" data-i="2" role="listitem"><small>마감 임박</small><b data-to="5" data-fmt="cnt">5건</b></button>
       </div>
       <button class="stage" id="stage" aria-label="마스코트 — 누르면 다음 안내로"><canvas></canvas></button>
     </div>
@@ -83,7 +92,7 @@
       <li>그 상태가 바뀌면 한꺼번에: 줄이 커지고 숫자가 0부터 올라가고 · 왼쪽 막대가 그 줄로 옮겨 가고 · 마스코트가 그 줄을 보며 팔을 뻗고 한 번 뜁니다.</li>
       <li>세 숫자는 <strong>늘 다 보여요</strong>. 작게 보이는 줄도 읽을 수 있고, 가리키는 것은 강조일 뿐입니다.</li>
       <li>마스코트를 누르면 동전이 나오면서 다음 줄로, 옆으로 끌면 돌아갑니다.</li>
-      <li>숫자는 올려 주신 화면(3,644만원 · 16건 · 마감 임박 5)의 것이에요.</li>
+      <li>이름표는 문장이 아니라 낱말로 — 신청 가능 공고 · 수령 가능액(후보 셋 중 고르기) · 마감 임박. 숫자는 올려 주신 화면의 것이에요.</li>
     </ul>
   </div>
 </div>
@@ -147,6 +156,9 @@
   function setSchool(k) { const d = MASCOTS[k]; stage.setChar(d.build()); $('who').textContent = `${d.school} · ${d.name}`; $('pick').value = k; setTimeout(aim, 60); }
   ORDER.forEach((k) => { const o = document.createElement('option'); o.value = k; o.textContent = `${MASCOTS[k].school} — ${MASCOTS[k].name}`; $('pick').appendChild(o); });
   $('pick').addEventListener('change', (e) => setSchool(e.target.value));
+  document.querySelectorAll('[data-label]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-label]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); $('amt-label').textContent = b.dataset.label; setTimeout(aim, 30);
+  }));
   const first = new URLSearchParams(location.search).get('m');
   setSchool(MASCOTS[first] ? first : 'hufs');
   setActive(0);
