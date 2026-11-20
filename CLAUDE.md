@@ -198,7 +198,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml`) — 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
-| `collector/schematize-forms.mjs` `form-pdf.mjs` `form-fields.mjs` | 양식 스키마화(멈춤) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart · 관문 「신청서 원본 → PDF」) · 쪽 그림·빈칸 자리(관문 「신청서 쪽 그림 · 빈칸 자리」) |
+| `collector/schematize-forms.mjs` `form-pdf.mjs` `form-fields.mjs` | 양식 스키마화(멈춤) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart · 관문 「신청서 원본 → PDF」) · 쪽 그림·빈칸 자리(관문 「신청서 쪽 그림 · 빈칸 자리」) · LibreOffice 변환(전용 프로필·시한·변환기 말)은 `collector/soffice.mjs` 한 곳 |
 | `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 재단 개별 공고 후보(확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
 | `collector/notice-source.mjs` `canon-url.mjs` `url-key.mjs` `clean-title.mjs` | '같은 공고인가'·'원문이 무엇인가' 규칙 한 곳 |
 | `collector/kosaf-*.mjs` | 층2 수확 · 첨부 사본 |

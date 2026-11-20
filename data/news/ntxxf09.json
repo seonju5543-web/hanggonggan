@@ -1,7 +1,27 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 2027학년도 학부제 전공배정 신청 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627309&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-20",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-20",
+   "desc": "2027학년도 학부제 전공배정 신청 안내 드립니다. 신입생 및 전공배정 미신청자 분들은 기간 내에 신청해주셔야 합니다. 제출기간부터 신청서 출력이 가능합니다. 신청 후 실물 출력 제출까지 하셔야 신청이 완료됩니다."
+  },
+  {
+   "title": "[입학에서 취업까지] [수학과] 2027학년도 전공배정신청 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627308&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-20",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-20",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
   {
    "title": "[일반] 2026-2학기 학위논문 본심사 기간 및 결과보고서 제출 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627289&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -395,25 +415,6 @@
    "src": "bf927d3e",
    "foundAt": "2026-11-08",
    "desc": "희망 학과(전공)을 부전공으로 이수하고자 하는 학생은 아래 내용을 참고하여 부전공을 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[일반] 2027학년도 학부제 전공배정 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627027&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-04",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-08",
-   "desc": "학생들은 기한 내에 KUTIS에서 신청 후 신청서를 출력하여 1전공 희망 전공 사무실에 제출하시기 바랍니다. ex) 가전공 일문, 희망전공 프문 -> 일어일문전공 사무실에서 도장 날인 후 프랑스어문전공 사무실에 제출"
-  },
-  {
-   "title": "[일반] 제42대 경기대학교 일반대학원 원우회장 선거 공고",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627021&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-04",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-08"
   }
  ]
 }

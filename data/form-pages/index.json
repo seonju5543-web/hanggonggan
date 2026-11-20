@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": {
   "auto-o2432actionviewno9994682": [
    {
@@ -655,19 +655,6 @@
     "at": "2026-11-18"
    }
   ],
-  "auto-scho332282856artclviewdo": [
-   {
-    "file": "auto-scho332282856artclviewdo/1-elig-xt6vup-1_p4-4.pdf",
-    "name": "공고문 안 신청서 서식 (4쪽)",
-    "pages": 1,
-    "bytes": 104434,
-    "src": "elig-xt6vup-1.hwp",
-    "srcBytes": 68096,
-    "srcPages": "4",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-18"
-   }
-  ],
   "kosaf-2000449006": [
    {
     "file": "kosaf-2000449006/1-2026년_2학기_장성군_대학생_등록금_지원사업_공고_p6-8.pdf",
@@ -703,6 +690,40 @@
     "srcBytes": 102069,
     "none": true,
     "at": "2026-11-19"
+   }
+  ],
+  "auto-0713no2516266sitedvscdkr": [
+   {
+    "file": "auto-0713no2516266sitedvscdkr/1-form-1n9svq-2_p4-6.pdf",
+    "name": "공고문 안 신청서 서식 (4~6쪽)",
+    "pages": 3,
+    "bytes": 276818,
+    "src": "form-1n9svq-2.pdf",
+    "srcBytes": 172908,
+    "srcPages": "4~6",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-enoticedoarticleno770332": [
+   {
+    "src": "elig-13mq64-1.pdf",
+    "srcBytes": 72895,
+    "none": true,
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-krbbskr846184artclviewdo": [
+   {
+    "file": "auto-krbbskr846184artclviewdo/1-elig-12fzwo-1_p4-9.pdf",
+    "name": "공고문 안 신청서 서식 (4, 6~7, 9쪽)",
+    "pages": 4,
+    "bytes": 598449,
+    "src": "elig-12fzwo-1.hwp",
+    "srcBytes": 81920,
+    "srcPages": "4, 6~7, 9",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-20"
    }
   ]
  }

@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": {
   "auto-ticedoarticleno231554919": [
    {
@@ -473,18 +473,6 @@
     "at": "2026-11-18"
    }
   ],
-  "auto-scho332282856artclviewdo": [
-   {
-    "file": "auto-scho332282856artclviewdo/1-2._전인적인재성장계획서.pdf",
-    "name": "2. 전인적인재성장계획서.hwp",
-    "pages": 1,
-    "bytes": 82637,
-    "srcBytes": 42496,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
   "act-02ed6k3": [
    {
     "file": "act-02ed6k3/1-붙임_지원서_양식_.pdf",
@@ -646,6 +634,104 @@
     "fonts": "ko-nanum-1",
     "at": "2026-11-19"
    }
+  ],
+  "auto-sknou51815772artclviewdo": [
+   {
+    "file": "auto-sknou51815772artclviewdo/1-_붙임2_공적활동확인서_활동사진_포함__신규서식_2026-2학기.pdf",
+    "name": "★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp",
+    "pages": 2,
+    "bytes": 275099,
+    "srcBytes": 851456,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-ent2431269444artclviewdo": [
+   {
+    "file": "auto-ent2431269444artclviewdo/1-붙임2._생활비_온라인_체크리스트.pdf",
+    "name": "붙임2.[생활비] 온라인 체크리스트.pdf",
+    "pages": 1,
+    "bytes": 65312,
+    "srcBytes": 65312,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-0713no2516266sitedvscdkr": [
+   {
+    "file": "auto-0713no2516266sitedvscdkr/1-_서식_1_3.pdf",
+    "name": "[서식] 1~3.hwp",
+    "pages": 3,
+    "bytes": 174108,
+    "srcBytes": 51712,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-2638viewdocurrentpageno1": [
+   {
+    "file": "auto-2638viewdocurrentpageno1/1-인산장학회_학번_이름_.pdf",
+    "name": "인산장학회(학번, 이름).hwp",
+    "pages": 3,
+    "bytes": 107891,
+    "srcBytes": 46080,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-ent2431272166artclviewdo": [
+   {
+    "file": "auto-ent2431272166artclviewdo/1-HUFS_Dream_장학금_신청서.pdf",
+    "name": "HUFS Dream 장학금 신청서.hwp",
+    "pages": 2,
+    "bytes": 143406,
+    "srcBytes": 221184,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-pnoticedoarticleno368050": [
+   {
+    "file": "auto-pnoticedoarticleno368050/1-붙임._아이소이아묻따생활장학금_신청서_양식.pdf",
+    "name": "붙임. 아이소이아묻따생활장학금 신청서 양식.hwp",
+    "pages": 4,
+    "bytes": 156718,
+    "srcBytes": 18432,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
+  ],
+  "act-0hpsg5o": [
+   {
+    "file": "act-0hpsg5o/1-_양식_2026년_대학생_재능봉사_프로그램_계획서.pdf",
+    "name": "(양식)2026년 대학생 재능봉사 프로그램 계획서.hwp",
+    "pages": 3,
+    "bytes": 322459,
+    "srcBytes": 223744,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
   ]
+ },
+ "roles": {
+  "auto-sknou51815772artclviewdo": {
+   "★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp": "form"
+  },
+  "auto-ent2431269444artclviewdo": {
+   "붙임2.[생활비] 온라인 체크리스트.pdf": "form"
+  },
+  "auto-0713no2516266sitedvscdkr": {
+   "[서식] 1~3.hwp": "form"
+  },
+  "auto-2638viewdocurrentpageno1": {
+   "인산장학회(학번, 이름).hwp": "form"
+  }
  }
 }
