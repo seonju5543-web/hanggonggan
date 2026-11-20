@@ -288,7 +288,7 @@
     const stack = opt.stack ? new Stack(scene, opt.stack[0], opt.stack[1], 12) : null;
 
     let ch = null, appear = 1;
-    const S = { yaw: 0, yawV: 0, drag: false, lookX: 0, lookY: 0, lx: 0, ly: 0, tJump: -1, blink: rand(1.5, 3.5), blinkT: 0, armUp: 0, capT: -1, tas: 0, tasV: 0, time: 0, visible: true };
+    const S = { yaw: 0, yawV: 0, drag: false, lookX: 0, lookY: 0, lx: 0, ly: 0, tJump: -1, blink: rand(1.5, 3.5), blinkT: 0, armUp: 0, capT: -1, tas: 0, tasV: 0, time: 0, visible: true, point: null, pz: 0.3, py: 0 };
 
     function setChar(next) {
       if (ch) { scene.remove(ch.root); }
@@ -363,7 +363,10 @@
       ch.squash.scale.set(sxz, sy, sxz);
       shadow.scale.setScalar((1 - y * 0.45) * (opt.scale || 1) * (ch.scale || 1));
       // 시선
-      S.lx = lerp(S.lx, S.lookX, 1 - Math.pow(0.002, dt)); S.ly = lerp(S.ly, S.lookY, 1 - Math.pow(0.002, dt));
+      /* 가리키기(point) — 화면의 글자 쪽을 본다 · 그쪽 팔을 뻗는다 · 몸을 조금 돌린다 (없으면 예전 그대로 손가락을 따라 본다) */
+      const P = S.point && !S.drag ? S.point : null;
+      S.lx = lerp(S.lx, P ? P.x : S.lookX, 1 - Math.pow(0.002, dt)); S.ly = lerp(S.ly, P ? -P.y : S.lookY, 1 - Math.pow(0.002, dt));
+      S.py = lerp(S.py, P ? P.x * 0.38 : 0, 1 - Math.pow(0.01, dt)); ch.root.rotation.y += S.py;
       const lk = ch.look || 1;
       ch.head.rotation.y = (S.lx * 0.34 - S.yaw * 0.25) * lk; ch.head.rotation.x = (S.ly * 0.2 + (S.tJump >= 0 && S.tJump < 0.56 ? -0.18 : 0)) * lk;
       ch.head.rotation.z = Math.sin(S.time * 1.1) * 0.03 * lk;
@@ -373,7 +376,11 @@
       const happy = S.tJump >= 0.12 && S.tJump < 0.7;
       ch.eyes.forEach((e) => { e.scale.y = S.blinkT > 0 ? 0.12 : (happy ? 0.55 : 1); });
       // 팔 · 귀 · 꼬리
-      ch.arms.forEach((a) => { const s = a.userData.side; a.rotation.z = s * (0.3 + S.armUp * 2.3 + Math.sin(S.time * 2.2 + s) * 0.05); });
+      const ps = P ? (P.x < 0 ? -1 : 1) : 0;   // 가리키는 쪽 팔
+      S.pz = lerp(S.pz, P ? Math.PI / 2 + P.y * 0.6 : 0.3, 1 - Math.pow(0.0008, dt));
+      ch.arms.forEach((a) => { const s = a.userData.side;
+        a.rotation.z = s === ps || (!P && Math.abs(S.pz - 0.3) > 0.02 && s === S.lastPs) ? s * (S.pz + Math.sin(S.time * 5) * 0.03) : s * (0.3 + S.armUp * 2.3 + Math.sin(S.time * 2.2 + s) * 0.05); });
+      if (ps) S.lastPs = ps;
       if (ch.ears) ch.ears.forEach((e, i) => { e.rotation.z = (i ? -1 : 1) * (Math.sin(S.time * 3 + i) * 0.04 + S.armUp * 0.22); });
       if (ch.tail) ch.tail.rotation.z = Math.sin(S.time * 2.6) * 0.22 + S.yawV * 0.03;
       // 학사모 — 톡 떠올라 한 바퀴
@@ -389,7 +396,8 @@
       renderer.render(scene, cam);
     }
     requestAnimationFrame(frame);
-    return { setChar, tap, size };
+    /* 밖에서 상태를 맞출 때 — point({x,y}): 화면 좌표(-1~1 · x 왼쪽이 −, y 위가 +)의 그 자리를 가리킨다(null 이면 그만) · hop(): 동전 없이 한 번 뛴다 */
+    return { setChar, tap, size, point(p) { S.point = p || null; }, hop() { if (S.tJump < 0 || S.tJump > 0.5) S.tJump = 0.1; } };
   }
 
 
