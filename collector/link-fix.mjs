@@ -26,6 +26,10 @@ export const FIX_DATASET_LABEL = {
 
 const hostOf = (u) => { try { return new URL(u).hostname.toLowerCase().replace(/^www\./, ''); } catch (e) { return ''; } };
 
+/** 한국장학재단이 직접 주는 사업인가 — 데이터의 org 로만 본다(주소·요청 값이 아니라). 관리자 저장 길(admin-apply)과
+ *  확인 로봇(link-candidates)이 이 한 곳을 같이 쓴다 — 둘이 갈라지면 한쪽만 재단 누리집 사업 안내를 원문으로 받는다(2026-11-20) */
+export function isKosafOwnOrg(org) { return /^(\(재\)|재단법인\s*)?한국장학재단$/.test(String(org || '').trim()); }
+
 /** 관리자가 넣은 주소를 원문 공고 주소로 받아도 되는가.
  *  돌려주는 것: { url(되푼 주소), errors[](하나라도 있으면 받지 않는다), warns[](받되 확인을 한 번 더 받는다) }
  *  opts.from = 지금 학생이 여는 주소(데이터에 실린 그대로) · opts.L = source-link.js 함수 묶음 · opts.downloadRe = 첨부 내려받기 꼴 */

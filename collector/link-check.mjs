@@ -50,7 +50,7 @@ import { gatherTargets, otherTitlesFor, planQueue, pickNext, summarize, kstToday
 import { makeBudget, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 import {
   loadCandidates, readIndexData, buildIndex, twinCandidates, kosafMatches, pickKosafPost, acceptCandidate, collisionOf, judgeTitles,
-  shouldOpen, nextCandState, publishFix, roundOf, hostOf, hostAllowed, normCandUrl, MAX_TRIES, PER_HOST_CAND, FINAL,
+  shouldOpen, nextCandState, publishFix, roundOf, hostOf, hostAllowed, normCandUrl, MAX_TRIES, PER_HOST_CAND, FINAL, kosafOwnOffHost,
 } from './link-candidates.mjs';
 import { extractDatedRows } from './board-links.mjs';
 import { robotsAllows } from './robots.mjs';
@@ -516,6 +516,8 @@ function recordCand(q, res, extra = {}) {
 const prevTries = (cid) => { const p = candState[cid]; return p && p.status === 'pending' ? (p.tries || 0) : 0; };
 /* 후보 주소 하나를 학생처럼 열고 판정 — 여는 눈(observe)·판정(judgeLanding)은 일반 차례와 같은 한 벌 */
 async function checkCandUrl(q, url, cand) {
+  /* 한국장학재단 자체 사업의 다른 사이트 글 — 판정이 어차피 거절하는 것을 열지 않는다(사이트별 한도·간격을 쓰지 않게 · 판정은 acceptCandidate 와 같은 함수) */
+  if (!cand.trusted && kosafOwnOffHost(q.target, url)) return { res: acceptCandidate({ target: q.target, cand, obs: {}, verdict: {}, ctx: {} }) };
   const titles = judgeTitles(q.target, cand);
   const t = { url, raw: url, titles, host: new URL(url).host, origin: new URL(url).origin };
   const obs = await observe(t);
