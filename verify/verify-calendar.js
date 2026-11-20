@@ -73,7 +73,8 @@ async function seed(page, saved, applied = []) {
      (2026-09-07에 이 검사가 실제로 그 중간값을 '결함'으로 잡았다).
      그래서 재기 전에 반드시 멈출 때까지 기다린다. */
   await page.waitForTimeout(1400);
-  const heroBefore = await page.textContent('#hero-amount').catch(() => '');
+  /* 히어로 숫자는 '지금 말하는 줄'이 될 때마다 0부터 올라간다(2026-11-20 가리키는 마스코트) — 글자 대신 멈춘 값(dataset.to)을 잰다 */
+  const heroBefore = await page.$eval('#hero-amount', (e) => e.dataset.to).catch(() => '');
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(300);
   const btnCount = await page.locator('#explore-list .save-btn').count();
@@ -96,7 +97,7 @@ async function seed(page, saved, applied = []) {
   /* ① 저장은 신청이 아니다 — 홈 합계가 움직이면 안 된다 */
   await page.click('.nav-item[data-nav="home"]');
   await page.waitForTimeout(1600);                     // 애니메이션이 멈춘 뒤에 읽는다(위 주석)
-  const heroAfter = await page.textContent('#hero-amount').catch(() => '');
+  const heroAfter = await page.$eval('#hero-amount', (e) => e.dataset.to).catch(() => '');
   ok('저장해도 홈의 예상 수혜액이 바뀌지 않는다', heroBefore === heroAfter, `${heroBefore} → ${heroAfter}`);
 
   /* ── ② 보관함 ────────────────────────────────────────── */

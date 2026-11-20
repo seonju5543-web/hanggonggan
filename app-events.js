@@ -124,14 +124,7 @@ function bindEvents() {
     if (!was) b.classList.add('on');
   });
 
-  /* 히어로 금액을 누르면 '금액 상세' — 그 숫자가 어떻게 나왔는지 줄 단위로 보여 준다 */
-  const heroAmt = $('#hero-amount');
-  if (heroAmt) {
-    heroAmt.addEventListener('click', renderAmountDetail);
-    heroAmt.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderAmountDetail(); }
-    });
-  }
+  /* 히어로 안내 줄을 누르면 그 줄의 목록 — 수령 가능액 줄은 예전처럼 '금액 상세'. 배선은 app-mascot.js(줄·마스코트·저절로 넘어감이 같은 상태 하나를 쓴다) */
 
   /* '받고 있는 장학금 없음'과 나머지는 같이 켤 수 없다 — 둘 다 켜지면 뜻이 모순된다 */
   const scholBox = $('#in-scholarships'), scholNone = $('#in-schol-none');

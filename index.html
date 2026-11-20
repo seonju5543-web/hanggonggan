@@ -414,20 +414,26 @@
            칸 숫자·그림은 app.js renderHome() 이 채운다(HERO_TILES).
            🔴 금액과 버튼 사이의 '빨간 한 줄'(`#hero-sub`)은 2026-10-03 개발자 지시로 뺐다 —
               그림 4칸이 생긴 뒤로 그 줄이 말할 숫자가 전부 칸·버튼에 이미 있었다(app.js 주석). -->
+      <!-- 🔴 히어로 — 가리키는 마스코트 (2026-11-20 개발자 승인 시안 docs/designs/mockups/mascot-3d/point.html · "시안을 앱 홈에 적용").
+           왼쪽 안내 줄 넷(매칭된 공고 → 수령 가능액 → 마감 D-n → 이어서 쓰기) · 오른쪽 마스코트가 지금 말하는 줄을 가리킨다.
+           상태(지금 말하는 줄)는 app-mascot.js 의 setActive 하나 — 줄·막대·점·캐릭터가 같이 따라온다.
+           숫자·숨김은 app.js renderHome() 이 채운다(판정을 새로 만들지 않는다 · 같은 applyable 하나에서 센다).
+           마감 줄과 이어서 쓰기 줄은 0건이면 숨는다(시안 그대로). 3D 를 못 그리는 폰은 무대만 비고 줄은 그대로다.
+           🔴 「쓰던 신청서」 띠(#home-resume)는 이 시안으로 없앴다 — 같은 일을 「이어서 쓰기」 줄이 한다. -->
       <div class="hero-card">
-        <!-- 3D 마스코트(2026-11-19) — 준비되면 app-mascot.js 가 .hero-card 에 has-mascot 를 달아 아래 글자를 말풍선으로 바꾸고 캐릭터를 세운다.
-             3D 를 못 그리는 폰은 #mascot-home 이 감춰진 채 글자 화면 그대로다. 금액·이름표 글자는 예전처럼 app.js 가 쓴다 -->
-        <div class="hero-say">
-          <p class="hero-label" id="hero-label">지금 신청할 수 있는 장학금</p>
-          <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
+        <div class="hero" id="hero">
+          <div class="mascot-wrap" id="mascot-home" hidden><button type="button" class="mascot-stage" aria-label="마스코트 — 누르면 다음 안내로"><canvas></canvas></button></div>
+          <div class="hero-lines" id="hero-lines">
+            <span class="hero-bar" id="hero-bar" aria-hidden="true"></span>
+            <button type="button" class="hero-ln" data-k="match"><small>매칭된 공고</small><b id="hero-match">0건</b></button>
+            <button type="button" class="hero-ln" data-k="amount"><small>수령 가능액</small><b id="hero-amount">0원</b></button>
+            <button type="button" class="hero-ln" data-k="due" hidden><small>마감 <span class="dd" id="hero-due-dd">D-Day</span></small><b id="hero-due">0건</b></button>
+            <button type="button" class="hero-ln" data-k="draft" hidden><small>이어서 쓰기</small><b id="hero-draft">0건</b></button>
+          </div>
         </div>
-        <div class="mascot-wrap" id="mascot-home" hidden><button type="button" class="mascot-stage" aria-label="마스코트 — 누르면 동전이 나와요"><canvas></canvas></button></div>
+        <div class="hero-foot"><div class="hero-dots" id="hero-dots" aria-hidden="true"></div><p class="hero-who" id="hero-who"></p></div>
         <div class="hero-tiles" id="hero-tiles"></div>
       </div>
-
-      <!-- 쓰던 신청서 — 창(4시간)을 넘겨 들어와도 진행분은 안 버린다는 자리.
-           내용은 app.js renderHome() 이 채운다. 설계: docs/designs/first-run-and-resume.md -->
-      <button type="button" class="resume-card" id="home-resume" hidden></button>
 
       <!-- 우리 학교 소식 띠 (2026-10-04 개발자 승인 시안 1안 「사진 카드 띠」 — 아이콘 네 칸 바로 밑).
            최근 소식 네 장을 사진 카드로 옆으로 넘겨 본다(글의 사진, 없으면 학교 대표 사진). 「전체 보기」는 시트로 전부.

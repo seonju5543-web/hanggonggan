@@ -29,14 +29,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { expectTitles, stripRowTail, headMatches } from './link-landing.mjs';
+import { expectTitles, stripRowTail, headMatches, labeledTitle, lineTitle, fileShown } from './link-landing.mjs';
 import { sameTitle, titleFingerprint, rowMatchesTitle, isDetailUrl } from './detail-url.mjs';
 import { stripSessionId, siteKey } from './board-links.mjs';
 import { urlKey, normTitle } from './url-key.mjs';
+import { isKosafOwnOrg, AGGREGATOR_RE } from './link-fix.mjs';
 
 const require = createRequire(import.meta.url);
 /* 앱과 같은 파일 — 주소 꼴·바로잡기 열쇠·회차를 베끼지 않는다 */
 const SL = require('../source-link.js');
+/* 내려받기 주소 꼴 — 등록 규칙 한 곳(로봇·감사 공용) */
+const ENTRY_RULES = require('../verify/entry-rules.cjs').RULES;
 /* 🔴 extract-excerpts.mjs 는 불러오는 순간 본편(발췌 로봇)이 도는 파일이다 — activity-excerpts.mjs 와 같은 길로 부른다 */
 process.env.EXCERPTS_AS_LIB = process.env.EXCERPTS_AS_LIB || '1';
 const { extractDeadline } = await import('./extract-excerpts.mjs');
@@ -158,7 +161,10 @@ export function cleanAttachTitle(name) {
     .replace(/^\s*(?:붙임|별첨)\s*\d*\s*[.)_-]?\s*/, '')
     .replace(/^\s*\d{1,2}\s*[.)]\s*/, '')
     .replace(/\((?:게시용[^)]*)\)|★|☆|_수정\d*|_최종/g, ' ')
+    .replace(/^\s*\d{6}\s*[-_.]\s*/, '')                       // 앞머리 올린 날 도장(261027- · 261027_) — 2026-11-20 경남장학회 · 밑줄을 띄어쓰기로 바꾸기 전에
     .replace(/_/g, ' ')
+    /* 끝 올린 날 도장(…선발공고0416) — 🔴 해(2026)는 회차를 묶는 글자라 떼지 않는다(리뷰 2026-11-20) */
+    .replace(/(공고문?|안내문?|모집|선발)\s*(?!(?:19|20)\d{2}\s*$)\d{3,8}\s*$/, '$1')
     .replace(/\s+/g, ' ').trim();
   if (s.length < 8 || NOT_NOTICE_FILE.test(s) || !/공고|안내|모집|선발|장학/.test(s)) return '';
   return s;
@@ -179,7 +185,7 @@ export function kosafTitles(k) {
   return out;
 }
 const ORG_NOISE = /\((?:재|사|주|복|사복)\)|재단법인|사단법인|사회복지법인|\(재단\)/g;
-const ORG_REGION_HEAD = /^(?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)/;
+const ORG_REGION_HEAD = /^(?:(?:서울|부산|대구|인천|광주|대전|울산)(?:특별|광역)시|세종특별자치시|경기도|강원(?:특별자치)?도|충청[남북]도|전라남도|전북특별자치도|전라북도|경상[남북]도|제주(?:특별자치)?도|서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)/;
 export function orgCore(org) { return titleFingerprint(String(org || '').replace(ORG_NOISE, ' ')); }
 export function programCore(name) {
   const s = titleFingerprint(String(name || '').replace(/\([^)]*\)/g, ' ').replace(/장학생|장학금|장학/g, ' '));
@@ -240,11 +246,47 @@ function fullDates(s) {
   }
   return out;
 }
+/* 그 글 **스스로의** 날짜(올린 날) — 화면 어디의 날짜든이 아니다(리뷰 2026-11-20: 이전글·다음글·최근 게시물 줄의 날짜가 1학기 글을 2학기 회차로 올렸다).
+   ① 「작성일·등록일·게시일·공고일」 이름표 바로 뒤 날짜(수정일 아님) ② 없으면 **글 표지 줄**의 날짜 — 날짜·시각·조회수·글쓴이 몇 글자뿐인 짧은 줄
+   (「관리자 2026-11-04 조회: 155」 · 「26-10-27 19:51」) 가운데 첫 줄. 이전글·다음글·목록 줄과 제목이 함께 붙은 줄(사이드바 「…채용 공고 2026-11-02」)은 아니다 */
+const POST_DATE_LABEL = /(?<!수정|변경)(?:작성일(?:자|시)?|등록일(?:자|시)?|게시일(?:자|시)?|공고일(?:자)?|게시\s*일|작성\s*일)\s*[:：|\t ]*\s*$/;
+const NAV_LINE = /이전\s*글|다음\s*글|이전\s*게시물|다음\s*게시물|최근\s*(?:게시물|글|소식)|^\s*목록|윗글|아랫글|\b(?:prev|next)\b/i;
+const DATE_AT = /(?<!\d)(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<![\d.\-])(\d{2})-(\d{2})-(\d{2})(?=\s+\d{1,2}:\d{2}|\s*$)/g;
+export function postDates(text) {
+  const lab = []; const meta = [];
+  for (const line of String(text || '').split('\n')) {
+    if (NAV_LINE.test(line)) continue;
+    for (const m of line.matchAll(DATE_AT)) {
+      const iso = m[1] ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : `20${m[4]}-${m[5]}-${m[6]}`;
+      if (!isoOk(iso)) continue;
+      if (POST_DATE_LABEL.test(line.slice(0, m.index))) { lab.push(iso); continue; }
+      const rest = line.replace(DATE_AT, ' ').replace(/\d{1,2}:\d{2}(?::\d{2})?|오전|오후|조회\s*수?|hit|views?|[\d,]+|[:：|/·\t()]/gi, ' ').replace(/\s+/g, '');
+      if (rest.length <= 12 && !/신청|접수|기간|마감|발표|일시|수정|변경|~|〜|까지|부터/.test(line)) meta.push(iso);
+    }
+  }
+  return lab.length ? lab : meta.slice(0, 1);
+}
+/* 회차를 볼 글자에서 **남의 글 줄**을 뺀다 — 이전글·다음글·최근 게시물 줄, 그리고 「다른 글 제목 + 날짜」로 끝나는 목록 줄
+   (리뷰 2026-11-20: 옆 칸 「2026 청소년문화센터 강사 채용 공고 2026-11-02」의 날짜가 접수 시작일과 같아 1학기 글이 '시작일이 보임'으로 올랐다).
+   본문의 일정 줄(「신청기간 : …」·「발표일정 : …」)은 이름표·기간 낱말이 있어 남는다 */
+export function ownPostText(text) {
+  return String(text || '').split('\n').filter((line) => {
+    if (NAV_LINE.test(line)) return false;
+    const m = line.match(/(?:(?<!\d)20\d{2}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\.?(?:\s*\d{1,2}:\d{2})?|(?<![\d.\-])\d{2}-\d{2}-\d{2}(?:\s+\d{1,2}:\d{2})?)\s*$/);
+    if (!m || /[:：]/.test(line.slice(0, m.index)) || /신청|접수|기간|마감|발표|일시|일정|까지|부터|~|〜/.test(line)) return true;
+    return line.slice(0, m.index).replace(/[\s\d|/·.,()\-]/g, '').length <= 12;
+  }).join('\n');
+}
+/* 제목 자리가 **장학생을 뽑는 글**인가 — 같은 재단의 수여식·이사회·전달식·결과 글은 아니다(리뷰 2026-11-20 · 회차 날짜 창·「장학생」뿐인 사업의 P 가 함께 쓴다) */
+const APPLY_HEAD = /선발|모집|신청|접수|공모|지원\s*사업|지원\s*대상|장학생|장학금/;
+const NOT_APPLY_HEAD = /수여식|전달식|증서|이사회|총회|개최|결과|발표|명단|합격|선정자|간담회|채용|행사|기념식|감사/;
+export const applyHead = (h) => APPLY_HEAD.test(String(h || '')) && !NOT_APPLY_HEAD.test(String(h || ''));
 /* 회차 판정 — { s: 'ok'|'fail'|'none', why }
    🔴 own = **우리 공고의 제목만**(후보가 적어 온 제목은 넣지 않는다) — 결과 글 판정이 후보 제목의 「결과」 낱말로 꺼지던 것(리뷰 2026-10-04)
    ref = 우리가 그 글을 본 날(게시일·수집일·등록일) — 마감도 연도도 없는 피드 글은 화면의 날짜가 그 무렵인지로 회차를 가린다 */
-export function roundCheck({ round, deadline, expectTitles: want = [], ownTitles, head, text, ref }) {
-  const all = `${head || ''}\n${text || ''}`;
+export function roundCheck({ round, deadline, expectTitles: want = [], ownTitles, head, text: text0, ref, kosafOwn = false }) {
+  const text = ownPostText(text0);
+  const all = `${head || ''}\n${text}`;
   const own = ownTitles || want;
   /* 결과·명단 발표 글 — 우리 공고 제목에 그 낱말이 없는데 열린 글 제목에 있으면 다른 글이다(층2만 보던 것을 모든 묶음에 · 리뷰 2026-10-04) */
   const resultPost = RESULT_WORD.test(head || '') && !own.some((w) => RESULT_WORD.test(w));
@@ -260,6 +302,15 @@ export function roundCheck({ round, deadline, expectTitles: want = [], ownTitles
     const dl = extractDeadline(all);
     if (dl && dl !== round.due) return { s: 'fail', why: `마감이 다름(글 ${dl} · 이번 회차 ${round.due})` };
     if (dl === round.due || dateShown(all, round.due) || dateShown(all, round.open)) return { s: 'ok', why: '마감·접수 시작일이 보임' };
+    /* 제목에 이번 회차의 해가 있고 제목 자리가 장학생을 뽑는 글이며, **그 글이 올라온 날**(postDates — 화면 아무 날짜가 아니다)이
+       접수 시작 30일 전 ~ 마감 사이(2026-11-20 · 그누보드 「26-10-27 19:51」). 다른 해·결과·반대 학기·다른 마감은 위에서 먼저 거절된다 */
+    if (round.open && ys.some((y) => okYears.includes(y)) && applyHead(head) && postDates(text).some((x) => x >= addDays(round.open, -30) && x <= round.due)) return { s: 'ok', why: '제목의 해와 글 올린 날이 이번 접수 기간 무렵' };
+    /* 한국장학재단 자체 사업 안내 쪽 — 사업 기간을 달로만 적는다(2026년 3월 ~ 2027년 2월). 시작 달·마감 달이 한 범위로 보일 때만 ·
+       다른 재단은 이 길을 안 탄다(2026-11-20) */
+    if (kosafOwn && round.open) {
+      const [oy, om] = round.open.split('-').map(Number); const [dy, dm] = round.due.split('-').map(Number);
+      if (new RegExp(`${oy}\\s*년\\s*0?${om}\\s*월\\s*[~〜-]\\s*${dy}\\s*년\\s*0?${dm}\\s*월`).test(all)) return { s: 'ok', why: '사업 기간(시작 달 ~ 마감 달)이 보임' };
+    }
     return { s: 'none', why: '회차를 가릴 날짜가 안 보임' };
   }
   const wantYears = [...new Set(own.flatMap(yearsIn))];
@@ -451,8 +502,12 @@ export function buildIndex(data) {
     const mine = fileKeys(k);
     const sameNotice = (o) => o !== k && o.org === k.org && o.due === k.due && fileKeys(o).some((f) => mine.includes(f));
     const attachTitles = kosafAttachTitles(k);
+    const kosafOwn = isKosafOwnOrg(k.org);
+    const titles = kosafTitles(k);
+    if (kosafOwn && k.name && !titles.some((x) => titleFingerprint(x) === titleFingerprint(k.name))) titles.push(String(k.name));
+    if (kosafOwn) allowed.push({ host: 'kosaf.go.kr' });
     add({
-      ds: 'kosaf', key: String(k.code), item: k, appItem, raw, titles: kosafTitles(k), nameOnly: !attachTitles.length, school: '',
+      ds: 'kosaf', key: String(k.code), item: k, appItem, raw, titles, kosafOwn, schoolHostSet: new Set(hostSchool.keys()), nameOnly: !attachTitles.length, school: '',
       deadline: k.due || '', label: appItem.name, org: k.org || '', orgCore: orgCore(k.org), program: k.name || '', programCore: programCore(k.name),
       attachTitles, round: kosafRound(k), allowed,
       alsoCodes: kosaf.filter(sameNotice).map((o) => String(o.code)),
@@ -530,11 +585,29 @@ const attachHit = (attach, title) => {
     return x.length >= 8 && y.includes(x);
   });
 };
+/* (2026-11-20) 검색 요약(post.snippet)도 증거로 — 검색 제목은 대개 그 쪽의 뭉뚱그린 창 제목(「공지사항 - 일신문화재단」 1점)이고
+   글 제목·첨부 이름(「[공고문]일신문화재단 2026 형남장학금.pdf」)은 요약에 있다. 제목만으로 3점이 안 될 때, 요약 혼자서는 아무 거절
+   (결과·다른 해·반대 학기·같은 재단의 다른 사업)에도 안 걸리고, 요약이 더해 준 점수에 공고문 파일 제목 또는 사업 이름이 있을 때만 쓴다.
+   🔴 요약은 고르는 데만 — 확인 로봇에 넘기는 제목은 검색 제목 그대로(judgeTitles 가 요약을 화면 증거로 쓰지 않게) */
 export function scoreKosafPost(t, post) {
+  const base = scoreKosafTitle(t, post);
+  const sn = String((post && post.snippet) || '').trim();
+  if (!sn || base.score < 0 || base.score >= 3) return base;
+  const alone = scoreKosafTitle(t, { ...post, title: sn, deadline: '', deadlineHint: '' });
+  if (alone.score < 0) return base;
+  const both = scoreKosafTitle(t, { ...post, title: `${(post && post.title) || ''} ${sn}` });
+  const has = (r, w) => r.why.some((x) => x.startsWith(w));
+  const added = ['공고문 파일 제목', '사업 이름'].some((w) => has(both, w) && !has(base, w));
+  if (both.score <= base.score || !added) return base;
+  return { score: both.score, why: [...both.why, '검색 요약'] };
+}
+function scoreKosafTitle(t, post) {
   const title = String((post && post.title) || '');
   const r = t.round || {};
   const why = [];
   if (RESULT_WORD.test(title)) return { score: -1, why: ['결과·명단 발표'] };
+  /* 같은 재단의 수여식·전달식·이사회 글 — 장학생을 뽑는 글이 아니다(리뷰 2026-11-20 · 우리 제목에 그 낱말이 있으면 예외) */
+  if (NOT_APPLY_HEAD.test(title) && !(t.titles || []).some((w) => NOT_APPLY_HEAD.test(w))) return { score: -1, why: ['수여식·이사회 같은 다른 글'] };
   const ys = yearsIn(title);
   const dueY = Number(String(r.due || '').slice(0, 4));
   if (dueY && ys.length && !ys.some((y) => y === dueY || y === dueY + 1)) return { score: -1, why: [`다른 해(${ys.join('·')})`] };
@@ -570,9 +643,31 @@ export function pickKosafPost(t, posts) {
 }
 /* 재단 게시판 글 주소인가 — 상세 주소 판정(isDetailUrl)에 더해, 재단 사이트의 낯선 번호 칸(아산 `index.php?m_cd=32&b_id=2026…`)도 글로 본다
    (data/external.json 은 우리 재단 게시판 로봇이 **날짜 붙은 글 줄**에서만 뽑은 것이라 메뉴가 아니다 — board-links.mjs extractDatedRows) */
+/* (2026-11-20) 파일을 내려주는 주소는 글이 아니다 — 열면 「Download is starting」으로 날마다 '못 엶'(인제 article/download?fileSeq= · 영천 dn.php?idx=).
+   내려받기 꼴은 등록 규칙 한 곳(entry-rules DOWNLOAD_URL)에 더해 dn.php · type=download 만 */
+const FILE_URL = /\/dn\.php\b|[?&](?:type|mode)=download\b/i;
+const isFileUrl = (u) => ENTRY_RULES.DOWNLOAD_URL.test(String(u || '')) || FILE_URL.test(String(u || ''));
+/* 「…_idx=18 & …=read_form」 — 읽기 표시(read·view·read_form)와 함께 오는 `_idx`·`_no`·`_seq` 번호 칸(두 자리 이상)도 글 번호(명지 mjsf 01.php) */
+const READ_VAL = /^(?:read|view|read_form)$/i;
+const ID_TAIL = /(?:_idx|_no|_number|_seq)$/i;
 export function looksLikePost(u) {
+  if (isFileUrl(u)) return false;
   if (isDetailUrl(u)) return true;
-  try { return [...new URL(u).searchParams].some(([k, v]) => !/page|offset|limit|menu|m_cd|cate/i.test(k) && /^\d{3,}$/.test(String(v))); } catch { return false; }
+  try {
+    const ps = [...new URL(u).searchParams];
+    if (ps.some(([k, v]) => !/page|offset|limit|menu|m_cd|cate/i.test(k) && /^\d{3,}$/.test(String(v)))) return true;
+    return ps.some(([, v]) => READ_VAL.test(String(v))) && ps.some(([k, v]) => ID_TAIL.test(k) && /^\d{2,}$/.test(String(v)));
+  } catch { return false; }
+}
+/* 경로만으로 된 글 꼴(광남 /ab-1923-19 · 재일 kref /news/2026scholarshipkorea/) — 보통 쪽(회사소개·슬러그 소식)도 같은 꼴이라
+   🔴 검색 결과에서 그 사업·재단 이름으로 3점 이상 받은 줄에만 쓴다(searchRows) · 게시판 줄·짝짓기는 안 쓴다 · 확인 로봇이 따로 연다 */
+export function looksLikePostLoose(u) {
+  if (looksLikePost(u)) return true;
+  if (isFileUrl(u)) return false;
+  try {
+    const p = new URL(u).pathname;
+    return /\/[a-z]{1,4}-\d{2,}-\d{1,}\/?$/i.test(p) || /\/news\/[\w-]*20\d{2}[\w-]*\/?$/i.test(p);
+  } catch { return false; }
 }
 export function kosafMatches(index, external, { today = '' } = {}) {
   const out = [];
@@ -592,12 +687,29 @@ export function kosafMatches(index, external, { today = '' } = {}) {
    후보에 적힌 제목(검색 결과 제목 등)은 **우리 제목과 같을 때만**(층2는 재단 이름이 들어 있을 때도) 증거다 —
    검색 결과 제목을 그대로 믿으면 남의 글 제목이 '제목 자리에 그 공고 제목'이 된다. 우리 짝짓기(match)가 고른 재단 글 제목과
    로봇이 재단 게시판 목록에서 점수로 고른 줄(picked)의 제목은 우리가 읽은 것이다. */
+/* 후보 제목이 층2 그 사업의 제목인가 — 재단 이름이 없어도 사업 이름(괄호 뺀 것 · 흔한 낱말만은 아님)이 들어 있거나,
+   공고문 파일 제목과 10자 이상·60% 이상 이어서 같으면. 🔴 이것은 '기대 제목'에 넣는 문일 뿐 — 재단(X)·사업(P)·회차(R)·사이트(H)는 따로 다 본다.
+   (2026-11-20 실측: 시군 누리집·대학 중계 글 제목엔 재단 이름이 드물어 기대 제목이 앱 이름뿐 → 제목 자리를 영영 못 맞췄다) */
+const GENERIC_PROGRAM = /^(?:대학생|대학|학생|일반|우수|성적우수|인재|인재육성|저소득|희망|사랑|미래|등록금|학자금|지원|지원사업|등록금지원|학자금지원)$/;
+const unParen = (s) => String(s || '').replace(/[(（][^)）]*[)）]/g, ' ');
+export function kosafKin(t, title) {
+  const c = titleFingerprint(unParen(title));
+  if (!c) return false;
+  const pc = t.programCore || '';
+  if (pc.length >= 3 && !GENERIC_PROGRAM.test(pc) && c.includes(pc)) return true;
+  for (const a of t.attachTitles || []) {
+    const k = titleFingerprint(unParen(a));
+    const need = Math.max(10, Math.ceil(k.length * 0.6));
+    for (let i = 0; i + need <= k.length; i += 1) if (c.includes(k.slice(i, i + need))) return true;
+  }
+  return false;
+}
 export function judgeTitles(t, cand) {
   const out = [...t.titles];
   const c = String((cand && cand.title) || '').trim();
   if (!c) return out;
   const fits = t.titles.some((w) => sameTitle(w, c))
-    || (t.ds === 'kosaf' && ((t.orgCore && t.orgCore.length >= 3 && titleFingerprint(c).includes(t.orgCore)) || cand.source === 'match' || cand.picked));
+    || (t.ds === 'kosaf' && ((t.orgCore && t.orgCore.length >= 3 && titleFingerprint(c).includes(t.orgCore)) || cand.source === 'match' || cand.picked || kosafKin(t, c)));
   if (fits && !out.some((x) => titleFingerprint(x) === titleFingerprint(c))) out.push(stripRowTail(c));
   return out;
 }
@@ -620,6 +732,31 @@ export function collisionOf(t, owners) {
 /* ── 판정 ───────────────────────────────────────────────────────────
    target: buildIndex 의 한 줄 · cand: 후보 · obs: 열어 본 것 · verdict: judgeLanding 결과(ev 포함) · ctx: { tries, owners }
    → { status, why, checks, alsoOk? } */
+/* 재단이 다른 사이트에 직접 올린 그 공고인가(재단 게시판 이사·도 신청 창구) — 주소가 아니라 화면 증거 셋이 다 있어야:
+   ① 같은 문서: KOSAF 공고문 파일 제목이 제목 자리에, 또는 16자 이상 통째로 화면에(첨부 이름 줄)
+   ② 올린 이가 그 재단: 「작성자·담당부서·등록자 : 재단」 이름표 또는 「재단 / 공지사항」 길잡이
+   ③ 학교·집계·블로그 사이트가 아님(학교 글은 학교 창구판 — 마감·접수처가 다르다 → relay) · 회차(마감·시작일)는 부르는 쪽이 따로 본다.
+   (2026-11-20 · 한독제석재단이 handokmuseum.com 에 올린 글 · 경남장학회가 경남바로서비스에 올린 글 — 주소 꼴만으로는 절대 받지 않는다) */
+export function issuerElsewhere(t, o, heads, where) {
+  const h = hostOf(where);
+  if (!h || AGGREGATOR_RE.test(where) || blockedHost(h) || NEWS_ARTICLE.test(where)) return { ok: false };   // 집계·블로그·신문 기사는 같은 문서를 실어도 원문이 아니다(목록은 위 한 곳)
+  const schoolSite = /\.ac\.kr$/.test(h) || [...(t.schoolHostSet || [])].some((x) => h === x || h.endsWith(`.${x}`));
+  const text = String(o.text || '');
+  const textFp = titleFingerprint(text);
+  const doc = (t.attachTitles || []).some((a) => heads.some((x) => headMatches(a, x) || sameTitle(a, x))
+    || (titleFingerprint(a).length >= 16 && textFp.includes(titleFingerprint(a))));
+  const org = t.orgCore && t.orgCore.length >= 3 ? t.orgCore : '';
+  if (!doc || !org) return { ok: false, relay: false };
+  const plain = text.replace(/\((?:재|사)\)|재단법인|사단법인/g, '');
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const orgRe = String(t.org || '').replace(/\((?:재|사|주|복|사복)\)|재단법인|사단법인|사회복지법인/g, '').trim();
+  const labeled = orgRe.length >= 3 && new RegExp(`(?:작성자|담당\\s?부서|등록자|게시자)\\s*[:：|]?\\s*${esc(orgRe)}`).test(plain.replace(/\s*\|\s*/g, ' | ').replace(/\n/g, ' | '));
+  const crumb = new RegExp(`${esc(org)}(?:공지사항|알림마당|게시판|새소식|공지)`).test(titleFingerprint(text.replace(/[/>›]/g, ' ')));
+  if (!(labeled || crumb)) return { ok: false };
+  if (schoolSite) return { ok: false, relay: true };
+  return { ok: true, why: labeled ? '재단이 올린 글(작성·담당 이름표)' : '재단 게시판 길잡이' };
+}
+export const kosafOwnOffHost = (t, url) => !!(t && t.kosafOwn) && !/(^|\.)kosaf\.go\.kr$/i.test(hostOf(url));
 const V_WORD = { list: '목록이 열림', home: '첫 화면이 열림', login: '로그인을 요구함', gone: '열리지 않음', other: '다른 화면이 열림' };
 export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
   const t = target || {}; const c = cand || {}; const o = obs || {}; const v = verdict || {};
@@ -642,6 +779,9 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
     if (status !== 'rejected' && (v.v === 'unread' || v.v === 'login')) return { status: 'verified', why: `관리자가 넣은 주소 — 로봇은 못 엶(${v.why || v.v})`, checks: { ...checks, A: 'ok' } };
   }
   if (status === 'rejected') return { status, why, checks };
+  /* 한국장학재단 자체 사업(isKosafOwnOrg — 데이터의 org 로만) — 회차 글이 없고 원문은 재단 누리집의 그 사업 안내 쪽뿐이다.
+     다른 사이트 글(대학 모집 공고 등)은 그 학교 창구판이라 거절(2026-11-20) — link-check 는 같은 함수(kosafOwnOffHost)로 열기 전에 건너뛴다 */
+  if (kosafOwnOffHost(t, c.url)) return { status: 'rejected', why: `한국장학재단 자체 사업은 재단 누리집의 사업 안내만 원문(${hostOf(c.url)})`, checks: { ...checks, H: 'fail' } };
 
   /* L 착지 */
   if (v.v === 'unread') {
@@ -651,14 +791,26 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
       : { status: 'pending', why: `못 엶(${v.why}) — 다시 봅니다`, checks: { ...checks, L: 'unread' } };
   }
   if (v.v !== 'post') return { status: 'rejected', why: `${V_WORD[v.v] || v.v}(${v.why})`, checks: { ...checks, L: 'fail' } };
-  if (v.ev === 'strong') pass('L'); else soft('L', '제목이 제목 자리가 아니라 본문에만 보임');
-
-  const heads = [o.docTitle || '', ...(o.headings || [])].filter(Boolean);
-  const want = judgeTitles(t, c);
-  const headHit = heads.filter((h) => want.some((w) => headMatches(w, h)));
+  const heads0 = [o.docTitle || '', ...(o.headings || [])].filter(Boolean);
+  /* 후보 제목이 그 쪽의 뭉뚱그린 창 제목(「공지사항 | 일신문화재단」)이면 제목 자리 증거가 아니다 — 창 제목이 그대로 '제목 자리'가 되어
+     결과·해·학기 판정이 진짜 글 제목을 못 보던 구멍(리뷰 2026-11-20 · 사업 이름이 들어 있으면 창 제목도 증거) */
+  const cFp = titleFingerprint(c.title || '');
+  /* 창 제목 = 창 제목과 같고, 사업 이름이 없고, 화면의 머리글·「제목」 칸·제목 줄 어디에도 그 글자로는 없는 것(진짜 글 제목은 따로 있다) */
+  const candIsWindow = !!cFp && cFp === titleFingerprint(o.docTitle || '') && !(t.programCore && cFp.includes(t.programCore))
+    && !(o.headings || []).some((h) => titleFingerprint(h) === cFp) && !labeledTitle(String(o.text || ''), c.title, { whole: true }) && !lineTitle(String(o.text || ''), c.title);
+  const cFps = [cFp, titleFingerprint(stripRowTail(c.title || ''))];   // judgeTitles 는 후보 제목을 stripRowTail 로 다듬어 넣는다
+  const want = judgeTitles(t, c).filter((w) => !(candIsWindow && cFps.includes(titleFingerprint(w)) && !t.titles.some((x) => titleFingerprint(x) === titleFingerprint(w))));
+  const text0 = String(o.text || '');
+  /* 제목 자리 = 창 제목·머리글 + 「제목」 이름표 뒤(통째) + 제목 줄(아래에 글 표지) + (층2) 그 코드의 KOSAF 공고문 파일이 첨부 목록에 보임.
+     (2026-11-20 실측: 정답 글 15건이 표 칸·맨 줄에 제목을 둬 '본문에만 보임'으로 멈췄다 — 규칙은 link-landing.mjs 한 곳) */
+  const slotOf = (w) => heads0.find((h) => headMatches(w, h)) || (labeledTitle(text0, w, { whole: true }) ? w : '') || lineTitle(text0, w);
+  const headHit = [...new Set(want.map(slotOf).filter(Boolean))];
+  const fileHit = t.ds === 'kosaf' ? fileShown(text0, ((t.item || {}).files || []).map((f) => f && f.name)) : '';
+  if (v.ev === 'strong' || headHit.length || fileHit) pass('L'); else soft('L', '제목이 제목 자리가 아니라 본문에만 보임');
+  const heads = [...heads0, ...headHit.filter((h) => !heads0.includes(h))];
   const head = (headHit.length ? headHit : [o.docTitle || '']).join(' \n ');
   /* 제목 자리에서 우리 제목을 **통째로** 못 찾았다 — 「제목」 칸의 앞 24자만 같은 이웃 글(같은 머리의 다른 재단 장학)일 수 있다(리뷰 2026-10-04) */
-  if (!headHit.length) soft('L', '제목 자리에서 우리 공고 제목을 통째로 찾지 못함(앞부분만 같을 수 있음)');
+  if (!headHit.length && !fileHit) soft('L', '제목 자리에서 우리 공고 제목을 통째로 찾지 못함(앞부분만 같을 수 있음)');
   const text = String(o.text || '');
   const allFp = titleFingerprint(`${heads.join(' ')} ${text}`);
 
@@ -672,7 +824,12 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
   } else if (hostAllowed(where, t.allowed)) pass('H');
   else {
     const named = [t.orgCore, titleFingerprint(t.school || ''), titleFingerprint(t.org || '')].filter((x) => x && x.length >= 3);
-    if (named.some((n) => heads.some((h) => titleFingerprint(h).includes(n)))) soft('H', `처음 보는 사이트(${hostOf(where)}) — 기관 이름은 보임 · 사람 확인`);
+    const away = t.ds === 'kosaf' ? issuerElsewhere(t, o, heads, where) : null;
+    /* 🔴 다른 사이트는 화면 증거가 다 있어도 **사람 확인까지만**(리뷰 2026-11-20: 고교·교육지원청·시청·장학 정보 모음 사이트가 재단 글을
+       작성자 줄·첨부 이름까지 통째로 옮겨 실으면 같은 증거가 나온다 — 옮겨 실은 글과 재단 원글을 화면만으로는 못 가른다) */
+    if (away && away.ok) soft('H', `${away.why} — 그래도 재단 홈이 아닌 사이트(${hostOf(where)})라 사람 확인`);
+    else if (away && away.relay) reject('H', `학교가 옮겨 실은 글(${hostOf(where)}) — 재단 원글이 아님`);
+    else if (named.some((n) => heads.some((h) => titleFingerprint(h).includes(n)))) soft('H', `처음 보는 사이트(${hostOf(where)}) — 기관 이름은 보임 · 사람 확인`);
     else reject('H', `그 공고의 사이트가 아님(${hostOf(where)})`);
   }
 
@@ -684,7 +841,7 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
   /* R 회차 */
   const it0 = t.item || {};
   const ref = String(it0.postedAt || it0.foundAt || it0.listedAt || '').slice(0, 10);
-  const rc = roundCheck({ round: t.ds === 'kosaf' ? t.round : null, deadline: t.deadline, expectTitles: want, ownTitles: t.titles, head, text, ref });
+  const rc = roundCheck({ round: t.ds === 'kosaf' ? t.round : null, deadline: t.deadline, expectTitles: want, ownTitles: t.titles, head, text, ref, kosafOwn: !!t.kosafOwn });
   if (rc.s === 'fail') reject('R', rc.why);
   else if (rc.s === 'ok') pass('R');
   /* 회차를 가릴 해·마감·날짜가 하나도 없으면 사람에게 — 해마다 같은 제목으로 올라오는 글(국가근로·휴강 안내)이 있다(리뷰 2026-10-04) */
@@ -694,19 +851,33 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
   if (t.ds === 'kosaf') {
     /* P 사업 — 사업 이름이 보이거나 제목 자리가 공고문 파일 제목 · 제목 자리에 같은 재단의 **다른** 사업 이름만 있으면 거절 */
     const headFp = titleFingerprint(head);
-    const attachHead = (t.attachTitles || []).some((a) => heads.some((h) => headMatches(a, h) || sameTitle(a, h)));
+    const attachHead = (t.attachTitles || []).some((a) => heads.some((h) => headMatches(a, h) || sameTitle(a, h)) || labeledTitle(text, a, { whole: true }) || !!lineTitle(text, a));
     /* X 기관 — 재단 이름(KOSAF 표기는 `광주남구장학회`, 공고문은 `(재)남구장학회` 처럼 지역 머리가 빠지기도 한다)이 화면에 있거나,
        제목 자리가 KOSAF 에 올라온 그 재단의 공고문 파일 제목일 때 */
     const orgShort = t.orgCore ? t.orgCore.replace(ORG_REGION_HEAD, '') : '';
-    if (t.orgCore && t.orgCore.length >= 2 && !allFp.includes(t.orgCore) && !(orgShort.length >= 4 && allFp.includes(orgShort)) && !attachHead) reject('X', '재단 이름이 화면에 없음');
+    /* 재단 자기 사이트(KOSAF 가 적은 그 재단 홈 · 관공서·대학처럼 여럿이 쓰는 곳은 아님)에서 제목 자리에 우리 사업 이름이 보이면 이름 표기가 달라도 그 재단 글
+       (2026-11-20 · 주교회의 「평신도기금운영위원회」 ↔ 제 사이트 「평신도인재양성·기금위원회」) */
+    const ownHome = hostOf(where) === hostOf(t.raw) && !/\.(?:go|ac)\.kr$/.test(hostOf(where));
+    const progInHead = !!(t.programCore && t.programCore.length >= 3 && !GENERIC_PROGRAM.test(t.programCore) && headFp.includes(t.programCore));
+    if (t.orgCore && t.orgCore.length >= 2 && !allFp.includes(t.orgCore) && !(orgShort.length >= 4 && allFp.includes(orgShort)) && !attachHead && !(ownHome && progInHead)) reject('X', '재단 이름이 화면에 없음');
     else pass('X');
     const mine = t.programCore && allFp.includes(t.programCore);
     /* 형제 사업 이름이 우리 이름을 품으면(신입대학생 ⊃ 대학생) 형제 이름을 지운 뒤에도 우리 이름이 남아야 우리 글이다(리뷰 2026-10-04) */
     const sibs = (t.siblings || []).filter((x) => x.length >= 2);
     const headLeft = sibs.filter((x) => t.programCore && x.includes(t.programCore) && x !== t.programCore).reduce((acc, x) => acc.split(x).join(' '), headFp);
     const oursInHead = !!(t.programCore && headLeft.includes(t.programCore));
-    if (!oursInHead && sibs.some((x) => headFp.includes(x))) reject('P', '같은 재단의 다른 사업 글');
+    /* 사업 이름이 그냥 「장학생」(programCore 없음)이면 '우리 이름'이 없어 형제 사업만 본다 — 제목 자리를 창 제목으로 잡았어도
+       머리글(h)에 형제 사업 이름이 있으면 그 사업 글이다(2026-11-20 · 「문의육영 장학생」 ↔ 「특별장학생」 글이 원문으로 오를 뻔) */
+    const sibHeads = t.programCore ? headFp : titleFingerprint([head, ...(o.headings || [])].join(' '));
+    /* 한국장학재단 자체 사업 — 머리글에 **다른** 장학 사업 이름이 둘 이상이면 여러 사업을 모은 쪽(「장학금 한눈에 보기」)이지 그 사업 안내 쪽이 아니다(리뷰 2026-11-20) */
+    const otherProgHeads = t.kosafOwn ? new Set((o.headings || []).map((h) => titleFingerprint(h)).filter((h) => /장학금|장학사업/.test(h) && h.length <= 30 && !(t.programCore && h.includes(t.programCore)))) : new Set();
+    if (NOT_APPLY_HEAD.test(head) && !RESULT_WORD.test(head) && !(t.titles || []).some((w) => NOT_APPLY_HEAD.test(w))) reject('P', '장학생을 뽑는 글이 아님(수여식·이사회·전달식 같은 글)');
+    else if (otherProgHeads.size >= 2) reject('P', `여러 사업을 모은 쪽(${[...otherProgHeads].slice(0, 3).join('·')}) — 그 사업 안내 쪽이 아님`);
+    else if (!oursInHead && sibs.some((x) => sibHeads.includes(x))) reject('P', '같은 재단의 다른 사업 글');
     else if (mine || attachHead) pass('P');
+    /* 사업 이름이 그냥 「장학생」뿐인 재단(programCore 없음) — 제목 자리에 그 재단 이름이 있으면 그 재단의 장학생 공고다 */
+    /* 🔴 재단 이름만으로는 아니다 — 제목 자리가 장학생을 뽑는 글(수여식·이사회·전달식·결과 글 아님 · 리뷰 2026-11-20)일 때만 */
+    else if (!t.programCore && t.orgCore && t.orgCore.length >= 4 && headFp.includes(t.orgCore) && applyHead(head)) pass('P');
     else if (!t.programCore && !(t.attachTitles || []).length) checks.P = 'n/a';
     else soft('P', '사업 이름이 화면에 안 보임');
     /* 같은 공고문을 쓰는 다른 코드(남구 ×5 · 춘천 ×9) — 각자의 사업 이름이 보이거나 공고문 제목이 제목 자리일 때만 함께 */

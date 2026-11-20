@@ -9,6 +9,7 @@
         싣지 않고 · 이튿날 그 주소가 확인 대상이 되고 · 층2 마감이 바뀌면 빠진다
      G4 착지 판정 — 글 주소 → 목록 주소 · 글 번호만 빠진 주소는 결정적 '목록' · 판정이 제목 증거의 세기(ev)를 함께 준다
      G5 걸려 있는가 — 워크플로가 후보 파일 push 로 깨고(기본 브랜치만) · 후보만 보는 모드 · 넷째 파일을 저장·되돌림
+     G8 2026-11-20 실측(정답 글 55건 중 5건만 받던 것) — 기대 제목 넓히기 · 제목 자리(「제  목」 칸·제목 줄·첨부 파일 이름) · 재단 표기 · 자체 사업 · 남의 사이트에 재단이 직접 올린 글
      G6 후보 파일 읽기는 무엇이 와도 던지지 않는다 — 잘못된 줄은 리포트 줄이 된다(관문이 빨개지면 그날 자동 등록이 되돌려진다)
    🔴 실데이터 숫자를 박지 않는다 · 진짜 후보 파일을 검사하지 않는다(사람이 잘못 적은 줄은 리포트로 — CLAUDE.md 2026-10-01 사고). */
 import fs from 'node:fs';
@@ -194,6 +195,203 @@ export default async function gate(eq, ctx) {
     const r8 = acc(hy, cand({ url: 'https://www.p.ac.kr/bbs/view.do?id=10' }), { status: 200, docTitle: '표본대학교', headings: [HY], text: `${HY} 작성일 2024.03.02 ${FILL}` });
     const r9 = acc(hy, cand({ url: 'https://www.p.ac.kr/bbs/view.do?id=91' }), { status: 200, docTitle: '표본대학교', headings: [HY], text: `${HY} ${FILL}` });
     eq('  ⑧ 해·마감이 없는 제목(해마다 같은 이름으로 올라오는 안내) — 글 날짜가 우리가 본 때와 멀면 거절 · 날짜가 없으면 사람 확인', [r8.status, r9.status], ['rejected', 'suggest']);
+  }
+
+  /* ── G8 2026-11-20 실측 — 정답 글 55건(사람이 열어 확인한 재단 원문)을 확인 로봇이 5건만 받던 까닭 여섯을 고친 것 ─────────────
+     🔴 남의 재단에 붙인 같은 주소(오답)는 하나도 원문이 되면 안 된다 — 고친 것마다 받는 꼴(+)과 막는 꼴(−)을 같이 잰다 */
+  {
+    const KS = (code, org, name, open, due, home, files = [], extra = {}) => ({ code, org, name, due, home, fields: { 신청기간: `○ ${open} ~ ${due}` }, files: files.map((n) => ({ name: n })), ...extra });
+    const D8 = { registered: [], notices: [], news: [], activities: [], external: [], kosafTexts: {}, externalSources: [], pool: [], boards: [{ school: '표본대학교', urls: ['https://www.x.ac.kr/bbs/list.do'] }],
+      kosaf: [
+        KS('8100001', '강원도 원주시청', '다자녀가정 특별지원 장학금', '2026-11-02', '2026-11-30', 'https://www.wonju.go.kr'),
+        KS('8100010', '영광군미래교육재단', '대학생등록금 지원', '2026-11-02', '2026-11-27', 'https://www.ygef.or.kr', ['2026년 영광군 대학생 등록금 지원사업 공고(안).hwp']),
+        KS('8100020', '한국천주교주교회의 평신도기금운영위원회', '명도회 장학금', '2026-11-01', '2026-11-30', 'https://www.cbck.or.kr/'),
+        KS('8100021', '표본관공서 평신도기금운영위원회', '명도회 장학금', '2026-11-01', '2026-11-30', 'https://www.pyobon.go.kr/'),
+        KS('8100030', '문의육영장학재단', '장학생', '2026-11-01', '2026-11-30', 'https://www.munui.or.kr'),
+        KS('8100031', '문의육영장학재단', '특별장학금', '2026-11-01', '2026-11-30', 'https://www.munui.or.kr'),
+        KS('8100040', '(재)한국장학재단', '국가근로장학금', '2026-03-01', '2027-02-28', 'https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08'),
+        KS('8100041', '(재)한국장학재단', '대학생청소년교육지원장학금', '2026-03-01', '2027-02-28', 'https://www.kosaf.go.kr/ko/mkinfo.do?pg=PTMKKsSrvMntoringGive_01M'),
+        KS('8100050', '한독제석재단', '장학생', '2026-11-03', '2026-11-30', 'https://www.handokjeseok.or.kr', ['2026년 한독제석재단 장학생 선발 공고.pdf']),
+        KS('8100060', '(재)다른장학회', '장학생', '2026-11-03', '2026-11-30', 'https://www.dareun.or.kr', ['2026년 다른장학회 장학생 선발 공고.pdf']),
+      ] };
+    const ix = C.buildIndex(D8);
+    const T8 = (key) => ix.find({ ds: 'kosaf', key });
+    const acc = (t, c, obs) => C.acceptCandidate({ target: t, cand: c, obs, verdict: J.judgeLanding({ ...obs, requestedUrl: c.url, titles: C.judgeTitles(t, c), titlesFromNameOnly: !!t.nameOnly, otherTitles: [] }), ctx: { owners: ix.ownersOf(c.url) } });
+
+    /* ① 검색 제목이 우리 사업 이름을 품으면(재단 이름이 없어도) 기대 제목 — 흔한 낱말만인 사업 이름(대학생)은 아니다 */
+    const WT = '2026년 다자녀가정 특별지원（대학등록금） 신청 안내';
+    const wObs = (org) => ({ status: 200, docTitle: `${WT} - ${org}`, headings: [WT], text: `${WT}\n담당부서 교육지원과 · ${org}\n신청기간: 2026. 11. 2.(월) ~ 2026. 11. 30.(월)\n작성일 2026-11-01 ${FILL}` });
+    const w1 = acc(T8('8100001'), cand({ url: 'https://www.wonju.go.kr/www/selectBbsNttView.do?bbsNo=1&nttNo=4008', title: WT }), wObs('원주시청'));
+    eq('G8 ① 시청 글 — 검색 제목에 우리 사업 이름(다자녀가정 특별지원)이 있으면 기대 제목 · KOSAF 의 「강원도 원주시청」은 도 이름을 떼고 화면의 「원주시청」과 맞춘다 → 원문',
+      [w1.status, w1.checks.L, w1.checks.X], ['verified', 'ok', 'ok']);
+    const w2 = acc(T8('8100001'), cand({ url: 'https://www.wonju.go.kr/www/selectBbsNttView.do?bbsNo=1&nttNo=4009', title: WT }), wObs('춘천시청'));
+    eq('  (−) 같은 글이 다른 시청 이름만 보이면 재단(X) 거절', [w2.status, w2.checks.X], ['rejected', 'fail']);
+    eq('  (−) 사업 이름이 흔한 낱말뿐(대학생)이면 검색 제목을 기대 제목에 넣지 않는다 · 공고문 파일 제목과 10자 이상 이어 같으면 넣는다',
+      [C.kosafKin({ programCore: '대학생', attachTitles: [] }, '2026년 대학생 장학금 지원 안내'), C.judgeTitles({ ds: 'kosaf', titles: ['원주시청 대학생 장학금'], orgCore: '강원도원주시청', programCore: '대학생', attachTitles: [] }, { title: '2026년 대학생 장학금 지원 안내' }).length,
+        C.kosafKin({ programCore: '', attachTitles: ['2026년 영광군 대학생 등록금 지원사업 공고(안)'] }, '2026년 2학기 대학생 등록금 지원사업 공고')], [false, 1, true]);
+
+    /* ② 제목 자리 넓히기 — 「제  목」 칸(통째) · 제목 줄(아래에 글 표지) · KOSAF 공고문 파일 이름이 첨부에 보임 */
+    const BT = '2026년도 백산장학재단 장학금 선발 공고';
+    eq('② 「제  목」(빈칸 둘) 칸이 그 제목 통째면 제목 자리 · 칸 앞 24자만 같고 뒤에 (OO재단)이 붙으면 통째가 아니다(⑦과 같은 꼴)',
+      [J.labeledTitle(`제  목\t${BT}\n작성자\t백산장학재단\t작성일\t2026-11-01`, BT, { whole: true }),
+        J.labeledTitle('제목 [모집] 2026학년도 2학기 가나드림 장학생 모집 (OO재단) 작성일 2026.09.19', '[모집] 2026학년도 2학기 가나드림 장학생 모집', { whole: true }),
+        J.labeledTitle('제목 [모집] 2026학년도 2학기 가나드림 장학생 모집 (OO재단) 작성일 2026.09.19', '[모집] 2026학년도 2학기 가나드림 장학생 모집')], [true, false, true]);
+    const YT = '2026년 영광군 대학생 등록금 지원사업 공고';
+    const yText = `공지사항\n${YT}\n영광군미래교육재단 / 2026-11-02 / 조회:657\n□ 접수기간: 2026. 11. 2.(월) ~ 11. 27.(금)\n${FILL}`;
+    const listText = `공지사항\n2026년 다른 공고 하나 안내\n2026-10-01\n2026년 다른 공고 둘째 안내\n2026-10-02\n${YT}\n2026-10-03\n${FILL}`;
+    eq('  제목 줄 — 한 줄이 그 제목 통째이고 바로 아래 줄이 글 표지(날짜·조회) · 그런 묶음이 셋 이상이면 목록이라 안 센다',
+      [J.lineTitle(yText, YT), J.lineTitle(listText, YT), J.lineTitle(`${YT}\n□ 접수기간: 2026. 11. 2.(월) ~ 11. 27.(금)`, YT)], [YT, '', '']);
+    const y1 = acc(T8('8100010'), cand({ url: 'https://www.ygef.or.kr/board/?type=view&post_idx=2190', title: YT }), { status: 200, docTitle: '영광군미래교육재단', headings: [], text: yText });
+    eq('  h 태그 없이 줄로만 제목을 그리는 게시판 — 제목 줄이면 제목 자리(L ok) → 원문', [y1.status, y1.checks.L], ['verified', 'ok']);
+    const y2 = acc(T8('8100010'), cand({ url: 'https://www.ygef.or.kr/board/?type=list&page=1', title: YT }), { status: 200, docTitle: '영광군미래교육재단', headings: [], text: listText.replace('2026-10-03', `2026-10-03\n접수: 2026. 11. 2. ~ 11. 27.`) });
+    eq('  (−) 같은 제목이 목록의 한 줄(제목+날짜 묶음이 셋)이면 제목 자리가 아니다 → 원문 아님', y2.status === 'verified', false);
+    const fileText = `알림마당\n대학생 등록금 지원 안내\n첨부파일 2026년 영광군 대학생 등록금 지원사업 공고(안).hwp (120KB)\n□ 접수기간: 2026. 11. 2.(월) ~ 11. 27.(금) 영광군미래교육재단 ${FILL}`;
+    eq('  첨부 목록에 그 코드의 KOSAF 공고문 파일 이름이 보이면 그 파일을 단 글 · 다른 이름이면 아니다',
+      [!!J.fileShown(fileText, ['2026년 영광군 대학생 등록금 지원사업 공고(안).hwp']), J.fileShown(fileText, ['2026년 다른군 장학생 선발 공고.hwp'])], [true, '']);
+    const y3 = acc(T8('8100010'), cand({ url: 'https://www.ygef.or.kr/board/?type=view&post_idx=2191' }), { status: 200, docTitle: '영광군미래교육재단', headings: [], text: fileText });
+    const y4 = acc(T8('8100060'), cand({ url: 'https://www.dareun.or.kr/board/?type=view&post_idx=2191' }), { status: 200, docTitle: '다른장학회', headings: [], text: fileText.replace(/영광군미래교육재단/, '다른장학회') });
+    eq('  (+) 파일 이름으로 L 통과 · (−) 파일이 다른 코드에 붙이면 L 이 통과하지 않는다(원문 아님)', [y3.checks.L, y4.checks.L === 'ok', y4.status === 'verified'], ['ok', false, false]);
+
+    /* ③ 재단 표기가 제 사이트와 다를 때 — KOSAF 가 적은 그 재단 홈(관공서·대학 아님)에서 제목 자리에 우리 사업 이름 */
+    const MT = '2026년 명도회 장학생 선발 공고';
+    const mObs = { status: 200, docTitle: '주교회의 평신도인재양성·기금위원회', headings: [MT], text: `${MT}\n주교회의 평신도인재양성·기금위원회\n접수: 2026. 11. 1. ~ 11. 30.\n작성일 2026-10-28 ${FILL}` };
+    const m1 = acc(T8('8100020'), cand({ url: 'https://www.cbck.or.kr/Notice/2026/view?idx=301', title: MT }), mObs);
+    const m2 = acc(T8('8100021'), cand({ url: 'https://www.pyobon.go.kr/Notice/view?idx=301', title: MT }), mObs);
+    eq('③ 재단 자기 사이트 + 제목 자리에 사업 이름(명도회) → 이름 표기가 달라도 X 통과 · (−) 홈이 관공서(.go.kr)면 X 거절',
+      [m1.status, m1.checks.X, m2.status, m2.checks.X], ['verified', 'ok', 'rejected', 'fail']);
+    const p1 = acc(T8('8100030'), cand({ url: 'https://www.munui.or.kr/bbs/view.php?no=41', title: '2026년 문의육영장학재단 장학생 선발계획 공고' }), { status: 200, docTitle: '문의육영장학재단', headings: ['2026년 문의육영장학재단 장학생 선발계획 공고'], text: `2026년 문의육영장학재단 장학생 선발계획 공고\n신청기간 2026. 11. 1. ~ 11. 30.\n작성일 2026-10-30 ${FILL}` });
+    const p2 = acc(T8('8100030'), cand({ url: 'https://www.munui.or.kr/bbs/view.php?no=42', title: '2026년 문의육영장학재단 특별장학생 선발 공고' }), { status: 200, docTitle: '문의육영장학재단', headings: ['2026년 문의육영장학재단 특별장학생 선발 공고'], text: `2026년 문의육영장학재단 특별장학생 선발 공고\n신청기간 2026. 11. 1. ~ 11. 30.\n작성일 2026-10-30 ${FILL}` });
+    eq('  사업 이름이 그냥 「장학생」 — 제목 자리에 재단 이름 통째면 P 통과 · (−) 형제 사업(특별) 제목이면 P 거절', [p1.status, p1.checks.P, p2.status, p2.checks.P], ['verified', 'ok', 'rejected', 'fail']);
+
+    /* ④ 한국장학재단 자체 사업 — 사업 이름만 제목 · 재단 누리집만 · 사업 기간(달 범위) */
+    const gk = T8('8100040');
+    const KP = 'https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08';
+    const kObs = { status: 200, docTitle: '한국장학재단', headings: ['국가근로장학금'], text: `국가근로장학금\n사업기간 : 2026년 3월 ~ 2027년 2월\n지원대상 대학생 ${FILL}` };
+    const k1 = acc(gk, cand({ url: KP, source: 'data' }), kObs);
+    const k2 = acc(T8('8100041'), cand({ url: KP, source: 'data' }), kObs);
+    const k3 = acc(gk, cand({ url: 'https://www.x.ac.kr/bbs/view.do?id=77', title: '2026학년도 국가근로장학금 신청 안내' }), { status: 403 });   // 못 열어도 '다시 봄'이 아니라 바로 거절(대학 모집 글은 학교 창구판)
+    eq('④ 한국장학재단 자체 사업 — 사업 안내 쪽(제목 = 사업 이름 · 사업 기간 2026년 3월 ~ 2027년 2월) → 원문 · (−) 같은 쪽을 다른 자체 사업에 붙이면 원문 아님 · (−) 대학 글은 열지 않고 거절',
+      [k1.status, k1.checks.R, k2.status === 'verified', k3.status, k3.checks.H, gk.kosafOwn, gk.titles.includes('국가근로장학금'), !!T8('8100050').kosafOwn, T8('8100050').titles.includes('장학생')],
+      ['verified', 'ok', false, 'rejected', 'fail', true, true, false, false]);
+    eq('  사업 기간 달 범위는 자체 사업에만 · 그 회차의 해와 같을 때만 · 제목의 해 + 글 날짜(작성일)가 접수 시작 30일 전 ~ 마감이면 회차 ok · 멀면 모름 · 다른 해 제목은 거절',
+      [C.roundCheck({ round: { open: '2026-03-01', due: '2027-02-28' }, head: '국가근로장학금', text: '사업기간 : 2026년 3월 ~ 2027년 2월', kosafOwn: true }).s,
+        C.roundCheck({ round: { open: '2026-03-01', due: '2027-02-28' }, head: '국가근로장학금', text: '사업기간 : 2025년 3월 ~ 2026년 2월', kosafOwn: true }).s,
+        C.roundCheck({ round: { open: '2026-03-01', due: '2027-02-28' }, head: '국가근로장학금', text: '사업기간 : 2026년 3월 ~ 2027년 2월' }).s,
+        C.roundCheck({ round: { open: '2026-10-27', due: '2026-11-27' }, head: '[공고] 일신문화재단 2026 형남장학금', text: '작성일 26-10-27 DATE : 2026-10-30' }).s,
+        C.roundCheck({ round: { open: '2026-10-27', due: '2026-11-27' }, head: '[공고] 일신문화재단 2026 형남장학금', text: 'DATE : 2026-06-10' }).s,
+        C.roundCheck({ round: { open: '2026-10-27', due: '2026-11-27' }, head: '[공고] 일신문화재단 2025 형남장학금', text: 'DATE : 2026-10-30' }).s],
+      ['ok', 'none', 'none', 'ok', 'none', 'fail']);
+    eq('  파일 이름의 올린 날 도장(앞 261027- · 끝 …공고0416)은 제목이 아니다 · 「제10기」·해는 그대로',
+      [C.cleanAttachTitle('2026년도내대학해외교환장학생모집·선발공고0416.hwp'), C.cleanAttachTitle('261027-2026년 표본장학회 장학생 선발 공고.pdf'), C.cleanAttachTitle('2027년도 제10기 장학생 선발 안내문.pdf')],
+      ['2026년도내대학해외교환장학생모집·선발공고', '2026년 표본장학회 장학생 선발 공고', '2027년도 제10기 장학생 선발 안내문']);
+
+    /* ⑤ 재단이 남의 사이트에 직접 올린 그 공고(박물관 게시판 · 도 신청 창구) — 같은 문서 + 올린 이가 재단 + 마감·접수일, 셋 다 화면에 */
+    const HT = '2026년 한독제석재단 장학생 선발 공고';
+    const hObs = (crumb, extra = '접수기간 2026. 11. 3. ~ 11. 30.\n작성일 2026-11-03') => ({ status: 200, docTitle: '한독의약박물관', headings: [HT], text: `${crumb}\n${HT}\n${extra}\n${FILL}` });
+    const h1 = acc(T8('8100050'), cand({ url: 'https://www.handokmuseum.com/bbs/board.php?bo_table=notice&wr_id=88', title: HT }), hObs('HOME / 한독제석재단 / 공지사항'));
+    const h2 = acc(T8('8100050'), cand({ url: 'https://www.x.ac.kr/bbs/view.do?id=88', title: HT }), hObs('HOME / 한독제석재단 / 공지사항\n작성자 학생과'));
+    const h3 = acc(T8('8100050'), cand({ url: 'https://www.handokmuseum.com/bbs/board.php?bo_table=notice&wr_id=89', title: HT }), hObs('주최 | 한독제석재단'));
+    const h4 = acc(T8('8100050'), cand({ url: 'https://www.handokmuseum.com/bbs/board.php?bo_table=notice&wr_id=90', title: HT }), hObs('HOME / 한독제석재단 / 공지사항', '장학생을 선발합니다\n작성일 2026-10-20'));   // 글 날짜는 회차 무렵이지만 마감·접수일이 안 보인다
+    const h5 = acc(T8('8100060'), cand({ url: 'https://www.handokmuseum.com/bbs/board.php?bo_table=notice&wr_id=88', title: HT }), hObs('HOME / 한독제석재단 / 공지사항'));
+    /* 🔴 (리뷰 2026-11-20) 다른 사이트는 증거가 다 있어도 **사람 확인까지만** — 고교·교육지원청·시청·장학 정보 사이트가 옮겨 실은 글도 같은 증거를 낸다 */
+    eq('⑤ 다른 사이트라도 KOSAF 공고문 제목이 제목 자리 + 「한독제석재단 / 공지사항」 길잡이 + 접수일 → 사람 확인(원문 아님 · H weak) · (−) 학교 사이트면 「학교가 옮겨 실은 글」 거절 · (−) 「주최」 이름표뿐 · 마감·접수일 없이 글 날짜뿐 · 남의 재단 코드는 원문 아님',
+      [h1.status, h1.checks.H, /사람 확인/.test(h1.why), h2.status, /학교가 옮겨 실은 글/.test(h2.why), h3.status === 'verified', h4.status === 'verified', h5.status === 'verified'],
+      ['suggest', 'weak', true, 'rejected', true, false, false, false]);
+    /* 집계·블로그·신문 기사 사이트는 길잡이 증거가 있어도 재단이 올린 글로 보지 않는다(issuerElsewhere 의 첫 거름 · 리뷰 M13) */
+    const ie = (url, fin) => C.issuerElsewhere(T8('8100050'), hObs('HOME / 한독제석재단 / 공지사항'), [HT], fin || url).ok;
+    eq('  (−) 길잡이·첨부 증거가 같아도 집계 사이트(allforyoung·contestkorea)·블로그로 돌려보냄·신문 기사 주소는 「재단이 올린 글」이 아니다 · (+) 보통 사이트는 맞다',
+      [ie('https://www.allforyoung.com/posts/1'), ie('https://www.contestkorea.com/sub/view.php?str_no=1'), ie('https://www.x.or.kr/a', 'https://blog.naver.com/abc/223'), ie('https://www.news.co.kr/news/articleView.html?idxno=1'), ie('https://www.handokmuseum.com/bbs/board.php?wr_id=88')],
+      [false, false, false, false, true]);
+    for (const [u, lab] of [['https://www.allforyoung.com/posts/1', '집계'], ['https://www.contestkorea.com/sub/view.php?str_no=202611030001', '집계'], ['https://www.news.co.kr/news/articleView.html?idxno=1', '기사']]) {
+      const r = acc(T8('8100050'), cand({ url: u, title: HT }), hObs('HOME / 한독제석재단 / 공지사항'));
+      eq(`  (−) ${lab} 주소(${u.split('/')[2]})는 원문이 아니다`, r.status === 'verified', false);
+    }
+  }
+
+  /* ── G8 ⑥ 리뷰 2026-11-20 — 오답이 원문으로 오르던 꼴들(모두 실관측 쪽을 고쳐 만든 표본) ─────────────────────────────── */
+  {
+    const KS = (code, org, name, open, due, home, files = []) => ({ code, org, name, due, home, fields: { 신청기간: `○ ${open} ~ ${due}` }, files: files.map((n) => ({ name: n })) });
+    const D9 = { registered: [], notices: [], news: [], activities: [], external: [], kosafTexts: {}, externalSources: [], pool: [], boards: [],
+      kosaf: [
+        KS('8200001', '(재)가나장학재단', '장학생', '2026-10-01', '2026-10-31', 'https://gana.or.kr/'),
+        KS('8200002', '(재)가나장학재단', '장학생', '2026-10-01', '2026-10-31', 'https://gana.or.kr/', ['2026년 가나장학재단 장학생 선발 공고.hwp']),
+        KS('8200003', '영광군미래교육재단', '대학생등록금 지원', '2026-11-02', '2026-11-27', 'https://www.ygef.or.kr', ['2026년_2학기_영광군_대학생등록금_지원사업_공고(안).hwpx']),
+        KS('8200004', '일신문화재단', '형남장학금', '2026-10-27', '2026-11-27', 'http://www.ilshinfoundation.com'),
+        KS('8200005', '(재)가나장학재단', '희망나래장학생', '2026-10-01', '2026-10-31', 'https://gana.or.kr/', ['2026년 가나장학재단 희망나래장학생 선발 공고문.hwp']),
+        KS('8200006', '(재)한국장학재단', '국가근로장학금', '2026-03-01', '2027-02-28', 'https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08'),
+      ] };
+    const ix = C.buildIndex(D9);
+    const T9 = (key) => ix.find({ ds: 'kosaf', key });
+    const acc = (t, c, obs) => C.acceptCandidate({ target: t, cand: c, obs, verdict: J.judgeLanding({ ...obs, requestedUrl: c.url, titles: C.judgeTitles(t, c), titlesFromNameOnly: !!t.nameOnly, otherTitles: [] }), ctx: { owners: ix.ownersOf(c.url) } });
+    const post = (title, body, doc) => ({ status: 200, docTitle: doc || title, headings: [title], text: `${title}\n작성자 관리자\n${body}\n${FILL}` });
+
+    /* ⑥-1 「장학생」뿐인 사업 — 같은 재단의 수여식·이사회·전달식 글(글 날짜가 접수 무렵)은 원문이 아니다 */
+    const b1 = acc(T9('8200001'), cand({ url: 'https://gana.or.kr/bbs/view.php?id=501', title: '2026 가나장학재단 장학증서 수여식 안내' }), post('2026 가나장학재단 장학증서 수여식 안내', '작성일 2026-10-10\n조회 33\n일시: 2026. 11. 20.(금) 14:00'));
+    const b2 = acc(T9('8200002'), cand({ url: 'https://gana.or.kr/bbs/view.php?id=502', title: '2026년 가나장학재단 정기 이사회 개최 공고' }), post('2026년 가나장학재단 정기 이사회 개최 공고', '작성일 2026-10-05\n조회 12'));
+    const b3 = acc(T9('8200001'), cand({ url: 'https://gana.or.kr/bbs/view.php?id=503', title: '2026년 가나장학재단 장학금 전달식 안내' }), post('2026년 가나장학재단 장학금 전달식 안내', '관리자 2026-10-12 조회: 155'));
+    const b4 = acc(T9('8200001'), cand({ url: 'https://gana.or.kr/bbs/view.php?id=504', title: '2026년 가나장학재단 장학생 선발 공고' }), post('2026년 가나장학재단 장학생 선발 공고', '관리자 2026-10-01 조회: 155'));
+    eq('G8 ⑥-1 (−) 「장학생」뿐인 사업에 같은 재단의 수여식·이사회·전달식 글 → 원문 아님 · (+) 같은 재단의 그해 장학생 선발 글(글 올린 날이 접수 무렵)은 원문',
+      [b1.status === 'verified', b2.status === 'verified', b3.status === 'verified', b4.status], [false, false, false, 'verified']);
+    /* 마감이 보여 회차가 맞아도(R ok) 수여식 글은 장학생 선발 글이 아니다 — 첨부 없는 「장학생」 사업은 P 가 n/a 라 이 거절이 마지막 문이다 */
+    const b5 = acc(T9('8200001'), cand({ url: 'https://gana.or.kr/bbs/view.php?id=505', title: '2026 가나장학재단 장학증서 수여식 안내' }), post('2026 가나장학재단 장학증서 수여식 안내', '작성일 2026-11-02\n신청기간 2026. 10. 1. ~ 2026. 10. 31. 에 선발된 장학생의 수여식을 엽니다.'));
+    /* 첨부가 있는 「장학생」 사업 — 제목 자리에 재단 이름만 있고 장학생을 뽑는 낱말이 없는 글(사무실 이전 안내)은 P 를 주지 않는다 */
+    const b6 = acc(T9('8200002'), cand({ url: 'https://gana.or.kr/bbs/view.php?id=506', title: '2026년 가나장학재단 사무실 이전 안내' }), post('2026년 가나장학재단 사무실 이전 안내', '작성일 2026-10-02\n이전일 2026. 10. 31.(토)'));
+    eq('  (−) 마감이 보이는 수여식 글 → P 거절 · (−) 재단 이름뿐인 다른 안내 글(첨부 있는 사업) → P 를 주지 않는다', [b5.status, b5.checks.P, b6.status === 'verified', b6.checks.P === 'ok'], ['rejected', 'fail', false, false]);
+    /* 회차 날짜 창은 글 올린 날만 — 본문 일정 줄(「설명회 일시 2026. 10. 15.」)의 날짜로는 열지 않는다 */
+    const b7 = acc(T9('8200001'), cand({ url: 'https://gana.or.kr/bbs/view.php?id=507', title: '2026년 가나장학재단 장학생 선발 공고' }), post('2026년 가나장학재단 장학생 선발 공고', '관리자 2026-03-02 조회: 155\n설명회 일시 2026. 10. 15.(목) 본관'));
+    eq('  (−) 글 올린 날(3월)은 멀고 본문 일정 날짜만 접수 무렵 → 원문 아님', b7.status === 'verified', false);
+    eq('  사냥꾼도 수여식·이사회 글을 고르지 않는다', [C.scoreKosafPost(T9('8200001'), { title: '2026 가나장학재단 장학증서 수여식 안내', url: 'https://gana.or.kr/bbs/view.php?id=501' }).score, C.scoreKosafPost(T9('8200001'), { title: '2026년 가나장학재단 정기 이사회 개최 공고', url: 'https://gana.or.kr/bbs/view.php?id=502' }).score], [-1, -1]);
+
+    /* ⑥-2 회차 날짜는 **그 글이 올라온 날**만 — 이전글·다음글·최근 게시물 줄의 날짜가 1학기 글을 2학기 회차로 올리던 것 */
+    eq('  글 올린 날(postDates) — 작성일 이름표 · 글 표지 줄 · 「26-10-27 19:51」 · (−) 다음글·최근 게시물·제목+날짜 목록 줄·최종수정일은 아니다',
+      [C.postDates('작성자\t재단\t작성일\t2026-11-01 오전 10:38:40\t조회\t1078'), C.postDates('관리자 2026-11-04 조회: 155'), C.postDates('26-10-27 19:51'),
+        C.postDates('재단 / 2026-03-09 / 조회:657\n다음글 2026년 2학기 대학생등록금 지원사업 공고 2026-10-12'), C.postDates('2026 청소년문화센터 강사 채용 공고 2026-11-02'), C.postDates('최종수정일2021-11-17'), C.postDates('이전글 2026-10-12\n재단 / 2026-03-09')],
+      [['2026-11-01'], ['2026-11-04'], ['2026-10-27'], ['2026-03-09'], [], [], ['2026-03-09']]);
+    const YT = '2026년 대학생등록금 지원사업 공고';
+    const yBody = (extra) => `영광군미래교육재단 / 2026-03-09 / 조회:657\n2026년도 1학기 영광군대학생 등록금 지원사업을 공고합니다.\n2026년_1학기_영광군_대학생등록금_지원사업_공고(안).hwpx\n${extra}`;
+    const a2 = acc(T9('8200003'), cand({ url: 'https://www.ygef.or.kr/board/?type=view&post_idx=2201', title: YT }), post(YT, yBody('다음글 2026년 2학기 대학생등록금 지원사업 공고 2026-10-12')));
+    const a4 = acc(T9('8200003'), cand({ url: 'https://www.ygef.or.kr/board/?type=view&post_idx=2190', title: `[영광군미래교육재단] ${YT}` }), post(`[영광군미래교육재단] ${YT}`, yBody('최근 게시물\n2026 청소년문화센터 강사 채용 공고 2026-11-02')));
+    const a5 = acc(T9('8200003'), cand({ url: 'https://www.ygef.or.kr/board/?type=view&post_idx=2191', title: YT }), post(YT, yBody('2026 청소년문화센터 강사 채용 공고 2026-11-02')));
+    eq('  (−) 같은 해 1학기 글 — 다음글 줄·「최근 게시물」 옆 칸 날짜(접수 시작일과 같은 날이어도)로는 이번 회차가 아니다',
+      [a2.status === 'verified', a4.status === 'verified', a5.status === 'verified'], [false, false, false]);
+
+    /* ⑥-3 후보 제목이 그 쪽의 뭉뚱그린 창 제목 — 진짜 글 제목(결과 발표)을 못 보고 원문으로 오르던 것 */
+    const RT = '[발표] 일신문화재단 2026 형남장학금 선발 결과 안내';
+    const rObs = { status: 200, docTitle: '공지사항 | 일신문화재단', headings: ['공지사항', RT], text: `HOME > 게시판 > 공지사항\n${RT}\n작성자\n일신문화재단\n작성일\n26-11-26 10:02\n일신문화재단 2026 형남장학금(신청기간 2026. 10. 27. ~ 2026. 11. 27.) 선발 결과를 안내합니다.\n${FILL}` };
+    const c1 = acc(T9('8200004'), cand({ url: 'http://www.ilshinfoundation.com/bbs/board.php?bo_table=notice&wr_id=15', title: '공지사항 | 일신문화재단' }), rObs);
+    const c2 = acc(T9('8200004'), cand({ url: 'http://www.ilshinfoundation.com/bbs/board.php?bo_table=notice&wr_id=16', title: RT }), rObs);
+    eq('  (−) 창 제목 후보(「공지사항 | 일신문화재단」)로 연 결과 발표 글 → 원문 아님 · 글 제목 후보면 「결과·명단 발표 글」 거절', [c1.status === 'verified', c2.status], [false, 'rejected']);
+
+    /* ⑥-4 다른 사이트(장학 정보 모음)가 작성자 줄·첨부 이름까지 옮겨 실은 글 → 사람 확인까지만 */
+    const GT = '2026년 가나장학재단 희망나래장학생 선발 공고문';
+    const g1 = acc(T9('8200005'), cand({ url: 'https://www.janghak-info.co.kr/board/view.php?no=8812', title: GT }),
+      { status: 200, docTitle: GT, headings: [GT], text: `장학정보나라 > 장학 소식\n${GT}\n작성자 : 가나장학재단\n등록일 2026-10-01\n접수기간: 2026. 10. 1. ~ 2026. 10. 31.\n첨부파일 2026년 가나장학재단 희망나래장학생 선발 공고문.hwp\n${FILL}` });
+    eq('  (−) 장학 정보 사이트가 옮겨 실은 글(작성자 : 재단) → 원문 아님(사람 확인)', g1.status, 'suggest');
+
+    /* ⑥-5 한국장학재단 「장학금 한눈에 보기」(여러 사업을 모은 쪽)는 한 사업의 원문이 아니다 */
+    const f5 = acc(T9('8200006'), cand({ url: 'https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship_main&naviParam=JH,01', title: '국가근로장학금', source: 'data' }),
+      { status: 200, docTitle: '장학금 한눈에 보기 | 장학금 | 한국장학재단', headings: ['장학금 한눈에 보기', '국가장학금', '국가근로장학금', '국가우수 장학금', '주거안정장학금'], text: `국가근로장학금\n2026년 2학기 사업기간: 2026. 9. 1. ~ 2027. 2. 28.\n2026년 1학기 사업기간: 2026. 3. 1. ~ 2026. 8. 31.\n${FILL}` });
+    eq('  (−) 「장학금 한눈에 보기」 모음 쪽 → P 거절', [f5.status, f5.checks.P], ['rejected', 'fail']);
+    eq('  자체 사업의 다른 사이트 글은 열기 전에 건너뛴다(link-check 가 판정과 같은 함수를 부른다)',
+      [C.kosafOwnOffHost(T9('8200006'), 'https://www.x.ac.kr/bbs/1'), C.kosafOwnOffHost(T9('8200006'), 'https://www.kosaf.go.kr/ko/x.do'), C.kosafOwnOffHost(T9('8200001'), 'https://www.x.ac.kr/bbs/1'),
+        /if \(!cand\.trusted && kosafOwnOffHost\(q\.target, url\)\) return[^\n]*\n[\s\S]{0,200}?const obs = await observe\(t\)/.test(fs.readFileSync(path.join(ROOT, 'collector/link-check.mjs'), 'utf8'))],
+      [true, false, false, true]);
+
+    /* ⑥-6 파일 이름의 해는 회차를 묶는 글자라 떼지 않는다 · 밑줄로 붙은 앞 도장(261027_)도 뗀다 */
+    eq('  올린 날 도장 — 끝의 해(2026)는 남긴다 · 앞 「261027_」도 뗀다',
+      [C.cleanAttachTitle('가나장학재단 장학생 선발 공고 2026.hwp'), C.cleanAttachTitle('261027_2026년 경남장학회 장학생 선발 공고.hwp')],
+      ['가나장학재단 장학생 선발 공고 2026', '2026년 경남장학회 장학생 선발 공고']);
+
+    /* ⑥-7 검색 요약·기대 제목 넓히기의 문턱 */
+    const kt = T9('8200005');
+    eq('  (−) 검색 요약이 재단 이름만 더하면(사업 이름·공고문 파일 제목 없음) 고르지 않는다 · (+) 공고문 파일 제목을 더하면 고른다 · 제목만으로 3점이면 요약을 보지 않는다',
+      [C.scoreKosafPost(kt, { title: '공지사항', snippet: '가나장학재단 소식 2026', url: 'https://gana.or.kr/bbs/1' }).why.includes('검색 요약'),
+        C.scoreKosafPost(kt, { title: '공지사항', snippet: '[공고] 2026년 가나장학재단 희망나래장학생 선발 공고문', url: 'https://gana.or.kr/bbs/2' }).why.includes('검색 요약'),
+        C.scoreKosafPost(kt, { title: '2026 가나장학재단 장학 소식', snippet: '희망나래장학생 선발 공고', url: 'https://gana.or.kr/bbs/3' }).why.includes('검색 요약')],
+      [false, true, false]);
+    eq('  (−) 공고문 파일 제목과 4~9자만 이어 같으면 기대 제목이 아니다 · (+) 10자 이상·60% 이상이면 맞다',
+      [C.kosafKin({ programCore: '', attachTitles: ['2026년 가나장학재단 희망나래장학생 선발 공고문'] }, '2026년 다른 재단 선발 공고문 안내'),
+        C.kosafKin({ programCore: '', attachTitles: ['2026년 가나장학재단 희망나래장학생 선발 공고문'] }, '가나장학재단 희망나래장학생 선발 안내')], [false, true]);
   }
 
   /* G7 ⑨ 같은 주소 열쇠(u:)를 쓰는 다른 글이 있으면 로봇 바로잡기를 싣지 않는다 · ⑩ 날마다 다시 볼 때 바로잡기의 제목도 기대 제목 */
