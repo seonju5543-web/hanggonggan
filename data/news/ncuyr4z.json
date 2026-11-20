@@ -1,7 +1,19 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "[전북국제개발협력센터] KOICA 귀국인재 JB 리크루터 커피챗 신청 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220072/detailView.do",
+   "postedAt": "2026-11-20",
+   "postId": "220072",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-20",
+   "thumb": "data/news/img/94605021ffc3ac32.webp",
+   "desc": "전북국제개발협력센터 안녕하세요, 전북국제개발협력센터입니다 (●'◡'●) KOICA 귀국인재 JB 리크루터 4기 커피챗을 진행합니다!"
+  },
   {
    "title": "[언어교육부] 12월 19일(토) 모의토익 실시 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/220053/detailView.do",
@@ -448,18 +460,6 @@
    "src": "e41d3fac",
    "foundAt": "2026-11-08",
    "desc": "언어교육부 언어교육부에서 아래와 같이 모의토익을 실시하오니, 많은 관심 부탁드립니다."
-  },
-  {
-   "title": "[영농창업특성화사업단] 11월10일 유럽형 샐러드 상추 나눔행사(사전예약 )",
-   "url": "https://www.jbnu.ac.kr/web/Board/219507/detailView.do",
-   "postedAt": "2026-11-06",
-   "postId": "219507",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/2012d73d8904b3b8.webp",
-   "desc": "농대영농창업특성화사업단 🥬 전북대학교 영농창업특성화사업단 상추 무료 나눔 안내 🥬 안녕하세요. 전북대학교 농업생명과학대학 영농창업특성화사업단입니다."
   }
  ]
 }

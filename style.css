@@ -5260,7 +5260,6 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .fill-pin:focus { outline: none; border-color: var(--accent); background: var(--surface); }
 .fill-undo { white-space: nowrap; }
 .fill-open { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); width: 100%; margin: var(--space-4) 0 var(--space-8); padding: var(--space-12) var(--space-16); background: var(--accent-soft); color: var(--text); border: 1px solid var(--accent-line); text-align: left; }
-.fill-open-m { font-size: var(--t-xs); color: var(--text-sub); font-weight: 500; }
 .fill-slot { list-style: none; }
 @media (max-width: 759px) {
   .fill-panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; border-radius: var(--radius) var(--radius) 0 0; box-shadow: var(--shadow-sheet); transform: translateY(calc(100% - 52px)); transition: transform 0.22s ease; max-height: 62vh; overflow: auto; padding-top: 0; }

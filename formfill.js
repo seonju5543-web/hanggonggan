@@ -62,7 +62,8 @@ function ffFileEntry(fj, file) {
   return F && Array.isArray(F.fields) && F.fields.length && Array.isArray(F.pages) && F.pages.length ? { rel, F } : null;
 }
 
-/* 신청 준비 시트·지원문서 머리의 「원본 양식 그대로 보기」 줄 밑 자리(li.fill-slot)에 「양식 채우기」 단추를 붙인다 — 빈칸을 찾은 파일만 */
+/* 신청 준비 시트·지원문서 머리·활동 시트의 신청서 PDF 줄 밑 자리(li.fill-slot · app-live.js pdfRowHtml)에 「양식 채우기」 단추를 붙인다 — 빈칸을 찾은 파일만.
+   단추 글자는 「양식 채우기」 한 마디다(2026-11-20 개발자 "ㅇㅇ 지워" — 빈칸 수·학적정보 수 작은 글씨를 뺐다 · 화면 안 「남은 칸 n」이 그 일을 한다) */
 function attachFormFillButtons(sch, root) {
   const slots = [...(root || document).querySelectorAll('.fill-slot[data-file]')];
   if (!slots.length || !sch) return;
@@ -70,8 +71,7 @@ function attachFormFillButtons(sch, root) {
     for (const slot of slots) {
       const e = ffFileEntry(fj, slot.dataset.file);
       if (!e) { slot.hidden = true; continue; }
-      const keyed = e.F.fields.filter((f) => f.key).length;
-      slot.innerHTML = `<button type="button" class="btn fill-open" data-id="${esc(sch.id)}" data-file="${esc(slot.dataset.file)}">양식 채우기<span class="fill-open-m">빈칸 ${e.F.fields.length}개${keyed ? ` · 학적정보로 ${keyed}개 먼저 채워요` : ''}</span></button>`;
+      slot.innerHTML = `<button type="button" class="btn fill-open" data-id="${esc(sch.id)}" data-file="${esc(slot.dataset.file)}">양식 채우기</button>`;
       slot.hidden = false;
     }
   });

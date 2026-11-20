@@ -204,6 +204,12 @@ function applySectionHtml(sch, opts) {
   const rows = `${period ? row('기간', period, true) : ''}${methodRow}${docText ? row('서류', docText) : ''}`;
   return rows ? `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${rows}</ul>` : '';
 }
+/* 상세 시트 「첨부」에 늘어놓는 첨부 — 본문 사진(bodyImage)은 첨부가 아니다 · 같은 파일이 두 번 실린 글(「1. 2026 절주서포터즈 모집 안내.pdf」 두 줄 · 2026-11-17 실측)은
+   이름+주소가 같으면 한 번만. verify/what-shows.mjs 가 이 함수를 그대로 불러 화면과 같은 줄 수를 말한다(베끼지 말 것) */
+function sheetAttachments(list) {
+  const seen = new Set();
+  return (list || []).filter((a) => a && !a.bodyImage).filter((a) => { const k = `${String(a.name || '').trim()}|${a.url || ''}`; if (seen.has(k)) return false; seen.add(k); return true; });
+}
 function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines = [] }) {
   /* ① 지원 자격 — 판정은 eligibilityRowsHtml·fitBadgeHtml 그대로(알약 status-pill 은 없다 · 두 축의 말이라).
      🔴 넣을 줄이 없고 물을 것도 없으면 **칸 자체를 안 그린다** (2026-11-07 개발자 지시 "지원자격을 못읽은경우에도 내용 없는 지원자격 칸이 있음 … 칸 자체를 없애기" —
@@ -217,12 +223,16 @@ function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines 
   /* ② 접수 ③ 공고 안내 */
   const apply = applySectionHtml(sch, { activity });
   const notice = noticeSummaryHtml(noticeLines);
-  /* ④ 첨부 — 본문 사진(bodyImage)은 첨부가 아니다 · 층2 첨부는 재단이 올린 선발 공고문이라 꼬리표로 말한다(신청서 양식이라 부르지 않는다) */
-  /* 활동 글은 신청 준비 화면이 없어(접수는 주최 사이트) 로봇이 바꿔 둔 신청서 원본 PDF 줄(+ 「양식 채우기」 자리)을 첨부 맨 위에 둔다 — 장학과 같은 줄 꼴 formPdfRowsHtml · 열쇠는 글 id(2026-10-30 공동개발자 "공모전 신청 양식이 매우 미흡") */
-  const pdfRows = activity && activity.id ? formPdfRowsHtml(activity) : '';
-  const attSeen = new Set();   // 같은 파일이 두 번 실린 글(「1. 2026 절주서포터즈 모집 안내.pdf」 두 줄 · 2026-11-17 실측) — 이름+주소가 같으면 한 번만
-  const atts = ((activity ? activity.attachments : sch.attachments) || []).filter((a) => a && !a.bodyImage).filter((a) => { const k = `${String(a.name || '').trim()}|${a.url || ''}`; if (attSeen.has(k)) return false; attSeen.add(k); return true; });
-  const att = atts.length ? `<h4>첨부${sch.sourceKind === 'kosaf' ? ' <span class="channel-tag">재단 선발 공고문</span>' : ''}</h4><ul class="doc-list">${pdfRows}${atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`  : (pdfRows ? `<h4>첨부</h4><ul class="doc-list">${pdfRows}</ul>` : '');
+  /* ④ 첨부 — 본문 사진(bodyImage)은 첨부가 아니다 · 층2 첨부는 재단이 올린 선발 공고문이라 꼬리표로 말한다(신청서 양식이라 부르지 않는다)
+     🔴 2026-11-20 승인 시안(docs/designs/all-docs-pdf.md · 개발자 "원본인 한글파일이나 독스는 그냥 맨 밑에 첨부파일에 원본 넣어놓고 학생이 열 수 있는 공고들은 다 pdf 로"):
+        위 목록 = PDF 줄(첨부 차례 · attachPdfRowsHtml 한 곳 — 장학·재단·활동 같은 함수 · 활동은 글 id 가 열쇠 · 활동 신청서 PDF 밑엔 「양식 채우기」 자리),
+        맨 밑 목록 = 올린 첨부 목록 그대로(원래 PDF 도 다시 · 이름만 — 크기 글씨 없음). 사본이 없는 첨부는 맨 밑에만 보인다. */
+  const atts = sheetAttachments(activity ? activity.attachments : sch.attachments);
+  const pdfRows = attachPdfRowsHtml(activity && activity.id ? activity : sch, atts);
+  const origRows = atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}</li>`).join('');
+  const att = (pdfRows || origRows)
+    ? `<h4>첨부${sch.sourceKind === 'kosaf' ? ' <span class="channel-tag">재단 선발 공고문</span>' : ''}</h4>${pdfRows ? `<ul class="doc-list">${pdfRows}</ul>` : ''}${origRows ? `<ul class="doc-list">${origRows}</ul>` : ''}`
+    : '';
   /* ⑤ 원문 — 이름·안내는 source-link.js 한 곳(sourceLinkHtml · sourceLinkHintHtml) · 층2 문의 */
   const link = activity ? sourceLink(activity, 'activity') : sourceLink(sch, 'detail');
   const a = activity ? (() => { const href = safeUrl(link.href); return href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : ''; })() : sourceLinkHtml(sch);   // 장학·층2는 sourceLinkHtml 한 곳(detail 자리)

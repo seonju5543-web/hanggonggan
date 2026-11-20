@@ -2282,7 +2282,7 @@ function renderFormFill(restore) {
     }
     /* AI 초안 버튼 — essay-config.js 의 endpoint 가 비어 있으면 버튼 자체가 없다 */
     if (typeof essayBind === 'function') essayBind(tpl, sch);
-    if (tpl.unofficial && typeof attachFormFillButtons === 'function') attachFormFillButtons(sch, sheet);   // 「원본 양식 그대로 보기」 밑 「양식 채우기」(formfill.js)
+    if (tpl.unofficial && typeof attachFormFillButtons === 'function') attachFormFillButtons(sch, sheet);   // 신청서 PDF 줄 밑 「양식 채우기」(formfill.js)
     /* 들어온 순간에도 한 번 적는다 — 자동으로 채운 값부터 남는다.
        치는 동안의 저장은 bindEvents 의 **위임 리스너 하나**가 맡는다:
        여기서 걸면 단계를 오갈 때마다 리스너가 쌓인다(시트는 innerHTML 만 갈린다). */
@@ -2855,7 +2855,8 @@ const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), l
    (`loadMajorsFor` · 위 주석). */
 bootJobs.push(loadTuition());  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
-bootJobs.push(loadFormsPdfIndex());   // 신청서 원본 PDF 색인 — 신청 준비 시트의 「원본 양식 그대로 보기」 줄
+bootJobs.push(loadFormsPdfIndex());   // 신청서 원본 PDF 색인 — 첨부 목록의 신청서 PDF 줄(attachPdfRowsHtml)
+bootJobs.push(loadDocsPdfIndex());    // 공고문·안내문 PDF 사본 색인 (2026-11-20 · docs/designs/all-docs-pdf.md)
 bootJobs.push(loadFormPagesIndex());  // 공고문에서 뗀 서식 쪽 색인 (2026-10-13 ②)
 /* 🔴 두 손가락으로 화면이 커졌다 작아졌다 하던 것 (2026-09-01 개발자 지적).
    막는 곳이 셋이라 셋 다 있어야 한다 — 하나만 두면 어떤 폰에서는 그대로 커진다:

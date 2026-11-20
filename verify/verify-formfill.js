@@ -80,7 +80,8 @@ const PROFILE = {
   eq('🔴 빈칸을 찾은 파일에만 단추가 선다 (못 찾은 파일은 자리가 숨는다 — 칸을 지어내지 않는다)',
     slots.every((s) => (s.file.endsWith(target.rel) ? (!s.hidden && s.btn) : true)) && slots.filter((s) => !s.hidden).every((s) => s.btn), true);
   const btnText = await page.$eval(`.fill-slot[data-file$="${target.rel}"] .fill-open`, (b) => b.textContent);
-  eq('  단추가 빈칸 수와 학적정보로 채울 수를 말한다', [new RegExp(`빈칸 ${target.n}개`).test(btnText), target.keyed ? new RegExp(`${target.keyed}개 먼저`).test(btnText) : true], [true, true]);
+  /* 2026-11-20 개발자 "ㅇㅇ 지워" — 단추 안 작은 글씨(빈칸 n개 · 학적정보로 n개 먼저)를 뺐다. 빈칸 수는 화면 안 「남은 칸 n」이 말한다(아래 ②) */
+  eq('  단추 글자는 「양식 채우기」 한 마디(작은 글씨 없음)', btnText.trim(), '양식 채우기');
 
   console.log('\n■ ② 화면 — 쪽 그림 위 칸 · 학적정보로 먼저 채움');
   await page.click(`.fill-slot[data-file$="${target.rel}"] .fill-open`);

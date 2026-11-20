@@ -1,7 +1,45 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "[공모전] 2026 디지털경제 컨소시엄 캐릭터 공모전 1차 심사 결과 및...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71058",
+   "postedAt": "2026-11-20",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-20"
+  },
+  {
+   "title": "[대학생활] 이런이런 2027년 달력을 구매할때가됐군네?주신다구요?",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71057",
+   "postedAt": "2026-11-20",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-20",
+   "thumb": "data/news/img/cad7cb43936af659.webp"
+  },
+  {
+   "title": "[채용공고] 2026년 제3회 전남대학교 패키지 지원대학 사업 전문/사무 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71055",
+   "postedAt": "2026-11-20",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-20"
+  },
+  {
+   "title": "[취업정보] [★일정변경] 2026년 글로컬대학사업 「(직무부트캠프) 현직...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71054",
+   "postedAt": "2026-11-20",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-20"
+  },
   {
    "title": "[채용공고] 2026년 제12회 전남대학교 앵커사업단 직원 채용 공고",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71053",
@@ -361,45 +399,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-11-16"
-  },
-  {
-   "title": "[학사안내] 2027학년도 전기(2차) 일반대학원 입학전형 모집요강 공고",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70994",
-   "postedAt": "2026-11-16",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-16"
-  },
-  {
-   "title": "[취업정보] [올포랜드]2027 신입사원(SW개발, 측량 및 공간정보부문)...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70993",
-   "postedAt": "2026-11-13",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-13"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 대체교과목 신청 안내",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70991",
-   "postedAt": "2026-11-13",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-13"
-  },
-  {
-   "title": "[취업정보] [미원상사]연구보조(1년계약직) 채용(~11.2.(일)까지)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70989",
-   "postedAt": "2026-11-13",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-13"
   }
  ]
 }
