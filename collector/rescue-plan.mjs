@@ -15,7 +15,8 @@
    ============================================================ */
 import { createRequire } from 'node:module';
 import { canonUrl } from './canon-url.mjs';
-import { sameFileEntry } from './attachment-link.mjs';   // 같은 파일인가(주소 + 이름 · 2026-11-20) — 수집 로봇의 다듬기와 같은 판정 한 곳
+import { sameFileAmong, FILE_NAME_SRC, fileNameIn } from './attachment-link.mjs';   // 같은 파일인가(주소 + 이름 · 2026-11-20) · 파일 이름 읽기 — 수집 로봇의 다듬기와 같은 눈 한 곳
+export { FILE_NAME_SRC, fileNameIn };   // 예전 자리에서 그대로 꺼내 쓰게(rescue-bodies · 관문)
 
 const { notStale } = createRequire(import.meta.url)('../match-engine.js');
 
@@ -96,14 +97,14 @@ const normName = (n) => { const s = String(n || ''); return (fileNameIn(s) || s)
 
 /** 페이지에서 찾은 첨부 중 아직 기록에 없는 것만.
     🔴 이름만 보지 않는다(2026-11-20) — 같은 링크를 읽는 길마다 이름이 조금씩 달라(`Attachment 2026….hwp` · `Attachment2026….hwp` · `2026….hwp`)
-       광운대 인석장학금은 파일 2개가 6줄이 됐다. 받을 주소까지 같은 같은 파일(attachment-link sameFileEntry)은 새 첨부가 아니다 */
+       광운대 인석장학금은 파일 2개가 6줄이 됐다. 받을 주소까지 같은 같은 파일(attachment-link sameFileAmong)은 새 첨부가 아니다 */
 export function newAttachments(have, found) {
   const had = new Set((have || []).map((a) => normName(a.name)));
   const out = [];
   for (const a of found || []) {
     const k = normName(a.name);
     if (had.has(k)) continue;
-    if ((have || []).some((h) => sameFileEntry(h, a)) || out.some((o) => sameFileEntry(o, a))) continue;
+    if (sameFileAmong(have, a) || sameFileAmong(out, a)) continue;
     had.add(k);
     out.push(a);
   }
@@ -171,16 +172,8 @@ export function dropSelfLinks(list, pageUrls) {
   return out;
 }
 
-/* 화면 글자에서 파일 이름 — 확장자로 끝나는 덩어리. 브라우저 안(census)과 여기(관문)가 같은 식을 쓴다(FILE_NAME_SRC 를 문자열로 넘긴다).
-   그림 확장자는 뺀다 — 본문 그림은 따로 적고(본문이미지-…), 사이트 로고·배너 파일 이름이 글자로 보이는 일은 드물지만 첨부로 세면 경보가 헛돈다 */
-export const FILE_NAME_SRC = String.raw`([^\\/:*?"<>|\n\t]{2,120}\.(?:hwp|hwpx|pdf|docx?|xlsx?|pptx?|zip))(?=$|[\s\[\(（【])`;
-const FILE_NAME = new RegExp(FILE_NAME_SRC, 'i');
-/** 글자 한 덩어리에서 파일 이름 하나(없으면 '') — 앞 번호·`미리보기` 꼬리·크기 표식은 normName 이 비교 때 뗀다.
-    확장자 바로 뒤에 글자가 이어지면 파일 이름이 아니다(「…신청서.hwp를 작성하여」 — 본문 문장 · 리뷰 1) */
-export function fileNameIn(text) {
-  const m = String(text || '').replace(/\s+/g, ' ').trim().match(FILE_NAME);
-  return m ? m[1].trim() : '';
-}
+/* 화면 글자에서 파일 이름 읽기(FILE_NAME_SRC · fileNameIn)는 attachment-link.mjs 로 옮겼다(2026-11-20 — 「같은 파일」 판정이 같은 눈을 쓴다 · 위에서 다시 내보낸다).
+   앞 번호·`미리보기` 꼬리·크기 표식은 normName 이 비교 때 뗀다 */
 
 /* ── 브라우저 안에서 도는 함수 — 화면에 **보이는** 파일 이름을 센다 ──
    rescue-bodies 가 frame.evaluate 로 넘긴다(함수 글자가 그대로 페이지로 간다 — 바깥 것을 못 쓴다 · 식은 인자 src 로 받는다). 여기 둔 것은 관문이 가짜 화면으로 부르려는 것이다.
@@ -288,8 +281,11 @@ export function upgradeAttachmentUrls(have, found) {
 }
 
 /** 살핀 뒤의 셈 — 화면에서 본 파일 이름(seenNames) 가운데 기록(attachments)에 받을 주소가 없는 것의 수 */
-export function attGapOf(seenNames, attachments) {
-  const ok = new Set((attachments || []).filter((a) => a && usableUrl(a.url)).map((a) => normName(a.name)));
+export function attGapOf(seenNames, attachments, found = []) {
+  /* 🔴 이번에 찾은 줄 가운데 받을 주소가 있는 것도 '구한 것'이다(2026-11-20 리뷰) — 같은 파일이 다른 이름으로 이미 적혀 있어 새로 쌓지 않은 줄
+     (`Attachment2026….hwp` — 적힌 이름은 `2026….hwp`)을 못 구한 것으로 세면 광운대 공고마다 헛 경보가 뜨고 이레마다 다시 연다.
+     찾은 줄은 전부 적혔거나(newAttachments) 같은 파일로 이미 적혀 있으므로(sameFileAmong) 받을 주소가 있으면 앱에서 받을 수 있다 */
+  const ok = new Set([...(attachments || []), ...(found || [])].filter((a) => a && !a.bodyImage && usableUrl(a.url)).map((a) => normName(a.name)));
   return [...new Set((seenNames || []).map(normName).filter(Boolean))].filter((n) => !ok.has(n)).length;
 }
 

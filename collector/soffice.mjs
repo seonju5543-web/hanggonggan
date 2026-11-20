@@ -55,6 +55,7 @@ const FIXED_BOX = /<draw:frame\b([^>]*?)\s+svg:height="([^"]+)"([^>]*)>(\s*)<dra
    진단한 틀 40여 개 가운데 글이 든 채 100% 아래인 문단은 그 하나(와 85% 하나)뿐이었고, 100% 이상인 문단의 틀은 풀자 다 살아났다(귀농인 217%).
    그런 문단에만 줄 간격 100% 인 **사본 모양**을 붙인다 — 같은 모양을 쓰는 글 문단은 건드리지 않는다 */
 const AS_CHAR_BOX = /<draw:frame\b[^>]*\btext:anchor-type="as-char"[^>]*>\s*<draw:text-box\b/g;
+export const MAX_FLAT_BYTES = 64 * 1024 * 1024;   // 중간 꼴(fodt) 크기 상한 — sofficeToPdfRelaxed
 const LOOSE_LINE = '_hdj100';
 const escRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function loosenLineSpacing(xml) {
@@ -96,10 +97,13 @@ export function relaxFrameHeights(fodt) {
   const { xml, lines } = loosenLineSpacing(grown);
   return { xml, boxes: boxes + lines };
 }
-export function sofficeToPdfRelaxed(src, work, { soffice = 'soffice' } = {}) {
+export function sofficeToPdfRelaxed(src, work, { soffice = 'soffice', maxBytes = MAX_FLAT_BYTES } = {}) {
   fs.mkdirSync(work, { recursive: true });
   const flat = sofficeConvert(src, work, 'fodt', { soffice });
   if (!flat.ok) return flat;
+  /* 중간 꼴은 그림을 글자(base64)로 품어 원본보다 크다 — 통째로 읽어 고치므로 너무 크면 가지 않는다(메모리가 모자라 죽으면 잡을 수 없고 실패 장부에도 안 남아 매 실행 같은 파일에서 죽는다 · 리뷰 11-20) */
+  const size = fs.statSync(flat.made).size;
+  if (size > maxBytes) return { ok: false, why: `중간 꼴이 너무 큼(${Math.round(size / 1024 / 1024)}MB)` };
   const { xml, boxes } = relaxFrameHeights(fs.readFileSync(flat.made, 'utf8'));
   if (!boxes) return { ok: false, why: '높이가 고정된 글상자 없음' };
   const dir = path.join(work, 'relaxed');

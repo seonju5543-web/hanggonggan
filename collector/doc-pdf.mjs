@@ -44,9 +44,9 @@ export const KEEP_MIN = 0.98;        // 원본 글자 중 PDF 에 남아야 하�
 export const MIN_CHARS = 50;         // 이보다 원본 글자가 적으면 잴 수 없다(그림 문서) — 사본은 두고 리포트에 센다
 export const REST_DAYS = 3;          // 받기·변환에 실패한 첨부는 사흘 쉰다
 /* 만드는 법의 판 번호 — 올리면 **글자가 덜 남은 사본과 쉬고 있는 실패만** 다음 실행에 다시 만든다(다 남은 사본은 안 건드린다 · 학교를 다시 두드리지 않는다).
-   3 = 글자가 빠지면 높이 고정 글상자를 풀어 다시 바꾼다 · 배포용 문서는 잴 수 없음으로 · `javascript:` 호출 속 절대 주소를 푼다(2026-11-20 — 첫 실행의 못 바꾼 7개 ·
-       2 는 같은 날 표 줄 높이를 풀던 판 — 진단에서 풀 줄이 0곳으로 나와 버렸다) */
-export const MAKER = 3;
+   4 = 글자가 빠지면 높이 고정 글상자와 그 문단의 줄 간격을 풀어 다시 바꾼다 · 배포용 문서는 잴 수 없음으로 · `javascript:` 호출 속 절대 주소를 푼다
+       (2026-11-20 — 첫 실행의 못 바꾼 7개 · 2 는 표 줄 높이를 풀던 판(진단에서 풀 줄 0곳) · 3 은 글상자만 풀던 판(통영시 공고가 줄 간격 34% 라 그대로 96%)) */
+export const MAKER = 4;
 export const FETCH_TIMEOUT_MS = 30000;
 export const TEXT_TIMEOUT_MS = 20000;   // 글자 대조의 두 도구(hwp-bodytext.py · pdftotext) — 평소 1초 안에 끝난다
 /* 파일 하나의 최대 시간(초) = 받기 + 변환 + 글자 뽑기 둘 — 예산 검사와 관문 「공고문 PDF 사본 — 배선」 ④가 같은 숫자를 쓴다 */
@@ -123,10 +123,15 @@ export function missingLines(origText, pdfText, max = 3) {
   const hay = sq(pdfText);
   const grams = new Set();
   for (let i = 0; i + 3 <= hay.length; i += 1) grams.add(hay.slice(i, i + 3));
+  /* 🔴 글자 수로도 모자란 글자가 든 줄만 — 표 칸 차례가 달라 묶음이 안 맞을 뿐인 짧은 줄(「(전화) (휴대폰)」)을 빠졌다고 적지 않게
+     (진단 2차: 글자가 100% 남은 사본에 그 줄 둘이 '빠진 줄'로 찍혔다). 글자 대조(keptRatio)와 같은 셈이라 다 남았으면 빈 목록이다 */
+  const have = tally(pdfText);
+  const short = new Set();
+  for (const [ch, c] of tally(origText)) if (c > (have.get(ch) || 0)) short.add(ch);
   const out = [];
   for (const line of String(origText || '').split('\n')) {
     const s = sq(line);
-    if (s.length < 4) continue;
+    if (s.length < 4 || ![...s].some((ch) => short.has(ch))) continue;
     let hit = 0;
     for (let i = 0; i + 3 <= s.length; i += 1) if (grams.has(s.slice(i, i + 3))) hit += 1;
     if (hit / (s.length - 2) < 0.5) { out.push(line.replace(/\s+/g, ' ').trim().slice(0, 60)); if (out.length >= max) break; }

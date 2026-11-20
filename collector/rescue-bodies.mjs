@@ -485,7 +485,7 @@ for (const t of targets) {
       const names = [...new Set([...(r.seenNames || []), ...r.found.filter((a) => !a.bodyImage).map((a) => fileNameIn(a.name)).filter(Boolean)])];
       const looked = !r.error && (text || names.length);
       if (looked) {
-        ledger[key] = withAttCheck(ledger[key], { today, seen: names.length, gap: attGapOf(names, t.it.attachments) });
+        ledger[key] = withAttCheck(ledger[key], { today, seen: names.length, gap: attGapOf(names, t.it.attachments, r.found) });
         attChecked += 1;
         if (ledger[key].attGap) attGaps += 1;
       } else if (t.attOnly) {

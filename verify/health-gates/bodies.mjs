@@ -270,7 +270,7 @@ export default async function bodies(eq, ctx) {
       newAttachments([{ name: '장학금 신청서.hwp (다운로드 : 12회)' }], [{ name: '장학금 신청서.hwp' }, { name: '1. 장학금 신청서.hwp 미리보기' }, { name: '선발 공고문.pdf [1.2MB]' }, { name: '선발 공고문.pdf' }]).map((a) => a.name),
       ['선발 공고문.pdf [1.2MB]']);
     /* 2026-11-20 — 광운대 인석장학금: 같은 링크를 읽는 길마다 이름이 달라(`Attachment 2026….hwp` · `Attachment2026….hwp` · `2026….hwp`) 파일 2개가 6줄이 됐다.
-       이름만 보던 겹침 판정에 **받을 주소까지 같은 같은 파일**(attachment-link sameFileEntry)을 더했다 — 주소만 같고 이름이 딴판이면 여전히 새 첨부다 */
+       이름만 보던 겹침 판정에 **받을 주소까지 같은 같은 파일**(attachment-link sameFileAmong)을 더했다 — 주소만 같고 이름이 딴판이면 여전히 새 첨부다 */
     {
       const U = 'https://www.kw.ac.kr/include/Download.jsp?fuid=35466&ano=53536';
       const SELF = 'https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&#';
@@ -281,6 +281,21 @@ export default async function bodies(eq, ctx) {
         [0, ['Attachment20261021 인석장학금 체크리스트1.hwp'], 1]);
       eq('  🔴 주소만 같고 이름이 딴판이면 다른 파일이다 — 공고 화면 주소(`…#`)를 같이 단 신청서·자기소개서는 둘 다 적는다(서울시립대 실측 꼴)',
         newAttachments([{ name: '발전기금 장학생 신청서.hwp', url: SELF }], [{ name: '자기소개서_기본형.hwp', url: SELF }]).map((a) => a.name), ['자기소개서_기본형.hwp']);
+      /* 리뷰 11-20 — 닮은 이름이어도 파일 하나의 주소가 아니면(그 주소에 딴 이름이 이미 섞여 있으면) 새 첨부로 둔다 · 학교가 새 이름으로 바꿔 올린 파일은 새 첨부다(경희대 점프장학) */
+      const ONE = 'https://a.ac.kr/down?no=1';
+      eq('  🔴 한 주소에 딴 이름이 이미 섞여 있으면 닮은 이름도 새로 적는다 · 같은 자리의 새 이름(`…_수정_20261001.pdf`)은 새 첨부 · 확장자만 다른 것도',
+        [newAttachments([{ name: '붙임1 공고문.hwp', url: ONE }, { name: '붙임2 신청서.hwp', url: ONE }], [{ name: '공고문.hwp', url: ONE }]).length,
+          newAttachments([{ name: '붙임1 운영 계획안_수정.pdf', url: U }], [{ name: '붙임1 운영 계획안_수정_20261001.pdf', url: U }]).length,
+          newAttachments([{ name: '선발 공고문.hwp', url: ONE }], [{ name: '선발 공고문.pdf', url: ONE }]).length],
+        [1, 1, 1]);
+      /* 리뷰 11-20 (중요 1) — 새로 쌓지 않은 줄을 '못 구한 것'으로 세면 광운대 공고마다 헛 경보가 뜨고 이레마다 다시 연다. 찾은 줄에 받을 주소가 있으면 구한 것이다 */
+      const stored = [{ name: '20261021 인석장학금 체크리스트1.hwp', url: U }];
+      const foundNow = [{ name: 'Attachment20261021 인석장학금 체크리스트1.hwp', url: U }, { name: '20261021 인석장학금 체크리스트1.hwp', url: U }];
+      const seenNow = ['Attachment20261021 인석장학금 체크리스트1.hwp', '20261021 인석장학금 체크리스트1.hwp', '화면에만 보인 서식.hwp'];
+      eq('  🔴 못 구한 첨부 수(attGap) — 같은 파일이라 안 쌓은 이름은 세지 않고(찾은 줄에 받을 주소가 있다) · 화면에만 보이고 주소를 못 구한 것만 센다 · 찾은 줄을 안 넘기면 예전처럼 2',
+        [newAttachments(stored, foundNow).length, attGapOf(seenNow, stored, foundNow), attGapOf(seenNow, stored), attGapOf(['주소 없는 서식.hwp'], stored, [{ name: '주소 없는 서식.hwp', url: '' }])],
+        [0, 1, 2, 1]);
+      eq('  로봇이 그 셈에 이번에 찾은 줄을 넘긴다(attGapOf(names, 적힌 것, 찾은 것))', /gap: attGapOf\(names, t\.it\.attachments, r\.found\)/.test(readText('collector/rescue-bodies.mjs')), true);
     }
     eq('  받을 수 있는 주소는 http(s) 뿐 — `javascript:`·빈 주소·`#` 는 앱이 이름만 보인다',
       [usableUrl('https://a.example/f.hwp'), usableUrl("javascript:filedown('1')"), usableUrl(''), usableUrl('#'), usableUrl(undefined)], [true, false, false, false, false]);
