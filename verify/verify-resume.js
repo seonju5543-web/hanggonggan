@@ -184,11 +184,17 @@ async function openWith(ctx, resume) {
     });
     await dismissNotify(stale);
     ok('5시간 만에 열면 홈으로 간다', (await shown(stale)) === 'home', await shown(stale));
-    ok("홈에 '신청서 마저 쓰기' 줄이 있다", await stale.isVisible('#home-resume').catch(() => false));
-    const sub = await stale.textContent('#home-resume').catch(() => '');
+    /* 🔴 2026-11-20 승인 시안 「가리키는 마스코트」 — 홈의 「쓰던 신청서」 띠(#home-resume)를 없애고 히어로의 「이어서 쓰기」 줄이 그 일을 한다.
+       줄 → 「이어서 쓰기」 시트(어느 공고인지) → 「이어서 쓰기」 버튼 → 신청서. 띠가 되살아나지 않았는지도 같이 본다 */
+    ok('홈의 「쓰던 신청서」 띠는 없다 (이어서 쓰기 줄로 옮김)', (await stale.$('#home-resume')) === null);
+    const draftLine = '#hero-lines .hero-ln[data-k="draft"]';
+    ok("히어로에 '이어서 쓰기' 줄이 보인다", await stale.isVisible(draftLine).catch(() => false));
+    await stale.click(draftLine);
+    await stale.waitForTimeout(1200);
+    const sub = await stale.textContent('#detail-sheet .hero-draft-card').catch(() => '');
     ok('그 줄이 어느 공고인지 말한다', String(sub).includes(target.name.slice(0, 6)), sub && String(sub).slice(0, 40));
 
-    await stale.click('#home-resume');
+    await stale.click('#btn-hero-draft');
     await stale.waitForTimeout(1400);
     ok('눌러서 신청서로 들어간다', await stale.isVisible('#btn-ff-generate').catch(() => false));
 

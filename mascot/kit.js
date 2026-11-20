@@ -288,7 +288,7 @@
     const stack = opt.stack ? new Stack(scene, opt.stack[0], opt.stack[1], 12) : null;
 
     let ch = null, appear = 1;
-    const S = { yaw: 0, yawV: 0, drag: false, lookX: 0, lookY: 0, lx: 0, ly: 0, tJump: -1, blink: rand(1.5, 3.5), blinkT: 0, armUp: 0, capT: -1, tas: 0, tasV: 0, time: 0, visible: true };
+    const S = { yaw: 0, yawV: 0, drag: false, lookX: 0, lookY: 0, lx: 0, ly: 0, tJump: -1, blink: rand(1.5, 3.5), blinkT: 0, armUp: 0, capT: -1, tas: 0, tasV: 0, time: 0, visible: true, point: null, pz: 0.3, py: 0 };
 
     function setChar(next) {
       if (ch) { scene.remove(ch.root); }
@@ -299,7 +299,10 @@
       renderer.setSize(w, h, false); cam.aspect = w / h;
       // 좁은 무대에서는 물러나 캐릭터가 잘리지 않게
       const dist = (opt.dist || 5.7) * Math.max(1, 0.95 / cam.aspect);
-      cam.position.set(0, opt.camY || 1.45, dist); cam.lookAt(0, opt.lookY || 1.28, 0); cam.updateProjectionMatrix();
+      /* screenX(-1~1): 캐릭터를 화면 가로 어디에 세울지 — 무대를 넓게 깔고 캐릭터만 한쪽에 두면 뻗은 팔·동전이 무대 끝에서 잘리지 않는다(2026-11-20 가리키는 시안).
+         카메라를 옆으로 옮길 뿐 바라보는 방향은 그대로다. 없으면 예전처럼 가운데 */
+      const cx = opt.screenX ? -opt.screenX * Math.tan((cam.fov * Math.PI) / 360) * dist * cam.aspect : 0;
+      cam.position.set(cx, opt.camY || 1.45, dist); cam.lookAt(cx, opt.lookY || 1.28, 0); cam.updateProjectionMatrix();
       if (stack) stack.group.visible = cam.aspect > 0.85;
     }
     new ResizeObserver(size).observe(btn); size();
@@ -331,7 +334,7 @@
     btn.addEventListener('click', (e) => { if (moved) { e.preventDefault(); moved = false; return; } tap(); });  // Enter·Space 도 이 길
     function look(e) {
       const r = btn.getBoundingClientRect();
-      S.lookX = clamp(((e.clientX - r.left) / r.width - 0.5) * 2, -1, 1);
+      S.lookX = clamp(((e.clientX - r.left) / r.width - 0.5) * 2 - (opt.screenX || 0), -1, 1);   // 캐릭터가 선 자리를 기준으로
       S.lookY = clamp(((e.clientY - r.top) / r.height - 0.5) * 2, -1, 1);
     }
 
@@ -363,7 +366,10 @@
       ch.squash.scale.set(sxz, sy, sxz);
       shadow.scale.setScalar((1 - y * 0.45) * (opt.scale || 1) * (ch.scale || 1));
       // 시선
-      S.lx = lerp(S.lx, S.lookX, 1 - Math.pow(0.002, dt)); S.ly = lerp(S.ly, S.lookY, 1 - Math.pow(0.002, dt));
+      /* 가리키기(point) — 화면의 글자 쪽을 본다 · 그쪽 팔을 뻗는다 · 몸을 조금 돌린다 (없으면 예전 그대로 손가락을 따라 본다) */
+      const P = S.point && !S.drag ? S.point : null;
+      S.lx = lerp(S.lx, P ? P.x : S.lookX, 1 - Math.pow(0.002, dt)); S.ly = lerp(S.ly, P ? -P.y : S.lookY, 1 - Math.pow(0.002, dt));
+      S.py = lerp(S.py, P ? P.x * 0.38 : 0, 1 - Math.pow(0.01, dt)); ch.root.rotation.y += S.py;
       const lk = ch.look || 1;
       ch.head.rotation.y = (S.lx * 0.34 - S.yaw * 0.25) * lk; ch.head.rotation.x = (S.ly * 0.2 + (S.tJump >= 0 && S.tJump < 0.56 ? -0.18 : 0)) * lk;
       ch.head.rotation.z = Math.sin(S.time * 1.1) * 0.03 * lk;
@@ -373,7 +379,13 @@
       const happy = S.tJump >= 0.12 && S.tJump < 0.7;
       ch.eyes.forEach((e) => { e.scale.y = S.blinkT > 0 ? 0.12 : (happy ? 0.55 : 1); });
       // 팔 · 귀 · 꼬리
-      ch.arms.forEach((a) => { const s = a.userData.side; a.rotation.z = s * (0.3 + S.armUp * 2.3 + Math.sin(S.time * 2.2 + s) * 0.05); });
+      const ps = P ? (P.x < 0 ? -1 : 1) : 0;   // 가리키는 쪽 팔
+      S.pz = lerp(S.pz, P ? Math.PI / 2 + P.y * 0.85 : 0.3, 1 - Math.pow(0.0008, dt));
+      /* 가리키는 동안 다른 팔은 만세(armUp)를 하지 않는다 — 뛸 때마다 바깥으로 뻗어 무대 끝에서 잘렸다(11-20 개발자 지적 · 가만히 둬도 3.4초마다 뛰므로) */
+      const cheer = P ? 0.35 : 2.3;
+      ch.arms.forEach((a) => { const s = a.userData.side;
+        a.rotation.z = s === ps || (!P && Math.abs(S.pz - 0.3) > 0.02 && s === S.lastPs) ? s * (S.pz + Math.sin(S.time * 5) * 0.03) : s * (0.3 + S.armUp * cheer + Math.sin(S.time * 2.2 + s) * 0.05); });
+      if (ps) S.lastPs = ps;
       if (ch.ears) ch.ears.forEach((e, i) => { e.rotation.z = (i ? -1 : 1) * (Math.sin(S.time * 3 + i) * 0.04 + S.armUp * 0.22); });
       if (ch.tail) ch.tail.rotation.z = Math.sin(S.time * 2.6) * 0.22 + S.yawV * 0.03;
       // 학사모 — 톡 떠올라 한 바퀴
@@ -389,7 +401,8 @@
       renderer.render(scene, cam);
     }
     requestAnimationFrame(frame);
-    return { setChar, tap, size };
+    /* 밖에서 상태를 맞출 때 — point({x,y}): 화면 좌표(-1~1 · x 왼쪽이 −, y 위가 +)의 그 자리를 가리킨다(null 이면 그만) · hop(): 동전 없이 한 번 뛴다 */
+    return { setChar, tap, size, point(p) { S.point = p || null; }, hop() { if (S.tJump < 0 || S.tJump > 0.5) S.tJump = 0.1; } };
   }
 
 

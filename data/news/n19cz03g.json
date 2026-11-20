@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-20",
  "items": [
   {
+   "title": "Java 취약점 관련 보안조치 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/272314/artclView.do",
+   "postedAt": "2026-11-20",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-20",
+   "desc": "최근 Java 애플리케이션에서 보안 취약점이 발견되었습니다. 교내에서 Java 기반 서버 및 서비스를 운영 중인 각 부서 및 연구실 에서는 다음 내용을 확인하시어 Java 버전과 사용 중인 서비스를 점검하고…"
+  },
+  {
    "title": "동원 김흥배 박사의 교육철학과 운보 컬렉션",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/272146/artclView.do",
    "postedAt": "2026-11-19",

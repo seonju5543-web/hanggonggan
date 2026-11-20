@@ -171,7 +171,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `essay.js` `essay-quality.js` `essay-submit-check.js` | AI 초안(유일하게 AI가 문장을 쓰는 곳 — 금지선은 '사실을 만드는 것') · 품질 검사 · 제출 전 점검 |
 | `chat.js` | 도우미 — 앱이 아는 것만 답하고 못 찾으면 "못 찾았다". 프로필은 절대 안 보낸다 |
 | `interactions.js` | 손짓·움직임(당겨서 새로고침·뼈대) — 판정을 새로 만들지 않는다 |
-| `app-mascot.js` `mascot/` | 3D 마스코트(11-19) — 홈은 그 학교 캐릭터 · 신청 내역은 대장님. 🔴 금액 글자는 예전 요소 그대로(3D 는 말풍선 모양만 입힌다 · 못 그리는 폰은 글자 화면) · 엔진은 늦게 싣는다 · 학교가 빼 달라면 `MASCOT_OFF` · 허락 경위 `docs/designs/mascot-permissions.md` · 관문 「3D 마스코트」 |
+| `app-mascot.js` `mascot/` | 3D 마스코트(11-19) — 홈은 그 학교 캐릭터 · 신청 내역은 대장님. 홈 히어로는 11-20 승인 시안 「가리키는 마스코트」(안내 줄 넷 · 상태는 `setActive` 하나 · 줄을 누르면 그 목록 `openHeroLine`) · 🔴 숫자는 renderHome 이 쓴다(이 파일은 안 센다 · 못 그리는 폰은 줄만) · 엔진은 늦게 싣는다 · 학교가 빼 달라면 `MASCOT_OFF` · 허락 경위 `docs/designs/mascot-permissions.md` · 관문 「3D 마스코트」 |
 | `formfill.js` | 양식 채우기 — 쪽 그림 위 빈칸에 답 얹기(학적정보 먼저 · 서랍/사이드바 · 인쇄→PDF) · `verify-formfill.js` |
 | `apply-channel.js` | 접수 채널 · 포털 시스템(`findApplyPortal`) |
 | `supabase-client.js` `supabase-config.js` | 로그인 — 서버로 나가는 사본은 **`syncSafeProfile()` 한 곳**(주민번호·계좌 제거) |

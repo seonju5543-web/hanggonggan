@@ -85,7 +85,7 @@ async function dismissNotify(page) {
     // 홈 히어로
     const hero = await page.textContent('#hero-amount').catch(() => 'ERR');
     if (/NaN|undefined|Infinity|-/.test(hero)) anomalies.push(`#${i} ${p.school}: bad hero "${hero}"`);
-    if (/최대 0원/.test(hero)) zeroHero++;
+    if (/^0원$/.test(hero.trim())) zeroHero++;   // 2026-11-20 「최대」 를 뺐다(수령 가능액 줄)
     heroVals.push(hero);
 
     // 탐색
@@ -112,7 +112,7 @@ async function dismissNotify(page) {
 
   console.log('=== PERSONA SWEEP ===');
   console.log('personas run:', N);
-  console.log('explore empty:', emptyExplore, '| zero hero (최대 0원):', zeroHero);
+  console.log('explore empty:', emptyExplore, '| zero hero (0원):', zeroHero);
   console.log('distinct hero values sample:', [...new Set(heroVals)].slice(0, 12).join(' | '));
   console.log('=== ANOMALIES (' + anomalies.length + ') ===');
   anomalies.slice(0, 60).forEach((a) => console.log(a));

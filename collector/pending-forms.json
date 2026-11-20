@@ -1197,9 +1197,8 @@
    "name": "제6회 글로벌 여성리더 장학생 선발 안내[학부생/대학원생]",
    "target": "제6회 글로벌 여성리더 장학생 선발 안내[학부생/대학원",
    "added": "2026-11-18",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 3,
    "lastTryAt": "2026-11-20"
   },
   {
@@ -1207,9 +1206,8 @@
    "name": "제21회 차세대 여성리더 장학생 선발 안내",
    "target": "제21회 차세대 여성리더 장학생 선발 안내",
    "added": "2026-11-18",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 3,
    "lastTryAt": "2026-11-20"
   },
   {

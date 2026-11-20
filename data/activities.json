@@ -2,6 +2,40 @@
  "updatedAt": "2026-11-20",
  "items": [
   {
+   "title": "2026년 대전 스타트업 원스톱 지원센터 아카데미 4회차",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179695",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026-11-02 ~ 2026-11-22 17:00 주관기관명 주식회사 렛츠 대상 전체 창업업력 예비창업자, 1년미만, 2년미만, 3",
+   "deadline": "2026-11-22",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-02 ~ 2026-11-22 17:00"
+    },
+    {
+     "label": "일시",
+     "text": "2026년 11월 25일(수) 10:00~16:30"
+    },
+    {
+     "label": "모집인원",
+     "text": "프로그램별 30명 내외 (선착순 마감)"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 대전 지역 예비/초기 창업자"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-20",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-20",
+   "id": "act-1k6vl6l"
+  },
+  {
    "title": "[보건복지부] 복지급여 신청주의 개선 대국민 정책브랜드 공모전",
    "url": "https://form.naver.com/response/JsbhhcPWUcK",
    "kind": "공모전",
@@ -190,6 +224,199 @@
    "foundAt": "2026-11-20",
    "seenAt": "2026-11-20",
    "excerptsAt": "2026-11-20"
+  },
+  {
+   "title": "[인천광역시] 2026 인천 미래리더 대학생 기업탐방",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/272294/artclView.do",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-11-26",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026.11.26"
+    }
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "해외·교류",
+   "excerptsAt": "2026-11-20",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "id": "act-1msa78g"
+  },
+  {
+   "title": "[국사편찬위원회] 2027학년도 사료연수과정 신입생 모집",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/272293/artclView.do",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "[서식1] 지원서(본 위원회 소정양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/153599/download.do"
+    },
+    {
+     "name": "[서식2] 이력서(PDF로 제출 불가, 본 위원회 소정양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/153600/download.do"
+    },
+    {
+     "name": "[서식3] 개인정보 수집 이용 동의서(본 위원회 소정양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/153601/download.do"
+    },
+    {
+     "name": "온라인 원서접수 및 수험표 다운로드 안내(연수시스템).pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/153602/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-20",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "id": "act-03xr7pr",
+   "documents": [
+    "지원서(본 위원회 소정양식)",
+    "2 이력서(PDF로 제출 금지,본 위원회 소정양식)",
+    "개인정보 수집·이용 동의서(본 위원회 소정양식)"
+   ],
+   "documentsFrom": "공고문 첨부(OCR)",
+   "eligibilityLines": [
+    "2.지원자격: 아래 내용 중 1개 이상 해당자",
+    "가.대학 또는 대학원에서 한국학 또는 동양학 관련 분야를 전공했거나,현재 대학원에서",
+    "전공하고 있는 자",
+    "※학부생은 지원대상 아님.졸업예정자는 해당",
+    "나.한학에 상당한 조예가 있는 자*",
+    "* 한문교육기관 수료(예정) 증명서,관련 연구업적 또는 번역 실적서 제출 가능한 자"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "docsV": 7
+  },
+  {
+   "title": "[사랑의열매 공모전] 사랑의열매 배분사업 아이디어 공모전",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice_outside.do?mode=view&articleNo=278037&article.offset=0&articleLimit=10",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "261106_사랑의열매_508x738 -4-rgb.jpg",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice_outside.do?mode=download&articleNo=278037&attachNo=227699"
+    }
+   ],
+   "deadlineHint": null,
+   "eligibilityLines": [
+    "BK21 FOUR 스마트파마 미래인재 양성사업팀"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-11-20",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "id": "act-007suek"
+  },
+  {
+   "title": "2026학년도 2학기 학생 자기설계 연수 1차(서류) 심사 합격팀 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171774&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "(붙임1) 2026학년도 2학기 학생 자기설계 연수 1차(서류)심사 합격팀 발표.pdf",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365271"
+    },
+    {
+     "name": "[붙임2] 학생 자기설계 연수 2차(프레젠테이션) 심사 안내.hwp",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365272"
+    },
+    {
+     "name": "[붙임3] 2026학년도 2학기 학생 자기설계 연수 2차 심사 일정표(학생배포).xlsx",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365273"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-20",
+   "school": "충북대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "id": "act-134rbo8"
+  },
+  {
+   "title": "[일반] [광운대학교] 2026학년도 동계 노원 대학 연합 창업캠프(~12.18) 참가자 모집",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53726&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment 2026학년도 동계 노원 대학 연합 창업캠프 운영공고.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35663&ano=53726"
+    },
+    {
+     "name": "광운미디어",
+     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+    }
+   ],
+   "deadlineHint": "모집기간 : ~ 2026. 12. 18.(금) (모집 상황에 따라 조기 종료될 수 있습니다.) ※ 모집대상 : 광운대학교 재학생(재학 및 휴학중",
+   "deadline": "2026-12-18",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "~ 2026. 12. 18.(금) (모집 상황에 따라 조기 종료될 수 있습니다.)"
+    },
+    {
+     "label": "대상",
+     "text": "광운대학교 재학생(재학 및 휴학중인 대학생), 선착순 모집"
+    },
+    {
+     "label": "모집인원",
+     "text": "대학별 15명, 총 60명 ​"
+    }
+   ],
+   "eligibilityLines": [
+    "※ 모집대상 : 광운대학교 재학생(재학 및 휴학중인 대학생), 선착순 모집",
+    "※ 모집규모 : 대학별 15명, 총 60명 ​",
+    "※ 캠프일자 : 2027. 1. 13.(수) ~ 2027. 1. 15.(금) (2박 3일)",
+    "※ 캠프장소 : 오션스위츠 제주호텔(제주특별자치도 제주시 탑동해안로 74)",
+    "※ 신청방법 : 포스터 QR 코드 확인 및 구글 폼 접수",
+    "광운대학교 학생 여러분의 많은 관심과 참여를 바랍니다.​"
+   ],
+   "noticeLines": [
+    "※ 모집기간 : ~ 2026. 12. 18.(금) (모집 상황에 따라 조기 종료될 수 있습니다.)"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-20",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "id": "act-040qihz"
   },
   {
    "title": "2026학년도 동계방학 AI 필드업 참여자 모집",
@@ -5616,159 +5843,6 @@
    "documentsV": 1
   },
   {
-   "title": "[대학혁신과공유센터] 2026학년도 해외융합프로젝트 참가자 모집(스위스 제네바 국제기구 탐방)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141930&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "2026 SKKU Intercultural Learning Program 참가 지원서.docx",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=141930&attachNo=119147"
-    }
-   ],
-   "deadlineHint": "신청 기간: 2026년 11월 13일(금) ~ 11월 18일(수) 오후 3시까지 (마감 시간은 담당자 이메일로 메일이 수신된 시간을 기준으로 함",
-   "deadline": "2026-11-18",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026년 11월 13일(금) ~ 11월 18일(수) 오후 3시까지"
-    }
-   ],
-   "eligibilityLines": [
-    "모집 대상 및 인원: 성균관대학교 학부 재학생 최대 16명 내외",
-    "• 모든 프로그램이 영어로 진행되므로 영어로 자신의 의견을 설명하고 질의·토론에 참여할 수 있는 학생",
-    "• 유효기간이 7개월 이상 남은 여권을 소지한 학생. 여권 미소지 또는 잔여 유효기간 미달 시 선발이 자동 취소됨",
-    "• 해외여행에 결격 사유가 없는 학생",
-    "• 국내 사전교육, 팀별 의제 심화 학습 및 이슈 브리프 작성, 제네바 현지 라운드테이블과 최종 회의 등 전 과정에 빠짐없이 적극적으로 참여할 수 있는 학생"
-   ],
-   "noticeLines": [
-    "신청 기간: 2026년 11월 13일(금) ~ 11월 18일(수) 오후 3시까지"
-   ],
-   "detailsV": 7,
-   "field": "해외·교류",
-   "excerptsAt": "2026-11-15",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-03k6crx",
-   "documentsV": 1
-  },
-  {
-   "title": "제7회 크리에이티브 브릿지 페스티벌 작품 공모",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141687&article.offset=0&articleLimit=10",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "[크브페]지원신청서_작품명_지원자(팀)명.hwp",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=141687&attachNo=119150"
-    }
-   ],
-   "deadlineHint": null,
-   "deadline": "2026-11-23",
-   "eligibilityLines": [
-    "- 개인: 대학생",
-    "- 팀: 대학생이 1명 이상 포함된 팀",
-    "(공모 대상 대학생의 기준은 학사 과정생 또는 수료생으로 함)",
-    "선정 규모: 총 10개 작품 선정",
-    "작품 설치 준비비: 선정 팀당 300,000원",
-    "전시 작품 중 우수 작품 5점 선정 및 상금 지급"
-   ],
-   "detailsV": 7,
-   "documents": [
-    "지원신청서 2부"
-   ],
-   "excerptsAt": "2026-11-15",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-0eamu3i",
-   "documentsV": 1
-  },
-  {
-   "title": "[뇌과학이미징연구단] (fMRI) 얼굴-장면-물체 지각 실험 참여자 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141929&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "eligibilityExcludes": [
-    "① 교정시력이 매우 나쁘거나 색맹 또는 색약이 있으신 분",
-    "(안경을 착용하지 않으신 분을 우대합니다.)",
-    "② 신경정신과적 병력이 있으신 분",
-    "③ 뇌과학이미징연구단 소속인 분"
-   ],
-   "detailsV": 7,
-   "excerptsAt": "2026-11-15",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-0zgrafz",
-   "documentsV": 1,
-   "eligibilityLines": [
-    "① 교정시력이 매우 나쁘거나 색맹 또는 색약이 있으신 분",
-    "(안경을 착용하지 않으신 분을 우대합니다.)",
-    "② 신경정신과적 병력이 있으신 분",
-    "③ 뇌과학이미징연구단 소속인 분"
-   ],
-   "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "2026학년도 겨울학기 현장실습 학생 지원 신청 안내(~11/29)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141926&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "붙임1. 표준현장실습학기제 안내자료.pdf",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=141926&attachNo=119144"
-    },
-    {
-     "name": "붙임2. 학과별 현장실습교과목 개설현황.pdf",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=141926&attachNo=119145"
-    }
-   ],
-   "deadlineHint": "신청 기간: 2026. 11. 9.(월) ~ 11. 29.(일) 2) 실습 기간: 2026. 12. 21.(월) ~ 2027. 2. 28.(일)",
-   "deadline": "2026-11-29",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026. 11. 9.(월) ~ 11. 29.(일)"
-    },
-    {
-     "label": "대상",
-     "text": "성균관대학교 2학년 이상 재학생 중 2026학년도 겨울학기 학점 인정이 가능한 학생"
-    }
-   ],
-   "eligibilityLines": [
-    "○ 참여자격: 성균관대학교 2학년 이상 재학생 중 2026학년도 겨울학기 학점 인정이 가능한 학생",
-    "※ 반드시 본인의 학적 상태를 확인한 후 지원"
-   ],
-   "detailsV": 7,
-   "field": "인턴·일경험",
-   "excerptsAt": "2026-11-15",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-10upawu",
-   "documentsV": 1
-  },
-  {
-   "title": "[연구 참여자 모집] AI면접 경험에 관한 연구",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141886&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "eligibilityLines": [
-    "• 만 19세 이상의 대학(원)생, 취업 준비생, 직장인",
-    "• 한국어로 면접 질문을 듣고 답하는 데 어려움이 없는 분",
-    "(단, 현재 BK21과 같은 모든 국가과제에 참여하고 있는 분은 실험비 지급이 불가합니다.)"
-   ],
-   "detailsV": 7,
-   "excerptsAt": "2026-11-15",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-0rkfh33",
-   "documentsV": 1
-  },
-  {
    "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673",
    "kind": "대외활동",
@@ -6303,46 +6377,6 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-07",
-   "seenAt": "2026-11-20",
-   "excerptsAt": "2026-11-20"
-  },
-  {
-   "title": "2026년 대전 스타트업 원스톱 지원센터 아카데미 4회차",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179695",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-22",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-02 ~ 2026-11-22"
-    },
-    {
-     "label": "대상",
-     "text": "대전 지역 예비/초기 창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "대전"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전창조경제혁신센터",
-   "api": "kstartup",
-   "apiId": "179695",
-   "id": "api-kstartup-179695",
-   "eligibilityLines": [
-    "대전 지역 예비/초기 창업자"
-   ],
-   "noticeLines": [
-    "대전창조경제혁신센터의 창업 교육 계획을 다음과 같이 공고하오니 참여를 희망하는 기업은 안내에 따라 신청해주시기 바랍니다.",
-    "온라인 접수 : https://moaform.com/q/m1RhhZ"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-06",
    "seenAt": "2026-11-20",
    "excerptsAt": "2026-11-20"
   },
