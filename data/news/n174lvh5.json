@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-20",
  "items": [
   {
+   "title": "제47회 가대문화상 및 제18회 한센병문화상 수상자 발표",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278040&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-20",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-20",
+   "desc": "최우수: 시 「소록」 김서연 (자유전공·26) 우수: 시 「맨손의 온도」 유하영 (국제학부·24)"
+  },
+  {
    "title": "보안 업데이트에 따른 대표 홈페이지 접속 일시 중단 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278015&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-19",
@@ -421,16 +431,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-27",
    "thumb": "data/news/img/3c88948b8136397c.webp"
-  },
-  {
-   "title": "[IR센터] 2026학년도 가톨릭대학교 학생 AI 학습 활용 현황 및 교육요구 조사 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277121&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-26",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/5c4e5cf09878a0f1.webp"
   }
  ]
 }
