@@ -788,6 +788,60 @@
   "verifiedAt": "2026-10-06",
   "also": []
  },
+ "kosaf|2000438004|board:https://www.namwon.go.kr/board/post/list.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e": {
+  "ds": "kosaf",
+  "key": "2000438004",
+  "url": "",
+  "board": "https://www.namwon.go.kr/board/post/list.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-21",
+  "lastAt": "2026-11-21",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판을 못 엶(응답 400)",
+  "checks": {},
+  "round": "2026-12-31",
+  "nextAt": "2026-11-22"
+ },
+ "kosaf|2000438004|https://www.namwon.go.kr/board/post/view.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e&postUid=9be51b0f9b7ccfee019be97eae942c8d": {
+  "ds": "kosaf",
+  "key": "2000438004",
+  "url": "https://www.namwon.go.kr/board/post/view.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e&postUid=9be51b0f9b7ccfee019be97eae942c8d",
+  "source": "search",
+  "by": "Claude 세션 (2026-11-20 · 남원시 사이트가 세션의 모든 접속 경로에서 400 — 로봇이 다른 망에서 확인)",
+  "title": "2026년 남원의 별 특별장학생 선발 안내",
+  "firstAt": "2026-11-21",
+  "lastAt": "2026-11-21",
+  "tries": 1,
+  "status": "rejected",
+  "why": "열리지 않음(HTTP 400)",
+  "checks": {
+   "C": "ok",
+   "L": "fail"
+  },
+  "round": "2026-12-31",
+  "decidedAt": "2026-11-21"
+ },
+ "kosaf|2000438004|https://www.namwon.go.kr/board/post/view.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e&postUid=9be51b0f9b7ccfee019be981374d2d74": {
+  "ds": "kosaf",
+  "key": "2000438004",
+  "url": "https://www.namwon.go.kr/board/post/view.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e&postUid=9be51b0f9b7ccfee019be981374d2d74",
+  "source": "search",
+  "by": "Claude 세션 (2026-11-20 · 남원시 사이트가 세션의 모든 접속 경로에서 400 — 로봇이 다른 망에서 확인)",
+  "title": "2026년 남원의 별 특별장학생 선발",
+  "firstAt": "2026-11-21",
+  "lastAt": "2026-11-21",
+  "tries": 1,
+  "status": "rejected",
+  "why": "열리지 않음(HTTP 400)",
+  "checks": {
+   "C": "ok",
+   "L": "fail"
+  },
+  "round": "2026-12-31",
+  "decidedAt": "2026-11-21"
+ },
  "kosaf|2000439007|board:https://www.iksan.go.kr/business/board/post/list.do?boardUid=ff8080819927194f01994bc5f5fa30a0&menuUid=ff8080819927194f019936f6b61b1bc6": {
   "ds": "kosaf",
   "key": "2000439007",
@@ -1449,15 +1503,15 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "2026학년도 창암장학생 지원 공고 안내",
   "firstAt": "2026-11-17",
-  "lastAt": "2026-11-20",
-  "tries": 4,
+  "lastAt": "2026-11-21",
+  "tries": 5,
   "status": "rejected",
   "why": "다른 공고의 링크와 같은 주소([학부·대학원-교외장학] 2026학년도 창암장학생 지원 공고 안내)",
   "checks": {
    "C": "fail"
   },
   "round": "2026-11-20",
-  "decidedAt": "2026-11-20"
+  "decidedAt": "2026-11-21"
  },
  "kosaf|2703692001|https://koreashe.org/notice/?uid=95478&mod=document&pageid=1": {
   "ds": "kosaf",

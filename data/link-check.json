@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-19T19:01:10.386Z",
+ "updatedAt": "2026-11-20T17:07:59.921Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -78,10 +78,6 @@
    "v": "other",
    "at": "2026-11-19"
   },
-  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894982&article.offset=0&articleLimit=10": {
-   "v": "gone",
-   "at": "2026-11-19"
-  },
   "https://www.sogang.ac.kr/ko/detail/551490?bbsConfigFk=141&namepage=ScholarshipNotice": {
    "v": "other",
    "at": "2026-11-19"
@@ -152,13 +148,6 @@
    "src": "robot",
    "title": "2026년 서울선순환인재 장학금 선발 공고문",
    "round": "2026-11-23"
-  },
-  "id:kosaf-2701096002": {
-   "url": "https://www.jincheon.go.kr/home/sub.do?menukey=406&mode=view&no=1090368397",
-   "at": "2026-11-18",
-   "src": "robot",
-   "title": "2026년 (재)이월면장학회 장학생 선발 공고",
-   "round": "2026-11-18"
   },
   "id:kosaf-2704378001": {
    "url": "https://www.cheongro.org/bbs/board.php?tbl=bbs41&mode=VIEW&num=30&",
