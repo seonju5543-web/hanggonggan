@@ -532,6 +532,44 @@ async function ask(page, q) {
     '🔴 아이폰처럼 화면 높이(innerHeight)까지 같이 줄어도 시트가 보이는 칸 안이고 추천 칩 줄은 접힌다', kb.shrunk);
   ok(kb.closed.inline === '' && kb.closed.sheet.bottom >= 843, '키보드가 내려가면 원래 자리로 돌아간다', kb.closed);
 
+  console.log('\n[7-3] 대화 창 위에서 손가락을 밀어도 뒤 화면이 따라 올라가지 않는다 (2026-11-20 개발자 제보 · 아이폰 스크린샷)');
+  /* 키보드가 떠 있는 아이폰은 시트의 머리말·빈 자리·입력 줄에서 위로 밀면 **화면 전체**가 밀려 올라갔다(입력 칸 자리에 커서만 떠 남음).
+     허용하는 손짓은 셋뿐 — 대화 목록이 그 방향으로 더 굴러갈 수 있을 때 · 추천 칩 줄·입력 칸의 가로 밀기 · 아래로 쓸어 닫기(enableSheetSwipe 가 따로 받는다).
+     진짜 손가락은 헤드리스에 없으므로 TouchEvent 를 보내고 브라우저 기본 동작(스크롤)을 막았는지(defaultPrevented)를 본다. */
+  await page.evaluate(() => { if (document.querySelector('#chat-sheet').hidden) chatOpen(); });
+  await page.waitForSelector('#chat-sheet:not([hidden])');
+  for (let i = 0; i < 3; i++) await ask(page, '지금 뭐 신청할 수 있어?');   // 대화 목록을 굴러갈 만큼 길게
+  const swipe = await page.evaluate(() => {
+    const send = (el, x0, y0, x1, y1) => {
+      const mk = (x, y) => new Touch({ identifier: 7, target: el, clientX: x, clientY: y });
+      el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, cancelable: true, touches: [mk(x0, y0)], targetTouches: [mk(x0, y0)], changedTouches: [mk(x0, y0)] }));
+      const mv = new TouchEvent('touchmove', { bubbles: true, cancelable: true, touches: [mk(x1, y1)], targetTouches: [mk(x1, y1)], changedTouches: [mk(x1, y1)] });
+      el.dispatchEvent(mv);
+      el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, cancelable: true, touches: [], targetTouches: [], changedTouches: [mk(x1, y1)] }));
+      return mv.defaultPrevented;
+    };
+    const log = document.querySelector('#chat-log');
+    const head = document.querySelector('.chat-head');
+    const form = document.querySelector('#chat-form');
+    const chips = document.querySelector('#chat-chips');
+    const out = {};
+    out.headUp = send(head, 200, 300, 200, 200);                         // 머리말에서 위로
+    out.formUp = send(form, 200, 800, 200, 700);                         // 입력 줄에서 위로
+    log.scrollTop = 0;
+    out.logUpMid = send(log, 200, 600, 200, 500);                        // 목록 맨 위에서 위로 밀기 = 아래 내용 보기(굴러가야 한다)
+    log.scrollTop = log.scrollHeight;
+    out.logUpEnd = send(log, 200, 600, 200, 500);                        // 목록 맨 아래에서 위로 = 더 갈 데가 없다(뒤 화면이 끌려가면 안 된다)
+    out.logDownEnd = send(log, 200, 500, 200, 600);                      // 맨 아래에서 아래로 = 위 내용 보기(굴러가야 한다)
+    out.chipsSide = send(chips, 300, 740, 150, 740);                     // 칩 줄 가로(세로 흔들림 0 — 아래로 흔들리면 쓸어 닫기가 받는다)
+    out.scrollable = log.scrollHeight > log.clientHeight + 5;
+    return out;
+  });
+  ok(swipe.scrollable, '대화 목록이 굴러갈 만큼 길다(시험 조건)', swipe);
+  ok(swipe.headUp && swipe.formUp, '머리말·입력 줄에서 위로 밀면 브라우저 스크롤을 막는다(뒤 화면이 안 올라간다)', swipe);
+  ok(swipe.logUpEnd, '대화 목록이 끝까지 내려가 있으면 더 밀어도 뒤 화면으로 넘어가지 않는다', swipe);
+  ok(!swipe.logUpMid && !swipe.logDownEnd, '대화 목록은 갈 데가 있으면 그대로 굴러간다(대화 확인은 된다)', swipe);
+  ok(!swipe.chipsSide, '추천 칩 줄의 가로 밀기는 막지 않는다', swipe);
+
   console.log('\n[8] 콘솔 오류');
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 3));
 
