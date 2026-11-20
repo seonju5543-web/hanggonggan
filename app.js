@@ -779,14 +779,14 @@ const hintText = (s) => unent(s).replace(PARTIAL_ENTITY_END, '').trim();
    로봇이 주운 기간 문장(deadlineHint)은 원문 한 토막이라 뒤 항목(ㅇ 접수방법 · 2. 신청방법)까지 딸려 와 글자 중간에서 잘렸다
    (「접수기한 ) ~ 10. 7.(수) 18시 ㅇ ( 접수방법 ) 모바일 … 응」). 첫 항목만 남기고 원문의 괄호 이름표를 펴고, 날짜가 없으면 안 보인다.
    🔴 지우고 다듬기만 한다 — 글자를 지어내지 않는다(원칙 8-1). 원문 전체는 상세·원문 링크가 그대로 보여 준다. */
-function hintShort(s) {
+function hintShort(s, max = 44) {   // max — 카드는 44자 · 상세 시트(openBoardDetail)는 자르지 않는다(Infinity — 마감 날짜가 잘려 나가지 않게 · 2026-11-20 리뷰)
   let t = hintText(s)
     .replace(/^\s*([가-힣]{2,8})\s*\)\s*/, '$1 ')                   // 앞이 잘려 짝 잃은 괄호 이름표 「접수기한 )」
     .replace(/[(（]\s*([가-힣]{2,8})\s*[)）]/g, '$1');                  // 「( 접수방법 )」
   t = t.split(/\s(?=[ㅇ○◯●■□\u25AA•※\u25B6]\s|\d{1,2}[.)]\s*[가-힣])/)[0];      // 다음 항목(「ㅇ 접수방법」·「2. 신청방법」) 앞에서 끊는다 — 날짜 「10. 7.」 은 항목 번호가 아니다
   t = t.replace(/\s+/g, ' ').trim();   // 글자는 원문 그대로(「신청기간 :」 의 띄어쓰기도) — 검사 드라이버가 잠근다
   if (!/\d/.test(t)) return '';                                            // 날짜가 없으면 기간 줄이 아니다
-  if (t.length > 44) { const cut = t.slice(0, 44); t = `${cut.slice(0, Math.max(cut.lastIndexOf(' '), 20)).trim()}…`; }
+  if (t.length > max) { const cut = t.slice(0, max); t = `${cut.slice(0, Math.max(cut.lastIndexOf(' '), 20)).trim()}…`; }
   return t;
 }
 

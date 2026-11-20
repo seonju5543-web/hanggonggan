@@ -556,7 +556,7 @@ function kosafAsScholarships() {
         ...((i.files || []).length
           ? { attachments: i.files.map((f) => ({ name: f.name, url: f.path, bytes: f.bytes || 0 })) }
           : {}),
-        ...(kosafClean(f['문의처']) ? { contact: kosafClean(f['문의처']) } : {}),
+        ...(knownValue(kosafClean(f['문의처'])) ? { contact: knownValue(kosafClean(f['문의처'])) } : {}),   // 재단이 적어 둔 「※ 기관확인필요」는 문의처가 아니다 — 읽는 곳 셋(시트·신청 준비·도우미)을 여기 한 곳에서(2026-11-20 티앤씨재단)
         /* 층2 줄에 함께 보여 줄 **재단이 적어 둔 칸** (2026-09-07 캘린더).
            자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
         ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
@@ -765,11 +765,15 @@ function openBoardDetail(url) {
   if (typeof trackUse === 'function') trackUse('detail', url);
   { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = url; }
   const tSplit = splitTitleDates(unent(n.title));
-  const hint = n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintShort(n.deadlineHint) : '';   // 카드와 같은 기간 한 줄(다음 항목 앞에서 끊는다)
+  const full = n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintShort(n.deadlineHint, Infinity) : '';   // 카드와 같은 기간 한 줄(다음 항목 앞에서 끊는다) · 카드의 44자 상한은 풀어 마감 날짜까지 보인다
+  /* 다음 한글 항목(「나. 신청방법 …」) 앞에서도 끊는다 — 끊고도 날짜가 남을 때만(「신청 기간 및 방법 가. 신청 기간: …」 은 앞토막에 날짜가 없어 통째로 둔다 · 실데이터 853줄 비교 2026-11-20) */
+  const cut = full.split(/\s(?=[가나다라마바사아자차카타파하]\s?\.\s*[가-힣])/)[0];
+  const hint = /\d/.test(cut) ? cut : full;
   const sch = {
     id: `board:${url}`, name: tSplit.title, type: '', provider: `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판`,
     eligibility: {}, documents: [], deadline: n.deadline || null, period: hint || tSplit.dates.join(' · '),
     attachments: n.attachments || [], sourceUrl: n.url,
+    title: n.title, boardTitle: n.boardTitle,   // 링크가 목록일 때 「목록에서 찾을 제목」은 게시판에 적힌 그대로(sourceLink hint)
   };
   const d = n.deadline ? dday(n.deadline) : null;
   sheetBack = null;   // 돌아갈 곳이 없다 — 내리면 닫힌다
