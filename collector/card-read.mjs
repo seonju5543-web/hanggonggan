@@ -166,25 +166,41 @@ function checkDeadline(d, srcN, item) {
   return { ok: true };
 }
 /* 다듬은 문장(text)의 사실 낱알이 근거(quote)와 같은가 (2026-11-20 · 원칙 8-1 개정) — 🔴 지어냄·뜻 뒤집힘을 막는 것은 이 함수다(지시문이 아니다).
-   ① 숫자 모음이 같다(빼도 · 더해도 · 바꿔도 떨어진다 — 줄머리 번호 「3)」「가.」 는 뗀다) ② 부정·비교 낱말 모음이 같다(「제외」 를 빼면 떨어진다)
-   ③ text 의 기관 이름이 근거(또는 제목)에 있다 ④ text 의 두 글자 조각 30% 이상이 근거에 있다(「수혜하지 않고」→「받고 있지 않은」 같은 다듬기는 넘긴다)(전혀 다른 말을 근거만 붙여 내지 못하게).
-   ponytail: 숫자 단위를 바꾼 다듬기(100만 원 → 1,000,000원)도 떨어진다 — 안전한 쪽(그 줄만 버린다) · 지시문이 숫자를 그대로 쓰라고 한다 */
-const LEAD_ENUM = /^(?:[가-하][.)]|\(?\d{1,2}[.)]|[①-⑳])/;
+   ① 숫자가 **같은 차례로** 같다(빼도 · 더해도 · 바꿔도 · 두 조건 사이에서 자리를 바꿔도 떨어진다 — 줄머리 번호 「3)」「가.」 는 떼되 「3.0」 은 숫자다)
+   ② 조건 말(이상·이하·미만·초과·이내·이외·제외·불가·배제·금지·제한·한함·한정·또는·혹은)이 **같은 차례로** 같다 — 「받을 수 없는 경우」 칸은 칸 이름이
+      이미 제외를 말하므로 제외·불가·배제를 떼고 견준다(지시문이 「휴학생 제외」→「휴학생」으로 쓰게 한다)
+   ③ 부정의 개수가 같다 — 않·못·아니·없 + 미·비·무·불 로 시작하는 낱말(「미수혜자」=「받지 않은 학생」 · 「미수혜자」→「수혜자」 는 떨어진다)
+   ④ 대상 낱말(여학생·남학생·기혼·미혼·신입생·편입생·재학생·휴학생·졸업·대학원·학부·외국인·유학생·장애·다자녀·한부모·기초생활·차상위·수급…) 모음이 같다
+   ⑤ text 의 기관 이름이 근거(또는 제목)에 있다 ⑥ 두 글자 조각이 **양쪽으로** 30% 이상 겹친다(근거의 조건을 통째로 빼거나 전혀 다른 말을 근거만 붙여 내지 못하게)
+   (2026-11-20 독립 리뷰가 첫 판에서 통과시킨 것: 미수혜자→수혜자 · 미혼→기혼 · 금지→가능 · 「또는 차상위계층」 빠짐 · 여학생 더함 · 두 조건의 이상/이하·숫자 맞바꿈 · 「3.0 이상」 의 3. 을 번호로 뗌)
+   ponytail: 안전한 쪽으로 틀린다 — 숫자 단위를 바꾸거나(100만 원 → 1,000,000원) 조건 차례를 바꾼 다듬기도 떨어진다(그 줄만 빼고 관리자에게). 지시문이 숫자·조건 말을 그대로 쓰라고 한다 */
+const LEAD_ENUM = /^(?:[가-하][.)]|\(?\d{1,2}[.)](?!\d)|[①-⑳])/;
 const ORG = /[가-힣A-Za-z]{2,}(?:장학재단|재단|장학회|대학교|대학|공단|공사|구청|시청|군청|도청|협회|은행|위원회)/g;
+const CMP = /이상|이하|미만|초과|이내|이외|제외|불가|배제|금지|제한|한함|한정|한하|또는|혹은/g;
+const EXCLUDE_CMP = new Set(['제외', '불가', '배제']);
+const NEG_TOK = /않|못|아니|아닌|없/g;
+const NEG_WORD = /(?:^|[^가-힣])(?:미|비|무|불)[가-힣]/g;   // 낱말 머리의 미·비·무·불 — 띄어쓰기를 지우기 전에 센다
+const WHO = /여학생|남학생|여성|남성|여자|남자|기혼|미혼|신입생|편입생|재학생|휴학생|졸업|대학원|학부|외국인|유학생|내국인|장애|다자녀|한부모|기초생활|차상위|수급/g;
 const uniq = (a) => [...new Set(a)].sort().join(',');
-export function factsMatch(text, quote, extra = '') {
+const negCount = (raw, n) => (n.match(NEG_TOK) || []).length + (String(raw || '').match(NEG_WORD) || []).length;
+export function factsMatch(text, quote, extra = '', field = '') {
   const t = norm(text), q = norm(quote).replace(LEAD_ENUM, '');
   if (t.length < 2) return { ok: false, kind: 'empty', why: '빈 줄' };
   const dt = digitsOf(t), dq = digitsOf(q);
-  if (dt.slice().sort().join(',') !== dq.slice().sort().join(',')) return { ok: false, kind: 'digits', t: dt, q: dq, why: `숫자가 근거와 다름: 「${dt.join(' ')}」 ↔ 「${dq.join(' ')}」` };
-  const kt = [...new Set(t.match(TOK) || [])], kq = [...new Set(q.match(TOK) || [])];
-  if (uniq(kt) !== uniq(kq)) return { ok: false, kind: 'tok', t: kt, q: kq, why: `부정·비교 말이 근거와 다름: 「${uniq(kt)}」 ↔ 「${uniq(kq)}」` };
+  if (dt.join(',') !== dq.join(',')) return { ok: false, kind: 'digits', t: dt, q: dq, why: `숫자가 근거와 다름: 「${dt.join(' ')}」 ↔ 「${dq.join(' ')}」` };
+  const cmp = (n) => (n.match(CMP) || []).filter((w) => !(field === 'excludes' && EXCLUDE_CMP.has(w)));
+  const kt = cmp(t), kq = cmp(q);
+  if (kt.join(',') !== kq.join(',')) return { ok: false, kind: 'tok', t: kt, q: kq, why: `조건 말이 근거와 다름: 「${kt.join(' ')}」 ↔ 「${kq.join(' ')}」` };
+  const nt = negCount(text, t), nq = negCount(String(quote).replace(LEAD_ENUM, ''), q);
+  if (nt !== nq) return { ok: false, kind: 'neg', t: [String(nt)], q: [String(nq)], why: `부정의 개수가 근거와 다름: ${nt} ↔ ${nq}` };
+  const wt = uniq(t.match(WHO) || []), wq = uniq(q.match(WHO) || []);
+  if (wt !== wq) return { ok: false, kind: 'who', t: wt ? wt.split(',') : [], q: wq ? wq.split(',') : [], why: `대상 낱말이 근거와 다름: 「${wt}」 ↔ 「${wq}」` };
   const qx = q + norm(extra);
   const org = (t.match(ORG) || []).find((o) => !qx.includes(o));
   if (org) return { ok: false, kind: 'org', t: [org], q: [], why: `근거에 없는 기관 이름: 「${org}」` };
-  const T = bigrams(t), Q = bigrams(q); let hit = 0, all = 0;
-  for (const [g, c] of T) { all += c; if (Q.has(g)) hit += c; }
-  if (all && hit / all < 0.3) return { ok: false, kind: 'words', why: '근거와 다른 말' };
+  const cover = (X, Y) => { let hit = 0, all = 0; for (const [g, c] of X) { all += c; if (Y.has(g)) hit += c; } return all ? hit / all : 1; };
+  const T = bigrams(t), Q = bigrams(q);
+  if (cover(T, Q) < 0.3 || cover(Q, T) < 0.3) return { ok: false, kind: 'words', why: '근거와 다른 말(한쪽에만 있는 조건이 있을 수 있음)' };
   return { ok: true };
 }
 /* 모델 한 번의 응답 → 원문에 있는 것만(kept) · 버린 것(dropped). 응답 꼴이 틀리면 전부 버린다(던지지 않는다).
@@ -202,7 +218,7 @@ export function verify(out, source, item) {
       const quote = pair ? line.quote : line, text = pair ? line.text : line;
       let r = (k === 'eligibility' || k === 'excludes') ? inSourceEnding(quote, srcN) : inSource(quote, srcN);
       if (!r.ok) r = { ...r, kind: 'quote' };
-      else if (pair) r = factsMatch(text, quote, titleN);
+      else if (pair) r = factsMatch(text, quote, titleN, k);
       if (r.ok) kept[k].push(text.trim());
       else dropped.push({ field: k, line: text, ...(pair ? { quote } : {}), why: r.why, kind: r.kind, ...(r.t ? { t: r.t, q: r.q } : {}) });
     }
@@ -271,8 +287,10 @@ export function agree(va, vb, item, source = '') {
     for (const line of A) (B.some((o) => sameLine(line, o)) ? ok : miss).push({ field: k, line, why: '둘째 읽기에 없음', kind: 'agree' });
     for (const line of B) if (!A.some((o) => sameLine(o, line))) miss.push({ field: k, line, why: '첫째 읽기에 없음', kind: 'agree' });
     held.push(...miss);
-    /* 🔴 2026-11-20 개발자 결정 — 갈린 줄은 빼고(관리자 「할 일」로) 두 읽기가 같이 낸 유료 줄은 싣는다(엄격 칸도). 같이 낸 줄이 하나도 없을 때만 무료 길 값 */
-    final[k] = miss.length && !ok.length ? null : ok.map((x) => x.line);
+    /* 옛 두 읽기(11-20 전에 읽은 공고 · 장부 다시 재기에만 쓰인다): 엄격 칸은 한 줄이라도 갈리면 무료 길 값 그대로(11-18 규칙 그대로).
+       🔴 11-20 「빼고 올려」 결정은 **기계 검사가 잡은 줄**에 대한 것이다 — 두 읽기가 줄을 다르게 잘라 갈린 것을 빼고 실으면 요건이 통째로 빠진다
+       (리뷰가 찾은 실제: 안산시 반값 등록금 — 한쪽만 낸 소득·자격 갈래 일곱 줄이 빠진 채 실렸다 · 틀린 안심). 갈린 줄은 관리자 「할 일」 접은 칸에 그대로 */
+    final[k] = miss.length && (STRICT_FIELDS.has(k) || !ok.length) ? null : ok.map((x) => x.line);
   }
   const da = va.kept.deadline, db = vb.kept.deadline;
   final.deadline = da && db && da.date === db.date ? da : null;
@@ -315,7 +333,9 @@ function finishEntry(final, held, dropped, unreadable, item, wonIn) {
   /* 🔴 2026-11-20 개발자 결정(「빼고 올려」 · *"유료가 틀린걸 무료가 잡는다는게 말이돼"*) — 기계 검사에 떨어진 줄은 **빼고** 통과한 유료 줄로 싣는다(엄격 칸도).
      떨어진 줄은 관리자 「할 일」로(card-read-review.json · 까닭과 확인할 것을 사람 말로). 한 칸의 줄이 **전부** 떨어져 실을 유료 줄이 없을 때만 그 칸은 무료 길 값(null).
      (11-18 까지는 한 줄만 떨어져도 칸 전체를 무료 길 값으로 돌렸다 — 「TOEIC 950/990」 한 줄이 떨어지자 어학 점수 없는 자격 두 줄만 실린 일이 있었고, 이제 그 줄은 관리자가 본다) */
-  for (const k of STRICT_FIELDS) {
+  /* 🔴 모든 칸에 — 금액·유의 칸도 줄이 전부 빠지면 빈 배열이 아니라 무료 길 값(null)이다. 빈 배열은 앱에서 「유료가 읽은 답 = 없음」이라
+     무료 길의 금액·유의 줄(「중복 수혜 불가」)까지 지운다(2026-11-20 독립 리뷰가 재현) */
+  for (const k of LIST_FIELDS) {
     const lost = dropped.filter((x) => x.field === k && String(x.line || '').replace(/[\s\-–·.]/g, ''));   // 빈 줄·줄표뿐인 줄은 빠진 요건이 아니다(리뷰)
     if (lost.length && Array.isArray(final[k]) && !final[k].length) final[k] = null;
   }
@@ -358,12 +378,12 @@ export function closedNow(it, paid, today) {
   return closedForStudents(d ? { ...it, deadline: d } : it, today);
 }
 /* 대상 — 학생 화면에 떠 있는 정식 등록 공고 중, 원문이 있고, 그 원문(과 지시문)을 아직 안 읽은 것. 마감이 가까운 것부터 */
-/* 🔴 2026-11-20 개발자 결정 「나」 — 유료로 읽는 것은 **숨김 등록분(`paidGate`)만**. 그 전 등록분은 숨기지도 다시 읽지도 않는다(지시문이 바뀌어 해시가 바뀌어도) */
+/* 🔴 2026-11-20 개발자 결정 「나」 — 유료로 읽는 것은 **숨김 등록분(`paidGate`)과 그 뒤 사람이 등록한 공고(`paidRead`)만**. 그 전 등록분은 숨기지도 다시 읽지도 않는다(지시문이 바뀌어 해시가 바뀌어도) */
 export function pickTargets(items, partsOf, ledger, { today, giveUpAfter = 3, only = null, paid = {} } = {}) {
   const out = [];
   for (const it of items) {
     if (it.program) continue;
-    if (!only && !it.paidGate) continue;
+    if (!only && !it.paidGate && !it.paidRead) continue;   // paidRead = 사람이 등록한 공고(숨기지 않고 읽기만 · admin-apply register)
     if (only ? it.id !== only : closedNow(it, paid[it.id], today)) continue;
     const text = sourceText(partsOf(it));
     if (text.replace(/[^가-힣]/g, '').length < 40) continue;      // 읽을 원문이 없다 — 무료 길 그대로
@@ -405,6 +425,9 @@ export function explainLine(d) {
     tok: () => [`문장의 조건 말(${shown(d.t)})이 원문 문구의 조건 말(${shown(d.q)})과 다릅니다 — '이상·이하·미만·제외·않' 같은 말이 빠지거나 더해지면 뜻이 뒤집힙니다.`,
       `원문에서 이 조건이 「${d.quote || ''}」 그대로인지(${shown(d.q)}) 확인해 주세요.`],
     org: () => [`문장에 있는 기관 이름 「${shown(d.t)}」가 근거로 든 원문 문구에 없습니다.`, '원문에 이 기관 이름이 실제로 적혀 있는지 확인해 주세요.'],
+    neg: () => [`문장의 부정(않·없·아니·미·비·무·불) 개수(${shown(d.t)})가 원문 문구의 개수(${shown(d.q)})와 다릅니다 — 「받은 / 받지 않은」처럼 뜻이 뒤집혔을 수 있습니다.`,
+      `원문에서 이 조건이 「${d.quote || ''}」 그대로인지 확인해 주세요.`],
+    who: () => [`문장의 대상(${shown(d.t)})이 원문 문구의 대상(${shown(d.q)})과 다릅니다.`, `원문에서 누구를 대상으로 하는지(${shown(d.q)}) 확인해 주세요.`],
     words: () => ['문장이 근거로 든 원문 문구와 다른 내용을 말합니다.', '문장이 원문 문구와 같은 뜻인지 확인해 주세요.'],
     quote: () => [d.quote ? '근거로 든 원문 문구를 공고 원문(본문·첨부)에서 찾지 못했습니다.' : '이 문장을 공고 원문(본문·첨부)에서 그대로 찾지 못했습니다 — 말을 바꿨거나 흩어진 표를 짜 맞췄을 수 있습니다.',
       `원문에 이 ${label} 내용이 실제로 적혀 있는지 확인해 주세요.`],
@@ -475,7 +498,7 @@ if (process.argv[1] && ranDirectly()) {
   const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // KST
   /* 있는 파일이 깨져 있으면 멈춘다 — 빈 것으로 읽고 이어 가면 전부 다시 읽는다(돈) · 없는 파일만 기본값 (리뷰 I10) */
   const strictJson = (rel, dflt) => { if (!fs.existsSync(P(rel))) return dflt; try { return JSON.parse(fs.readFileSync(P(rel), 'utf8')); } catch (e) { console.error(`[card-read] ${rel} 을 읽지 못했습니다(깨진 파일) — 멈춥니다: ${e.message}`); process.exit(1); } };
-  const cfg = { enabled: false, maxPerRun: 20, maxUsdPerRun: 3, giveUpAfter: 3, effort: 'medium', maxMs: 9 * 60 * 1000, ...readJson('card-read-config.json', {}) };
+  const cfg = { enabled: false, maxPerRun: 20, maxUsdPerRun: 3, giveUpAfter: 3, effort: 'medium', maxMs: 7 * 60 * 1000, ...readJson('card-read-config.json', {}) };   // 읽기→고치기가 차례로라 한 건이 두 배 걸린다 — 단계 시한 12분 안에 진행 중인 한 건까지 끝나게(리뷰)
   const data = strictJson('../data/card-read.json', { items: {} });
   if (!data.items) data.items = {};
   if (process.argv.includes('--check')) {

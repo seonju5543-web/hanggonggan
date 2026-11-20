@@ -899,7 +899,8 @@ const GATE_WHY = {
   unreadable: '유료가 원문을 읽었지만 카드에 실을 내용을 찾지 못했습니다(메뉴뿐인 화면·오류 화면·로그인 화면일 수 있습니다).',
 };
 function paidLineHtml(it, l, key = `${l.field}|${l.text}`) {
-  const canPut = CARD_FIX_FIELDS.includes(l.field) && !!(D.cardRead || {})[it.id];
+  const paid = (D.cardRead || {})[it.id];
+  const canPut = CARD_FIX_FIELDS.includes(l.field) && !!paid && Array.isArray(paid[l.field]);   // 무료 길 값(null) 칸에는 한 줄만 얹지 않는다(학생이 보던 줄 전체가 줄어든다)
   return `<div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-paid-line="${esc(it.id)}" data-paid-key="${esc(key)}" data-paid-field="${esc(l.field)}">
     <div>
       <div><span class="pill">${esc(l.label)}</span> <b>유료가 쓴 문장</b> ${esc(l.text)}</div>
@@ -911,7 +912,7 @@ function paidLineHtml(it, l, key = `${l.field}|${l.text}`) {
         <input class="input" data-paid-text value="${esc(l.text)}" aria-label="고쳐서 실을 문장" style="min-width:16em">
         <button class="btn btn-sm" data-paid-op="edit">고쳐서 싣기</button>
         <button class="btn btn-sm" data-paid-op="drop">버리기</button></div>`
-    : `<div class="btn-row"><span class="muted">${CARD_FIX_FIELDS.includes(l.field) ? '이 공고는 아직 유료 결과가 없어 줄을 얹을 카드가 없습니다.' : '마감·주는 곳·제목은 공고 고치기에서 고쳐 주세요.'}</span>
+    : `<div class="btn-row"><span class="muted">${!CARD_FIX_FIELDS.includes(l.field) ? '마감·주는 곳·제목은 공고 고치기에서 고쳐 주세요.' : !paid ? '이 공고는 아직 유료 결과가 없어 줄을 얹을 카드가 없습니다.' : '이 칸은 학생 화면에 무료 값(원문 줄 전체)이 보이고 있습니다 — 고칠 것이 있으면 공고 고치기에서 고쳐 주세요.'}</span>
         <button class="btn btn-sm" data-paid-op="drop">확인했어요(목록에서 내리기)</button></div>`}
     </div></div>`;
 }
@@ -935,7 +936,7 @@ function paidReviewHtml() {
   return `
     <details id="todo-paid" data-paid-section>
       <summary>유료 확인에서 사람이 볼 것 — 기계 검사가 카드에서 뺀 줄 ${lines.reduce((a, x) => a + x.lines.length, 0)}줄(${lines.length}건) · 유료 확인을 못 한 공고 ${held.length}건 · 최종 검토에서 나온 것 ${fin.reduce((a, x) => a + x.problems.length, 0)}건</summary>
-      <p class="muted">학생 화면에는 뺀 줄 없이 공고가 올라가 있습니다. 원문을 열어 확인한 뒤 살리기·고쳐서 싣기·버리기 중 하나를 누르면 바로 저장됩니다.</p>
+      <p class="muted">학생 화면에는 이 줄들이 빠진 채 공고가 올라가 있습니다(한 칸의 줄이 전부 빠진 경우엔 그 칸만 무료 값으로). 원문을 열어 확인한 뒤 살리기·고쳐서 싣기·버리기 중 하나를 누르면 바로 저장됩니다.</p>
       ${held.length ? `<div class="pgroup"><h3>유료 확인을 못 해 아직 학생 화면에 없는 공고</h3><div>${held.map(({ it, why }) => `
         <div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-gate-row="${esc(it.id)}"><div>
           <div><b>${esc(it.name)}</b> ${link(it)}</div>

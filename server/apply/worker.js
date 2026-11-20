@@ -25,6 +25,7 @@ import { APP_ORIGIN } from '../shared/app-address.mjs';   // 앱 주소 한 곳
 /* 발행물은 앱과 같은 곳에서 읽는다 — 사본을 서버에 두면 두 벌이 되어 갈라진다. */
 const REGISTERED_URL = APP_ORIGIN + '/hanggonggan/data/registered.json';
 const CARD_READ_URL = APP_ORIGIN + '/hanggonggan/data/card-read.json';   // 유료 확인 결과 — 숨김분 거르기(2026-11-20)
+const CARD_FIXES_URL = APP_ORIGIN + '/hanggonggan/data/card-read-fixes.json';   // 관리자가 살린 줄 — 앱과 같은 값으로 다시 판정
 
 /* 발행물을 매 요청마다 받지 않는다(하루 몇 번 바뀐다). ⚠️ 워커 인스턴스는 언제든 죽으므로
    이 캐시는 '있으면 빠르다' 일 뿐, 없다고 동작이 달라지면 안 된다. */
@@ -36,7 +37,8 @@ async function loadRegistered() {
   const r = await fetch(REGISTERED_URL, { cf: { cacheTtl: 300 } });
   if (!r.ok) return null;                      // 🔴 못 받으면 null → 아래에서 막는다(보내지 않는다)
   const cardRead = await fetch(CARD_READ_URL, { cf: { cacheTtl: 300 } }).then((x) => (x.ok ? x.json() : null)).catch(() => null);
-  const data = publishedRegistered(await r.json(), cardRead);   // 학생 화면과 같은 목록만 — 못 받으면 숨김분은 다 빠진다
+  const cardFixes = await fetch(CARD_FIXES_URL, { cf: { cacheTtl: 300 } }).then((x) => (x.ok ? x.json() : null)).catch(() => null);
+  const data = publishedRegistered(await r.json(), cardRead, cardFixes);   // 학생 화면과 같은 목록만 — 못 받으면 숨김분은 다 빠진다
   cached = { at: Date.now(), data };
   return data;
 }

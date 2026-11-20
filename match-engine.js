@@ -2493,8 +2493,9 @@ function paidGateOpen(sch, doc, today) {
   const waited = (Date.parse(`${today || kstToday()}T00:00:00Z`) - Date.parse(`${String(sch.paidGate).slice(0, 10)}T00:00:00Z`)) / 86400000;
   return Number.isFinite(waited) && waited > PAID_GATE_WAIT_DAYS;
 }
-/* 관리자가 잡힌 줄을 살린 것(data/card-read-fixes.json · tools/admin-apply cardLine) — 유료 결과 칸에 덧붙인다. 유료 결과가 없는 공고·꼴이 틀린 것은 건드리지 않는다.
-   칸이 무료 길 값(null)이었으면 사람이 살린 줄로 그 칸을 채운다 */
+/* 관리자가 잡힌 줄을 살린 것(data/card-read-fixes.json · tools/admin-apply cardLine) — 유료 결과 칸(배열)에 덧붙인다.
+   🔴 칸이 무료 길 값(null)이면 덧붙이지 않는다 — 한 줄로 채우면 학생이 보던 무료 길 줄 전체가 그 한 줄로 줄어든다(리뷰) ·
+   살린 때의 유료 읽기(hash)와 지금 유료 읽기가 다르면 얹지 않는다(다시 읽은 결과에 옛 줄이 붙지 않게) · 유료 결과가 없는 공고·꼴이 틀린 것은 건드리지 않는다 */
 function mergeCardFixes(doc, fixes) {
   const fx = fixes && fixes.items;
   if (!doc || !doc.items || !fx || typeof fx !== 'object') return doc;
@@ -2502,11 +2503,12 @@ function mergeCardFixes(doc, fixes) {
   for (const [id, f] of Object.entries(fx)) {
     const cur = items[id], add = f && f.add;
     if (!cur || typeof cur !== 'object' || !add || typeof add !== 'object') continue;
+    if (f.hash && cur.hash && f.hash !== cur.hash) continue;
     const next = { ...cur };
     for (const [k, lines] of Object.entries(add)) {
       if (!Array.isArray(lines) || !['eligibility', 'excludes', 'priority', 'amount', 'apply', 'documents', 'notes'].includes(k)) continue;
       const ok = lines.filter((l) => typeof l === 'string' && l.trim());
-      if (ok.length) next[k] = Array.from(new Set([...(Array.isArray(cur[k]) ? cur[k] : []), ...ok]));
+      if (ok.length && Array.isArray(cur[k])) next[k] = Array.from(new Set([...cur[k], ...ok]));
     }
     items[id] = next;
   }

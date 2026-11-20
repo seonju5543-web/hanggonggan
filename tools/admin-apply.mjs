@@ -498,6 +498,8 @@ switch (action) {
       duplicable: true,
       sourceUrl: url,
       sourceKind: 'admin',
+      /* 유료 카드 읽기 대상(2026-11-20) — 사람이 등록한 공고는 숨기지 않고(paidGate 아님) 유료로 읽기만 한다. 안 달면 유료 읽기가 숨김분만 읽어 영영 안 읽힌다(리뷰) */
+      paidRead: TODAY,
       ...(patch.note ? { note: patch.note } : {}),
       ...(patch.formId ? { formId: patch.formId }
         : { noForm: patch.noForm || `관리자 등록 ${TODAY} — 양식은 확인 후 연결` }),
@@ -1262,7 +1264,9 @@ switch (action) {
     if (!doc.items || typeof doc.items !== 'object' || Array.isArray(doc.items)) doc.items = {};
     const done = [];
     for (const ln of lines) {
-      const id = String((ln && ln.id) || ''), field = String((ln && ln.field) || ''), key = cleanText(ln && ln.key), op = String((ln && ln.op) || '');
+      /* 🔴 key 는 화면이 본 「칸|문장」 그대로 — cleanText 처럼 빈칸을 줄이거나 자르면 화면의 줄과 안 맞아 「할 일」에서 영영 안 내려간다(리뷰) */
+      const id = String((ln && ln.id) || ''), field = String((ln && ln.field) || ''), key = String((ln && ln.key) || '').replace(/[\u0000-\u001f\u007f]/g, ' '), op = String((ln && ln.op) || '');
+      if (key.length > 2000) fail(`${id} — 줄이 너무 깁니다(${key.length}자)`);
       const it = reg.items.find((x) => x.id === id);
       if (!it) fail(`정식 등록에 그 공고가 없습니다: ${id}`);
       if (!key) fail(`${id} — 어느 줄인지(key)가 없습니다`);
@@ -1271,9 +1275,12 @@ switch (action) {
       if (op !== 'drop') {
         if (!CARD_FIX_FIELDS.includes(field)) fail(`${id} — 이 칸(${field})은 여기서 싣지 않습니다 — 마감·주는 곳은 공고 고치기(edit)로`);
         if (!(cr && cr.items && cr.items[id])) fail(`${id} — 유료 결과가 아직 없는 공고라 줄을 얹을 카드가 없습니다`);
-        const text = cleanText(ln.text);
-        if (!text) fail(`${id} — 실을 문장이 비었습니다`);
-        e.add[field] = Array.from(new Set([...(e.add[field] || []), text]));
+        if (!Array.isArray(cr.items[id][field])) fail(`${id} — 이 칸은 지금 무료 길 값(원문 줄 전체)이 보이고 있어 한 줄만 얹을 수 없습니다 — 공고 고치기(edit)에서 칸을 고쳐 주세요`);
+        const rawText = String(ln.text || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
+        if (!rawText) fail(`${id} — 실을 문장이 비었습니다`);
+        if (rawText.length > 300) fail(`${id} — 실을 문장이 300자를 넘습니다(${rawText.length}자) — 줄여서 다시 보내 주세요(자르지 않습니다)`);
+        e.add[field] = Array.from(new Set([...(e.add[field] || []), rawText]));
+        e.hash = cr.items[id].hash;   // 이 유료 읽기에 얹은 줄 — 다시 읽으면(해시가 바뀌면) 앱이 얹지 않는다(match-engine mergeCardFixes)
       }
       e.done = Array.from(new Set([...(e.done || []), key]));
       e.by = actor; e.at = TODAY;

@@ -49,8 +49,8 @@ export function findNotice(registered, id) {
 }
 /** 학생 화면과 같은 목록 — 유료 확인 전 숨김분을 거르고 유료 결과를 얹는다(match-engine publishedList · 2026-11-20).
  *  🔴 화면에 없는 공고를 서버가 대신 보내면 안 된다 · card-read.json 을 못 받아도(null) 거른다 */
-export function publishedRegistered(registered, cardRead) {
-  return { ...(registered || {}), items: ME.publishedList((registered && registered.items) || registered || [], cardRead) };
+export function publishedRegistered(registered, cardRead, cardFixes = null) {
+  return { ...(registered || {}), items: ME.publishedList((registered && registered.items) || registered || [], cardRead, null, cardFixes) };
 }
 
 /* 🔴 **서버 사본이 특별자격·처지를 모를 수 있다** — 학생이 민감정보 동의를 안 켰으면

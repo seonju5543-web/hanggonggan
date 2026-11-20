@@ -17,7 +17,7 @@ import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { makeSources, sourceText, norm, inSource, FIELD_LABEL, closedNow } from './card-read.mjs';
+import { makeSources, sourceText, norm, inSource, factsMatch, FIELD_LABEL, closedNow } from './card-read.mjs';
 import { attachmentText } from './attachment-text.mjs';
 import { sameTitle } from './detail-url.mjs';
 
@@ -75,7 +75,8 @@ export function docsOf(it, { formsPdf = {}, formsIndex = [], eligDocs = {}, extr
     const text = readPdf(fileURLToPath(new URL(`../data/forms-pdf/${f.file}`, HERE)));
     const row = formsIndex.find((r) => r.attach === f.name && sameTitle(r.title, it.name));
     const orig = row ? readAttach(`${extractedDir}/${row.file}`) : '';
-    out.push({ name: f.name, kind: '신청서 사본(PDF)', text: text || '', orig: orig || '', same: text && orig ? sameness(text, orig) : null });
+    /* 글자 도구(pdftotext)가 없으면 text 는 null — 「모름」이다. 빈 글자('')로 두면 모든 사본이 「내용 없음」이 되고 해시가 바뀌어 다시 돈을 쓴다(리뷰) */
+    out.push({ name: f.name, kind: '신청서 사본(PDF)', text: text == null ? null : text, orig: orig || '', same: text && orig ? sameness(text, orig) : null });
   }
   for (const f of ((eligDocs[it.id] || {}).files) || []) {
     const text = readAttach(`${extractedDir}/${f}`);
@@ -83,14 +84,14 @@ export function docsOf(it, { formsPdf = {}, formsIndex = [], eligDocs = {}, extr
   }
   return out;
 }
-export const reviewHash = (source, docs, card) => crypto.createHash('sha256').update(SYSTEM).update(source).update(JSON.stringify(docs.map((d) => [d.name, d.text]))).update(JSON.stringify(card)).digest('hex').slice(0, 16);
+export const reviewHash = (source, docs, card) => crypto.createHash('sha256').update(SYSTEM).update(source).update(JSON.stringify(docs.map((d) => [d.name, d.text == null ? '?' : d.text]))).update(JSON.stringify(card)).digest('hex').slice(0, 16);
 
 /* 기계 + 모델 → 관리자에게 보일 문제 줄(사람 말 · 로봇 말 없이). missing 은 근거가 원문에 있는 것만 */
 export function problemsOf(docs, out, source) {
   const pr = [];
   for (const d of docs) {
     if (d.same != null && d.same < SAME_MIN) pr.push({ kind: 'notSame', doc: d.name, reason: `앱이 보여 주는 「${d.name}」 사본의 글자가 받아 둔 원본 첨부와 다릅니다(같은 정도 ${Math.round(d.same * 100)}%).`, check: '원본 첨부와 앱의 사본을 나란히 열어 같은 문서인지 확인해 주세요.' });
-    if (!hasContent(d.text)) pr.push({ kind: 'noText', doc: d.name, reason: `「${d.name}」에서 읽을 글자가 거의 없습니다(빈 문서·그림뿐인 문서일 수 있습니다).`, check: '문서를 열어 내용이 있는 문서인지 확인해 주세요.' });
+    if (d.text != null && !hasContent(d.text)) pr.push({ kind: 'noText', doc: d.name, reason: `「${d.name}」에서 읽을 글자가 거의 없습니다(빈 문서·그림뿐인 문서일 수 있습니다).`, check: '문서를 열어 내용이 있는 문서인지 확인해 주세요.' });
   }
   const o = (out && typeof out === 'object') ? out : {};
   for (const m of Array.isArray(o.docs) ? o.docs : []) {
@@ -104,17 +105,18 @@ export function problemsOf(docs, out, source) {
   for (const m of Array.isArray(o.missing) ? o.missing : []) {
     if (!m || !MISSING_FIELDS.includes(m.field) || typeof m.text !== 'string' || !m.text.trim() || typeof m.quote !== 'string') continue;
     if (!inSource(m.quote, srcN).ok) continue;   // 근거가 원문에 없으면 버린다(지어낸 「빠진 내용」을 사람에게 넘기지 않는다)
+    if (!factsMatch(m.text, m.quote, '', m.field).ok) continue;   // 카드에 실을 문장도 유료 확인 1 과 같은 사실 검사를 거친다(살리기 한 번으로 실리므로 · 리뷰)
     const label = FIELD_LABEL[m.field];
     pr.push({ kind: 'missing', field: m.field, label, text: m.text.trim(), quote: m.quote, reason: `문서에 있는 ${label} 내용이 카드에 없습니다.`, check: `원문에서 확인하고 카드의 ${label}에 넣을지 정해 주세요.` });
   }
   return pr;
 }
 /* 볼 공고 — 유료 확인 1 을 통과해 학생 화면에 떠 있는 숨김 등록분(그 전 등록분은 보지 않는다 · 개발자 결정 「나」). 다시 볼지는 해시로(본편) */
-export const reviewable = (items, cardRead, today) => items.filter((it) => it.paidGate && cardRead[it.id] && !closedNow(it, cardRead[it.id], today));
+export const reviewable = (items, cardRead, today) => items.filter((it) => (it.paidGate || it.paidRead) && cardRead[it.id] && !closedNow(it, cardRead[it.id], today));
 export const needsReview = (led, hash, giveUpAfter = 3) => !led || led.hash !== hash || !(led.done || (led.tries || 0) >= giveUpAfter);
 
 async function ask(client, item, source, docs, card, effort) {
-  const docText = docs.map((d, i) => `===== 앱이 보이는 문서 ${i + 1}: ${d.name} (${d.kind}) =====\n${String(d.text).slice(0, DOC_MAX) || '(뽑힌 글자 없음)'}`).join('\n\n');
+  const docText = docs.map((d, i) => `===== 앱이 보이는 문서 ${i + 1}: ${d.name} (${d.kind}) =====\n${d.text == null ? '(글자를 뽑지 못함 — 판단하지 마세요)' : String(d.text).slice(0, DOC_MAX) || '(뽑힌 글자 없음)'}`).join('\n\n');
   const stream = client.beta.messages.stream({
     model: MODEL, max_tokens: 16000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default', system: SYSTEM,
     output_config: { effort, format: { type: 'json_schema', schema: SCHEMA } },
