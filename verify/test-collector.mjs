@@ -3604,6 +3604,12 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
   eq('  학교가 [교내] 라고 적어 둔 게시판 글은 "교내" 칸에도 온다',
     /boardNoticesInSchool\(\)/.test(exploreFn), true);
   eq('    그 카드도 같은 그림을 쓴다 (베끼지 않는다)', /noticeCardHtml/.test(exploreFn), true);
+  /* 🔴 **그 칸의 게시판 글 카드도 눌러서 시트를 연다** (2026-11-20 개발자 지적: 장학금 찾기 '교내' 를 누르면
+     *"카드가 안 열리고 그대로 원문 링크로 들어가지는"* — 같은 칸의 등록 카드는 전부 시트를 연다). 원문은 시트 「원문」 절이 준다 */
+  eq('    그 카드는 원문으로 나가지 않고 시트를 연다 (sheet 표식)', /noticeCardHtml\(n, \{ sheet: true \}\)/.test(exploreFn), true);
+  eq('      시트 표식이면 링크(href)가 아니라 단추(data-board)다', /o\.sheet \? ` type="button" data-board=/.test(liveFn) && /const tag = o\.sheet \? 'button' : 'a'/.test(liveFn), true);
+  eq('      누르면 openBoardDetail 이 그 글을 시트로 연다', /closest\('\[data-board\]'\);\s*if \(card\) openBoardDetail\(card\.dataset\.board\)/.test(app), true);
+  eq('      시트도 홈과 같은 목록에서 글을 찾는다', /boardNoticesForMe\(\)\.find\(/.test(cutFnApp('openBoardDetail')), true);
   /* 판정을 새로 만들지 않는다 — `noticeKind` 한 곳(로봇·앱이 같이 쓴다) */
   const inSchoolFn = cutFnApp('boardNoticesInSchool');
   eq('    판정은 공용 noticeKind 하나다', /noticeKind\(n\.title\) === '교내'/.test(inSchoolFn), true);

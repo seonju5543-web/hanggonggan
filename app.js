@@ -1939,7 +1939,7 @@ function renderExplore() {
      *"실시간 공고 보니까 교내에서 진행되는 거 있는데 교내탭에는 안 들어가져 있어"*).
      우리가 원문을 읽어 등록한 카드가 먼저 오고, 그 **뒤에** 게시판 글이 붙는다 — 읽은 것과
      읽지 않은 것을 섞지 않는다(게시판 글 카드는 `.notice-card` 라 겉모습부터 다르고,
-     아랫줄이 '원문 보기 ↗' 라고 말한다. 누르면 예전처럼 학교 게시판으로 나간다).
+     2026-11-20 부터 누르면 원문으로 바로 나가지 않고 상세 시트를 연다 — openBoardDetail · 원문은 시트 맨 아래).
      ⚠️ 검색어는 여기에도 건다 — 안 걸면 '검색했는데 그대로'가 된다(2026-09-12 · UI-16).
         카드에 보이는 글자(제목)로만 거른다, 위 등록 공고와 같은 규칙이다. */
   const boardIn = inSchoolTab
@@ -1947,7 +1947,7 @@ function renderExplore() {
     : [];
   $('#explore-list').innerHTML = (list.length || boardIn.length)
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
-      + boardIn.map(noticeCardHtml).join('')
+      + boardIn.map((n) => noticeCardHtml(n, { sheet: true })).join('')   // 이 칸의 카드는 전부 시트를 연다(2026-11-20 · 원문은 시트 맨 아래)
     : `<p class="empty">${emptyMsg}</p>`;
 }
 
