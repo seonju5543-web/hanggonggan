@@ -2185,9 +2185,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .ad-top { display: flex; gap: 8px; align-items: baseline; }
 .ad-name { font-size: var(--t-sm); font-weight: 700; letter-spacing: -.02em; flex: 1; line-height: 1.4; }
 .ad-val  { font-size: var(--t-md); font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.ad-val.on  { color: var(--green); }
-.ad-val.off { color: var(--text-weak); }
-.ad-val.est { color: var(--orange); }
+.ad-val.on, .ad-val.off, .ad-val.est { color: var(--green); }   /* 금액 색은 하나 (2026-11-20 개발자 지시 — 추정값만 주황이던 것 · 추정은 「약」 글자가 말한다 · 못 받는 줄은 줄째 흐리게(.ad-row.dim)) */
 .ad-chk  { color: var(--green); font-size: var(--t-sm); font-weight: 900; margin-right: 1px; }
 .ad-note { font-size: var(--t-2xs); color: var(--text-weak); margin-top: 5px; }
 

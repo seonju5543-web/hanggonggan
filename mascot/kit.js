@@ -381,8 +381,10 @@
       // 팔 · 귀 · 꼬리
       const ps = P ? (P.x < 0 ? -1 : 1) : 0;   // 가리키는 쪽 팔
       S.pz = lerp(S.pz, P ? Math.PI / 2 + P.y * 0.85 : 0.3, 1 - Math.pow(0.0008, dt));
+      /* 가리키는 동안 다른 팔은 만세(armUp)를 하지 않는다 — 뛸 때마다 바깥으로 뻗어 무대 끝에서 잘렸다(11-20 개발자 지적 · 가만히 둬도 3.4초마다 뛰므로) */
+      const cheer = P ? 0.35 : 2.3;
       ch.arms.forEach((a) => { const s = a.userData.side;
-        a.rotation.z = s === ps || (!P && Math.abs(S.pz - 0.3) > 0.02 && s === S.lastPs) ? s * (S.pz + Math.sin(S.time * 5) * 0.03) : s * (0.3 + S.armUp * 2.3 + Math.sin(S.time * 2.2 + s) * 0.05); });
+        a.rotation.z = s === ps || (!P && Math.abs(S.pz - 0.3) > 0.02 && s === S.lastPs) ? s * (S.pz + Math.sin(S.time * 5) * 0.03) : s * (0.3 + S.armUp * cheer + Math.sin(S.time * 2.2 + s) * 0.05); });
       if (ps) S.lastPs = ps;
       if (ch.ears) ch.ears.forEach((e, i) => { e.rotation.z = (i ? -1 : 1) * (Math.sin(S.time * 3 + i) * 0.04 + S.armUp * 0.22); });
       if (ch.tail) ch.tail.rotation.z = Math.sin(S.time * 2.6) * 0.22 + S.yawV * 0.03;

@@ -75,6 +75,16 @@
   .draft .t { font-weight: 800; line-height: 1.4; } .draft .p { margin: 8px 0 12px; height: 5px; border-radius: 5px; background: #eee; overflow: hidden; } .draft .p i { display: block; height: 100%; width: 50%; background: var(--accent); }
   .btn { width: 100%; border: 0; border-radius: 16px; padding: 14px; background: #222b45; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
   .mock { font-size: 11.5px; color: var(--weak); margin: 10px 0 0; }
+  /* 자격 요건 매칭 목록 — 앱 금액 상세의 줄 모양 그대로 · 금액 색은 하나(추정은 「약」 글자로만) */
+  .grp-h { display: flex; justify-content: space-between; align-items: baseline; margin: 2px 0 10px; } .grp-h b { font-size: 16px; } .grp-h span { font-size: 12.5px; color: var(--weak); font-weight: 600; }
+  .ad { display: block; width: 100%; text-align: left; border: 0; background: #fff; border-radius: 16px; box-shadow: 0 1px 2px rgba(58,48,28,.05), 0 6px 16px rgba(58,48,28,.07); padding: 14px 16px; margin: 0 0 10px; cursor: pointer; }
+  .ad .top { display: flex; gap: 10px; justify-content: space-between; align-items: flex-start; } .ad .nm { font-weight: 700; font-size: 14.5px; line-height: 1.4; }
+  .ad .val { flex: none; font-weight: 800; color: #3d6b47; font-variant-numeric: tabular-nums; }
+  .ad .pv { margin-top: 8px; font-size: 12.5px; color: var(--sub); font-weight: 600; } .ad .pv::after { content: ' ›'; }
+  .card { border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+  .card .kc { display: inline-block; font-size: 11.5px; font-weight: 800; color: var(--accent); background: rgba(39,80,143,.08); border-radius: 999px; padding: 2px 8px; }
+  .card .nm { margin: 8px 0 4px; font-weight: 800; font-size: 17px; line-height: 1.4; } .card .val { font-weight: 800; color: #3d6b47; } .card .pv { font-size: 12.5px; color: var(--sub); margin-top: 4px; }
+  .back { border: 0; background: none; padding: 0 0 10px; color: var(--accent); font-weight: 700; font-size: 13.5px; cursor: pointer; }
 
   .notes { margin-top: 22px; background: #fff; border-radius: 18px; padding: 16px 18px; font-size: 13.5px; line-height: 1.6; color: var(--sub); }
   .notes h3 { margin: 0 0 6px; font-size: 14px; color: var(--ink); } .notes ul { margin: 0; padding-left: 18px; }
@@ -128,7 +138,7 @@
     <ul>
       <li>상태는 <strong>'지금 말하는 줄' 하나</strong>뿐이에요. 줄을 누르든, 마스코트를 누르든, 저절로 넘어가든 같은 한 곳이 바뀝니다.</li>
       <li>그 상태가 바뀌면 한꺼번에: 줄이 커지고 숫자가 0부터 올라가고 · 왼쪽 막대가 그 줄로 옮겨 가고 · 마스코트가 그 줄을 보며 팔을 뻗고 한 번 뜁니다.</li>
-      <li><strong>줄을 누르면</strong> 마스코트가 먼저 그 줄을 가리키고 내용이 열려요 — 매칭된 공고 → 장학금 목록 · 수령 가능액 → 금액 상세 · 마감 → 그 날 마감인 공고 · 이어서 쓰기 → 쓰던 신청서.</li>
+      <li><strong>줄을 누르면</strong> 마스코트가 먼저 그 줄을 가리키고 내용이 열려요 — 매칭된 공고 → 「자격 요건 매칭」 목록(줄을 누르면 그 공고 카드) · 수령 가능액 → 금액 상세 · 마감 → 그 날 마감인 공고 · 이어서 쓰기 → 쓰던 신청서.</li>
       <li><strong>마감 줄의 이름표는 가장 빠른 마감</strong>이에요 — 오늘이면 「마감 D-Day」, 3일 뒤면 「마감 D-3」, 숫자는 그날 마감인 공고 수. 마감이 없거나 쓰던 신청서가 없으면 그 줄은 숨깁니다(0건 줄을 남기지 않아요).</li>
       <li>쓰던 신청서 띠는 없앴어요 — 같은 일을 「이어서 쓰기」 줄이 합니다.</li>
       <li>무대(3D)를 히어로 전체에 깔고 캐릭터만 오른쪽에 세워, 왼쪽으로 뻗은 팔이 잘리지 않게 했어요.</li>
@@ -163,9 +173,16 @@
     3: [{ t: '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발', m: '100만원' }],
   };
   const DRAFT = { t: '재단법인 광남새마을금고 장학회 우등장학생 선발', step: '2/4 단계' };
+  /* 자격 요건 매칭 — 개발자가 올린 앱 화면(11-20)의 줄 그대로 · 추정값(약)도 같은 색 */
+  const MATCH = [
+    { t: '국가장학금 Ⅰ유형', m: '285만원', p: '한국장학재단' }, { t: '국가장학금 Ⅱ유형 (대학연계지원형)', m: '100만원', p: '한국장학재단' },
+    { t: '국가근로장학금', m: '120만원', p: '한국장학재단' }, { t: '인문100년장학금 (국가우수장학)', m: '600만원', p: '한국장학재단' },
+    { t: '2026-2학기 다문화가정 장학금 신청 안내', m: '약 109만원', p: '' }, { t: '2026학년도 창업장학금 신청 안내(~11/27)', m: '100만원', p: '한국외국어대학교' },
+    { t: '2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내', m: '400만원', p: '' },
+  ];
   let due = '0', hasDraft = true, active = null, holdUntil = 0, sheetTimer = 0;
 
-  const stage = Stage($('stage'), { screenX: 0.4, coins: 8, spread: 1.0, jump: 0.28, camY: 1.4, lookY: 1.22, dist: 7.4,
+  const stage = Stage($('stage'), { screenX: 0.33, coins: 8, spread: 1.0, jump: 0.28, camY: 1.4, lookY: 1.22, dist: 8.0,
     onTap() { hold(); const v = visible(); setActive(v[(v.indexOf(active) + 1) % v.length].dataset.k, true); } });
   if (!stage) return;
 
@@ -202,7 +219,9 @@
   /* 줄을 누르면 — 먼저 가리키고(0.35초) 그 줄의 내용을 연다 */
   function openSheet(k) {
     let h = '';
-    if (k === 'match') h = `<h3 id="sheet-h">매칭된 공고 16건</h3><p class="sub">앱에서는 장학금 탭(내게 맞는 순)으로 갑니다</p>`;
+    if (k === 'match') h = `<h3 id="sheet-h">매칭된 공고</h3><div class="grp-h"><b>자격 요건 매칭</b><span>16건 · 3,644만원</span></div>`
+      + MATCH.map((x, i) => `<button class="ad" type="button" data-card="${i}"><div class="top"><span class="nm">${esc(x.t)}</span><span class="val">${esc(x.m)}</span></div><div class="pv">${esc(x.p || '공고 보기')}</div></button>`).join('')
+      + `<p class="mock">줄을 누르면 그 공고 카드로 갑니다 · 아래 9건 생략</p>`;
     if (k === 'amount') h = `<h3 id="sheet-h">수령 가능액 3,644만원</h3><p class="sub">앱에서는 지금처럼 금액 상세 — 어떤 공고가 얼마씩인지 — 가 열립니다</p>`;
     if (k === 'due') {
       const list = DUE[due] || [], dd = due === '0' ? 'D-Day' : 'D-' + due;
@@ -210,11 +229,21 @@
         + list.map((x) => `<div class="row"><span class="dd">${dd}</span><span class="t">${esc(x.t)}${x.m ? `<br><span class="m">${esc(x.m)}</span>` : ''}</span>›</div>`).join('');
     }
     if (k === 'draft') h = `<h3 id="sheet-h">이어서 쓰기</h3><p class="sub">쓰다 만 신청서</p><div class="draft"><div class="t">${esc(DRAFT.t)}</div><div class="p"><i></i></div><div class="m">${esc(DRAFT.step)}</div></div><p></p><button class="btn" type="button">이어서 쓰기</button>`;
-    $('sheet-body').innerHTML = h + '<p class="mock">시안 — 앱에서는 이 자리에 실제 내용이 열립니다</p>';
+    $('sheet-body').innerHTML = h + (k === 'match' ? '' : '<p class="mock">시안 — 앱에서는 이 자리에 실제 내용이 열립니다</p>');
+    $('sheet').scrollTop = 0;
     $('phone').classList.add('open'); hold(60000);
   }
   function closeSheet() { $('phone').classList.remove('open'); hold(); }
   $('dim').addEventListener('click', closeSheet);
+  /* 목록의 줄을 누르면 그 공고 카드(앱: 그 공고의 상세 시트) · 「‹ 자격 요건 매칭」 으로 돌아온다 */
+  $('sheet-body').addEventListener('click', (e) => {
+    const c = e.target.closest('[data-card]'), back = e.target.closest('[data-back]');
+    if (back) { openSheet('match'); return; }
+    if (!c) return;
+    const x = MATCH[Number(c.dataset.card)];
+    $('sheet-body').innerHTML = `<button class="back" type="button" data-back>‹ 자격 요건 매칭</button><div class="card"><span class="kc">${x.p === '한국외국어대학교' ? '교내' : '교외'}</span><div class="nm" id="sheet-h">${esc(x.t)}</div><div class="val">${esc(x.m)}</div>${x.p ? `<div class="pv">${esc(x.p)}</div>` : ''}</div><p class="mock">시안 — 앱에서는 장학금 탭에서 카드를 누른 것과 같은 상세 시트가 열립니다</p>`;
+    $('sheet').scrollTop = 0;
+  });
   addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
   all.forEach((l) => l.addEventListener('click', () => {
     hold(); setActive(l.dataset.k); clearTimeout(sheetTimer); sheetTimer = setTimeout(() => openSheet(l.dataset.k), REDUCED ? 0 : 350);
