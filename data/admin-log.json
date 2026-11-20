@@ -635,6 +635,48 @@
    "by": "Claude 세션(개발자 지시 2026-11-19)",
    "action": "linkFix",
    "detail": "원문 주소 1건 — 넣음 명도회장학금(천주교) → https://cbck.or.kr/cafl/Resources?no=20261403"
+  },
+  {
+   "at": "2026-11-20 09:34 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생장학금 → https://www.inje.go.kr/portal/field-info/scholarship/learnfare?articleSeq=245595"
+  },
+  {
+   "at": "2026-11-20 09:34 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 예/체능특기자장학금 → https://www.inje.go.kr/portal/field-info/scholarship/learnfare?articleSeq=245595"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 국가근로장학금 → https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 청소년교육지원장학금 → https://www.kosaf.go.kr/ko/mkinfo.do?pg=PTMKKsSrvMntoringGive_01M&naviParam=MK,03,04,01"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 청소년 AI 교육지원장학금 → https://www.kosaf.go.kr/ko/mkinfo.do?pg=aiES&naviParam=MK,03,06,01"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 다문화 · 탈북(이주 · 북한배경)학생 멘토링장학금 → https://www.kosaf.go.kr/ko/mkinfo.do?pg=PTMKKsSrvMntoringCult_01M&naviParam=MK,03,03,01"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 재능봉사 캠프 → https://portal.kosaf.go.kr/CO/jspAction.do?forwardOnlyFlag=Y&forwardPage=pt/mk/contents/PTMKKsSrvMntoringCamp_01M&ignoreSession=Y&naviParam=MK,03,02,01,01 (확인: 1)"
   }
  ]
 }

@@ -1160,7 +1160,9 @@ switch (action) {
       const current = SL.decodeUrlEntities(linkRawOf(ds, it));
       if (current !== from && !payload.force) fail(`그 사이 로봇이 주소를 바꿨습니다: 현재 ${current || '(주소 없음)'} — 화면을 새로 고쳐 다시 확인해 주세요`);
       const name = it.name || it.title || it.id || it.code || '';
-      const chk = checkFixUrl(fx.url, { from: current, L: SL, downloadRe: ENTRY_RULES.DOWNLOAD_URL });
+      /* 한국장학재단이 직접 주는 사업만 재단의 사업 안내 쪽을 받는다(collector/link-fix.mjs kosafOwn) — 주는 곳은 데이터의 org 로 본다(요청이 준 값을 믿지 않는다) */
+      const kosafOwn = ds === 'kosaf' && /^(\(재\)|재단법인\s*)?한국장학재단$/.test(String(it.org || '').trim());
+      const chk = checkFixUrl(fx.url, { from: current, L: SL, downloadRe: ENTRY_RULES.DOWNLOAD_URL, kosafOwn });
       if (chk.errors.length) fail(`${String(name).slice(0, 40)} — ${chk.errors.join(' · ')}`);
       const key = fixKeyFor(ds, it, SL);
       if (!key) fail(`${String(name).slice(0, 40)} — 장부 열쇠를 만들지 못했습니다`);

@@ -1,7 +1,7 @@
 {
  "v": 1,
  "note": "관리자가 넣은 원문 공고 주소 — 관리자 화면 「원문 링크」가 적는다(tools/admin-apply.mjs linkFix). 앱은 source-link.js 가 읽는다. 열쇠: id:<공고 id> · u:<지금 주소>",
- "updatedAt": "2026-11-20 02:04 KST",
+ "updatedAt": "2026-11-20 09:42 KST",
  "fix": {
   "id:reg-khu-uiam": {
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415",
@@ -416,6 +416,62 @@
    "round": "2026-12-11",
    "title": "[공모] 2027년도 명도회 장학금 지원 대상자 공모",
    "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000421001": {
+   "url": "https://www.inje.go.kr/portal/field-info/scholarship/learnfare?articleSeq=245595",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "at": "2026-11-20",
+   "round": "2026-12-04",
+   "title": "2026년도 인제군 장학생 선발공고",
+   "note": "인제군청 장학사업공지 글(신청기간 2026.1.19~12.4 · 첨부가 재단 목록 파일과 같음) — 2026-11-20 다른 망의 브라우저로 열어 확인"
+  },
+  "id:kosaf-2000421002": {
+   "url": "https://www.inje.go.kr/portal/field-info/scholarship/learnfare?articleSeq=245595",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "at": "2026-11-20",
+   "round": "2026-12-04",
+   "title": "2026년도 인제군 장학생 선발공고",
+   "note": "인제군청 장학사업공지 글(신청기간 2026.1.19~12.4 · 첨부가 재단 목록 파일과 같음) — 2026-11-20 다른 망의 브라우저로 열어 확인"
+  },
+  "id:kosaf-2000001126": {
+   "url": "https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "at": "2026-11-20",
+   "round": "2027-02-28",
+   "title": "국가근로장학금",
+   "note": "한국장학재단이 직접 주는 사업 — 회차 글이 없고 재단의 사업 안내 쪽이 그 장학금의 안내(신청은 소속 대학 공고) · 2026-11-19 새 탭으로 열어 확인"
+  },
+  "id:kosaf-2000001132": {
+   "url": "https://www.kosaf.go.kr/ko/mkinfo.do?pg=PTMKKsSrvMntoringGive_01M&naviParam=MK,03,04,01",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "at": "2026-11-20",
+   "round": "2027-02-28",
+   "title": "대학생 청소년교육지원장학금",
+   "note": "한국장학재단이 직접 주는 사업 — 회차 글이 없고 재단의 사업 안내 쪽이 그 장학금의 안내(신청은 소속 대학 공고) · 2026-11-19 새 탭으로 열어 확인"
+  },
+  "id:kosaf-2000001133": {
+   "url": "https://www.kosaf.go.kr/ko/mkinfo.do?pg=aiES&naviParam=MK,03,06,01",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "at": "2026-11-20",
+   "round": "2027-02-28",
+   "title": "대학생 청소년 AI 교육지원장학금",
+   "note": "한국장학재단이 직접 주는 사업 — 회차 글이 없고 재단의 사업 안내 쪽이 그 장학금의 안내(신청은 소속 대학 공고) · 2026-11-19 새 탭으로 열어 확인"
+  },
+  "id:kosaf-2000001134": {
+   "url": "https://www.kosaf.go.kr/ko/mkinfo.do?pg=PTMKKsSrvMntoringCult_01M&naviParam=MK,03,03,01",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "at": "2026-11-20",
+   "round": "2027-02-28",
+   "title": "다문화·탈북(이주·북한배경)학생 멘토링",
+   "note": "한국장학재단이 직접 주는 사업 — 회차 글이 없고 재단의 사업 안내 쪽이 그 장학금의 안내(신청은 소속 대학 공고) · 2026-11-19 새 탭으로 열어 확인"
+  },
+  "id:kosaf-2000001135": {
+   "url": "https://portal.kosaf.go.kr/CO/jspAction.do?forwardOnlyFlag=Y&forwardPage=pt/mk/contents/PTMKKsSrvMntoringCamp_01M&ignoreSession=Y&naviParam=MK,03,02,01,01",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "at": "2026-11-20",
+   "round": "2026-12-31",
+   "title": "대학생 재능봉사 캠프",
+   "note": "한국장학재단이 직접 주는 사업 — 회차 글이 없고 재단의 사업 안내 쪽이 그 장학금의 안내(신청은 소속 대학 공고) · 2026-11-19 새 탭으로 열어 확인"
   }
  }
 }
