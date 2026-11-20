@@ -15158,7 +15158,104 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     qKeys([{ host: 'e.kr', targets: [qe, qf] }], new Set(), [], []), ['E1']);
   const khSrcQ = readText(new URL('../collector/kosaf-hunt.mjs', import.meta.url));
   eq('  ⑧-4 로봇이 실제로 그 대상으로 묻는다 · 물은 날을 묶음째 장부(searched)에 적는다 — 줄을 옛 leftover 로 되돌리면 빨갛다(리뷰 11-18)',
-    [/for \(const t of searchQueue\(groups, huntedKeys, leftover, prevFile\.items, searchedAt\)\)/.test(khSrcQ), /for \(const k of \[t\.key, \.\.\.\(t\.alsoCodes \|\| \[\]\)\]\) searchedAt\[k\] = today/.test(khSrcQ), /searched: searchedLive/.test(khSrcQ)], [true, true, true]);
+    [/for \(const t of searchQueue\(groups, huntedKeys, leftover, prevFile\.items, searchedAt, rejected\)\)/.test(khSrcQ), /for \(const k of \[t\.key, \.\.\.\(t\.alsoCodes \|\| \[\]\)\]\) searchedAt\[k\] = today/.test(khSrcQ), /searched: searchedLive/.test(khSrcQ)], [true, true, true]);
+  /* ⑨ 2026-11-20 실측 — 사흘 내리 「40번 물어 글 0건」: 검색 대상 46건 중 43건이 **사람이 이미 원문을 넣은** 공고였다(로봇 장부만 봤다).
+     대상인지는 앱의 규칙 그대로(source-link.js linkFixFor — 사람 바로잡기 먼저 · 층2는 회차가 마감과 같을 때만) */
+  const t9001 = idx.find({ ds: 'kosaf', key: '9001' });
+  const humanFix = (o) => ({ 'id:kosaf-9001': { url: 'https://gana.or.kr/bbs/view.php?id=101', round: '2026-11-30', by: '관리자', at: '2026-11-01', ...o } });
+  const inQueue = (human) => (KH.huntTargets ? KH.huntTargets(idx, { today: '2026-10-12', fixes, human }) : []).some((g) => g.targets.some((t) => t.key === '9001'));
+  eq('⑨ 사람이 이번 회차 원문을 넣은 공고는 사냥 대상이 아니다 · (−) 작년 회차 바로잡기 · 목록 표식 주소 · 회차 없는 바로잡기는 대상 그대로',
+    [inQueue(humanFix({})), inQueue(humanFix({ round: '2025-11-30' })), inQueue(humanFix({ url: 'https://gana.or.kr/bbs/list.php#n-x' })), inQueue(humanFix({ round: undefined })), inQueue({}), KH.hasUsableFix ? KH.hasUsableFix(t9001, {}, humanFix({})) : null],
+    [false, true, true, true, true, true]);
+  /* ⑩ 검색 요약 — 검색 제목은 대개 그 쪽의 뭉뚱그린 창 제목(「공지사항 - 일신문화재단」)이고 글 제목·첨부 이름은 요약에 있다 */
+  const sumRows = (desc, title = '공지사항 - 가나장학재단') => (KH.searchRows ? KH.searchRows({ items: [{ title, link: 'https://gana.or.kr/bbs/view.php?id=101', description: desc }] }, t1.allowed, t1) : []);
+  const sum1 = KH.searchLine ? KH.searchLine(t1, sumRows('[공고문]2026 <b>가나장학재단</b> 성적우수장학생 선발 공고.pdf'), 'q', { today: '2026-11-20' }) : null;
+  const sum2 = KH.searchLine ? KH.searchLine(t1, sumRows('2026 가나장학재단 예체능장학생 선발 결과 발표'), 'q', { today: '2026-11-20' }) : 'x';
+  const sum3 = KH.searchLine ? KH.searchLine(t1, sumRows(''), 'q', { today: '2026-11-20' }) : 'x';
+  const sum4 = KH.searchLine ? KH.searchLine(t1, sumRows('2025 가나장학재단 성적우수장학생 선발 공고', '공지사항 - 가나장학재단 2026'), 'q', { today: '2026-11-20' }) : 'x';   // 요약 혼자는 작년 글 — 제목의 해와 섞어 통과시키지 않는다
+  eq('⑩ 검색 제목이 창 제목뿐이어도 요약에 사업 이름이 있으면 고른다(까닭에 「검색 요약」) · 🔴 후보 제목은 검색 제목 그대로 · (−) 요약이 다른 사업·결과 글이면 · 요약이 없으면 · 요약 혼자 다른 해면 안 고른다',
+    [sum1 && sum1.url, sum1 && /검색 요약/.test(sum1.note), sum1 && sum1.title, sum2, sum3, sum4], ['https://gana.or.kr/bbs/view.php?id=101', true, '공지사항 - 가나장학재단', null, null, null]);
+  /* ⑪ 파일 내려받기 주소는 글이 아니다(열면 'Download is starting' 으로 날마다 못 엶) · 읽기 표시 + _idx 번호 · 경로만 된 글 꼴은 검색 줄에 이름 점수가 있을 때만 */
+  eq('⑪ 글 주소 꼴 — (−) 내려받기 셋 · (+) read_form&…_idx=18 · (−) 쪽 번호만 · 경로 꼴(/ab-1923-19)은 느슨한 판정에서만 · (−) /news/about/',
+    [LCm.looksLikePost('https://www.inje.go.kr/egf/bp/board/article/download?fileSeq=120999'), LCm.looksLikePost('https://ycsf.or.kr/open/notice/dn.php?idx=342'), LCm.looksLikePost('https://ygef.or.kr/board/download/?type=download&file_idx=3845'),
+      LCm.looksLikePost('https://mjsf.co.kr/01.php?com_board_basic=read_form&com_board_idx=18'), LCm.looksLikePost('https://x.or.kr/list.php?board_no=12&page=2'),
+      LCm.looksLikePost('http://www.kwangnam.co.kr/ab-1923-19'), LCm.looksLikePostLoose('http://www.kwangnam.co.kr/ab-1923-19'), LCm.looksLikePostLoose('https://x.or.kr/news/about/'),
+      LCm.looksLikePost('https://gana.or.kr/bbs/view.php?id=101'), LCm.looksLikePost('https://www.gangbuk.go.kr/www/selectBbsNttView.do?bbsNo=1&nttNo=364001')],
+    [false, false, false, true, false, false, true, false, true, true]);
+  const looseRow = (title) => (KH.searchRows ? KH.searchRows({ items: [{ title, link: 'https://gana.or.kr/ab-1923-19' }] }, t1.allowed, t1).length : -1);
+  eq('  경로 꼴 검색 줄 — 그 재단·사업 이름으로 3점 이상이면 남기고 · (−) 「회사소개」 같은 제목이면 버린다 · (−) 대상을 안 넘기면(게시판 줄) 쓰지 않는다',
+    [looseRow('2026년 가나장학재단 성적우수장학생 선발 공고'), looseRow('회사소개'), KH.searchRows ? KH.searchRows({ items: [{ title: '2026년 가나장학재단 성적우수장학생 선발 공고', link: 'https://gana.or.kr/ab-1923-19' }] }, t1.allowed).length : -1], [1, 0, 0]);
+  /* ⑫ 둘째 물을 말 = KOSAF 공고문 파일 이름(꼬리 뗀 것) · 첫 말로 못 고를 때만 · 둘째 말도 상한에 센다 */
+  eq('⑫ 물을 말 둘 — 파일 이름에서 확장자·「(15)」·「ver-1.5」·끝 날짜 도장·「공고문」을 뗀다 · 파일이 없으면 하나',
+    KH.searchQueries ? [KH.searchQueries({ org: '배재장학재단', program: '장학생', attachTitles: ['배재장학재단 선발 요강 (15)'] }), KH.searchQueries({ org: '재일한국장학회', program: '장학금', attachTitles: ['2026 재일한국장학회 장학생 모집 공고문 ver-1.5'] }), KH.searchQueries({ org: '가나장학재단', program: '장학생', attachTitles: [] })] : [],
+    [['배재장학재단 장학생 공고', '배재장학재단 선발 요강'], ['재일한국장학회 장학금 공고', '2026 재일한국장학회 장학생 모집'], ['가나장학재단 장학생 공고']]);
+  eq('  로봇이 둘째 말을 실제로 묻고 상한(SEARCH_MAX)을 말마다 잰다 · 이번 회차에 거절된 주소는 다시 적지 않는다',
+    [/for \(const q of searchQueries\(t\)\) \{\n\s+if \(sstat\.asked >= SEARCH_MAX\)/.test(khSrcQ), /rejected\.has\(`\$\{t\.key\}\|\$\{urlKey\(line\.url\)\}`\)/.test(khSrcQ)], [true, true]);
+  /* ⑬ 확인 로봇이 이번 회차에 거절한 url 줄은 '글 후보 있음'으로 치지 않는다(그 줄 때문에 검색에서 사흘 넘게 빠지던 것 · ikef wr_id=102) */
+  const rjIdx = { find: ({ key }) => ({ B1: { deadline: '2026-11-30' }, C1: { deadline: '2026-11-30' } })[key] || null };
+  const rj = KH.rejectedCandKeys ? KH.rejectedCandKeys({
+    a: { ds: 'kosaf', key: 'B1', url: 'https://b.kr/v?id=1', status: 'rejected', why: '다른 글이 열림', round: '2026-11-30' },
+    b: { ds: 'kosaf', key: 'C1', url: 'https://c.kr/v?id=1', status: 'pending', why: '못 엶', round: '2026-11-30' },
+    c: { ds: 'kosaf', key: 'C1', url: 'https://c.kr/v?id=2', status: 'rejected', why: '마감이 다름(글 2026-10-01 · 이번 회차 2026-11-30)', round: '2026-11-30' },
+    d: { ds: 'kosaf', key: 'C1', url: 'https://c.kr/v?id=3', status: 'rejected', why: '다른 글이 열림', round: '2025-11-30' } }, rjIdx) : new Set();
+  const rjPrev = [{ target: { key: 'B1' }, url: 'https://b.kr/v?id=1' }, { target: { key: 'kosaf-C1' }, url: 'https://c.kr/v?id=1' }];
+  eq('⑬ 이번 회차 거절(「마감이 다름」 말고)만 센다 · 그 줄이 있던 공고는 다시 검색 대상 · 다시 볼(pending) 줄은 그대로 후보 있음',
+    [[...rj], qKeys([{ host: 'b.kr', targets: [qb] }, { host: 'c.kr', targets: [qc] }], new Set(), [], rjPrev, {}, rj), qKeys([{ host: 'b.kr', targets: [qb] }, { host: 'c.kr', targets: [qc] }], new Set(), [], rjPrev, {})],
+    [['B1|' + urlKey('https://b.kr/v?id=1')], ['B1'], []]);
+  /* ⑭ 한국장학재단 자체 사업 — KOSAF 가 적은 사업 안내 쪽(kosaf.go.kr 글 꼴)을 바로 후보로(검색 안 함) · 첫 화면·남의 재단은 아니다 */
+  const own = LCm.buildIndex({ kosaf: [K('9101', '(재)한국장학재단', '국가근로장학금', '2027-02-28', 'https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08'), K('9102', '(재)한국장학재단', '재능봉사 캠프', '2026-12-31', 'https://www.kosaf.go.kr/'), K('9103', '(재)가나장학재단', '장학생', '2026-12-31', 'https://www.kosaf.go.kr/ko/scholar.do?pg=x1')], externalSources: [], boards: [], registered: [], notices: [], news: [], external: [], activities: [], pool: [], kosafTexts: {} });
+  const ownL = KH.kosafOwnLine ? ['9101', '9102', '9103'].map((k) => KH.kosafOwnLine(own.find({ ds: 'kosaf', key: k }), { today: '2026-11-20' })) : [];
+  eq('⑭ 자체 사업 사업 안내 쪽 → source data 후보 하나(확인 로봇이 읽는 꼴) · (−) 첫 화면 주소 · (−) 한국장학재단이 아닌 org',
+    [ownL[0] && [ownL[0].source, ownL[0].url, LCm.loadCandidates({ v: 1, items: [ownL[0]] }, { today: '2026-11-20' }).ok.length], ownL[1], ownL[2]],
+    [['data', 'https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08', 1], null, null]);
+  /* ⑮ (리뷰 2026-11-20) runHunt 배선 — 순수 함수만 재면 본편이 사람 원문·자체 사업 줄·거절 장부·대상 넘기기를 안 써도 초록이다.
+     임시 저장소 + 가짜 검색(fetch 를 잠시 바꾼다 · 인터넷 없음 · dry 라 아무 파일도 안 쓴다)으로 한 바퀴 돌려 본다 */
+  {
+    const hr = fs.mkdtempSync(path.join(os.tmpdir(), 'kosaf-hunt-e2e-'));
+    const W = (rel, o) => { fs.mkdirSync(path.dirname(path.join(hr, rel)), { recursive: true }); fs.writeFileSync(path.join(hr, rel), JSON.stringify(o)); };
+    const GA = 'https://gana.or.kr/bbs/view.php?id=301';
+    W('data/kosaf-open.json', { items: [
+      K('9201', '(재)가나장학재단', '희망나래장학생', '2026-12-10', 'https://gana.or.kr/'),
+      K('9202', '(재)나다장학재단', '장학생', '2026-12-10', 'https://nada.or.kr/'),
+      K('9203', '(재)한국장학재단', '국가근로장학금', '2027-02-28', 'https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08'),
+      K('9204', '(재)라마장학재단', '성적우수장학생', '2026-12-10', 'https://rama.or.kr/'),
+      K('9205', '(재)바사장학재단', '특별장학생', '2026-12-10', 'https://basa.or.kr/'),
+    ] });
+    W('collector/kosaf-hunt.json', { v: 1, items: [{ target: { ds: 'kosaf', key: '9202' }, url: 'https://nada.or.kr/bbs/view.php?id=9', title: '2026년 나다장학재단 장학생 선발 공고', source: 'search', by: '로봇', addedAt: '2026-11-18' }] });   // 사람 원문이 생긴 공고의 옛 줄은 지운다(liveKeys)
+    W('data/link-fixes.json', { fix: { 'id:kosaf-9202': { url: 'https://nada.or.kr/bbs/view.php?id=5', round: '2026-12-10', by: '관리자', at: '2026-11-01' } } });
+    const stateWith = { a: { ds: 'kosaf', key: '9201', url: GA, status: 'rejected', why: '다른 글이 열림', round: '2026-12-10' } };
+    const asked = [];
+    const hits = { 가나: [{ title: '2026년 가나장학재단 희망나래장학생 선발 공고', link: GA }], 라마: [{ title: '2026년 라마장학재단 성적우수장학생 선발 공고', link: 'https://rama.or.kr/ab-1923-19' }],
+      /* 경로 꼴 줄(2점 — 이름 점수 3 미만)은 버려야 보통 글(3점)이 홀로 남아 골라진다 · 남기면 점수 차가 1이라 아무것도 못 고른다 */
+      바사: [{ title: '2026 바사장학재단 장학 소식', link: 'https://basa.or.kr/bbs/view.php?id=7' }, { title: '바사장학재단 2026 소식', link: 'https://basa.or.kr/ab-12-3' }],
+      나다: [{ title: '2026년 나다장학재단 장학생 선발 공고', link: 'https://nada.or.kr/bbs/view.php?id=9' }] };
+    const realFetch = globalThis.fetch; const envKeep = { id: process.env.NAVER_CLIENT_ID, s: process.env.NAVER_CLIENT_SECRET };
+    globalThis.fetch = async (u) => {
+      const s = String(u);
+      if (!/naverapihub/.test(s)) return new Response('', { status: 404 });
+      const q = new URL(s).searchParams.get('query') || ''; asked.push(q);
+      const k = Object.keys(hits).find((x) => q.includes(x));
+      return new Response(JSON.stringify({ items: k ? hits[k] : [] }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+    process.env.NAVER_CLIENT_ID = 'gate-id'; process.env.NAVER_CLIENT_SECRET = 'gate-secret';
+    const run = async () => { asked.length = 0; const r = !KH.runHunt ? { items: [] } : await KH.runHunt({ root: hr, today: '2026-11-20', dry: true, useBrowser: false, all: true, log: () => {} }); return { r, asked: [...asked] }; };
+    let A = null; let B = null;
+    try {
+      A = await run();
+      W('collector/link-candidates-state.json', stateWith);
+      B = await run();
+    } finally {
+      globalThis.fetch = realFetch;
+      if (envKeep.id === undefined) delete process.env.NAVER_CLIENT_ID; else process.env.NAVER_CLIENT_ID = envKeep.id;
+      if (envKeep.s === undefined) delete process.env.NAVER_CLIENT_SECRET; else process.env.NAVER_CLIENT_SECRET = envKeep.s;
+      fs.rmSync(hr, { recursive: true, force: true });
+    }
+    const line = (x, key) => (x.r.items || []).find((l) => String(l.target.key).replace(/^kosaf-/, '') === key);
+    eq('⑮ runHunt 한 바퀴(가짜 검색) — 사람 원문이 있는 공고는 안 묻는다 · 자체 사업은 data 줄 · 경로 꼴 글도 이름 점수로 줄 · 거절된 주소는 다음 바퀴에 안 적는다',
+      [A.asked.some((q) => q.includes('나다')), !!line(A, '9202'), line(A, '9203') && line(A, '9203').source, A.asked.some((q) => q.includes('국가근로')),
+        line(A, '9204') && line(A, '9204').url, line(A, '9201') && line(A, '9201').url, line(A, '9205') && line(A, '9205').url, A.asked.some((q) => q.includes('바사')), !!line(B, '9201'), B.asked.some((q) => q.includes('가나'))],
+      [false, false, 'data', false, 'https://rama.or.kr/ab-1923-19', GA, 'https://basa.or.kr/bbs/view.php?id=7', true, false, true]);
+  }
   const khSrc = readText(new URL('../collector/kosaf-hunt.mjs', import.meta.url));
   eq('  열쇠는 환경 변수로만 받는다(코드에 값 없음) · 주소는 NAVER API HUB(옛 개발자센터는 신규 신청이 닫혔다) · 워크플로가 Secrets 를 넘긴다 · 상한이 있다',
     [/X-NCP-APIGW-API-KEY-ID': keys\.id/.test(khSrc) && /naverapihub\.apigw\.ntruss\.com\/search\/v1\/webkr/.test(khSrc), /NAVER_CLIENT_ID: \$\{\{ secrets\.NAVER_CLIENT_ID \}\}/.test(wf), /NAVER_CLIENT_SECRET: \$\{\{ secrets\.NAVER_CLIENT_SECRET \}\}/.test(wf), /sstat\.asked >= SEARCH_MAX/.test(khSrc)], [true, true, true, true]);

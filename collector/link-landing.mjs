@@ -73,17 +73,51 @@ export function headMatches(title, head) {
 /* 화면의 「제목」 이름표 바로 뒤가 그 공고 제목인가 — 상세 화면이 제목을 머리글이 아니라 표 칸(`<th>제목</th><td>…</td>`)에 두는 게시판
    (서울과기대 commonview — 확인 로봇 첫 실행에서 아래에 다른 글 제목이 보여 '목록'으로 오판). 목록 화면의 「제목」은 머리 칸이라
    뒤에 「작성자·날짜」가 온다 — 그래서 이름표 뒤 첫머리가 그 제목일 때만 센다. */
-const TITLE_LABEL = /(?:^|\s)(?:(?:글\s?)?제\s?목|정책\s?명|사업\s?명|공고\s?명)\s*[:：]?\s*/g;   // 청년 포털은 「정책명」(충남 — 정찰 2차)
-export function labeledTitle(text, title) {
+const TITLE_LABEL = /(?:^|\s)(?:(?:글\s?)?제\s{0,2}목|정책\s?명|사업\s?명|공고\s?명)\s*[:：]?\s*/g;   // 청년 포털은 「정책명」(충남 — 정찰 2차) · asp 게시판은 「제  목」(빈칸 둘 · 2026-11-20)
+const CELL_END = /\s(?:작성자|작성일|등록일|게시일|조회수?|부서|담당)\s*[:：]?\s/;
+export function labeledTitle(text, title, { whole = false } = {}) {
   const k = titleFingerprint(title);
   if (k.length < 6) return false;   // 이름표 바로 뒤라는 자리가 증거라 짧은 정책 이름(`창업어가 멘토링` 7자)도 센다
   const src = String(text || '');
   const head = k.slice(0, Math.min(k.length, 24));
   for (const m of src.matchAll(TITLE_LABEL)) {
-    const after = titleFingerprint(src.slice(m.index + m[0].length, m.index + m[0].length + 200));
-    if (after.startsWith(head)) return true;
+    const rest = src.slice(m.index + m[0].length, m.index + m[0].length + 200);
+    /* whole(2026-11-20 · 후보 확인 로봇용) — 이름표 뒤 **칸 하나**(줄 끝·탭·작성일 같은 다음 이름표까지)가 그 제목과 통째로 같을 때만(앞 24자만 같은 이웃 글을 거른다) */
+    if (whole) { if (titleFingerprint(rest.split(/[\n\t]/)[0].split(CELL_END)[0]) === k) return true; continue; }
+    if (titleFingerprint(rest).startsWith(head)) return true;
   }
   return false;
+}
+/* (2026-11-20) 제목 줄 — 화면의 한 줄(또는 탭 칸)이 그 제목 **통째**이고, 바로 아래 두 줄 안에 글 표지(날짜·작성자·조회 등)가 오는가.
+   h 태그도 「제목」 이름표도 없이 제목을 줄로만 그리는 게시판(그누보드·asp 게시판). 목록도 '제목 줄 + 날짜 줄'이라 그런 묶음이
+   화면에 셋 이상이면(목록) 세지 않는다. */
+const META_LINE = /^(?:작성자|작성일|등록일|게시일|조회수?|페이지\s?정보|담당\s?부서|부서|글쓴이)(?:\s|[:：]|$)|^(?![^\n]*(?:기간|까지|[~〜]))[^\n]{0,40}(?<!\d)20\d{2}[-.]\d{2}[-.]\d{2}(?!\d)[^\n]{0,40}$/;
+export function lineTitle(text, title) {
+  const k = titleFingerprint(title);
+  if (k.length < 10) return '';
+  const lines = String(text || '').split('\n').map((l) => l.trim());
+  const next = (i) => { const out = []; for (let j = i + 1; j < lines.length && out.length < 2; j += 1) if (lines[j]) out.push(lines[j]); return out; };
+  let blocks = 0; let hit = '';
+  lines.forEach((l, i) => {
+    if (titleFingerprint(l).length < 10 || META_LINE.test(l)) return;
+    if (!next(i).some((x) => META_LINE.test(x))) return;
+    blocks += 1;
+    if (!hit && (titleFingerprint(l) === k || l.split('\t').some((c) => titleFingerprint(c) === k))) hit = l;
+  });
+  return hit && blocks <= 2 ? hit : '';
+}
+/* (2026-11-20) 첨부 파일 이름이 화면에 있는가 — 층2 공고문 파일(KOSAF 가 받아 둔 이름)이 그 글의 첨부 목록에 보이면 그 파일을 단 글이다.
+   목록 화면은 대개 파일 이름을 안 보인다. 확장자·끝 꼬리(_홈페이지 등 6자 안)만 다를 때까지 같다고 본다 */
+export function fileShown(text, names) {
+  const keys = (names || []).map((n) => titleFingerprint(String(n || '').replace(/\.[a-z0-9]{2,5}$/i, ''))).filter((x) => x.length >= 10);
+  if (!keys.length) return '';
+  for (const l of String(text || '').split('\n')) {
+    for (const m of l.matchAll(/([^\t\n]{6,160}?)\.(?:hwpx?|pdf|docx?|zip|xlsx?|jpe?g|png)\b/gi)) {
+      const f = titleFingerprint(m[1].replace(/^\s*첨부(?:파일)?(?:\s*#?\d{1,2}\s*[.:)\]])?\s*/, ''));   // 「첨부파일 #1.」 꼬리표만 — 「첨부파일 2026년 …」의 해는 제목이다
+      if (keys.some((x) => f === x || (f.endsWith(x) && f.length - x.length <= 12) || (f.startsWith(x) && f.length - x.length <= 6))) return m[0].trim();
+    }
+  }
+  return '';
 }
 /* 제목의 대부분이 본문에 이어서 보이는가 — 게시판 줄 앞머리 분류(국민대 「등록금외지원」)처럼 화면 제목에는 없는 글자가 기대 제목에
    붙어 있을 때. 60% 이상 · 12자 이상이 끊김 없이 같아야 한다(다른 공고의 비슷한 이름이 걸리지 않게). */
@@ -245,4 +279,4 @@ export function publishBad(state, liveUrls) {
   return Object.fromEntries(Object.entries(bad).sort(([a], [b]) => (a < b ? -1 : 1)));
 }
 
-export default { VERDICTS, BAD, stripRowTail, expectTitles, headMatches, titleEvidence, listRedirect, judgeLanding, hostGuard, nextState, publishBad };
+export default { VERDICTS, BAD, stripRowTail, expectTitles, headMatches, labeledTitle, lineTitle, fileShown, titleEvidence, listRedirect, judgeLanding, hostGuard, nextState, publishBad };
