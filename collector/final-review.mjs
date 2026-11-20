@@ -7,7 +7,9 @@
      기계(돈 0) — ① 원본과 같은가: 앱이 보이는 신청서 PDF 사본(data/forms-pdf)의 글자 ↔ 받아 둔 원본 첨부의 글자
                   ② 내용이 있는가: 문서에서 뽑힌 한글 분량
      모델(한 번) — ③ 이 공고의 문서인가 ④ 신청 양식인가 ⑤ 문서 내용 가운데 카드에 없는 것 — ⑤ 의 줄은 근거(quote)가 원문에 있어야 남는다(card-read inSource)
-   결과는 고치지 않고 보고한다 → collector/final-review.json(관리자 「할 일」 · 앱은 받지 않는다). 빠진 줄은 관리자가 「살리기」로 카드에 싣는다(cardLine).
+   🔴 카드에 빠진 내용(⑤)은 **자동으로 카드에 넣는다**(2026-11-21 개발자 결정 *"빠진 내용은 자동으로 넣고"*) — 근거가 원문에 있고 사실 검사(factsMatch)를 통과한 줄만,
+      유료 결과 칸(배열)에만 덧붙인다(data/card-read.json · 이미 있는 줄은 안 넣는다 · 무료 값 칸(null)에 한 줄만 넣으면 학생이 보던 줄 전체가 그 한 줄로 줄어 관리자에게 넘긴다).
+   문서 문제(①~④)는 고치지 않고 보고만 한다 → collector/final-review.json(관리자 「할 일」) — 로봇이 잘못 판단해 진짜 신청서를 내리면 학생이 양식을 잃는다.
 
    🔴 돈이 나가는 로봇 — 스위치 둘(final-review-config.json enabled + FINAL_REVIEW_ENABLE=1) · 실행당 상한 · 같은 문서·카드는 다시 안 본다(해시 장부).
    실행: node collector/final-review.mjs [--write]   · FINAL_REVIEW_FAKE=<파일 {id: 응답}> 로 돈 없이(관문)
@@ -111,6 +113,24 @@ export function problemsOf(docs, out, source) {
   }
   return pr;
 }
+/* 카드에 빠진 내용 자동으로 넣기 (2026-11-21 개발자 결정) — problemsOf 가 이미 근거·사실 검사를 거친 missing 줄만 받는다.
+   유료 결과 칸이 배열일 때만 덧붙이고(같은 말·이미 든 줄은 건너뛴다) · 칸이 무료 값(null·없음)이면 사람 몫으로 남긴다. 들어온 entry 는 고치지 않고 새 객체를 낸다 */
+export function fillMissing(entry, problems) {
+  const next = entry && typeof entry === 'object' ? { ...entry } : null;
+  const added = [], left = [];
+  for (const p of problems || []) {
+    if (p.kind !== 'missing') { left.push(p); continue; }
+    if (!next || !Array.isArray(next[p.field])) {
+      left.push({ ...p, reason: `${p.reason} 이 칸은 학생 화면에 무료 값(원문 줄 전체)이 보이고 있어 자동으로 넣지 않았습니다.`, check: `원문에서 확인하고 필요하면 공고 고치기에서 ${p.label} 칸을 고쳐 주세요.` });
+      continue;
+    }
+    const n = norm(p.text);
+    if (next[p.field].some((l) => norm(l).includes(n))) continue;   // 이미 든 줄(같은 말 · 그 줄을 품은 기존 줄) — 🔴 반대(새 줄이 짧은 기존 줄을 품음)는 건너뛰지 않는다: 「재학생」만 있는 칸에 「본교 재학생 중 평점 3.0 이상인 학생」은 빠진 요건이다
+    next[p.field] = [...next[p.field], p.text];
+    added.push({ field: p.field, label: p.label, text: p.text, quote: p.quote });
+  }
+  return { entry: next, added, left };
+}
 /* 볼 공고 — 유료 확인 1 을 통과해 학생 화면에 떠 있는 숨김 등록분(그 전 등록분은 보지 않는다 · 개발자 결정 「나」). 다시 볼지는 해시로(본편) */
 export const reviewable = (items, cardRead, today) => items.filter((it) => (it.paidGate || it.paidRead) && cardRead[it.id] && !closedNow(it, cardRead[it.id], today));
 export const needsReview = (led, hash, giveUpAfter = 3) => !led || led.hash !== hash || !(led.done || (led.tries || 0) >= giveUpAfter);
@@ -153,7 +173,9 @@ if (process.argv[1] && ranDirectly()) {
   const live = new Map(reg.items.map((it) => [it.id, it]));
   for (const id of Object.keys(result.items)) { const it = live.get(id); if (!it || closedNow(it, crItems[id], TODAY)) { delete result.items[id]; delete ledger[id]; } }
   const writeAtomic = (rel, obj) => { const p = P(rel), tmp = `${p}.tmp`; fs.writeFileSync(tmp, `${JSON.stringify(obj, null, 1)}\n`); fs.renameSync(tmp, p); };
-  const save = () => { result.updatedAt = TODAY; writeAtomic('final-review.json', result); writeAtomic('final-review-ledger.json', ledger); };
+  let crDirty = false;   // 빠진 내용을 카드에 넣었으면 유료 결과 파일도 저장한다(카드 읽기 로봇과 같은 꼴 · JSON.stringify(x, null, 1))
+  const save = () => { result.updatedAt = TODAY; if (crDirty) writeAtomic('../data/card-read.json', cr); writeAtomic('final-review.json', result); writeAtomic('final-review-ledger.json', ledger); };
+  const mergedOf = (id) => (((ME.mergeCardFixes({ items: { [id]: cr.items[id] } }, fixes) || {}).items) || {})[id];
 
   /* 문서·카드가 바뀌었으면 다시 본다(해시) */
   const targets = [];
@@ -182,11 +204,17 @@ if (process.argv[1] && ranDirectly()) {
       try {
         const r = fake ? { out: fake[t.it.id], usd: 0 } : await ask(client, t.it, t.source, t.docs, crItems[t.it.id], cfg.effort);
         usd += r.usd; led.usd = Math.round(((led.usd || 0) + r.usd) * 10000) / 10000;
-        const problems = problemsOf(t.docs, r.out, t.source);
-        result.items[t.it.id] = { name: led.name, hash: t.hash, at: TODAY, problems };
+        const f = fillMissing(cr.items[t.it.id], problemsOf(t.docs, r.out, t.source));
+        let hash = t.hash;
+        if (f.added.length) {
+          cr.items[t.it.id] = f.entry; crItems[t.it.id] = mergedOf(t.it.id); crDirty = true;
+          hash = reviewHash(t.source, t.docs, crItems[t.it.id]);   // 🔴 넣은 뒤의 카드로 해시를 잡는다 — 안 그러면 제가 넣은 줄 때문에 다음 실행이 같은 공고를 돈 내고 또 본다
+          led.hash = hash;
+        }
+        result.items[t.it.id] = { name: led.name, hash, at: TODAY, problems: f.left, ...(f.added.length ? { added: f.added } : {}) };
         led.done = true; led.at = TODAY; led.raw = r.out; delete led.error;
         done += 1; streak = 0;
-        log(`  ✓ ${t.it.id} · ${String(t.it.name).slice(0, 30)} · 문서 ${t.docs.length}개 · 사람이 볼 것 ${problems.length}건`);
+        log(`  ✓ ${t.it.id} · ${String(t.it.name).slice(0, 30)} · 문서 ${t.docs.length}개 · 카드에 넣은 줄 ${f.added.length} · 사람이 볼 것 ${f.left.length}건`);
       } catch (e) {
         failed += 1; streak += 1; led.tries = (led.tries || 0) + 1; led.error = String((e && e.message) || e).slice(0, 200);
         log(`  ✕ ${t.it.id} · ${led.error}`);

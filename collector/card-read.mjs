@@ -432,6 +432,7 @@ export function gateStats({ items = [], data = {}, ledger = {}, frLedger = {}, f
     linePass: kept + dropped ? kept / (kept + dropped) : null, droppedLines: dropped,
     frRead: fr.length, frUsdPerNotice: fr.length ? sum(fr) / fr.length : null,
     frProblems: Object.values((frResult && frResult.items) || {}).reduce((a, r) => a + ((r && r.problems) || []).length, 0),
+    frAdded: Object.values((frResult && frResult.items) || {}).reduce((a, r) => a + ((r && r.added) || []).length, 0),
   };
 }
 export function gateStatsText(st, today) {
@@ -440,7 +441,7 @@ export function gateStatsText(st, today) {
     `- 숨김 등록 공고 ${st.gated}건(마감 전 ${st.open}건): 학생 화면에 오름 ${st.passed} · 사람에게 넘김 ${st.toPerson} · 기다리는 중 ${st.waiting}(그중 사흘 넘어 무료 값으로 오른 것 ${st.stalled})`,
     `- 관리자가 직접 등록한 공고(숨기지 않고 읽기만) ${st.manual}건`,
     `- 유료 확인 1(읽기→고치기→사실 검사): 읽은 공고 ${st.read}건 · 건당 평균 ${usd(st.usdPerNotice)} · 줄 통과율 ${pct(st.linePass)}(기계 검사가 뺀 줄 ${st.droppedLines}줄)`,
-    `- 최종 검토: 본 공고 ${st.frRead}건 · 건당 평균 ${usd(st.frUsdPerNotice)} · 사람이 볼 것 ${st.frProblems}건`].join('\n');
+    `- 최종 검토: 본 공고 ${st.frRead}건 · 건당 평균 ${usd(st.frUsdPerNotice)} · 카드에 자동으로 넣은 줄 ${st.frAdded || 0}줄 · 사람이 볼 것 ${st.frProblems}건`].join('\n');
 }
 /* 관리자 「할 일」에 보일 말 (2026-11-20 개발자 지시 — *"이러이러한 부분이 기계검사에서 잡혔으니 뭐랑 뭐를 확인바란다는게 명확하게"*).
    🔴 로봇 말(held·verify·대조·「원문에 없는 글자」)을 쓰지 않는다 — 어느 칸 · 왜 잡혔는지 · 무엇을 확인하면 되는지를 한 문장씩 */

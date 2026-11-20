@@ -32,7 +32,8 @@ on:
       '교내 소식 수집 로봇',                  # data/news/ — 홈 「우리 학교 소식」 (2026-09-30 신설 · 학교별 파일)
       '공공 API 로봇',                        # data/activities.json — K-Startup·1365·온통청년 (2026-10-01 신설)
       '원문 링크 확인 로봇',                  # data/link-check.json — 확정된 문제 링크(앱이 링크 이름을 정직하게 바꾼다 · 2026-10-03 신설)
-      '유료 카드 읽기']                       # data/card-read.json — 유료로 읽은 카드 칸 (2026-11-15 신설 · 빠지면 최대 12시간 앱에 안 나간다)
+      '유료 카드 읽기',                       # data/card-read.json — 유료로 읽은 카드 칸 (2026-11-15 신설 · 빠지면 최대 12시간 앱에 안 나간다)
+      '유료 최종 검토']                       # data/card-read.json — 카드에 빠진 내용을 자동으로 넣는다 (2026-11-21)
     types: [completed]
   push:
     branches: ['claude/nice-heisenberg-WESq5']

@@ -48,7 +48,7 @@
 
 ## 🔴 유료 관문 (2026-11-20 지시 · 설계 `docs/designs/paid-gate-pipeline.md` · 앞선 설계 `docs/designs/paid-card-reading.md`)
 
-- 흐름: 수집 → 숨김 등록(`auto-register.mjs` 가 `paidGate` 를 단다) → 원문 받기(`rescue-bodies.mjs` 「원문 받기 로봇」) → 💰 유료 확인 1 → 학생 화면 → 신청서 PDF → 💰 최종 검토(`collector/final-review.mjs` · 보고만 · 11-21 개발자 지시로 켬).
+- 흐름: 수집 → 숨김 등록(`auto-register.mjs` 가 `paidGate` 를 단다) → 원문 받기(`rescue-bodies.mjs` 「원문 받기 로봇」) → 💰 유료 확인 1 → 학생 화면 → 신청서 PDF → 💰 최종 검토(`collector/final-review.mjs` · 11-21 켬 · 카드에 빠진 내용은 사실 검사 뒤 자동으로 넣고 문서 문제는 관리자에게).
 - 유료 확인 1 = `collector/card-read.mjs`: 첫째 모델이 줄마다 다듬은 문장+원문 근거(`text`·`quote`) → 둘째 모델이 고친 완성본 → 기계 검사(`verify`·`factsMatch` — 근거가 원문에 있고 숫자·부정·기관 이름이 근거와 같아야). 🔴 지어냄을 막는 것은 지시문이 아니라 기계 검사다 · `registered.json` 은 안 고친다.
 - 🔴 잡힌 줄은 **빼고** 통과한 유료 줄로 싣는다(무료 값으로 바꿔 끼우지 않는다 · 칸이 전부 빠질 때만 무료 값 · 옛 두 읽기에서 갈린 줄은 11-18 규칙 그대로) · 잡힌 줄은 관리자 「할 일」(`collector/card-read-review.json` · `explainLine` 사람 말) → 살리기·고쳐서 싣기·버리기(`tools/admin-apply.mjs` `cardLine` → `data/card-read-fixes.json`).
 - 보이는가 = `match-engine.js` `publishedList`·`paidGateOpen` 한 곳(앱·서비스워커·`what-shows`·인스타·검색 요약·접수 서버 · 푸시 서버는 사본) — 결과 파일을 못 받으면 숨김분은 안 보이고, 사흘 넘게 통과가 없으면 무료 값 + 경보(`card-read.yml`). 그 전 등록분은 숨기지도 다시 읽지도 않는다. 관문 「유료 관문」·「유료 최종 검토」·「유료 카드 읽기」 · `verify-card-read.js`.

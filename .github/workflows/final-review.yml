@@ -4,8 +4,8 @@
 #    켜는 것은 개발자가 채팅에서 지시할 때만 — CLAUDE.md 🔴 8). 한 실행의 상한은 같은 파일의 maxPerRun · maxUsdPerRun.
 #    같은 문서·카드는 다시 보지 않는다(해시) — 평소에는 새로 유료 확인을 통과한 공고만 본다.
 #
-# 하는 일: 앱이 보이는 문서가 원본과 같은가 · 이 공고의 문서인가 · 신청 양식인가 · 내용이 있는가 · 그 내용이 카드에 다 들어갔나 →
-#   collector/final-review.json(관리자 「할 일」 · 앱은 받지 않는다). 아무것도 고치지 않는다(보고만).
+# 하는 일: 앱이 보이는 문서가 원본과 같은가 · 이 공고의 문서인가 · 신청 양식인가 · 내용이 있는가 · 그 내용이 카드에 다 들어갔나.
+#   카드에 빠진 내용은 사실 검사를 통과하면 data/card-read.json 에 자동으로 넣는다(2026-11-21 개발자 결정) · 문서 문제는 보고만 → collector/final-review.json(관리자 「할 일」).
 
 name: 유료 최종 검토
 
@@ -68,6 +68,11 @@ jobs:
 
       # 저장 앞 관문 — 결과 파일의 꼴(앱이 받는 파일) · 규칙 관문 · 데이터 감사. 하나라도 빨가면 저장하지 않고 멈춘다.
       # 그때 돈을 쓴 결과를 잃지 않게 장부(응답 원본이 들어 있다)를 아티팩트로 남긴다 — 되살린 뒤 `--recheck --write` 로 돈 없이 다시 만든다
+      # 빠진 내용을 카드에 넣으면 앱이 받는 유료 결과 파일을 고친다(2026-11-21) — 저장 앞에 그 파일의 꼴을 잰다(카드 읽기 로봇과 같은 검사)
+      - name: 결과 파일 꼴 검사
+        timeout-minutes: 2
+        run: node collector/card-read.mjs --check
+
       - name: 규칙 관문
         timeout-minutes: 12
         run: node verify/test-collector.mjs > /tmp/gate.txt 2>&1 || { tail -40 /tmp/gate.txt; exit 1; }
@@ -80,6 +85,7 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -f data/card-read.json ] && git add data/card-read.json   # 카드에 자동으로 넣은 빠진 내용(2026-11-21)
           [ -f collector/final-review.json ] && git add collector/final-review.json
           [ -f collector/final-review-ledger.json ] && git add collector/final-review-ledger.json
           if ! git diff --cached --quiet; then
@@ -111,6 +117,7 @@ jobs:
           path: |
             collector/final-review-ledger.json
             collector/final-review.json
+            data/card-read.json
           retention-days: 14
 
       - name: 🚨 실패 알림

@@ -17257,6 +17257,15 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     [pr.map((p) => p.kind).sort(), pr.filter((p) => p.kind === 'missing').map((p) => p.text), pr.every((p) => /확인/.test(p.check) && !/held|verify|대조/.test(p.reason + p.check)), /40%/.test(pr.find((p) => p.kind === 'notSame').reason)],
     [['missing', 'noText', 'notForm', 'notSame', 'otherNotice'], ['가족관계증명서 1부'], true, true]);
   eq('  응답 꼴이 깨져도 넘어지지 않는다 — 기계 문제만 남는다', FR.problemsOf(docs, null, SRC).map((p) => p.kind).sort(), ['noText', 'notSame']);
+  /* 카드에 빠진 내용 자동으로 넣기(2026-11-21 개발자 결정 「빠진 내용은 자동으로 넣고」) — 문서 문제는 그대로 사람 몫 */
+  const miss = (field, text) => ({ kind: 'missing', field, label: '제출 서류', text, quote: text, reason: '문서에 있는 내용이 카드에 없습니다.', check: '확인' });
+  const before = { documents: ['신청서 1부'], excludes: null, hash: 'h' };
+  const fm2 = FR.fillMissing(before, [miss('documents', '가족관계증명서 1부'), miss('documents', '신청서 1부'), miss('excludes', '휴학생'), { kind: 'notForm', doc: 'x.hwp', reason: 'r', check: 'c' }]);
+  eq('  빠진 내용은 카드 칸(배열)에 덧붙인다 · 이미 든 줄은 안 넣는다 · 🔴 무료 값(null) 칸은 안 넣고 사람에게(한 줄로 줄지 않게) · 문서 문제는 사람에게 · 들어온 카드는 안 바뀐다',
+    [fm2.entry.documents, fm2.added.map((a) => a.text), fm2.left.map((p) => p.kind).sort(), /자동으로 넣지 않았습니다/.test((fm2.left.find((p) => p.kind === 'missing') || {}).reason), before.documents.length, FR.fillMissing(null, [miss('documents', 'x')]).added.length],
+    [['신청서 1부', '가족관계증명서 1부'], ['가족관계증명서 1부'], ['missing', 'notForm'], true, 1, 0]);
+  const fm3 = FR.fillMissing({ eligibility: ['재학생'] }, [{ ...miss('eligibility', '본교 재학생 중 평점 3.0 이상인 학생'), label: '지원 자격' }]);
+  eq('  🔴 짧은 기존 줄(「재학생」)을 품은 새 요건은 빠진 요건이다 — 넣는다(기존 줄이 새 줄을 품을 때만 건너뛴다)', fm3.entry.eligibility, ['재학생', '본교 재학생 중 평점 3.0 이상인 학생']);
   eq('  다시 볼지 — 처음 · 해시가 바뀜 · 실패 3번 전은 본다 / 같은 해시로 끝냈거나 3번 실패하면 안 본다',
     [FR.needsReview(null, 'h'), FR.needsReview({ hash: 'a', done: true }, 'h'), FR.needsReview({ hash: 'h', tries: 1 }, 'h'), FR.needsReview({ hash: 'h', done: true }, 'h'), FR.needsReview({ hash: 'h', tries: 3 }, 'h')],
     [true, true, true, false, false]);
@@ -17270,24 +17279,25 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     items: [it('s1', { paidGate: plus(-2) }), it('s2', { paidGate: plus(-2) }), it('s3', { paidGate: plus(-5) }), it('s4', { paidGate: plus(-1) }), it('s5', { paidRead: plus(-1) }), it('s6')],
     data: { items: { s1: { eligibility: ['가', '나'], notes: ['다'] }, s5: { eligibility: ['라'] } }, gateHeld: { s2: 'unreadable' } },
     ledger: { s1: { mode: 'fix', done: true, usd: 0.12, dropped: [{}] }, s5: { mode: 'fix', done: true, usd: 0.14, dropped: [] }, s6: { done: true, usd: 0.1 } },
-    frLedger: { s1: { done: true, usd: 0.09 } }, frResult: { items: { s1: { problems: [{}, {}] } } } });
+    frLedger: { s1: { done: true, usd: 0.09 } }, frResult: { items: { s1: { problems: [{}, {}], added: [{}] } } } });
   eq('⑥ 유료 관문 기록(돈 0 · 11-21 「위의 두개도 켜서」) — 숨김 4건: 오름 1 · 사람에게 1 · 기다림 2(사흘 넘은 1) · 직접 등록 1 · 새 방식으로 읽은 2건 건당 0.13 · 줄 통과율 4/5 · 최종 검토 1건 · 볼 것 2 · 옛 방식(mode 없음)은 안 센다 · 실행 요약에 붙인다',
-    [st.gated, st.passed, st.toPerson, st.waiting, st.stalled, st.manual, st.read, Math.round(st.usdPerNotice * 1000), Math.round(st.linePass * 100), st.frRead, st.frProblems,
+    [st.gated, st.passed, st.toPerson, st.waiting, st.stalled, st.manual, st.read, Math.round(st.usdPerNotice * 1000), Math.round(st.linePass * 100), st.frRead, st.frProblems, st.frAdded,
       /건당 평균 \$0\.130/.test(CR.gateStatsText(st, plus(0))), (wfc.match(/card-read\.mjs --stats >> "\$GITHUB_STEP_SUMMARY"/g) || []).length + (wff.match(/card-read\.mjs --stats >> "\$GITHUB_STEP_SUMMARY"/g) || []).length],
-    [4, 1, 1, 2, 1, 1, 2, 130, 80, 1, 2, true, 2]);
+    [4, 1, 1, 2, 1, 1, 2, 130, 80, 1, 2, 1, true, 2]);
   eq('  경보 짝 — 여는 것과 닫는 것이 같은 제목 · 세기는 --gate-alarm',
     [/card-read\.mjs --gate-alarm >> "\$GITHUB_OUTPUT"/.test(wfc), (wfc.match(/--title '🧾 유료 확인이 멈췄어요'/g) || []).length], [true, 2]);
   const robot = readText(new URL('../collector/final-review.mjs', import.meta.url));
-  eq('④ 최종 검토 로봇 — 스위치 둘(설정 파일 enabled 는 참·거짓 하나 — 켜고 끄는 것은 개발자 지시 · 11-21 켬) · registered.json·card-read.json 에 쓰지 않는다 · 건마다 저장 · 연달아 실패하면 멈춘다 · 워크플로가 유료 단계에 스위치를 준다',
+  eq('④ 최종 검토 로봇 — 스위치 둘(설정 파일 enabled 는 참·거짓 하나 — 켜고 끄는 것은 개발자 지시 · 11-21 켬) · registered.json 에 쓰지 않는다(카드 파일은 빠진 내용을 넣을 때만 · 아래 ⑤) · 건마다 저장 · 연달아 실패하면 멈춘다 · 워크플로가 유료 단계에 스위치를 준다',
     [/cfg\.enabled === true && process\.env\.FINAL_REVIEW_ENABLE === '1'/.test(robot), typeof JSON.parse(readText(new URL('../collector/final-review-config.json', import.meta.url))).enabled,
-      /writeFileSync\([^)]*(registered|card-read)/.test(robot) || /writeAtomic\('\.\.\/data/.test(robot), /save\(\);   \/\/ 건마다 저장/.test(robot), /if \(streak >= 3\)/.test(robot),
+      /writeFileSync\([^)]*registered/.test(robot) || /writeAtomic\('\.\.\/data\/(?!card-read\.json)/.test(robot), /save\(\);   \/\/ 건마다 저장/.test(robot), /if \(streak >= 3\)/.test(robot),
       /FINAL_REVIEW_ENABLE: '1'/.test(wff) && /set -o pipefail\n\s+node collector\/final-review\.mjs --write/.test(wff)], [true, 'boolean', false, true, true, true]);
   const sb = fSandbox(new URL('../', import.meta.url), 'hdj-final-review-');
   const NOENV = { FINAL_REVIEW_ENABLE: '', FINAL_REVIEW_FAKE: '', ANTHROPIC_API_KEY: '' };
   try {
     const items = [it('r-1', { paidGate: plus(-2), sourceUrl: 'https://example.ac.kr/r?no=1', type: '교외', amountValue: 0, attachments: [], eligibility: {} }), it('r-2', { sourceUrl: 'https://example.ac.kr/r?no=2' })];
     sb.write('data/registered.json', { items });
-    sb.write('data/card-read.json', { items: { 'r-1': { eligibility: ['다문화가정의 자녀인 학부 재학생'], documents: ['신청서 1부'] }, 'r-2': { eligibility: ['x'] } } });
+    const card = (over) => ({ title: '', host: '', eligibility: [], excludes: [], priority: [], amount: [], apply: [], documents: [], notes: [], head: 0, deadline: null, multi: false, hash: 'h', ...over });   // 진짜 카드 꼴(checkData)
+    sb.write('data/card-read.json', { items: { 'r-1': card({ eligibility: ['다문화가정의 자녀인 학부 재학생'], documents: ['신청서 1부'] }), 'r-2': card({ eligibility: ['x'] }) } });
     sb.write('collector/extracted/notices-text.json', [{ title: items[0].name, school: '시험대학교', url: items[0].sourceUrl, text: `${SRC}\n${'장학생 선발 안내 본문입니다 '.repeat(10)}` }]);
     const off = sb.run('collector/final-review.mjs', ['--write'], NOENV, 30000);
     eq('⑤ 진짜 로봇을 임시 폴더에서 — 스위치가 꺼져 있으면 부르지 않는다 · 숨김 등록분만 대상(그 전 등록분 r-2 는 안 본다)', [off.status, /부르지 않았습니다/.test(off.out), /대상 1건/.test(off.out)], [0, true, true]);
@@ -17295,8 +17305,10 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     const run = sb.run('collector/final-review.mjs', ['--write'], { ...NOENV, FINAL_REVIEW_FAKE: sb.abs('fake.json') }, 30000);
     const res = sb.json('collector/final-review.json') || {};
     const again = sb.run('collector/final-review.mjs', ['--write'], { ...NOENV, FINAL_REVIEW_FAKE: sb.abs('fake.json') }, 30000);
-    eq('  가짜 응답으로 — 빠진 내용이 관리자 파일에 · 같은 문서·카드는 다시 안 본다 · 학생 앱 파일(data/)은 그대로',
-      [run.status, ((res.items || {})['r-1'] || { problems: [] }).problems.map((p) => p.text), /대상 0건/.test(again.out), sb.read('data/card-read.json').includes('가족관계증명서')], [0, ['가족관계증명서 1부'], true, false]);
+    const cr2 = sb.json('data/card-read.json') || { items: {} };
+    eq('  가짜 응답으로 — 🔴 빠진 내용은 카드(data/card-read.json)에 자동으로 들어가고(11-21) · 기록에 남고 · 사람이 볼 것에서는 빠진다 · 넣은 뒤의 카드로 해시를 잡아 다음 실행이 같은 공고를 다시 안 산다 · 꼴 검사 통과',
+      [run.status, cr2.items['r-1'].documents, ((res.items || {})['r-1'] || {}).added.map((a) => a.text), ((res.items || {})['r-1'] || { problems: [] }).problems.length, /대상 0건/.test(again.out), CR.checkData(cr2).length],
+      [0, ['신청서 1부', '가족관계증명서 1부'], ['가족관계증명서 1부'], 0, true, 0]);
     if (run.status !== 0) console.log(run.out.slice(-600));
   } finally { sb.done(); }
 }
