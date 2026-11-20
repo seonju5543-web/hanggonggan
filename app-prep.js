@@ -240,7 +240,99 @@ function renderAmountDetail(keepScroll) {
       <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
     </div>`;
   openSheetShell(keepScroll);   // 되돌아온 것이면 보던 자리로 (아니면 undefined → 맨 위)
+  sheetListRender = renderAmountDetail;
   return true;
+}
+
+/* ── 히어로 안내 줄을 누르면 열리는 목록 (2026-11-20 승인 시안 「가리키는 마스코트」) ──
+   매칭된 공고 → 「자격 요건 매칭」 목록(줄을 누르면 그 공고의 상세 시트) · 수령 가능액 → 금액 상세(위) ·
+   마감 → 그날 마감인 공고 · 이어서 쓰기 → 쓰던 신청서.
+   🔴 숫자는 renderHome 이 센 값(lastHero · lastBill) 그대로 — 여기서 다시 판정하지 않는다.
+   🔴 공고 줄은 금액 상세와 같은 줄(amountDetailRow)이고 금액 색은 하나다(2026-11-20 개발자 지시 · 추정은 「약」 글자로만).
+   공고로 들어갔다 내리면 **이 목록**으로 돌아온다(sheetListRender — rememberAmountBack 이 읽는다). */
+let sheetListRender = null;
+
+/* 공고 하나 → 금액 상세의 그 줄(합친 공고는 대표 줄 하나) */
+function billItemFor(sch) {
+  const b = lastBill && lastBill.bill;
+  if (!b) return null;
+  const all = [].concat(b.added || [], b.onlyOne || [], b.dropped || [], b.unknown || []);
+  return all.find((m) => m.ref === sch || (m.mergedFrom || []).indexOf(sch) >= 0) || null;
+}
+
+function renderMatchList(keepScroll) {
+  if (!lastHero || !lastBill) return false;
+  const seen = new Set();
+  const rows = lastHero.applyable.map((m) => {
+    const item = billItemFor(m.sch) || { ref: m.sch, won: 0 };
+    if (seen.has(item)) return '';
+    seen.add(item);
+    /* 함께 못 받는 공고(금액 상세 「중복 수혜 불가」 의 아래쪽)는 금액 상세와 같이 흐리게 — 위 합계에 안 든 금액을 든 것처럼 보이지 않게 */
+    const dropped = (lastBill.bill.dropped || []).indexOf(item) >= 0;
+    return amountDetailRow(item, dropped ? { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' } : estOpt(item, { tone: 'on' }));
+  }).join('');
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">매칭된 공고</h3>
+      <div class="ad-grp"><div class="ad-grp-h"><b>자격 요건 매칭</b><span>${lastHero.applyable.length}건 · ${won(lastBill.bill.total)}</span></div>
+      ${rows || '<p class="ad-empty">지금 신청할 수 있는 장학금이 없어요</p>'}</div>
+    </div>`;
+  openSheetShell(keepScroll);
+  sheetListRender = renderMatchList;
+  return true;
+}
+
+function renderDueList(keepScroll) {
+  if (!lastHero || !lastHero.dueList.length) return false;
+  const d = lastHero.dueDays, dd = d === 0 ? 'D-Day' : `D-${d}`;
+  const rows = lastHero.dueList.map((m) => {
+    const item = billItemFor(m.sch);
+    const val = item ? (estOpt(item, {}).text || (item.won ? won(item.won) : '')) : '';
+    return `<div class="hero-due-row tappable" data-goto="${esc(m.sch.id)}" role="button" tabindex="0">
+      <span class="hero-due-dd">${dd}</span>
+      <span class="hero-due-t">${esc(m.sch.name || '')}${val ? `<span class="hero-due-m">${esc(val)}</span>` : ''}</span>
+    </div>`;
+  }).join('');
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">마감 ${dd} · ${lastHero.dueList.length}건</h3>
+      <p class="sheet-provider">${d === 0 ? '오늘' : `${d}일 뒤`} 마감인 매칭 공고</p>
+      ${rows}
+    </div>`;
+  openSheetShell(keepScroll);
+  sheetListRender = renderDueList;
+  return true;
+}
+
+function renderDraftSheet() {
+  const dr = typeof resumeDraft === 'function' ? resumeDraft() : null;   // 열 때 장부를 다시 읽는다 — 홈을 그린 뒤 더 쓴 것까지
+  if (!dr) return false;
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">이어서 쓰기</h3>
+      <p class="sheet-provider">쓰다 만 신청서</p>
+      <div class="hero-draft-card">
+        <p class="hero-draft-t">${esc(dr.sch.name || dr.sch.title || '')}</p>
+        <p class="hero-draft-m">${esc(agoLabel(dr.prog.at))}에 쓰던 것</p>
+      </div>
+      <button type="button" class="btn btn-primary" id="btn-hero-draft">이어서 쓰기</button>
+    </div>`;
+  openSheetShell();
+  sheetListRender = null;
+  $('#btn-hero-draft').addEventListener('click', () => { sheetBack = null; startFormFill(dr.sch, dr.prog); });
+  return true;
+}
+
+/* 히어로 줄 → 그 줄의 목록 (app-mascot.js 가 줄을 누른 뒤 부른다) */
+function openHeroLine(k) {
+  if (k === 'match') return renderMatchList();
+  if (k === 'amount') return renderAmountDetail();
+  if (k === 'due') return renderDueList();
+  if (k === 'draft') return renderDraftSheet();
+  return false;
 }
 
 /* 🔴 **'신청 버튼을 누를 수 있는가'의 단 하나의 기준** (2026-09-13 · 노션 백로그 핵심-2).

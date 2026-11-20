@@ -9920,9 +9920,10 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     /setTimeout\(tryOpen/.test(launchBody), true);
   eq('그래도 무한정 기다리지는 않는다 (시한이 있다)', /DEADLINE/.test(launchBody), true);
 
-  /* ⑦ 홈 줄의 말은 개발자가 정한 그대로다 (2026-09-09 지시) */
-  eq("홈 줄의 버튼 문구가 '신청서 마저 쓰기' 다",
-    /rc-go">신청서 마저 쓰기</.test(appJs), true);
+  /* ⑦ 홈 줄의 말은 개발자가 정한 그대로다 — 2026-09-09 「신청서 마저 쓰기」 띠 → 2026-11-20 개발자 지시("작성 중 -> 이어서 쓰기로 하여 추가 / 홈의 쓰던 신청서는 삭제")로
+     히어로의 「이어서 쓰기」 줄과 그 시트의 「이어서 쓰기」 버튼이 같은 일을 한다(승인 시안 point.html) */
+  eq("홈 이어보기의 말이 '이어서 쓰기' 다 (히어로 줄 이름표 · 시트 버튼)",
+    [/<small>이어서 쓰기<\/small>/.test(readText(new URL('../index.html', import.meta.url))), /id="btn-hero-draft">이어서 쓰기</.test(appSource()), /rc-go">신청서 마저 쓰기</.test(appSource())], [true, true, false]);
 
   /* ⑤ 🔴 데이터 초기화가 이어보기 장부까지 지운다 — 안 지우면 '지웠다'가 거짓말이 된다
      (그 장부에 이름·학번·전화·계좌번호와 신청서에 쓴 글이 들어 있다) */
@@ -10631,8 +10632,9 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     appSrc2.indexOf('function renderExplore('));
   eq('renderHome 구간을 찾았다', homeBody.length > 500, true);
   eq("홈 히어로가 '약' 을 붙이지 않는다", /'약 '/.test(homeBody), false);
-  eq('  홈 히어로는 countUp 에 최대만 넘긴다',
-    /countUp\(\$\('#hero-amount'\), total, \(v\) => `최대 \$\{won\(v\)\}`\)/.test(appSrc2), true);
+  /* 2026-11-20 개발자 지시 — 「수령 가능액」 줄에서 「최대」 도 뺐다("수령 가능액에서 최대도 빼줘") · 숫자는 금액만 */
+  eq('  홈 히어로 수령 가능액 줄은 금액만 넘긴다 (최대·약 없음 — 2026-11-20)',
+    [/heroLine\('#hero-amount', total, won\)/.test(appSrc2), /`최대 \$\{won\(v\)\}`/.test(homeBody)], [true, false]);
   eq('금액 상세는 어림잡은 몫을 그대로 밝힌다 (여기까지 걷으면 안 된다)',
     /금액을 못 읽은 \$\{bill\.assumed\.length\}건은 어림잡아 더함/.test(appSrc2)
     && /확인된 공고들의 중앙값/.test(appSrc2), true);
@@ -17419,7 +17421,24 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
   eq('  연결 코드는 app.js 보다 먼저 실리고 서비스워커가 담는다 · 엔진은 index.html 이 직접 싣지 않는다(늦게 싣는다)',
     [html.indexOf('src="app-mascot.js"') > 0 && html.indexOf('src="app-mascot.js"') < html.indexOf('src="app.js"'), readText(new URL('../sw.js', import.meta.url)).includes("'app-mascot.js'"), /src="mascot\//.test(html)], [true, true, false]);
   eq('  3D 자리는 처음에 감춰져 있고(hidden) 글자 요소는 그대로다 — 못 그리는 폰은 글자 화면',
-    [/id="mascot-home" hidden/.test(html), /id="mascot-apps" hidden/.test(html), /id="hero-label"/.test(html) && /id="hero-amount"/.test(html)], [true, true, true]);
+    [/id="mascot-home" hidden/.test(html), /id="mascot-apps" hidden/.test(html), /id="hero-lines"/.test(html) && /id="hero-amount"/.test(html)], [true, true, true]);
+  /* 🔴 홈 히어로 = 승인 시안 「가리키는 마스코트」 (2026-11-20 · docs/designs/mockups/mascot-3d/point.html · "시안을 앱 홈에 적용").
+     줄 넷의 차례·이름표(낱말 — 문장 아님)·0건 숨김·쓰던 신청서 띠 삭제를 못 박는다. 화면을 바꾸려면 개발자에게 다시 보여 주고 이 줄도 같이 고친다(스킬 approved-design) */
+  {
+    const keys = [...html.matchAll(/class="hero-ln" data-k="([a-z]+)"/g)].map((m) => m[1]);
+    eq('  히어로 안내 줄 차례 — 매칭된 공고 → 수령 가능액 → 마감 → 이어서 쓰기', keys, ['match', 'amount', 'due', 'draft']);
+    eq('  이름표 넷이 시안 글자 그대로', ['<small>매칭된 공고</small>', '<small>수령 가능액</small>', '<small>마감 <span class="dd" id="hero-due-dd">', '<small>이어서 쓰기</small>'].filter((t) => !html.includes(t)), []);
+    eq('  🔴 쓰던 신청서 띠(#home-resume)는 없앴다 — 같은 일을 「이어서 쓰기」 줄이 한다', /id="home-resume"/.test(html), false);
+    const app = appSource();
+    eq('  마감 줄·이어서 쓰기 줄은 0건이면 숨긴다 (시안: 0건 줄을 남기지 않는다)',
+      [/\[data-k="due"\]'\)\.hidden = !dueList\.length/.test(app), /\[data-k="draft"\]'\)\.hidden = !draft/.test(app)], [true, true]);
+    eq('  줄을 누르면 그 줄의 목록 — 매칭된 공고 · 수령 가능액(금액 상세) · 마감 · 이어서 쓰기',
+      ['renderMatchList', 'renderAmountDetail', 'renderDueList', 'renderDraftSheet'].filter((f) => !new RegExp(`if \\(k === '[a-z]+'\\) return ${f}\\(\\)`).test(app)), []);
+    eq('  매칭된 공고 목록의 갈래 이름은 「자격 요건 매칭」(금액 상세 첫 갈래와 같은 말)', /<b>자격 요건 매칭<\/b>/.test(app), true);
+    eq('  상태는 하나 — 줄 누르기·마스코트 누르기·저절로 넘어가기가 같은 setActive 를 부른다',
+      [/hold\(\); setActive\(k\);/.test(am), /onTap\(\) \{ hold\(\); const k = nextKey\(\); if \(k\) setActive\(k, 'mascot'\)/.test(am), /const k = nextKey\(\); if \(k\) setActive\(k\);/.test(am)], [true, true, true]);
+    eq('  무대는 히어로 전체에 깔고 캐릭터만 오른쪽(screenX) — 왼쪽으로 뻗은 팔이 잘리지 않게', /screenX: 0\.33/.test(am), true);
+  }
   eq('  학교별로 끄는 자리(MASCOT_OFF)가 있고 꺼 둔 학교는 대장님 · 금액 글자를 이 파일이 만들지 않는다',
     [/const MASCOT_OFF = \[/.test(am), /MASCOT_OFF\.indexOf\(school\) >= 0/.test(am), /만원|toLocaleString/.test(am)], [true, true, false]);
   eq('  화면이 그릴 때 부른다 — 홈(학교) · 신청 내역(요약이 보일 때만)',

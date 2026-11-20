@@ -5325,19 +5325,58 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
 .mascot-bump { animation: mascot-bump 0.32s var(--ease-spring); }
 @keyframes mascot-bump { 40% { transform: scale(1.06); } }
 @media (prefers-reduced-motion: reduce) { .mascot-bump { animation: none; } }
-/* 홈 — 이름표·금액이 말풍선이 되어 캐릭터 위에 */
-.hero-card.has-mascot .hero-say {
-  position: relative; width: max-content; max-width: 100%; margin: 0 auto;
-  padding: var(--space-12) var(--space-20); text-align: center;
-  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-lg);   /* 그림자 없음 — 떠 있는 것이 아니다(verify-interactions) */
+/* 홈 히어로 — 가리키는 마스코트 (2026-11-20 개발자 승인 시안 docs/designs/mockups/mascot-3d/point.html)
+   왼쪽 안내 줄 넷 · 오른쪽 마스코트. 🔴 무대(3D)는 히어로 전체(화면 좌우 끝까지)에 깔고 캐릭터만 오른쪽에 세운다(kit Stage screenX) —
+   오른쪽 칸에만 두면 왼쪽으로 뻗은 팔이 칸 끝에서 잘린다(11-20 개발자 지적). 글자는 무대 위층. 3D 가 없으면 무대만 빈다 */
+.hero { position: relative; min-height: 292px; display: flex; align-items: center; }
+.hero > .mascot-wrap {
+  position: absolute; top: 0; bottom: 0; left: -20px; right: -20px; z-index: 0;   /* 20px = .screen 좌우 안여백 */
+  background: radial-gradient(34% 22% at 76% 86%, var(--accent-soft), transparent 70%);
 }
-.hero-card.has-mascot .hero-say::after,
+.hero > .mascot-wrap .mascot-stage { height: 100%; cursor: grab; }
+.hero-lines { position: relative; z-index: 1; width: 60%; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-4) 0; }
+.hero-ln {
+  position: relative; display: block; max-width: 100%; align-self: flex-start; text-align: left;
+  border: 0; background: none; padding: var(--space-8) var(--space-20) var(--space-8) var(--space-12); border-radius: var(--radius);
+  font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.hero-ln[hidden] { display: none; }
+.hero-ln small { display: block; font-size: var(--t-xs); font-weight: 600; color: var(--text-weak); white-space: nowrap; transition: color var(--dur) var(--ease); }
+.hero-ln small .dd { font-variant-numeric: tabular-nums; }
+.hero-ln.urgent small .dd { color: var(--red); }
+.hero-ln b {
+  display: block; font-size: var(--t-xl); font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; color: var(--text-weak);
+  font-variant-numeric: tabular-nums; white-space: nowrap; transition: font-size 0.36s var(--ease-spring), color var(--dur) var(--ease);
+}
+.hero-ln.on small { color: var(--text-sub); }
+.hero-ln.on b { font-size: var(--t-3xl); color: var(--text); }
+.hero-ln::after { content: '›'; position: absolute; right: var(--space-4); top: 50%; transform: translateY(-50%); font-size: var(--t-xl); color: var(--rule); transition: color var(--dur) var(--ease); }
+.hero-ln.on::after { color: var(--text-sub); }
+.hero-ln:focus-visible { outline: none; box-shadow: var(--ring); }
+.hero-ln:active b { color: var(--accent); }
+/* 가리킴 표시 — 지금 말하는 줄 왼쪽의 막대가 줄을 따라 옮겨 간다(캐릭터 팔과 같은 상태) */
+.hero-bar { position: absolute; left: 0; top: 0; width: 4px; height: 0; border-radius: var(--radius-hair); background: var(--accent);
+  transition: transform 0.42s var(--ease-spring), height 0.42s var(--ease-spring); }
+.hero-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); margin-top: var(--space-8); position: relative; z-index: 1; }
+.hero-dots { display: flex; gap: var(--space-6); margin-left: var(--space-12); }
+.hero-dots i { width: 6px; height: 6px; border-radius: var(--radius-hair); background: var(--rule); transition: width var(--dur) var(--ease-spring), background var(--dur) var(--ease); }
+.hero-dots i.on { width: 18px; background: var(--accent); }
+.hero-who { margin: 0; font-size: var(--t-xs); color: var(--text-weak); text-align: right; }
+@media (prefers-reduced-motion: reduce) { .hero-ln b, .hero-ln small, .hero-bar, .hero-dots i { transition: none; } }
+/* 줄을 누르면 열리는 목록 — 마감 줄(그날 마감인 공고) · 이어서 쓰기(쓰던 신청서). 매칭된 공고 목록은 금액 상세와 같은 줄(.ad-row) */
+.hero-due-row { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-12) 0; border-top: 1px solid var(--line); font-size: var(--t-md); cursor: pointer; }
+.hero-due-row::after { content: '›'; color: var(--text-weak); }
+.hero-due-dd { flex: none; font-size: var(--t-xs); font-weight: 800; color: var(--red); border: 1px solid var(--red-weak); border-radius: var(--radius-pill); padding: var(--space-2) var(--space-8); }   /* 시안 그대로 — D-n 이면 늘 빨강 */
+.hero-due-t { flex: 1; min-width: 0; font-weight: 700; line-height: 1.4; }
+.hero-due-m { display: block; font-size: var(--t-xs); color: var(--text-sub); font-weight: 600; }
+.hero-draft-card { border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-16); margin-bottom: var(--space-16); }
+.hero-draft-t { margin: 0; font-weight: 800; line-height: 1.4; }
+.hero-draft-m { margin: var(--space-6) 0 0; font-size: var(--t-xs); color: var(--text-sub); }
 .has-mascot > .apps-summary .summary-card::after {
   content: ''; position: absolute; left: 50%; bottom: -7px; width: 12px; height: 12px;
   background: var(--surface); border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
   transform: translateX(-50%) rotate(45deg);
 }
-.hero-card.has-mascot .hero-amount { transform-origin: center; }
 /* 신청 내역 — 남색 카드 대신 대장님의 말풍선 */
 .has-mascot > .apps-summary { margin-bottom: 0; }
 .has-mascot > .apps-summary .summary-card {

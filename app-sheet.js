@@ -904,7 +904,9 @@ function dismissSheet() {
    두 곳(누르기·키보드)에서 부르므로 함수로 둔다. 베껴 두면 한쪽만 고쳐져 갈라진다. */
 function rememberAmountBack() {
   const y = $('#detail-sheet').scrollTop;
-  sheetBack = () => renderAmountDetail(y);
+  /* 지금 열린 목록으로 돌아간다 — 금액 상세 · 히어로 줄 목록(매칭된 공고 · 마감) 모두 (2026-11-20) */
+  const back = (typeof sheetListRender === 'function' && sheetListRender) || renderAmountDetail;
+  sheetBack = () => back(y);
 }
 
 /* ── 자격 확인 도우미 — 못 읽은 자격을 그 자리에서 묻는다 (2026-09-17 · 노션 AI-1) ──
@@ -1082,6 +1084,7 @@ function eligAskSave(sch, reopen = () => openDetail(sch.id)) {
 
 function closeSheet() {
   sheetBack = null;          // 흐름이 닫을 때는 돌아갈 곳도 지운다
+  sheetListRender = null;    // 열려 있던 목록(금액 상세·히어로 줄 목록)도 놓는다 — 다음에 다른 데서 연 공고가 엉뚱한 목록으로 돌아가지 않게
   eligAsk = null;            // 자격 묻기 — 펼친 상태와 본 줄을 놓는다
   docPrep = null;
   /* 🔴 **쓰던 신청서 표시도 함께 내린다** (2026-09-09 코드 리뷰). 안 내리면 시트가 닫힌 뒤에도

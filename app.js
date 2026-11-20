@@ -705,11 +705,16 @@ function countUp(el, target, formatter, duration = 900) {
      어지럼증·전정기관 질환 때문에 켜는 설정이라, 히어로 금액이 900ms 동안 튀어오르는 것이
      정확히 그 사람들이 끄고 싶어 한 움직임이다. 값은 그대로 보여 준다 — 정보는 안 줄인다. */
   if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el._countRun = (el._countRun || 0) + 1;
     el.textContent = formatter(target);
     return;
   }
   const start = performance.now();
+  /* 같은 칸을 다시 올리면 앞의 것은 멈춘다 (2026-11-20) — 히어로 줄은 그 줄로 넘어올 때마다 다시 올린다.
+     안 멈추면 앞의 것이 남은 프레임 동안 옛 숫자를 덮어써 새 숫자 옆에 틀린 숫자가 남는다 */
+  const run = (el._countRun = (el._countRun || 0) + 1);
   function tick(now) {
+    if (el._countRun !== run) return;
     const t = Math.min(1, (now - start) / duration);
     const eased = 1 - Math.pow(1 - t, 3);
     el.textContent = formatter(Math.round(target * eased));
@@ -1571,25 +1576,30 @@ function saveBtnHtml(id) {
 
    🔴 여기서 마감·자격을 보고 숨기지 않는다. 이미 쓴 글은 학생 것이고, 마감됐다는 사실은
       들어간 화면이 제 손으로 말한다. 숨기면 쓴 글이 사라진 것처럼 보인다. */
-function renderResumeCard() {
-  const el = $('#home-resume');
-  if (!el) return;
+/* 쓰던 신청서 — 창(4시간)을 넘겨 들어와도 진행분은 안 버린다(docs/designs/first-run-and-resume.md).
+   예전엔 홈의 「쓰던 신청서」 띠(#home-resume)였는데 2026-11-20 승인 시안으로 히어로의 「이어서 쓰기」 줄이 그 일을 맡았다.
+   여기서는 **있는지와 무엇인지**만 돌려준다 — 줄을 그리는 것은 renderHome, 여는 것은 renderDraftSheet(app-prep.js). */
+function resumeDraft() {
   const saved = typeof resumeLoad === 'function' ? resumeLoad() : null;
   const prog = saved && saved.form;
   const alive = typeof resumeProgressAlive === 'function' && resumeProgressAlive(prog, Date.now());
   const sch = alive && findSch(prog.schId);
-  if (!sch) { el.hidden = true; return; }
-
-  el.hidden = false;
-  el.innerHTML = `
-    <span class="rc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15h6"/></svg></span>
-    <span class="rc-body">
-      <span class="rc-title">쓰던 신청서가 있어요</span>
-      <span class="rc-sub">${esc(sch.name || sch.title || '')} · ${esc(agoLabel(prog.at))}에 쓰던 것</span>
-    </span>
-    <span class="rc-go">신청서 마저 쓰기</span>`;
-  el.onclick = () => { openSheetShell(); startFormFill(sch, prog); };
+  return sch ? { sch, prog } : null;
 }
+/* 히어로 줄 숫자 한 칸 — 그 줄로 넘어올 때 app-mascot.js 가 같은 값·같은 모양으로 다시 올린다(dataset 두 칸) */
+const HERO_FMT = new Map();
+function heroLine(sel, to, fmt) {
+  const el = $(sel);
+  if (!el) return;
+  el.dataset.to = String(to);
+  HERO_FMT.set(el, fmt);
+  /* 숫자는 그 자리에 바로 쓴다 — 0부터 올리는 것은 **지금 말하는 줄 하나**뿐이고 그건 app-mascot.js setActive 가 한다(시안 그대로).
+     renderHome 은 공고 파일이 올 때마다 다시 돈다 — 여기서 올리면 그때마다 네 줄이 한꺼번에 0부터 돈다 */
+  el._countRun = (el._countRun || 0) + 1;
+  el.textContent = fmt(to);
+}
+/* 히어로 줄을 누르면 열리는 목록에 쓰는 값 — renderHome 이 채운다(lastBill 과 같은 때) */
+let lastHero = null;
 
 /* '5분 전'·'어제' 처럼 사람이 읽는 말로. 🔴 지어내지 않는다 — 못 재면 빈 말을 하지 않고
    '전에'라고만 한다(원칙 8-1). */
@@ -1685,14 +1695,15 @@ function renderHome() {
      🔴 그래도 내역은 남아 있다 — 금액을 누르면 열리는 **금액 상세**가 '금액을 못 읽은 n건은
         어림잡아 더함' 과 한 건당 얼마로 쳤는지를 그대로 적는다(renderAmountDetail).
      ⚠️ 되돌려 '약' 을 다시 붙이지 말 것 — 관문이 막는다. */
-  countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
+  /* 🔴 수령 가능액 — 「최대」 를 붙이지 않는다 (2026-11-20 개발자 지시: "수령 가능액에서 최대도 빼줘"). '약' 도 안 붙인다(아래 9/17 지시 그대로).
+     줄 글자는 app-mascot.js 가 그 줄로 넘어올 때 0부터 올린다(같은 dataset.to · 같은 모양) */
+  heroLine('#hero-amount', total, won);
   /* 🔴 히어로 아랫줄을 **통째로 없앴다** (2026-09-17 개발자 지시 2차: "금액 밑에 있는
      '그중 N건은 바로 신청할 수 있어요' 안내도 삭제해줘"). 앞서 같은 자리에서 금액 회계
      두 줄을 걷어냈고, 이 줄이 마지막 하나였다. 이제 히어로는 **금액과 그림 칸**뿐이다(버튼은 2026-11-19 에 없앴다 — 일괄 신청 준비 삭제).
      🔴 `#hero-count` 요소도 index.html 에서 뺐다 — 채우는 곳이 없는 빈 칸을 남겨 두면
         다음 세션이 '왜 안 채우지'를 뒤진다. 그 칸이 주던 아래 여백은 style.css 파일 끝
         '히어로' 절에서 `.hero-amount` 가 물려받는다(실측 57px → 같은 자리 유지). */
-  $('#hero-label').textContent = '지금 신청할 수 있는 장학금';
   if (window.Mascot) Mascot.syncHome(state.profile && state.profile.school);   // 3D 마스코트(app-mascot.js) — 학교가 바뀌면 캐릭터도 바뀐다
   /* 🔴 히어로 2026-10-01 CTO 결정(시안 I4) — 금액 아래 한 줄 + 그림 4칸.
      9/17 에 걷었던 아랫줄 자리지만 CTO 가 이 시안을 골라 다시 둔다. 숫자는 **전부 위
@@ -1723,7 +1734,24 @@ function renderHome() {
       <span class="hero-tile-name">${t.name}</span>
     </button>`).join('');
 
-  renderResumeCard();
+  /* 히어로 안내 줄 (2026-11-20 승인 시안 「가리키는 마스코트」) — 차례: 매칭된 공고 → 수령 가능액 → 마감 D-n → 이어서 쓰기.
+     🔴 숫자는 전부 위 `applyable` 하나에서 센다 — 금액 상세(lastBill)·그림 칸과 같은 모집단이다.
+     · 매칭된 공고 = applyable 건수(금액 상세 머리줄 「신청 가능 n건」 과 같은 수)
+     · 마감 = **가장 빠른 마감일** 하나와 그날 마감인 공고 수(마감이 적힌 것만 — dday 의 가짜 14 를 쓰지 않는다) · 없으면 줄을 숨긴다
+     · 이어서 쓰기 = 쓰던 신청서(이어보기 저장분이 살아 있고 그 공고를 찾을 때) · 없으면 줄을 숨긴다 */
+  const dated = applyable.filter((m) => m.sch.deadline).sort(byDeadline);
+  const dueDays = dated.length ? dday(dated[0].sch.deadline).days : null;
+  const dueList = dated.filter((m) => dday(m.sch.deadline).days === dueDays).sort(byHomeOrder);
+  const draft = resumeDraft();
+  lastHero = { applyable: applyable.slice().sort(byHomeOrder), dueDays, dueList, draft };
+  heroLine('#hero-match', applyable.length, (v) => `${v}건`);
+  $('#hero-due-dd').textContent = dueDays === 0 ? 'D-Day' : `D-${dueDays}`;
+  heroLine('#hero-due', dueList.length, (v) => `${v}건`);
+  heroLine('#hero-draft', draft ? 1 : 0, (v) => `${v}건`);
+  $('#hero-lines [data-k="due"]').hidden = !dueList.length;
+  $('#hero-lines [data-k="due"]').classList.toggle('urgent', dueDays === 0);
+  $('#hero-lines [data-k="draft"]').hidden = !draft;
+  if (window.Mascot) Mascot.syncLines();
 
   /* 담을 것은 그대로다 — 자격이 확실히 미달인 것과 이미 마감된 것, 오래된 것만 뺀다.
      차례는 위 `byHomeOrder`(적합도 + 마감일 한 점수) 하나가 정한다. */
