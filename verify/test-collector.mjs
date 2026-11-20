@@ -8228,13 +8228,13 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   const body = app.slice(app.indexOf('function estOpt'), app.indexOf('function applyLock'));
   eq('renderAmountDetail 이 있다', body.length > 200, true);
 
-  // ① 갈래 넷 — 이름은 개발자가 '명사형으로 조이기'로 정한 것이다
-  //    넷째 '금액 미확인' → '금액을 못 읽은 공고' (2026-11-15 · 개발자 결정 11-02 '미확인'류 글자 없음 — 히어로 아랫줄 「금액을 못 읽은 n건」과 같은 말 · 갈래 수는 그대로 넷)
-  //    첫째 '합산' → '자격 요건 매칭' (2026-11-20 개발자 지시)
-  for (const t of ['자격 요건 매칭', '중복 수혜 불가', '등록금 비율 환산', '금액을 못 읽은 공고']) {
-    eq(`갈래 '${t}' 가 있다`, body.includes(`grp('${t}'`), true);
-  }
-  eq('제목은 금액 상세다', body.includes('금액 상세'), true);
+  // ① 🔴 갈래는 「자격 요건 매칭」 하나뿐이다 (2026-11-20 개발자 지시: "총장학금 클릭 시, 자격요건매칭만 나오게 하고 나머지는 모두 삭제해줘.
+  //    추정 값도 그대로 자격 요건 매칭 칸에 들어가게 하고 앞에 약이라는 표현만 써.") — 2026-08-27 의 갈래 넷(합산·중복 수혜 불가·등록금 비율 환산·금액 미확인)은 그 지시로 걷었다.
+  //    되살리려면 개발자에게 다시 보여 주고 이 줄을 같이 고친다(스킬 approved-design).
+  const bodyCode = body.replace(/\/\*[\s\S]*?\*\//g, '');   // 주석은 뺀다 — 지운 갈래 이름을 경위로 적어 두었다
+  eq('갈래는 「자격 요건 매칭」 하나다', [bodyCode.includes('<b>자격 요건 매칭</b>'), ...['중복 수혜 불가', '등록금 비율 환산', '금액을 못 읽은 공고', '함께 못 받는 공고'].map((t) => bodyCode.includes(t))], [true, false, false, false, false]);
+  eq('  합계 상자·맺음말도 지웠다', [/ad-total-amt/.test(body), /ad-foot/.test(body)], [false, false]);
+  eq('제목은 금액 상세다', body.includes('<h3 class="sheet-title">금액 상세</h3>'), true);
   /* 금액 색은 하나 (2026-11-20 개발자 지시) — 추정값만 다른 색이면 다른 종류의 돈처럼 읽힌다. 추정은 「약」 글자가 말한다 */
   {
     const css = readText(new URL('../style.css', import.meta.url));
@@ -8242,28 +8242,16 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
     eq('  금액 색이 하나다 — on · est · off 가 같은 색', new Set(['on', 'est', 'off'].map(colorOf)).size, 1);
   }
 
-  /* 🔴 **추정값을 확정값처럼 적지 않는다** (2026-09-11 코드 리뷰에서 잡았다).
-     2026-09-10 수리로 비율형이 이중수혜 갈래를 거치게 되면서 같은 공고가 `added`(또는
-     `onlyOne`)와 `estimated` 양쪽에 들어간다. 합계는 옳지만, 합산 줄이 `400만원` 이라고
-     딱 떨어지게 적으면 학교 평균 등록금에서 뽑은 **추정**이 확정된 금액으로 읽힌다.
-     ⚠️ 계산을 고치지 말 것 — total 은 옳다. 고칠 자리는 '적는 법'(estOpt)뿐이다. */
-  eq('합산 줄이 추정 여부를 거쳐 그려진다', /bill\.added\.map\(\(m\) => amountDetailRow\(m, estOpt\(/.test(body), true);
-  eq('  중복 수혜 불가 줄도 같은 길을 쓴다', /bill\.onlyOne\.map\(\(m\) => amountDetailRow\(m, estOpt\(/.test(body), true);
-  eq("  추정이면 '약' 과 est 를 붙인다", /estimated\.indexOf\(m\)[\s\S]{0,200}text: '약 '/.test(body), true);
-  eq('  비율 환산 갈래가 다시 적은 것임을 밝힌다', body.includes('건수를 더하지 마세요'), true);
-
-  // ② 🔴 비어 있어도 갈래를 그린다 — 이게 이번 사고의 재발 방지선이다
-  eq('갈래가 비었다고 통째로 숨기지 않는다', /grp = \([^)]*\) => \(rows \?/.test(body), false);
-  eq('빈 갈래는 안내 문구로 자리를 지킨다', body.includes('ad-empty'), true);
-
-  // ③ 개발자가 고쳐 준 문구 — 되돌아가면 실패한다
-  eq('학교별 등록금 기준 (평균 아님)', body.includes('학교별 한 학기 등록금 기준 추정값'), true);
-  /* 🔴 단위를 밝힌다 (2026-08-29) — 표는 1년치인데 장학금은 학기 단위라, 단위를 안 적으면
-     학생이 1년치로 읽는다. 개발자가 고쳐 준 '학교별'(평균 아님)은 그대로 지켰다. */
-  eq('  한 학기 기준임을 밝힌다', /한 학기 등록금 기준/.test(body), true);
-  eq("'~했어요' 체를 쓰지 않는다", /했어요|드릴게요|돼요/.test(body), false);
-  eq('갈래 이름에 이모지를 붙이지 않는다', /grp\('[^']*[\u{1F300}-\u{1FAFF}\u{2700}-\u{27BF}]/u.test(body), false);
-  eq('뺀 공고 문구에 안 셈을 붙이지 않는다', body.includes('안 셈'), false);
+  /* 🔴 **추정값을 확정값처럼 적지 않는다** (2026-09-11 코드 리뷰 · 2026-11-20 개발자 지시 "앞에 약이라는 표현만").
+     줄 = 수령 가능액 합계에 실제로 더한 것(added · onlyOne · assumed) — 줄을 더하면 머리줄 합계와 맞는다.
+     ⚠️ 계산을 고치지 말 것 — total 은 옳다. 고칠 자리는 '적는 법'(estOpt · 어림 줄의 '약 ')뿐이다. */
+  eq('같이 받는 줄이 추정 여부를 거쳐 그려진다', /bill\.added\.map\(\(m\) => amountDetailRow\(m, estOpt\(/.test(body), true);
+  eq('  고른 1건(중복 수혜)도 같은 길을 쓴다', /bill\.onlyOne\.map\(\(m\) => amountDetailRow\(m, estOpt\(/.test(body), true);
+  eq("  등록금 비율이면 '약' 을 붙인다", /estimated\.indexOf\(m\)[\s\S]{0,200}text: '약 '/.test(body), true);
+  eq("  금액을 못 읽어 어림한 줄도 같은 칸에 '약 n만원' 으로 (2026-11-20 개발자 결정)", /\(bill\.assumed \|\| \[\]\)\.map\(\(m\) => amountDetailRow\(m, \{ tone: 'on', text: '약 ' \+ won\(bill\.assumedEach\)/.test(body), true);
+  eq('  머리줄 합계는 홈 수령 가능액과 같은 bill.total', /\$\{rows\.length\}건 · \$\{won\(bill\.total\)\}/.test(body), true);
+  eq('빈 목록은 안내 문구로 자리를 지킨다', body.includes('ad-empty'), true);
+  eq("'~했어요' 체를 쓰지 않는다", /했어요|드릴게요|돼요/.test(body.replace('지금 신청할 수 있는 장학금이 없어요', '')), false);
   eq('원문은 더보기로 접는다', body.includes('원문 보기'), true);
   /* 🔴 발췌만 넣고 **출처 줄을 빠뜨렸다가** 승인받은 화면과 달라졌다(2026-08-27).
      목업은 발췌를 따옴표로 감싸고 밑에 `○○대학교 게시 원문`을 붙인다. */
@@ -8271,9 +8259,6 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('발췌 밑에 출처 줄을 붙인다', body.includes('noticeSourceLabel'), true);
   /* 빈 갈래 문구에 이중부정을 쓰지 않는다 (개발자 지적) */
   eq('빈 갈래에 이중부정을 쓰지 않는다', /없는 공고가 없|못 읽은 공고가 없/.test(body), false);
-  eq("빈 갈래는 '0건 중 0건' 대신 해당 없음으로 쓴다", body.includes("'해당 없음'"), true);
-  eq('뺀 공고도 더보기로 보여 준다', body.includes('함께 못 받는 공고'), true);
-  eq('미확인 공고도 더보기로 보여 준다', body.includes('건 보기'), true);
   eq('합침은 학교 이름 외 N건으로 쓴다', /외 \$\{merged\}건|외 \$\{/.test(app), true);
 
   /* ④ 줄을 누르면 **그 공고의 상세 시트**가 바로 뜬다 (2026-08-27 개발자 지시로 변경).
@@ -10684,9 +10669,10 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
   /* 2026-11-20 개발자 지시 — 「수령 가능액」 줄에서 「최대」 도 뺐다("수령 가능액에서 최대도 빼줘") · 숫자는 금액만 */
   eq('  홈 히어로 수령 가능액 줄은 금액만 넘긴다 (최대·약 없음 — 2026-11-20)',
     [/heroLine\('#hero-amount', total, won\)/.test(appSrc2), /`최대 \$\{won\(v\)\}`/.test(homeBody)], [true, false]);
-  eq('금액 상세는 어림잡은 몫을 그대로 밝힌다 (여기까지 걷으면 안 된다)',
-    /금액을 못 읽은 \$\{bill\.assumed\.length\}건은 어림잡아 더함/.test(appSrc2)
-    && /확인된 공고들의 중앙값/.test(appSrc2), true);
+  /* 2026-11-20 개발자 지시로 금액 상세의 「금액을 못 읽은 공고」 갈래를 걷고 어림한 공고를 「자격 요건 매칭」 줄에 「약 n만원」 으로 넣었다 —
+     어림이라는 사실은 이제 그 줄의 「약」 이 밝힌다(여기까지 걷으면 어림을 확인된 금액처럼 내놓게 된다) */
+  eq('금액 상세는 어림잡은 몫을 「약」 으로 밝힌다 (여기까지 걷으면 안 된다)',
+    /\(bill\.assumed \|\| \[\]\)\.map\(\(m\) => amountDetailRow\(m, \{ tone: 'on', text: '약 '/.test(appSrc2), true);
 
   /* 🔴 히어로 아랫줄은 **요소째로 없앴다** (2026-09-17 개발자 지시 2차: "금액 밑에 있는
      '그중 N건은 바로 신청할 수 있어요' 안내도 삭제해줘"). 금액 회계 두 줄에 이어 마지막
@@ -17910,9 +17896,9 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
     const app = appSource();
     eq('  마감 줄·이어서 쓰기 줄은 0건이면 숨긴다 (시안: 0건 줄을 남기지 않는다)',
       [/\[data-k="due"\]'\)\.hidden = !dueList\.length/.test(app), /\[data-k="draft"\]'\)\.hidden = !draft/.test(app)], [true, true]);
-    eq('  줄을 누르면 그 줄의 목록 — 매칭된 공고 · 수령 가능액(금액 상세) · 마감 · 이어서 쓰기',
-      ['renderMatchList', 'renderAmountDetail', 'renderDueList', 'renderDraftSheet'].filter((f) => !new RegExp(`if \\(k === '[a-z]+'\\) return ${f}\\(\\)`).test(app)), []);
-    eq('  매칭된 공고 목록의 갈래 이름은 「자격 요건 매칭」(금액 상세 첫 갈래와 같은 말)', /<b>자격 요건 매칭<\/b>/.test(app), true);
+    eq('  줄을 누르면 그 줄의 목록 — 수령 가능액(자격 요건 매칭) · 마감 · 이어서 쓰기 · 🔴 매칭된 공고 줄은 열지 않는다(11-20 개발자 지시 — 같은 내용)',
+      ['renderAmountDetail', 'renderDueList', 'renderDraftSheet'].filter((f) => !new RegExp(`if \\(k === '[a-z]+'\\) return ${f}\\(\\)`).test(app)), []);
+    eq('  매칭된 공고 줄은 열 목록이 없다 (renderMatchList 없음 · 화살표 없음)', [/function renderMatchList|k === 'match'\) return/.test(app), /\.hero-ln\[data-k="match"\]::after \{ content: none; \}/.test(readText(new URL('../style.css', import.meta.url)))], [false, true]);
     eq('  상태는 하나 — 줄 누르기·마스코트 누르기·저절로 넘어가기가 같은 setActive 를 부른다',
       [/hold\(\); setActive\(k\);/.test(am), /onTap\(\) \{ hold\(\); const k = nextKey\(\); if \(k\) setActive\(k, 'mascot'\)/.test(am), /const k = nextKey\(\); if \(k\) setActive\(k\);/.test(am)], [true, true, true]);
     eq('  무대는 히어로 전체에 깔고 캐릭터만 오른쪽(screenX) — 왼쪽으로 뻗은 팔이 잘리지 않게', /screenX: 0\.33/.test(am), true);

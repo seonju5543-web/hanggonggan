@@ -187,57 +187,24 @@ const schoolOfNotice = (sch) => {
 function renderAmountDetail(keepScroll) {
   /* 못 그렸다는 것을 부르는 쪽이 알아야 한다 — dismissSheet 가 이 값을 보고 닫는다 */
   if (!lastBill) return false;
-  const { bill, count } = lastBill;
-  const p = state.profile;
-  const sum = (arr) => arr.reduce((s, m) => s + (m.won || 0), 0);
-  /* 🔴 갈래는 **비어 있어도 그린다.** 승인받은 화면이 네 갈래이기 때문이다.
-     처음에 '내용 없으면 통째로 숨김'을 넣었다가 개발자가 승인한 화면과 다른 것이 나갔다
-     (2026-08-27). 보여 주고 승인받은 구조를 코드에서 조용히 바꾸지 말 것. */
-  const grp = (title, right, note, rows, empty) => `
-    <div class="ad-grp"><div class="ad-grp-h"><b>${title}</b><span>${rows ? right : '해당 없음'}</span></div>
-    ${rows && note ? `<p class="ad-grp-note">${note}</p>` : ''}${rows || `<p class="ad-empty">${empty}</p>`}</div>`;
-
+  const { bill } = lastBill;
+  /* 🔴 2026-11-20 개발자 지시 — 「자격 요건 매칭」 갈래 하나만 남기고 나머지(합계 상자 · 중복 수혜 불가 · 등록금 비율 환산 · 금액을 못 읽은 공고 · 맺음말)는 지웠다:
+       "총장학금 클릭 시, 자격요건매칭만 나오게 하고 나머지는 모두 삭제해줘. 추정 값도 그대로 자격 요건 매칭 칸에 들어가게 하고 앞에 약이라는 표현만 써."
+     줄 = 수령 가능액 합계에 실제로 더한 것 그대로 — added(같이 받을 수 있는 것) + onlyOne(함께 못 받는 것 중 고른 1건) + assumed(금액을 못 읽어 어림잡아 더한 것).
+     그래서 줄 금액을 더하면 머리줄 합계(= 홈 수령 가능액)와 맞는다.
+     · 등록금 비율로 적힌 공고 → 「약 n만원」(estOpt)
+     · 금액이 안 적힌 공고 → 「약 n만원」(확인된 공고들의 중앙값 — 개발자 결정 11-20 "②도 '약 n만원'으로 표시". 그 공고의 금액이 아니라 어림값이라 반드시 「약」)
+     🔴 합계에 안 든 공고(함께 못 받아 뺀 것 · 넓게 막혀 어림에서도 뺀 것)는 이 목록에 없다 — 줄 합계와 머리줄이 갈라지지 않게 */
+  const rows = []
+    .concat(bill.added.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))))
+    .concat(bill.onlyOne.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))))
+    .concat((bill.assumed || []).map((m) => amountDetailRow(m, { tone: 'on', text: '약 ' + won(bill.assumedEach) })));
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="sheet-body">
       <h3 class="sheet-title">금액 상세</h3>
-      <p class="sheet-provider">${esc(p.school || '')}${p.campus ? ' · ' + esc(p.campus) : ''} · 신청 가능 ${count}건</p>
-      <div class="ad-total">
-        <p class="ad-total-lb">지금 받을 수 있는 장학금</p>
-        <p class="ad-total-amt">${bill.assumedWon > 0 ? '약' : '최대'} ${won(bill.total)}</p>
-        <p class="ad-total-sub">${bill.assumedWon > 0
-          ? `금액을 못 읽은 ${bill.assumed.length}건은 어림잡아 더함`
-          : `금액을 읽은 공고만 합산${bill.unknown.length ? ` · 못 읽은 ${bill.unknown.length}건 제외` : ''}`}</p>
-      </div>
-      ${/* 첫 갈래 이름 '합산' → '자격 요건 매칭' (2026-11-20 개발자 지시 — 이 갈래는 자격이 맞아 더한 공고들이다 · 갈래 수는 그대로 넷) */ ''}
-      ${grp('자격 요건 매칭', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
-        bill.added.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))).join(''),
-        '합산할 공고가 아직 없어요')}
-      ${grp('중복 수혜 불가', `${bill.onlyOne.length + bill.dropped.length}건 중 ${bill.onlyOne.length}건`,
-        '함께 받을 수 없는 공고입니다. 가장 큰 1건만 합산했습니다.',
-        bill.onlyOne.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on', check: true }))).join('')
-        + (bill.dropped.length ? `<details><summary>함께 못 받는 공고 ${bill.dropped.length}건</summary>
-          ${bill.dropped.map((m) => amountDetailRow(m, { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' })).join('')}</details>` : ''),
-        '모두 함께 받을 수 있는 공고입니다.')}
-      ${grp('등록금 비율 환산', `${bill.estimated.length}건 · 추정`,
-        '금액이 등록금 비율로만 적힌 공고입니다. 학교별 한 학기 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다. 위 갈래에 이미 들어 있는 공고를 다시 적은 것이라 건수를 더하지 마세요.',
-        bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''),
-        '등록금 비율로 적힌 공고는 없어요')}
-      ${/* 🔴 홈 히어로가 이 몫을 어림잡아 더하므로(2026-09-17 개발자 지시) 이 칸도 그렇게
-           적어야 한다 — 합계에 넣어 놓고 '0원'이라고 적으면 두 숫자가 서로 다른 말을 한다.
-           🔴 줄마다의 금액은 여전히 비어 있다(2026-11-15 · 예전 '금액 원문 확인'): 어림잡은 것은 **합계 한 곳**이지
-              그 공고의 금액이 아니다(원칙 8-1 · parse-amount.js sumAmounts ④). */ ''}
-      ${/* 갈래 이름 '금액 미확인' → '금액을 못 읽은 공고' (2026-11-15 · 개발자 결정 11-02 '미확인'류 글자 없음 · 히어로 아랫줄 「금액을 못 읽은 n건」과 같은 말) */ ''}
-      ${grp('금액을 못 읽은 공고', bill.assumedWon > 0
-          ? `${bill.unknown.length}건 · 어림 ${won(bill.assumedWon)}`
-          : `${bill.unknown.length}건 · 0원`,
-        bill.assumedWon > 0
-          ? `원문에 금액이 없거나 첨부파일에만 있는 공고입니다. 이 중 ${bill.assumed.length}건은 위 합계에 한 건당 ${won(bill.assumedEach)}(확인된 공고들의 중앙값)으로 어림잡아 더했습니다 — 실제 금액과 다를 수 있습니다.`
-          : '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
-        bill.unknown.length ? `<details><summary>공고 ${bill.unknown.length}건 보기</summary>
-          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', srcLink: true })).join('')}</details>` : '',
-        '모든 공고의 금액을 확인했습니다.')}
-      <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
+      <div class="ad-grp"><div class="ad-grp-h"><b>자격 요건 매칭</b><span>${rows.length}건 · ${won(bill.total)}</span></div>
+      ${rows.join('') || '<p class="ad-empty">지금 신청할 수 있는 장학금이 없어요</p>'}</div>
     </div>`;
   openSheetShell(keepScroll);   // 되돌아온 것이면 보던 자리로 (아니면 undefined → 맨 위)
   sheetListRender = renderAmountDetail;
@@ -245,7 +212,7 @@ function renderAmountDetail(keepScroll) {
 }
 
 /* ── 히어로 안내 줄을 누르면 열리는 목록 (2026-11-20 승인 시안 「가리키는 마스코트」) ──
-   매칭된 공고 → 「자격 요건 매칭」 목록(줄을 누르면 그 공고의 상세 시트) · 수령 가능액 → 금액 상세(위) ·
+   수령 가능액 → 「자격 요건 매칭」 목록(위 renderAmountDetail · 줄을 누르면 그 공고의 상세 시트) · 매칭된 공고 줄은 열지 않는다(11-20 개발자 지시 — 같은 내용이라 수령 가능액만) ·
    마감 → 그날 마감인 공고 · 이어서 쓰기 → 쓰던 신청서.
    🔴 숫자는 renderHome 이 센 값(lastHero · lastBill) 그대로 — 여기서 다시 판정하지 않는다.
    🔴 공고 줄은 금액 상세와 같은 줄(amountDetailRow)이고 금액 색은 하나다(2026-11-20 개발자 지시 · 추정은 「약」 글자로만).
@@ -260,35 +227,13 @@ function billItemFor(sch) {
   return all.find((m) => m.ref === sch || (m.mergedFrom || []).indexOf(sch) >= 0) || null;
 }
 
-function renderMatchList(keepScroll) {
-  if (!lastHero || !lastBill) return false;
-  const seen = new Set();
-  const rows = lastHero.applyable.map((m) => {
-    const item = billItemFor(m.sch) || { ref: m.sch, won: 0 };
-    if (seen.has(item)) return '';
-    seen.add(item);
-    /* 함께 못 받는 공고(금액 상세 「중복 수혜 불가」 의 아래쪽)는 금액 상세와 같이 흐리게 — 위 합계에 안 든 금액을 든 것처럼 보이지 않게 */
-    const dropped = (lastBill.bill.dropped || []).indexOf(item) >= 0;
-    return amountDetailRow(item, dropped ? { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' } : estOpt(item, { tone: 'on' }));
-  }).join('');
-  $('#detail-sheet').innerHTML = `
-    <div class="sheet-handle"></div>
-    <div class="sheet-body">
-      <h3 class="sheet-title">매칭된 공고</h3>
-      <div class="ad-grp"><div class="ad-grp-h"><b>자격 요건 매칭</b><span>${lastHero.applyable.length}건 · ${won(lastBill.bill.total)}</span></div>
-      ${rows || '<p class="ad-empty">지금 신청할 수 있는 장학금이 없어요</p>'}</div>
-    </div>`;
-  openSheetShell(keepScroll);
-  sheetListRender = renderMatchList;
-  return true;
-}
-
 function renderDueList(keepScroll) {
   if (!lastHero || !lastHero.dueList.length) return false;
   const d = lastHero.dueDays, dd = d === 0 ? 'D-Day' : `D-${d}`;
   const rows = lastHero.dueList.map((m) => {
     const item = billItemFor(m.sch);
-    const val = item ? (estOpt(item, {}).text || (item.won ? won(item.won) : '')) : '';
+    const assumed = item && (lastBill.bill.assumed || []).indexOf(item) >= 0;   // 금액을 못 읽어 어림한 것 — 수령 가능액 목록과 같은 「약」
+    const val = !item ? '' : assumed ? '약 ' + won(lastBill.bill.assumedEach) : (estOpt(item, {}).text || (item.won ? won(item.won) : ''));
     return `<div class="hero-due-row tappable" data-goto="${esc(m.sch.id)}" role="button" tabindex="0">
       <span class="hero-due-dd">${dd}</span>
       <span class="hero-due-t">${esc(m.sch.name || '')}${val ? `<span class="hero-due-m">${esc(val)}</span>` : ''}</span>
@@ -328,7 +273,6 @@ function renderDraftSheet() {
 
 /* 히어로 줄 → 그 줄의 목록 (app-mascot.js 가 줄을 누른 뒤 부른다) */
 function openHeroLine(k) {
-  if (k === 'match') return renderMatchList();
   if (k === 'amount') return renderAmountDetail();
   if (k === 'due') return renderDueList();
   if (k === 'draft') return renderDraftSheet();
