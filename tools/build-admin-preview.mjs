@@ -63,6 +63,7 @@ const DATA = {
   'collector/card-read-review.json': readJson('collector/card-read-review.json'),
   'data/card-read-fixes.json': readJson('data/card-read-fixes.json'),
   'data/card-read.json': readJson('data/card-read.json'),
+  'collector/final-review.json': readJson('collector/final-review.json'),
   'data/kosaf-open.json': readJson('data/kosaf-open.json'),
   'data/external.json': readJson('data/external.json'),
   'data/notices/index.json': readJson('data/notices/index.json'),

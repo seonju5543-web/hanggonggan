@@ -11429,7 +11429,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
   const unreachable = all.filter((f) => !calls.includes(f));
   eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
-    unreachable.sort(), ['card-read.yml', 'codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'error-watch.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
+    unreachable.sort(), ['card-read.yml', 'codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'error-watch.yml', 'final-review.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
 }
 
 console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
@@ -16841,6 +16841,59 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
       /publishedRegistered\(await r\.json\(\), cardRead\)/.test(src('server/apply/worker.js'))], [true, true, true, true, true, true]);
   eq('  자동 등록이 새 공고에 등록일로 표식을 단다 · 관리자는 표식을 지우기만 한다(빈 값 = 무료 값으로 올리기 · 다른 값은 멈춤)',
     [/paidGate: TODAY,/.test(src('collector/auto-register.mjs')), /'paidGate',/.test(src('tools/admin-apply.mjs')) && /k === 'paidGate' && v\) \{\s*fail\(/.test(src('tools/admin-apply.mjs')), /paidGate: '/.test(src('tools/edit-diff.mjs'))], [true, true, true]);
+}
+
+/* ══ 유료 확인 2 — 최종 검토 · 유료가 멈춘 숨김분 경보 (2026-11-20 · 설계 docs/designs/paid-gate-pipeline.md 3절) ══ 🔴 돈 0(가짜 응답) */
+{
+  console.log('\n■ 유료 최종 검토 · 유료가 멈춘 숨김분 경보 (2026-11-20)');
+  const FR = await import(new URL('../collector/final-review.mjs', import.meta.url));
+  const CR = await import(new URL('../collector/card-read.mjs', import.meta.url));
+  const { sandbox: fSandbox } = await import(new URL('./health-gates/bodies.mjs', import.meta.url));
+  const FORM = '2026-2학기 다문화가정 장학금 신청서\n성명 학번 학과 연락처\n가족관계 서약 본인은 위 내용이 사실임을 확인합니다';
+  eq('① 기계 — 같은 문서(줄바꿈·띄어쓰기만 다름)는 같다 · 다른 문서는 다르다 · 글자가 없으면 모른다(null) · 내용 분량(한글 40자)',
+    [FR.sameness(FORM, FORM.replace(/\n/g, '   ')) >= FR.SAME_MIN, FR.sameness(FORM, '2025학년도 결과 발표 명단 합격자 안내') < FR.SAME_MIN, FR.sameness('', FORM), FR.hasContent(FORM), FR.hasContent('1 2 3 page')],
+    [true, true, null, true, false]);
+  const SRC = '===== 게시판 본문 =====\n다문화가정 장학금 신청 안내\n지원자격: 다문화가정의 자녀인 학부 재학생\n제출서류: 신청서 1부, 가족관계증명서 1부';
+  const docs = [{ name: '신청서.hwp', kind: '신청서 사본(PDF)', text: FORM, same: 0.4 }, { name: '첨부 1', kind: '공고 첨부', text: '' }];
+  const pr = FR.problemsOf(docs, { docs: [{ name: '신청서.hwp', thisNotice: false, isForm: false, empty: false, why: '2025학년도 서식' }],
+    missing: [{ field: 'documents', text: '가족관계증명서 1부', quote: '가족관계증명서 1부' }, { field: 'documents', text: '주민등록등본', quote: '주민등록등본 1부' }, { field: 'deadline', text: 'x', quote: '신청서' }] }, SRC);
+  eq('② 문제 줄 — 원본과 다름 · 내용 없음 · 다른 공고 · 양식 아님 · 카드에 빠진 내용(근거가 원문에 있는 것만 · 마감 같은 칸은 받지 않음) · 사람 말',
+    [pr.map((p) => p.kind).sort(), pr.filter((p) => p.kind === 'missing').map((p) => p.text), pr.every((p) => /확인/.test(p.check) && !/held|verify|대조/.test(p.reason + p.check)), /40%/.test(pr.find((p) => p.kind === 'notSame').reason)],
+    [['missing', 'noText', 'notForm', 'notSame', 'otherNotice'], ['가족관계증명서 1부'], true, true]);
+  eq('  응답 꼴이 깨져도 넘어지지 않는다 — 기계 문제만 남는다', FR.problemsOf(docs, null, SRC).map((p) => p.kind).sort(), ['noText', 'notSame']);
+  eq('  다시 볼지 — 처음 · 해시가 바뀜 · 실패 3번 전은 본다 / 같은 해시로 끝냈거나 3번 실패하면 안 본다',
+    [FR.needsReview(null, 'h'), FR.needsReview({ hash: 'a', done: true }, 'h'), FR.needsReview({ hash: 'h', tries: 1 }, 'h'), FR.needsReview({ hash: 'h', done: true }, 'h'), FR.needsReview({ hash: 'h', tries: 3 }, 'h')],
+    [true, true, true, false, false]);
+  const plus = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const it = (id, over = {}) => ({ id, name: `${id} 장학생 선발`, deadline: plus(10), listedAt: plus(-5), ...over });
+  const stall = CR.gateStalled([it('a', { paidGate: plus(-5) }), it('b', { paidGate: plus(-5) }), it('c', { paidGate: plus(-5) }), it('d', { paidGate: plus(-1) }), it('e'), it('f', { paidGate: plus(-5), deadline: plus(-1) })],
+    { items: { b: {} }, gateHeld: { c: 'no-source' } }, plus(0));
+  eq('③ 유료가 멈춘 숨김분 — 사흘 넘게 통과·사람 몫 없이 기다린 것만(통과한 것·사람에게 넘긴 것·하루 된 것·표식 없는 것·마감 지난 것은 아님)', stall.map((x) => x.id), ['a']);
+  const wfc = readText(new URL('../.github/workflows/card-read.yml', import.meta.url)), wff = readText(new URL('../.github/workflows/final-review.yml', import.meta.url));
+  eq('  경보 짝 — 여는 것과 닫는 것이 같은 제목 · 세기는 --gate-alarm',
+    [/card-read\.mjs --gate-alarm >> "\$GITHUB_OUTPUT"/.test(wfc), (wfc.match(/--title '🧾 유료 확인이 멈췄어요'/g) || []).length], [true, 2]);
+  const robot = readText(new URL('../collector/final-review.mjs', import.meta.url));
+  eq('④ 최종 검토 로봇 — 스위치 둘 · 꺼진 채로 나간다(켜는 것은 개발자 지시) · registered.json·card-read.json 에 쓰지 않는다 · 건마다 저장 · 연달아 실패하면 멈춘다 · 워크플로가 유료 단계에 스위치를 준다',
+    [/cfg\.enabled === true && process\.env\.FINAL_REVIEW_ENABLE === '1'/.test(robot), JSON.parse(readText(new URL('../collector/final-review-config.json', import.meta.url))).enabled,
+      /writeFileSync\([^)]*(registered|card-read)/.test(robot) || /writeAtomic\('\.\.\/data/.test(robot), /save\(\);   \/\/ 건마다 저장/.test(robot), /if \(streak >= 3\)/.test(robot),
+      /FINAL_REVIEW_ENABLE: '1'/.test(wff) && /set -o pipefail\n\s+node collector\/final-review\.mjs --write/.test(wff)], [true, false, false, true, true, true]);
+  const sb = fSandbox(new URL('../', import.meta.url), 'hdj-final-review-');
+  const NOENV = { FINAL_REVIEW_ENABLE: '', FINAL_REVIEW_FAKE: '', ANTHROPIC_API_KEY: '' };
+  try {
+    const items = [it('r-1', { paidGate: plus(-2), sourceUrl: 'https://example.ac.kr/r?no=1', type: '교외', amountValue: 0, attachments: [], eligibility: {} }), it('r-2', { sourceUrl: 'https://example.ac.kr/r?no=2' })];
+    sb.write('data/registered.json', { items });
+    sb.write('data/card-read.json', { items: { 'r-1': { eligibility: ['다문화가정의 자녀인 학부 재학생'], documents: ['신청서 1부'] }, 'r-2': { eligibility: ['x'] } } });
+    sb.write('collector/extracted/notices-text.json', [{ title: items[0].name, school: '시험대학교', url: items[0].sourceUrl, text: `${SRC}\n${'장학생 선발 안내 본문입니다 '.repeat(10)}` }]);
+    const off = sb.run('collector/final-review.mjs', ['--write'], NOENV, 30000);
+    eq('⑤ 진짜 로봇을 임시 폴더에서 — 스위치가 꺼져 있으면 부르지 않는다 · 숨김 등록분만 대상(그 전 등록분 r-2 는 안 본다)', [off.status, /부르지 않았습니다/.test(off.out), /대상 1건/.test(off.out)], [0, true, true]);
+    sb.write('fake.json', { 'r-1': { docs: [], missing: [{ field: 'documents', text: '가족관계증명서 1부', quote: '가족관계증명서 1부' }] } });
+    const run = sb.run('collector/final-review.mjs', ['--write'], { ...NOENV, FINAL_REVIEW_FAKE: sb.abs('fake.json') }, 30000);
+    const res = sb.json('collector/final-review.json') || {};
+    const again = sb.run('collector/final-review.mjs', ['--write'], { ...NOENV, FINAL_REVIEW_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  가짜 응답으로 — 빠진 내용이 관리자 파일에 · 같은 문서·카드는 다시 안 본다 · 학생 앱 파일(data/)은 그대로',
+      [run.status, ((res.items || {})['r-1'] || { problems: [] }).problems.map((p) => p.text), /대상 0건/.test(again.out), sb.read('data/card-read.json').includes('가족관계증명서')], [0, ['가족관계증명서 1부'], true, false]);
+    if (run.status !== 0) console.log(run.out.slice(-600));
+  } finally { sb.done(); }
 }
 
 /* ══ 활동 글의 틀린 미달 — 처지 낱말 · 열거 속 처지 · 「참가제한」 절 (2026-11-15 개발자 "네, 고쳐 주세요") ══

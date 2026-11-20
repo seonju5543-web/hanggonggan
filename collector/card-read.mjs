@@ -388,6 +388,11 @@ export function gateHeldOf(items, partsOf, ledger, paid, today, waitDays = 3) {
   }
   return out;
 }
+/* 유료가 멈춘 숨김분 — 사흘 넘게 기다렸는데 통과도 사람 몫(gateHeld)도 아닌 것. 앱은 이것을 무료 값으로 올린다(비상망) → 경보(card-read.yml)로 알린다 */
+export function gateStalled(items, data, today, waitDays = 3) {
+  const paid = (data && data.items) || {}, held = (data && data.gateHeld) || {};
+  return items.filter((it) => it.paidGate && !paid[it.id] && !held[it.id] && !closedNow(it, null, today) && daysSince(it.paidGate, today) > waitDays);
+}
 /* 관리자 「할 일」에 보일 말 (2026-11-20 개발자 지시 — *"이러이러한 부분이 기계검사에서 잡혔으니 뭐랑 뭐를 확인바란다는게 명확하게"*).
    🔴 로봇 말(held·verify·대조·「원문에 없는 글자」)을 쓰지 않는다 — 어느 칸 · 왜 잡혔는지 · 무엇을 확인하면 되는지를 한 문장씩 */
 export const FIELD_LABEL = { eligibility: '지원 자격', excludes: '받을 수 없는 경우', priority: '먼저 뽑는 기준', amount: '금액', apply: '접수 방법',
@@ -480,6 +485,12 @@ if (process.argv[1] && ranDirectly()) {
     process.exit(bad.length ? 1 : 0);
   }
   const reg = readJson('../data/registered.json', { items: [] });
+  if (process.argv.includes('--gate-alarm')) {   // 경보 세기(GITHUB_OUTPUT 꼴 · 읽기만) — 값에 줄바꿈이 들어가지 않게 누른다
+    const st = gateStalled(reg.items, data, TODAY), one = (x) => String(x || '').replace(/[\r\n]+/g, ' ').trim();
+    console.log(`count=${st.length}`);
+    console.log(`list=${one(st.slice(0, 12).map((it) => `${one(it.name).slice(0, 40)}(${it.id})`).join(' / ')).slice(0, 900)}`);
+    process.exit(0);
+  }
   const partsOf = makeSources({ texts: readJson('extracted/notices-text.json', {}), browserBodies: readJson('extracted/browser-bodies.json', {}), eligDocs: readJson('extracted/elig-docs.json', {}), extractedDir: P('extracted') });
   const ledger = strictJson('card-read-ledger.json', {});
   const { wonIn } = require('../parse-amount.js');

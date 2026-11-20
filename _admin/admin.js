@@ -246,7 +246,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages, paidReview, cardFixes, cardRead] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages, paidReview, cardFixes, cardRead, finalReview] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -272,10 +272,12 @@ async function loadAll() {
       readJson('collector/card-read-review.json', { items: {}, gateHeld: {} }),
       readJson('data/card-read-fixes.json', { v: 1, items: {} }),
       readJson('data/card-read.json', { items: {} }),
+      readJson('collector/final-review.json', { items: {} }),
     ]);
   D.paidReview = { items: (paidReview && paidReview.items) || {}, gateHeld: (paidReview && paidReview.gateHeld) || {} };
   D.cardFixes = (cardFixes && cardFixes.items) || {};
   D.cardRead = (cardRead && cardRead.items) || {};
+  D.finalReview = (finalReview && finalReview.items) || {};
 
   D.reg = reg.items || [];
   D.formsPdf = (formsPdf && formsPdf.items) || {};
@@ -864,6 +866,20 @@ function paidReviewTodo() {
   }
   return out;
 }
+/* 최종 검토(collector/final-review.mjs)가 낸 것 — 문서 문제(원본과 다름·다른 공고·양식 아님·내용 없음) · 카드에 빠진 내용 */
+const finalKey = (p) => (p.kind === 'missing' ? `final|${p.field}|${p.text}` : `final|${p.kind}|${p.doc}`);
+function finalReviewTodo() {
+  const live = new Map(D.reg.map((it) => [it.id, it]));
+  const out = [];
+  for (const [id, r] of Object.entries(D.finalReview || {})) {
+    const it = live.get(id);
+    if (!openForStudents(it)) continue;
+    const done = new Set(((D.cardFixes || {})[id] || {}).done || []);
+    const ps = (r.problems || []).filter((p) => !done.has(finalKey(p)));
+    if (ps.length) out.push({ it, problems: ps });
+  }
+  return out;
+}
 function gateHeldTodo() {
   const live = new Map(D.reg.map((it) => [it.id, it]));
   return Object.entries((D.paidReview && D.paidReview.gateHeld) || {}).map(([id, why]) => ({ it: live.get(id), why }))
@@ -872,7 +888,8 @@ function gateHeldTodo() {
 /* 옛 방식(두 번 읽기 · 11-20 전에 읽은 공고)에서 한쪽만 낸 줄은 기계 검사가 잡은 것이 아니다 — 따로 접어 두고 할 일 숫자에 안 센다(그 공고들이 마감되면 사라진다) */
 const isLegacyLine = (l) => l.kind === 'agree';
 function paidReviewCard() {
-  const n = paidReviewTodo().reduce((a, x) => a + x.lines.filter((l) => !isLegacyLine(l)).length, 0) + gateHeldTodo().length;
+  const n = paidReviewTodo().reduce((a, x) => a + x.lines.filter((l) => !isLegacyLine(l)).length, 0) + gateHeldTodo().length
+    + finalReviewTodo().reduce((a, x) => a + x.problems.length, 0);
   return { n, tone: 'is-warn', k: '유료 확인에서 사람이 볼 것',
     d: '기계 검사가 카드에서 뺀 줄과, 유료 확인을 못 해 아직 학생 화면에 없는 공고입니다. 줄마다 무엇을 확인하면 되는지 적혀 있습니다.',
     btn: '<button class="btn btn-sm" data-paid-card>아래에서 보기</button>', okD: '유료 확인이 뺀 줄도, 멈춘 공고도 없습니다' };
@@ -881,8 +898,7 @@ const GATE_WHY = {
   'no-source': '등록한 지 사흘이 지나도 공고 원문(본문·첨부)을 받지 못해 유료 확인을 못 했습니다.',
   unreadable: '유료가 원문을 읽었지만 카드에 실을 내용을 찾지 못했습니다(메뉴뿐인 화면·오류 화면·로그인 화면일 수 있습니다).',
 };
-function paidLineHtml(it, l) {
-  const key = `${l.field}|${l.text}`;
+function paidLineHtml(it, l, key = `${l.field}|${l.text}`) {
   const canPut = CARD_FIX_FIELDS.includes(l.field) && !!(D.cardRead || {})[it.id];
   return `<div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-paid-line="${esc(it.id)}" data-paid-key="${esc(key)}" data-paid-field="${esc(l.field)}">
     <div>
@@ -899,17 +915,26 @@ function paidLineHtml(it, l) {
         <button class="btn btn-sm" data-paid-op="drop">확인했어요(목록에서 내리기)</button></div>`}
     </div></div>`;
 }
+/* 최종 검토의 문서 문제 한 줄 — 고칠 줄이 아니라 사람이 문서를 열어 볼 일이라 「확인했어요」 하나 */
+function finalProblemHtml(it, p) {
+  if (p.kind === 'missing') return paidLineHtml(it, p, finalKey(p));
+  return `<div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-paid-line="${esc(it.id)}" data-paid-key="${esc(finalKey(p))}" data-paid-field="">
+    <div><div><span class="pill">문서</span> <b>${esc(p.doc || '')}</b></div>
+      <div><b>무엇이 걸렸나</b> ${esc(p.reason)}</div>
+      <div><b>확인할 것</b> ${esc(p.check)}</div>
+      <div class="btn-row"><button class="btn btn-sm" data-paid-op="drop">확인했어요(목록에서 내리기)</button></div></div></div>`;
+}
 function paidReviewHtml() {
-  const all = paidReviewTodo(), held = gateHeldTodo();
+  const all = paidReviewTodo(), held = gateHeldTodo(), fin = finalReviewTodo();
   const pick = (legacy) => all.map(({ it, lines: ls }) => ({ it, lines: ls.filter((l) => isLegacyLine(l) === legacy) })).filter((x) => x.lines.length);
   const lines = pick(false), legacy = pick(true);
-  if (!all.length && !held.length) return '';
+  if (!all.length && !held.length && !fin.length) return '';
   const group = ({ it, lines: ls }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${ls.length}줄</span></h3>
         <div>${ls.map((l) => paidLineHtml(it, l)).join('')}</div></div>`;
   const link = (it) => (it.sourceUrl ? `<a href="${esc(it.sourceUrl)}" target="_blank" rel="noopener">원문 열기 ↗</a>` : '');
   return `
     <details id="todo-paid" data-paid-section>
-      <summary>유료 확인에서 사람이 볼 것 — 기계 검사가 카드에서 뺀 줄 ${lines.reduce((a, x) => a + x.lines.length, 0)}줄(${lines.length}건) · 유료 확인을 못 한 공고 ${held.length}건</summary>
+      <summary>유료 확인에서 사람이 볼 것 — 기계 검사가 카드에서 뺀 줄 ${lines.reduce((a, x) => a + x.lines.length, 0)}줄(${lines.length}건) · 유료 확인을 못 한 공고 ${held.length}건 · 최종 검토에서 나온 것 ${fin.reduce((a, x) => a + x.problems.length, 0)}건</summary>
       <p class="muted">학생 화면에는 뺀 줄 없이 공고가 올라가 있습니다. 원문을 열어 확인한 뒤 살리기·고쳐서 싣기·버리기 중 하나를 누르면 바로 저장됩니다.</p>
       ${held.length ? `<div class="pgroup"><h3>유료 확인을 못 해 아직 학생 화면에 없는 공고</h3><div>${held.map(({ it, why }) => `
         <div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-gate-row="${esc(it.id)}"><div>
@@ -919,6 +944,8 @@ function paidReviewHtml() {
           <div class="btn-row"><button class="btn btn-sm" data-gate-op="open">올리기(무료 값으로)</button>
             <button class="btn btn-sm" data-gate-op="revert">빼기(재등록 차단)</button></div>
         </div></div>`).join('')}</div></div>` : ''}
+      ${fin.length ? `<div class="pgroup"><h3>최종 검토 — 앱의 문서·카드를 원문과 맞춰 본 결과</h3>${fin.map(({ it, problems }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${problems.length}건</span></h3>
+        <div>${problems.map((p) => finalProblemHtml(it, p)).join('')}</div></div>`).join('')}</div>` : ''}
       ${lines.map(group).join('')}
       ${legacy.length ? `<details><summary>옛 방식(두 번 읽기)에서 한쪽만 낸 줄 ${legacy.reduce((a, x) => a + x.lines.length, 0)}줄(${legacy.length}건) — 11월 20일 전에 읽은 공고라 마감되면 저절로 사라집니다</summary>
         ${legacy.map(group).join('')}</details>` : ''}
@@ -931,8 +958,13 @@ function bindPaidReview(root = byId('screen-todo')) {
     if (!row) return;
     const op = b.dataset.paidOp;
     const inp = row.querySelector('[data-paid-text]');
-    const text = op === 'keep' ? ((paidReviewTodo().find((x) => x.it.id === row.dataset.paidLine) || { lines: [] }).lines.find((l) => `${l.field}|${l.text}` === row.dataset.paidKey) || {}).text
-      : op === 'edit' ? ((inp && inp.value) || '').trim() : '';
+    const keepOf = () => {
+      const id = row.dataset.paidLine, key = row.dataset.paidKey;
+      const l = ((paidReviewTodo().find((x) => x.it.id === id) || { lines: [] }).lines.find((x) => `${x.field}|${x.text}` === key))
+        || ((finalReviewTodo().find((x) => x.it.id === id) || { problems: [] }).problems.find((p) => finalKey(p) === key));
+      return (l || {}).text;
+    };
+    const text = op === 'keep' ? keepOf() : op === 'edit' ? ((inp && inp.value) || '').trim() : '';
     if (op !== 'drop' && !text) { toast('실을 문장이 비었습니다'); return; }
     await applyAction('cardLine', { lines: [{ id: row.dataset.paidLine, field: row.dataset.paidField, key: row.dataset.paidKey, op, ...(text ? { text } : {}) }] },
       { keep: '줄 살리기', edit: '고쳐서 싣기', drop: '줄 버리기' }[op]);
@@ -2908,7 +2940,7 @@ const ROBOTS = [
      안 일어나는' 버튼이 된다.
    · `two-school-scan.yml` — 일회용이고 push 트리거가 남의 브랜치를 본다.
    관문(test-collector)이 이 둘이 목록에 **없는지** 확인한다. */
-const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml', 'key-expiry.yml', 'codeql.yml', 'codeql-triage.yml', 'error-watch.yml', 'card-read.yml'];   /* card-read: 유료 카드 읽기(11-15 · 하루 두 번 예약 · 스위치는 card-read-config.json) */   // error-watch: 앱 오류 급증 감시(11-13 · 2시간마다 · 경보 이슈로만) · codeql-triage: 보안 경고 정리(11-11 · Claude 세션용 버튼) · codeql: 보안 코드 점검(11-11 · 매주 예약 + 코드 push · 경보 이슈로만) · key-expiry: 열쇠 만료 확인(11-11 · 매일 예약 · 경보 이슈로만 알린다) · rollback: 직전 판으로 되돌리기(11-11 · 미리보기 → 번호 넣고 되돌리기 · Actions 탭에서만 — 관리자 화면 버튼은 나중에) · push-limit-check: 푸시 서버 운영 판이 저장소 판인지 도장으로 대조하는 진단(10-12) · push-deploy: 푸시 서버를 Cloudflare 운영에 올리는 배포(10-12 · 열쇠는 Actions 시크릿) — 둘 다 Actions 탭에서만
+const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml', 'key-expiry.yml', 'codeql.yml', 'codeql-triage.yml', 'error-watch.yml', 'card-read.yml', 'final-review.yml'];   /* card-read: 유료 카드 읽기(11-15 · 하루 두 번 예약 · 스위치는 card-read-config.json) · final-review: 유료 최종 검토(11-20 · 하루 한 번 예약 · 스위치는 final-review-config.json — 돈이 나가 버튼을 두지 않는다) */   // error-watch: 앱 오류 급증 감시(11-13 · 2시간마다 · 경보 이슈로만) · codeql-triage: 보안 경고 정리(11-11 · Claude 세션용 버튼) · codeql: 보안 코드 점검(11-11 · 매주 예약 + 코드 push · 경보 이슈로만) · key-expiry: 열쇠 만료 확인(11-11 · 매일 예약 · 경보 이슈로만 알린다) · rollback: 직전 판으로 되돌리기(11-11 · 미리보기 → 번호 넣고 되돌리기 · Actions 탭에서만 — 관리자 화면 버튼은 나중에) · push-limit-check: 푸시 서버 운영 판이 저장소 판인지 도장으로 대조하는 진단(10-12) · push-deploy: 푸시 서버를 Cloudflare 운영에 올리는 배포(10-12 · 열쇠는 Actions 시크릿) — 둘 다 Actions 탭에서만
 
 /** 설명은 함수일 수 있다 — 건수를 사본으로 두지 않고 셀 때 센다 */
 const robotDesc = (r) => (typeof r.d === 'function' ? r.d() : r.d);

@@ -134,6 +134,41 @@ jobs:
           node tools/alert-issue.mjs --mode open --match exact --title '🧾 유료 카드 읽기 알림' \
             --label card-read --label-color 5319E7 --label-description '유료 카드 읽기 로봇 실패' --body "$body"
 
+      # 🔴 유료가 멈춘 숨김분 (2026-11-20 · 설계 docs/designs/paid-gate-pipeline.md 2-1) — 사흘 넘게 통과를 못 낸 새 공고는 앱이 무료 값으로 올린다(비상망).
+      #    조용히 무료로 넘어가지 않게 여기서 경보를 연다. 짝(닫기)은 바로 아래 · 제목이 같아야 닫힌다(tools/alert-issue.mjs)
+      - id: stall
+        name: 유료가 멈춘 숨김분 세기
+        if: always()
+        timeout-minutes: 1
+        continue-on-error: true
+        run: node collector/card-read.mjs --gate-alarm >> "$GITHUB_OUTPUT"
+      - name: 🚨 유료 확인이 사흘 넘게 멈췄어요
+        if: always() && steps.stall.outputs.count != '' && steps.stall.outputs.count != '0'
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          N: ${{ steps.stall.outputs.count }}
+          LIST: ${{ steps.stall.outputs.list }}
+        run: |
+          body="🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 새로 등록된 공고 ${N}건이 사흘 넘게 유료 확인을 통과하지 못해 **무료 값으로** 학생 화면에 올라갔습니다.
+          ${LIST}
+
+          유료 카드 읽기가 꺼져 있거나(collector/card-read-config.json) 잔액이 없거나 실패하고 있는지 확인하세요.
+          다음 실행에서 0건이면 이 이슈는 저절로 닫힙니다."
+          node tools/alert-issue.mjs --mode open --match exact --title '🧾 유료 확인이 멈췄어요' \
+            --label card-read --label-color 5319E7 --label-description '유료 카드 읽기 로봇 실패' --body "$body"
+      - name: ✅ 유료 확인 회복 — 경보 닫기
+        if: always() && steps.stall.outputs.count == '0'
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          node tools/alert-issue.mjs --mode resolve --match exact --title '🧾 유료 확인이 멈췄어요' --body "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 유료 확인을 기다리다 무료 값으로 넘어간 공고가 없습니다. 자동으로 닫습니다."
+
       - name: 다시 성공하면 알림을 닫는다
         if: success() && steps.read.outcome == 'success'
         timeout-minutes: 1
