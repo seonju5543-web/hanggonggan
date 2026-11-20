@@ -1,7 +1,53 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "2026학년도 11월 2차 교내 정기 단체헌혈 안내 (11/24 화요일 10시~16시반)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31879&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-20",
+   "postId": "31879",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-20",
+   "thumb": "data/news/img/6c6b03bc294d3397.webp",
+   "desc": "대외협력과 2026학년도 11월 2차 교내 정기 단체헌혈 안내입니다! 많은 관심과 참여 부탁드립니다!"
+  },
+  {
+   "title": "2026년도 제24회 「UOS 연구 콜로키움」 - 삼성미래기술육성사업 설명회 개최 안내 (2026. 11. 23.(월) 14시, 창의혁신관 SI 아레나)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31880&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-20",
+   "postId": "31880",
+   "kind": "행사",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-20",
+   "thumb": "data/news/img/8e911dcd2263f403.webp",
+   "desc": "이번 콜로키움은 삼성미래기술육성사업 설명회 로 진행됩니다. 삼성 미래기술육성 재단 김성진 PD 님을 모시고 사업 소개와 함께, 현재 진행 중인 2027 년 상반기 과제 공모 안내 및 현장 질의응답 시간을 가질…"
+  },
+  {
+   "title": "[의사소통교실] 2026학년도 2학기 <대학글쓰기> 교과목 감독자 추가 모집 안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31881&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-20",
+   "postId": "31881",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-20",
+   "desc": "근무일시 모집대상 ○ 서울시립대학교 대학원생 및 졸업생 ( ※ 학부생 및 교직원 지원불가 ) 모집인원 시험감독"
+  },
+  {
+   "title": "서울시립대학교 교원업적평가 규정 일부개정(안) 사전예고",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31876&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-20",
+   "postId": "31876",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-20"
+  },
   {
    "title": "[청년취업사관학교] 📌AI로 영상을 제작한다고@.@",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31874&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -420,53 +466,6 @@
    "foundAt": "2026-11-09",
    "thumb": "data/news/img/33c232c91a03ccfb.webp",
    "desc": "대외협력과 2026학년도 11월 교내 정기 단체헌혈 안내입니다! 많은 관심과 참여 부탁드립니다!"
-  },
-  {
-   "title": "▶제108차 어반인프라포럼: From One Million to the10-Minute City: How Seoul’s Planning Evolved with Each Stage of Development◀",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31799&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-09",
-   "postId": "31799",
-   "kind": "행사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-09"
-  },
-  {
-   "title": "[박물관] 2025년 기획전 전시 종료 및 2026년 기획전 신규 개관 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31807&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-09",
-   "postId": "31807",
-   "kind": "행사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-09",
-   "desc": "2025년 기획전 <고양이 눈의 신부 리차드 러트가 그린 한국> 전시가 종료되었습니다. 기존 전시 철거 및 새 전시 공사를 위해 2026.11.9.~12.10.까지 박물관 문을 닫습니다."
-  },
-  {
-   "title": "홈페이지 보안사고 관련 경위 및 전담 콜센터 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31805&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-06",
-   "postId": "31805",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/4376a475ca196ca3.webp",
-   "desc": "전산정보과 전산정보과 서울시립대학교 구성원 여러분께 안내드립니다 . 최근 우리 대학 홈페이지에서 발생한 악성코드 침해 사고로 구성원 여러분께 불편과 심려를 끼쳐 드린 점 진심으로 사과드립니다 . 사고 발생 이후…"
-  },
-  {
-   "title": "[공고] 2027학년도 수시모집 면접평가 시행에 따른 캠퍼스 및 건물 출입 통제 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31806&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-06",
-   "postId": "31806",
-   "kind": "생활",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-08",
-   "desc": "서울시립대학교 공고 제 2026 – 522 호 「 2027 학년도 수시모집 학생부종합전형 면접평가 」 시행과 관련하여 원활한 입학 전형 진행을 위해 출입이 허가된 사람 ( 수험생 및 면접 평가 관계자 등 ) 이외에…"
   }
  ]
 }

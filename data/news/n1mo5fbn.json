@@ -1,7 +1,18 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "웹툰으로 알아보는 상담소 이용 가이드 ⑦탄 - 자기이해와 자존감",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=896528&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-20",
+   "school": "세종대학교",
+   "campus": "",
+   "src": "8a741b47",
+   "foundAt": "2026-11-20",
+   "thumb": "data/news/img/2467eed548abfe90.webp",
+   "desc": "학생생활상담소 남들과 비교하며 스스로를 부족하다고 느끼고, 괜히 나만 뒤처지는 것 같은 기분에 지치셨나요 ? 비교와 자기비난 속에서 작아지는 내 마음, 나만의 강점과 소중한 모습을 함께 찾아보며 작은 실천부터…"
+  },
   {
    "title": "웹툰으로 알아보는 상담소 이용 가이드 ⑥탄 - 대학생활 적응",
    "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=896489&article.offset=0&articleLimit=10",
@@ -100,17 +111,6 @@
    "foundAt": "2026-10-29",
    "thumb": "data/news/img/9a050f727cfe51da.webp",
    "desc": "교수학습개발센터 2~4학년 비대면 그룹 학습컨설팅 이 현재 접수 진행 중이며(~11/15) 1학년/2~4학년의 온라인 셀프 학습컨설팅 또한 현재 접수 연장하여 진행 중(~11/30) 입니다."
-  },
-  {
-   "title": "세종대학교 정규직 채용",
-   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894982&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-20",
-   "kind": "채용",
-   "school": "세종대학교",
-   "campus": "",
-   "src": "8a741b47",
-   "foundAt": "2026-10-20",
-   "desc": "우리 대학과 함께 성장할 유능하고 성실한 인재를 아래와 같이 모집합니다."
   }
  ]
 }

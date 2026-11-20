@@ -1,7 +1,27 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "[국제학생] [Alumni Interview Relay11] From Kwangwoon to a Career in Korea : Do Thi Phuong Chi’s Journey",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53718&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-20",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-20"
+  },
+  {
+   "title": "[학사] 2026학년도 동계 계절수업 서울권역e-러닝 학사일정 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53719&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-20",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-20",
+   "desc": "학사일정 계절학기 수업운영 기준 [SELC LMS (selc.or.kr)에서 온라인으로 진행] 수업은 총 3주(강의 14회)로 운영되며, 지각제도는 운영하지 않음 1주차: 2026. 12. 21.(월) 강의 5회차…"
+  },
   {
    "title": "[일반] [광운대학교 창업보육센터] 광운창업지원센터 신규 입주기업 모집(~12.07(월))",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53715&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -409,27 +429,6 @@
    "foundAt": "2026-11-08",
    "thumb": "data/news/img/74c179efb3ca6703.webp",
    "desc": "안녕하십니까, 2026년도 광운대학교 제60대 졸업준비위원회입니다. 2026학년도 2학기 졸업 앨범 촬영 일정을 아래와 같이 안내드립니다."
-  },
-  {
-   "title": "[국제교류] [대학혁신사업] 2026학년도 Global Challenger 최종선발팀 및 유의사항 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53609&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-04",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/f9096dabf5754238.webp"
-  },
-  {
-   "title": "[일반] 2027학년도 전반기 전임교원 특별채용 초빙 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53608&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-04",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-08",
-   "desc": "1. 초빙 분야 및 인원 가 . 일반전임 ( 정년트랙 ) 전자정보공과대학 전자공학과 학과 ( 부 ) 별 인원 전자통신공학과 전자융합공학과 전기공학과 전자재료공학과 반도체시스템공학부 인공지능융합대학 컴퓨터정보공학부…"
   }
  ]
 }

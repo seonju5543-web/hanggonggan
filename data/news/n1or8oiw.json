@@ -1,6 +1,6 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
   {
    "title": "[동국대학교 인권센터] 2026학년도 인권실태조사 참여 안내 (2026.11.17~11.24)",
@@ -20,7 +20,8 @@
    "school": "동국대학교",
    "campus": "",
    "src": "d521f12e",
-   "foundAt": "2026-11-19"
+   "foundAt": "2026-11-19",
+   "thumb": "data/news/img/600513977f31434a.webp"
   },
   {
    "title": "[교수학습혁신센터] **For international students** GROW PROGRAM: 2nd Recruitment(Application Period Extended!!)",
@@ -424,38 +425,6 @@
    "src": "d521f12e",
    "foundAt": "2026-10-21",
    "thumb": "data/news/img/1a4f6e842b382123.webp"
-  },
-  {
-   "title": "[카운슬링센터] '온라인 심리검사'로 자기점검 해볼까? - 대학생활 적응 정도 및 학습 전략 장단점에 관하여",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766675",
-   "postId": "26766675",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[서울앵커사업단 캠퍼스타운센터] (일본대학 학생들과 함께하는) 해외 대학 연계 인바운드 팀창업 프로젝트",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766670",
-   "postedAt": "2026-10-20",
-   "postId": "26766670",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/a903c6e99ad7e84f.webp",
-   "desc": "동국대학교 캠퍼스타운센터에서는 창업에 관심이 높은 일본 대학생 및 동국대 학생 간 지역 문제 해결형 · 콘텐츠 발굴형 팀창업 실습 참가자를 다음과 같이 모집하오니 많은 관심과 참여 부탁드립니다 ."
-  },
-  {
-   "title": "(예비군연대) 2026년 학생 예비군 3차 훈련 안내",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766669",
-   "postedAt": "2026-10-20",
-   "postId": "26766669",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/a386e8d30f9d4d7d.webp"
   }
  ]
 }
