@@ -267,10 +267,12 @@ async function backgroundCheck() {
 
   /* 유료 카드 읽기 결과를 화면과 **같은 함수**로 얹는다(match-engine applyCardRead · 2026-11-15) — 안 얹으면 화면은 고친 마감을, 알림은 옛 마감을 말한다.
      못 받으면 그대로(무료 길) · 옛 엔진이 캐시에서 올 수 있어 typeof 로 감싼다 */
-  if (reg && typeof applyCardRead === 'function') {
+  /* 2026-11-20 유료 관문 — 유료 확인 전 숨김분도 화면과 같은 함수(publishedList)로 거른다 · card-read.json 을 못 받아도 거른다 */
+  if (reg && typeof publishedList === 'function') {
     const cardRead = await readJson('data/card-read.json').catch(() => null);
-    if (cardRead) reg.items = applyCardRead(reg.items || [], cardRead);
-  }
+    const cardFixes = await readJson('data/card-read-fixes.json').catch(() => null);   // 관리자가 살린 줄 — 화면과 같은 값
+    reg.items = publishedList(reg.items || [], cardRead, null, cardFixes);
+  } else if (reg) reg.items = (reg.items || []).filter((s) => !s.paidGate);
   const out = NOTIFY_RULES.evaluate({
     now: Date.now(),
     profile,

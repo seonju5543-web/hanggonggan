@@ -167,10 +167,24 @@ function effectiveDeadline(s, cardRead) {
   const d = cr && cr.deadline && typeof cr.deadline === 'object' ? String(cr.deadline.date || '') : '';
   return /^\d{4}-\d{2}-\d{2}$/.test(d) && !/^관리자/.test(String(s.deadlineFrom || '')) ? d : (s.deadline || null);
 }
+/* 🔴 유료 관문 (2026-11-20) — match-engine.js paidGateOpen 의 **사본**(이 워커는 공용 파일을 안 불러 쓴다 · 위 사본 절의 까닭).
+   유료 확인 전 숨김분으로 폰을 깨우면 폰은 그 공고를 못 보여 준다(빈 알림). 관문 「유료 관문」 이 글자로 대조한다 — 원본을 바꾸면 여기도 */
+const PAID_GATE_WAIT_DAYS = 3;
+const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+function paidGateOpen(sch, doc, today) {
+  if (!sch || !sch.paidGate) return true;
+  if (!doc || typeof doc !== 'object') return false;   // 결과 파일을 못 받은 날은 숨김분을 다 숨긴다(통과했는지 모른다 · 잠깐 안 보이는 쪽이 안전하다)
+  const items = doc.items, held = doc.gateHeld;
+  if (items && typeof items === 'object' && items[sch.id]) return true;
+  if (held && typeof held === 'object' && held[sch.id]) return false;
+  const waited = (Date.parse(`${today || kstToday()}T00:00:00Z`) - Date.parse(`${String(sch.paidGate).slice(0, 10)}T00:00:00Z`)) / 86400000;
+  return Number.isFinite(waited) && waited > PAID_GATE_WAIT_DAYS;
+}
 function summarize(reg, notices, cardRead) {
+  const today = kstToday();
   return {
     reg: ((reg && reg.items) || [])
-      .filter((s) => s && s.id)
+      .filter((s) => s && s.id && paidGateOpen(s, cardRead, today))
       .map((s) => {
         const e = s.eligibility || {};
         const any = Array.isArray(e.schoolsAny) && e.schoolsAny.length

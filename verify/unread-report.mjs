@@ -4,7 +4,7 @@
    왜: 개발자가 카드를 하나씩 열어 보고 "이건 왜 금액이 없어?"라고 알려 줘야 고쳐지던 것을 끝낸다.
        같은 숫자를 매일 로봇이 세어 수집 리포트(GitHub 이슈)에 붙이면, 새 유형은 **사람이 아니라 숫자가** 먼저 말한다.
    무엇을 가르나(마감 전 공고만 · 상시 제도 제외):
-     · 원문 없음           — 받아 온 글자가 메뉴뿐(껍데기)이거나 없다 → 자격요건 로봇(rescue-bodies)의 몫
+     · 원문 없음           — 받아 온 글자가 메뉴뿐(껍데기)이거나 없다 → 원문 받기 로봇(rescue-bodies)의 몫
      · 글자 있는데 못 읽음 — 원문에 금액 글자·이름표 달린 날짜가 있는데 규칙이 못 읽었다 → **규칙 고칠 일**(이 목록이 개발자가 알려 주던 그것)
      · 원문에 없음         — 글자는 있는데 금액·날짜가 적혀 있지 않다 → 첨부가 있으면 첨부 로봇의 몫, 없으면 정직하게 빈 칸
    베끼지 않는다: 원문 찾기는 notice-source(indexTexts·sourceFor·hasText), 금액은 parse-amount, 마감은 extract-excerpts 그대로.
@@ -68,7 +68,7 @@ export function render(r) {
   sec('💰 금액 모름', r.amount);
   sec('📅 마감 없음', r.deadline);
   sec('📋 자격 줄 없음', r.elig);
-  lines.push('> 「글자 있는데 못 읽음」은 규칙이 고칠 목록(parse-amount · extract-excerpts) · 「원문 없음」은 자격요건 로봇(rescue-bodies)이 다시 받는다 · 「원문에 없음」은 첨부 로봇 몫이거나 정직한 빈 칸.');
+  lines.push('> 「글자 있는데 못 읽음」은 규칙이 고칠 목록(parse-amount · extract-excerpts) · 「원문 없음」은 원문 받기 로봇(rescue-bodies)이 다시 받는다 · 「원문에 없음」은 첨부 로봇 몫이거나 정직한 빈 칸.');
   return lines.join('\n');
 }
 

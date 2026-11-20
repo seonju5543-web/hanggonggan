@@ -19,8 +19,8 @@
    🔴 받은 파일은 **커밋하지 않는다**(act-files 는 .gitignore) — 포스터가 글 15건에 8MB 였다(첫 실측). ①②는 한 실행 안에서 끝나고,
       ③은 필요한 파일을 그 자리에서 다시 받는다. 커밋하는 것은 '이미 해 봤다' 장부(act-docs.json)뿐이다.
    🔴 본문에서 자격이 나오면 본문이 이긴다 — 수집 로봇이 다시 읽을 때 putActivityDetails 가 정한다.
-   ④ --browser (2026-10-04 개발자 지시 "진짜 브라우저로 열어야 되는 공고는 다 자격요건 로봇으로") — ①②를 **진짜 크롬으로 그린 페이지**로.
-      자격요건 로봇(rescue-bodies.yml)만 이 모드로 돌린다(수집 로봇과 따로 · 겹치지 않게). 무료 모드로 이미 해 보고도 못 읽은 글만 맡는다.
+   ④ --browser (2026-10-04 개발자 지시 "진짜 브라우저로 열어야 되는 공고는 다 원문 받기 로봇으로") — ①②를 **진짜 크롬으로 그린 페이지**로.
+      원문 받기 로봇(rescue-bodies.yml)만 이 모드로 돌린다(수집 로봇과 따로 · 겹치지 않게). 무료 모드로 이미 해 보고도 못 읽은 글만 맡는다.
       🔴 data/activities.json 은 **쓰지 않는다** — 수집 로봇·공공 API 로봇이 이미 쓰는 파일이라 셋이 쓰면 push 가 부딪힌다.
          결과는 자기 장부(collector/act-browser.json)에만 적고, 수집 로봇의 --apply 가 다음 실행에 합친다.
       규칙(고르기·남의 글 막기·첨부·요강 페이지)은 무료 모드와 **한 벌** — 페이지를 받는 방법(getHtml)만 바꿔 끼운다.
@@ -46,7 +46,7 @@ const DIR = fileURLToPath(new URL('act-files/', HERE));          // 일회용 �
 const MANIFEST = path.join(DIR, 'manifest.json');                // 이번 실행이 받은 파일 { 주소: [파일] }
 const BROWSER = process.argv.includes('--browser');
 const PLAIN_LEDGER = fileURLToPath(new URL('act-docs.json', HERE));       // 수집 로봇(무료 모드)의 장부 — { 주소: { at, tries } }
-const BROWSER_LEDGER = fileURLToPath(new URL('act-browser.json', HERE));  // 자격요건 로봇(브라우저 모드)의 장부 + 결과
+const BROWSER_LEDGER = fileURLToPath(new URL('act-browser.json', HERE));  // 원문 받기 로봇(브라우저 모드)의 장부 + 결과
 const LEDGER = BROWSER ? BROWSER_LEDGER : PLAIN_LEDGER;                   // 커밋 — 모드마다 제 장부만 쓴다(두 로봇이 같은 파일을 안 쓴다)
 const log = (m) => console.log(`[activity-docs] ${m}`);
 
@@ -181,7 +181,7 @@ async function plainHtml(url, referer) {
 }
 let getHtml = plainHtml;
 
-/* 진짜 크롬 — 자격요건 로봇 전용. 🔴 시간 초과 대비(collector/rescue-bodies.mjs 에서 배운 것을 그대로):
+/* 진짜 크롬 — 원문 받기 로봇 전용. 🔴 시간 초과 대비(collector/rescue-bodies.mjs 에서 배운 것을 그대로):
    ① 한 페이지에 절대 시한(PAGE_MS) — goto 가 돌아와도 프레임 읽기가 멈출 수 있다 ② 팝업을 치운다(동국대: 팝업이 본문을 가렸다)
    ③ 프레임 안까지 읽는다 ④ 브라우저가 죽으면 한 번 다시 띄운다 ⑤ 페이지는 반드시 닫는다 */
 const PAGE_MS = 45000;
@@ -458,7 +458,7 @@ function applyPhase(acts) {
   return got;
 }
 
-/** 자격요건 로봇이 장부에 적어 둔 결과를 활동 글에 합친다 — 수집 로봇(무료 모드 --apply)만 부른다. 아직 자격이 없는 글에만.
+/** 원문 받기 로봇이 장부에 적어 둔 결과를 활동 글에 합친다 — 수집 로봇(무료 모드 --apply)만 부른다. 아직 자격이 없는 글에만.
     장부에 이미 적힌 옛 줄도 지금 거름(activity-excerpts.mjs eligLineOk — 여러 갈래 나이·개인정보 안내문)을 지나야 한다 —
     안 그러면 발행이 걷은 줄을 다음 실행이 장부에서 다시 붙여 자격 칸이 비었다 찼다 한다. 남는 줄이 없으면 합치지 않는다 (2026-10-05 점검 api-06) */
 export function mergeBrowserResults(acts, bled = readJson(BROWSER_LEDGER, {})) {

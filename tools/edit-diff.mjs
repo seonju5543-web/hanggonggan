@@ -47,6 +47,7 @@ export const EDIT_LABEL = {
   exclusivity: '이중수혜(중복 수혜) 조항',
   prepDoc: '자유 형식 제출 (준비용 문서)',
   prepDocBasis: '자유 형식 제출 근거 문장',
+  paidGate: '유료 확인 대기 (지우면 무료 값으로 올림)',
 };
 
 export const ALLOWED = new Set(Object.keys(EDIT_LABEL));

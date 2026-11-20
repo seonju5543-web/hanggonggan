@@ -246,7 +246,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages, paidReview, cardFixes, cardRead, finalReview] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -268,7 +268,16 @@ async function loadAll() {
       readJson('data/link-fixes.json', { v: 1, fix: {} }),
       readJson('data/forms-pdf/index.json', { items: {} }),
       readJson('data/form-pages/index.json', { items: {} }),
+      /* 유료 확인(2026-11-20) — 잡힌 줄(사람 말) · 사람이 정한 줄 · 유료 결과 */
+      readJson('collector/card-read-review.json', { items: {}, gateHeld: {} }),
+      readJson('data/card-read-fixes.json', { v: 1, items: {} }),
+      readJson('data/card-read.json', { items: {} }),
+      readJson('collector/final-review.json', { items: {} }),
     ]);
+  D.paidReview = { items: (paidReview && paidReview.items) || {}, gateHeld: (paidReview && paidReview.gateHeld) || {} };
+  D.cardFixes = (cardFixes && cardFixes.items) || {};
+  D.cardRead = (cardRead && cardRead.items) || {};
+  D.finalReview = (finalReview && finalReview.items) || {};
 
   D.reg = reg.items || [];
   D.formsPdf = (formsPdf && formsPdf.items) || {};
@@ -835,6 +844,146 @@ function renderCounts() {
   set('n-news', D.newsSources.sources.filter((s) => !s.boardUrl).length, true);   // 사람 손이 필요한 것 = 게시판 주소가 없는 학교 수
 }
 
+/* ============================================================
+   유료 확인에서 사람이 볼 것 (2026-11-20 개발자 지시 — *"이러이러한 부분이 기계검사에서 잡혔으니 뭐랑 뭐를 확인바란다는게 명확하게"*)
+   ------------------------------------------------------------
+   ① 잡힌 줄 — 유료 확인(collector/card-read.mjs)의 기계 검사가 뺀 줄. 학생 화면에는 그 줄만 빠진 채 공고가 올라가 있다(개발자 결정 「빼고 올려」).
+      줄마다 칸 이름 · 유료가 쓴 문장 · 근거로 든 원문 문구 · 왜 잡혔는지 · 무엇을 확인하면 되는지 — 말은 로봇이 collector/card-read-review.json 에 적어 둔다(explainLine).
+      살리기 = 그 문장 그대로 카드에 싣는다 · 고쳐서 싣기 = 고친 문장을 싣는다 · 버리기 = 싣지 않고 목록에서 내린다(tools/admin-apply cardLine → data/card-read-fixes.json).
+   ② 유료 확인을 못 한 숨김분 — 원문을 못 받았거나 읽을 내용이 없던 공고(학생 화면에 아직 없다). 올리기 = 무료 값으로 학생 화면에 · 빼기 = 등록 취소 + 재등록 차단.
+   ============================================================ */
+const CARD_FIX_FIELDS = ['eligibility', 'excludes', 'priority', 'amount', 'apply', 'documents', 'notes'];
+const openForStudents = (it) => it && (dday(it.deadline) == null || dday(it.deadline) >= 0);
+function paidReviewTodo() {
+  const live = new Map(D.reg.map((it) => [it.id, it]));
+  const out = [];
+  for (const [id, r] of Object.entries((D.paidReview && D.paidReview.items) || {})) {
+    const it = live.get(id);
+    if (!openForStudents(it)) continue;
+    const done = new Set(((D.cardFixes || {})[id] || {}).done || []);
+    const lines = (r.lines || []).filter((l) => !done.has(`${l.field}|${l.text}`));
+    if (lines.length) out.push({ it, lines });
+  }
+  return out;
+}
+/* 최종 검토(collector/final-review.mjs)가 낸 것 — 문서 문제(원본과 다름·다른 공고·양식 아님·내용 없음) · 카드에 빠진 내용 */
+const finalKey = (p) => (p.kind === 'missing' ? `final|${p.field}|${p.text}` : `final|${p.kind}|${p.doc}`);
+function finalReviewTodo() {
+  const live = new Map(D.reg.map((it) => [it.id, it]));
+  const out = [];
+  for (const [id, r] of Object.entries(D.finalReview || {})) {
+    const it = live.get(id);
+    if (!openForStudents(it)) continue;
+    const done = new Set(((D.cardFixes || {})[id] || {}).done || []);
+    const ps = (r.problems || []).filter((p) => !done.has(finalKey(p)));
+    if (ps.length) out.push({ it, problems: ps });
+  }
+  return out;
+}
+function gateHeldTodo() {
+  const live = new Map(D.reg.map((it) => [it.id, it]));
+  return Object.entries((D.paidReview && D.paidReview.gateHeld) || {}).map(([id, why]) => ({ it: live.get(id), why }))
+    .filter((x) => x.it && x.it.paidGate && openForStudents(x.it));
+}
+/* 옛 방식(두 번 읽기 · 11-20 전에 읽은 공고)에서 한쪽만 낸 줄은 기계 검사가 잡은 것이 아니다 — 따로 접어 두고 할 일 숫자에 안 센다(그 공고들이 마감되면 사라진다) */
+const isLegacyLine = (l) => l.kind === 'agree';
+function paidReviewCard() {
+  const n = paidReviewTodo().reduce((a, x) => a + x.lines.filter((l) => !isLegacyLine(l)).length, 0) + gateHeldTodo().length
+    + finalReviewTodo().reduce((a, x) => a + x.problems.length, 0);
+  return { n, tone: 'is-warn', k: '유료 확인에서 사람이 볼 것',
+    d: '기계 검사가 카드에서 뺀 줄과, 유료 확인을 못 해 아직 학생 화면에 없는 공고입니다. 줄마다 무엇을 확인하면 되는지 적혀 있습니다.',
+    btn: '<button class="btn btn-sm" data-paid-card>아래에서 보기</button>', okD: '유료 확인이 뺀 줄도, 멈춘 공고도 없습니다' };
+}
+const GATE_WHY = {
+  'no-source': '등록한 지 사흘이 지나도 공고 원문(본문·첨부)을 받지 못해 유료 확인을 못 했습니다.',
+  unreadable: '유료가 원문을 읽었지만 카드에 실을 내용을 찾지 못했습니다(메뉴뿐인 화면·오류 화면·로그인 화면일 수 있습니다).',
+};
+function paidLineHtml(it, l, key = `${l.field}|${l.text}`) {
+  const paid = (D.cardRead || {})[it.id];
+  const canPut = CARD_FIX_FIELDS.includes(l.field) && !!paid && Array.isArray(paid[l.field]);   // 무료 길 값(null) 칸에는 한 줄만 얹지 않는다(학생이 보던 줄 전체가 줄어든다)
+  return `<div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-paid-line="${esc(it.id)}" data-paid-key="${esc(key)}" data-paid-field="${esc(l.field)}">
+    <div>
+      <div><span class="pill">${esc(l.label)}</span> <b>유료가 쓴 문장</b> ${esc(l.text)}</div>
+      ${l.quote ? `<div class="muted"><b>근거로 든 원문</b> 「${esc(l.quote)}」</div>` : ''}
+      <div><b>왜 뺐나</b> ${esc(l.reason)}</div>
+      <div><b>확인할 것</b> ${esc(l.check)}</div>
+      ${canPut ? `<div class="btn-row">
+        <button class="btn btn-sm" data-paid-op="keep">살리기</button>
+        <input class="input" data-paid-text value="${esc(l.text)}" aria-label="고쳐서 실을 문장" style="min-width:16em">
+        <button class="btn btn-sm" data-paid-op="edit">고쳐서 싣기</button>
+        <button class="btn btn-sm" data-paid-op="drop">버리기</button></div>`
+    : `<div class="btn-row"><span class="muted">${!CARD_FIX_FIELDS.includes(l.field) ? '마감·주는 곳·제목은 공고 고치기에서 고쳐 주세요.' : !paid ? '이 공고는 아직 유료 결과가 없어 줄을 얹을 카드가 없습니다.' : '이 칸은 학생 화면에 무료 값(원문 줄 전체)이 보이고 있습니다 — 고칠 것이 있으면 공고 고치기에서 고쳐 주세요.'}</span>
+        <button class="btn btn-sm" data-paid-op="drop">확인했어요(목록에서 내리기)</button></div>`}
+    </div></div>`;
+}
+/* 최종 검토의 문서 문제 한 줄 — 고칠 줄이 아니라 사람이 문서를 열어 볼 일이라 「확인했어요」 하나 */
+function finalProblemHtml(it, p) {
+  if (p.kind === 'missing') return paidLineHtml(it, p, finalKey(p));
+  return `<div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-paid-line="${esc(it.id)}" data-paid-key="${esc(finalKey(p))}" data-paid-field="">
+    <div><div><span class="pill">문서</span> <b>${esc(p.doc || '')}</b></div>
+      <div><b>무엇이 걸렸나</b> ${esc(p.reason)}</div>
+      <div><b>확인할 것</b> ${esc(p.check)}</div>
+      <div class="btn-row"><button class="btn btn-sm" data-paid-op="drop">확인했어요(목록에서 내리기)</button></div></div></div>`;
+}
+function paidReviewHtml() {
+  const all = paidReviewTodo(), held = gateHeldTodo(), fin = finalReviewTodo();
+  const pick = (legacy) => all.map(({ it, lines: ls }) => ({ it, lines: ls.filter((l) => isLegacyLine(l) === legacy) })).filter((x) => x.lines.length);
+  const lines = pick(false), legacy = pick(true);
+  if (!all.length && !held.length && !fin.length) return '';
+  const group = ({ it, lines: ls }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${ls.length}줄</span></h3>
+        <div>${ls.map((l) => paidLineHtml(it, l)).join('')}</div></div>`;
+  const link = (it) => (it.sourceUrl ? `<a href="${esc(it.sourceUrl)}" target="_blank" rel="noopener">원문 열기 ↗</a>` : '');
+  return `
+    <details id="todo-paid" data-paid-section>
+      <summary>유료 확인에서 사람이 볼 것 — 기계 검사가 카드에서 뺀 줄 ${lines.reduce((a, x) => a + x.lines.length, 0)}줄(${lines.length}건) · 유료 확인을 못 한 공고 ${held.length}건 · 최종 검토에서 나온 것 ${fin.reduce((a, x) => a + x.problems.length, 0)}건</summary>
+      <p class="muted">학생 화면에는 이 줄들이 빠진 채 공고가 올라가 있습니다(한 칸의 줄이 전부 빠진 경우엔 그 칸만 무료 값으로). 원문을 열어 확인한 뒤 살리기·고쳐서 싣기·버리기 중 하나를 누르면 바로 저장됩니다.</p>
+      ${held.length ? `<div class="pgroup"><h3>유료 확인을 못 해 아직 학생 화면에 없는 공고</h3><div>${held.map(({ it, why }) => `
+        <div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-gate-row="${esc(it.id)}"><div>
+          <div><b>${esc(it.name)}</b> ${link(it)}</div>
+          <div>${esc(GATE_WHY[why] || '유료 확인을 못 했습니다.')}</div>
+          <div><b>확인할 것</b> 원문을 열어 진짜 장학 공고인지 보고, 올릴지 뺄지 정해 주세요.</div>
+          <div class="btn-row"><button class="btn btn-sm" data-gate-op="open">올리기(무료 값으로)</button>
+            <button class="btn btn-sm" data-gate-op="revert">빼기(재등록 차단)</button></div>
+        </div></div>`).join('')}</div></div>` : ''}
+      ${fin.length ? `<div class="pgroup"><h3>최종 검토 — 앱의 문서·카드를 원문과 맞춰 본 결과</h3>${fin.map(({ it, problems }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${problems.length}건</span></h3>
+        <div>${problems.map((p) => finalProblemHtml(it, p)).join('')}</div></div>`).join('')}</div>` : ''}
+      ${lines.map(group).join('')}
+      ${legacy.length ? `<details><summary>옛 방식(두 번 읽기)에서 한쪽만 낸 줄 ${legacy.reduce((a, x) => a + x.lines.length, 0)}줄(${legacy.length}건) — 11월 20일 전에 읽은 공고라 마감되면 저절로 사라집니다</summary>
+        ${legacy.map(group).join('')}</details>` : ''}
+    </details>`;
+}
+function bindPaidReview(root = byId('screen-todo')) {
+  $$('[data-paid-op]', root).forEach((b) => b.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const row = b.closest('[data-paid-line]');
+    if (!row) return;
+    const op = b.dataset.paidOp;
+    const inp = row.querySelector('[data-paid-text]');
+    const keepOf = () => {
+      const id = row.dataset.paidLine, key = row.dataset.paidKey;
+      const l = ((paidReviewTodo().find((x) => x.it.id === id) || { lines: [] }).lines.find((x) => `${x.field}|${x.text}` === key))
+        || ((finalReviewTodo().find((x) => x.it.id === id) || { problems: [] }).problems.find((p) => finalKey(p) === key));
+      return (l || {}).text;
+    };
+    const text = op === 'keep' ? keepOf() : op === 'edit' ? ((inp && inp.value) || '').trim() : '';
+    if (op !== 'drop' && !text) { toast('실을 문장이 비었습니다'); return; }
+    await applyAction('cardLine', { lines: [{ id: row.dataset.paidLine, field: row.dataset.paidField, key: row.dataset.paidKey, op, ...(text ? { text } : {}) }] },
+      { keep: '줄 살리기', edit: '고쳐서 싣기', drop: '줄 버리기' }[op]);
+  }));
+  $$('[data-gate-op]', root).forEach((b) => b.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const id = (b.closest('[data-gate-row]') || {}).dataset.gateRow;
+    if (!id) return;
+    if (b.dataset.gateOp === 'open') {
+      PENDING_EDITS.set(id, { ...(PENDING_EDITS.get(id) || {}), paidGate: '' });
+      renderPendingBar();
+      toast("올리기로 모아 뒀습니다 — '한꺼번에 반영' 을 누르면 학생 화면에 나옵니다");
+    } else {
+      await applyAction('revert', { ids: [id] }, '빼기(재등록 차단)');
+    }
+  }));
+}
+
 /* ---------------- ① 오늘 할 일 ---------------- */
 function renderTodo() {
   const fi = formIdSet();
@@ -868,6 +1017,7 @@ function renderTodo() {
       d: '학생이 원문 보기를 눌렀을 때 안 열리는 주소입니다',
       btn: '<button class="btn btn-sm" data-go="todo">아래에서 보기</button>' },
     linkFixCard(),
+    paidReviewCard(),
     { n: fails.length, tone: 'is-bad', k: '수집 실패 중인 학교',
       d: '이 학교 공고가 앱1에 들어오지 않고 있습니다',
       btn: '<button class="btn btn-sm" data-go="robots">수집망 보기</button>' },
@@ -919,6 +1069,8 @@ function renderTodo() {
 
     ${amountFillHtml()}
 
+    ${paidReviewHtml()}
+
     <!-- 공고 원문을 열어 봐야 아는 것 — 펼칠 때만 800KB 원문을 받는다 -->
     <details id="todo-src-scan" data-src-scan${scanWasOpen ? ' open' : ''}>
       <summary>공고 원문을 열어 봐야 아는 것 — 자격 미확보 ${noEligItems().length}건 ·
@@ -948,6 +1100,7 @@ function renderTodo() {
   });
   bindDeadlineFill();
   bindAmountFill();
+  bindPaidReview();
   const det = byId('todo-src-scan');
   if (det) {
     det.addEventListener('toggle', () => { if (det.open) openSrcScan(); });
@@ -1486,6 +1639,11 @@ function lfLabelAfter(e, url) {
 /* 화면 안 위임 — bindGlobal 의 클릭 처리에서 부른다. 처리했으면 true. */
 async function handleLinkFixClick(ev) {
   const t = ev.target;
+  if (t.closest('[data-paid-card]')) {
+    const det = byId('todo-paid');
+    if (det) { det.open = true; det.scrollIntoView({ block: 'start' }); }
+    return true;
+  }
   if (t.closest('[data-lf-card]')) {
     const det = byId('todo-link-fix');
     if (det) { det.open = true; det.scrollIntoView({ block: 'start' }); }
@@ -1719,7 +1877,7 @@ function renderSrcScan() {
   const eligHtml = `
     <div class="sec-head"><h2>지원 자격을 아직 못 읽은 ${elig.length}건</h2>
       <p>원문이 저장된 ${have.length}건만 AI 자격 읽기가 읽습니다 ·
-         원문이 없는 ${none.length}건은 먼저 「자격요건 로봇」이 필요합니다.</p></div>
+         원문이 없는 ${none.length}건은 먼저 「원문 받기 로봇」이 필요합니다.</p></div>
     <div class="pgroup" data-pgroup data-elig-split>
       <div class="pgroup-head">
         <span class="pill">원문 있음 ${have.length}건</span>
@@ -1733,8 +1891,8 @@ function renderSrcScan() {
       <div class="pgroup-head">
         <span class="pill warn">원문 없음 ${none.length}건</span>
         <span class="pgroup-msg">먼저 본문을 받아 와야 합니다</span>
-        <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="자격요건 로봇">
-          자격요건 로봇 — 지금 실행</button>
+        <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="원문 받기 로봇">
+          원문 받기 로봇 — 지금 실행</button>
       </div>
       <div class="rows" data-rows>${none.slice(0, 20).map((it) => rowHtml(it)).join('')}</div>` : ''}
     </div>`;
@@ -1765,8 +1923,8 @@ function renderSrcScan() {
         <div class="scope-count" data-scope-count>${esc(countLine(c, school))}</div>
         ${c.line ? `<div class="excerpt">${esc(c.line)}</div>` : ''}
         ${c.state === 'nosrc' ? `<div class="btn-row">
-          <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="자격요건 로봇">
-            자격요건 로봇 — 지금 실행</button>
+          <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="원문 받기 로봇">
+            원문 받기 로봇 — 지금 실행</button>
           <button class="btn btn-sm" data-run="link-hunter.yml" data-run-name="링크 사냥꾼">
             링크 사냥꾼 — 지금 실행</button></div>` : ''}
       </div>
@@ -2697,8 +2855,8 @@ const ROBOTS = [
   },
   {
     f: 'rescue-bodies.yml',
-    n: '자격요건 로봇',
-    d: '진짜 브라우저로 자격을 찾습니다 — 장학 공고 본문 재수집 · 대외활동·공모전(첨부·포스터·PDF 포함)',
+    n: '원문 받기 로봇',
+    d: '진짜 브라우저로 공고 원문·첨부를 받아 옵니다(자격 판정은 유료 확인이 합니다) — 장학 공고 본문 재수집 · 대외활동·공모전(첨부·포스터·PDF 포함)',
     when: '매일 05:23 · 18:23',
     inputs: [{ name: 'cap', kind: 'num', label: '이번에 최대 몇 건', def: '25', min: 1, max: 200 }],
   },
@@ -2783,7 +2941,7 @@ const ROBOTS = [
      안 일어나는' 버튼이 된다.
    · `two-school-scan.yml` — 일회용이고 push 트리거가 남의 브랜치를 본다.
    관문(test-collector)이 이 둘이 목록에 **없는지** 확인한다. */
-const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml', 'key-expiry.yml', 'codeql.yml', 'codeql-triage.yml', 'error-watch.yml', 'card-read.yml'];   /* card-read: 유료 카드 읽기(11-15 · 하루 두 번 예약 · 스위치는 card-read-config.json) */   // error-watch: 앱 오류 급증 감시(11-13 · 2시간마다 · 경보 이슈로만) · codeql-triage: 보안 경고 정리(11-11 · Claude 세션용 버튼) · codeql: 보안 코드 점검(11-11 · 매주 예약 + 코드 push · 경보 이슈로만) · key-expiry: 열쇠 만료 확인(11-11 · 매일 예약 · 경보 이슈로만 알린다) · rollback: 직전 판으로 되돌리기(11-11 · 미리보기 → 번호 넣고 되돌리기 · Actions 탭에서만 — 관리자 화면 버튼은 나중에) · push-limit-check: 푸시 서버 운영 판이 저장소 판인지 도장으로 대조하는 진단(10-12) · push-deploy: 푸시 서버를 Cloudflare 운영에 올리는 배포(10-12 · 열쇠는 Actions 시크릿) — 둘 다 Actions 탭에서만
+const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml', 'key-expiry.yml', 'codeql.yml', 'codeql-triage.yml', 'error-watch.yml', 'card-read.yml', 'final-review.yml'];   /* card-read: 유료 카드 읽기(11-15 · 하루 두 번 예약 · 스위치는 card-read-config.json) · final-review: 유료 최종 검토(11-20 · 하루 한 번 예약 · 스위치는 final-review-config.json — 돈이 나가 버튼을 두지 않는다) */   // error-watch: 앱 오류 급증 감시(11-13 · 2시간마다 · 경보 이슈로만) · codeql-triage: 보안 경고 정리(11-11 · Claude 세션용 버튼) · codeql: 보안 코드 점검(11-11 · 매주 예약 + 코드 push · 경보 이슈로만) · key-expiry: 열쇠 만료 확인(11-11 · 매일 예약 · 경보 이슈로만 알린다) · rollback: 직전 판으로 되돌리기(11-11 · 미리보기 → 번호 넣고 되돌리기 · Actions 탭에서만 — 관리자 화면 버튼은 나중에) · push-limit-check: 푸시 서버 운영 판이 저장소 판인지 도장으로 대조하는 진단(10-12) · push-deploy: 푸시 서버를 Cloudflare 운영에 올리는 배포(10-12 · 열쇠는 Actions 시크릿) — 둘 다 Actions 탭에서만
 
 /** 설명은 함수일 수 있다 — 건수를 사본으로 두지 않고 셀 때 센다 */
 const robotDesc = (r) => (typeof r.d === 'function' ? r.d() : r.d);

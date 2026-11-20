@@ -122,6 +122,8 @@ const ALLOWED = new Set([
      🔴 `amountSpec`(금액 구조)은 **일부러 안 넣는다** — 손으로 적으면 홈 합계가 틀어지고,
         그건 학생에게 받을 수 없는 숫자를 보여 주는 일이다(기망). */
   'announceDate', 'eligibilityExcludes', 'eligibilityPriority', 'exclusivity',
+  /* 유료 확인 대기 표식(2026-11-20 · auto-register 가 단다) — **지우기만**: 지우면 유료 확인 없이 무료 길 값으로 학생 화면에 나온다(관리자 「할 일」 「올리기」) */
+  'paidGate',
   /* 자유 형식 제출 스위치 — 아래에서 **근거 문장과 짝으로만** 다룬다 */
   'prepDoc', 'prepDocBasis',
 ]);
@@ -283,6 +285,10 @@ function guardBulkRemove(targetIds) {
       앱은 source-link.js ⑥(setLinkFixes)이 이 장부를 읽어 학생이 여는 주소와 링크 이름을 정한다.
    🔴 이 장부를 쓰는 곳은 여기 하나다(로봇 몫은 data/link-check.json fix — 둘을 섞지 않는다). */
 const LINK_FIXES = 'data/link-fixes.json';
+/* 유료 확인에서 잡힌 줄을 사람이 정한 것 (2026-11-20 · 관리자 「할 일」) — 앱이 유료 결과에 얹는다(match-engine mergeCardFixes).
+   로봇(card-read)은 이 파일을 안 고친다 — 사람 것이 늘 이긴다(원문 바로잡기 link-fixes 와 같은 짜임) */
+const CARD_FIXES = 'data/card-read-fixes.json';
+const CARD_FIX_FIELDS = ['eligibility', 'excludes', 'priority', 'amount', 'apply', 'documents', 'notes'];
 const LINK_FIX_MAX = 50;   // 한 번에 받는 건수 — 화면은 '적어 두기'로 모아 한 번에 보낸다
 const SL = createRequire(import.meta.url)('../source-link.js');
 const cleanText = (v) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, FIX_TEXT_MAX);
@@ -492,6 +498,8 @@ switch (action) {
       duplicable: true,
       sourceUrl: url,
       sourceKind: 'admin',
+      /* 유료 카드 읽기 대상(2026-11-20) — 사람이 등록한 공고는 숨기지 않고(paidGate 아님) 유료로 읽기만 한다. 안 달면 유료 읽기가 숨김분만 읽어 영영 안 읽힌다(리뷰) */
+      paidRead: TODAY,
       ...(patch.note ? { note: patch.note } : {}),
       ...(patch.formId ? { formId: patch.formId }
         : { noForm: patch.noForm || `관리자 등록 ${TODAY} — 양식은 확인 후 연결` }),
@@ -670,6 +678,8 @@ switch (action) {
           if (v < 0) fail(`${it.id} — 금액은 0 이상이어야 합니다 (받은 값: ${v})`);
         } else if (k === 'deadline' && v) {
           if (!isDay(v)) fail(`마감일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD · 달력에 있는 날)`);
+        } else if (k === 'paidGate' && v) {
+          fail(`${it.id} — 유료 확인 대기 표식은 지우기만 할 수 있습니다 (빈 값으로 보내세요)`);
         } else if (k === 'type' && v && !['교내', '교외'].includes(v)) {
           fail(`구분은 '교내' 또는 '교외'만 가능합니다: ${v}`);
         } else if ((k === 'sourceUrl' || k === 'applyEmail') && v) {
@@ -1244,6 +1254,47 @@ switch (action) {
   }
 
   /* ── 원문 바로잡기 지우기 — 장부에서 열쇠를 뺀다(학생 링크는 데이터 주소로 돌아간다) ── */
+  /* ── 유료 확인에서 잡힌 줄 — 살리기(keep) · 고쳐서 싣기(edit) · 버리기(drop) (2026-11-20) ─────────────
+     payload = { lines: [{ id, field, key, op, text? }] } — key 는 관리자 화면이 본 줄(card-read-review.json 의 「칸|문장」).
+     살리기·고쳐서 싣기는 그 칸에 줄을 더하고(유료 결과가 있는 공고만 — 학생 화면에 실린 카드에 얹는다), 셋 다 그 줄을 「할 일」에서 내린다 */
+  case 'cardLine': {
+    const lines = Array.isArray(payload.lines) ? payload.lines : [];
+    if (!lines.length) fail('정할 줄이 없습니다');
+    if (lines.length > LINK_FIX_MAX) fail(`한 번에 ${LINK_FIX_MAX}줄까지만 받습니다 (받은 것: ${lines.length}줄)`);
+    const cr = readJson('data/card-read.json', null);
+    const doc = readJson(CARD_FIXES, null) || { v: 1, items: {} };
+    if (!doc.items || typeof doc.items !== 'object' || Array.isArray(doc.items)) doc.items = {};
+    const done = [];
+    for (const ln of lines) {
+      /* 🔴 key 는 화면이 본 「칸|문장」 그대로 — cleanText 처럼 빈칸을 줄이거나 자르면 화면의 줄과 안 맞아 「할 일」에서 영영 안 내려간다(리뷰) */
+      const id = String((ln && ln.id) || ''), field = String((ln && ln.field) || ''), key = String((ln && ln.key) || '').replace(/[\u0000-\u001f\u007f]/g, ' '), op = String((ln && ln.op) || '');
+      if (key.length > 2000) fail(`${id} — 줄이 너무 깁니다(${key.length}자)`);
+      const it = reg.items.find((x) => x.id === id);
+      if (!it) fail(`정식 등록에 그 공고가 없습니다: ${id}`);
+      if (!key) fail(`${id} — 어느 줄인지(key)가 없습니다`);
+      if (!['keep', 'edit', 'drop'].includes(op)) fail(`${id} — 모르는 처리입니다: ${op} (keep·edit·drop)`);
+      const e = doc.items[id] || (doc.items[id] = { add: {}, done: [] });
+      if (op !== 'drop') {
+        if (!CARD_FIX_FIELDS.includes(field)) fail(`${id} — 이 칸(${field})은 여기서 싣지 않습니다 — 마감·주는 곳은 공고 고치기(edit)로`);
+        if (!(cr && cr.items && cr.items[id])) fail(`${id} — 유료 결과가 아직 없는 공고라 줄을 얹을 카드가 없습니다`);
+        if (!Array.isArray(cr.items[id][field])) fail(`${id} — 이 칸은 지금 무료 길 값(원문 줄 전체)이 보이고 있어 한 줄만 얹을 수 없습니다 — 공고 고치기(edit)에서 칸을 고쳐 주세요`);
+        const rawText = String(ln.text || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
+        if (!rawText) fail(`${id} — 실을 문장이 비었습니다`);
+        if (rawText.length > 300) fail(`${id} — 실을 문장이 300자를 넘습니다(${rawText.length}자) — 줄여서 다시 보내 주세요(자르지 않습니다)`);
+        e.add[field] = Array.from(new Set([...(e.add[field] || []), rawText]));
+        e.hash = cr.items[id].hash;   // 이 유료 읽기에 얹은 줄 — 다시 읽으면(해시가 바뀌면) 앱이 얹지 않는다(match-engine mergeCardFixes)
+      }
+      e.done = Array.from(new Set([...(e.done || []), key]));
+      e.by = actor; e.at = TODAY;
+      done.push(`${{ keep: '살림', edit: '고쳐 실음', drop: '버림' }[op]} ${String(it.name).slice(0, 24)} · ${key.slice(0, 40)}`);
+    }
+    doc.v = 1; doc.updatedAt = `${kstNow()} KST`;
+    writeJson(CARD_FIXES, doc);
+    detail = `유료 확인 잡힌 줄 ${done.length}줄 — ${done.join(' / ')}`.slice(0, 600);
+    touched = true;
+    break;
+  }
+
   case 'linkUnfix': {
     const keys = (Array.isArray(payload.keys) ? payload.keys : []).map((k) => String(k || '')).filter((k) => /^(id|u):\S/.test(k));
     if (!keys.length) fail('지울 열쇠가 없습니다 (id:… 또는 u:…)');

@@ -46,10 +46,12 @@
 - **원문 바로잡기**(`source-link.js` ⑥ · 로봇 데이터에 고쳐 쓰면 사라진다): 사람 `data/link-fixes.json`(관리자 「원문 링크 손볼 것」 → `tools/admin-apply.mjs` `linkFix` · 늘 이긴다) ·
   로봇 `data/link-check.json` `fix`(후보 `collector/link-candidates.json` 을 학생처럼 열어 `acceptCandidate` 통과분만). 열쇠 `id:`·`u:` · 회차(`round`)는 층2만. 관문 같은 절 fixes·candidates·admin.
 
-## 🔴 유료 카드 읽기 (2026-11-15 지시 · 설계 `docs/designs/paid-card-reading.md`)
+## 🔴 유료 관문 (2026-11-20 지시 · 설계 `docs/designs/paid-gate-pipeline.md` · 앞선 설계 `docs/designs/paid-card-reading.md`)
 
-- 로봇 `collector/card-read.mjs` 가 본문+첨부를 모델 둘에게 따로 읽혀, 글자가 원문에 있고(`verify`) 둘이 같은 말을 한 줄(`agree`)만 `data/card-read.json` 에 싣는다. 🔴 `registered.json` 은 안 고친다(무료 길 = 비상망) · 지어냄을 막는 것은 지시문이 아니라 `verify` 다.
-- 앱·알림·`what-shows` 는 `applyCardRead`(match-engine) 한 곳으로 얹는다 — 얹힌 공고(`cardRead`)는 `requirementLines` 의 거르기를 건너뛴다. 스위치 `enabled`+`CARD_READ_ENABLE`. 관문 「유료 카드 읽기」 · `verify-card-read.js`.
+- 흐름: 수집 → 숨김 등록(`auto-register.mjs` 가 `paidGate` 를 단다) → 원문 받기(`rescue-bodies.mjs` 「원문 받기 로봇」) → 💰 유료 확인 1 → 학생 화면 → 신청서 PDF → 💰 최종 검토(`collector/final-review.mjs` · 보고만 · 꺼진 채로 나감).
+- 유료 확인 1 = `collector/card-read.mjs`: 첫째 모델이 줄마다 다듬은 문장+원문 근거(`text`·`quote`) → 둘째 모델이 고친 완성본 → 기계 검사(`verify`·`factsMatch` — 근거가 원문에 있고 숫자·부정·기관 이름이 근거와 같아야). 🔴 지어냄을 막는 것은 지시문이 아니라 기계 검사다 · `registered.json` 은 안 고친다.
+- 🔴 잡힌 줄은 **빼고** 통과한 유료 줄로 싣는다(무료 값으로 바꿔 끼우지 않는다 · 칸이 전부 빠질 때만 무료 값 · 옛 두 읽기에서 갈린 줄은 11-18 규칙 그대로) · 잡힌 줄은 관리자 「할 일」(`collector/card-read-review.json` · `explainLine` 사람 말) → 살리기·고쳐서 싣기·버리기(`tools/admin-apply.mjs` `cardLine` → `data/card-read-fixes.json`).
+- 보이는가 = `match-engine.js` `publishedList`·`paidGateOpen` 한 곳(앱·서비스워커·`what-shows`·인스타·검색 요약·접수 서버 · 푸시 서버는 사본) — 결과 파일을 못 받으면 숨김분은 안 보이고, 사흘 넘게 통과가 없으면 무료 값 + 경보(`card-read.yml`). 그 전 등록분은 숨기지도 다시 읽지도 않는다. 관문 「유료 관문」·「유료 최종 검토」·「유료 카드 읽기」 · `verify-card-read.js`.
 - **첨부가 신청서 칸인가 카드인가**(11-20)는 원본 **내용**으로 — `attachDecision`(attachment-text) 한 곳 · 모르면 이름 규칙 · 앱은 `attIsForm`(색인 `roles`). 글자 없는 스캔 PDF·그림만 `collector/attach-role-read.mjs` 가 파일째 모델 둘에게 묻고 같은 답만 `collector/attach-role-paid.json` 에(같은 스위치 · 상한 `roleMaxPerRun`·`roleMaxUsdPerRun`). 관문 「첨부를 내용으로 가르기」.
 
 ## 🔴 학적정보 테일러링 (2026-10-24 개발자 지시 넷 — 원문은 설계 문서 0절)
@@ -92,7 +94,8 @@
 7. **소급 적용** — 엔진·정책이 바뀌면 기존 데이터 전체에. 강제 장치 `node verify/audit-data.js`(바꾼 뒤 필수).
 8. **진척도는 사용자가 기록**(제출했어요/선정·미선정). '심사'만 객관적 사실(제출 기록 + 마감 경과)로 자동.
 8-1. **추론 금지 · 원문 발췌** — 신청 방법·서류는 원문 문장을 그대로 발췌(`collector/extract-excerpts.mjs` → `excerpts`)해 보이고,
-   없으면 지어내지 않고 '원문 보기'만. 금액 미확인은 `amountValue 0`.
+   없으면 지어내지 않고 '원문 보기'만. 금액 미확인은 `amountValue 0`. **유료 경로만 예외(2026-11-20 개발자 승인)** — 깔끔한 문장으로 다시 써도 되지만
+   줄마다 원문 근거를 붙이고 숫자·날짜·부정·기관 이름이 근거와 같아야 실린다(위 「유료 관문」).
 8-2. **앱 지원문서는 앱 양식이 없는 모든 정식 등록 공고에**(10-13 개발자 결정). 머리말은 `PREP_TAG` 한 줄 · 안내는 `PREP_LEADS`(**'그대로 제출 가능'은 `prepDoc: true` 만**) · 없는 절은 지어내지 않는다. 관문 「공고별 지원문서」.
 9. 🔴 **학교 아이디·비밀번호를 받아 대신 로그인하지 않는다 (09-25 지시 · 고문 보고서 Q2 · 변경 금지)** —
    스크래핑은 보안 사고 시 치명적이고 학교가 알아채면 IP 차단·법적 문제다.
@@ -198,7 +201,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/activity-docs.mjs` | 대외활동 자격 **출처만** 늘리는 곳(본문 → 요강 → HWP·DOCX → 그림·PDF OCR → 유료 AI(꺼짐)) · 🔴 자격 줄 고르기는 늘 `activityDetails` 하나 · 남의 글 막기는 `ownsImageText` · 받은 파일은 커밋 안 함 · 관문 「대외활동·공모전 — 첨부·포스터 읽기」 |
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
-| `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml`) — 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
+| `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **원문 받기 로봇**(`.github/workflows/rescue-bodies.yml`) — 🔴 진짜 브라우저로 원문을 받는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다 · 자격 판정은 유료 확인 — 2026-11-20) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
 | `collector/schematize-forms.mjs` `form-pdf.mjs` `form-fields.mjs` `doc-pdf.mjs` | 양식 스키마화(멈춤) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart · 관문 「신청서 원본 → PDF」) · 쪽 그림·빈칸 자리(관문 「신청서 쪽 그림 · 빈칸 자리」) · LibreOffice 변환(전용 프로필·시한·변환기 말)은 `collector/soffice.mjs` 한 곳 · 공고문·안내문 → PDF(data/docs-pdf · 관문 「공고문 PDF 사본」) |
 | `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 재단 개별 공고 후보(확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
 | `collector/notice-source.mjs` `canon-url.mjs` `url-key.mjs` `clean-title.mjs` | '같은 공고인가'·'원문이 무엇인가' 규칙 한 곳 |

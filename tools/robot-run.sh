@@ -36,7 +36,7 @@ FORCE=${ROBOT_RUN_FORCE:-0}
 
 # 데이터를 고치는 로봇들. 이 중 하나라도 돌거나 줄 서 있으면 로컬 실행을 미룬다.
 # 🔴 손으로 적지 않는다 — 워크플로 파일에서 `git add data/…|collector/…` 하는 것의 name: 을 읽는다(tools/data-robots.mjs).
-#    손 목록(8개)이 낡아 data/registered.json 을 쓰는 자격요건 로봇·자격요건 매칭이 빠져 있었다(2026-10-05 로봇·도구 점검 · gaps-04).
+#    손 목록(8개)이 낡아 data/registered.json 을 쓰는 원문 받기 로봇·자격요건 매칭이 빠져 있었다(2026-10-05 로봇·도구 점검 · gaps-04).
 #    (pages 배포·잠금 확인처럼 데이터를 안 건드리는 것은 걸리지 않는다 — 넣으면 늘 막힌다)
 NAMES=$(node tools/data-robots.mjs 2>/dev/null || true)
 if [ -z "$NAMES" ]; then

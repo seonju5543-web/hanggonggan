@@ -1,0 +1,9 @@
+{
+ "enabled": false,
+ "maxPerRun": 15,
+ "maxUsdPerRun": 3,
+ "giveUpAfter": 3,
+ "effort": "medium",
+ "_무엇인가": "유료 최종 검토 로봇(collector/final-review.mjs)의 스위치와 한 실행의 상한. 설계 docs/designs/paid-gate-pipeline.md 3절.",
+ "_enabled": "true 이고 워크플로가 FINAL_REVIEW_ENABLE=1 을 줄 때만 유료 API 를 부른다. 켜는 것은 개발자가 채팅에서 지시할 때만(CLAUDE.md 🔴 8)."
+}

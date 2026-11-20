@@ -28,6 +28,8 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { indexTexts, sourceFor, hasText, looksLikeErrorPage, makeTitleLine } from './notice-source.mjs';
 import { makeStripperMulti } from './page-boilerplate.mjs';
+import { createRequire } from 'node:module';
+const { paidGateOpen } = createRequire(import.meta.url)('../match-engine.js');
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const REG = path.join(ROOT, 'data/registered.json');
@@ -153,7 +155,8 @@ export function buildSearchIndex(items, texts, browserBodies) {
 
 function main() {
   const reg = JSON.parse(fs.readFileSync(REG, 'utf8'));
-  const items = reg.items || [];
+  let cardRead = null; try { cardRead = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/card-read.json'), 'utf8')); } catch { /* 아직 없음 */ }
+  const items = (reg.items || []).filter((s) => paidGateOpen(s, cardRead));   // 유료 확인 전 숨김분은 도우미도 모른다(2026-11-20)
   let texts = {};
   try { texts = JSON.parse(fs.readFileSync(TEXTS, 'utf8')); } catch (e) { /* 원문이 없으면 빈 파일이 나온다 */ }
   let browserBodies = {};

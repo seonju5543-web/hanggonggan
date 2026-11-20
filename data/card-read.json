@@ -37,12 +37,15 @@
    },
    "multi": false,
    "hash": "a5cb502a1263e79a",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-ticedoarticleno231554921": {
    "title": "2026-2학기 3대 동문가족 특별장학금 신청 안내",
    "host": "영남대학교",
-   "eligibility": null,
+   "eligibility": [
+    "정규학기 이내 학부 재학생으로서, 직계존속 가족 중 2대가 영남대학교를 졸업하여, 가족 중 본인을 포함한 3대가 우리 대학교 동문인 자",
+    "직전학기 평점평균 2.5 이상인 자"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [
@@ -73,7 +76,7 @@
    },
    "multi": false,
    "hash": "d4fbc70dcd363a0d",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-ticedoarticleno231554923": {
    "title": "2026-2학기 천마가족장학금 신청 안내",
@@ -117,7 +120,7 @@
    },
    "multi": false,
    "hash": "136ed1fc3bd14013",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-ervicenoticedetail520872": {
    "title": "2026-2학기 복지장학생(부모장애) 선발 안내",
@@ -133,7 +136,10 @@
     "방문: 경북 경주시 동대로 123 동국대학교 WISE캠퍼스 학생회관2층 학생서비스팀",
     "메일: demian@dongguk.ac.kr"
    ],
-   "documents": null,
+   "documents": [
+    "장학금신청서",
+    "장애인증명서 1부(제출일 기준 6개월 이내 발급서류만 인정)"
+   ],
    "notes": [],
    "head": 300000,
    "deadline": {
@@ -148,7 +154,9 @@
    "title": "2026년 2학기 안산시 대학생 본인부담 등록금 반값지원 장학생 선발",
    "host": "(재)안산인재육성재단",
    "eligibility": null,
-   "excludes": null,
+   "excludes": [
+    "외국대학 및 대학원, 학점은행제 교육훈련기관"
+   ],
    "priority": [],
    "amount": [
     "본인부담 등록금 X 50%(학기당 100만원 한도)"
@@ -167,13 +175,25 @@
    },
    "multi": false,
    "hash": "744d258f58940eca",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-kuk2351210342artclviewdo": {
    "title": "2026학년도 2학기 안산인재육성재단 안산시 대학생 등록금 반값 지원 장학생 선발 안내",
    "host": "(재)안산인재육성재단",
-   "eligibility": null,
-   "excludes": null,
+   "eligibility": [
+    "국민기초생활수급자 학생",
+    "장애인복지법에 따른 장애인 학생",
+    "한부모가족지원법에 따른 법정 한부모가족 학생",
+    "3자녀 이상 가정의 모든 학생",
+    "차상위계층 학생",
+    "한국장학재단 통지 기준 소득분위 1~6구간 가정 학생",
+    "국내 대학 재학생(한국호텔관광실용전문학교 포함)",
+    "29세 이하 대학생(1997년 1월 1일 이후 출생자)",
+    "공고일 기준 학생과 가족 1인 이상이 안산시에 계속 3년 이상 또는 합산 10년 이상 주민등록을 두고 거주"
+   ],
+   "excludes": [
+    "외국대학 및 대학원, 학점은행제 교육훈련기관"
+   ],
    "priority": [],
    "amount": [
     "본인부담 등록금 X 50%(학기당 100만원 한도)"
@@ -193,12 +213,15 @@
    },
    "multi": false,
    "hash": "e784b5a1639dae5f",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-ghaknoticedetail26766866": {
    "title": "2026-2학기 동국사랑1.1.1 장학 신청 안내",
    "host": "동국대학교",
-   "eligibility": null,
+   "eligibility": [
+    "2026-2학기 학부 재학생",
+    "누적학기 성적 3.0 이상"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [
@@ -229,7 +252,9 @@
   "auto-bswj104944586artclviewdo": {
    "title": "2026학년도 2학기 신문고 장학금 신청 안내",
    "host": "",
-   "eligibility": null,
+   "eligibility": [
+    "국가장학금 소득분위 산정 이후 가족의 실직, 사고 및 사망, 질병 치료, 사업 실패 등으로 가정경제상황이 갑자기 나빠진 학생으로 서류 확인이 가능한 자"
+   ],
    "excludes": null,
    "priority": [],
    "amount": null,
@@ -255,7 +280,7 @@
    },
    "multi": false,
    "hash": "bdf825d4b9341fe2",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-otice06doarticleno141703": {
    "title": "2026학년도 한국교육재단 한국사무소 장학생 모집 안내",
@@ -317,7 +342,7 @@
    },
    "multi": false,
    "hash": "c5d64eb6212ad92a",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-amepagescholarshipnotice-12u2guu": {
    "title": "",
@@ -359,12 +384,15 @@
    },
    "multi": false,
    "hash": "3ad70d760f2d2fff",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-spxboardid5cate8key70976": {
    "title": "2026학년도 미래성장 장학생 선발 안내",
    "host": "전남대학교",
-   "eligibility": null,
+   "eligibility": [
+    "본교 학부 2~3학년 재학생",
+    "26.2학기 기준 직전 학기 평균평점이 1.75 이상이고 12학점 이상 이수한 자로 장학금 활용 계획서/실행 보고서 제출자"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [
@@ -492,7 +520,7 @@
    },
    "multi": false,
    "hash": "f657cc4e417661ce",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-bbssc58944506artclviewdo": {
    "title": "2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내",
@@ -540,7 +568,7 @@
    },
    "multi": false,
    "hash": "b346abe069fa9c67",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-345bnum5233cate0qidx5233": {
    "title": "통영시 저소득 대학생 장학금 지원대상자 선발 안내",
@@ -588,7 +616,7 @@
    },
    "multi": false,
    "hash": "409b348ac0f73586",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-amepagescholarshipnotice-09j8czz": {
    "title": "관정이종환교육재단 장학생 선발 안내",
@@ -633,12 +661,19 @@
    },
    "multi": false,
    "hash": "122ccadae5ed7739",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle": {
    "title": "송원김영환장학재단 2027학년도 제44기 송원장학생 모집 안내(학교지원)",
    "host": "송원김영환장학재단",
-   "eligibility": null,
+   "eligibility": [
+    "2027학년도 1학기 기준 2학년 진급 예정자",
+    "전체 평점 3.0/4.5 이상인 자",
+    "한국장학재단 학자금지원구간 3구간 이하인 자(기초생활수급자·차상위계층 포함)",
+    "소득분위에는 반영되지 않았지만 동급으로 가정형편이 곤란한 자",
+    "재단 공식 행사(신년회, 수련회 등)에 성실히 참여하며 공동체 생활에 적응 가능한 자",
+    "2027학년도 1학기 휴학 계획이 없는 학생"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [
@@ -778,7 +813,10 @@
    "title": "(2026-동계) 근로장학생(방학중) 신청 안내",
    "host": "상명대학교",
    "eligibility": null,
-   "excludes": null,
+   "excludes": [
+    "부서주전 근로장학생 및 국가근로장학생 선발자",
+    "2026-2 학기중 근로자"
+   ],
    "priority": [],
    "amount": [
     "1,500,000원/인당"
@@ -832,7 +870,7 @@
    },
    "multi": true,
    "hash": "35ebb4f3a11550ad",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-ent2431269444artclviewdo": {
    "title": "2026학년도 하반기 인석장학금 선발 공고",
@@ -861,7 +899,7 @@
    },
    "multi": false,
    "hash": "b984ed1a1747eff9",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-dmodeviewduid53536tpage1": {
    "title": "2026학년도 하반기 인석장학금 지원신청 안내",
@@ -922,7 +960,7 @@
    },
    "multi": false,
    "hash": "45f7aed8df0753d1",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-ent2431269128artclviewdo": {
    "title": "2026학년도 창업장학금 신청 안내",
@@ -967,7 +1005,7 @@
    },
    "multi": false,
    "hash": "ba0c68e071a24d5d",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-ent2431270591artclviewdo": {
    "title": "2026-2학기 글로벌캠퍼스 HUFS Dream 장학금 신청 안내",
@@ -1007,12 +1045,15 @@
    },
    "multi": false,
    "hash": "0fb7499d14c2dd7b",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-698detailviewdocategory6": {
    "title": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내",
    "host": "",
-   "eligibility": null,
+   "eligibility": [
+    "동창회비를 2026년도 1학기까지 납부 완료한 자(1학년은 2026년도 2학기까지 납부한 자)",
+    "기존 총동창회 장학재단 장학금 미수혜자"
+   ],
    "excludes": [],
    "priority": [],
    "amount": [
@@ -1037,7 +1078,7 @@
    },
    "multi": false,
    "hash": "9eab85236d7a063a",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-otice06doarticleno140764": {
    "title": "2026학년도 2학기 의료인공지능특화융합인재양성사업 연구우수 장학생 선발 안내",
@@ -1102,7 +1143,7 @@
    },
    "multi": true,
    "hash": "a79b184c94172c54",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-skor478126688artclviewdo": {
    "title": "(등록금 전액) 2027학년도 한독제석재단 장학생 후보 선발 안내",
@@ -1211,7 +1252,7 @@
    },
    "multi": true,
    "hash": "2306761f7ce3d02a",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-oarticleno160317nocat501": {
    "title": "2026학년도 2학기 신용카드수수료장학금 신청 안내",
@@ -1316,8 +1357,14 @@
   "auto-2582viewdocurrentpageno1": {
    "title": "제21회 차세대 여성리더 장학생 선발 안내",
    "host": "국민대학교 여교수회",
-   "eligibility": null,
-   "excludes": null,
+   "eligibility": [
+    "2026학년도 현재 국민대학교에 재학 중인 2-3학년, 혹은 졸업을 2학기 이상 남긴 학생 중 평점 평균이 3.5 이상으로 지도자로서의 자질이 인정되는 여학생",
+    "2027-1학기 재학 예정인 여학생"
+   ],
+   "excludes": [
+    "타 등록금성 및 생활비 장학금 수혜자",
+    "2027학년도 1학기 등록금성 장학금 수혜자"
+   ],
    "priority": [],
    "amount": [
     "1인당 450만원씩 지급 (교내 단일 장학금으로 최대 금액)"
@@ -1422,15 +1469,19 @@
    },
    "multi": false,
    "hash": "2ba74ff521207977",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-sknou51815772artclviewdo": {
    "title": "2026. 2학기 한국방송통신대학교 교외(발전기금, 출판문화원,아시아발전재단)장학생 선발",
    "host": "",
-   "eligibility": null,
+   "eligibility": [
+    "2026. 2학기 재학생(신·편입생, 복학생, 재입학생 제외)",
+    "2026. 1학기 12학점 이상 이수",
+    "평점평균 2.0 이상(F학점 제외)인 자"
+   ],
    "excludes": null,
    "priority": [],
-   "amount": [],
+   "amount": null,
    "apply": [
     "홈페이지–맞춤정보–학사정보-MyKnou학사정보-교외장학–선택1(발전기금, 출판문화원, 아시아발전재단)-개인정보 동의-신청정보 입력",
     "온라인으로 신청함에 따라 본인 소속지역대학 접수됨(제출서류 없음)"
@@ -1449,7 +1500,7 @@
    },
    "multi": true,
    "hash": "deed421c82519a9b",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-scho332282297artclviewdo": {
    "title": "2026-2학기 교내 외국어 JUMP 장학생 선발 공고",
@@ -1508,7 +1559,7 @@
    },
    "multi": false,
    "hash": "bd0a69ae762b599c",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-bbssc58944606artclviewdo": {
    "title": "한국고등교육재단 문우림 제6기 장학생 선발 안내",
@@ -1537,7 +1588,7 @@
    },
    "multi": false,
    "hash": "efc325bc2550c6f3",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-hkrwdsfpnos1073sfpnos888-0hnkqu3": {
    "title": "",
@@ -1564,7 +1615,7 @@
    },
    "multi": false,
    "hash": "bd0a69ae762b599c",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-amepagescholarshipnotice-0d1tyil": {
    "title": "",
@@ -1578,7 +1629,18 @@
    "apply": [
     "베르크만스 우정원 209호 학생지원팀"
    ],
-   "documents": null,
+   "documents": [
+    "개인정보 동의서(지원자용)",
+    "지원신청서",
+    "인적사항 및 주요 이력",
+    "자기소개서",
+    "지원서 Self-Checklist",
+    "재학증명서",
+    "외국인등록증 스캔본",
+    "성적증명서 (고등학교 성적증명서, 대학교 성적증명서)",
+    "어학 자격서류(한국어능력시험 TOPIK 2급이상 성적표 필수 제출, 영어능력 증빙서류 선택 제출)",
+    "장학금 수혜증명서(또는 미수혜 증명서)"
+   ],
    "notes": [
     "재학학기 기준으로 8학기까지 장학금 지원(9학기부터는 장학금 지원 제외)",
     "재단 지침에 의거 학교별 동일 국적 장학생 수는 2명 이내로 제한 됨(현재 베트남 국적 학생 2명 수혜 중)"
@@ -1590,7 +1652,7 @@
    },
    "multi": false,
    "hash": "611265391b32bb59",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-amepagescholarshipnotice-1h5dt8m": {
    "title": "보림선원 서울선원 장학생 선발 안내",
@@ -1617,7 +1679,7 @@
    },
    "multi": false,
    "hash": "39b0c73762eb7780",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-o2432actionviewno9994682": {
    "title": "2026학년도 공과대학생 어학/전공 자격증 취득 장학금 지원(PKNU-꿈·미래) 신청 안내",
@@ -1653,7 +1715,7 @@
    },
    "multi": false,
    "hash": "ae93b7c93ffe7681",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-skor478127125artclviewdo": {
    "title": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
@@ -1683,7 +1745,7 @@
    },
    "multi": true,
    "hash": "0658fd0808e5a3cc",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-notice7doarticleno894170": {
    "title": "2026-2 학업수석총장장학금 선발 안내",
@@ -1715,7 +1777,7 @@
    "deadline": null,
    "multi": false,
    "hash": "d7148790f4eb0217",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-3bnum57138cate0qidx57138": {
    "title": "2026-2학기 국가근로장학생 교체 선발모집_(주)아이티희망나눔",
@@ -1742,7 +1804,7 @@
    "deadline": null,
    "multi": false,
    "hash": "19a0dca402c0f3ec",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-4bnum57138cate0qidx57138-1duciyc": {
    "title": "2026-2학기 국가근로장학생 모집(교체선발)_한국전시산업융합연구원",
@@ -1768,7 +1830,7 @@
    "deadline": null,
    "multi": false,
    "hash": "06e94bed940c847c",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-ervicenoticedetail521215": {
    "title": "2026학년도 국가우수장학(이공계) 일시지원유형(한 학기) 장학생 선발 안내",
@@ -1809,7 +1871,13 @@
   "auto-krbbskr846174artclviewdo": {
    "title": "2026학년도 미래의동반자재단 CHUBB Innovation Fund 7기 장학생 선발 안내",
    "host": "주한미국상공회의소 미래의동반자재단",
-   "eligibility": null,
+   "eligibility": [
+    "3, 4학년 학부생",
+    "2026년도 2학기 기준 5학기 이상 재학한 학생",
+    "총 평균 평점 3.0/4.5 이상",
+    "한국장학재단 산정 기준 소득분위 7분위 이하 (2026년도 2학기)",
+    "27년 1월 중에 진행되는 킥오프 미팅에 참석 가능한 학생 (1월 셋째 - 넷째 주 중 하루진행 예정)"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [
@@ -1837,7 +1905,7 @@
    },
    "multi": false,
    "hash": "cbae91470a5569a0",
-   "readAt": "2026-11-18"
+   "readAt": "2026-11-20"
   },
   "auto-kuk2351212436artclviewdo": {
    "title": "2026학년도 2학기 일목 정태영 장학기금 장학생 선발 안내",
@@ -2140,5 +2208,6 @@
    "readAt": "2026-11-20"
   }
  },
- "updatedAt": "2026-11-20"
+ "updatedAt": "2026-11-20",
+ "gateHeld": {}
 }
