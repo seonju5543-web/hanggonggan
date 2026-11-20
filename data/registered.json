@@ -21919,11 +21919,11 @@
    "attachments": [
     {
      "name": "자기소개서_기본형 (1).hwp",
-     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#"
+     "url": "https://scholarship.uos.ac.kr/scholarship/download.do?brdBbsseq=1&brdDate=20261105&brdSeq=1&filSeq=1"
     },
     {
      "name": "발전기금 장학생 신청서(2026년2학기) (1).hwp",
-     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#"
+     "url": "https://scholarship.uos.ac.kr/scholarship/download.do?brdBbsseq=1&brdDate=20261105&brdSeq=1&filSeq=2"
     }
    ],
    "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
@@ -23651,11 +23651,9 @@
     "schoolOnly": "전북대학교"
    },
    "documents": [
-    "장학금 프로젝트 수행계획서를 작성하여",
-    "지원인원 : 필요 서류)",
-    "장학생 지원서",
+    "장학생 지원서(단과대학장 추천 및 직인 필수)",
     "재학증명서",
-    "성적증명서",
+    "성적증명서(신입생 제외)",
     "통장사본"
    ],
    "duplicable": true,
@@ -23680,28 +23678,28 @@
    "sourceUrl": "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "접수기간 : 자격요건",
-    "2026년 11월 11일(수)~11월 27일(금)",
-    "1)동창회비를 2026년도 1학기까지 납부 완료한 자",
-    "(1학년은 2026년도 2학기까지 납부한 자)",
-    "접수메일",
-    "2)기존 총동창회 장학재단 장학금 미수혜자",
-    "'2026년 문화예술 장학금 이름 학과(학번)'과",
-    "1팀 당 최대 500만원,총 1000만원",
-    "PDF 파일로 제출",
-    "학생이 직접 기획한 문화예술 프로젝트의 소요 예산",
-    "을 산출하여 맞춤형 편딩 방식으로 지원 예정",
-    "심사 절차",
-    "사후서류"
+    "▶지원대상",
+    "- 전북대학교 예술대학 재학생 및 전북대학교 재학생",
+    "▶지원인원: 예술전공 1팀, 비예술전공 1팀",
+    "※개인 또는 팀별 구성(팀 구성 인원 제한없음.)",
+    "- 각 팀 당 최대 5,000,000원, 총 10,000,000원",
+    "※학생이 직접 기획한 문화예술 프로젝트(해외 유학·연수, 국제 콩쿠르 참가, 전시·공연 기획, 작품 제작 등)의 소요 예산을 산출하여 맞춤형 펀딩 방식으로 지원 예정.",
+    "지원금액은 최대 한도이며, 예산 편성의 적정성과 효율성을 평가에 반영함. 불필요한 지출을 최소화하고 합리적으로 예산을 편성한 팀에 가산점을 부여함.",
+    "1) 동창회비를 2026년도 1학기까지 납부 완료한 자(1학년은 2026년도 2학기까지 납부한 자)",
+    "2) 기존 총동창회 장학재단 장학금 미수혜자"
    ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "documentsFrom": "공고문 첨부(OCR)",
+   "eligibilityFrom": "공고문 첨부",
+   "documentsFrom": "공고문 첨부",
    "amountFrom": "관리자 2026-11-16 · 비움",
    "excerpts": [
-    "문의:전북대학교동창회장학재단 063-270-3641"
+    "- 접수기간: 2026년 11월 11일(수) ~ 11월 27일(금)"
    ],
    "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
-   "deadlineFrom": "관리자 2026-11-16"
+   "deadlineFrom": "관리자 2026-11-16",
+   "openDate": "2026-11-11",
+   "applyEmail": "jalumni@jbnu.ac.kr",
+   "applyEmailSource": "- 접수메일: jalumni@jbnu.ac.kr汫h / 전북대학교 진수당 1층 153호 총동창회",
+   "applyEmailFrom": "공고문 첨부"
   },
   {
    "id": "auto-amepagescholarshipnotice-12u2guu",

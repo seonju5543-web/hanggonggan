@@ -75,6 +75,17 @@ const JS_DOWNLOAD_RULES = [
        이름 안의 따옴표는 `\'` 로 적혀 온다(「웰로 \'Wello\' 앱」) — 그래서 인자를 `\'` 를 건너 읽고 되돌린다 */
     call: /^javascript:\s*downGO\(\s*'((?:\\'|[^'])*)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/i,
     path: (m) => `/cmmn/fileDown.do?filename=${encodeURIComponent(m[1].replace(/\\'/g, "'"))}&filepath=${m[2]}&filerealname=${m[3]}` },
+  /* 서울시립대 장학 게시판 (2026-11-21 · 언론인회 장학금의 신청서·자기소개서를 누르면 파일 대신 공고 화면이 열렸다 — 화면 주소가 첨부 주소로 적혀 있었다).
+     정의(/js/headquarter/scholarship/scholarship.js): function filedown(brdDate, brdSeq, filSeq) { $("#brdDate").val(brdDate); $("#brdSeq").val(brdSeq); $("#filSeq").val(filSeq);
+       $("#sendForm").attr("action", "/scholarship/download.do").submit(); } — sendForm 은 GET 이고 게시판 번호(brdBbsseq)를 숨은 칸으로 들고 있다(공고 주소의 brdBbsseq 와 같은 값).
+     실측(쿠키 없는 새 요청): …/download.do?brdBbsseq=1&brdDate=20261105&brdSeq=1&filSeq=1 → HWP 12.8KB · filSeq=2 → HWP 17.4KB — 내려온 이름(Content-Disposition)이 화면의 첨부 이름과 맞았다.
+     호출은 `href="#"` 의 onclick 에 있다(detailAttachments ⑤). 🔴 게시판 번호를 공고 주소에서 못 읽으면 풀지 않는다(짐작하지 않는다 — path 가 null) */
+  { host: /^scholarship\.uos\.ac\.kr$/i,
+    call: /^javascript:\s*filedown\(\s*'(\d{8})'\s*,\s*'(\d+)'\s*,\s*'(\d+)'\s*\)/i,
+    path: (m, pageUrl) => {
+      const board = new URL(pageUrl).searchParams.get('brdBbsseq');
+      return /^\d+$/.test(board || '') ? `/scholarship/download.do?${new URLSearchParams({ brdBbsseq: board, brdDate: m[1], brdSeq: m[2], filSeq: m[3] })}` : null;
+    } },
 ];
 
 /* 호출 안에 **파일의 절대 주소가 통째로 적힌** 꼴 (2026-11-20 · 공고문 PDF 로봇 첫 실행의 '주소 없음' 3개가 전부 이 꼴이었다):
@@ -91,7 +102,8 @@ export function resolveJsDownload(href, pageUrl) {
   for (const r of JS_DOWNLOAD_RULES) {
     if (!r.host.test(host)) continue;
     const m = String(href || '').trim().match(r.call);
-    if (m) return new URL(r.path(m), pageUrl).href;
+    const p = m ? r.path(m, pageUrl) : null;   // 규칙이 공고 주소에서 읽을 것이 있으면 읽는다(서울시립대 게시판 번호) · 못 읽으면 null — 풀지 않는다
+    if (p) return new URL(p, pageUrl).href;
   }
   const abs = String(href || '').trim().match(JS_ABSOLUTE_FILE);
   return abs ? abs[2] : null;

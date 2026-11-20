@@ -95,7 +95,7 @@
       clearTimeout(hero.sheetTimer);
       /* 먼저 가리키고(0.35초) 그 줄의 내용을 연다 — 캐릭터가 없으면 기다릴 까닭이 없다 */
       hero.sheetTimer = setTimeout(() => {
-        if (homeShown() && !sheetOpen() && typeof openHeroLine === 'function') openHeroLine(k);   // 그 사이 홈을 떠났으면 열지 않는다
+        if (homeShown() && !sheetOpen() && typeof openHeroLine === 'function') openHeroLine(k);   // 그 사이 홈을 떠났으면 열지 않는다 · 매칭된 공고 줄은 openHeroLine 이 열지 않는다(가리키기만)
       }, st.home && !REDUCED ? 350 : 0);
     }));
     let wasOpen = false;

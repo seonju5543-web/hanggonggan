@@ -5352,6 +5352,8 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
 .hero-ln.on b { font-size: var(--t-3xl); color: var(--text); }
 .hero-ln::after { content: '›'; position: absolute; right: var(--space-4); top: 50%; transform: translateY(-50%); font-size: var(--t-xl); color: var(--rule); transition: color var(--dur) var(--ease); }
 .hero-ln.on::after { color: var(--text-sub); }
+/* 매칭된 공고 줄은 안으로 들어가지 않는다(2026-11-20 개발자 지시 — 수령 가능액과 같은 목록이라 그 줄만 연다) · 누르면 가리키기만 */
+.hero-ln[data-k="match"]::after { content: none; }
 .hero-ln:focus-visible { outline: none; box-shadow: var(--ring); }
 .hero-ln:active b { color: var(--accent); }
 /* 가리킴 표시 — 지금 말하는 줄 왼쪽의 막대가 줄을 따라 옮겨 간다(캐릭터 팔과 같은 상태) */

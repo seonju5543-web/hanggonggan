@@ -4045,7 +4045,7 @@
    "expiredAt": "2026-11-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703652001",
    "org": "재단법인 문의육영장학재단",
    "name": "장학생",
@@ -4055,7 +4055,9 @@
    "cards": 4,
    "dir": "insta/pub/2703652001",
    "at": "2026-10-23",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "prepared",
@@ -4200,7 +4202,7 @@
    "expiredAt": "2026-10-24"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700727005",
    "org": "재단법인 안산인재육성재단",
    "name": "대학생 본인부담 등록금 반값 지원",
@@ -4210,7 +4212,9 @@
    "cards": 5,
    "dir": "insta/pub/2700727005",
    "at": "2026-10-23",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "expired",
@@ -4413,7 +4417,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703679001",
    "org": "재단법인 창암장학재단",
    "name": "창암장학생",
@@ -4423,7 +4427,9 @@
    "cards": 4,
    "dir": "insta/pub/2703679001",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "expired",
@@ -4501,7 +4507,7 @@
    "expiredAt": "2026-11-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700004002",
    "org": "관정재단",
    "name": "학부장학생",
@@ -4511,7 +4517,9 @@
    "cards": 5,
    "dir": "insta/pub/2700004002",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "prepared",
@@ -4626,7 +4634,7 @@
    "expiredAt": "2026-11-19"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000395002",
    "org": "(재)옹진군인재육성재단",
    "name": "예체능 특기장학금",
@@ -4636,10 +4644,12 @@
    "cards": 5,
    "dir": "insta/pub/2000395002",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000395001",
    "org": "(재)옹진군인재육성재단",
    "name": "인재장학금",
@@ -4649,10 +4659,12 @@
    "cards": 5,
    "dir": "insta/pub/2000395001",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000395006",
    "org": "(재)옹진군인재육성재단",
    "name": "지역핵심인재장학금",
@@ -4662,7 +4674,9 @@
    "cards": 5,
    "dir": "insta/pub/2000395006",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "prepared",
@@ -4723,7 +4737,7 @@
    "expiredAt": "2026-11-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000395003",
    "org": "(재)옹진군인재육성재단",
    "name": "복지장학금",
@@ -4733,7 +4747,9 @@
    "cards": 5,
    "dir": "insta/pub/2000395003",
    "at": "2026-11-10",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "prepared",
@@ -4764,7 +4780,7 @@
    "expiredAt": "2026-11-19"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000053007",
    "org": "재단법인 강서구장학회(서울)",
    "name": "구민한마음 4년 장학금",
@@ -4774,7 +4790,9 @@
    "cards": 5,
    "dir": "insta/pub/2000053007",
    "at": "2026-11-10",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "prepared",
@@ -4904,7 +4922,7 @@
    "expiredAt": "2026-11-19"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000307005",
    "org": "경상북도청",
    "name": "영·호남 상생 장학생",
@@ -4914,10 +4932,12 @@
    "cards": 5,
    "dir": "insta/pub/2000307005",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703603001",
    "org": "재단법인 유하푸른재단",
    "name": "장학생",
@@ -4927,10 +4947,12 @@
    "cards": 5,
    "dir": "insta/pub/2703603001",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704375001",
    "org": "한국교육재단 한국사무소",
    "name": "장학생",
@@ -4940,7 +4962,9 @@
    "cards": 4,
    "dir": "insta/pub/2704375001",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "prepared",
@@ -5034,7 +5058,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701104001",
    "org": "검단장학재단",
    "name": "장학생",
@@ -5044,10 +5068,12 @@
    "cards": 5,
    "dir": "insta/pub/2701104001",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000193001",
    "org": "강원도 홍천군청",
    "name": "저소득주민자녀장학금 (일반)",
@@ -5057,10 +5083,12 @@
    "cards": 5,
    "dir": "insta/pub/2000193001",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000193002",
    "org": "강원도 홍천군청",
    "name": "저소득주민자녀장학금 (특별)",
@@ -5070,7 +5098,9 @@
    "cards": 5,
    "dir": "insta/pub/2000193002",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-21"
   },
   {
    "status": "expired",
