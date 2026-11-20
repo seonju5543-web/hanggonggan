@@ -3,14 +3,47 @@
  "updatedAt": "2026-11-20",
  "items": [
   {
-   "title": "[등록/장학] [한국장학재단] 2026년 국가우수장학금(이공계) 일시지원(한 학기 지원) 유형 선발 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53691&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "title": "[등록/장학] 2027학년도 1학기 국가장학금 1차 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53720&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
     {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment (첨부자료) 2027년 1학기 국가장학금 1차 신청매뉴얼(홈페이지).pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35656&ano=53720"
+    },
+    {
+     "name": "Attachment (첨부자료) 2027년 1학기 국가장학금 1차 신청매뉴얼(모바일).pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35657&ano=53720"
     }
    ],
+   "deadlineHint": "신청 기간 : 2026.12.01.(화 ) ~ 12.14.(월 )) ※ 화도 / 동해장학금 수혜희망자는 국가장학금 및 화도 / 동해장학금을 각각",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-20"
+  },
+  {
+   "title": "[등록/장학] [한국장학재단] 2026년 국가우수장학금(이공계) 일시지원(한 학기 지원) 유형 선발 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53691&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
    "deadlineHint": "신청 기간 및 방법 가 . 신청 기간 : ~2026 년 11 월 20 일 ( 금 ) 15 시까지 나 . 신청 방법 : 학생복지팀 방문 제출 (",
    "school": "광운대학교",
    "campus": "",
