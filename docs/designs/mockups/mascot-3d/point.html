@@ -6,14 +6,14 @@
 <title>가리키는 마스코트 시안 — 글자와 캐릭터가 한 상태로 움직인다</title>
 <!--
   레퍼런스 시안 (2026-11-20 · 승인 전) — 앱 화면은 바뀌지 않았다.
-  마스코트가 오른쪽에 서서 왼쪽 안내 문구(최대 n원 · n건 · n건)를 가리킨다.
+  마스코트가 오른쪽에 서서 왼쪽 안내 줄(매칭된 공고 · 수령 가능액 · 마감 D-n · 이어서 쓰기)을 가리킨다. 줄을 누르면 그 내용이 열린다.
   🔴 상태는 하나(active — 지금 말하는 줄)뿐이고 글자와 캐릭터가 그 상태를 같이 본다:
      줄이 커지고 숫자가 올라가는 것 · 가리킴 표시가 옮겨 가는 것 · 캐릭터가 그 줄을 보고 팔을 뻗고 한 번 뛰는 것이 한 번에 일어난다.
      줄을 눌러도, 마스코트를 눌러도, 가만히 둬도(3.4초마다) 같은 함수 setActive 하나가 돈다.
   엔진은 앱과 같은 mascot/kit.js (point · hop 을 이 시안을 위해 더했다 — 부르지 않으면 앱 화면은 예전 그대로).
 -->
 <style>
-  :root { --bg: #fdfcfa; --ink: #191713; --sub: #57524a; --weak: #8b857b; --line: rgba(25,23,19,.10); --rule: rgba(25,23,19,.14); --accent: #27508f; --page: #ece8e1;
+  :root { --bg: #fdfcfa; --ink: #191713; --sub: #57524a; --weak: #8b857b; --line: rgba(25,23,19,.10); --rule: rgba(25,23,19,.14); --accent: #27508f; --red: #b4402f; --page: #ece8e1;
     --font: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif; --spring: cubic-bezier(0.34, 1.4, 0.44, 1); }
   * { box-sizing: border-box; } html, body { margin: 0; }
   body { background: var(--page); color: var(--ink); font-family: var(--font); letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
@@ -21,68 +21,106 @@
   .wrap { max-width: 460px; margin: 0 auto; padding: 22px 16px 60px; }
   h1 { font-size: 20px; margin: 0 0 6px; letter-spacing: -0.03em; }
   .lead { margin: 0 0 14px; color: var(--sub); font-size: 14px; line-height: 1.55; }
-  .ctl { display: flex; gap: 8px; align-items: center; margin: 0 0 10px; font-size: 12px; color: var(--weak); }
+  .ctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 8px; font-size: 12px; color: var(--weak); }
+  .ctl > span { min-width: 76px; }
   .chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 11px; font-size: 12.5px; font-weight: 600; color: var(--sub); cursor: pointer; }
   .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
-  .ctl { flex-wrap: wrap; }
   .pick { font-size: 14px; font-weight: 600; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: #fff; max-width: 100%; }
-  .phone { background: var(--bg); border-radius: 30px; padding: 22px 0 22px 20px; box-shadow: 0 1px 2px rgba(58,48,28,.05), 0 14px 36px rgba(58,48,28,.12); overflow: hidden; }
+  .phone { position: relative; background: var(--bg); border-radius: 30px; padding: 22px 0 18px 20px; box-shadow: 0 1px 2px rgba(58,48,28,.05), 0 14px 36px rgba(58,48,28,.12); overflow: hidden; margin-top: 12px; }
 
-  /* 히어로 — 왼쪽 글자 · 오른쪽 마스코트 */
-  .hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 45%; align-items: center; min-height: 268px; }
-  .lines { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 6px 0; z-index: 1; }
-  .ln { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 9px 12px 9px 14px; border-radius: 16px; cursor: pointer;
-    transition: background .32s ease, transform .36s var(--spring); transform-origin: left center; -webkit-tap-highlight-color: transparent; }
-  .ln small { display: block; font-size: 12.5px; font-weight: 600; color: var(--weak); transition: color .3s ease; }
-  .ln b { display: block; font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: var(--weak); font-variant-numeric: tabular-nums; line-height: 1.25;
+  /* 히어로 — 왼쪽 글자 · 오른쪽 마스코트.
+     🔴 무대(3D)는 히어로 전체에 깔고 캐릭터만 오른쪽에 세운다(kit Stage screenX) — 무대를 오른쪽 칸에만 두면 왼쪽으로 뻗은 팔이 칸 끝에서 잘린다(11-20 개발자 지적). 글자는 무대 위층 */
+  .hero { position: relative; min-height: 292px; display: flex; align-items: center; }
+  .stage { position: absolute; inset: 0 0 0 -20px; width: calc(100% + 20px); height: 100%; border: 0; padding: 0; background: radial-gradient(34% 22% at 76% 86%, rgba(157,211,242,.32), transparent 70%); display: block; cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; outline: none; z-index: 0; }
+  .stage canvas { width: 100%; height: 100%; display: block; }
+  .lines { position: relative; width: 60%; display: flex; flex-direction: column; gap: 2px; padding: 4px 0; z-index: 1; }
+  .ln { position: relative; display: block; width: auto; max-width: 100%; align-self: flex-start; text-align: left; border: 0; background: none; padding: 8px 22px 8px 14px; border-radius: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .ln[hidden] { display: none; }
+  .ln small { display: block; font-size: 12.5px; font-weight: 600; color: var(--weak); transition: color .3s ease; white-space: nowrap; }
+  .ln small .dd { font-variant-numeric: tabular-nums; }
+  .ln.urgent small .dd { color: var(--red); }
+  .ln b { display: block; font-size: 19px; font-weight: 800; letter-spacing: -0.03em; color: var(--weak); font-variant-numeric: tabular-nums; line-height: 1.25;
     transition: font-size .36s var(--spring), color .3s ease; white-space: nowrap; }
   .ln.on small { color: var(--sub); }
   .ln.on b { font-size: 28px; color: var(--ink); }
+  .ln::after { content: '›'; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--rule); transition: color .3s ease; }
+  .ln.on::after { color: var(--sub); }
   .ln:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(138,106,31,.25); }
+  .ln:active b { color: var(--accent); }
   /* 가리킴 표시 — 지금 말하는 줄 왼쪽의 막대가 줄을 따라 옮겨 간다(캐릭터 팔과 같은 상태) */
   .bar { position: absolute; left: 0; top: 0; width: 4px; border-radius: 4px; background: var(--accent); transition: transform .42s var(--spring), height .42s var(--spring); }
-  /* 손끝에서 줄로 가는 점선 — 캐릭터와 글자를 눈으로 이어 준다 */
-  .ray { display: none; position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: visible; }
-  .ray line { stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1 7; opacity: .55; transition: opacity .2s ease; }
-  .ray.move line { opacity: 0; }
-  .stage { position: relative; height: 268px; width: 100%; border: 0; padding: 0; background: radial-gradient(70% 26% at 50% 84%, rgba(157,211,242,.30), transparent 70%); display: block; cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; outline: none; }
-  .stage canvas { width: 100%; height: 100%; display: block; }
-  .who { margin: 4px 20px 0 0; text-align: right; font-size: 12px; color: var(--weak); }
-  .dots { display: flex; gap: 6px; margin: 12px 0 0 14px; }
+  .dots { display: flex; gap: 6px; margin: 8px 0 0 14px; }
   .dots i { width: 6px; height: 6px; border-radius: 6px; background: var(--rule); transition: width .3s var(--spring), background .3s ease; }
   .dots i.on { width: 18px; background: var(--accent); }
+  .who { margin: -14px 20px 0 0; text-align: right; font-size: 12px; color: var(--weak); position: relative; z-index: 1; }
+
+  /* 히어로 아래 — 그림 칸 다음 바로 「우리 학교 소식」 (쓰던 신청서 띠는 없앤다 · 그 일은 「이어서 쓰기」 줄이 한다) */
+  .below { margin: 14px 20px 0 0; }
+  .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+  .tiles span { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--sub); }
+  .tiles span::before { content: ''; width: 40px; height: 40px; border-radius: 13px; background: #f1eee8; }
+  .gone { margin: 14px 0 10px; padding: 9px 12px; border: 1px dashed var(--rule); border-radius: 14px; font-size: 12px; color: var(--weak); text-align: center; text-decoration: line-through; }
+  .news-h { display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; } .news-h a { color: var(--accent); font-weight: 700; font-size: 13px; }
+
+  /* 줄을 누르면 열리는 시트 (휴대폰 화면 안) */
+  .sheet-dim { position: absolute; inset: 0; background: rgba(25,23,19,.28); opacity: 0; pointer-events: none; transition: opacity .25s ease; z-index: 5; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 10px 20px 22px; transform: translateY(105%); transition: transform .34s var(--spring); z-index: 6; max-height: 78%; overflow: auto; }
+  .phone.open .sheet-dim { opacity: 1; pointer-events: auto; } .phone.open .sheet { transform: none; }
+  .sheet .grab { width: 38px; height: 4px; border-radius: 4px; background: var(--rule); margin: 0 auto 12px; }
+  .sheet h3 { margin: 0 0 4px; font-size: 18px; letter-spacing: -0.02em; } .sheet .sub { margin: 0 0 12px; font-size: 12.5px; color: var(--weak); }
+  .row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; }
+  .row .t { flex: 1; min-width: 0; font-weight: 700; line-height: 1.4; } .row .m { font-size: 12.5px; color: var(--sub); font-weight: 600; }
+  .row .dd { flex: none; font-size: 12px; font-weight: 800; color: var(--red); border: 1px solid rgba(180,64,47,.3); border-radius: 999px; padding: 2px 8px; }
+  .draft { border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+  .draft .t { font-weight: 800; line-height: 1.4; } .draft .p { margin: 8px 0 12px; height: 5px; border-radius: 5px; background: #eee; overflow: hidden; } .draft .p i { display: block; height: 100%; width: 50%; background: var(--accent); }
+  .btn { width: 100%; border: 0; border-radius: 16px; padding: 14px; background: #222b45; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .mock { font-size: 11.5px; color: var(--weak); margin: 10px 0 0; }
+
   .notes { margin-top: 22px; background: #fff; border-radius: 18px; padding: 16px 18px; font-size: 13.5px; line-height: 1.6; color: var(--sub); }
   .notes h3 { margin: 0 0 6px; font-size: 14px; color: var(--ink); } .notes ul { margin: 0; padding-left: 18px; }
   .nogl { display: none; font-size: 13px; color: #8f3a2e; }
-  @media (prefers-reduced-motion: reduce) { .ln, .ln b, .bar, .dots i { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .ln b, .bar, .dots i, .sheet, .sheet-dim { transition: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>가리키는 마스코트 시안</h1>
-  <p class="lead">마스코트가 오른쪽에서 왼쪽 안내 문구를 <strong>가리킵니다</strong>. 차례는 매칭된 공고 → 그 공고를 신청했을 때의 금액 → 마감 임박이에요. 줄을 누르거나 마스코트를 누르면 다음 안내로 넘어가고, 글자와 캐릭터가 같이 움직여요. 가만히 두면 3.4초마다 저절로 넘어갑니다.</p>
+  <p class="lead">마스코트가 오른쪽에서 왼쪽 안내 줄을 <strong>가리킵니다</strong>. 줄을 누르면 마스코트가 그 줄을 가리키고 그 내용이 열려요. 마스코트를 누르면 다음 줄로, 가만히 두면 3.4초마다 저절로 넘어갑니다.</p>
   <p class="nogl" id="nogl">이 화면에서는 3D(WebGL)가 켜지지 않았어요.</p>
   <div class="ctl"><span>학교</span><select class="pick" id="pick" aria-label="학교 고르기"></select></div>
-  <div class="ctl" aria-label="금액 이름표 후보 (앱에는 없음)"><span>금액 이름표</span>
-    <button class="chip" data-label="수령 가능액" aria-pressed="true">수령 가능액</button>
-    <button class="chip" data-label="예상 장학금" aria-pressed="false">예상 장학금</button>
-    <button class="chip" data-label="장학금 합계" aria-pressed="false">장학금 합계</button>
+  <div class="ctl" aria-label="가장 빠른 마감 (시안 조절 · 앱에는 없음)"><span>가장 빠른 마감</span>
+    <button class="chip" data-due="0" aria-pressed="true">오늘</button>
+    <button class="chip" data-due="3" aria-pressed="false">3일 뒤</button>
+    <button class="chip" data-due="none" aria-pressed="false">없음</button>
+  </div>
+  <div class="ctl" aria-label="쓰던 신청서 (시안 조절 · 앱에는 없음)"><span>쓰던 신청서</span>
+    <button class="chip" data-draft="1" aria-pressed="true">있음</button>
+    <button class="chip" data-draft="0" aria-pressed="false">없음</button>
   </div>
 
-  <div class="phone">
+  <div class="phone" id="phone">
     <div class="hero" id="hero">
-      <svg class="ray" id="ray" aria-hidden="true"><line id="ray-line" x1="0" y1="0" x2="0" y2="0"/></svg>
+      <button class="stage" id="stage" aria-label="마스코트 — 누르면 다음 안내로"><canvas></canvas></button>
       <div class="lines" id="lines" role="list">
         <span class="bar" id="bar"></span>
-        <!-- 차례(2026-11-20 개발자 지시): 매칭된 공고 → 그 공고를 신청했을 때의 금액 → 마감 임박. 이름표는 문장이 아니라 낱말 -->
-        <button class="ln" data-i="0" role="listitem"><small>매칭된 공고</small><b data-to="16" data-fmt="cnt">16건</b></button>
-        <button class="ln" data-i="1" role="listitem"><small id="amt-label">수령 가능액</small><b data-to="3644" data-fmt="won">3,644만원</b></button>
-        <button class="ln" data-i="2" role="listitem"><small>마감 임박</small><b data-to="5" data-fmt="cnt">5건</b></button>
+        <!-- 차례(2026-11-20 개발자 지시): 매칭된 공고 → 그 공고를 신청했을 때의 금액 → 가장 빠른 마감 → 이어서 쓰기. 이름표는 문장이 아니라 낱말 -->
+        <button class="ln" data-k="match" role="listitem"><small>매칭된 공고</small><b data-to="16" data-fmt="cnt">16건</b></button>
+        <button class="ln" data-k="amount" role="listitem"><small>수령 가능액</small><b data-to="3644" data-fmt="won">3,644만원</b></button>
+        <button class="ln urgent" data-k="due" role="listitem"><small>마감 <span class="dd" id="due-dd">D-Day</span></small><b id="due-n" data-to="3" data-fmt="cnt">3건</b></button>
+        <button class="ln" data-k="draft" role="listitem"><small>이어서 쓰기</small><b data-to="1" data-fmt="cnt">1건</b></button>
       </div>
-      <button class="stage" id="stage" aria-label="마스코트 — 누르면 다음 안내로"><canvas></canvas></button>
     </div>
-    <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="dots" id="dots" aria-hidden="true"></div>
     <p class="who" id="who"></p>
+
+    <div class="below" aria-hidden="true">
+      <div class="tiles"><span>마감 임박</span><span>교내</span><span>교외</span><span>대외활동</span><span>공모전</span><span>신청 내역</span></div>
+      <p class="gone">쓰던 신청서 띠 — 없앰 (「이어서 쓰기」 줄로 옮김)</p>
+      <div class="news-h">우리 학교 소식 <a>전체 보기</a></div>
+    </div>
+
+    <div class="sheet-dim" id="dim"></div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h"><div class="grab"></div><div id="sheet-body"></div></div>
   </div>
 
   <div class="notes">
@@ -90,9 +128,11 @@
     <ul>
       <li>상태는 <strong>'지금 말하는 줄' 하나</strong>뿐이에요. 줄을 누르든, 마스코트를 누르든, 저절로 넘어가든 같은 한 곳이 바뀝니다.</li>
       <li>그 상태가 바뀌면 한꺼번에: 줄이 커지고 숫자가 0부터 올라가고 · 왼쪽 막대가 그 줄로 옮겨 가고 · 마스코트가 그 줄을 보며 팔을 뻗고 한 번 뜁니다.</li>
-      <li>세 숫자는 <strong>늘 다 보여요</strong>. 작게 보이는 줄도 읽을 수 있고, 가리키는 것은 강조일 뿐입니다.</li>
-      <li>마스코트를 누르면 동전이 나오면서 다음 줄로, 옆으로 끌면 돌아갑니다.</li>
-      <li>이름표는 문장이 아니라 낱말로 — 매칭된 공고 · 수령 가능액(후보 셋 중 고르기 · '최대'는 뺌 — 11-20 개발자 결정) · 마감 임박. 숫자는 올려 주신 화면의 것이에요.</li>
+      <li><strong>줄을 누르면</strong> 마스코트가 먼저 그 줄을 가리키고 내용이 열려요 — 매칭된 공고 → 장학금 목록 · 수령 가능액 → 금액 상세 · 마감 → 그 날 마감인 공고 · 이어서 쓰기 → 쓰던 신청서.</li>
+      <li><strong>마감 줄의 이름표는 가장 빠른 마감</strong>이에요 — 오늘이면 「마감 D-Day」, 3일 뒤면 「마감 D-3」, 숫자는 그날 마감인 공고 수. 마감이 없거나 쓰던 신청서가 없으면 그 줄은 숨깁니다(0건 줄을 남기지 않아요).</li>
+      <li>쓰던 신청서 띠는 없앴어요 — 같은 일을 「이어서 쓰기」 줄이 합니다.</li>
+      <li>무대(3D)를 히어로 전체에 깔고 캐릭터만 오른쪽에 세워, 왼쪽으로 뻗은 팔이 잘리지 않게 했어요.</li>
+      <li>숫자·공고 이름은 오늘(11-20) 한국외대 학생 기준의 예시예요.</li>
     </ul>
   </div>
 </div>
@@ -112,57 +152,101 @@
   const $ = (id) => document.getElementById(id);
   if (!window.K) { $('nogl').style.display = 'block'; return; }
   const { Stage, MASCOTS, ORDER, REDUCED, clamp } = K;
-  const lines = [...document.querySelectorAll('.ln')], dots = [...$('dots').children];
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const all = [...document.querySelectorAll('.ln')];
   const FMT = { won: (n) => n.toLocaleString('ko-KR') + '만원', cnt: (n) => n.toLocaleString('ko-KR') + '건' };
-  let active = -1, timer = 0, holdUntil = 0;
+  /* 예시 자료 — 오늘(11-20) 한국외대 학생에게 보일 만한 공고(정식 등록분에서 골랐다 · 앱에서는 매칭 결과가 채운다) */
+  const DUE = {
+    0: [{ t: '2026년 2학기 안산시 대학생 본인부담 등록금 반값지원 장학생 선발', m: '100만원' },
+        { t: '2026-2학기 영어통번역학부 TESOL영어학 제자사랑 장학생 모집', m: '' },
+        { t: '2026-2학기 다문화가정 장학금 신청 안내', m: '등록금 30%' }],
+    3: [{ t: '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발', m: '100만원' }],
+  };
+  const DRAFT = { t: '재단법인 광남새마을금고 장학회 우등장학생 선발', step: '2/4 단계' };
+  let due = '0', hasDraft = true, active = null, holdUntil = 0, sheetTimer = 0;
 
-  const stage = Stage($('stage'), { coins: 8, spread: 1.4, jump: 0.3, camY: 1.4, lookY: 1.18, dist: 5.3,
-    onTap() { hold(); setActive((active + 1) % lines.length, true); } });
+  const stage = Stage($('stage'), { screenX: 0.4, coins: 8, spread: 1.0, jump: 0.28, camY: 1.4, lookY: 1.22, dist: 7.4,
+    onTap() { hold(); const v = visible(); setActive(v[(v.indexOf(active) + 1) % v.length].dataset.k, true); } });
   if (!stage) return;
 
+  const visible = () => all.filter((l) => !l.hidden);
+  const lineOf = (k) => all.find((l) => l.dataset.k === k);
   function countUp(el) {
     const to = Number(el.dataset.to), fmt = FMT[el.dataset.fmt];
     if (REDUCED) { el.textContent = fmt(to); return; }
     const t0 = performance.now(), my = (el._run = (el._run || 0) + 1);
     (function step(now) { if (el._run !== my) return; const u = clamp((now - t0) / 700, 0, 1), e = 1 - Math.pow(1 - u, 3); el.textContent = fmt(Math.round(to * e)); if (u < 1) requestAnimationFrame(step); })(t0);
   }
-  /* 줄의 자리 → 캐릭터가 가리킬 곳 · 막대 · 점선. 글자 크기가 바뀌는 동안(전환)에도 맞게, 잠깐 뒤 한 번 더 잰다 */
+  /* 줄의 자리 → 캐릭터가 가리킬 높이 · 막대. 글자 크기가 바뀌는 동안에도 맞게 잠깐 뒤 한 번 더 잰다 */
   function aim() {
-    if (active < 0) return;
-    const ln = lines[active], hero = $('hero').getBoundingClientRect(), r = ln.getBoundingClientRect(), s = $('stage').getBoundingClientRect(), box = $('lines').getBoundingClientRect();
+    const ln = lineOf(active); if (!ln || ln.hidden) return;
+    const r = ln.getBoundingClientRect(), s = $('stage').getBoundingClientRect(), box = $('lines').getBoundingClientRect();
     const cy = r.top + r.height / 2;
-    const py = clamp(-((cy - (s.top + s.height / 2)) / (s.height / 2)), -0.9, 0.9) * 0.75;
-    stage.point({ x: -1, y: py });
+    stage.point({ x: -1, y: clamp(-((cy - (s.top + s.height * 0.5)) / (s.height * 0.5)), -0.9, 0.9) * 0.8 });
     $('bar').style.transform = `translateY(${r.top - box.top + 8}px)`; $('bar').style.height = (r.height - 16) + 'px';
-    const L = $('ray-line');   // 줄 오른쪽 끝 → 캐릭터 손 근처
-    L.setAttribute('x1', r.left - hero.left + Math.min(r.width - 6, ln.querySelector('b').getBoundingClientRect().width + 26)); L.setAttribute('y1', cy - hero.top);
-    L.setAttribute('x2', s.left - hero.left + s.width * 0.1); L.setAttribute('y2', s.top - hero.top + s.height * (0.52 - py * 0.2));
+  }
+  function drawDots() {
+    $('dots').innerHTML = visible().map((l) => `<i class="${l.dataset.k === active ? 'on' : ''}"></i>`).join('');
   }
   /* 🔴 상태가 바뀌는 곳은 여기 하나 — 글자·막대·점·캐릭터가 같이 따라온다 */
-  function setActive(i, fromMascot) {
-    if (i === active) { if (!fromMascot) stage.hop(); return; }
-    active = i;
-    lines.forEach((l, k) => { l.classList.toggle('on', k === i); l.setAttribute('aria-current', k === i ? 'true' : 'false'); });
-    dots.forEach((d, k) => d.classList.toggle('on', k === i));
-    countUp(lines[i].querySelector('b'));
-    $('ray').classList.add('move'); aim(); if (!fromMascot) stage.hop();
-    setTimeout(() => { aim(); $('ray').classList.remove('move'); }, 430);
+  function setActive(k, fromMascot) {
+    if (k === active) { if (!fromMascot) stage.hop(); return; }
+    active = k;
+    all.forEach((l) => { const on = l.dataset.k === k; l.classList.toggle('on', on); l.setAttribute('aria-current', on ? 'true' : 'false'); });
+    drawDots(); countUp(lineOf(k).querySelector('b'));
+    aim(); if (!fromMascot) stage.hop();
+    setTimeout(aim, 420);
   }
-  function hold() { holdUntil = performance.now() + 8000; }
-  lines.forEach((l, i) => l.addEventListener('click', () => { hold(); setActive(i); }));
-  timer = setInterval(() => { if (!REDUCED && !document.hidden && performance.now() > holdUntil) setActive((active + 1) % lines.length); }, 3400);
+  function hold(ms) { holdUntil = performance.now() + (ms || 8000); }
+
+  /* 줄을 누르면 — 먼저 가리키고(0.35초) 그 줄의 내용을 연다 */
+  function openSheet(k) {
+    let h = '';
+    if (k === 'match') h = `<h3 id="sheet-h">매칭된 공고 16건</h3><p class="sub">앱에서는 장학금 탭(내게 맞는 순)으로 갑니다</p>`;
+    if (k === 'amount') h = `<h3 id="sheet-h">수령 가능액 3,644만원</h3><p class="sub">앱에서는 지금처럼 금액 상세 — 어떤 공고가 얼마씩인지 — 가 열립니다</p>`;
+    if (k === 'due') {
+      const list = DUE[due] || [], dd = due === '0' ? 'D-Day' : 'D-' + due;
+      h = `<h3 id="sheet-h">마감 ${dd} · ${list.length}건</h3><p class="sub">${due === '0' ? '오늘' : due + '일 뒤'} 마감인 매칭 공고</p>`
+        + list.map((x) => `<div class="row"><span class="dd">${dd}</span><span class="t">${esc(x.t)}${x.m ? `<br><span class="m">${esc(x.m)}</span>` : ''}</span>›</div>`).join('');
+    }
+    if (k === 'draft') h = `<h3 id="sheet-h">이어서 쓰기</h3><p class="sub">쓰다 만 신청서</p><div class="draft"><div class="t">${esc(DRAFT.t)}</div><div class="p"><i></i></div><div class="m">${esc(DRAFT.step)}</div></div><p></p><button class="btn" type="button">이어서 쓰기</button>`;
+    $('sheet-body').innerHTML = h + '<p class="mock">시안 — 앱에서는 이 자리에 실제 내용이 열립니다</p>';
+    $('phone').classList.add('open'); hold(60000);
+  }
+  function closeSheet() { $('phone').classList.remove('open'); hold(); }
+  $('dim').addEventListener('click', closeSheet);
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+  all.forEach((l) => l.addEventListener('click', () => {
+    hold(); setActive(l.dataset.k); clearTimeout(sheetTimer); sheetTimer = setTimeout(() => openSheet(l.dataset.k), REDUCED ? 0 : 350);
+  }));
+  setInterval(() => {
+    if (REDUCED || document.hidden || performance.now() < holdUntil || $('phone').classList.contains('open')) return;
+    const v = visible(); setActive(v[(v.indexOf(lineOf(active)) + 1) % v.length].dataset.k);
+  }, 3400);
   addEventListener('resize', aim);
+
+  /* 시안 조절 — 가장 빠른 마감 · 쓰던 신청서. 없으면 그 줄을 숨긴다(0건 줄을 남기지 않는다) */
+  function applyState() {
+    const dl = lineOf('due'), dr = lineOf('draft');
+    dl.hidden = due === 'none';
+    if (due !== 'none') { $('due-dd').textContent = due === '0' ? 'D-Day' : 'D-' + due; const n = $('due-n'); n.dataset.to = String((DUE[due] || []).length); n.textContent = FMT.cnt(Number(n.dataset.to)); dl.classList.toggle('urgent', due === '0'); }
+    dr.hidden = !hasDraft;
+    if (!lineOf(active) || lineOf(active).hidden) { active = null; setActive('match'); } else { drawDots(); setTimeout(aim, 60); }
+  }
+  document.querySelectorAll('[data-due]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-due]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); due = b.dataset.due; applyState();
+  }));
+  document.querySelectorAll('[data-draft]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-draft]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); hasDraft = b.dataset.draft === '1'; applyState();
+  }));
 
   function setSchool(k) { const d = MASCOTS[k]; stage.setChar(d.build()); $('who').textContent = `${d.school} · ${d.name}`; $('pick').value = k; setTimeout(aim, 60); }
   ORDER.forEach((k) => { const o = document.createElement('option'); o.value = k; o.textContent = `${MASCOTS[k].school} — ${MASCOTS[k].name}`; $('pick').appendChild(o); });
   $('pick').addEventListener('change', (e) => setSchool(e.target.value));
-  document.querySelectorAll('[data-label]').forEach((b) => b.addEventListener('click', () => {
-    document.querySelectorAll('[data-label]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); $('amt-label').textContent = b.dataset.label; setTimeout(aim, 30);
-  }));
-  const first = new URLSearchParams(location.search).get('m');
-  setSchool(MASCOTS[first] ? first : 'hufs');
-  setActive(0);
-  window.__point = { setActive, stage };
+  const q = new URLSearchParams(location.search);
+  setSchool(MASCOTS[q.get('m')] ? q.get('m') : 'hufs');
+  setActive('match');
+  window.__point = { setActive, stage, openSheet, closeSheet, visible };
 })();
 </script>
 </body>

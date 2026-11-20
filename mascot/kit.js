@@ -299,7 +299,10 @@
       renderer.setSize(w, h, false); cam.aspect = w / h;
       // 좁은 무대에서는 물러나 캐릭터가 잘리지 않게
       const dist = (opt.dist || 5.7) * Math.max(1, 0.95 / cam.aspect);
-      cam.position.set(0, opt.camY || 1.45, dist); cam.lookAt(0, opt.lookY || 1.28, 0); cam.updateProjectionMatrix();
+      /* screenX(-1~1): 캐릭터를 화면 가로 어디에 세울지 — 무대를 넓게 깔고 캐릭터만 한쪽에 두면 뻗은 팔·동전이 무대 끝에서 잘리지 않는다(2026-11-20 가리키는 시안).
+         카메라를 옆으로 옮길 뿐 바라보는 방향은 그대로다. 없으면 예전처럼 가운데 */
+      const cx = opt.screenX ? -opt.screenX * Math.tan((cam.fov * Math.PI) / 360) * dist * cam.aspect : 0;
+      cam.position.set(cx, opt.camY || 1.45, dist); cam.lookAt(cx, opt.lookY || 1.28, 0); cam.updateProjectionMatrix();
       if (stack) stack.group.visible = cam.aspect > 0.85;
     }
     new ResizeObserver(size).observe(btn); size();
@@ -331,7 +334,7 @@
     btn.addEventListener('click', (e) => { if (moved) { e.preventDefault(); moved = false; return; } tap(); });  // Enter·Space 도 이 길
     function look(e) {
       const r = btn.getBoundingClientRect();
-      S.lookX = clamp(((e.clientX - r.left) / r.width - 0.5) * 2, -1, 1);
+      S.lookX = clamp(((e.clientX - r.left) / r.width - 0.5) * 2 - (opt.screenX || 0), -1, 1);   // 캐릭터가 선 자리를 기준으로
       S.lookY = clamp(((e.clientY - r.top) / r.height - 0.5) * 2, -1, 1);
     }
 
@@ -377,7 +380,7 @@
       ch.eyes.forEach((e) => { e.scale.y = S.blinkT > 0 ? 0.12 : (happy ? 0.55 : 1); });
       // 팔 · 귀 · 꼬리
       const ps = P ? (P.x < 0 ? -1 : 1) : 0;   // 가리키는 쪽 팔
-      S.pz = lerp(S.pz, P ? Math.PI / 2 + P.y * 0.6 : 0.3, 1 - Math.pow(0.0008, dt));
+      S.pz = lerp(S.pz, P ? Math.PI / 2 + P.y * 0.85 : 0.3, 1 - Math.pow(0.0008, dt));
       ch.arms.forEach((a) => { const s = a.userData.side;
         a.rotation.z = s === ps || (!P && Math.abs(S.pz - 0.3) > 0.02 && s === S.lastPs) ? s * (S.pz + Math.sin(S.time * 5) * 0.03) : s * (0.3 + S.armUp * 2.3 + Math.sin(S.time * 2.2 + s) * 0.05); });
       if (ps) S.lastPs = ps;
