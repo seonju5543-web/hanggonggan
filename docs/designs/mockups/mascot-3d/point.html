@@ -139,7 +139,8 @@
       <li>상태는 <strong>'지금 말하는 줄' 하나</strong>뿐이에요. 줄을 누르든, 마스코트를 누르든, 저절로 넘어가든 같은 한 곳이 바뀝니다.</li>
       <li>그 상태가 바뀌면 한꺼번에: 줄이 커지고 숫자가 0부터 올라가고 · 왼쪽 막대가 그 줄로 옮겨 가고 · 마스코트가 그 줄을 보며 팔을 뻗고 한 번 뜁니다.</li>
       <li><strong>줄을 누르면</strong> 마스코트가 먼저 그 줄을 가리키고 내용이 열려요 — 매칭된 공고 → 「자격 요건 매칭」 목록(줄을 누르면 그 공고 카드) · 수령 가능액 → 금액 상세 · 마감 → 그 날 마감인 공고 · 이어서 쓰기 → 쓰던 신청서.</li>
-      <li><strong>마감 줄의 이름표는 가장 빠른 마감</strong>이에요 — 오늘이면 「마감 D-Day」, 3일 뒤면 「마감 D-3」, 숫자는 그날 마감인 공고 수. 마감이 없거나 쓰던 신청서가 없으면 그 줄은 숨깁니다(0건 줄을 남기지 않아요).</li>
+      <li><strong>마감 줄의 이름표는 가장 빠른 마감</strong>이에요 — 오늘이면 「마감 D-Day」, 3일 뒤면 「마감 D-3」, 숫자는 그날 마감인 공고 수. 마감 공고가 없으면 이 줄을 숨깁니다(0건 줄을 남기지 않아요).</li>
+      <li>「이어서 쓰기」 줄도 쓰던 신청서가 없으면 숨깁니다.</li>
       <li>쓰던 신청서 띠는 없앴어요 — 같은 일을 「이어서 쓰기」 줄이 합니다.</li>
       <li>무대(3D)를 히어로 전체에 깔고 캐릭터만 오른쪽에 세워, 왼쪽으로 뻗은 팔이 잘리지 않게 했어요.</li>
       <li>숫자·공고 이름은 오늘(11-20) 한국외대 학생 기준의 예시예요.</li>
@@ -180,10 +181,10 @@
     { t: '2026-2학기 다문화가정 장학금 신청 안내', m: '약 109만원', p: '' }, { t: '2026학년도 창업장학금 신청 안내(~11/27)', m: '100만원', p: '한국외국어대학교' },
     { t: '2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내', m: '400만원', p: '' },
   ];
-  let due = '0', hasDraft = true, active = null, holdUntil = 0, sheetTimer = 0;
+  let due = '0', hasDraft = true, active = null, holdUntil = 0, sheetTimer = 0, openK = null;
 
   const stage = Stage($('stage'), { screenX: 0.33, coins: 8, spread: 1.0, jump: 0.28, camY: 1.4, lookY: 1.22, dist: 8.0,
-    onTap() { hold(); const v = visible(); setActive(v[(v.indexOf(active) + 1) % v.length].dataset.k, true); } });
+    onTap() { hold(); setActive(nextKey(), true); } });
   if (!stage) return;
 
   const visible = () => all.filter((l) => !l.hidden);
@@ -214,10 +215,13 @@
     aim(); if (!fromMascot) stage.hop();
     setTimeout(aim, 420);
   }
+  /* 다음 줄 — 마스코트 누르기와 저절로 넘어가기가 같은 한 곳을 쓴다 */
+  function nextKey() { const v = visible(); return v[(v.indexOf(lineOf(active)) + 1) % v.length].dataset.k; }
   function hold(ms) { holdUntil = performance.now() + (ms || 8000); }
 
   /* 줄을 누르면 — 먼저 가리키고(0.35초) 그 줄의 내용을 연다 */
   function openSheet(k) {
+    openK = k;
     let h = '';
     if (k === 'match') h = `<h3 id="sheet-h">매칭된 공고</h3><div class="grp-h"><b>자격 요건 매칭</b><span>16건 · 3,644만원</span></div>`
       + MATCH.map((x, i) => `<button class="ad" type="button" data-card="${i}"><div class="top"><span class="nm">${esc(x.t)}</span><span class="val">${esc(x.m)}</span></div><div class="pv">${esc(x.p || '공고 보기')}</div></button>`).join('')
@@ -233,7 +237,7 @@
     $('sheet').scrollTop = 0;
     $('phone').classList.add('open'); hold(60000);
   }
-  function closeSheet() { $('phone').classList.remove('open'); hold(); }
+  function closeSheet() { openK = null; clearTimeout(sheetTimer); $('phone').classList.remove('open'); hold(); }
   $('dim').addEventListener('click', closeSheet);
   /* 목록의 줄을 누르면 그 공고 카드(앱: 그 공고의 상세 시트) · 「‹ 자격 요건 매칭」 으로 돌아온다 */
   $('sheet-body').addEventListener('click', (e) => {
@@ -250,7 +254,7 @@
   }));
   setInterval(() => {
     if (REDUCED || document.hidden || performance.now() < holdUntil || $('phone').classList.contains('open')) return;
-    const v = visible(); setActive(v[(v.indexOf(lineOf(active)) + 1) % v.length].dataset.k);
+    setActive(nextKey());
   }, 3400);
   addEventListener('resize', aim);
 
@@ -258,9 +262,11 @@
   function applyState() {
     const dl = lineOf('due'), dr = lineOf('draft');
     dl.hidden = due === 'none';
-    if (due !== 'none') { $('due-dd').textContent = due === '0' ? 'D-Day' : 'D-' + due; const n = $('due-n'); n.dataset.to = String((DUE[due] || []).length); n.textContent = FMT.cnt(Number(n.dataset.to)); dl.classList.toggle('urgent', due === '0'); }
+    if (due !== 'none') { $('due-dd').textContent = due === '0' ? 'D-Day' : 'D-' + due; const n = $('due-n'); n.dataset.to = String((DUE[due] || []).length); n._run = (n._run || 0) + 1; n.textContent = FMT.cnt(Number(n.dataset.to)); dl.classList.toggle('urgent', due === '0'); }
     dr.hidden = !hasDraft;
     if (!lineOf(active) || lineOf(active).hidden) { active = null; setActive('match'); } else { drawDots(); setTimeout(aim, 60); }
+    /* 열린 시트도 같은 상태를 따른다 — 줄이 숨으면 닫고, 남아 있으면 새 값으로 다시 그린다 */
+    if (openK && (openK === 'due' || openK === 'draft')) { if (lineOf(openK).hidden) closeSheet(); else openSheet(openK); }
   }
   document.querySelectorAll('[data-due]').forEach((b) => b.addEventListener('click', () => {
     document.querySelectorAll('[data-due]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); due = b.dataset.due; applyState();
@@ -272,8 +278,7 @@
   function setSchool(k) { const d = MASCOTS[k]; stage.setChar(d.build()); $('who').textContent = `${d.school} · ${d.name}`; $('pick').value = k; setTimeout(aim, 60); }
   ORDER.forEach((k) => { const o = document.createElement('option'); o.value = k; o.textContent = `${MASCOTS[k].school} — ${MASCOTS[k].name}`; $('pick').appendChild(o); });
   $('pick').addEventListener('change', (e) => setSchool(e.target.value));
-  const q = new URLSearchParams(location.search);
-  setSchool(MASCOTS[q.get('m')] ? q.get('m') : 'hufs');
+  setSchool('hufs');   /* 학교는 위 고르기 칸으로만 바꾼다 — 주소 뒤 글자를 읽지 않는다(공개 HTML 관문) */
   setActive('match');
   window.__point = { setActive, stage, openSheet, closeSheet, visible };
 })();
