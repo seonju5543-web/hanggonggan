@@ -50,16 +50,60 @@ export function sofficeToPdf(src, work, { soffice = 'soffice' } = {}) {
    🔴 평소 길을 바꾸지 않는다 — 부르는 쪽(doc-pdf)이 **글자가 빠졌을 때만** 이 길로 다시 가서 더 많이 남은 쪽을 쓴다(신청서·쪽 그림 로봇은 안 부른다).
    돌려주는 것: { ok: true, made, boxes } | { ok: false, why } — boxes 는 높이를 푼 틀의 수(0 이면 풀 것이 없어 다시 바꾸지 않는다) */
 const FIXED_BOX = /<draw:frame\b([^>]*?)\s+svg:height="([^"]+)"([^>]*)>(\s*)<draw:text-box\b(?![^>]*\bfo:min-height=)([^>]*)>/g;
-/** 중간 꼴(fodt)에서 높이가 고정된 글상자 틀을 자라는 틀로 — { xml, boxes }. 그림 틀·이미 자라는 틀·다른 글자는 그대로 */
+/* 둘째 원인 — 글자처럼 놓인 글상자를 품은 **문단의 줄 간격이 100% 아래**(통영시 저소득 공고의 「제출서류」 표: 문단 줄 간격 34%).
+   한글은 줄에 놓인 표의 높이만큼 줄을 잡지만 LibreOffice 는 그 줄을 줄 간격 비율만큼 줄여, 틀을 풀어도 표의 위아래(머리 줄 · ⑤~⑦ 줄)가 줄 밖으로 잘렸다.
+   진단한 틀 40여 개 가운데 글이 든 채 100% 아래인 문단은 그 하나(와 85% 하나)뿐이었고, 100% 이상인 문단의 틀은 풀자 다 살아났다(귀농인 217%).
+   그런 문단에만 줄 간격 100% 인 **사본 모양**을 붙인다 — 같은 모양을 쓰는 글 문단은 건드리지 않는다 */
+const AS_CHAR_BOX = /<draw:frame\b[^>]*\btext:anchor-type="as-char"[^>]*>\s*<draw:text-box\b/g;
+export const MAX_FLAT_BYTES = 64 * 1024 * 1024;   // 중간 꼴(fodt) 크기 상한 — sofficeToPdfRelaxed
+const LOOSE_LINE = '_hdj100';
+const escRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function loosenLineSpacing(xml) {
+  const paras = new Map();   // 문단 여는 태그의 자리 → { open, name }
+  for (const m of xml.matchAll(AS_CHAR_BOX)) {
+    let p = m.index;
+    do { p = xml.lastIndexOf('<text:p', p - 1); } while (p >= 0 && !/^<text:p[\s>]/.test(xml.slice(p, p + 8)));   // <text:page-number 같은 이웃 이름은 문단이 아니다
+    if (p < 0) continue;
+    const open = xml.slice(p, xml.indexOf('>', p) + 1);
+    if (xml.slice(p + open.length, m.index).includes('</text:p>')) continue;   // 그 문단은 틀 앞에서 닫혔다 — 이 틀을 품은 문단이 아니다
+    const name = (open.match(/\btext:style-name="([^"]+)"/) || [])[1];
+    if (name && !name.endsWith(LOOSE_LINE)) paras.set(p, { open, name });
+  }
+  const clones = new Map();   // 모양 이름 → { block, clone } (줄 간격이 100% 아래인 것만)
+  for (const { name } of paras.values()) {
+    if (clones.has(name)) continue;
+    const block = (xml.match(new RegExp(`<style:style\\b[^>]*\\bstyle:name="${escRe(name)}"[^>]*[^/]>[\\s\\S]*?</style:style>`)) || [])[0];
+    const pct = block && (block.match(/\bfo:line-height="(\d+(?:\.\d+)?)%"/) || [])[1];
+    clones.set(name, block && pct && Number(pct) < 100
+      ? { block, clone: block.replace(`style:name="${name}"`, `style:name="${name}${LOOSE_LINE}"`).replace(/\bfo:line-height="[^"]+"/, 'fo:line-height="100%"') }
+      : null);
+  }
+  let out = xml;
+  let lines = 0;
+  for (const p of [...paras.keys()].sort((a, b) => b - a)) {   // 뒤에서부터 — 앞 자리가 안 밀린다
+    const { open, name } = paras.get(p);
+    if (!clones.get(name)) continue;
+    out = out.slice(0, p) + open.replace(`text:style-name="${name}"`, `text:style-name="${name}${LOOSE_LINE}"`) + out.slice(p + open.length);
+    lines += 1;
+  }
+  for (const c of clones.values()) if (c) out = out.replace(c.block, () => c.block + c.clone);   // 모양 사본은 원래 모양 바로 뒤에(함수로 — `$` 가 든 글자를 바꿈표로 읽지 않게)
+  return { xml: out, lines };
+}
+/** 중간 꼴(fodt)에서 글자가 잘리는 두 자리를 푼다 — { xml, boxes }: 높이가 고정된 글상자 틀은 자라는 틀로 · 그런 틀을 품은 문단의 줄 간격이 100% 아래면 100% 로.
+    boxes 는 푼 곳의 수(틀 + 문단). 그림 틀·이미 자라는 틀·다른 글자는 그대로 */
 export function relaxFrameHeights(fodt) {
   let boxes = 0;
-  const xml = String(fodt || '').replace(FIXED_BOX, (m, a, h, b, ws, c) => { boxes += 1; return `<draw:frame${a}${b}>${ws}<draw:text-box fo:min-height="${h}"${c}>`; });
-  return { xml, boxes };
+  const grown = String(fodt || '').replace(FIXED_BOX, (m, a, h, b, ws, c) => { boxes += 1; return `<draw:frame${a}${b}>${ws}<draw:text-box fo:min-height="${h}"${c}>`; });
+  const { xml, lines } = loosenLineSpacing(grown);
+  return { xml, boxes: boxes + lines };
 }
-export function sofficeToPdfRelaxed(src, work, { soffice = 'soffice' } = {}) {
+export function sofficeToPdfRelaxed(src, work, { soffice = 'soffice', maxBytes = MAX_FLAT_BYTES } = {}) {
   fs.mkdirSync(work, { recursive: true });
   const flat = sofficeConvert(src, work, 'fodt', { soffice });
   if (!flat.ok) return flat;
+  /* 중간 꼴은 그림을 글자(base64)로 품어 원본보다 크다 — 통째로 읽어 고치므로 너무 크면 가지 않는다(메모리가 모자라 죽으면 잡을 수 없고 실패 장부에도 안 남아 매 실행 같은 파일에서 죽는다 · 리뷰 11-20) */
+  const size = fs.statSync(flat.made).size;
+  if (size > maxBytes) return { ok: false, why: `중간 꼴이 너무 큼(${Math.round(size / 1024 / 1024)}MB)` };
   const { xml, boxes } = relaxFrameHeights(fs.readFileSync(flat.made, 'utf8'));
   if (!boxes) return { ok: false, why: '높이가 고정된 글상자 없음' };
   const dir = path.join(work, 'relaxed');

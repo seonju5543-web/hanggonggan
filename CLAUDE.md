@@ -86,7 +86,7 @@
 3. **선조치후보고** — 방향 결정이 필요하면 최적안으로 먼저 조치하고 "어떤 상황에서 어떤 조치"를 보고.
 4. **양식 = 공고 첨부 신청서 원본 그대로**(2026-10-14 결정 6) — `collector/form-pdf.mjs` 가 PDF 사본을 `data/forms-pdf/` 에 두고 앱은 PDF 줄·「양식 채우기」(`formfill.js`). 앱이 양식을 다시 그리는 스키마화는 멈춤(`schematize-config.json` enabled:false · 있는 앱 양식은 그 공고가 닫힐 때까지).
    글꼴은 `collector/install-form-fonts.sh`(없으면 표가 깨진다). 관문 「신청서 원본 → PDF」.
-4-1. **공고문·안내문도 PDF**(2026-11-20 결정 · `docs/designs/all-docs-pdf.md`) — `collector/doc-pdf.mjs` 가 신청서 아닌 한글·워드(층2는 전부)를 바꾼다(원본 글자 98% 대조 · 못 미치면 원본만). 첨부 목록은 PDF 줄 위·올린 목록 맨 밑 그대로(`attachPdfRowsHtml` 한 곳 · 이름 그대로 · 회색 글씨 없음). 관문 「공고문 PDF 사본」.
+4-1. **공고문·안내문도 PDF**(2026-11-20 결정 · `docs/designs/all-docs-pdf.md`) — `collector/doc-pdf.mjs` 가 신청서 아닌 한글·워드(층2는 전부)를 바꾼다(원본 글자 98% 대조 · 못 미치면 원본만 · 글자가 빠지면 틀·줄 간격을 풀어 한 번 더 `sofficeToPdfRelaxed` · 왜 빠졌나는 짐작 말고 `doc-pdf-probe.yml` 진단으로). 첨부 목록은 PDF 줄 위·올린 목록 맨 밑 그대로(`attachPdfRowsHtml` 한 곳 · 이름 그대로 · 회색 글씨 없음). 관문 「공고문 PDF 사본」.
 5. **정식 등록은 원본 첨부까지 한 세트** — ① 마감 전 등록 공고의 신청서 첨부는 로봇이 스스로 받는다(`pickFormBacklog` · 매일 · 못 받으면 사흘 쉼) ·
    그 밖은 `collector/run-deepfetch.txt` 에 `targets: 키워드` 적어 기본 브랜치 push(원본이 `collector/extracted/` 에 커밋되고 PDF 로봇이 잇는다) ② 새 `forms.json` 양식은 만들지 않는다(옛 `formId` 는 `verify/verify-registered.js`·
    `verify-forms-data.js` 로 검증) ③ 포털 입력형 등은 모든 수단(상세·첨부·재단 홈·정찰)을 쓴 뒤에만 묻는다. 채울 양식이 없으면 `noForm: "사유"`.
@@ -309,6 +309,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - 문법 검사는 `node --check` — `import('./x.mjs')` 는 **실행된다**. 불러오는 순간 실행되는 파일(auto-register·schematize)은 가져다 쓰지 말 것.
 - **원문 링크는 그 공고 하나로** — 주소를 유추하지 말고 게시판 폼을 그대로 · 세션 없는 새 탭에서 열어 확인 · '못 읽음'과 '다른 글'을 구분 ·
   같은 학교를 하루에 여러 번 두드리지 말 것 · 못 찾으면 `#n-` 표식(앱이 '게시판 목록 ↗'). 사냥꾼이 못 찾는 이유는 대개 `boardTitle` 이 없어서.
+- 첨부 목록은 저장 때 `stripSiteChrome` 이 다듬는다 — 공통 링크 걷기 · 같은 파일 한 줄(`collapseSameFiles`) · 풀리는 스크립트 주소. 🔴 주소만 같다고 합치지 않는다(이름까지 · 그 주소의 줄 전부가 맞을 때만). 관문 「공고문 첨부에서 자격 읽기」.
 - 주소 같음 판정 `urlKey()`/`canonUrl` 한 곳 · 공고 상한 `capNotices()` · 실시간 공고 60일 · 정식 등록은 마감+30일, 마감 없으면 `listedAt`+60일(`notStale`).
 - **폰은 `notices.json` 을 받지 않는다 — 학교별 파일뿐이다**(`noticeFilesForProfile` · 색인으로 알 때는 옛 파일도 안 받는다 — `noticeFallbackNeeded` 한 곳, 화면·알림 공용) · 프로필이 없으면 안 받고 학교가 바뀌면 다시 받는다(`loadNoticesIfSchoolChanged`). 관문 「학교별 공고 파일」.
 - **학과 목록도 학교별 파일뿐이다**(`majorsFileFor`) · 발행 `collector/publish-majors.mjs`(majors.mjs 는 **불러오는 순간 API 를 두드린다** — 가져다 쓰지 말 것) · 🔴 끊기면 **조용하다**(전국 공통 목록으로 물러난다) ·

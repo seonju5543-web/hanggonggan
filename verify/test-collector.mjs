@@ -6530,13 +6530,32 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     const cau = [{ name: '장학생 개인정보 동의서.docx', url: SELF }, { name: '장학생 자기소개서.docx', url: SELF }, { name: '장학생 모집 공고.docx', url: SELF }];
     eq('  🔴 주소가 같다고 같은 파일은 아니다 — 스크립트 내려받기 게시판의 서로 다른 파일 셋(전부 공고 화면 주소 `…#;`)은 그대로 셋',
       AL.collapseSameFiles(cau).length, 3);
-    eq('  조각(#) 없는 같은 주소라도 이름이 서로 품지 않으면 다른 파일로 둔다(틀리게 합치면 첨부가 사라진다)',
-      AL.collapseSameFiles([{ name: '신청서.hwp', url: 'https://a.ac.kr/down?no=1' }, { name: '추천서.hwp', url: 'https://a.ac.kr/down?no=1' }]).length, 2);
-    eq('  학교가 같은 자리의 파일 이름만 바꾼 것(경희대 `…_수정.pdf` → `…_수정_20261001.pdf`)도 한 줄 · 아이콘 꼬리(` chevron_forward`)도 한 줄 · 주소가 다르면 다른 파일',
-      [AL.collapseSameFiles([{ name: '붙임1 운영 계획안_수정.pdf', url: 'https://k.ac.kr/fileDown.do?fileSn=4' }, { name: '붙임1 운영 계획안_수정_20261001.pdf', url: 'https://k.ac.kr/fileDown.do?fileSn=4' }]).map((a) => a.name),
+    eq('  🔴 화면 주소(`#`)를 단 줄은 이름이 닮아도 합치지 않는다 — 받을 주소가 아니다(이름만 다른 두 줄이어도 그대로 둘)',
+      AL.collapseSameFiles([{ name: '장학생 신청서.hwp', url: SELF }, { name: 'Attachment 장학생 신청서.hwp', url: SELF }]).length, 2);
+    const ONE = 'https://a.ac.kr/down?no=1';   // 파일마다 다르지 않은 주소(옛 `href=""` 줄 · 함께 쓰는 내려받기 창구)를 흉내 낸다
+    eq('  조각(#) 없는 같은 주소라도 딴 이름이면 다른 파일로 둔다(틀리게 합치면 첨부가 사라진다) — 딴 이름 · 확장자만 다름 · 한쪽이 다른 쪽으로 시작(작성예시 · 붙임1/붙임10)',
+      [AL.collapseSameFiles([{ name: '신청서.hwp', url: ONE }, { name: '추천서.hwp', url: ONE }]).length,
+        AL.collapseSameFiles([{ name: '2026 장학생 선발 공고문.hwp', url: ONE }, { name: '2026 장학생 선발 공고문.pdf', url: ONE }]).length,
+        AL.collapseSameFiles([{ name: '신청서.hwp', url: ONE }, { name: '신청서 작성예시.hwp', url: ONE }]).length,
+        AL.collapseSameFiles([{ name: '붙임1.hwp', url: ONE }, { name: '붙임10.hwp', url: ONE }]).length],
+      [2, 2, 2, 2]);
+    /* ④ 그 주소를 단 줄이 **전부** 서로 같은 이름일 때만 — 한 줄이라도 딴 이름이면 그 주소는 파일 하나의 주소가 아니다(리뷰 11-20: 짧은 이름으로 바꾸며 차례로 합쳐져 셋이 하나가 됐다) */
+    const mixed = [{ attachments: [{ name: '붙임1 공고문.hwp', url: ONE }, { name: '붙임2 신청서.hwp', url: ONE }, { name: '공고문.hwp', url: ONE }] }];
+    eq('  한 주소에 딴 이름이 섞여 있으면 닮은 둘도 합치지 않는다 — 다듬기를 세 번 불러도 셋 그대로(고친 수 0 · 0 · 0)',
+      [AL.stripSiteChrome([mixed]), AL.stripSiteChrome([mixed]), AL.stripSiteChrome([mixed]), mixed[0].attachments.length], [0, 0, 0, 3]);
+    eq('  🔴 학교가 같은 자리의 파일을 새 이름으로 바꿔 올린 것(경희대 `…_수정.pdf` → `…_수정_20261001.pdf`)은 합치지 않는다 — 합치면 새 이름이 영영 안 실린다',
+      AL.collapseSameFiles([{ name: '붙임1 운영 계획안_수정.pdf', url: 'https://k.ac.kr/fileDown.do?fileSn=4' }, { name: '붙임1 운영 계획안_수정_20261001.pdf', url: 'https://k.ac.kr/fileDown.do?fileSn=4' }]).length, 2);
+    /* 서울교대 우양재단(파일 3개가 36줄) — 링크 글자에 붙은 내려받은 횟수가 볼 때마다 달랐다. 문서도 그림도 횟수 꼬리를 떼고 본다 · 꼬리 없는 이름이 있으면 그 이름으로 */
+    const SN = (k) => `https://www.snue.ac.kr/common/nttFileDownload.do?fileKey=${k}&bbsId=1083`;
+    eq('  내려받은 횟수 꼬리만 다른 줄은 한 줄 — 문서(.hwp) · 그림(.jpg) · 꼬리 없는 이름이 섞여 있으면 그 이름이 남는다 · 아이콘 꼬리(` chevron_forward`)도 · 주소가 다르면 다른 파일',
+      [AL.collapseSameFiles([{ name: '[공문] 협조 요청.hwp (다운로드 : 11회)', url: SN('a') }, { name: '[붙임1] 홍보 포스터.jpg (다운로드 : 9회)', url: SN('b') }, { name: '[공문] 협조 요청.hwp (다운로드 : 12회)', url: SN('a') },
+        { name: '[붙임1] 홍보 포스터.jpg (다운로드 : 10회)', url: SN('b') }, { name: '[공문] 협조 요청.hwp (다운로드 : 27회)', url: SN('a') }]).map((a) => a.name),
+        AL.collapseSameFiles([{ name: 'X 신청서.hwp (다운로드 : 11회)', url: SN('c') }, { name: 'X 신청서.hwp', url: SN('c') }]).map((a) => a.name),
         AL.collapseSameFiles([{ name: '포스터.png', url: 'https://g.ac.kr/f/1.png' }, { name: '포스터.png chevron_forward', url: 'https://g.ac.kr/f/1.png' }]).map((a) => a.name),
         AL.collapseSameFiles([{ name: '신청서.hwp', url: 'https://a.ac.kr/f/1' }, { name: '신청서.hwp', url: 'https://a.ac.kr/f/2' }]).length],
-      [['붙임1 운영 계획안_수정.pdf'], ['포스터.png'], 2]);
+      [['[공문] 협조 요청.hwp (다운로드 : 11회)', '[붙임1] 홍보 포스터.jpg (다운로드 : 9회)'], ['X 신청서.hwp'], ['포스터.png'], 2]);
+    eq('  그 공고 화면 주소(조각 없음 — 옛 `href=""` 줄)를 단 줄은 같은 이름이어도 보지 않는다(다듬기가 공고 주소를 넘긴다)',
+      AL.collapseSameFiles([{ name: '신청서.hwp', url: 'https://a.ac.kr/view?id=7' }, { name: 'Attachment 신청서.hwp', url: 'https://a.ac.kr/view?id=7' }], 'https://a.ac.kr/view?id=7').length, 2);
     eq('  본문 그림·주소 없는 줄·`javascript:` 줄은 건드리지 않는다',
       AL.collapseSameFiles([{ name: '본문이미지-1x1.png', url: 'https://a/i.png', bodyImage: true }, { name: '본문이미지-1x1.png', url: 'https://a/i.png', bodyImage: true },
         { name: '요강.hwp', url: '' }, { name: '요강.hwp', url: '' }, { name: '서식.hwp', url: "javascript:f('1')" }, { name: '서식.hwp', url: "javascript:f('1')" }]).length, 6);
@@ -17574,7 +17593,8 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       const fetchImpl = async (url) => { calls.push(url); const r = respond(url); return { ok: r.ok, status: r.status, arrayBuffer: async () => { if (r.bodyError) throw Object.assign(new Error('The operation was aborted due to timeout'), { name: 'TimeoutError' }); return r.body; } }; };
       const convert = (src, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, '%PDF-1.4 fake'); return { ok: true, out, pages: 1, bytes: 13 }; };
       let pdfText = () => T;
-      const base = { root: tmpRepo, isApplicationForm, fetchImpl, convert, origText: () => T, pdfText: (p) => pdfText(p), log: () => {} };
+      /* relax 는 가짜로 — 안 넣으면 글자가 빠진 시험(⑦)이 진짜 변환기를 띄운다(deep-fetch 는 LibreOffice 를 깐 뒤 이 관문을 5분 단계에서 돌린다 · 리뷰 11-20) */
+      const base = { root: tmpRepo, isApplicationForm, fetchImpl, convert, relax: () => ({ ok: false, why: '시험 — 다시 가지 않음' }), origText: () => T, pdfText: (p) => pdfText(p), log: () => {} };
       respond = (url) => (url.endsWith('/f/2') ? { ok: true, status: 200, body: Buffer.from(`<!doctype html><html>${'x'.repeat(2000)}</html>`) } : { ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
       const r1 = await DP.runDocPdf({ ...base, today: '2026-11-20' });
       const idx1 = readIdx();
@@ -17642,7 +17662,10 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       /* 원본 두 줄 — 평소 사본에는 첫 줄만(둘째 줄이 통째로 빠진다 · 74자 중 56자 = 75.6%) */
       const T2 = `${'가나다라마바사아자차카타파하'.repeat(4)}\n거너더러머버서어저처커터퍼허 2026`;
       const LOSSY = T2.split('\n')[0];
-      const twoWay = (p) => (/out-relaxed\.pdf$/.test(p) ? T2 : LOSSY);
+      /* 가짜 변환은 받은 것이 PDF 면 그 글자를 그대로 옮긴다(convertOne 이 PDF 를 확인만 하고 옮기는 것처럼) — 그래서 둘째 사본의 글자는 **틀을 푼 중간 꼴에서 온 것**일 때만 전부다.
+         둘째 변환에 원본(src)을 잘못 넘기면 첫 줄뿐이라 이 관문이 빨개진다(리뷰 11-20: 예전 가짜는 받은 것을 안 봐서 못 잡았다) */
+      base.convert = (src, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); if (/\.pdf$/.test(src)) fs.copyFileSync(src, out); else fs.writeFileSync(out, '%PDF-1.4 fake'); return { ok: true, out, pages: 1, bytes: 13 }; };
+      const twoWay = (p) => (/loose/.test(readText(p)) ? T2 : LOSSY);
       base.origText = () => T2;
       const relaxCalls = [];
       const relaxOk = (src, work) => { relaxCalls.push(path.basename(src)); fs.mkdirSync(work, { recursive: true }); const made = path.join(work, 'src.pdf'); fs.writeFileSync(made, '%PDF-1.4 loose'); return { ok: true, made, boxes: 7 }; };
@@ -17664,6 +17687,10 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       fresh();
       const r12c = await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: twoWay, relax: () => ({ ok: false, why: '높이가 고정된 글상자 없음' }) });
       eq('  풀 줄이 없으면(변환기가 못 하면) 평소 사본으로 판정한다 — 던지지 않는다', r12c.failed.map((f) => f.why), ['글자 빠짐(75%)']);
+      fresh();
+      const r12d = await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: () => T2.slice(0, -1), relax: () => { throw new Error('ENOSPC: no space left on device'); } });
+      eq('  다시 가는 길이 넘어져도(던져도) 평소 사본의 판정은 그대로 — 기준을 넘은 사본은 실린다(「오류」로 버리지 않는다)',
+        [r12d.done.length, r12d.failed.length, ((readIdx().items.r1 || [])[0] || {}).kept], [1, 0, 0.986]);
       /* ⑬ 판 번호(MAKER) — 만드는 법이 바뀌면 글자가 덜 남은 사본과 쉬던 실패만 다시 · 다 남은 사본은 받지도 않는다(학교를 다시 두드리지 않는다) */
       const oldEntry = (kept, mk) => ({ items: { r1: [{ file: 'r1/1-공고문.pdf', name: '공고문.hwp', pages: 1, bytes: 13, fonts: FPm.FONT_STAMP, kept, ...(mk ? { mk } : {}), at: '2026-11-20' }] }, tried: {} });
       const rerun = async (idx) => { put('data/docs-pdf/r1/1-공고문.pdf', '%PDF old'); put('data/docs-pdf/index.json', JSON.stringify(idx)); calls.length = 0; const r = await DP.runDocPdf({ ...base, today: '2026-12-03', pdfText: twoWay, relax: relaxOk }); return [calls.length, r.skipped, r.done.length]; };
@@ -17684,6 +17711,8 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       eq('⑮ 빠진 원본 줄 — PDF 에 없는 두 줄만(줄이 다른 자리에서 꺾여도 있는 줄은 세지 않는다) · 못 뽑았으면(null) 빈 목록 · 앞에서 max 개',
         [DP.missingLines(ORIG, '1. 지원 대상은 통영시에\n주소를 둔 대학생 접수 기간 2026년\n11월 23일까지'), DP.missingLines(ORIG, null), DP.missingLines(ORIG, '', 1)],
         [['기타여건 신청자 영농의지 평가', '마을주민과 화합 및 마을 기여도'], [], ['1. 지원 대상은 통영시에 주소를 둔 대학생']]);
+      eq('  글자가 다 남은 사본에는 빠진 줄이 없다 — 표 칸 차례가 달라 묶음이 안 맞을 뿐인 짧은 줄(「(전화) (휴대폰)」)을 빠졌다고 적지 않는다(진단 2차 · 100% 인데 두 줄이 찍혔다)',
+        [DP.missingLines('성명 (전화) (휴대폰)\n(전화) (휴대폰)\n주소', '성명 주소 전화 전화 (휴대폰) (휴대폰)'), DP.missingLines('(전화) (휴대폰)\n기타여건 영농의지', '전화 그리고 휴대폰')], [[], ['기타여건 영농의지']]);
       /* ⑯ 진단 모드(--probe) — 본편과 같은 길을 가되 data/ 에 아무것도 쓰지 않는다 · 두 길의 결과를 돌려준다 · 받은 것·만든 것은 keepDir 에만 */
       fresh(); const beforeProbe = idxText(); fs.rmSync(path.join(tmpRepo, 'collector', 'doc-pdf-report.md'), { force: true });
       fs.rmSync(path.join(tmpRepo, 'data', 'docs-pdf', 'r1'), { recursive: true, force: true });   // 앞 시험이 남긴 사본 폴더 — 진단이 새로 만들지 않는지 보려고 비운다
@@ -17693,7 +17722,7 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       eq('⑯ 진단 모드 — 색인·리포트·사본 폴더를 안 건드리고 · 두 길(평소 75.6% · 글상자 풂 100%)과 빠진 줄을 찍고 · 재료는 keepDir 에',
         [idxText() === beforeProbe, fs.existsSync(path.join(tmpRepo, 'collector', 'doc-pdf-report.md')), fs.existsSync(path.join(tmpRepo, 'data', 'docs-pdf', 'r1')),
           pr.map((x) => [x.id, x.ok, x.kept, x.tries.map((t) => t.how)]), lines.some((s) => /평소: 75\.6%.*빠진 줄: 「거너더러/.test(s)), lines.some((s) => /글상자 7곳 풂: 100%/.test(s)),
-          fs.existsSync(path.join(keepDir, 'r1-1', 'out.pdf')) && fs.existsSync(path.join(keepDir, 'r1-1', 'out-relaxed.pdf'))],
+          fs.existsSync(path.join(keepDir, 'r1-1', 'out.pdf')) && fs.existsSync(path.join(keepDir, 'r1-1', 'out-relaxed.pdf')) && /loose/.test(readText(path.join(keepDir, 'r1-1', 'out-relaxed.pdf')))],
         [true, false, false, [['r1', true, 1, ['평소', '글상자 7곳 풂']]], true, true, true]);
       const prNone = await DP.runDocProbe({ ...base, today: '2026-12-06', ids: [], log: () => {} });
       eq('  id 를 안 주면 실패 장부의 「글자 빠짐」과 글자가 덜 남은 사본만 고른다(지금은 없음 → 0개)', prNone.length, 0);
@@ -17712,6 +17741,21 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       [relaxed.boxes, relaxed.xml.includes('<draw:frame draw:style-name="fr1" draw:name="Frame8" text:anchor-type="as-char" svg:width="6.6925in">\n<draw:text-box fo:min-height="7.589in"><table:table table:name="Table16"/>'),
         relaxed.xml.includes(PIC), relaxed.xml.includes(GROWS), relaxed.xml.includes('<r style:min-row-height="0.3in"/>'), SO.relaxFrameHeights(relaxed.xml).boxes],
       [1, true, true, true, true, 0]);
+    /* 둘째 원인(진단 3차) — 틀을 품은 문단의 줄 간격이 100% 아래면 틀을 풀어도 줄이 표보다 줄어 위아래가 잘린다(통영시 「제출서류」 표 · 문단 줄 간격 34% → 풀자 96.6% → 100%).
+       그 문단에만 줄 간격 100% 인 사본 모양을 붙인다 — 같은 모양을 쓰는 글 문단 · 100% 이상인 문단 · 틀이 없는 문단은 그대로 */
+    const STY = (n, lh) => `<style:style style:name="${n}" style:family="paragraph" style:parent-style-name="바탕글"><style:paragraph-properties fo:margin-left="0in" fo:line-height="${lh}" fo:text-align="left"/></style:style>`;
+    const BOX = (n, h) => `<draw:frame draw:style-name="fr1" draw:name="${n}" text:anchor-type="as-char" svg:width="6.5in" svg:height="${h}">\n<draw:text-box><table:table table:name="T"/></draw:text-box></draw:frame>`;
+    const docX = `<office><automatic>${STY('P29', '34%')}${STY('P47', '126%')}${STY('P5', '80%')}</automatic><body>`
+      + `<text:p text:style-name="P29"><text:s text:c="5"/>${BOX('Frame1', '3.0402in')}</text:p>`
+      + '<text:p text:style-name="P29">글만 있는 같은 모양 문단</text:p>'
+      + `<text:p text:style-name="P47">${BOX('Frame2', '0.4in')}</text:p>`
+      + '<text:p text:style-name="P5">쪽 <text:page-number text:select-page="current"/> 글만 있는 80% 문단</text:p></body></office>';
+    const lr = SO.relaxFrameHeights(docX);
+    eq('  틀을 품은 문단의 줄 간격 — 34% 문단만 100% 사본 모양으로(푼 곳 3 = 틀 2 + 문단 1) · 사본은 원래 모양 바로 뒤 · 같은 모양의 글 문단·126% 문단·틀 없는 80% 문단은 그대로 · 한 번 더 불러도 0',
+      [lr.boxes, lr.xml.includes('<text:p text:style-name="P29_hdj100"><text:s text:c="5"/><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="as-char" svg:width="6.5in">'),
+        lr.xml.includes(STY('P29', '34%') + STY('P29_hdj100', '100%')), lr.xml.includes('<text:p text:style-name="P29">글만 있는 같은 모양 문단</text:p>'),
+        lr.xml.includes('<text:p text:style-name="P47"><draw:frame draw:style-name="fr1" draw:name="Frame2"'), /P47_hdj100|P5_hdj100/.test(lr.xml), SO.relaxFrameHeights(lr.xml).boxes],
+      [3, true, true, true, true, false, 0]);
     const box = fs.mkdtempSync(path.join(os.tmpdir(), 'soffice-fake-'));
     const fake = path.join(box, 'soffice');
     /* 가짜 변환기: --convert-to fodt 면 높이 고정 글상자 둘이 든 XML 을, pdf 면 받은 파일을 그대로 품은 「PDF」를 낸다(무엇이 넘어왔는지 보려고) · NOBOX 면 글상자 없는 XML */
@@ -17731,6 +17775,9 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
     delete process.env.NOBOX;
     eq('  풀 틀이 없으면 다시 바꾸지 않는다(이유를 돌려준다) · 변환기가 없으면 평소 길과 같은 말', [rn.ok, rn.why, SO.sofficeToPdfRelaxed(srcDoc, path.join(box, 'w3'), { soffice: path.join(box, 'none') }).why],
       [false, '높이가 고정된 글상자 없음', `변환기 없음(${path.join(box, 'none')})`]);
+    const big = SO.sofficeToPdfRelaxed(srcDoc, path.join(box, 'w4'), { soffice: fake, maxBytes: 10 });
+    eq('  중간 꼴이 상한보다 크면 읽지 않고 돌아선다(통째로 읽다 메모리가 모자라 죽으면 실패 장부에도 안 남는다 · 리뷰 11-20) · 상한은 64MB',
+      [big.ok, /^중간 꼴이 너무 큼\(\d+MB\)$/.test(big.why || ''), SO.MAX_FLAT_BYTES], [false, true, 64 * 1024 * 1024]);
     fs.rmSync(box, { recursive: true, force: true });
   }
   /* ⑱ 배포용 문서(잠긴 한글) — 본문 뽑기가 읽는 것은 안내 문구 한 줄이다. 그것과 대조하면 틀린 「글자 빠짐」(이공계 환수 업무처리기준.hwp 90% · PDF 30쪽은 멀쩡했다) → 잴 수 없음으로 */
