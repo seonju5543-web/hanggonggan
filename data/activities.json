@@ -1,6 +1,37 @@
 {
- "updatedAt": "2026-11-20",
+ "updatedAt": "2026-11-21",
  "items": [
+  {
+   "title": "2026년 규제개선 대국민 아이디어 공모전 지원대상 일반인",
+   "url": "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=256039&menuNo=200104&sSort=2&pageIndex=1",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-11-22",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-05 ~ 2026-11-22"
+    },
+    {
+     "label": "대상",
+     "text": "일반인"
+    }
+   ],
+   "eligibilityLines": [
+    "지원대상 : 일반인",
+    "지역 전국"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-11-20",
+   "school": "",
+   "campus": "",
+   "host": "문화포털 문화지원사업",
+   "foundAt": "2026-11-20",
+   "id": "act-0o9bxch"
+  },
   {
    "title": "2026년 대전 스타트업 원스톱 지원센터 아카데미 4회차",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179695",
@@ -4599,11 +4630,11 @@
    "attachments": [
     {
      "name": "붙임 2. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 지원서.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ms4XQUrj_0fa4a0f4a56ed532b3bcda0b05753ffcd7bdfc64.hwp', '붙임 2. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 지원서.hwp')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ms4XQUrj_0fa4a0f4a56ed532b3bcda0b05753ffcd7bdfc64.hwp"
     },
     {
      "name": "붙임 1. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 모집요강.pdf",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_R7u1yWOs_6a3bc4f59592574e7a1984d89804613dcc2f96c4.pdf', '붙임 1. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 모집요강.pdf')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_R7u1yWOs_6a3bc4f59592574e7a1984d89804613dcc2f96c4.pdf"
     }
    ],
    "deadlineHint": null,
@@ -4626,7 +4657,7 @@
    "attachments": [
     {
      "name": "SK Telecom 사업공고문, 신청 양식.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_nMqArJHK_30d7e3d8d54f5a65edc00f4765ab2a6a58a25c76.hwp', ' SK Telecom 사업공고문, 신청 양식.hwp')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_nMqArJHK_30d7e3d8d54f5a65edc00f4765ab2a6a58a25c76.hwp"
     }
    ],
    "deadlineHint": null,
@@ -4675,11 +4706,11 @@
    "attachments": [
     {
      "name": "51기 WFK 청년봉사단 단장 모집 안내서교직원 및 교수용.pdf",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ZDd0hKH5_58d78008ea1ee0d3c2c8d1528667620b5a9dbadc.pdf', '51기 WFK 청년봉사단 단장 모집 안내서교직원 및 교수용.pdf')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ZDd0hKH5_58d78008ea1ee0d3c2c8d1528667620b5a9dbadc.pdf"
     },
     {
      "name": "51기 WFK 청년봉사단 단원 모집 안내서학생용.pdf",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ZpI7hljO_408467849db9dc052707139e53b05594fb56505f.pdf', '51기 WFK 청년봉사단 단원 모집 안내서학생용.pdf')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ZpI7hljO_408467849db9dc052707139e53b05594fb56505f.pdf"
     }
    ],
    "deadlineHint": "지원기간 : 2026.09.04.(금) ~ 대학별 마감일 상이 *지원서 제출 마감일은 대학마다 다르므로, 1차 심사 관련 상세 내용은 반드시 소",
@@ -4732,7 +4763,7 @@
    "attachments": [
     {
      "name": "1. 2026년 동계 대학 자체개발 해외봉사 프로그램 공모 안내문.pdf",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_oDQxKqh2_88b7797d9bfedad3d107d6c51011c3069c8ac537.pdf', '1. 2026년 동계 대학 자체개발 해외봉사 프로그램 공모 안내문.pdf')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_oDQxKqh2_88b7797d9bfedad3d107d6c51011c3069c8ac537.pdf"
     }
    ],
    "deadlineHint": null,
@@ -4798,7 +4829,7 @@
    "attachments": [
     {
      "name": "지원자용 2025-2027 KOICA-청년중기봉사단아프리카중남미 2차 파견 단원 모집선발 안내서.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_twcjDXfn_158cf4522ab2a25bfbd4b0c1b8f1cbf998e524bf.hwp', '지원자용 2025-2027 KOICA-청년중기봉사단아프리카중남미 2차 파견 단원 모집선발 안내서.hwp')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_twcjDXfn_158cf4522ab2a25bfbd4b0c1b8f1cbf998e524bf.hwp"
     }
    ],
    "deadlineHint": "접수 기한을 5.13.(수)까지 연장합니다! 관심있는 지원자분들의 많은 지원 바랍니다. *기존 서류심사 및 발표 일정은 이전과 동일하오니, 아래",
@@ -4865,11 +4896,11 @@
    "attachments": [
     {
      "name": "50기 WFK 청년봉사단 단장 모집 안내서교직원및교수용.pdf",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_4uvexOJ9_8d313162ce6ffde14ceedede2d44dc3357f61433.pdf', '50기 WFK 청년봉사단 단장 모집 안내서교직원및교수용.pdf')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_4uvexOJ9_8d313162ce6ffde14ceedede2d44dc3357f61433.pdf"
     },
     {
      "name": "50기 WFK 청년봉사단 단원 모집 안내서학생용.pdf",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_Wf5q3viY_42fcf18a58cd1ae727705d687c993d1238d6bbde.pdf', '50기 WFK 청년봉사단 단원 모집 안내서학생용.pdf')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_Wf5q3viY_42fcf18a58cd1ae727705d687c993d1238d6bbde.pdf"
     }
    ],
    "deadlineHint": null,
@@ -4890,7 +4921,7 @@
    "attachments": [
     {
      "name": "지원자용 2025-2027 KOICA-청년중기봉사단아프리카중남미 2차 파견 단원 모집선발 안내서.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_mX6Ty75x_3144e7821f5fa790f92923dd3076a28519bc34b9.hwp', '지원자용 2025-2027 KOICA-청년중기봉사단아프리카중남미 2차 파견 단원 모집선발 안내서.hwp')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_mX6Ty75x_3144e7821f5fa790f92923dd3076a28519bc34b9.hwp"
     }
    ],
    "deadlineHint": "모집기간 · 사전공고 2026.04.07.~04.19. · 신청접수 2026.04.20.~05.10. * 지원 방법 · 4월 20일부터 5월 1",
@@ -4928,7 +4959,7 @@
    "attachments": [
     {
      "name": "지원자용 2025-2027 KOICA-청년중기봉사단아프리카중남미 2차 파견 단원 모집선발 안내서.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_NUrZTmBY_877f2ab633e64cf2769e9a8719e2258e013175b1.hwp', '지원자용 2025-2027 KOICA-청년중기봉사단아프리카중남미 2차 파견 단원 모집선발 안내서.hwp')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_NUrZTmBY_877f2ab633e64cf2769e9a8719e2258e013175b1.hwp"
     }
    ],
    "deadlineHint": null,
@@ -4964,11 +4995,11 @@
    "attachments": [
     {
      "name": "붙임1. 2025년 월드프렌즈코리아 청년봉사단 프로그램 모집 안내서.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_mKEIL632_66cb7ce1af6eab3822146f583da443512c51fa1b.hwp', '붙임1. 2025년 월드프렌즈코리아 청년봉사단 프로그램 모집 안내서.hwp')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_mKEIL632_66cb7ce1af6eab3822146f583da443512c51fa1b.hwp"
     },
     {
      "name": "붙임2. 월드프렌즈코리아 청년봉사단 프로그램 제안서.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_HfVL7YI4_3b70f2654405a4ef03cdd39acb57cbb70b0a6919.hwp', '붙임2. 월드프렌즈코리아 청년봉사단 프로그램 제안서.hwp')"
+     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_HfVL7YI4_3b70f2654405a4ef03cdd39acb57cbb70b0a6919.hwp"
     }
    ],
    "deadlineHint": null,
@@ -5799,48 +5830,6 @@
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "docsV": 7
-  },
-  {
-   "title": "2026학년도 동계 의료인공지능 체험형 인턴십 프로그램 참가자 모집(~11/27)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141980&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "2026동계 인턴십 참가 신청서_성명.hwp",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=141980&attachNo=119173"
-    },
-    {
-     "name": "2026동계의료AI체험형인턴십_안내261116.pdf",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=141980&attachNo=119174"
-    }
-   ],
-   "deadlineHint": "모집기간 : 2026. 11. 27. 까지 ○ 전형절차 : 지원서 접수 > 면접 > 최종합격 *기업에 따라 코딩테스트, 인성검사, 기술면접 PT",
-   "deadline": "2026-11-27",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026. 11. 27. 까지"
-    },
-    {
-     "label": "대상",
-     "text": "성균관대학교 의료인공지능융합인재양성사업 참여 학부생 및 대학원생"
-    }
-   ],
-   "eligibilityLines": [
-    "○ 대상 : 성균관대학교 의료인공지능융합인재양성사업 참여 학부생 및 대학원생",
-    "*사업 미참여 학생들은 사업 참여 조건으로 지원 가능하나 사업 참여 학생들에 우선권 부여"
-   ],
-   "detailsV": 7,
-   "documents": [
-    "지원서(첨부 양식)"
-   ],
-   "field": "인턴·일경험",
-   "excerptsAt": "2026-11-15",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-00t4wxq",
-   "documentsV": 1
   },
   {
    "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",

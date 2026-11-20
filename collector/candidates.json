@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-11-20",
- "count": 1913,
+ "updatedAt": "2026-11-21",
+ "count": 1914,
  "items": [
   {
    "title": "장학 ★ 2027학년도 1학기 주한미군상공회의소 미래의동반자재단 장학생 선발 공고 (~11/25 수 15시)",
@@ -320,6 +320,30 @@
    "school": "서강대학교",
    "campus": "",
    "foundAt": "2026-11-20"
+  },
+  {
+   "title": "[한국장학재단] 2027-1학기 국가근로장학금 1차 신청기간 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/282936/artclView.do",
+   "attachments": [
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380375/download.do"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380376/download.do"
+    },
+    {
+     "name": "붙임2. 2027년 1학기 1차 국가근로장학금 학생신청 포스터.jpg",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380377/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 안내 2026.11.20 접수마감일 | 2027.01.07 185 한국장학재단 2027학년도 1학기 1차 국가근로장학금 신청기간을 안내",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "2026.11.20 접수마감일 | 2027.01.07"
   },
   {
    "title": "[서울][교내] 2026학년도 2학기 서울캠퍼스 HUFS Dream 장학금 신청 안내 (1",

@@ -1226,8 +1226,8 @@
    "added": "2026-11-18",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
-   "lastTryAt": "2026-11-20"
+   "tries": 4,
+   "lastTryAt": "2026-11-21"
   },
   {
    "id": "auto-amepagescholarshipnotice-12u2guu",
@@ -1276,8 +1276,8 @@
    "added": "2026-11-20",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
-   "lastTryAt": "2026-11-20"
+   "tries": 2,
+   "lastTryAt": "2026-11-21"
   }
  ]
 }
