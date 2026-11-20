@@ -212,15 +212,20 @@ function convertChecked({ src, work, name, convert, relax, origText, pdfText, ma
     best.later = true;
     tries.push({ how: '글상자 풂', why: '남은 예산이 모자라 다음 실행으로' });
   } else if (best.ratio != null && best.ratio < 1) {
-    const loose = relax(src, path.join(work, 'loose'), { soffice });
-    const second = path.join(work, 'out-relaxed.pdf');
-    const r2 = loose && loose.ok ? convert(loose.made, second, { soffice, name }) : null;   // PDF 를 넘기면 convertOne 은 확인(진짜 PDF · 크기)하고 쪽 수만 센다
-    if (r2 && r2.ok) {
-      const text2 = pdfText(second);
-      const ratio2 = keptRatio(orig, text2);
-      tries.push({ how: `글상자 ${loose.boxes}곳 풂`, ratio: ratio2, pages: r2.pages, miss: missingLines(orig, text2, 6) });
-      if (ratio2 != null && ratio2 > best.ratio) best = { pdf: second, r: r2, text: text2, ratio: ratio2, boxes: loose.boxes };
-    } else tries.push({ how: '글상자 풂', why: (loose && !loose.ok && loose.why) || (r2 && r2.why) || '못 함' });
+    /* 🔴 다시 가는 길은 덤이다 — 여기서 무엇이 넘어져도(중간 꼴을 쓰다 디스크 오류 등) 평소 사본의 판정은 그대로 간다(던지면 멀쩡한 평소 사본까지 「오류」로 버려진다) */
+    try {
+      const loose = relax(src, path.join(work, 'loose'), { soffice });
+      const second = path.join(work, 'out-relaxed.pdf');
+      const r2 = loose && loose.ok ? convert(loose.made, second, { soffice, name }) : null;   // PDF 를 넘기면 convertOne 은 확인(진짜 PDF · 크기)하고 쪽 수만 센다
+      if (r2 && r2.ok) {
+        const text2 = pdfText(second);
+        const ratio2 = keptRatio(orig, text2);
+        tries.push({ how: `글상자 ${loose.boxes}곳 풂`, ratio: ratio2, pages: r2.pages, miss: missingLines(orig, text2, 6) });
+        if (ratio2 != null && ratio2 > best.ratio) best = { pdf: second, r: r2, text: text2, ratio: ratio2, boxes: loose.boxes };
+      } else tries.push({ how: '글상자 풂', why: (loose && !loose.ok && loose.why) || (r2 && r2.why) || '못 함' });
+    } catch (e) {
+      tries.push({ how: '글상자 풂', why: `오류(${String((e && e.message) || e).replace(/\s+/g, ' ').slice(0, 80)})` });
+    }
   }
   return { ok: true, ...best, orig, tries };
 }

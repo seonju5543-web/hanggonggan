@@ -17664,6 +17664,10 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       fresh();
       const r12c = await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: twoWay, relax: () => ({ ok: false, why: '높이가 고정된 글상자 없음' }) });
       eq('  풀 줄이 없으면(변환기가 못 하면) 평소 사본으로 판정한다 — 던지지 않는다', r12c.failed.map((f) => f.why), ['글자 빠짐(75%)']);
+      fresh();
+      const r12d = await DP.runDocPdf({ ...base, today: '2026-12-02', pdfText: () => T2.slice(0, -1), relax: () => { throw new Error('ENOSPC: no space left on device'); } });
+      eq('  다시 가는 길이 넘어져도(던져도) 평소 사본의 판정은 그대로 — 기준을 넘은 사본은 실린다(「오류」로 버리지 않는다)',
+        [r12d.done.length, r12d.failed.length, ((readIdx().items.r1 || [])[0] || {}).kept], [1, 0, 0.986]);
       /* ⑬ 판 번호(MAKER) — 만드는 법이 바뀌면 글자가 덜 남은 사본과 쉬던 실패만 다시 · 다 남은 사본은 받지도 않는다(학교를 다시 두드리지 않는다) */
       const oldEntry = (kept, mk) => ({ items: { r1: [{ file: 'r1/1-공고문.pdf', name: '공고문.hwp', pages: 1, bytes: 13, fonts: FPm.FONT_STAMP, kept, ...(mk ? { mk } : {}), at: '2026-11-20' }] }, tried: {} });
       const rerun = async (idx) => { put('data/docs-pdf/r1/1-공고문.pdf', '%PDF old'); put('data/docs-pdf/index.json', JSON.stringify(idx)); calls.length = 0; const r = await DP.runDocPdf({ ...base, today: '2026-12-03', pdfText: twoWay, relax: relaxOk }); return [calls.length, r.skipped, r.done.length]; };
