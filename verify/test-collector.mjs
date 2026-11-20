@@ -1399,9 +1399,10 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
   eq('  준비 시트는 확인 버튼 배선을 가진다', /\$\('#btn-prep-confirm'\)\.addEventListener\('click'/.test(prep), true);
   eq('🔴 확인 버튼을 누르기 전에는 finalizeApply 를 부르지 않는다', /finalizeApply\(/.test(beforeClick), false);
   eq('  확인 버튼이 finalizeApply 를 부른다', /addEventListener\('click',[\s\S]*finalizeApply\(sch/.test(prep), true);
-  /* 제출처·채널 이름·양식 첨부 판정·원문 링크 이름은 **한 곳씩** — 시트가 제 사본을 들면 상세 시트와 다른 말을 한다 */
+  /* 제출처·채널 이름·양식 첨부 판정·원문 링크 이름은 **한 곳씩** — 시트가 제 사본을 들면 상세 시트와 다른 말을 한다
+     (양식 첨부 판정의 한 곳은 2026-11-20 부터 attIsForm — 로봇의 내용 판정(roles)이 먼저, 없으면 data.js isApplicationForm · 관문 「첨부를 내용으로 가르기」) */
   eq('  판정을 새로 만들지 않고 한 곳씩 가져다 쓴다',
-    ['officialChannel(sch)', 'submitChannelLabel(sch)', 'isApplicationForm', 'sourceNoteHtml(sch)'].filter((s) => !prep.includes(s)), []);
+    ['officialChannel(sch)', 'submitChannelLabel(sch)', 'attIsForm(sch, a)', 'sourceNoteHtml(sch)'].filter((s) => !prep.includes(s)), []);
   /* 확인하면 닫지 않고 그 공고의 '준비 완료' 화면을 연다 — 메일 접수 버튼·제출처가 거기 있다(리뷰 L1) */
   eq('  확인하면 그 공고의 준비 완료 화면을 다시 연다 (다음 할 일이 거기 있다)',
     /finalizeApply\(sch, null\);\s*openDetail\(sch\.id\)/.test(prep), true);
@@ -1755,7 +1756,7 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
       eq('  서식 쪽 — 로봇이 data/form-pages 색인(파일 있는 줄만)도 돈다 · 앱이 두 fields.json 을 합쳐 읽고 쪽 그림 주소를 폴더(base)로 고른다 · 서식 쪽 줄 밑에도 「양식 채우기」 자리',
         [/const sets = \[\[outDir, items\], \[pagesDir,/.test(ffSrc) && /filter\(\(f\) => f && f\.file\)/.test(ffSrc),
           /Promise\.all\(\[pdfs \? one\('forms-pdf'\) : \{\}, pages \? one\('form-pages'\) : \{\}\]\)/.test(fillSrc), /data\/\$\{esc\(F\.base \|\| 'forms-pdf'\)\}/.test(fillSrc),
-          /function formPageRowsHtml[\s\S]{0,900}?<li class="fill-slot" data-file="\$\{esc\(f\.file\)\}" hidden><\/li>/.test(appSrc2)],
+          /function formPageRowsHtml[\s\S]{0,600}?pdfRowHtml\(\{[\s\S]{0,200}?slot: f\.file \}\)/.test(appSrc2) && /function pdfRowHtml[\s\S]{0,1200}?<li class="fill-slot" data-file="\$\{esc\(slot\)\}" hidden><\/li>/.test(appSrc2)],
         [true, true, true, true]);
     }
     /* 2026-11-18 (인계 1 f) — 사람이 지정한 칸(fieldFix · fields-fix.json) — 로봇이 칸을 다시 만들어도 얹는다 · 쪽 밖은 버린다 · 모르는 key 는 null */
@@ -1859,7 +1860,7 @@ console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식�
   /* 배선 — 워크플로 보강 단계 · 저장 목록 · 병합 규칙 · 서비스워커 · 앱 */
   const wf = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)).split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
   eq('  deep-fetch 보강 단계(시한 + continue-on-error)로 돌고 data/form-pages 를 저장한다',
-    [/timeout-minutes: 6\s*\n\s*continue-on-error: true\s*\n\s*run: \|\s*\n\s*sudo apt-get install -y -qq poppler-utils\s*\n\s*node collector\/form-pages\.mjs/.test(wf), /git add -A data\/form-pages/.test(wf), /git add collector\/form-pages-report\.md/.test(wf)], [true, true, true]);
+    [/timeout-minutes: 6\s*\n\s*continue-on-error: true\s*\n\s*run: \|\s*\n\s*sudo apt-get install -y -qq(?: -o DPkg::Lock::Timeout=\d+)? poppler-utils\s*\n\s*node collector\/form-pages\.mjs/.test(wf), /git add -A data\/form-pages/.test(wf), /git add collector\/form-pages-report\.md/.test(wf)], [true, true, true]);
   const ga = readText(new URL('../.gitattributes', import.meta.url));
   eq('  병합 규칙 — 사본은 이진 · 색인·리포트는 내 것', /data\/form-pages\/\*\*\s+-diff/.test(ga) && /data\/form-pages\/index\.json\s+merge=ours/.test(ga) && /collector\/form-pages-report\.md merge=ours/.test(ga), true);
   eq('  서비스워커가 뗀 쪽 PDF 를 가로채지 않는다', /\\\/data\\\/form-pages\\\//.test(readText(new URL('../sw.js', import.meta.url))), true);
@@ -3603,6 +3604,12 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
   eq('  학교가 [교내] 라고 적어 둔 게시판 글은 "교내" 칸에도 온다',
     /boardNoticesInSchool\(\)/.test(exploreFn), true);
   eq('    그 카드도 같은 그림을 쓴다 (베끼지 않는다)', /noticeCardHtml/.test(exploreFn), true);
+  /* 🔴 **그 칸의 게시판 글 카드도 눌러서 시트를 연다** (2026-11-20 개발자 지적: 장학금 찾기 '교내' 를 누르면
+     *"카드가 안 열리고 그대로 원문 링크로 들어가지는"* — 같은 칸의 등록 카드는 전부 시트를 연다). 원문은 시트 「원문」 절이 준다 */
+  eq('    그 카드는 원문으로 나가지 않고 시트를 연다 (sheet 표식)', /noticeCardHtml\(n, \{ sheet: true \}\)/.test(exploreFn), true);
+  eq('      시트 표식이면 링크(href)가 아니라 단추(data-board)다', /o\.sheet \? ` type="button" data-board=/.test(liveFn) && /const tag = o\.sheet \? 'button' : 'a'/.test(liveFn), true);
+  eq('      누르면 openBoardDetail 이 그 글을 시트로 연다', /closest\('\[data-board\]'\);\s*if \(card\) openBoardDetail\(card\.dataset\.board\)/.test(app), true);
+  eq('      시트도 홈과 같은 목록에서 글을 찾는다', /boardNoticesForMe\(\)\.find\(/.test(cutFnApp('openBoardDetail')), true);
   /* 판정을 새로 만들지 않는다 — `noticeKind` 한 곳(로봇·앱이 같이 쓴다) */
   const inSchoolFn = cutFnApp('boardNoticesInSchool');
   eq('    판정은 공용 noticeKind 하나다', /noticeKind\(n\.title\) === '교내'/.test(inSchoolFn), true);
@@ -3722,7 +3729,7 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     const appSrc = appSource();
     const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
     const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
-    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 카드 한 자리 — 활동 시트의 기간 토막 줄은 2026-11-02 승인 시안으로 없어졌다)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/(?:esc|tidyChars)\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s\) \{\n  let t = hintText\(s\)/.test(appSrc)], [true, 1, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다 · 활동 시트는 hintText 위에 tidyChars(2026-10-15)
+    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 카드 한 자리 — 활동 시트의 기간 토막 줄은 2026-11-02 승인 시안으로 없어졌다)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/(?:esc|tidyChars)\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s, max = 44\) \{[^\n]*\n  let t = hintText\(s\)/.test(appSrc)], [true, 1, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다 · 활동 시트는 hintText 위에 tidyChars(2026-10-15)
     /* 리뷰(10-03) — 여기서 hintText 를 따로 지어 재면 앱의 것이 바뀌어도 모른다 → 앱 소스의 그 줄들(ENTITIES·ENTITY_RE·unent·PARTIAL_ENTITY_END·hintText)을 떼어 실행한다 */
     const line = (re) => (appSrc.match(re) || [''])[0];
     const unentSrc = (() => { const at = appSrc.indexOf('function unent('); return at < 0 ? '' : appSrc.slice(at, appSrc.indexOf('\n}', at) + 2); })();
@@ -4959,6 +4966,180 @@ console.log('\n■ 자격 절 고르기 — 이름표 줄 · 짧은 블록 덧�
   const majorOf = (l) => (PRq.parseLine(l).conds || []).filter((c) => c.kind === 'major').length;
   eq('  `…컴퓨터 관련 전공 아니어도 활동 가능` 은 학과 요건이 아니다 · `원자력 관련 학과 재학생` 은 그대로 학과 요건',
     [majorOf('기본 선발 요건을 충족한 학생 (AI, SW 컴퓨터 관련 전공 아니어도 활동 가능)'), majorOf('원자력 관련 학과 재학생')], [0, 1]);
+}
+
+console.log('\n■ 첨부를 내용으로 가르기 — 신청서 칸인가 카드(자격·마감)인가 (2026-11-20)');
+{
+  /* 개발자 지시(2026-11-20): 원문의 문서·이미지·파일을 전부 읽고 「공고 카드에 들어갈 것」과 「신청 양식 칸에 들어갈 것」을 가른다.
+     이름만 보던 세 자리(양식 PDF 로봇 pickFormTargets · 공고문 고르기 noticeDocFiles · 앱 신청서 칸)가 attachDecision 한 곳을 따른다.
+     🔴 아래 글자는 **실제 원본에서 옮긴 줄**이다(파일을 읽지 않는다 — 실데이터에 기댄 관문 금지):
+        복지장학생 신청서(form-t8is3u-1 HWP 미리보기 칸 꼴) · 공적활동확인서(form-1vruxo-2) · 복지장학금 신청서 첫머리(form-2x9z1k-1 · 인적사항 칸 없는 익명 서식) ·
+        HUFS Dream 신청 안내(공고문 절 머리) */
+  const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
+  const call = (o, k, ...a) => { try { return typeof o[k] === 'function' ? o[k](...a) : '(없음)'; } catch (e) { return `(오류 ${e.message})`; } };
+  const FORM_HWP = '<복 지 장 학 생 신 청 서>\n<신 청 자><성  명><><학  번><><소  속><             대학                      학과/전공                   학년><연락처><><주  소><><계 좌>< 은행 :            계좌번호 :                    예금주 : 학생본인>\n<위와 같이 장학금을 지급받고자 신청합니다. 20  년      월       일                                            위 본인                   (인/서명)    학생처장  귀하>';
+  const FORM_ACT = '2026. 2학기 공적활동확인서(활동사진 포함)\n학  과\n국문<예시: 실제 작성 시 삭제>\n학  번\n202311-1234567\n성  명\n홍길동\n연락처\n010-123-4567\n활동분야 (3분야 중 선택)\n□ 기획\n■ 홍보\n□ 진행';
+  const FORM_ANON = '복지장학금 신청서\n\n장학금 구분\n\n등록금성 장학금\n\n• 복지장학금은 생활비성 장학이 아닌 등록금성 장학으로\n\n유의사항\n\n※ 주의사항: 이름 등 본인을 특정할 수 있는 인적 사항은 기재를 금함\n작성해야 하는 문항은 총 3개이며, 누락할 시에 심사에서 제외됨';
+  const NOTICE = '2026학년도 2학기 서울캠퍼스 HUFS Dream 장학금 신청 안내\n다음과 같이 선발하오니 많은 신청 바랍니다.\n3. 장학금액 : 최대 1,000,000 원 ( 등록금 범위 내 지급 , 타 장학금 전액 수혜자 제외 )\n4. 신청자격 ( 아래 가 · 나 항목을 모두 충족해야 함 )\n① 2026-2 학기 서울캠퍼스에 재학중인 자 ( 초과학기자 지원 가능 )\n6. 신청기간 : 2026. 11. 23.(월 ) 9:00 ~ 2026. 12. 4.(금 ) 16:00\n7. 제출서류 : 신청서 1부\n10. 관련 문의 : 서울캠퍼스 장학팀 02-2173-2138';
+  eq('내용 판정 — 빈칸·서명란 서식(HWP 칸 꼴 · 확인서) = form · 첫머리 「…신청서」 익명 서식은 form 쪽 표식 · 절 머리 안내문 = notice · 둘 다 = mixed · 글자 없음 = null(이름 규칙)',
+    [call(AT, 'docRole', FORM_HWP), call(AT, 'docRole', FORM_ACT), call(AT, 'docRoleSignals', FORM_ANON).form >= 2, call(AT, 'docRole', NOTICE),
+      call(AT, 'docRole', `${NOTICE}\n${FORM_HWP}`), call(AT, 'docRole', ''), call(AT, 'docRole', 'poster')],
+    ['form', 'form', true, 'notice', 'mixed', null, null]);
+  const dec = (name, text, nameForm) => { const d = call(AT, 'attachDecision', name, text, nameForm); return typeof d === 'object' ? [d.form, d.notice] : d; };
+  eq('  행선지 — 이름에 신청서가 없는 진짜 서식은 신청서 칸으로(`[서식] 1~3.hwp`) · 속이 안내문인 「…신청서.hwp」는 칸에서 빼고 카드로 · 추천서는 서식이어도 칸에 안 둔다',
+    [dec('[서식] 1~3.hwp', FORM_HWP, false), dec('★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp', FORM_ACT, false),
+      dec('2026-2학기 특별장학금 신청서.hwp', NOTICE, true), dec('동산장학회) 학(과)장 장학생 추천서(양식).hwp', FORM_HWP, false)],
+    [[true, false], [true, false], [false, true], [false, false]]);
+  eq('  이름이 공고문인데 속에 서식이 있으면 둘 다 든 파일(카드로 읽고 칸엔 안 올림 · 서식 쪽은 form-pages) · 이름이 신청서인 둘 다 든 파일은 칸에도 · 글자 없으면 이름 규칙 그대로 · 익명 서식은 이름 규칙(신청서)이 지킨다',
+    [dec('2026년도 하반기 장학생 선발 공고문(발췌본).hwpx', FORM_HWP, false), dec('붙임. 충남대학교총동창회 장학생선발공고+신청서식.hwp', `${NOTICE}\n${FORM_HWP}`, true),
+      dec('2026 장학금 신청서.hwp', '', true), dec('2026 장학생 선발 공고.hwp', '', false), dec('2.2026학년도2학기복지장학금신청서류.hwp', FORM_ANON, true)],
+    [[false, true], [true, true], [true, false], [false, true], [true, false]]);
+
+  /* 배선 ① 양식 PDF 로봇 — 받은 원본의 내용으로 대상을 고르고(contentDecide) · 이름과 다르게 가른 것을 색인 roles 에 남기고 · 안 받은 문서 첨부는 unread 로 */
+  process.env.FORM_PDF_AS_LIB = '1';
+  const FP = await import(new URL('../collector/form-pdf.mjs', import.meta.url));
+  const FR = await import(new URL('../collector/form-rules.mjs', import.meta.url));
+  const { isApplicationForm } = FR.loadFormRules(fileURLToPath(new URL('..', import.meta.url)));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'attach-role-'));
+  const put = (f, body) => fs.writeFileSync(path.join(tmp, f), body);
+  put('form-r-1.hwp', 'hwp'); put('form-r-1.hwp.body.txt', FORM_HWP);
+  put('form-r-2.hwp', 'hwp'); put('form-r-2.hwp.body.txt', NOTICE);
+  put('form-r-3.hwp', 'hwp'); put('form-r-3.hwp.body.txt', FORM_HWP);
+  const item = { id: 'R', name: 'T', deadline: '2099-12-31', attachments: [
+    { name: '[서식] 1~3.hwp', url: 'u1' }, { name: '2026 특별장학금 신청서.hwp', url: 'u2' }, { name: '붙임1.hwp', url: 'u3' },
+    { name: '2026 장학금 신청서.hwp', url: 'u4' }, { name: '붙임2.pdf', url: 'u5' }, { name: '선발 공고.pdf', url: 'u7' }, { name: '포스터.jpg', url: 'u6' }] };
+  const rows = [{ file: 'form-r-1.hwp', title: 'T', attach: '[서식] 1~3.hwp', id: 'R' }, { file: 'form-r-2.hwp', title: 'T', attach: '2026 특별장학금 신청서.hwp', id: 'R' },
+    { file: 'form-r-3.hwp', title: 'T', attach: '붙임1.hwp', id: 'R' }];
+  const got = call(FP, 'pickFormTargets', [item], rows, { today: '2026-11-20', isApplicationForm, decide: FP.contentDecide ? FP.contentDecide(tmp) : undefined });
+  eq('  양식 PDF 로봇: 내용이 서식인 것만 대상(이름이 애매해도) · 속이 안내문인 「신청서」는 뺀다 · 다르게 가른 것은 roles · 안 받은 신청서는 missing · 이름이 신청서도 공고문도 아닌 안 받은 문서만 unread(공고문은 자격 로봇 몫 · 그림은 아니다)',
+    typeof got === 'object' ? [got.targets.flatMap((t) => t.files.map((f) => f.name)), got.roles, got.missing.map((m) => m.name), (got.unread || []).map((m) => m.name)] : got,
+    [['[서식] 1~3.hwp', '붙임1.hwp'], { R: { '[서식] 1~3.hwp': 'form', '2026 특별장학금 신청서.hwp': 'notice', '붙임1.hwp': 'form' } }, ['2026 장학금 신청서.hwp'], ['붙임2.pdf']]);
+  const bl = call(FP, 'pickFormBacklog', [item, { id: 'S', name: 'S', deadline: '2099-12-31', attachments: [{ name: '붙임.hwp', url: 'v' }] }], rows, { today: '2026-11-20', isApplicationForm });
+  eq('  밀린 목록이 이름이 애매한 문서도 받는다(받아야 내용으로 가른다) · 확실한 신청서가 있는 공고가 먼저',
+    Array.isArray(bl) ? bl.map(({ it, atts }) => [it.id, atts.map((a) => a.name)]) : bl, [['R', ['2026 장학금 신청서.hwp', '붙임2.pdf']], ['S', ['붙임.hwp']]]);
+  const fpSrc = readText(new URL('../collector/form-pdf.mjs', import.meta.url));
+  eq('  본편이 내용 판정으로 고르고 색인에 roles 를 쓴다', [/pickFormTargets\(items, rows, \{[^}]*decide: contentDecide\(/.test(fpSrc), /index\.roles = roles/.test(fpSrc)], [true, true]);
+
+  /* 배선 ② 공고문 고르기 — 신청서 쪽으로 받은 원본도 속이 안내문이면 카드를 읽는 데 쓴다(이름이 애매한 「붙임1.hwp」) */
+  put('form-r-4.hwp', 'hwp4'); put('form-r-4.hwp.body.txt', NOTICE);
+  fs.writeFileSync(path.join(tmp, 'elig-docs.json'), '{}');
+  fs.writeFileSync(path.join(tmp, 'forms-index.txt'), ['form-r-4.hwp\tT\t붙임1.hwp\t10\tR', 'form-r-1.hwp\tT\t[서식] 1~3.hwp\t10\tR'].join('\n'));
+  eq('  공고문 고르기: 이름이 애매해도 속이 안내문이면 읽고 · 속이 서식이면 안 읽는다',
+    call(AT, 'noticeDocFiles', { id: 'R' }, { index: call(AT, 'loadNoticeDocIndex', tmp) }), ['form-r-4.hwp']);
+  /* 리뷰(2026-11-20) 셋 — ① 절 머리는 갈래 **전체**를 줄 머리에 묶는다(`^a|b` 는 서식 칸의 「기타사항」「장학금액」을 줄 어디서나 셌다)
+     ② 이름이 서식 꼴인 「공고 몇 줄 + 신청서」 파일은 카드로 안 읽는다(개인정보 동의 문구가 자격이 된 08-20 사고) ③ 속이 안내문이라 뺀 신청서의 옛 PDF 는 지운다 */
+  const CELLS = '장학생 지원서\n성  명\n학  번\n학  과\n연락처\n지원 장학금액 (만원)\n기타사항 및 특기사항\n담당부서 확인\n위와 같이 지원합니다.\n2026년   월   일\n지원자 (서명)';
+  eq('  ① 서식 칸의 「…장학금액」「기타사항」「담당부서」는 공고문 절 머리가 아니다', call(AT, 'docRoleSignals', CELLS).notice, 0);
+  put('form-r-5.hwp', 'hwp5'); put('form-r-5.hwp.body.txt', `${NOTICE}\n${FORM_HWP}`);
+  fs.writeFileSync(path.join(tmp, 'forms-index.txt'), 'form-r-5.hwp\tT\t(서식) 일반장학생 선발 지원서.hwp\t10\tR');
+  eq('  ② 이름이 서식 꼴이고 속에 서식이 든 파일(공고 몇 줄 + 신청서)은 카드 읽기에 안 넣는다',
+    call(AT, 'noticeDocFiles', { id: 'R' }, { index: call(AT, 'loadNoticeDocIndex', tmp) }), []);
+  {
+    const fake = fs.mkdtempSync(path.join(os.tmpdir(), 'attach-role-fake-'));
+    const mk = (rel, body) => { fs.mkdirSync(path.dirname(path.join(fake, rel)), { recursive: true }); fs.writeFileSync(path.join(fake, rel), body); };
+    fs.copyFileSync(fileURLToPath(new URL('../data.js', import.meta.url)), path.join(fake, 'data.js'));
+    mk('data/registered.json', JSON.stringify({ items: [{ id: 'D', name: 'T', deadline: '2099-12-31', attachments: [{ name: '2026 특별장학금 신청서.hwp', url: 'u' }] }] }));
+    mk('collector/extracted/forms-index.txt', 'form-d-1.hwp\tT\t2026 특별장학금 신청서.hwp\t10\tD');
+    mk('collector/extracted/form-d-1.hwp', 'hwp'); mk('collector/extracted/form-d-1.hwp.body.txt', NOTICE);
+    mk('data/forms-pdf/D/1-old.pdf', '%PDF');
+    mk('data/forms-pdf/index.json', JSON.stringify({ items: { D: [{ file: 'D/1-old.pdf', name: '2026 특별장학금 신청서.hwp' }] } }));
+    const r = call(FP, 'runFormPdf', { root: fake, today: '2026-11-20', soffice: '/nonexistent-soffice', log: () => {} });
+    const idx = JSON.parse(readText(path.join(fake, 'data/forms-pdf/index.json')));
+    eq('  ③ 속이 안내문이라 신청서 칸에서 뺀 첨부의 옛 PDF 는 색인·파일에서 지운다(그 공고의 신청서가 전부 빠져도) · roles 에 남긴다',
+      [typeof r === 'object', idx.items.D, fs.existsSync(path.join(fake, 'data/forms-pdf/D/1-old.pdf')), (idx.roles || {}).D], [true, undefined, false, { '2026 특별장학금 신청서.hwp': 'notice' }]);
+    fs.rmSync(fake, { recursive: true, force: true });
+  }
+  fs.rmSync(tmp, { recursive: true, force: true });
+  const fpgSrc = readText(new URL('../collector/form-pages.mjs', import.meta.url));
+  eq('  공고문 뒷장 서식 떼기도 같은 공고문 고르기를 쓴다(신청서 쪽으로 받은 「공고+서식」 파일)', /filesFor = \(it\) => noticeDocFiles\(it/.test(fpgSrc) && /pickPageTargets\(\{[^}]*filesFor \}\)/.test(fpgSrc), true);
+
+  /* 배선 ③ 앱 — 신청서 칸 두 자리(양식 화면 머리 · 신청 준비 시트)가 로봇의 roles 를 먼저 본다 */
+  const liveSrc = readText(new URL('../app-live.js', import.meta.url));
+  const prepSrc = readText(new URL('../app-prep.js', import.meta.url));
+  eq('  앱 신청서 칸이 내용 판정(attIsForm · 색인 roles)을 먼저 본다 — 양식 화면 머리와 신청 준비 시트 둘 다',
+    [/function attIsForm\(sch, a\)[\s\S]{0,200}formsPdfIndex\.roles/.test(liveSrc), /kosaf \|\| attIsForm\(sch, a\)/.test(liveSrc), /atts\.filter\(\(a\) => [^\n]*attIsForm\(sch, a\)/.test(prepSrc)],   // 2026-11-20 첨부 PDF 통일 — 같은 판정 + PDF 로 올라온 신청서(사본 이름) 조건이 곁에 붙는다
+    [true, true, true]);
+  const attIsForm = new Function('formsPdfIndex', 'isApplicationForm', `${liveSrc.match(/function attIsForm\(sch, a\) \{[\s\S]*?\n\}/)[0]}\nreturn attIsForm;`)(
+    { roles: { X: { '붙임1.hwp': 'form', '특별장학금 신청서.hwp': 'notice' } } }, (a) => /신청서/.test(a.name));
+  const wsSrc = readText(new URL('what-shows.mjs', import.meta.url));
+  eq('  what-shows 가 장학 공고의 신청서 양식 칸을 말한다 — 앱 attIsForm 을 가져다 쓴다(베끼지 않는다) · 원본 PDF·서식 쪽·첨부 셋',
+    [/takeFn\('attIsForm'\)/.test(wsSrc), /function formSlotLines\(sch\)[\s\S]{0,600}appIsForm\(sch, a\)/.test(wsSrc), /for \(const l of formSlotLines\(sch\)\) console\.log\(l\)/.test(wsSrc)], [true, true, true]);
+  eq('  attIsForm — roles 가 있으면 그것 · 없으면 이름 규칙',
+    [attIsForm({ id: 'X' }, { name: '붙임1.hwp' }), attIsForm({ id: 'X' }, { name: '특별장학금 신청서.hwp' }), attIsForm({ id: 'Y' }, { name: '장학금 신청서.hwp' })], [true, false, true]);
+
+  /* ── 유료 첨부 판정 (2026-11-20 개발자 지시 「유료로 해」) — 글자 없는 스캔 PDF·그림만 · 모델 둘이 같은 답일 때만 · 가짜 응답으로(돈 0) ── */
+  let AR = null;
+  try { AR = await import(new URL('../collector/attach-role-read.mjs', import.meta.url)); } catch (e) { eq('유료 첨부 판정 로봇(collector/attach-role-read.mjs)을 불러온다', e.message, '(있음)'); }
+  if (AR) {
+    eq('유료 첨부 판정: 두 답이 같고 unknown 이 아닐 때만 싣는다 · 정해진 넷 밖의 답은 버린다',
+      [AR.agreeRole({ role: 'form' }, { role: 'form' }), AR.agreeRole({ role: 'form' }, { role: 'notice' }), AR.agreeRole({ role: 'unknown' }, { role: 'unknown' }), AR.agreeRole({ role: 'poster' }, { role: 'poster' }), AR.agreeRole(null, { role: 'form' })],
+      ['form', null, null, null, null]);
+    eq('  유료 답은 글자로 못 가른 파일에만 — 글자가 정한 것은 무료 길이 이긴다 · 유료 답의 행선지도 같은 규칙(추천서는 칸에 안 둔다)',
+      [dec('붙임1.pdf', '', false), (() => { const d = AT.attachDecision('붙임1.pdf', '', false, 'form'); return [d.form, d.by]; })(),
+        AT.attachDecision('2026 특별장학금 신청서.pdf', NOTICE, true, 'form').form, AT.attachDecision('교수 추천서.pdf', '', false, 'form').form],
+      [[false, false], [true, 'paid'], false, false]);
+    /* 임시 저장소 — 스캔 PDF(글자 없음) 둘 · 글자로 가른 PDF 하나 · 20쪽 PDF 하나 */
+    const fake = fs.mkdtempSync(path.join(os.tmpdir(), 'attach-role-paid-'));
+    const mk = (rel, body) => { fs.mkdirSync(path.dirname(path.join(fake, rel)), { recursive: true }); fs.writeFileSync(path.join(fake, rel), body); };
+    const pdf = (n) => `%PDF-1.4\n${Array.from({ length: n }, (_, i) => `${i + 1} 0 obj << /Type /Page >> endobj`).join('\n')}\n<< /Type /Pages /Count ${n} >>\n%%EOF`;
+    fs.copyFileSync(fileURLToPath(new URL('../data.js', import.meta.url)), path.join(fake, 'data.js'));
+    mk('data/registered.json', JSON.stringify({ items: [{ id: 'P', name: 'T', deadline: '2099-12-31', attachments: [
+      { name: '붙임1.pdf', url: 'u1' }, { name: '2026 장학금 신청서.pdf', url: 'u2' }, { name: '안내.pdf', url: 'u3' }, { name: '요강.pdf', url: 'u4' }] },
+      { id: 'Q', name: 'old', deadline: '2020-01-01', attachments: [{ name: 'x.pdf', url: 'u' }] }] }));
+    mk('collector/extracted/forms-index.txt', ['form-p-1.pdf\tT\t붙임1.pdf\t9\tP', 'form-p-2.pdf\tT\t2026 장학금 신청서.pdf\t9\tP', 'form-p-3.pdf\tT\t안내.pdf\t9\tP', 'form-p-4.pdf\tT\t요강.pdf\t9\tP'].join('\n'));
+    mk('collector/extracted/form-p-1.pdf', pdf(2)); mk('collector/extracted/form-p-2.pdf', pdf(1));
+    mk('collector/extracted/form-p-3.pdf', pdf(1)); mk('collector/extracted/form-p-3.pdf.txt', NOTICE);
+    mk('collector/extracted/form-p-4.pdf', pdf(20));
+    mk('collector/card-read-config.json', JSON.stringify({ enabled: false }));
+    mk('collector/attach-role-paid.json', JSON.stringify({ items: { 'Q|x.pdf': { role: 'form' } } }));
+    const fakeAns = path.join(fake, 'fake.json');
+    fs.writeFileSync(fakeAns, JSON.stringify({ 'P|붙임1.pdf': { a: { role: 'form', evidence: '위와 같이 신청합니다' }, b: { role: 'form', evidence: '(서명)' } },
+      'P|2026 장학금 신청서.pdf': { a: { role: 'notice', evidence: '1. 지원자격' }, b: { role: 'form', evidence: '성명' } } }));
+    const quiet = () => {};
+    const off = await AR.runAttachRole({ root: fake, today: '2026-11-20', write: true, env: {}, log: quiet });
+    eq('  대상은 글자로 못 가른 스캔 PDF 만(글자로 가른 것·15쪽 넘는 것은 아니다) · 스위치가 꺼져 있으면 부르지 않는다 · 마감 지난 공고 줄은 뺀다',
+      [off.targets.map((t) => t.a.name), off.called, Object.keys(JSON.parse(readText(path.join(fake, 'collector/attach-role-paid.json'))).items)],
+      [['붙임1.pdf', '2026 장학금 신청서.pdf'], 0, []]);
+    const on = await AR.runAttachRole({ root: fake, today: '2026-11-20', write: true, env: { ATTACH_ROLE_FAKE: fakeAns }, log: quiet });
+    const saved = JSON.parse(readText(path.join(fake, 'collector/attach-role-paid.json'))).items;
+    eq('  가짜 응답으로 한 바퀴 — 같은 답(form)만 싣고 갈린 답은 안 싣는다 · 같은 바이트는 다시 묻지 않는다',
+      [on.called, saved['P|붙임1.pdf'].role, saved['P|2026 장학금 신청서.pdf'].role, saved['P|붙임1.pdf'].file,
+        (await AR.runAttachRole({ root: fake, today: '2026-11-20', write: false, env: {}, log: quiet })).targets.length],
+      [2, 'form', undefined, 'form-p-1.pdf', 0]);
+    /* 양식 PDF 로봇이 그 답을 쓴다 — 파일 이름이 같을 때만(다시 받은 다른 원본에 옛 답을 붙이지 않는다) */
+    const rowsP = FP.parseFormsIndex(readText(path.join(fake, 'collector/extracted/forms-index.txt')));
+    const itP = JSON.parse(readText(path.join(fake, 'data/registered.json'))).items[0];
+    const pk = (paid) => FP.pickFormTargets([itP], rowsP, { today: '2026-11-20', isApplicationForm, decide: FP.contentDecide(path.join(fake, 'collector/extracted'), paid) });
+    eq('  양식 PDF 로봇이 유료 답으로 「붙임1.pdf」(스캔 신청서)를 신청서 칸에 올린다 · 파일이 바뀐 옛 답은 안 쓴다',
+      [pk({ items: saved }).roles, pk({ items: { 'P|붙임1.pdf': { file: 'form-p-9.pdf', role: 'form' } } }).roles,
+        pk({ items: { 'P|붙임1.pdf': { ...saved['P|붙임1.pdf'], hash: 'deadbeefdeadbeef' } } }).roles], [{ P: { '붙임1.pdf': 'form' } }, {}, {}]);
+    /* 리뷰(2026-11-20 · 돈 새는 구멍) — 쪽 수는 쪽 나무 /Count 와 견줘 큰 쪽(객체 스트림 PDF 를 1쪽으로 세고 80쪽을 보낼 뻔) · 상한·시간 예산에서 멈춘다 */
+    eq('  쪽 수: 쪽 객체가 하나만 보여도 /Count 80 이면 80쪽(15쪽 넘어 안 보낸다)', AR.pdfPages(Buffer.from('<< /Type /Page >> << /Type /Pages /Kids [1 0 R] /Count 80 >>')), 80);
+    const capRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'attach-role-cap-'));
+    const mk2 = (rel, body) => { fs.mkdirSync(path.dirname(path.join(capRoot, rel)), { recursive: true }); fs.writeFileSync(path.join(capRoot, rel), body); };
+    fs.copyFileSync(fileURLToPath(new URL('../data.js', import.meta.url)), path.join(capRoot, 'data.js'));
+    const names = ['a1.pdf', 'a2.pdf', 'a3.pdf'];
+    mk2('data/registered.json', JSON.stringify({ items: [{ id: 'C', name: 'T', deadline: '2099-12-31', attachments: names.map((n) => ({ name: n, url: n })) }] }));
+    mk2('collector/extracted/forms-index.txt', names.map((n, i) => `form-c-${i + 1}.pdf\tT\t${n}\t9\tC`).join('\n'));
+    names.forEach((n, i) => mk2(`collector/extracted/form-c-${i + 1}.pdf`, `${pdf(1)}\n% ${i}`));
+    const ansC = path.join(capRoot, 'fake.json');
+    fs.writeFileSync(ansC, JSON.stringify(Object.fromEntries(names.map((n) => [`C|${n}`, { a: { role: 'form', evidence: 'x' }, b: { role: 'form', evidence: 'x' } }]))));
+    mk2('collector/card-read-config.json', JSON.stringify({ roleMaxPerRun: 2 }));
+    const capRun = await AR.runAttachRole({ root: capRoot, today: '2026-11-20', write: true, env: { ATTACH_ROLE_FAKE: ansC }, log: quiet });
+    fs.rmSync(path.join(capRoot, 'collector/attach-role-paid.json'));
+    mk2('collector/card-read-config.json', JSON.stringify({ roleMaxMs: 0 }));
+    const timeRun = await AR.runAttachRole({ root: capRoot, today: '2026-11-20', write: true, env: { ATTACH_ROLE_FAKE: ansC }, log: quiet });
+    eq('  한 실행 상한(roleMaxPerRun)과 시간 예산(roleMaxMs)에서 멈춘다', [capRun.called, timeRun.called], [2, 0]);
+    fs.rmSync(capRoot, { recursive: true, force: true });
+    fs.rmSync(fake, { recursive: true, force: true });
+    const crSrc = readText(new URL('../.github/workflows/card-read.yml', import.meta.url));
+    const fpSrc2 = readText(new URL('../collector/form-pdf.mjs', import.meta.url));
+    eq('  배선 — 유료 카드 읽기 워크플로가 같은 스위치로 돌리고(시한·실패해도 저장) 답 파일을 저장·보관하고 실패를 알린다 · 양식 PDF 로봇이 답 파일을 읽는다',
+      [/id: role[\s\S]{0,200}timeout-minutes: 6[\s\S]{0,60}continue-on-error: true[\s\S]{0,200}CARD_READ_ENABLE: '1'[\s\S]{0,120}attach-role-read\.mjs --write/.test(crSrc),
+        /git add collector\/attach-role-paid\.json/.test(crSrc), /steps\.role\.outcome == 'failure'/.test(crSrc),
+        /attach-role-paid\.json[\s\S]{0,300}contentDecide\(path\.join\(root, 'collector', 'extracted'\), paid\)/.test(fpSrc2)],
+      [true, true, true, true]);
+  }
 }
 
 console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표 꼴·해·첨부 한 곳·발췌·자격 절 (2026-11-15)');
@@ -7027,15 +7208,16 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   const appA = appSource();
   const sheet = appA.slice(appA.indexOf('function openActivityDetail('), appA.indexOf('/* ---------------- 재단·지자체 새 공고'));
   const sections = appA.slice(appA.indexOf('function applySectionHtml('), appA.indexOf('function sourceNoteHtml('));
-  eq('④ 활동 시트(승인 시안 11-02 · sheetSectionsHtml) — 서류는 「접수 · 서류」 줄(act.documents · 같은 자리표시 거름 · esc) · 신청서 원본 PDF 는 「첨부」 맨 위(장학과 같은 formPdfRowsHtml · 글 id) · 둘 다 없으면 줄·칸이 없다',
-    [/const act = \(opts && opts\.activity\) \|\| null;/.test(sections), /const pdfRows = activity && activity\.id \? formPdfRowsHtml\(activity\) : '';/.test(sections),
-      /<ul class="doc-list">\$\{pdfRows\}\$\{atts\.map/.test(sections), /: \(pdfRows \? `<h4>첨부<\/h4><ul class="doc-list">\$\{pdfRows\}<\/ul>` : ''\);/.test(sections)], [true, true, true, true]);
+  /* 2026-11-20 승인 시안(docs/designs/all-docs-pdf.md) — 「첨부」는 위 PDF 줄(attachPdfRowsHtml 한 곳 · 활동은 글 id) + 맨 밑 올린 목록 그대로 · 둘 다 없으면 칸이 없다 */
+  eq('④ 활동 시트(승인 시안 11-02 · sheetSectionsHtml) — 서류는 「접수 · 서류」 줄(act.documents · 같은 자리표시 거름 · esc) · 신청서 원본 PDF 는 「첨부」 위 PDF 줄(장학과 같은 attachPdfRowsHtml · 글 id) · 둘 다 없으면 줄·칸이 없다',
+    [/const act = \(opts && opts\.activity\) \|\| null;/.test(sections), /const pdfRows = attachPdfRowsHtml\(activity && activity\.id \? activity : sch, atts\);/.test(sections),
+      /\$\{pdfRows \? `<ul class="doc-list">\$\{pdfRows\}<\/ul>` : ''\}\$\{origRows \? `<ul class="doc-list">\$\{origRows\}<\/ul>` : ''\}/.test(sections), /const att = \(pdfRows \|\| origRows\)/.test(sections)], [true, true, true, true]);
   const ffSrc = readText(new URL('../formfill.js', import.meta.url));
   eq('  「양식 채우기」 — 활동 시트가 빈칸 단추를 붙이고(attachFormFillButtons · 글 id·이름만 든 activityFillTarget) · 단추는 fillTargetFor 로 장학 먼저, 없으면 활동 글을 찾는다 (2026-10-31)',
     [/if \(n\.id && typeof attachFormFillButtons === 'function'\) attachFormFillButtons\(activityFillTarget\(n\), \$\('#detail-sheet'\)\)/.test(sheet), /function fillTargetFor\(id\) \{[\s\S]*?allScholarships\(\)\.find[\s\S]*?activityFillTarget\(/.test(appA),
       /typeof fillTargetFor === 'function' \? fillTargetFor\(open\.dataset\.id\)/.test(ffSrc)], [true, true, true]);
   const drv = readText(new URL('./verify-activities.js', import.meta.url));
-  eq('  브라우저 드라이버가 두 자리를 잰다(가짜 색인 FORMS_PDF_FIXTURE · 글 id 열쇠)', [/FORMS_PDF_FIXTURE/.test(drv), /'act-fixture1'/.test(drv), /접수 · 서류 — 활동 글이/.test(drv), /첨부 맨 위 — 로봇이 바꿔 둔 원본 PDF/.test(drv)], [true, true, true, true]);
+  eq('  브라우저 드라이버가 두 자리를 잰다(가짜 색인 FORMS_PDF_FIXTURE · 글 id 열쇠)', [/FORMS_PDF_FIXTURE/.test(drv), /'act-fixture1'/.test(drv), /접수 · 서류 — 활동 글이/.test(drv), /첨부 위 — 로봇이 바꿔 둔 원본 PDF/.test(drv)], [true, true, true, true]);   // 2026-11-20 승인 시안 — 「첨부」 위 PDF 줄 · 맨 밑 올린 목록
 }
 
 console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08-25 개발자 지적으로 수리)');
@@ -14667,9 +14849,13 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   const c4 = FP.convertOne ? FP.convertOne(path.join(tmp, 'b.hwp'), path.join(tmp, 'out', 'b.pdf'), { soffice: path.join(tmp, 'no-such-soffice') }) : {};
   /* 🔴 전용 프로필 (2026-10-27) — root 소유 프로필 폴더 때문에 soffice 가 종료 77 로 못 뜨던 것. 두 변환 자리 모두 -env:UserInstallation 을 넘기고, 설치 스크립트도 임시 프로필 + 소유권 되돌림 */
   const fpdfSrc = readText(new URL('../collector/form-pdf.mjs', import.meta.url)); const fpgSrc = readText(new URL('../collector/form-pages.mjs', import.meta.url)); const h2o = readText(new URL('../collector/install-h2orestart.sh', import.meta.url));
-  eq('  변환기는 전용 프로필로 띄운다(form-pdf · form-pages 둘 다 loProfileArg) · 설치 스크립트는 임시 프로필로 깔고 root 소유 프로필을 되돌린다',
-    [/spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(fpdfSrc), /spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(fpgSrc),
-      /^-env:UserInstallation=/m.test(String(FP.loProfileArg ? FP.loProfileArg() : '')), /-env:UserInstallation=file:\/\/\$TMP\/unopkg-profile/.test(h2o) && /chown -R/.test(h2o)], [true, true, true, true]);
+  /* 2026-11-20 두 로봇의 변환 사본을 collector/soffice.mjs 한 곳으로 — 전용 프로필은 거기서 한 번 · 두 로봇은 그 함수만 부르고 제 손으로 soffice 를 띄우지 않는다 */
+  const soSrc = readText(new URL('../collector/soffice.mjs', import.meta.url));
+  const SO = await import('../collector/soffice.mjs');
+  const viaShared = (src) => /import \{[^}]*\bsofficeToPdf\b[^}]*\} from '\.\/soffice\.mjs'/.test(src) && /sofficeToPdf\(src, work, \{ soffice \}\)/.test(src) && !/spawnSync\(soffice\b/.test(src);
+  eq('  변환기는 전용 프로필로 띄운다(soffice.mjs 한 곳 · form-pdf · form-pages 둘 다 그것만 부른다) · 설치 스크립트는 임시 프로필로 깔고 root 소유 프로필을 되돌린다',
+    [/spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(soSrc), viaShared(fpdfSrc), viaShared(fpgSrc),
+      /^-env:UserInstallation=/m.test(String(SO.loProfileArg())), /-env:UserInstallation=file:\/\/\$TMP\/unopkg-profile/.test(h2o) && /chown -R/.test(h2o)], [true, true, true, true, true]);
   eq('⑥ pdf 는 바이트 그대로 복사 · 가짜 pdf 와 없는 원본은 거절 · 변환기가 없으면 「변환기 없음」',
     [c1.ok, c1.pages, fs.existsSync(path.join(tmp, 'out', 'a.pdf')) && pdfBytes(path.join(tmp, 'out', 'a.pdf')).equals(pdf), c2.why, c3.why, /변환기 없음/.test(c4.why || '')],
     [true, 2, true, 'PDF 가 아님', '원본 파일 없음', true]);
@@ -15036,7 +15222,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   eq('  ✕ 로 이미 보인 줄은 「내 정보로 확인한 항목」에 또 적지 않는다 (shownBad)', /shownBad\.has\(r\.slice\(FAIL_PREFIX\.length\)\)/.test(appSrc), true);
   eq('  주관·금액의 「원문 확인」 자리 표시는 큰 글씨·주관 줄에 안 나간다 · 본문 사진은 첨부 목록에 안 나간다',
     /* 2026-11-02 승인 시안 — 금액은 amountLine(모르면 줄 없음 · 재단 긴 금액은 옅게) · 주최는 cardProviderLine(모르면 빈 글자) · 본문 사진 거르기는 sheetSectionsHtml 의 첨부 절 */
-    [/const amt = amountLine\(sch\); const t = amt\.text\.replace/.test(appSrc), /function cardProviderLine[\s\S]*?if \(providerUnknown\(prov\)\) return '';/.test(appSrc), /filter\(\(a\) => a && !a\.bodyImage\)[^\n]*;\n  const att = atts\.length \?/.test(appSrc)], [true, true, true]);   // 11-17 — 같은 줄 뒤에 같은 파일 한 번만(attSeen) 거르기가 붙었다
+    [/const amt = amountLine\(sch\); const t = amt\.text\.replace/.test(appSrc), /function cardProviderLine[\s\S]*?if \(providerUnknown\(prov\)\) return '';/.test(appSrc), /function sheetAttachments\(list\) \{[\s\S]{0,200}?filter\(\(a\) => a && !a\.bodyImage\)/.test(appSrc) && /const atts = sheetAttachments\(activity \? activity\.attachments : sch\.attachments\);/.test(appSrc)], [true, true, true]);   // 2026-11-20 — 거르기는 sheetAttachments 한 곳(what-shows 도 부른다)   // 11-17 — 같은 줄 뒤에 같은 파일 한 번만(attSeen) 거르기가 붙었다
   eq('  단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」도 뺐다(2026-10-29 개발자 지시) · 「준비를 마치면 … 표시됩니다」 없음', [/준비를 마치면 최종 제출처/.test(appSrc), /최종 제출 · \$\{esc\(ch\.label\)\}/.test(appSrc)], [false, false]);
   /* ⑨ 리뷰(2026-10-15)가 실데이터 전수 비교(등록 226 + 활동 200 × 7 프로필)로 잡은 틀린 미달·틀린 안심·글자 회귀 — 되돌리면 그대로 재현된다 */
   eq('⑨ 「… 3.0/4.5점 또는」 — 이상이 분수 뒤에 없으면 성적 조건이 아니다 (춘곡장학회 · 평점 2.8 에게 ✕ 였다)', kinds('직전 정규학기에 12학점 이상 이수하였으며, 대학 전체학기 성적 평균 3.0/4.5점 또는').includes('grade'), false);
@@ -17138,7 +17324,10 @@ console.log('■ 신청서 원본 → PDF — 단계 시한 안에 끝난다 (20
      숫자는 글자로 읽는다 */
   const src = readText(new URL('../collector/form-pdf.mjs', import.meta.url));
   const num = (name) => Number(eval((new RegExp('export const ' + name + '\\s*=\\s*([^;]+);').exec(src) || [, 'NaN'])[1].replace(/Number\(process\.env\.\w+\s*\|\|\s*(\d+)\)/, '$1')));
-  const FP = { BUDGET_SEC: num('BUDGET_SEC'), SOFFICE_TIMEOUT_MS: num('SOFFICE_TIMEOUT_MS') };
+  /* 파일 하나의 변환 시간은 변환 한 곳(collector/soffice.mjs · 2026-11-20)에서 읽고, form-pdf 가 그 숫자를 들여와 쓰는지 본다 */
+  const soSrcT = readText(new URL('../collector/soffice.mjs', import.meta.url));
+  const FP = { BUDGET_SEC: num('BUDGET_SEC'), SOFFICE_TIMEOUT_MS: Number((/export const SOFFICE_TIMEOUT_MS\s*=\s*(\d+);/.exec(soSrcT) || [, 'NaN'])[1]) };
+  eq('  (form-pdf 가 변환 시간을 soffice.mjs 에서 들여온다 — 따로 적은 숫자가 없다)', [/import \{[^}]*\bSOFFICE_TIMEOUT_MS\b[^}]*\} from '\.\/soffice\.mjs'/.test(src), /export const SOFFICE_TIMEOUT_MS/.test(src)], [true, false]);
   eq('  (숫자를 글자로 읽었다 — 예산·파일 하나 시간)', [FP.BUDGET_SEC > 0, FP.SOFFICE_TIMEOUT_MS > 0], [true, true]);
   eq('① 예산 검사가 파일 하나의 최대 변환 시간(SOFFICE_TIMEOUT_MS)을 셈에 넣는다',
     /const overBudget = \(\) => [^\n]*SOFFICE_TIMEOUT_MS/.test(src), true);
@@ -17150,6 +17339,208 @@ console.log('■ 신청서 원본 → PDF — 단계 시한 안에 끝난다 (20
     limitMin * 60 >= budget + FP.SOFFICE_TIMEOUT_MS / 1000 + 180, true);
   eq('③ 그 단계와 다음 단계의 설치는 잠금을 기다린다(끊긴 앞 단계 잠금에 0초 실패하지 않게)',
     (yml.match(/apt-get install[^\n]*DPkg::Lock::Timeout/g) || []).length >= 2, true);
+}
+
+/* ■ 공고문 PDF 사본 (2026-11-20 개발자 결정 · docs/designs/all-docs-pdf.md) — 한글·워드 첨부(신청서 아닌 것 · 층2 는 전부)를 PDF 로.
+   🔴 collector/doc-pdf.mjs 는 DOC_PDF_AS_LIB=1 이 아니면 불러오는 순간 본편이 돈다(form-pdf 와 같은 규칙). */
+console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (2026-11-20 · docs/designs/all-docs-pdf.md)');
+{
+  process.env.FORM_PDF_AS_LIB = '1';
+  process.env.DOC_PDF_AS_LIB = '1';
+  const DP = await import('../collector/doc-pdf.mjs').catch((e) => ({ loadError: e.message }));
+  eq('  (로봇을 불러왔다 — 본편은 돌지 않는다)', [typeof DP.pickDocTargets, DP.loadError || ''], ['function', '']);
+  if (typeof DP.pickDocTargets === 'function') {
+    const { isApplicationForm } = (await import('../collector/form-rules.mjs')).loadFormRules(fileURLToPath(new URL('..', import.meta.url)));
+    const today = '2026-11-20';
+    const reg = [
+      { id: 'r1', name: '가 장학', deadline: '2026-12-01', sourceUrl: 'https://x.ac.kr/v?id=1', attachments: [
+        { name: '공고문.hwp chevron_forward', url: 'https://x.ac.kr/f/1' }, { name: '공고문.hwp', url: 'https://x.ac.kr/f/1' },
+        { name: '장학생 신청서.hwp', url: 'https://x.ac.kr/f/2' }, { name: '포스터.jpg', url: 'https://x.ac.kr/f/3' },
+        { name: '모집요강.pdf', url: 'https://x.ac.kr/f/4' }, { name: '안내.docx', url: 'https://x.ac.kr/f/5', bodyImage: true }] },
+      { id: 'r2', name: '지난 공고', deadline: '2026-11-01', attachments: [{ name: '공고문.hwp', url: 'u' }] },
+      { id: 'r3', name: '상시 제도', program: true, attachments: [{ name: '공고문.hwp', url: 'u' }] },
+      { id: 'r4', name: '숨김', hidden: true, deadline: '2026-12-01', attachments: [{ name: '공고문.hwp', url: 'u' }] },
+    ];
+    const act = [{ id: 'act-1', title: '봉사단', deadline: '2026-12-01', url: 'https://y.or.kr/1', attachments: [
+      { name: '모집 요강.hwpx', url: 'https://y.or.kr/a' }, { name: '참가신청서.hwp', url: 'https://y.or.kr/b' }] }];
+    const ko = [
+      { code: '123', due: '2026-12-01', files: [{ name: '선발 공고.hwpx', path: 'data/kosaf-files/123/선발 공고.hwpx' },
+        { name: '장학생 신청서.hwp', path: 'data/kosaf-files/123/장학생 신청서.hwp' }, { name: '안내.pdf', path: 'data/kosaf-files/123/안내.pdf' }] },
+      { code: '456', due: '2026-11-01', files: [{ name: '공고.hwp', path: 'data/kosaf-files/456/공고.hwp' }] },
+      { code: '789', due: '', files: [{ name: '공고.docx', path: 'data/kosaf-files/789/공고.docx' }] },
+    ];
+    const got = DP.pickDocTargets({ registered: reg, activities: act, kosaf: ko }, { today, isApplicationForm });
+    eq('① 대상 — 마감 전·상시 아님·숨김 아님 공고의 한글·워드 첨부 중 신청서가 아닌 것 · 같은 이름은 한 번 · 본문 사진 아님 · 층2 는 신청서 이름이어도 전부 · 마감 모르는 재단은 둔다',
+      got.map((t) => [t.id, t.files.map((f) => f.name)]),
+      [['r1', ['공고문.hwp chevron_forward']], ['act-1', ['모집 요강.hwpx']], ['kosaf-123', ['선발 공고.hwpx', '장학생 신청서.hwp']], ['kosaf-789', ['공고.docx']]]);
+    const withRoles = DP.pickDocTargets({ registered: reg }, { today, isApplicationForm, roles: { r1: { '장학생 신청서.hwp': 'notice', '공고문.hwp chevron_forward': 'form' } } });
+    eq('  신청서 판정은 form-pdf·앱(attIsForm)과 같은 기준 — 로봇이 원본 내용으로 가른 roles 가 먼저(속이 안내문인 「…신청서」는 여기서 바꾸고 · 진짜 서식은 건너뛴다)',
+      withRoles.map((t) => [t.id, t.files.map((f) => f.name)]), [['r1', ['장학생 신청서.hwp']]]);
+    eq('  층1·활동은 첨부 주소(url)와 원문 주소(pageUrl)로 받고 · 층2 는 저장소 사본(src)에서 바꾼다',
+      [got[0].files[0].url, got[0].pageUrl, got[1].pageUrl, got[2].files[0].src], ['https://x.ac.kr/f/1', 'https://x.ac.kr/v?id=1', 'https://y.or.kr/1', 'data/kosaf-files/123/선발 공고.hwpx']);
+    const T = '가나다라마바사아자차카타파하'.repeat(5) + '2026';
+    eq('② 글자 대조 — 같으면 1 · PDF 에 머리말·쪽 번호가 더 있어도 1 · 차례는 안 본다(표 칸이 다른 차례로 나와도 통과)',
+      [DP.keptRatio(T, T), DP.keptRatio(T, `${T} 머리말 1`), DP.keptRatio(T, [...T].reverse().join(''))], [1, 1, 1]);
+    eq('  한글이 일부 빠지면 기준 아래 · 원본 글자가 50자 미만이면 잴 수 없다(null)',
+      [DP.keptRatio(T, T.slice(7)) < DP.KEEP_MIN, DP.keptRatio('가나다 123', '')], [true, null]);
+    /* 🔴 PDF 글자를 못 뽑은 것(null · pdftotext 없음)은 '잴 수 없음'이지 '글자 0%'가 아니다 — 섞으면 도구 하나 빠진 날 사본이 전부 버려진다 */
+    eq('  PDF 글자를 못 뽑았으면(null) 잴 수 없다 · 뽑았는데 비었으면("") 0', [DP.keptRatio(T, null), DP.keptRatio(T, '')], [null, 0]);
+    eq('  기준 숫자(통과 비율 · 잴 수 있는 최소 글자 · 쉼 날수)', [DP.KEEP_MIN, DP.MIN_CHARS, DP.REST_DAYS], [0.98, 50, 3]);
+    const office = (n, ext = '') => Array.from({ length: n }, (_, i) => ({ id: `x${i}`, name: 'a.hwp', why: `변환기가 못 읽음(hwp)${ext} · 종료 1` }));
+    eq('  실행 빨간불은 변환기 자체가 깨진 날만 — 확장 없음 표식 · 못 읽음 둘 이상인데 0개 바꿈 · 파일 하나 못 읽음이나 하나라도 바꾼 날은 아니다(경보가 사흘마다 흔들리지 않게)',
+      [DP.systemicFailure({ failed: office(1, ' — 가져오기 확장(H2Orestart) 필요'), done: [] }), DP.systemicFailure({ failed: office(2), done: [] }),
+        DP.systemicFailure({ failed: office(1), done: [] }), DP.systemicFailure({ failed: office(3), done: [{}] })], [true, true, false, false]);
+    eq('③ 실패한 첨부는 사흘 쉰다 — 이틀 전 실패는 쉬는 중 · 사흘 전은 다시 · 기록 없으면 다시',
+      [DP.resting({ 'a|b': { at: '2026-11-18' } }, 'a|b', today), DP.resting({ 'a|b': { at: '2026-11-17' } }, 'a|b', today), DP.resting({}, 'a|b', today)],
+      [true, false, false]);
+
+    /* ④ 본편 — 임시 저장소 · 가짜 받기·변환기·글자 뽑기(인터넷·LibreOffice 없이) */
+    eq('④ 본편 함수가 있다', typeof DP.runDocPdf, 'function');
+    if (typeof DP.runDocPdf === 'function') {
+      const FPm = await import('../collector/form-pdf.mjs');
+      const tmpRepo = fs.mkdtempSync(path.join(os.tmpdir(), 'docpdf-'));   // 임시 저장소 — 실데이터가 아니다(뿌리 이름이면 실데이터 톱니가 센다)
+      const put = (rel, body) => { fs.mkdirSync(path.dirname(path.join(tmpRepo, rel)), { recursive: true }); fs.writeFileSync(path.join(tmpRepo, rel), body); };
+      const idxText = () => readText(path.join(tmpRepo, 'data', 'docs-pdf', 'index.json'));
+      const readIdx = () => JSON.parse(idxText());
+      const L2NAME = '※ 2026 (재)빛고을 공고.hwpx';
+      put('data/registered.json', JSON.stringify({ items: [
+        { id: 'r1', name: '가 장학', deadline: '2026-12-01', sourceUrl: 'https://x.ac.kr/v?id=1', attachments: [{ name: '공고문.hwp', url: 'https://x.ac.kr/f/1' }, { name: '안내.docx', url: 'https://x.ac.kr/f/2' }] },
+        { id: 'r9', name: '스크립트 주소', deadline: '2026-12-01', sourceUrl: 'https://z.ac.kr/v', attachments: [{ name: '요강.hwp', url: "javascript:fnDown('1')" }] },
+      ] }));
+      put('data/activities.json', JSON.stringify({ items: [] }));
+      put('data/kosaf-open.json', JSON.stringify({ items: [{ code: '123', due: '2026-12-01', files: [{ name: L2NAME, path: 'data/kosaf-files/123/a.hwpx' }] }] }));
+      put('data/kosaf-files/123/a.hwpx', 'PK fake hwpx');
+      put('data/docs-pdf/old/1-x.pdf', '%PDF old');                               // 마감 지나 목록에서 빠진 공고의 옛 사본
+      put('data/docs-pdf/index.json', JSON.stringify({ items: { old: [{ file: 'old/1-x.pdf', name: 'x.hwp', fonts: FPm.FONT_STAMP }] }, tried: {} }));
+      put('data/forms-pdf/keep/1-form.pdf', '%PDF form');                         // 남의 폴더 — 손대면 안 된다
+      const T = '가나다라마바사아자차카타파하'.repeat(5) + '2026';
+      const calls = [];
+      let respond = () => ({ ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
+      const fetchImpl = async (url) => { calls.push(url); const r = respond(url); return { ok: r.ok, status: r.status, arrayBuffer: async () => { if (r.bodyError) throw Object.assign(new Error('The operation was aborted due to timeout'), { name: 'TimeoutError' }); return r.body; } }; };
+      const convert = (src, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, '%PDF-1.4 fake'); return { ok: true, out, pages: 1, bytes: 13 }; };
+      let pdfText = () => T;
+      const base = { root: tmpRepo, isApplicationForm, fetchImpl, convert, origText: () => T, pdfText: (p) => pdfText(p), log: () => {} };
+      respond = (url) => (url.endsWith('/f/2') ? { ok: true, status: 200, body: Buffer.from(`<!doctype html><html>${'x'.repeat(2000)}</html>`) } : { ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
+      const r1 = await DP.runDocPdf({ ...base, today: '2026-11-20' });
+      const idx1 = readIdx();
+      eq('⑤ 첫 실행 — 층1 첨부는 받아서 · 층2 는 사본에서 바꿔 색인에 싣는다(대조 1) · 받기는 층1 두 번뿐(스크립트 주소는 못 풀어 안 받는다)',
+        [Object.keys(idx1.items).sort(), (idx1.items.r1 || []).map((e) => [e.name, e.file, e.kept, e.fonts === FPm.FONT_STAMP]), calls.length],
+        [['kosaf-123', 'r1'], [['공고문.hwp', 'r1/1-공고문.pdf', 1, true]], 2]);
+      eq('  층2 이름의 ※·괄호·띄어쓰기는 파일 이름에서 안전한 글자로(safeName) · 앱에는 첨부 이름 그대로',
+        (idx1.items['kosaf-123'] || []).map((e) => [e.file, e.name]), [[`kosaf-123/1-${FPm.safeName(L2NAME)}.pdf`, L2NAME]]);
+      eq('  받은 것이 웹페이지면 버리고 · 주소를 못 풀면 「주소 없음」 — 둘 다 실패 장부에 오늘 날짜',
+        [/웹페이지/.test(((idx1.tried || {})['r1|안내.docx'] || {}).why || ''), ((idx1.tried || {})['r9|요강.hwp'] || {}).why || '', ((idx1.tried || {})['r1|안내.docx'] || {}).at || ''],
+        [true, '주소 없음', '2026-11-20']);
+      eq('  마감 지나 빠진 공고의 사본·색인은 지우고 · 남의 폴더(data/forms-pdf)는 그대로 · 리포트를 남긴다',
+        [fs.existsSync(path.join(tmpRepo, 'data/docs-pdf/old')), 'old' in idx1.items, fs.existsSync(path.join(tmpRepo, 'data/forms-pdf/keep/1-form.pdf')), fs.existsSync(path.join(tmpRepo, 'collector/doc-pdf-report.md'))],
+        [false, false, true, true]);
+      eq('  돌려준 숫자 — 바꿈 2 · 실패 2', [r1.done.length, r1.failed.length], [2, 2]);
+      calls.length = 0;
+      const r2 = await DP.runDocPdf({ ...base, today: '2026-11-21' });
+      eq('⑥ 이튿날 — 이미 바꾼 둘은 받지도 않고 건너뛰고 · 실패한 둘은 쉬는 중이라 안 두드린다(받기 0번)', [calls.length, r2.skipped, r2.rested], [0, 2, 2]);
+      /* 글자 대조 — 80% 만 남은 PDF 는 버린다 · 잴 수 없으면(null) 사본은 두고 센다 */
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
+      pdfText = () => T.slice(0, Math.floor(T.length * 0.8));
+      const r3 = await DP.runDocPdf({ ...base, today: '2026-11-25' });
+      const idx3 = readIdx();
+      eq('⑦ 글자가 빠진 PDF 는 버린다 — 색인에 없고 · 파일도 지우고 · 이유에 「글자 빠짐(nn%)」',
+        [Object.keys(idx3.items).length, fs.existsSync(path.join(tmpRepo, 'data/docs-pdf/r1/1-공고문.pdf')), r3.failed.filter((f) => /^글자 빠짐\(\d+%\)$/.test(f.why)).length],
+        [0, false, 2]);
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
+      pdfText = () => null;
+      const r4 = await DP.runDocPdf({ ...base, today: '2026-11-25' });
+      eq('  PDF 글자를 못 뽑으면(pdftotext 없음) 잴 수 없음 — 사본은 두고 「대조 안 함」으로 센다',
+        [r4.done.length, r4.unchecked.length, (readIdx().items.r1 || [])[0]?.kept], [2, 2, null]);
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
+      pdfText = () => T;
+      respond = () => ({ ok: false, status: 404, body: Buffer.alloc(0) });
+      calls.length = 0;
+      await DP.runDocPdf({ ...base, today: '2026-11-25' });
+      const idx5 = readIdx();
+      eq('⑧ 404 는 「HTTP 404」 로 적고 사흘 쉰다', [((idx5.tried || {})['r1|공고문.hwp'] || {}).why], ['HTTP 404']);
+      const beforeDry = idxText();
+      calls.length = 0;
+      await DP.runDocPdf({ ...base, today: '2026-11-30', dry: true });
+      eq('⑨ --dry 는 받지도 쓰지도 않는다', [calls.length, idxText() === beforeDry], [0, true]);
+      /* ⑩ 한 파일이 넘어져도 로봇은 멈추지 않는다(리뷰 2026-11-20 #1) — 본문을 받다 끊김 · 깨진 문서를 읽다 RangeError → 그 첨부만 실패 장부 · 다음 공고는 그대로 · 대조 전 사본은 결과 폴더에 안 남는다 */
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
+      respond = (url) => (url.endsWith('/f/1') ? { ok: true, status: 200, bodyError: true } : { ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
+      let threw = '';
+      const r10 = await DP.runDocPdf({ ...base, today: '2026-12-01' }).catch((e) => { threw = String(e); return null; });
+      const idx10 = readIdx();
+      eq('⑩ 본문 받다 끊겨도 던지지 않는다 — 그 첨부는 「오류(TimeoutError…)」로 쉬고 · 같은 실행의 재단 공고는 그대로 바뀐다',
+        [threw, /^오류\(TimeoutError/.test(((idx10.tried || {})['r1|공고문.hwp'] || {}).why || ''), Object.keys(idx10.items).includes('kosaf-123'), r10 ? r10.done.map((d) => `${d.id}|${d.name}`).sort() : null],
+        ['', true, true, ['kosaf-123|※ 2026 (재)빛고을 공고.hwpx', 'r1|안내.docx']]);
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
+      respond = () => ({ ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
+      threw = '';
+      const r11 = await DP.runDocPdf({ ...base, today: '2026-12-01', origText: () => { throw new RangeError('Offset is outside the bounds of the DataView'); } }).catch((e) => { threw = String(e); return null; });
+      const idx11 = readIdx();
+      eq('  깨진 문서를 읽다 RangeError — 던지지 않고 「오류(RangeError…)」 · 대조 전 사본이 결과 폴더에 남지 않는다(변환은 임시 폴더에서)',
+        [threw, /^오류\(RangeError/.test(((idx11.tried || {})['r1|공고문.hwp'] || {}).why || ''), Object.keys(idx11.items).length, fs.existsSync(path.join(tmpRepo, 'data', 'docs-pdf', 'r1')), !!r11],
+        ['', true, 0, false, true]);
+      fs.rmSync(tmpRepo, { recursive: true, force: true });
+    }
+  }
+}
+
+console.log('■ 공고문 PDF 사본 — 배선(deep-fetch 보강 단계 · 경보 짝 · 되돌리기·저장 목록 · 서비스워커)');
+{
+  const yml = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
+  const steps = yml.split('\n      - name: ').slice(1).map((c) => ({ name: c.split('\n')[0].trim(), body: c }));
+  const step = (re) => (steps.find((s) => re.test(s.name)) || { body: '' }).body;
+  const title = (b) => ((/title:\s*(.+)/.exec(b || '') || [])[1] || '').trim();
+  /* 경보 짝 — 넘어지면 이슈를 열고(mode open · 그 라벨) 회복하면 같은 제목으로 닫는다(mode resolve · continue-on-error) */
+  const pair = (id, label) => {
+    const open = steps.find((s) => s.body.includes(`steps.${id}.outcome == 'failure'`));
+    const res = steps.find((s) => s.body.includes(`steps.${id}.outcome == 'success'`));
+    return [!!open && /mode: open/.test(open.body) && open.body.includes(`label: ${label}\n`),
+      !!res && /mode: resolve/.test(res.body) && /continue-on-error: true/.test(res.body),
+      !!open && !!res && !!title(open.body) && title(open.body) === title(res.body)];
+  };
+  const doc = step(/^공고문 → PDF/);
+  eq('① 단계 「공고문 → PDF」 — id docpdf · 시한 · continue-on-error · 예산 · 잠금 대기 설치(poppler) · olefile · 확장·글꼴 · 로봇 실행',
+    [/\n\s+id: docpdf\n/.test(doc), /timeout-minutes:\s*\d+/.test(doc), /continue-on-error:\s*true/.test(doc), /DOC_PDF_BUDGET_SEC:\s*'?\d+/.test(doc),
+      /apt-get install[^\n]*DPkg::Lock::Timeout[^\n]*poppler-utils/.test(doc), /pip install olefile/.test(doc), /install-h2orestart\.sh/.test(doc),
+      /install-form-fonts\.sh/.test(doc), /node collector\/doc-pdf\.mjs/.test(doc)],
+    [true, true, true, true, true, true, true, true, true]);
+  eq('  경보 짝(doc-pdf-step) — 열고 · 닫고 · 제목이 같다', pair('docpdf', 'doc-pdf-step'), [true, true, true]);
+  const pages = step(/^공고문 뒷장 서식 쪽 떼기/);
+  eq('② 빠져 있던 것 — 「공고문 뒷장 서식 쪽 떼기」 단계도 id · 잠금 대기 · 경보 짝(form-pages-step · CLAUDE.md 매 세션 7)',
+    [/\n\s+id: formpages\n/.test(pages), /apt-get install[^\n]*DPkg::Lock::Timeout/.test(pages), ...pair('formpages', 'form-pages-step')], [true, true, true, true, true]);
+  const guard = step(/^관문 실패 시 되돌리기/);
+  const save = step(/^저장$/);
+  eq('③ 관문 되돌리기(--stage · checkout · clean)와 저장(git add)에 data/docs-pdf · 리포트',
+    [/--stage [^\n]*data\/docs-pdf/.test(guard), /git checkout -- [^\n]*data\/docs-pdf/.test(guard), /git clean [^\n]*data\/docs-pdf/.test(guard),
+      /\[ -d data\/docs-pdf \] && git add -A data\/docs-pdf/.test(save), /\[ -f collector\/doc-pdf-report\.md \] && git add collector\/doc-pdf-report\.md/.test(save)],
+    [true, true, true, true, true]);
+  const jobCap = Number((/^ {4}timeout-minutes:\s*(\d+)/m.exec(yml) || [])[1] || 0);
+  const docMin = Number((/timeout-minutes:\s*(\d+)/.exec(doc) || [])[1] || 0);
+  const budget = Number((/DOC_PDF_BUDGET_SEC:\s*'?(\d+)/.exec(doc) || [])[1] || 0);
+  process.env.DOC_PDF_AS_LIB = '1';
+  const fileMax = Number((await import('../collector/doc-pdf.mjs')).FILE_MAX_SEC) || 999;
+  eq(`④ 시한 셈 — 단계 ${docMin}분 ≥ 예산 ${budget}초 + 파일 하나 최대 ${fileMax}초(받기·변환·글자 뽑기 둘) + 설치 여유 180초 · 작업 상한 ${jobCap}분 ≥ 54 + 새 단계 시한`,
+    [docMin * 60 >= budget + fileMax + 180, jobCap >= 54 + docMin], [true, true]);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  eq('  병합 규칙 — 사본은 이진 · 색인·리포트는 로봇 것(merge=ours) — 없으면 배포 동기화가 충돌로 멈춘다(2026-08-01 #85·#86 · .gitattributes 머리말)',
+    [/^data\/docs-pdf\/\*\*\s+-diff$/m.test(ga), /^data\/docs-pdf\/index\.json\s+merge=ours$/m.test(ga), /^collector\/doc-pdf-report\.md\s+merge=ours$/m.test(ga)], [true, true, true]);
+  const swjs = readText(new URL('../sw.js', import.meta.url));
+  const guardLine = 'if (/\\/data\\/docs-pdf\\//.test(url.pathname)) return;';
+  eq('⑤ 서비스워커는 공고문 PDF 사본을 가로채지 않는다 — 그 줄이 navigate 분기보다 위(아래면 새 탭에 앱이 뜬다)',
+    swjs.indexOf(guardLine) >= 0 && swjs.indexOf(guardLine) < swjs.indexOf("e.request.mode === 'navigate'"), true);
+  /* ⑥ 앱 — 승인 시안(2026-11-20) 글자 잠금. 화면 순서·꼴은 브라우저 드라이버(verify-kosaf · verify-apply-prep · verify-activities · verify-formfill)가 잰다 */
+  const appX = appSource();
+  const codeOf = (src) => String(src).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const fetchFiles = createRequire(import.meta.url)('../tools/app-fetch-files.cjs');
+  const appFiles = (fetchFiles.appFetchFiles || fetchFiles.default || fetchFiles)(fileURLToPath(new URL('..', import.meta.url)));
+  eq('⑥ 앱이 공고문 PDF 색인을 받는다 — 첫 실행·다시 받기 둘 다 · 라이브 점검 목록(check-live · app-fetch-files)에 저절로 든다',
+    [/fetch\('data\/docs-pdf\/index\.json'/.test(appX), /bootJobs\.push\(loadDocsPdfIndex\(\)\)/.test(appX), /jobs\.push\(loadDocsPdfIndex\(\)\)/.test(appX), Array.isArray(appFiles) && appFiles.includes('data/docs-pdf/index.json')],
+    [true, true, true, true]);
+  eq('  줄 꼴 잠금 — PDF 줄은 한 함수(pdfRowHtml)·이름 밑 작은 글씨 없음 · 「원본 양식 그대로 보기」 문구 없음 · 단추 작은 글씨(fill-open-m) 없음 · 목록 밑 안내 문단 없음',
+    [!/att-m/.test((/function pdfRowHtml[\s\S]*?\n\}/.exec(appX) || [''])[0]), !/원본 양식 그대로 보기/.test(codeOf(appX)),
+      !/fill-open-m/.test(readText(new URL('../formfill.js', import.meta.url)) + readText(new URL('../style.css', import.meta.url))),
+      !/dp-note/.test((/function prepOriginalsHtml[\s\S]*?\n\}/.exec(appX) || [''])[0])],
+    [true, true, true, true]);
 }
 
 console.log('■ app.js 나누기 — 떼어 낸 화면이 제자리에 실린다 (2026-11-19 · 첫 화면 app-onboarding.js)');
@@ -17233,6 +17624,54 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
     [/const MASCOT_OFF = \[/.test(am), /MASCOT_OFF\.indexOf\(school\) >= 0/.test(am), /만원|toLocaleString/.test(am)], [true, true, false]);
   eq('  화면이 그릴 때 부른다 — 홈(학교) · 신청 내역(요약이 보일 때만)',
     [/Mascot\.syncHome\(state\.profile && state\.profile\.school\)/.test(appSource()), /Mascot\.syncApps\(apps\.length > 0 && !calMode\)/.test(appSource())], [true, true]);
+}
+
+console.log('\n■ 대장님 말귀 — 오타·변형 알아듣기 · 공고 한 건의 칸 (2026-11-20 개발자 지시)');
+{
+  /* 개발자 지시: "입력된 값을 1000-10000개 수준으로 늘려서 … 오타를 내거나 같은 의미에서 변형된 말을 해도 알아듣고 …
+     ~공고의 지원자격을 알려줘 / ~공고의 원문 링크는 뭐야?" — 말귀는 chat-nlu.js · 지식은 chat-kb.js · 답은 chat.js.
+     🔴 모르는 말은 안 알아듣는 쪽이 맞다 — 아래 '새면 안 되는 질문'이 인사·사용법 답으로 가면 빨간불(chat.js 머리말 「못 찾으면 못 찾았다」). */
+  const req = createRequire(import.meta.url);
+  const N = req('../chat-nlu.js');
+  const K = req('../chat-kb.js');
+  const idx = N.nluBuildIndex(K.kbIntents());
+  const cnt = K.kbCount();
+  eq('학습 문장 수가 1,000~10,000 사이다 (개발자 지시 · 주제×묻는 꼴 곱 포함)', cnt >= 1000 && cnt <= 10000, true);
+  eq('  의도 이름이 겹치지 않는다', K.CHAT_KB.length === new Set(K.CHAT_KB.map((it) => it.id)).size, true);
+  const kbSrc = readText(new URL('../chat-kb.js', import.meta.url));
+  const chatSrc = readText(new URL('../chat.js', import.meta.url));
+  const dynNames = [...new Set(K.CHAT_KB.filter((it) => it.dyn).map((it) => it.dyn))];
+  eq('  dyn 의도마다 chat.js CHAT_DYN 에 만드는 함수가 있다', dynNames.filter((d) => !new RegExp(`\\n  ${d}: `).test(chatSrc.slice(chatSrc.indexOf('const CHAT_DYN')))), []);
+  eq('  고정 답이 가리키는 행동(act)은 chat.js chatDoAction 이 아는 것뿐이다',
+    [...new Set((kbSrc.match(/act: '([a-z]+)/g) || []).map((x) => x.slice(6)))].filter((a) => !new RegExp(`'${a}:?'`).test(chatSrc.slice(chatSrc.indexOf('function chatDoAction'), chatSrc.indexOf('async function chatSend')))), []);
+  const want = [
+    ['안녕하세여', 'greet'], ['ㅎㅇ', 'greet'], ['안뇽하세요 대장님', 'greet'], ['고마어', 'thanks'], ['ㄱㅅ', 'thanks'], ['넌 누구냐', 'who'],
+    ['마깜 임박한거', 'dyn.deadline'], ['서루 뭐 준비해', 'dyn.documents'], ['서류함 어케 써', 'app.wallet'], ['서류 보관함 어디잇어', 'app.wallet'],
+    ['알람이 안와여', 'app.notify'], ['푸쉬 알림 설정', 'app.notify'], ['로그인 꼭 해야대?', 'app.login'], ['휴지통어디', 'app.trash'],
+    ['적합도 계산 어케해', 'app.fit'], ['교내교외 차이', 'app.kind'], ['국장 신청방법', 'gk.kosaf'], ['이중수혜 되나', 'gk.dup'],
+    ['홈화면에 추가하는법', 'app.install'], ['홈에 금액은 뭐야', 'app.home.amount'], ['저장한거 어디서봐', 'app.saved'], ['제출했어요 버튼 어딨어', 'app.submitted'],
+    ['등본 어디서 떼', 'dyn.docissue'], ['이번주 마감', 'dyn.today'], ['공모전 추천해줘', 'dyn.activities'], ['원문 확인은 어디서 해?', 'app.source'],
+  ];
+  const got = want.map(([q]) => { const r = N.nluClassify(idx, q); return r && (r.score >= 0.86 || (r.score >= 0.8 && r.margin >= 0.1) || (r.score >= 0.74 && r.margin >= 0.04)) ? r.id : null; });
+  eq('  오타·띄어쓰기·말끝이 달라도 같은 의도로 알아듣는다 (' + want.length + '문장)', want.map(([q], i) => (got[i] === want[i][1] ? '' : `${q} → ${got[i]}`)).filter(Boolean), []);
+  /* 새면 안 되는 질문 — 공고 낱말·엉뚱한 말이 인사·사용법으로 답해지면 '아는 척'이다(verify-chat 의 쿼카 질문과 같은 자리) */
+  const neg = ['쿼카 사육 지원금 있어?', 'ㅁㄴㅇㄹ 쿼카 사육', '기숙사', '기숙사비 지원금', '유흥수 장학금 자격', '삼성 장학금', '이공계 장학금'];
+  eq('  공고 낱말·엉뚱한 말은 지식 답으로 새지 않는다(답하는 문턱·되묻는 문턱 둘 다 아래)', neg.filter((q) => { const r = N.nluClassify(idx, q); return r && (r.score >= 0.74 || (r.score >= 0.62 && r.margin >= 0.15)); }), []);
+  /* 공고 한 건의 칸 */
+  eq('  묻는 칸을 가른다 — 자격·링크·마감·금액·서류·신청 방법·문의·인원·중복',
+    ['유흥수 장학금 지원 자격 알려줘', '유흥수장학금 원문 링크 뭐야', '마감 언제까지야', '얼마 줘?', '제출 서류 뭐야', '어케 신청해', '문의처', '몇명 뽑아', '중복 돼?'].map(N.nluField),
+    ['elig', 'link', 'deadline', 'amount', 'documents', 'how', 'contact', 'count', 'dup']);
+  const names = [{ key: 'a', names: ['유흥수 장학금 (한국외대 융합일본지역학부)'] }, { key: 'b', names: ['국가장학금 Ⅰ유형'] }, { key: 'c', names: ['2026 국세청 근로 · 자녀 장려 장학생 선발 안내'] }, { key: 'd', names: ['경기대학교 KGU 창업준비 아카데미 모집'] }, { key: 'e', names: ['농어촌 기본소득 우수모델을 찾습니다'] }];
+  const top = (q) => { const r = N.nluFindByName(q, names, 1)[0]; return r && r.score >= 0.8 ? r.key : null; };
+  eq('  공고 이름은 오타·로마 숫자·남은 말에도 찾는다 (유흥슈·1유형·국세쳥·몇명 뽑아)', ['유흥슈 장학금 링크', '국가장학금 1유형 자격', '국세쳥 장학생 마감', '유흥수 장학금 몇명 뽑아'].map(top), ['a', 'b', 'c', 'a']);
+  eq('  🔴 짧은 토막·남은 말로는 엉뚱한 이름을 고르지 않는다 (2026-11-20 실측: `드림`→공모전 · `준비해`→창업준비 아카데미)', ['드림 장학금 링크', '서류 뭐 준비해?', '장학금 자격 알려줘', '원문 확인은 어디서 해?'].map(top), [null, null, null, null]);
+  eq('  위기의 말은 오타·띄어쓰기에 상관없이 먼저 잡는다(장학금 이야기 대신 상담 번호)', ['죽고 싶어', '죽고싶다', '자살하고 싶어', '살기 싫어'].map(N.nluCrisis).concat(N.nluCrisis('죽을 만큼 바빠')), [true, true, true, true, false]);
+  eq('  chat.js 가 칸 답·지식 답을 경로에 둔다(칸 → 지식 → 기존 규칙 → 검색 → 되묻기) · index.html·sw.js 가 두 파일을 chat.js 보다 먼저 싣는다',
+    [/const field = chatAnswerField\(s\);/.test(chatSrc), /chatKbClassify\(s\)/.test(chatSrc),
+      (() => { const h = readText(new URL('../index.html', import.meta.url)); const a = h.indexOf('src="chat-nlu.js"'), b = h.indexOf('src="chat-kb.js"'), c = h.indexOf('src="chat.js"'); return a > 0 && a < b && b < c; })(),
+      /'chat-nlu\.js', 'chat-kb\.js', 'chat\.js'/.test(readText(new URL('../sw.js', import.meta.url)))],
+    [true, true, true, true]);
+  eq('  🔴 일반 질문(`서류 뭐 준비해?`)에는 본문에만 낱말이 든 공고 하나를 고르지 않는다 — 이름에서 찾은 것만(chatNameHit)', /if \(hit && chatNameHit\(hit, q\)\)/.test(chatSrc), true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

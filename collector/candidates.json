@@ -1,8 +1,137 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-20",
- "count": 1896,
+ "count": 1902,
  "items": [
+  {
+   "title": "장학 ★ 2027학년도 1학기 주한미군상공회의소 미래의동반자재단 장학생 선발 공고 (~11/25 수 15시)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EC%A3%BC%ED%95%9C%EB%AF%B8%EA%B5%B0%EC%83%81%EA%B3%B5%ED%9A%8C%EC%9D%98%EC%86%8C-%EB%AF%B8%EB%9E%98%EC%9D%98%EB%8F%99%EB%B0%98%EC%9E%90&keyword=%EC%9E%A5%ED%95%99",
+   "attachments": [
+    {
+     "name": "CHUBB-Innovation-Fund-7기_신청서-학생용.docx",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs7s%2BVXQmGmCK1yNclLeS5yEeR%2Frb7Ls7D%2BQlYH4MuR%2BTpWmRhaEfvlPCOwh7bUQoyF4y9R3fQMHOsYLGzBXQkFY1bUoqL3Nh8dR3gTvc6RaP%2FxUx%2Bn8vD33hfH0N4%2FbuCzHcMfxmu2FoC4dsvEgc2ff9mPMXsg6wuOBAQBLi89T%2F"
+    },
+    {
+     "name": "개인정보-수집·이용-및-제3자-제공-동의서_숭실대학생지원팀_개정후.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs3EQW3phvlgqGXlfIhRdkoetXQdN2sZtimANyBIz9mTglHApcL3UQQWn3SfjGPHnPEz4E8ZfE1BHCO4RF66t0UZL8T2YxS5Q0v3F8V%2FCr4fAKVjSLbuiPdDs%2FBKd3Ea3Au%2F4M%2B5tzWIkxTHHoEOOSPTMtq01Y3xnufQNYpm8VDjJHrAIwmktraxdO2km7dr1NEzKRQlvwMWusALabosUYz80TYo3ak0O2%2ByLpXCux9zelXCsvucaldacA4hZO6SNGqz7YdR8khUWeo%2Bgk6jBWmA%3D"
+    }
+   ],
+   "deadlineHint": "신청기한: 2026.11.25.( 수 ) 15:00 까지 신청방법: 이메일 제출(학생지원팀 ser@ssu.ac.kr ) 가. 메일제목: 미래의동",
+   "school": "숭실대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "bodyDeadline": "2026-11-25",
+   "bodyDeadlineText": "★ 2027학년도 1학기 주한미군상공회의소 미래의동반자재단 장학생 선발 공고 (~11/25 수 15시)"
+  },
+  {
+   "title": "[학부대학운영팀] 2026학년도 DESIGNer 학년제 장학금 안내 (2026학년도 신입생 대상)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278032&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-20"
+  },
+  {
+   "title": "[공통] 2027년 1학기 국가근로장학금 1차 학생 신청기간 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/127317/artclView.do",
+   "attachments": [
+    {
+     "name": "(붙임1) 2027년 1학기 국가근로장학금 1차 학생신청 매뉴얼(홈페이지).pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/159192/download.do"
+    },
+    {
+     "name": "(붙임2) 2027년 1학기 국가근로장학금 1차 학생신청 매뉴얼(모바일앱).pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/159193/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 안내 2026.11.20 56 2026.11.20 학생복지처 장학복지팀에서는 2027년 1학기 국가근로장학금 1차 학생 신청기간을 아래",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "□ 2027년 1학기 국가근로장학금 1차 학생 신청기간 안내 - 신청기간: 2026. 11. 24.(화), 09:00 ~ 2027. 1. 7.(목), 18:00"
+  },
+  {
+   "title": "[장학안내] 2027학년도 1학기 국가장학금 1차 신청 안내(지방 국립대학...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71056&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "[한국장학재단]2027년 지방 국립대학 전액 장학금 안내.pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2592484"
+    }
+   ],
+   "deadlineHint": "신청기간 : ' 26. 11. 24.( 화 ) 09:00 ~ ' 27. 1. 7.( 목 ) 18:00 - 서류제출 및 가구원 정보제공 동의 기간",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "2. 신청기간 : ' 26. 11. 24.( 화 ) 09:00 ~ ' 27. 1. 7.( 목 ) 18:00"
+  },
+  {
+   "title": "[등록/장학] 2027학년도 1학기 국가장학금 1차 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53720&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment (첨부자료) 2027년 1학기 국가장학금 1차 신청매뉴얼(홈페이지).pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35656&ano=53720"
+    },
+    {
+     "name": "Attachment (첨부자료) 2027년 1학기 국가장학금 1차 신청매뉴얼(모바일).pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35657&ano=53720"
+    }
+   ],
+   "deadlineHint": "신청 기간 : 2026.12.01.(화 ) ~ 12.14.(월 )) ※ 화도 / 동해장학금 수혜희망자는 국가장학금 및 화도 / 동해장학금을 각각",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "bodyDeadline": "2026-12-14",
+   "bodyDeadlineText": "복학학기로 이연되며 복학학기에 신청할 수 없으므로 반드시 휴학 전 신청 ( 성적우수 , 프론티어 신청 기간 : 2026.12.01.(화 ) ~ 12.14.(월 ))"
+  },
+  {
+   "title": "2026-2 국가이공계 일시지원 장학생 선발 안내",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=896512&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임3. 2026년 국가우수장학금(이공계) 일시지원(한 학기 지원)유형 학생신청 매뉴얼.pdf",
+     "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=download&articleNo=896512&attachNo=238363"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "세종대학교",
+   "campus": "",
+   "foundAt": "2026-11-20",
+   "bodyDeadline": "2026-11-25",
+   "bodyDeadlineText": "■ 신청방법 ① 학생지원과 성적증명서 제출 : 2026. 11. 25 일 ( 수 ) 오후 5 시까지 기한엄수"
+  },
   {
    "title": "[서울][교내] 2026학년도 2학기 서울캠퍼스 HUFS Dream 장학금 신청 안내 (1",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/272166/artclView.do",

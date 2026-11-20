@@ -103,30 +103,24 @@ function loadFormPagesIndex() {
     .catch(() => { /* 없으면 그 줄만 안 그린다 */ });
 }
 function formPagesFor(sch) { return ((sch && formPagesIndex[sch.id]) || []).filter((f) => f && f.file); }
+/* 서식 쪽도 빈칸을 찾았으면 「양식 채우기」(formfill.js · 2026-11-18) — 줄 꼴은 PDF 줄 한 벌(pdfRowHtml) · 이름은 로봇이 붙인 「공고문 안 신청서 서식 (n~m쪽)」(떼어 낸 쪽이라 원래 파일 이름이 없다) */
 function formPageRowsHtml(sch) {
-  return formPagesFor(sch).map((f) => {
-    const meta = `${f.pages ? `${f.pages}쪽 · ` : ''}${Math.max(1, Math.round((f.bytes || 0) / 1024))}KB · 공고문에서 뗀 서식 쪽${f.srcPages ? ` (원문 ${f.srcPages}쪽)` : ''}`;
-    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/form-pages/${f.file}`)}" target="_blank" rel="noopener">${esc(f.name || '공고문 안 신청서 서식')}</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li><li class="fill-slot" data-file="${esc(f.file)}" hidden></li>`;   /* 서식 쪽도 빈칸을 찾았으면 「양식 채우기」(formfill.js · 2026-11-18) */
-  }).join('');
+  return formPagesFor(sch).map((f) => pdfRowHtml({ href: `data/form-pages/${f.file}`, name: f.name || '공고문 안 신청서 서식', slot: f.file })).join('');
 }
-/* 원본 신청서 — 공고 첨부 중 신청서(isApplicationForm · data.js 한 곳) + 로봇이 PDF 로 바꿔 둔 사본(data/forms-pdf/index.json · formPdfsFor) + 공고문에서 뗀 서식 쪽(formPagesFor).
-   양식 작성 화면(지원문서 질문 화면)과 신청 준비 시트가 **같은 줄 꼴**(attachRowHtml · formPdfRowsHtml — 승인 시안 A 2026-10-14)로 그린다(베끼면 한쪽만 PDF 를 모른다).
-   층2(10-13 ①)는 첨부를 **선발 공고문**이라 부른다 — 신청서가 아니다(CLAUDE.md 「층2」). 10-13 개발자 결정으로 층1은 지원문서 질문 화면이 먼저 뜨므로 시안 A 의 줄은 여기(화면 머리)에 선다. */
+/* 지원문서 작성 화면 머리 — 층1은 신청서 첨부(isApplicationForm · data.js 한 곳 + PDF 로 올라온 신청서), 층2(10-13 ①)는 첨부 전부를 **선발 공고문**이라 부른다(CLAUDE.md 「층2」).
+   🔴 줄 순서는 2026-11-20 승인 시안(docs/designs/all-docs-pdf.md): PDF 줄(첨부 차례 · attachPdfRowsHtml) → 공고문에서 뗀 서식 쪽 → 올린 원본(맨 밑).
+      목록 밑 회색 안내 문단은 없다(개발자 "ㅇㅇ 지워") · 신청 준비 시트·상세 시트가 같은 함수로 그린다(베끼면 한쪽만 PDF 를 모른다). */
 function prepOriginalsHtml(sch) {
   const kosaf = sch.sourceKind === 'kosaf';
-  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && (kosaf || isApplicationForm(a)));
-  const pdfRows = kosaf ? '' : formPdfRowsHtml(sch);
+  const formNames = new Set(formPdfsFor(sch).map((f) => f.name));
+  /* 신청서인가는 attIsForm 한 곳(로봇이 원본 내용으로 가른 roles 가 먼저 · 2026-11-20) + PDF 로 올라온 신청서(사본과 이름이 같은 첨부 — 「원래 PDF 는 두 곳 다」) */
+  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && (kosaf || attIsForm(sch, a) || formNames.has(a.name)));
+  const pdfRows = attachPdfRowsHtml(sch, atts);
   const pageRows = formPageRowsHtml(sch);
   if (!atts.length && !pdfRows && !pageRows) return '';
   const head = kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '신청서 양식 <span class="channel-tag">공고 원본</span>';
-  const attMeta = kosaf ? '재단 공고문 사본 · 내려받기' : '학교 게시판 첨부 · 내려받기';
-  const note = kosaf
-    ? '접수 방법과 서식은 재단의 공고문이 정합니다 — 아래에서 정리한 내용을 그 서식에 옮겨 적으세요.'
-    : `제출은 이 원본 양식으로 합니다 — 아래에서 정리한 내용을 옮겨 적으세요.${pdfRows ? ' 빈칸을 찾은 PDF 는 「양식 채우기」로 답을 얹을 수 있어요.' : ''}`;
-  /* 줄 순서 — 원본 PDF 사본 → 첨부 원본 파일 → 공고문에서 뗀 서식 쪽(시안 A 드라이버가 앞 두 묶음의 자리를 잰다) */
   return `<h4>${head}</h4>
-      <ul class="doc-list">${pdfRows}${atts.map((a) => attachRowHtml(a, { meta: `${attMeta}${attachKb(a)}` })).join('')}${pageRows}</ul>
-      <p class="dp-note">${note}</p>`;
+      <ul class="doc-list">${pdfRows}${pageRows}${atts.map((a) => attachRowHtml(a)).join('')}</ul>`;
 }
 
 /* 이 공고에서 쓸 양식 템플릿 id — 공식 양식이 우선, 없으면 준비용 문서 */
@@ -307,21 +301,61 @@ let formsPdfIndex = { items: {} };
 function loadFormsPdfIndex() {
   return fetch('data/forms-pdf/index.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
-    .then((j) => { if (j && j.items && typeof j.items === 'object') formsPdfIndex = j; })
+    .then((j) => { tidyData(j); if (j && j.items && typeof j.items === 'object') formsPdfIndex = j; })   // 이름을 공고 첨부와 같은 다듬기로(엔터티·겹친 띄어쓰기 · file 은 안 건드린다) — 줄 짝짓기가 이름으로 한다
     .catch(() => {});
 }
-function formPdfsFor(sch) { return (sch && formsPdfIndex.items && formsPdfIndex.items[sch.id]) || []; }
-/* 첨부 한 줄(시안 A 꼴) — 아이콘(확장자) · 이름 · 작은 글씨 · 오른쪽 동작 */
-function attachKb(a) { return a && a.bytes ? ` · ${Math.max(1, Math.round(a.bytes / 1024))}KB` : ''; }
+/* 여러 줄로 둔다 — verify/what-shows.mjs 의 takeFn 은 줄 머리의 `}` 까지 가져가서, 한 줄 함수면 뒤의 선언까지 끌고 간다 */
+function formPdfsFor(sch) {
+  return (sch && formsPdfIndex.items && formsPdfIndex.items[sch.id]) || [];
+}
+/* 공고문·안내문 PDF 사본 색인 (2026-11-20 · collector/doc-pdf.mjs · docs/designs/all-docs-pdf.md) — 신청서가 아닌 한글·워드 첨부(층2 재단 공고문은 전부)를
+   로봇이 글자를 대조해 PDF 로 바꿔 둔 것. { items: { <공고 id>: [{ file, name, pages, bytes }] } }. 못 받으면 빈 채로 — PDF 줄만 없고 맨 밑 원본 목록은 그대로다. */
+let docsPdfIndex = { items: {} };
+function loadDocsPdfIndex() {
+  return fetch('data/docs-pdf/index.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j) => { tidyData(j); if (j && j.items && typeof j.items === 'object') docsPdfIndex = j; })   // 신청서 색인과 같은 다듬기
+    .catch(() => {});
+}
+function docPdfsFor(sch) {
+  return (sch && docsPdfIndex.items && docsPdfIndex.items[sch.id]) || [];
+}
+/* 첨부가 신청서 칸에 서는가 — 로봇이 **원본 내용**을 읽고 이름과 다르게 가른 것(색인 roles · collector/attachment-text attachDecision)이 먼저,
+   없으면 이름 규칙(data.js isApplicationForm). 2026-11-20 — 이름만 보면 속이 안내문인 「…신청서.hwp」가 양식 칸에 서고 「[서식] 1~3.hwp」는 안 섰다 */
+function attIsForm(sch, a) {
+  const r = sch && formsPdfIndex.roles && formsPdfIndex.roles[sch.id];
+  const v = r && a && r[a.name];
+  return v ? v === 'form' : isApplicationForm(a);
+}
+/* 첨부 한 줄 — 아이콘(확장자) · 이름 · 오른쪽 동작. 이름 밑 작은 글씨(출처·크기)는 2026-11-20 승인 시안에서 뺐다(meta 를 주는 곳이 없다) */
 function attachRowHtml(a, { meta = '', go = '↓' } = {}) {
   const ext = (String((a && a.name) || '').match(/\.(\w{2,5})$/) || [, ''])[1].toUpperCase();
   return `<li class="att att-row"><span class="att-ic att-ic-${esc(ext.toLowerCase())}">${esc(ext || '파일')}</span><span class="att-t">${attachmentLinkHtml(a)}${meta ? `<span class="att-m">${esc(meta)}</span>` : ''}</span><span class="att-go">${esc(go)}</span></li>`;
 }
-function formPdfRowsHtml(sch) {
-  return formPdfsFor(sch).map((f) => {
-    const meta = `${f.pages ? `${f.pages}쪽 · ` : ''}${Math.max(1, Math.round((f.bytes || 0) / 1024))}KB · 글자 하나 안 바꾼 원본 사본${formPdfsFor(sch).length > 1 ? ` · ${f.name}` : ''}`;
-    /* 밑 자리(li.fill-slot)는 formfill.js attachFormFillButtons 가 빈칸을 찾은 파일에만 「양식 채우기」 단추로 채운다(시트·지원문서 머리 둘 다) */
-    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/forms-pdf/${f.file}`)}" target="_blank" rel="noopener">원본 양식 그대로 보기</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li><li class="fill-slot" data-file="${esc(f.file)}" hidden></li>`;
+/* PDF 줄 한 벌 (2026-11-20 승인 시안 · docs/designs/all-docs-pdf.md) — 신청서 사본·공고문 사본·원래 PDF·공고문에서 뗀 서식 쪽이 모두 이 꼴이다.
+   🔴 이름은 첨부 이름 그대로(엔터티·공백만 — attachmentLinkHtml 과 같은 다듬기) · 이름 밑 작은 글씨 없음(개발자 "파일명은 그냥 원래대로 냅두고 밑의 회색글씨는 다 지워") ·
+      「열기 ›」 · 새 탭(폰의 PDF 보기 — (가) 결정). slot 이 있으면 밑에 「양식 채우기」 자리(li.fill-slot — formfill.js attachFormFillButtons 가 빈칸을 찾은 파일에만 채운다) */
+function pdfRowHtml({ href, name, slot = '' }) {
+  const nm = unent(String(name || '')).replace(/\s+/g, ' ').trim() || '첨부 파일';
+  return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(href)}" target="_blank" rel="noopener">${esc(nm)}</a></span><span class="att-go">열기 ›</span></li>${slot ? `<li class="fill-slot" data-file="${esc(slot)}" hidden></li>` : ''}`;
+}
+/* 첨부 목록의 PDF 줄 — **첨부 차례대로**: 신청서 사본(data/forms-pdf · 「양식 채우기」 자리) · 공고문 사본(data/docs-pdf) · 원래 PDF(원래 주소 · 안전한 주소만).
+   🔴 짝은 첨부 이름으로만 짓는다(다른 첨부의 PDF 를 붙이지 않는다) · 같은 이름이 두 줄로 실린 첨부는 PDF 줄 하나 · 사본이 없으면 줄이 없다(지어내지 않는다).
+   상세 시트(장학·재단·활동)·지원문서 머리·신청 준비 시트가 이 한 함수를 쓴다 — 올린 원본 목록은 각자 맨 밑에 그대로 둔다(원래 PDF 도 두 곳 다 · 개발자 11-20). */
+function attachPdfRowsHtml(sch, atts) {
+  const forms = formPdfsFor(sch);
+  const docs = docPdfsFor(sch);
+  const seen = new Set();
+  return (atts || []).filter((a) => a && !a.bodyImage).map((a) => {
+    const name = String(a.name || '');
+    if (seen.has(name)) return '';
+    seen.add(name);
+    const f = forms.find((x) => x.name === name);
+    if (f) return pdfRowHtml({ href: `data/forms-pdf/${f.file}`, name, slot: f.file });
+    const d = docs.find((x) => x.name === name);
+    if (d) return pdfRowHtml({ href: `data/docs-pdf/${d.file}`, name });
+    const href = /\.pdf(?:\s|$)/i.test(name.trim()) ? safeUrl(a.url) : '';
+    return href ? pdfRowHtml({ href, name }) : '';
   }).join('');
 }
 
@@ -376,6 +410,7 @@ function refreshAllData() {
   jobs.push(ledger);
   if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
   jobs.push(loadFormsPdfIndex());   // 신청서 원본 PDF 색인 (시안 A)
+  jobs.push(loadDocsPdfIndex());    // 공고문·안내문 PDF 사본 색인 (2026-11-20)
   jobs.push(loadFormPagesIndex());  // 공고문에서 뗀 서식 쪽 색인 (2026-10-13 ②)
   /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
      그 줄이 아직 실행되기 전에 여기를 부르면 `typeof` 로 물어봐도 예외가 난다(TDZ).
@@ -525,7 +560,7 @@ function kosafAsScholarships() {
         ...((i.files || []).length
           ? { attachments: i.files.map((f) => ({ name: f.name, url: f.path, bytes: f.bytes || 0 })) }
           : {}),
-        ...(kosafClean(f['문의처']) ? { contact: kosafClean(f['문의처']) } : {}),
+        ...(knownValue(kosafClean(f['문의처'])) ? { contact: knownValue(kosafClean(f['문의처'])) } : {}),   // 재단이 적어 둔 「※ 기관확인필요」는 문의처가 아니다 — 읽는 곳 셋(시트·신청 준비·도우미)을 여기 한 곳에서(2026-11-20 티앤씨재단)
         /* 층2 줄에 함께 보여 줄 **재단이 적어 둔 칸** (2026-09-07 캘린더).
            자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
         ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
@@ -667,8 +702,12 @@ function noticeCardHtml(n, opts) {
      🔴 주소도 이름과 같은 link 에서 — 바로잡은 원문(source-link.js ⑥)이 있으면 그 주소다. n.url 로 열면 이름은 「원문」인데 목록이 열린다(리뷰 2026-10-04) */
   const href = safeUrl(link.href);
   const sp = !thumb && o.schoolPhoto && SCHOOL_PHOTO_RE.test(o.schoolPhoto.src || '') ? o.schoolPhoto : null;
+  /* o.sheet — 누르면 원문으로 나가지 않고 상세 시트(openBoardDetail)를 연다 (2026-11-20 개발자 지적: 장학금 찾기 '교내' 칸에서
+     "카드가 안 열리고 그대로 원문 링크로 들어가지는" 것 — 그 칸의 다른 카드는 전부 시트를 연다). 원문은 시트 맨 아래 「원문」 절이 준다 */
+  const tag = o.sheet ? 'button' : 'a';
+  const open = o.sheet ? ` type="button" data-board="${esc(n.url || '')}"` : (href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : '');
   return `
-    <a class="sch-card notice-card${thumb || sp ? ' has-thumb' : ''}"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+    <${tag} class="sch-card notice-card${thumb || sp ? ' has-thumb' : ''}"${open}>
       ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
            예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
            걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
@@ -710,7 +749,7 @@ function noticeCardHtml(n, opts) {
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
       ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) && hintShort(n.deadlineHint) ? `<p class="sch-provider">${esc(hintShort(n.deadlineHint))}</p>` : ''}
       ${/* 링크 이름은 sourceLink 한 곳(card) — 목록·홈페이지·로봇이 확인한 문제 주소는 '원문'이라 부르지 않는다 (2026-10-03) */ ''}
-      <p class="sch-provider">${[(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개` : '', o.dateTop || !n.foundAt ? '' : `${esc(shortDay(n.foundAt))} 수집`, link.label ? esc(link.label) : ''].filter(Boolean).join(' · ')}</p>
+      <p class="sch-provider">${[(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개` : '', o.dateTop || !n.foundAt ? '' : `${esc(shortDay(n.foundAt))} 수집`, link.label && !o.sheet ? esc(link.label) : ''].filter(Boolean).join(' · ')}</p>
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
@@ -718,7 +757,38 @@ function noticeCardHtml(n, opts) {
            🔴 사진 위 「학교 사진」 표시는 **개발자 지시로 뺐다**(같은 날 *"학교사진에 '학교사진' 이라는 디스크립션 빼"*) — 다시 붙이지 말 것(관문이 잠근다).
            출처 줄(작가·라이선스 — 열린 라이선스의 표기 의무)은 구역 아래 한 번(schoolNewsHtml) · 학교 사진인지는 클래스(notice-thumb-school)로만 안다 */ ''}
       ${sp ? `<img class="notice-thumb notice-thumb-school" src="${esc(sp.src)}" alt="" loading="lazy" decoding="async" width="72" height="72"${PHOTO_FOCUS_RE.test(sp.focus || '') ? ` style="object-position:${esc(sp.focus)}"` : ''} />` : ''}
-    </a>`;
+    </${tag}>`;
+}
+
+/* 게시판 글 상세 시트 — 장학 시트와 같은 머리줄·절(sheetSectionsHtml). 우리가 읽은 것은 제목·기간 토막·첨부·주소뿐이라
+   그것만 적는다(원칙 8-1 · 자격 줄이 없으면 「지원 자격」 칸은 안 그린다). 주최를 모르므로 칩은 「장학」 하나 · 윗줄은 카드와 같은 「○○ 게시판」.
+   주소는 sourceUrl 로 넘겨 원문 링크 이름·바로잡기가 sourceLink 한 곳을 거친다 */
+function openBoardDetail(url) {
+  const n = boardNoticesForMe().find((x) => x.url === url);
+  if (!n) return;
+  if (typeof trackUse === 'function') trackUse('detail', url);
+  { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = url; }
+  const tSplit = splitTitleDates(unent(n.title));
+  const full = n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintShort(n.deadlineHint, Infinity) : '';   // 카드와 같은 기간 한 줄(다음 항목 앞에서 끊는다) · 카드의 44자 상한은 풀어 마감 날짜까지 보인다
+  /* 다음 한글 항목(「나. 신청방법 …」) 앞에서도 끊는다 — 끊고도 날짜가 남을 때만(「신청 기간 및 방법 가. 신청 기간: …」 은 앞토막에 날짜가 없어 통째로 둔다 · 실데이터 853줄 비교 2026-11-20) */
+  const cut = full.split(/\s(?=[가나다라마바사아자차카타파하]\s?\.\s*[가-힣])/)[0];
+  const hint = /\d/.test(cut) ? cut : full;
+  const sch = {
+    id: `board:${url}`, name: tSplit.title, type: '', provider: `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판`,
+    eligibility: {}, documents: [], deadline: n.deadline || null, period: hint || tSplit.dates.join(' · '),
+    attachments: n.attachments || [], sourceUrl: n.url,
+    title: n.title, boardTitle: n.boardTitle,   // 링크가 목록일 때 「목록에서 찾을 제목」은 게시판에 적힌 그대로(sourceLink hint)
+  };
+  const d = n.deadline ? dday(n.deadline) : null;
+  sheetBack = null;   // 돌아갈 곳이 없다 — 내리면 닫힌다
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      ${sheetHeadHtml({ x: sch, d, save: '' })}
+      <h3 class="sheet-title">${esc(sch.name)}</h3>
+      ${sheetSectionsHtml({ sch, result: evaluateFor(sch, state.profile), fit: 0, fd: null })}
+    </div>`;
+  openSheetShell();
 }
 
 /* 학교 사진 고르기 — 학교에 여러 장이면 구역에서 사진 없는 카드의 차례(k)대로 돌아가며 쓴다(이웃 카드끼리 같은 사진이 이어지지 않게).

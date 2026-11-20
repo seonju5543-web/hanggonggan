@@ -148,7 +148,7 @@ async function notifyDeliver(events) {
       key: 'sum:' + Date.now(),
       type: 'newMatch',
       title: `새 알림 ${events.length}건 확인하기`,
-      body: events[0].title + ` 외 ${events.length - 1}건`,
+      body: NOTIFY_RULES.summaryBody(events),
       url: './?screen=notifications',
     }];
   }

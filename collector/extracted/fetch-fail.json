@@ -22,5 +22,17 @@
   "why": "TypeError · fetch failed · UND_ERR_SOCKET",
   "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261110103455858.hwp&path=/bbs/34&fn=(%EA%B3%B5%EC%A7%80%EC%9A%A9)2026-2%ED%95%99%EA%B8%B0%20KNU%ED%95%B5%EC%8B%AC%EC%97%AD%EB%9F%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EA%B3%84%ED%9A%8D.hwp",
   "n": 1
+ },
+ "act-037wp91|[붙임2] 신청 양식.hwp": {
+  "at": "2026-11-20",
+  "why": "TypeError · fetch failed · UND_ERR_SOCKET",
+  "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261116031321563.hwp&path=/bbs/345&fn=[%EB%B6%99%EC%9E%842]%20%EC%8B%A0%EC%B2%AD%20%EC%96%91%EC%8B%9D.hwp",
+  "n": 1
+ },
+ "act-1fz2fcx|[붙임2] 신청 양식.hwp": {
+  "at": "2026-11-20",
+  "why": "TypeError · fetch failed · UND_ERR_SOCKET",
+  "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261105092624072.hwp&path=/bbs/345&fn=[%EB%B6%99%EC%9E%842]%20%EC%8B%A0%EC%B2%AD%20%EC%96%91%EC%8B%9D.hwp",
+  "n": 1
  }
 }

@@ -42,6 +42,93 @@ export const isNoticeDoc = (name) => {
   return NOTICEISH.test(n) && !FORMISH.test(n.replace(WITH_FORM, ''));
 };
 
+/* ============================================================================
+   첨부의 **내용**으로 가르기 — 신청서(학생이 채우는 서식)인가, 공고문(읽는 글)인가 (2026-11-20 개발자 지시)
+   지시: *"원문 글 안의 문서·이미지·파일 전부를 읽고 공고 카드(지원자격 등)에 들어가야 되는지 신청 양식 칸에 들어가야 되는지 구분"*.
+   🔴 왜 — 이름만 보고 갈랐다(isNoticeDoc · data.js isApplicationForm). 실측(2026-11-20 · 마감 전 등록 64건의 첨부):
+      `[서식] 1~3.hwp`·`★붙임2_공적활동확인서.hwp` 는 빈칸·서명란뿐인 진짜 서식인데 이름에 '신청서'가 없어 앱 양식 칸에 없었고,
+      `…특별장학금 신청서.hwp` 꼴이라도 속이 안내문이면 양식 칸에 앉았으며, 이름이 애매한 공고문은 카드 자격으로 안 읽혔다.
+   무엇을 — 글자에서 **서식 표식**(「위와 같이 신청합니다」·(인/서명)·귀하·빈 날짜·빈칸 이름표·체크 칸)과
+      **공고문 표식**(지원자격·신청기간·선발인원 같은 절 머리 · 「…공고합니다」)을 따로 센다.
+   돌려주는 것 — 'form'(서식만) · 'notice'(공고문만) · 'mixed'(공고문 뒤에 서식이 붙은 한 파일) · null(글자가 없거나 표식이 모자라 모름).
+   🔴 null 이면 **이름 규칙이 그대로** 정한다(글자를 못 읽은 파일을 내용으로 판정했다고 하지 않는다 · 원칙 5).
+   🔴 쓰는 곳은 attachDecision 한 곳을 거친다 — 양식 PDF 로봇(form-pdf)·공고문 고르기(noticeDocFiles)·앱 양식 칸(forms-pdf 색인 roles)이 같은 답을 본다.
+   ============================================================================ */
+const ROLE_LABELS = /^(성\s*명|이\s*름|학\s*번|생\s*년\s*월\s*일|연\s*락\s*처|휴\s*대\s*폰|전\s*화(번호)?|주\s*소|소\s*속|학\s*과|학\s*부|전\s*공|학\s*년|계\s*좌(번호)?|이\s*메\s*일|e-?mail|주민등록번호|성\s*별|국\s*적|학\s*적\s*상\s*태)\s*[:：]?$/i;
+const ROLE_NOTICE_HEADS = [
+  /(지원|신청|응모|참가)\s*자격|자격\s*요건/, /(선발|지원|신청|모집|추천)\s*대상/, /(선발|모집|지원)\s*인원/,
+  /(선발|심사)\s*(기준|방법|절차)/, /(신청|접수|모집|제출)\s*(기간|기한|일정)/, /(신청|접수|제출)\s*방법/,
+  /(제출|구비)\s*서류/, /(지원|장학|지급)\s*(금액|내용|규모)|장학금액/, /유의\s*사항/, /문의\s*처?/,   // 「기타사항」「담당부서」는 서식 칸 이름으로도 흔해 뺀다(리뷰)
+  /(결과|합격자?)\s*발표|추진\s*일정/,
+];
+/* 서명란 줄의 「(인)」 이 기관장 직인 줄이면 서식 표식이 아니다(form-pages STRONG 과 같은 직함 목록) */
+const ROLE_OFFICIAL = /이사장|총장|회장|원장|대표|장관|시장|군수|구청장|교육감|센터장|학장|처장|단장|위원장|조합장|재단장|사장/;
+export function docRoleSignals(text) {
+  /* HWP 미리보기(.txt)는 표 칸을 `<칸><칸>` 으로 잇는다 — 칸마다 한 줄로 편다(본문 .body.txt 와 같은 꼴) */
+  const lines = String(text || '').replace(/></g, '\n').replace(/[<>]/g, '\n').split(/\n|\f/).map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  const t = lines.join('\n');
+  let form = 0;
+  if (/위와\s*같이[^\n]{0,30}(신청|지원|추천|동의|서약|확인|제출)[^\n]{0,6}(합니다|함|하오니|하고자)/.test(t)) form += 2;
+  if (lines.some((l) => /\(\s*(인|서명|날인|인\s*[\/·]\s*서명|서명\s*[\/·]\s*인|서명\s*또는\s*인)\s*\)|서명\s*\(\s*인\s*\)/.test(l) && !ROLE_OFFICIAL.test(l))) form += 2;
+  if (/귀\s*하\s*$/m.test(t)) form += 1;
+  if (/(?:20\d{0,2})?\s*년\s{1,}월\s{1,}일|\b20\s+년\s+\d{0,2}\s*월/.test(t)) form += 1;
+  const labels = new Set(lines.filter((l) => l.length <= 14 && ROLE_LABELS.test(l)).map((l) => l.replace(/\s|[:：]/g, '')));
+  form += labels.size >= 4 ? 2 : labels.size >= 2 ? 1 : 0;
+  if ((t.match(/[□☐]/g) || []).length >= 2) form += 1;
+  if (/동의\s*(함|합니다|하십니까)[^\n]{0,6}[□☐(]|[□☐]\s*동의/.test(t)) form += 1;
+  /* 첫머리 제목 줄이 서식 이름(「복지장학금 신청서」) — 인적사항 칸이 없는 익명 심사 서식도 있다(2026-11-20 · 복지장학금 신청서류 실측) */
+  if (lines.slice(0, 3).some((l) => l.length <= 30 && /(신\s*청\s*서|지\s*원\s*서|원\s*서|동\s*의\s*서|서\s*약\s*서|확\s*인\s*서|자\s*기\s*소\s*개\s*서|계\s*획\s*서|사\s*유\s*서)\s*\)?\s*$/.test(l))) form += 2;
+  /* 공고문 표식 — 줄 머리에 온 절 이름만 센다(번호·기호 머리 허용 · 「1. 신청자격 : 재학생」 처럼 내용이 붙어도) · 서식에도 「제출서류」 한 줄쯤은 있다 */
+  /* 번호 머리는 한 글자 가·나·다 / 숫자 / 로마 숫자 / 동그라미 숫자만 뗀다(「기타·문의처」의 「기타·」 를 떼지 않는다 · 리뷰) */
+  const heads = lines.filter((l) => l.length <= 160).map((l) => l.replace(/^\s*(?:(?:\d{1,3}|[가-하]|[ⅠⅡⅢⅣⅤ])\s*[.)）]\s*|[(（](?:\d{1,2}|[가-하])[)）]\s*|[①-⑳]\s*)?[■□○●◎▶▷◆◇※∘ㅇ\-]?\s*/, ''));
+  /* 🔴 `^(?:…)` 로 **갈래 전체**를 줄 머리에 묶는다 — `^a|b` 는 b 를 줄 어디서나 찾아 서식의 「기타사항」·「장학금액」 칸을 공고문 표식으로 셌다(리뷰) */
+  const notice = ROLE_NOTICE_HEADS.filter((re) => heads.some((h) => new RegExp(`^(?:${re.source})`).test(h))).length
+    + (/(공고|안내|모집|선발)\s*(합니다|하오니)|알려\s*드립니다|다음과\s*같이\s*(선발|모집|공고|안내)/.test(t) ? 1 : 0);
+  const hangul = t.replace(/[^가-힣]/g, '').length;
+  return { form, notice, hangul };
+}
+export function docRole(text, sig = docRoleSignals(text)) {
+  const { form, notice, hangul } = sig;
+  if (hangul < 40) return null;
+  /* 절 머리가 셋 이상이면 서식 표식이 많아도 공고문이 든 파일이다 — 정부 공고문은 □ 머리·인적사항 표가 있어 서식 쪽 점수가 붙는다(리뷰) */
+  if (form >= 3 && notice >= 3) return 'mixed';
+  if (form >= 3) return 'form';
+  if (notice >= 3 && form <= 1) return 'notice';
+  if (notice >= 2 && form === 0) return 'notice';
+  return null;
+}
+/* 판정에 쓰는 글자 — 원문 글자(HWP·HWPX·DOCX·OCR)가 먼저 · 없으면 PDF 글자층(자격 줄엔 안 쓰지만 서식/공고 가르기엔 숫자가 필요 없다) */
+const roleMemo = new Map();   // 같은 실행 안에서 같은 파일을 여러 번 읽지 않는다(발췌기는 공고마다 이 색인을 2~3번 훑는다 · 리뷰 실측 공고 하나 0.2초)
+export const roleText = (filePath) => {
+  if (!roleMemo.has(filePath)) roleMemo.set(filePath, attachmentText(filePath) || pdfLayerText(filePath));
+  return roleMemo.get(filePath);
+};
+
+/* 학생이 아니라 남(교수·학과장)이 쓰거나 선발 **뒤에** 내는 서식 — 내용이 서식이어도 신청서 칸에 두지 않는다(data.js isApplicationForm 과 같은 선) */
+const NOT_STUDENT_FORM = (n) => /추천서|보고서|영수증|점검표|수료\s*확인서/.test(n) && !/자기소개서|(신청서|지원서)\s*(및|와|과|[,·&+])\s*(장학생\s*)?추천서/.test(n);
+
+/** 첨부 하나의 행선지 — { form: 앱 신청서 칸에 둔다, notice: 카드(자격·마감·서류)를 읽는 데 쓴다, role, by: 'content'|'name' }
+    name = 첨부 이름 · text = 그 파일 글자(roleText) · nameForm = 이름 규칙(data.js isApplicationForm · PDF 꼴) */
+export function attachDecision(name, text, nameForm, paidRole = null) {
+  const n = String(name || '');
+  const sig = docRoleSignals(text);
+  let role = docRole(text, sig);
+  /* 글자로 못 가른 파일(스캔 PDF·그림)만 — 유료 첨부 판정(모델 둘이 같은 답 · collector/attach-role-read.mjs)의 답을 쓴다. 글자로 가른 것은 그대로(무료 길이 먼저) */
+  let by = 'content';
+  if (role === null && ['form', 'notice', 'mixed'].includes(paidRole)) { role = paidRole; by = 'paid'; }
+  /* 이름이 공고문(공고문·요강·선발계획·업무처리기준)인데 속에 서식 표식이 있으면 **뒷장에 서식이 붙은 공고문**으로 본다 —
+     통째로 신청서 칸에 올리면 공고문 전체가 '원본 양식'으로 보인다(운영지침·업무처리기준 실측). 서식 쪽은 form-pages 가 뗀다 */
+  if (role === 'form' && !nameForm && (isNoticeDoc(n) || /지침|규정/.test(n))) role = 'mixed';
+  /* 이름이 신청서인데 공고문 표식이 많아도 서식 표식이 하나라도 있으면 둘 다 든 한 파일이다(「선발 공지문 및 학업계획서 양식.hwpx」) */
+  if (role === 'notice' && nameForm && sig.form >= 1) role = 'mixed';
+  if (role === 'form') return { form: !NOT_STUDENT_FORM(n), notice: false, role, by };
+  if (role === 'notice') return { form: false, notice: true, role, by };
+  /* 공고문에 서식이 붙은 한 파일 — 카드는 늘 읽는다(뒷장 서식의 견본 날짜는 발췌기 annexCut 이 자른다) · 신청서 칸엔 이름이 신청서일 때만
+     (아니면 서식 쪽만 form-pages 가 떼어 「공고문 안 신청서 서식」으로 보인다) */
+  if (role === 'mixed') return { form: !!nameForm && !NOT_STUDENT_FORM(n), notice: true, role, by };
+  return { form: !!nameForm, notice: !nameForm && isNoticeDoc(n), role: null, by: 'name' };
+}
+
 /* zip(=docx·hwpx·첨부 묶음) 안을 직접 읽는다 — 바깥 라이브러리 없이.
    항목 이름은 UTF-8 로 읽되 깨지면 EUC-KR 로 다시 읽는다(한글 윈도우가 만든 zip · 2026-10-17 홍익대 묶음 첨부). */
 const entryName = (b) => {
@@ -350,6 +437,16 @@ function fileHash(p) {
   if (!hashMemo.has(p)) { let h = null; try { h = crypto.createHash('sha1').update(fs.readFileSync(p)).digest('hex'); } catch { /* 없음 */ } hashMemo.set(p, h); }
   return hashMemo.get(p);
 }
+/* 신청서 쪽 원본을 카드 읽기에 쓰는가 — 🔴 공고문인지는 **원본 내용**으로(attachDecision · 2026-11-20): 이름이 애매한 「붙임1.hwp」·「…시행(안).hwp」·FAQ 도
+   속이 안내문이면 읽는다. 🔴 단 **이름이 서식 꼴**(신청서·지원서·서식·동의서…)인 파일은 속이 **안내문뿐**(서식 표식 0)일 때만 읽는다 —
+   공고문 몇 줄이 앞에 붙은 신청서(「仁松 선발 지원서」·「헌혈기부권 신청서식」)를 읽으면 개인정보 동의 문구가 자격이 된다(2026-08-20 사고 · 위 머리말 · 리뷰).
+   이름이 공고문인 파일은 예전처럼 늘 읽는다(isNoticeDoc) — 이 함수가 **더하는** 것은 이름이 애매하거나 이름과 속이 다른 공고문뿐이다 */
+function noticeByContent(name, filePath) {
+  if (isNoticeDoc(name)) return true;
+  const formish = FORMISH.test(String(name || ''));
+  const d = attachDecision(name, roleText(filePath), formish);
+  return formish ? d.role === 'notice' : d.notice;
+}
 /** 이 공고의 공고문 첨부 파일 이름들(extracted/ 기준) — 원문 글자(HWP·DOCX)가 먼저(docOrder) */
 export function noticeDocFiles(it, { index, formPath = true, sameTitle = null } = {}) {
   const idx = index || (defaultIndex ??= loadNoticeDocIndex());
@@ -359,9 +456,9 @@ export function noticeDocFiles(it, { index, formPath = true, sameTitle = null } 
     const titles = [it.boardTitle, it.name, it.title].filter(Boolean);
     const seen = new Set(out.map((f) => fileHash(`${idx.dir}/${f}`)).filter(Boolean));
     for (const r of idx.forms || []) {
-      if (out.includes(r.file) || !isNoticeDoc(r.attach)) continue;
+      if (out.includes(r.file)) continue;
       const mine = r.id ? r.id === it.id : (!!sameTitle && attNames.has(r.attach) && titles.some((t) => sameTitle(t, r.title)));
-      if (!mine) continue;
+      if (!mine || !noticeByContent(r.attach, `${idx.dir}/${r.file}`)) continue;   // 그 공고 줄인지 먼저(싸다) — 내용 판정은 파일을 연다
       const h = fileHash(`${idx.dir}/${r.file}`);
       if (!h || seen.has(h)) continue;   // 파일이 없거나 이미 든 파일의 사본
       seen.add(h); out.push(r.file);

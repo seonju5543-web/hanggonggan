@@ -36,7 +36,7 @@ const readJson = (rel, dflt) => { try { return JSON.parse(fs.readFileSync(P(rel)
 const log = (m) => console.log(`[card-read] ${m}`);
 
 export const MODELS = { a: 'claude-opus-5-5', b: 'claude-sonnet-5-5' };
-const PRICE = { 'claude-opus-5-5': [4, 20], 'claude-sonnet-5-5': [2, 10] };   // 달러 / 100만 토큰 (입력, 출력) — 2026-11 요금
+export const PRICE = { 'claude-opus-5-5': [4, 20], 'claude-sonnet-5-5': [2, 10] };   // 달러 / 100만 토큰 (입력, 출력) — 2026-11 요금
 
 const LINE_RULES = `줄마다 두 가지를 냅니다 — text 와 quote.
 - text: 학생에게 보일 문장. 자연스럽고 깔끔한 한국어로 다시 써도 됩니다(끊긴 문장 잇기 · 번호·기호·이름표 떼기 · 어색한 말 다듬기 · 「~인 자」를 「~인 학생」으로 등). 한 줄에 하나만.

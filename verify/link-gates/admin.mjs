@@ -40,6 +40,12 @@ export default async function gate(eq, ctx) {
       /아이디·비밀번호/.test(errs('https://news.khu.ac.kr@evil.example/view.do?id=1')),
       /보이지 않는 글자/.test(errs('https://a.kr/view.do?id=1\u200b')),
     ], Array(14).fill(true));
+  /* 한국장학재단이 직접 주는 사업(kosafOwn) — 사업 안내 쪽만 받고, 그때는 지금 링크와 같아도 받는다. 표시 없이는 그대로 막는다 */
+  const own = (u, from = '', kosafOwn = true) => LF.checkFixUrl(u, { from, L: SL, downloadRe: RULES.DOWNLOAD_URL, kosafOwn });
+  const kp = 'https://www.kosaf.go.kr/ko/mkinfo.do?pg=aiES&naviParam=MK,03,06,01';
+  eq('  한국장학재단 자체 사업(kosafOwn)만 사업 안내 쪽을 받는다 — 같은 주소도 받음 · 첫 화면은 여전히 막음 · 표시 없으면 막음 · 표시가 true 아니면 막음 · 남의 사이트는 같은 주소면 막음',
+    [own(kp, kp).errors, /첫 화면|kosaf/.test(own('https://www.kosaf.go.kr/index.html').errors.join()), /kosaf\.go\.kr/.test(errs(kp, kp)), /kosaf\.go\.kr/.test(own(kp, kp, 'yes').errors.join()), /같은 주소/.test(own('https://a.kr/view.do?id=3', 'https://a.kr/view.do?id=3').errors.join())],
+    [[], true, true, true, true]);
   const other = chk('https://b.or.kr/notice/view?no=5', 'https://a.kr/bbs/list.do#n-x');
   const root = chk('https://maicon.kr/', 'https://a.kr/bbs/list.do#n-x');
   eq('  경고(받되 한 번 더 확인) — 지금 링크와 다른 사이트 · 맨 도메인(공모전 전용 사이트만)',

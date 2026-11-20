@@ -1,7 +1,17 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "[대학혁신지원사업/학생상담센터(세종)]⭐생체신호 측정하여 스트레스 지수 파악⭐ 옴니핏 스트레스 검사 실시 안내",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160590&noCat=32",
+   "postedAt": "2026-11-20",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-20",
+   "desc": "세종캠퍼스 학생상담센터(세종) ★ 단 1분으로 알아보는 내 스트레스, 두뇌 컨디션, 집중도는??"
+  },
   {
    "title": "학생설계전공 시행 안내",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160549&noCat=500",
@@ -424,17 +434,6 @@
    "src": "9c41077f",
    "foundAt": "2026-10-27",
    "desc": "학사지원팀 2026학년도 동계계절학기에 서경대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
-  },
-  {
-   "title": "홍익대학교 영자신문사 Tidings에서 신입기자를 모집합니다!",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159621&noCat=514",
-   "postedAt": "2026-10-27",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/8c85031f0caf9104.webp",
-   "desc": "학생활동 영자신문 📝모집 인원 : 0명 📝모집 부문 : 취재기자 0명 📝주요 업무 &bull; 기자: 연 4회 간행물 발행에 따른 기사 작성 및 그에 필요한 활동 📝지원 자격 : 2026년 2학기 재학생 중…"
   }
  ]
 }

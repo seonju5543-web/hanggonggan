@@ -30,7 +30,7 @@ const hostOf = (u) => { try { return new URL(u).hostname.toLowerCase().replace(/
  *  돌려주는 것: { url(되푼 주소), errors[](하나라도 있으면 받지 않는다), warns[](받되 확인을 한 번 더 받는다) }
  *  opts.from = 지금 학생이 여는 주소(데이터에 실린 그대로) · opts.L = source-link.js 함수 묶음 · opts.downloadRe = 첨부 내려받기 꼴 */
 export function checkFixUrl(raw, opts = {}) {
-  const { from = '', L, downloadRe } = opts;
+  const { from = '', L, downloadRe, kosafOwn = false } = opts;
   const errors = [];
   const warns = [];
   if (!L || typeof L.decodeUrlEntities !== 'function' || typeof L.linkShape !== 'function' || typeof L.fixUrlUsable !== 'function') {
@@ -59,9 +59,15 @@ export function checkFixUrl(raw, opts = {}) {
   else if (!L.fixUrlUsable(url)) errors.push('원문 공고 주소로 쓸 수 없는 꼴입니다');
   if (downloadRe && downloadRe.test(url)) errors.push('첨부 파일 내려받기 주소입니다 — 첨부가 아니라 공고 글의 주소를 넣어 주세요');
   if (AGGREGATOR_RE.test(url)) errors.push('집계 사이트(링커리어 등) 주소입니다 — 주최가 올린 원래 공고를 넣어 주세요');
-  if (/(^|\.)kosaf\.go\.kr$/i.test(x.hostname)) errors.push('한국장학재단(kosaf.go.kr) 상세 주소는 새 탭에서 열리지 않습니다 — 재단이 직접 올린 공고 주소를 넣어 주세요');
+  /* 한국장학재단 주소 — 재단 목록의 '상세'는 새 탭에서 안 열려 막는다. 🔴 예외 하나(2026-11-20 개발자 지시 *"모든 공고에 원문 공고 링크"*):
+     **한국장학재단이 직접 주는 사업**(국가근로·멘토링 …)은 회차 글이 없고 재단의 사업 안내 쪽이 곧 그 장학금의 안내다 —
+     부르는 쪽(tools/admin-apply.mjs)이 그 공고의 주는 곳이 한국장학재단임을 확인해 kosafOwn 을 줄 때만 받는다.
+     그때는 '지금 링크와 같은 주소'도 받는다(목록에 실린 주소가 이미 그 사업 쪽 — 사람이 열어 보고 그렇다고 적는 것). */
+  const isKosaf = /(^|\.)kosaf\.go\.kr$/i.test(x.hostname);
+  const kosafProgram = isKosaf && kosafOwn === true && shape === 'page';
+  if (isKosaf && !kosafProgram) errors.push('한국장학재단(kosaf.go.kr) 상세 주소는 새 탭에서 열리지 않습니다 — 재단이 직접 올린 공고 주소를 넣어 주세요');
   const fromUrl = L.decodeUrlEntities(from);
-  if (fromUrl && fromUrl === url) errors.push('지금 링크와 같은 주소입니다');
+  if (fromUrl && fromUrl === url && !kosafProgram) errors.push('지금 링크와 같은 주소입니다');
   if (!errors.length) {
     const a = hostOf(fromUrl);
     const b = hostOf(url);

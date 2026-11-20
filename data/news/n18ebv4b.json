@@ -1,6 +1,6 @@
 {
  "school": "서울교육대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
   {
    "title": "2026년 12월 각군 현역병 모집일정 안내",
@@ -191,17 +191,6 @@
    "src": "4d730c6c",
    "foundAt": "2026-10-21",
    "thumb": "data/news/img/b0da010dc0108a90.webp"
-  },
-  {
-   "title": "[수도권 국립대학 프로젝트] SNUEAPE Bridge Project 장애아동 체",
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55438",
-   "postedAt": "2026-10-20",
-   "postId": "55438",
-   "school": "서울교육대학교",
-   "campus": "",
-   "src": "4d730c6c",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/ecd68a4aff51aa41.webp"
   }
  ]
 }

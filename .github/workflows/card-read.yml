@@ -36,7 +36,7 @@ jobs:
   read:
     runs-on: ubuntu-latest
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
-    timeout-minutes: 55   # 단계 상한의 합(사전 관문 12 + 읽기 12 + 꼴 검사 2 + 규칙 관문 12 + 감사 5 + 저장·알림)보다 길게
+    timeout-minutes: 55   # 단계 상한의 합(사전 관문 12 + 읽기 12 + 첨부 판정 6 + 꼴 검사 2 + 규칙 관문 12 + 감사 5 = 49 + 받기·설치·저장·알림)보다 길게
     steps:
       - uses: actions/checkout@v7
         with:
@@ -72,6 +72,20 @@ jobs:
           if [ -n "$ONLY_ID" ]; then node collector/card-read.mjs --only="$ONLY_ID" --write | tee /tmp/card-read.txt
           else node collector/card-read.mjs --write | tee /tmp/card-read.txt; fi
 
+      # 유료 첨부 판정 (2026-11-20 개발자 지시 「유료로 해」) — 글자로 못 가른 스캔 PDF·그림 첨부만 파일째 모델 둘에게 보여 신청서/공고문을 묻는다.
+      # 스위치·키는 위 단계와 같다(card-read-config.json enabled + CARD_READ_ENABLE) · 한 실행 상한은 같은 파일의 roleMaxPerRun·roleMaxUsdPerRun.
+      # 답은 collector/attach-role-paid.json 에만 — 양식 PDF 로봇(deep-fetch.yml)이 다음 실행에 신청서 칸을 고친다. 실패해도 읽은 카드는 저장한다(continue-on-error)
+      - id: role
+        name: 첨부 판정 (유료)
+        timeout-minutes: 6
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CARD_READ_ENABLE: '1'
+        run: |
+          set -o pipefail
+          node collector/attach-role-read.mjs --write | tee /tmp/attach-role.txt
+
       # 저장 앞 관문 — 결과 파일의 꼴(앱이 받는 파일) · 규칙 관문 · 데이터 감사. 하나라도 빨가면 저장하지 않고 멈춘다.
       # 그때 돈을 쓴 결과를 잃지 않게 장부(응답 원본이 들어 있다)를 아티팩트로 남긴다 — 되살린 뒤 `--recheck --write` 로 돈 없이 다시 만든다
       - name: 결과 파일 꼴 검사
@@ -93,8 +107,9 @@ jobs:
           [ -f data/card-read.json ] && git add data/card-read.json
           [ -f collector/card-read-ledger.json ] && git add collector/card-read-ledger.json
           [ -f collector/card-read-review.json ] && git add collector/card-read-review.json
+          [ -f collector/attach-role-paid.json ] && git add collector/attach-role-paid.json
           if ! git diff --cached --quiet; then
-            git commit -m "유료 카드 읽기: $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/card-read.txt | tail -1 || echo '결과 갱신')"
+            git commit -m "유료 카드 읽기: $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/card-read.txt | tail -1 || echo '결과 갱신') · 첨부 판정 $(grep -o '물음 [0-9]*개(실음 [0-9]*)' /tmp/attach-role.txt | tail -1 || echo '없음')"
             pushed=0
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
@@ -115,10 +130,11 @@ jobs:
           path: |
             collector/card-read-ledger.json
             data/card-read.json
+            collector/attach-role-paid.json
           retention-days: 14
 
       - name: 🚨 실패 알림
-        if: failure() || cancelled() || steps.read.outcome == 'failure'
+        if: failure() || cancelled() || steps.read.outcome == 'failure' || steps.role.outcome == 'failure'
         timeout-minutes: 1
         continue-on-error: true
         env:
@@ -127,6 +143,7 @@ jobs:
         run: |
           body="🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **유료 카드 읽기** 가 끝까지 돌지 못했습니다.
           $(tail -5 /tmp/card-read.txt 2>/dev/null || true)
+          $(tail -3 /tmp/attach-role.txt 2>/dev/null || true)
 
           실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           앱은 이미 실린 결과와 무료 길 값으로 그대로 보입니다. 잔액 부족이면 콘솔 Billing 을 확인하세요.
@@ -170,7 +187,7 @@ jobs:
           node tools/alert-issue.mjs --mode resolve --match exact --title '🧾 유료 확인이 멈췄어요' --body "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 유료 확인을 기다리다 무료 값으로 넘어간 공고가 없습니다. 자동으로 닫습니다."
 
       - name: 다시 성공하면 알림을 닫는다
-        if: success() && steps.read.outcome == 'success'
+        if: success() && steps.read.outcome == 'success' && steps.role.outcome == 'success'
         timeout-minutes: 1
         continue-on-error: true
         env:

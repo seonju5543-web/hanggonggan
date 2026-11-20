@@ -1,7 +1,18 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
+  {
+   "title": "게임전공, 독일 게임산업 사절단 초청... 한·독 게임산업 및 교육 교류의 장 마련",
+   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770502&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-20",
+   "school": "상명대학교",
+   "campus": "",
+   "src": "f8a29ec6",
+   "foundAt": "2026-11-20",
+   "thumb": "data/news/img/39a5ef5bc3190071.webp",
+   "desc": "대외협력팀 우리 대학 게임전공은 지난 16일 독일 게임산업 사절단을 초청해 한·독 게임산업 및 교육 분야의 교류를 위한 시간을 가졌다."
+  },
   {
    "title": "‘나이지리아 디지털 거버넌스 기반환경 조성사업’ 대장정 마무리... ‘전자정부 마스터플랜 2.0’ 이양",
    "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770472&article.offset=0&articleLimit=10",

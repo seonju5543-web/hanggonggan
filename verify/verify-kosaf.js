@@ -365,11 +365,12 @@ const PROFILE = {
     const att = await page.$$eval('#detail-sheet a', (as) => as
       .filter((a) => /kosaf-files/.test(a.getAttribute('href') || ''))
       .map((a) => ({ href: a.href, text: a.textContent.trim() })));
-    eq('공고문 링크가 상세 시트에 뜬다', att.length, 1);
+    /* 2026-11-20 승인 시안(docs/designs/all-docs-pdf.md · 개발자 "원래 pdf인건 그냥 두 군데 둘다") — 원래 PDF 인 공고문은 위 PDF 줄과 맨 밑 올린 목록 두 곳에 뜬다(같은 주소) */
+    eq('공고문 링크가 상세 시트에 뜬다 — 위 PDF 줄 · 맨 밑 올린 목록 두 곳 · 같은 주소', [att.length, new Set(att.map((x) => x.href)).size], [2, 1]);
     /* 🔴 주소가 **우리 도메인 + 앱이 놓인 자리** 로 풀려야 한다. `location.origin` 기준으로
        풀면 `/data/…` 가 사이트 뿌리로 가서 404 다(앱은 /hanggonggan/ 아래에 있다). */
     eq('  우리 도메인에서 받는다 (KOSAF 원주소가 아니다)',
-      att.length === 1 && att[0].href.startsWith(`http://localhost:${PORT}/data/kosaf-files/`), true);
+      att.length > 0 && att.every((x) => x.href.startsWith(`http://localhost:${PORT}/data/kosaf-files/`)), true);
     /* 🔴 **앱이 하위 경로에 놓인 상태로 재야 한다** — 이 검사는 처음에 무력했다(2026-09-12).
        검사 서버는 앱을 뿌리(`localhost:8123/`)에 두는데 진짜 앱은
        `…github.io/hanggonggan/` 아래에 있다. 뿌리에서는 `location.origin` 기준으로
@@ -387,6 +388,76 @@ const PROFILE = {
     /* 🔴 공고문을 '첨부 양식'이라 부르면, 받은 학생이 신청서인 줄 알고 빈칸을 찾는다 */
     eq('  그 파일이 무엇인지 이름을 붙인다 (선발 공고문)', /선발 공고문/.test(sheet2), true);
     eq('  신청서 양식이라고 부르지 않는다', /공고 원본 첨부 양식/.test(sheet2), false);
+  }
+
+  /* ══ 첨부 — PDF 줄 위 · 올린 첨부 목록 맨 밑 (2026-11-20 승인 시안 · docs/designs/all-docs-pdf.md) ══════
+     공고문 PDF 사본 색인(data/docs-pdf/index.json)을 가짜 응답으로 주고, 이미 목록에 뜬 재단의 첨부를 [HWPX 공고문, 원래 PDF] 로 얹는다.
+     🔴 줄 꼴: PDF 아이콘 · 첨부 이름 그대로 · 이름 밑 작은 글씨 없음 · 「열기 ›」 · 새 탭 / 맨 밑: 올린 첨부 목록 그대로(원래 PDF 도 다시)
+     🔴 지원문서 머리도 같은 규칙 · 목록 밑 회색 안내 문단 없음(11-20 개발자 "ㅇㅇ 지워") · 사본이 없으면 PDF 줄만 없고 맨 밑 목록은 그대로 */
+  console.log('\n■ 첨부 — PDF 줄 위 · 올린 첨부 목록 맨 밑 (2026-11-20 승인 시안)');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(400);
+  {
+    const id = info.first;
+    const code = String(id || '').replace(/^kosaf-/, '');
+    const FIX = { updatedAt: '2026-11-20', items: { [id]: [{ file: `${id}/1-선발_공고.pdf`, name: '선발 공고.hwpx', pages: 2, bytes: 1000, fonts: 'ko-nanum-1', kept: 1, at: '2026-11-20' }] } };
+    await page.route('**/data/docs-pdf/index.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FIX) }));
+    const ready = await page.evaluate(async (c) => {
+      const it = kosafList.find((x) => x.code === c);
+      if (!it || typeof loadDocsPdfIndex !== 'function') return false;
+      it.files = [{ name: '선발 공고.hwpx', path: `data/kosaf-files/${c}/선발 공고.hwpx`, bytes: 68000 }, { name: '안내 (2026).pdf', path: `data/kosaf-files/${c}/안내 (2026).pdf`, bytes: 90000 }];
+      await loadDocsPdfIndex();
+      renderExplore();
+      return true;
+    }, code);
+    eq('공고문 PDF 색인을 받는 함수가 있고 표본을 얹었다', ready, true);
+    const attOf = () => page.evaluate(() => {
+      const sec = [...document.querySelectorAll('#detail-sheet .sheet-sec')].find((s) => /^첨부/.test(((s.querySelector('h4') || {}).textContent || '').trim()));
+      if (!sec) return null;
+      const uls = [...sec.querySelectorAll('ul.doc-list')];
+      const pathOf = (a) => { try { return decodeURI(new URL(a.href).pathname); } catch { return ''; } };
+      const row = (li) => { const a = li.querySelector('a'); return [((li.querySelector('.att-ic') || {}).textContent || '').trim(), a ? a.textContent.trim() : '', a ? pathOf(a) : '', a ? a.target : '', ((li.querySelector('.att-go') || {}).textContent || '').trim()]; };
+      const pdfUl = uls.find((u) => u.querySelector('li.att-row'));
+      const origUl = uls.find((u) => !u.querySelector('li.att-row'));
+      return { top: pdfUl ? [...pdfUl.querySelectorAll('li.att-row')].map(row) : [], meta: sec.querySelectorAll('.att-m').length,
+        bottom: origUl ? [...origUl.querySelectorAll('li.att')].map((li) => (li.querySelector('a') || li).textContent.trim()) : [],
+        order: uls.map((u) => (u.querySelector('li.att-row') ? 'pdf' : 'orig')) };
+    });
+    if (ready) {
+      await page.click(`#explore-list [data-detail="${id}"]`);
+      await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+      await page.waitForTimeout(250);
+      const s1 = await attOf();
+      eq('상세 시트 「첨부」 위 — PDF 줄(공고문 사본 · 원래 PDF) · 첨부 이름 그대로 · 새 탭 · 「열기 ›」 · 첨부 차례대로', s1 && s1.top, [
+        ['PDF', '선발 공고.hwpx', `/data/docs-pdf/${id}/1-선발_공고.pdf`, '_blank', '열기 ›'],
+        ['PDF', '안내 (2026).pdf', `/data/kosaf-files/${code}/안내 (2026).pdf`, '_blank', '열기 ›']]);
+      eq('  이름 밑 작은 회색 글씨가 없다(.att-m 0) · PDF 목록이 위, 올린 목록이 맨 밑', s1 && [s1.meta, s1.order], [0, ['pdf', 'orig']]);
+      eq('  맨 밑 — 올린 첨부 목록 그대로(원래 PDF 도 다시)', s1 && s1.bottom, ['선발 공고.hwpx', '안내 (2026).pdf']);
+      /* 지원문서 작성 화면 머리 「선발 공고문」 — PDF 줄 → (서식 쪽) → 올린 원본(↓) · 안내 문단 없음 */
+      await page.evaluate((sid) => applyTo(findSch(sid)), id);
+      await page.waitForTimeout(700);
+      const head = await page.evaluate(() => {
+        const h = [...document.querySelectorAll('#detail-sheet h4')].find((x) => /^선발 공고문/.test(x.textContent.trim()));
+        const ul = h && h.nextElementSibling;
+        const rows = ul ? [...ul.querySelectorAll('li.att')].map((li) => [((li.querySelector('.att-ic') || {}).textContent || '').trim(), ((li.querySelector('a') || li).textContent || '').trim(), ((li.querySelector('.att-go') || {}).textContent || '').trim()]) : [];
+        return { rows, meta: ul ? ul.querySelectorAll('.att-m').length : -1, note: !!(ul && ul.nextElementSibling && ul.nextElementSibling.matches('p.dp-note')) };
+      });
+      eq('지원문서 머리 「선발 공고문」 — 첫 두 줄이 PDF 줄(열기 ›) · 끝 두 줄이 올린 원본(↓) · 작은 글씨·안내 문단 없음',
+        [head.rows.slice(0, 2), head.rows.slice(-2), head.meta, head.note],
+        [[['PDF', '선발 공고.hwpx', '열기 ›'], ['PDF', '안내 (2026).pdf', '열기 ›']], [['HWPX', '선발 공고.hwpx', '↓'], ['PDF', '안내 (2026).pdf', '↓']], 0, false]);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(400);
+      /* 사본 색인이 없으면(404·오프라인 · 아직 안 바꿈) PDF 줄은 원래 PDF 하나뿐 · 맨 밑 목록은 그대로 */
+      await page.evaluate(() => { docsPdfIndex = { items: {} }; });
+      await page.evaluate((sid) => openDetail(sid), id);
+      await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+      await page.waitForTimeout(250);
+      const s2 = await attOf();
+      eq('  사본이 없으면 — 공고문 PDF 줄은 없고(원래 PDF 줄만) · 맨 밑 목록은 그대로 둘', s2 && [s2.top.map((r) => r[1]), s2.bottom], [['안내 (2026).pdf'], ['선발 공고.hwpx', '안내 (2026).pdf']]);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(300);
+    }
+    await page.unroute('**/data/docs-pdf/index.json*');
   }
 
   /* ══ 층2도 신청 버튼이 열린다 (2026-09-13 · 노션 백로그 핵심-2) ═══════════════════

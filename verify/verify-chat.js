@@ -9,6 +9,8 @@
    ⑦ 쓸어내려 닫기 — 대화가 중간이면 스크롤, 맨 위·머리말이면 닫기 (스크롤을 뺏지 않는다)
    ⑧ AI가 꺼져 있는 동안에는 바깥으로 나가는 요청이 **0건**이다
    ⑨ 질문에 스크립트를 넣어도 그대로 실행되지 않는다(XSS)
+   ⑩ 공고 한 건의 칸(원문 링크·자격·마감)을 이름·「그거」로 물으면 상세 시트와 같은 값으로 답한다 · 오타 인사·사용법 (2026-11-20)
+   ⑪ 입력 칸을 눌러도·키보드가 올라와도 레이아웃이 어긋나지 않는다 (2026-11-20 개발자 제보)
    실행: python3 -m http.server 8123 & 후 node verify/verify-chat.js */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
@@ -135,16 +137,18 @@ async function ask(page, q) {
       if (!w) continue;
       /* 한 글자만 바꾼다 — 오타 봐주기가 살아 있으면 되묻어야 한다 */
       const ch = w[1] === '아' ? '어' : '아';
-      return w.slice(0, 1) + ch + w.slice(2);
+      return { typo: w.slice(0, 1) + ch + w.slice(2), word: w };
     }
     return null;
   });
   if (!typoQ) console.log('  · 오타를 낼 만한 공고 이름이 없어 되묻기 항목을 건너뜁니다');
-  const clarified = typoQ ? await ask(page, `${typoQ} 장학`) : '';
+  const clarified = typoQ ? await ask(page, `${typoQ.typo} 장학`) : '';
   const askChips = await page.locator('#chat-log .chat-asks .chat-chip').count();
   if (typoQ) {
-    ok(/이 중 하나인가요|찾았어요/.test(clarified) || askChips > 0,
-      `딱 안 맞아도 비슷한 후보를 되묻는다 (물어본 말: ${typoQ})`, clarified.slice(0, 60));
+    /* 2026-11-20 — 말귀(chat-nlu.js)가 오타를 **알아듣고 바로 답하는 것**도 맞다. 단 그 답이 원래 이름(오타 전 낱말)에
+       대한 것이어야 한다 — 엉뚱한 답·빈 답은 여전히 빨간불. */
+    ok(/이 중 하나인가요|찾았어요/.test(clarified) || askChips > 0 || clarified.includes(typoQ.word),
+      `딱 안 맞아도 비슷한 후보를 되묻거나 원래 이름으로 알아듣는다 (물어본 말: ${typoQ.typo} · 원래: ${typoQ.word})`, clarified.slice(0, 60));
   }
 
   /* ④ 앞 대화 기억 — 공고 하나를 물은 뒤 "그거 서류 뭐야?"가 통하는가 */
@@ -449,6 +453,84 @@ async function ask(page, q) {
   ok(xss === false, '질문 속 스크립트가 실행되지 않는다');
   const raw = await page.locator('#chat-log .chat-row.me').last().textContent();
   ok(raw.includes('<img'), '질문은 글자 그대로 보인다');
+
+  console.log('\n[7-1] 공고 한 건의 칸 묻기 · 인사·사용법 (2026-11-20 개발자 지시)');
+  /* 대상 공고는 **지금 화면에 있는 것**에서 고른다(id·이름을 박지 않는다) — 이름이 다른 공고와 겹치지 않고
+     원문 주소가 있는 정식 등록 하나. 링크는 앱이 상세 시트에서 쓰는 것(sourceLink)과 **같은 주소**여야 한다. */
+  const tgt = await page.evaluate(() => {
+    const ms = getMatches().filter((m) => !m.sch.program && m.sch.sourceKind !== 'kosaf');
+    for (const m of ms) {
+      const name = m.sch.name;
+      const href = safeUrl(sourceLink(m.sch, 'detail').href);
+      if (!href) continue;
+      const lines = requirementLines(m.sch, null, { all: true });
+      const r = chatPickEntry(`${name} 원문 링크`);
+      if (r && r.entry && r.entry.key === 'r:' + m.sch.id) return { name, href, lines: lines.length, deadline: m.sch.deadline || '' };
+    }
+    return null;
+  });
+  if (tgt) {
+    await page.evaluate(() => { if (document.querySelector('#chat-sheet').hidden) chatOpen(); });
+    await page.waitForSelector('#chat-sheet:not([hidden])');
+    await ask(page, `${tgt.name} 원문 링크 뭐야?`);
+    const linkHref = await page.locator('#chat-log .chat-row.bot').last().locator('.chat-links a').first().getAttribute('href').catch(() => null);
+    ok(linkHref === tgt.href, '「○○ 원문 링크」에 상세 시트와 같은 주소를 준다', { 받은: linkHref, 기대: tgt.href });
+    const elig = await ask(page, '그거 지원 자격 알려줘');
+    ok(tgt.lines ? /지원 자격/.test(elig) : /정리해 두지 못했어요|지원 자격/.test(elig), '「그거 지원 자격」은 앞에서 말한 공고의 자격을 답한다', elig.slice(0, 80));
+    const dl = await ask(page, '그거 마감 언제까지야');
+    ok(tgt.deadline ? dl.includes(tgt.deadline) : /마감|기간|정리해 두지 못했어요/.test(dl), '「그거 마감」은 그 공고의 마감일을 글자 그대로 말한다', { 기대: tgt.deadline, 받은: dl.slice(0, 80) });
+  } else {
+    ok(false, '칸 묻기를 시험할 공고가 있다(원문 주소가 있는 정식 등록)');
+  }
+  const hello = await ask(page, '안녕하세여');
+  ok(/대장님|반가워|여기 있어요/.test(hello), '오타 섞인 인사에도 인사로 답한다', hello.slice(0, 50));
+  const how = await ask(page, '서류함 어케 써');
+  ok(/서류함/.test(how) && !/못 알아들었/.test(how), '앱 사용법을 오타·줄임말로 물어도 답한다', how.slice(0, 50));
+  const quokka = await ask(page, '쿼카 사육 지원금 있어?');
+  ok(/못 알아들었|찾지 못|없어요|못 찾/.test(quokka), '지식이 늘어도 모르는 질문은 여전히 "못 찾았다"', quokka.slice(0, 60));
+
+  console.log('\n[7-2] 입력 칸 레이아웃 — 눌렀을 때 · 키보드가 올라왔을 때 (2026-11-20 개발자 제보)');
+  /* 실측 원인: 입력 칸 49px(줄 높이) · 보내기 44px 이 윗선만 맞아 아래가 어긋났고, 키보드가 올라와도 시트는
+     화면 높이(dvh) 그대로라 키보드 뒤로 들어갔다. 키보드는 헤드리스에 없으므로 visualViewport 를 줄여 흉내 낸다. */
+  await page.tap('#chat-input');
+  await page.waitForTimeout(200);
+  const align = await page.evaluate(() => {
+    const a = document.querySelector('#chat-input').getBoundingClientRect();
+    const b = document.querySelector('.chat-send').getBoundingClientRect();
+    return { inH: Math.round(a.height), btnH: Math.round(b.height), dMid: Math.abs((a.top + a.bottom) / 2 - (b.top + b.bottom) / 2) };
+  });
+  ok(align.inH === align.btnH && align.dMid < 1, '눌렀을 때 입력 칸과 보내기 단추의 높이·가운데가 같다', align);
+  const kb = await page.evaluate(() => {
+    const real = Object.getOwnPropertyDescriptor(window, 'visualViewport');
+    const fake = { height: innerHeight - 336, width: innerWidth, offsetTop: 0, offsetLeft: 0, scale: 1, addEventListener() {}, removeEventListener() {} };
+    Object.defineProperty(window, 'visualViewport', { value: fake, configurable: true });
+    const rect = (s) => { const r = document.querySelector(s).getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom) }; };
+    chatFitKeyboard();
+    const open = { vv: [0, fake.height], sheet: rect('#chat-sheet'), head: rect('.chat-head'), input: rect('#chat-input') };
+    fake.offsetTop = 120; chatFitKeyboard();                      // 사파리가 보이는 칸을 밀어 올린 경우
+    const panned = { vv: [120, 120 + fake.height], sheet: rect('#chat-sheet'), input: rect('#chat-input') };
+    /* 🔴 실기기(아이폰 홈 화면 앱 · 2026-11-20 개발자 화면 녹화)에서는 키보드가 올라오면 **innerHeight 도 같이 줄었다** —
+       '가린 높이 = innerHeight − 보이는 칸'으로 재던 첫 수리가 0 을 얻어 아무것도 안 했고, 시트는 dvh(키보드 무관) 그대로
+       78% 높이라 아래(추천 칩·입력 칸)가 키보드 뒤로 들어가 사파리가 화면을 밀어 올렸다. 그 경우를 따로 흉내 낸다. */
+    const realIH = Object.getOwnPropertyDescriptor(window, 'innerHeight');
+    const fullH = innerHeight;
+    fake.height = fullH; fake.offsetTop = 0; chatFitKeyboard();          // 키보드 닫힌 상태를 한 번 본다(기준 높이)
+    Object.defineProperty(window, 'innerHeight', { get: () => fullH - 336, configurable: true });
+    fake.height = fullH - 336; fake.offsetTop = 0; chatFitKeyboard();
+    const shrunk = { vv: [0, fake.height], sheet: rect('#chat-sheet'), head: rect('.chat-head'), input: rect('#chat-input'), chips: getComputedStyle(document.querySelector('#chat-chips')).display };
+    if (realIH) Object.defineProperty(window, 'innerHeight', realIH); else delete window.innerHeight;
+    fake.height = innerHeight; fake.offsetTop = 0; chatFitKeyboard();   // 키보드가 내려감
+    const closed = { sheet: rect('#chat-sheet'), inline: document.querySelector('#chat-sheet').style.bottom + document.querySelector('#chat-sheet').style.top };
+    if (real) Object.defineProperty(window, 'visualViewport', real); else delete window.visualViewport;
+    return { open, panned, shrunk, closed };
+  });
+  const inside = (box, vv) => box.top >= vv[0] - 1 && box.bottom <= vv[1] + 1;
+  ok(inside(kb.open.sheet, kb.open.vv) && inside(kb.open.input, kb.open.vv) && inside(kb.open.head, kb.open.vv),
+    '키보드가 올라오면 시트(머리말·입력 칸까지)가 보이는 칸 안에 들어온다', kb.open);
+  ok(inside(kb.panned.sheet, kb.panned.vv) && inside(kb.panned.input, kb.panned.vv), '사파리가 화면을 밀어 올려도 보이는 칸 안이다', kb.panned);
+  ok(inside(kb.shrunk.sheet, kb.shrunk.vv) && inside(kb.shrunk.head, kb.shrunk.vv) && inside(kb.shrunk.input, kb.shrunk.vv) && kb.shrunk.chips === 'none',
+    '🔴 아이폰처럼 화면 높이(innerHeight)까지 같이 줄어도 시트가 보이는 칸 안이고 추천 칩 줄은 접힌다', kb.shrunk);
+  ok(kb.closed.inline === '' && kb.closed.sheet.bottom >= 843, '키보드가 내려가면 원래 자리로 돌아간다', kb.closed);
 
   console.log('\n[8] 콘솔 오류');
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 3));

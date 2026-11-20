@@ -401,6 +401,354 @@
    "by": "이선주",
    "action": "revert",
    "detail": "3건 제거(362 → 359건) · 재등록 차단 id 3·주소 3"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 등록금 지원사업 → https://www.ygef.or.kr/board/?board=notice&site=ygmirae&mn=211&type=view&post_idx=2356"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 워킹홀리데이 지원사업 → https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=974401097"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 문우림 장학 → https://www.mju.ac.kr/bbs/mjukr/145/237091/artclView.do (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 재능장학생 → https://www.gangbuk.go.kr/portal/bbs/B0000145/view.do?menuNo=200081&nttId=186080"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 다자녀가정 특별지원 장학금 → https://www.wonju.go.kr/www/selectBbsNttView.do?key=211&bbsNo=1&nttNo=478878"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 저소득주민자녀장학금 (일반) → https://eminwon.hongcheon.go.kr/emwp/gov/mogaha/ntis/web/ofr/action/OfrAction.do?method=selectOfrNotAncmt&methodnm=selectOfrNotAncmtRegst&jndinm=OfrNotAncmtEJB&context=NTIS&not_ancmt_mgt_no=56076&homepage_pbs_yn=Y&subCheck=Y (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 저소득주민자녀장학금 (특별) → https://eminwon.hongcheon.go.kr/emwp/gov/mogaha/ntis/web/ofr/action/OfrAction.do?method=selectOfrNotAncmt&methodnm=selectOfrNotAncmtRegst&jndinm=OfrNotAncmtEJB&context=NTIS&not_ancmt_mgt_no=56076&homepage_pbs_yn=Y&subCheck=Y (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → https://geomdansf.clickn.co.kr/boards/33/view"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 저소득대학생장학금 → https://www.tongyeong.go.kr/00852/00853/00858.web?amode=view&not_ancmt_mgt_no=51792"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 지역대학생 장학금 → https://www.tongyeong.go.kr/00852/00853/00858.web?amode=view&not_ancmt_mgt_no=51736"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 도내 대학 해외교환 장학생 → https://baro.gyeongnam.go.kr/baro/serviceView.es?service_no=475&mid=a10202000000 (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 귀농인 대학생 자녀 장학금 → https://www.yeongju.go.kr/atec/page.do?step=258&parm_bod_uid=1167553&mnu_uid=10795&"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 학부장학생 → https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=1&btin.bbs_cde=1&btin.doc_no=1338708&btin.appl_no=000000&menu_idx=67 (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 생활안정비 → https://www.gimje.go.kr/board/view.gimje?boardId=BBS_0000027&menuCd=DOM_000000104001000000&dataSid=375816"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 동지장학생 → https://mjsf.co.kr/default/board/01.php?com_board_basic=read_form&com_board_idx=18&com_board_id=1"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 통일간호리더장학금 → https://www.koreanursing.or.kr/bbs/kna_ko/9/10937/artclView.do (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → https://blog.naver.com/pscholarship/224455531565"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 모범학생장학금(자립지원) → https://www.pcu.ac.kr/kor/article/scholarship/1926154031"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 모범학생장학금(특기자) → https://www.pcu.ac.kr/kor/article/scholarship/1926154031"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 인재육성장학생 → https://www.pcu.ac.kr/kor/article/scholarship/1926154031"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → http://www.baeksan.or.kr/SBoard/sboard.asp?boardid=notice&mode=view&seq=46"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 보림 새말귀 장학생 → https://cafe.naver.com/borimseoul/607"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → http://www.bwdi.or.kr/bbs/board.php?bo_table=06_1&wr_id=801"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 SOS 장학금 → https://www.ycsf.or.kr/open/notice/read.html?idx=342&step=A"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 형남장학금 → http://www.ilshinfoundation.com/bbs/board.php?bo_table=notice&wr_id=14"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → https://www.cheongju.go.kr/munui/selectBbsNttView.do?key=2426&bbsNo=511&nttNo=273950&searchCtgry=&searchCnd=all&searchKrwd=&pageIndex=1&integrDeptCode=000100200"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 석성장학생 → https://www.seoksung.co.kr/cms/bbs/board.php?bo_table=notice&wr_id=55"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 특별장학생 → https://www.seoksung.co.kr/cms/bbs/board.php?bo_table=notice&wr_id=55"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 본인부담 등록금 반값 지원 → https://ansanfys.or.kr/sub02/sub01.php?type=view&uid=1071 (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367925 (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 창암장학생 → http://www.changam.or.kr/?act=board&bbs_code=notice&bbs_mode=view&bbs_seq=21 (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학장학생 → https://www.handokmuseum.com/company/notice.php?ptype=view&idx=42577&code=notice_c (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 연구지원금 → https://www.handokmuseum.com/company/notice.php?ptype=view&idx=42577&code=notice_c (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 등록금 지원사업 → https://www.jangseong.go.kr/home/www/news/jangseong/notice/show/6675"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 다자녀가구 등록금 지원 → https://www.jecheon.go.kr/www/selectBbsNttView.do?key=5233&bbsNo=18&nttNo=405538"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 미래 건설교통신기술인 장학생 → https://www.inha.ac.kr/bbs/kr/8/46131/artclView.do (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → https://www.kref.or.jp/news/2026scholarshipkorea/"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 KRA아동돌봄 지원사업 → https://www.rhof.or.kr/sub/sub0401_view.jsp?headerId=B00001100"
+  },
+  {
+   "at": "2026-11-20 02:04 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 명도회장학금(천주교) → https://cbck.or.kr/cafl/Resources?no=20261403"
+  },
+  {
+   "at": "2026-11-20 09:34 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생장학금 → https://www.inje.go.kr/portal/field-info/scholarship/learnfare?articleSeq=245595"
+  },
+  {
+   "at": "2026-11-20 09:34 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 예/체능특기자장학금 → https://www.inje.go.kr/portal/field-info/scholarship/learnfare?articleSeq=245595"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 국가근로장학금 → https://www.kosaf.go.kr/ko/scholar.do?pg=scholarship05_04_01&naviParam=JH,03,01,08"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 청소년교육지원장학금 → https://www.kosaf.go.kr/ko/mkinfo.do?pg=PTMKKsSrvMntoringGive_01M&naviParam=MK,03,04,01"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 청소년 AI 교육지원장학금 → https://www.kosaf.go.kr/ko/mkinfo.do?pg=aiES&naviParam=MK,03,06,01"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 다문화 · 탈북(이주 · 북한배경)학생 멘토링장학금 → https://www.kosaf.go.kr/ko/mkinfo.do?pg=PTMKKsSrvMntoringCult_01M&naviParam=MK,03,03,01"
+  },
+  {
+   "at": "2026-11-20 09:42 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 재능봉사 캠프 → https://portal.kosaf.go.kr/CO/jspAction.do?forwardOnlyFlag=Y&forwardPage=pt/mk/contents/PTMKKsSrvMntoringCamp_01M&ignoreSession=Y&naviParam=MK,03,02,01,01 (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 13:10 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 우등장학생 → http://www.kwangnam.co.kr/ab-1923-19"
+  },
+  {
+   "at": "2026-11-20 13:10 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → http://www.jinjukang.org/im/technote/read.cgi?board=news&y_number=339"
+  },
+  {
+   "at": "2026-11-20 13:10 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 체육장학금 → https://spowell.kspo.or.kr/bbs/welfare/1339?mSn=7395 (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 13:10 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 다자녀가정 특별지원사업 → https://www.samcheok.go.kr/media/00083/00089.web?amode=view&idx=142862"
+  },
+  {
+   "at": "2026-11-20 13:10 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 영·호남 상생 장학생 → https://www.ikw.ac.kr/board/detail.tc?mn=2589&mngNo=94&pageSeq=1929&boardNo=335595 (확인: 1)"
+  },
+  {
+   "at": "2026-11-20 13:13 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 석천 이장우 학업지원(자립지원) → https://www.heavenswell.org/bbs/board.php?bo_table=offer&wr_id=17"
+  },
+  {
+   "at": "2026-11-20 13:13 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 석천 이장우 학업지원(성적우수) → https://www.heavenswell.org/bbs/board.php?bo_table=offer&wr_id=17"
+  },
+  {
+   "at": "2026-11-20 13:13 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 석천 이장우 학업지원(특기우수) → https://www.heavenswell.org/bbs/board.php?bo_table=offer&wr_id=17"
+  },
+  {
+   "at": "2026-11-20 13:13 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 석천 이장우 학업지원(자원봉사) → https://www.heavenswell.org/bbs/board.php?bo_table=offer&wr_id=17"
+  },
+  {
+   "at": "2026-11-20 13:13 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학생 장학생 → https://www.tncfoundation.org/Notice/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=175681717&t=board"
+  },
+  {
+   "at": "2026-11-20 13:13 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 영호남 상생 장학생 → https://www.jntle.kr/main/board/2/read/2686"
+  },
+  {
+   "at": "2026-11-20 13:59 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 교통사고 생계지원금 → https://www.fordrivers.or.kr/board/selectBoardArticle.do?menuId=1070100&bbsId=BBSMSTR_000000000032&nttId=10745&pageIndex=1&cateCode=&searchCnd=0&searchWrd="
   }
  ]
 }

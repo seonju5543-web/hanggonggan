@@ -152,15 +152,26 @@ vm.runInContext([
     'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'JUNK_CHARS', 'OCR_URL_GARBLE', 'TIDY_SKIP_KEY', 'OCR_TEXT_KEY', 'OCR_MARK'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
   ...['esc', 'unent', 'tidyOcr', 'tidyText', 'tidyData', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // knownValue: 층2 공고 안내 칸 값이 부른다 · attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
-    'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy'].map(takeFn),
+    'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy',
+    'formPdfsFor', 'docPdfsFor', 'pdfRowHtml', 'attachPdfRowsHtml', 'sheetAttachments'].map(takeFn),   // 「첨부」 칸 — 위 PDF 줄 · 맨 밑 올린 목록(2026-11-20 승인 시안)
   /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
   'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
+  'var formsPdfIndex = { items: {} }; var docsPdfIndex = { items: {} };',   // 아래에서 앱이 받는 색인 그대로 넣는다
   /* 「공고 안내」 블록(NS_LABELS … noticeSummaryHtml) — 활동 시트의 셋째 칸을 앱 함수 그대로 그린다(test-collector 「공고 카드 품질」과 같은 자르기) */
   appSrc.slice(appSrc.indexOf('const NS_LABELS = ['), appSrc.indexOf('\nfunction sourceNoteHtml(')),
 ].join('\n\n'), linkCtx, { filename: 'app.js(링크 자리)' });
 linkCtx.joinSpacedSyllables = ME.joinSpacedSyllables;   // noticeSummaryHtml 의 tidyChars 가 쓴다(match-engine)
 linkCtx.stripListNumber = ME.stripListNumber;   // noticeSummaryRows 의 번호 떼기도 match-engine 한 곳(2026-11-17)
 const linkFn = (n) => vm.runInContext(n, linkCtx);
+/* 「첨부」 칸 (2026-11-20 승인 시안 · docs/designs/all-docs-pdf.md) — 앱이 받는 두 사본 색인을 넣고 앱 함수(attachPdfRowsHtml · sheetAttachments)로 그대로 센다 */
+for (const [k, rel] of [['formsPdfIndex', '../data/forms-pdf/index.json'], ['docsPdfIndex', '../data/docs-pdf/index.json']]) {
+  try { linkCtx[k] = linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(rel, import.meta.url), 'utf8'))); } catch { /* 없으면 빈 색인 — 앱도 그때 PDF 줄이 없다 */ }   // 앱처럼 다듬는다
+}
+function attachLines(it) {
+  const atts = linkFn('sheetAttachments')(it.attachments);
+  const rows = [...String(linkFn('attachPdfRowsHtml')(it, atts)).matchAll(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/g)].map((m) => `${htmlText(m[2])}${/data\/(forms|docs)-pdf\//.test(m[1]) ? ' (사본)' : ''}`);
+  return [`   ─ 첨부 — 위 PDF 줄 ${rows.length}개${rows.length ? ` · ${rows.join(' · ').slice(0, 90)}` : ''} · 맨 밑 올린 목록 ${atts.length}개`];
+}
 const LEDGER = new URL('../data/link-check.json', import.meta.url);
 const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;
 linkFn('setLinkChecks')(ledger);
@@ -171,6 +182,33 @@ const htmlText = (h) => stripTags(h).replace(/&amp;/g, '&');
 const hrefIn = (h) => ((String(h).match(/\shref="([^"]*)"/) || [])[1] || '').replace(/&amp;/g, '&');
 const CLS_WORD = { post: '그 공고 하나로 가는 주소', list: '게시판 목록이 열린다', home: '사이트 첫 화면이 열린다', trouble: '로봇이 「그 공고가 아니었다」를 확정', none: '열 주소가 없다' };
 /* 화면 자리마다 실제로 찍히는 이름 — 정식 등록·층2(sch) · 게시판 글 카드(card) · 활동 시트(activity) */
+/* ── 신청서 양식 칸 — 양식 작성 화면 머리·신청 준비 시트가 그리는 줄 (2026-11-20) ─────────────
+   로봇이 원본을 PDF 로 바꾼 줄(data/forms-pdf · 「원본 양식 그대로 보기」) + 공고문에서 뗀 서식 쪽(data/form-pages) + 신청서로 보이는 첨부.
+   첨부가 신청서인가는 앱의 attIsForm 을 **가져다 쓴다**(로봇이 원본 내용으로 가른 색인 roles 가 먼저 · 없으면 data.js isApplicationForm) */
+const formsIdx = (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/forms-pdf/index.json', import.meta.url), 'utf8')); } catch { return { items: {} }; } })();
+const pagesIdx = (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/form-pages/index.json', import.meta.url), 'utf8')).items || {}; } catch { return {}; } })();
+const appIsForm = (() => {
+  const ds = fs.readFileSync(new URL('../data.js', import.meta.url), 'utf8');
+  const take = (n) => { const m = ds.match(new RegExp(`^function ${n}\\([\\s\\S]*?^\\}`, 'm')); if (!m) throw new Error(`data.js 에서 ${n}() 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.`); return m[0]; };
+  return new Function('formsPdfIndex', `${take('isFormAttachment')}\n${take('isApplicationForm')}\n${takeFn('attIsForm')}\nreturn attIsForm;`)(formsIdx);
+})();
+function formSlotLines(sch) {
+  if (sch.sourceKind === 'kosaf') return [];
+  const pdfs = (formsIdx.items || {})[sch.id] || [];
+  const pages = (pagesIdx[sch.id] || []).filter((f) => f && f.file);
+  const pdfNames = new Set(pdfs.map((f) => f.name));
+  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && appIsForm(sch, a) && !pdfNames.has(a.name));
+  const roles = (formsIdx.roles || {})[sch.id] || {};
+  const n = pdfs.length + pages.length + atts.length;
+  const out = [`   ─ 신청서 양식 칸 (${n}줄${n ? '' : ' · 칸 없음'})`];
+  for (const f of pdfs) out.push(`       · 원본 양식 그대로 보기 — ${String(f.name).slice(0, 70)}${roles[f.name] ? ' (원본 내용으로 신청서라 봄)' : ''}`);
+  for (const f of pages) out.push(`       · ${String(f.name || '공고문 안 신청서 서식').slice(0, 70)}`);
+  for (const a of atts) out.push(`       · 첨부 — ${String(a.name).slice(0, 70)} (PDF 사본 아직 없음)`);
+  const out2 = Object.entries(roles).filter(([, r]) => r === 'notice').map(([nm]) => nm);
+  if (out2.length) out.push(`       (칸에서 뺀 첨부 — 속이 안내문: ${out2.join(' · ').slice(0, 80)})`);
+  return out;
+}
+
 function linkLines(it, where) {
   const L = linkFn('sourceLink')(it, 'detail');
   const out = [`   ─ 원문 링크 — ${L.kind} (${CLS_WORD[L.cls] || L.cls})${ledger ? '' : ' · 확인 장부 없음(주소 꼴만 봄)'}`];
@@ -212,6 +250,7 @@ function linkLines(it, where) {
     out.push(`   ─ 제출 서류 (${(it.documents || []).length}줄${(it.documents || []).length ? '' : ' · 칸 접힘'})`);
     for (const d of it.documents || []) out.push(`       · ${String(d).slice(0, 84)}`);
     out.push(`   ─ 신청서 양식 PDF ${pdfs.length}개${pdfs.length ? ` (${pdfs.map((f) => f.name).join(' · ').slice(0, 80)})` : ' · 칸 접힘'} · 첨부 ${(it.attachments || []).length}개 · 마감 ${it.deadline || '(없음)'}`);
+    out.push(...attachLines(it));
   }
   return out;
 }
@@ -231,6 +270,7 @@ function kosafFitLines(sch) {
     const v = ME.requirementMatch(text, p, sch);
     out.push(`       ${v === 'ok' ? '✓' : v === 'no' ? '✕' : '?'} ${group ? `[택1 ${group}] ` : ''}${String(text).slice(0, 84)}`);
   }
+  out.push(...attachLines(sch));   // 「첨부」 칸 — 위 PDF 줄 · 맨 밑 올린 목록(2026-11-20)
   return out;
 }
 
@@ -301,7 +341,10 @@ function pressRoute(sch) {
   }
   if (got[0] === 'doc') return `서류 도우미 (${run('essayDefsFor')(s).map((d) => d.doc).join(' · ')})`;
   if (got[0] === 'prep') {
-    const n = (s.attachments || []).filter(run('isFormAttachment')).length;
+    /* 앱 신청서 칸과 같은 셈 — 로봇이 원본 내용을 읽고 이름과 다르게 가른 것(forms-pdf 색인 roles · app-live attIsForm)이 먼저 (2026-11-20) */
+    const roles = (() => { try { return (JSON.parse(fs.readFileSync(new URL('../data/forms-pdf/index.json', import.meta.url), 'utf8')).roles || {})[s.id] || {}; } catch { return {}; } })();
+    const isForm = run('isFormAttachment');
+    const n = (s.attachments || []).filter((a) => (roles[a.name] ? roles[a.name] === 'form' : isForm(a))).length;
     return `신청 준비 시트 — 확인을 눌러야 담긴다 (내려받을 신청서 양식 첨부 ${n}개)`;
   }
   return `(알 수 없음: ${got.join(',') || '아무것도 안 부름'})`;
@@ -401,7 +444,9 @@ for (const sch of hits) {
   for (const l of exLines) console.log(`       ✗ ${String(l).slice(0, 84)}`);
   const why = (result.reasons || []).filter((r) => /미달|없어|불가/.test(r));
   if (why.length) console.log(`   ─ 미달 사유\n       ${why.map((w) => w.slice(0, 90)).join('\n       ')}`);
+  for (const l of attachLines(sch)) console.log(l);
   for (const l of linkLines(sch, 'sch')) console.log(l);
+  for (const l of formSlotLines(sch)) console.log(l);
 }
 
 if (feedMode && !showFeedLinks(q)) {

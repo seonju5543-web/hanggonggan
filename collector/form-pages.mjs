@@ -16,14 +16,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { noticeDocFiles, loadNoticeDocIndex } from './attachment-text.mjs';
+import { sameTitle } from './detail-url.mjs';
+import { sofficeToPdf } from './soffice.mjs';   // LibreOffice 변환 한 곳(전용 프로필 · 시한 · 변환기 말) — 신청서 PDF 로봇과 같이 쓴다
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const BUDGET_SEC = Number(process.env.FORM_PAGES_BUDGET_SEC || 240);
 export const MAX_PDF_BYTES = 5 * 1024 * 1024;
 export const MAX_PAGES = 60;   // 이보다 긴 PDF 는 공고문이 아니다(요강집) — 건너뛴다
 export const CONVERTIBLE = /\.(pdf|hwp|hwpx|docx?)$/i;   // HWP·HWPX·DOC·DOCX 공고문은 LibreOffice(+H2Orestart)로 PDF 를 만들어 본다 — form-pdf.mjs 와 같은 길
-export const SOFFICE_TIMEOUT_MS = 60000;
 
 /* ── 쪽 판정 ─────────────────────────────────────────────────────────────────── */
 /* 강한 표식: 표식만 든 짧은 줄(서식 머리) · 서명란 · 서식 제목 한 줄 */
@@ -74,11 +76,12 @@ export const rangeLabel = (ranges) => ranges.map(([a, b]) => (a === b ? `${a}` :
 /* ── 대상 고르기(순수) ──────────────────────────────────────────────────────── */
 export const isOpen = (due, today) => !due || String(due) >= today;
 /** 층1·층2에서 받을 공고문 PDF 목록 — [{ id, name, due, files:[{ src, name }] }] */
-export function pickPageTargets({ registered = [], kosaf = [], eligIndex = {}, today, extractedDir, kosafDir, exists = fs.existsSync, readdir = fs.readdirSync }) {
+export function pickPageTargets({ registered = [], kosaf = [], eligIndex = {}, today, extractedDir, kosafDir, exists = fs.existsSync, readdir = fs.readdirSync, filesFor = null }) {
   const out = [];
   for (const it of registered) {
     if (!it || !it.id || it.program || !isOpen(it.deadline, today)) continue;
-    const files = ((eligIndex[it.id] || {}).files || []).filter((f) => CONVERTIBLE.test(f)).map((f) => ({ src: path.join(extractedDir, f), name: f }))
+    /* filesFor — 공고문 첨부 고르기(attachment-text noticeDocFiles · 2026-11-20): 신청서 쪽으로 받았지만 속이 공고문(+뒷장 서식)인 원본도 본다 */
+    const files = (filesFor ? filesFor(it) : ((eligIndex[it.id] || {}).files || [])).filter((f) => CONVERTIBLE.test(f)).map((f) => ({ src: path.join(extractedDir, f), name: f }))
       .filter((f) => exists(f.src));
     if (files.length) out.push({ id: it.id, name: it.name || it.id, due: it.deadline || '', files });
   }
@@ -130,19 +133,12 @@ export function extractRanges(src, ranges, outPath) {
 }
 
 /** PDF 가 아닌 공고문 → 임시 PDF (soffice). 돌려주는 경로는 부른 쪽이 지운다 */
-/* 전용 프로필 — form-pdf.mjs 와 같은 이유(러너의 root 소유 프로필 폴더 · 2026-10-27). 실행마다 하나. */
-let LO_PROFILE = null;
-export function loProfileArg() {
-  if (!LO_PROFILE) { LO_PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lo-profile-')); }
-  return `-env:UserInstallation=${pathToFileURL(LO_PROFILE).href}`;
-}
 export function toPdf(src, { soffice = process.env.FORM_PAGES_SOFFICE || 'soffice' } = {}) {
   if (/\.pdf$/i.test(src)) return { ok: true, pdf: src, temp: false };
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'form-pages-conv-'));
-  const r = spawnSync(soffice, ['--headless', '--norestore', loProfileArg(), '--convert-to', 'pdf', '--outdir', work, src], { encoding: 'utf8', timeout: SOFFICE_TIMEOUT_MS });
-  if (r.error) { fs.rmSync(work, { recursive: true, force: true }); return { ok: false, why: r.error.code === 'ETIMEDOUT' ? '변환 시간 초과' : `변환기 없음(${soffice})` }; }
-  const made = path.join(work, `${path.basename(src).replace(/\.[^.]+$/, '')}.pdf`);
-  if (!fs.existsSync(made)) { fs.rmSync(work, { recursive: true, force: true }); return { ok: false, why: `변환기가 못 읽음(${(src.match(/\.(\w+)$/) || [, '?'])[1]})${/could not be loaded/.test(r.stdout + r.stderr) ? ' — 가져오기 확장(H2Orestart) 필요' : ''}` }; }
+  const conv = sofficeToPdf(src, work, { soffice });   // 실패 문구는 soffice.mjs 한 곳(신청서 PDF 로봇과 같은 말 · 변환기가 한 말까지)
+  if (!conv.ok) { fs.rmSync(work, { recursive: true, force: true }); return { ok: false, why: conv.why }; }
+  const made = conv.made;
   return { ok: true, pdf: made, temp: true, work };
 }
 export const safeName = (name) => String(name || '').replace(/\.[^.]+$/, '').replace(/[^0-9A-Za-z가-힣._-]+/g, '_').slice(0, 50) || 'doc';
@@ -180,7 +176,11 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
   const reportPath = path.join(root, 'collector', 'form-pages-report.md');
   let index = { updatedAt: today, items: {} };
   try { const j = JSON.parse(fs.readFileSync(indexPath, 'utf8')); if (j && j.items) index = j; } catch { /* 첫 실행 */ }
-  const targets = pickPageTargets({ registered: reg, kosaf, eligIndex, today, extractedDir: path.join(root, 'collector', 'extracted'), kosafDir: path.join(root, 'data', 'kosaf-files') });
+  const extractedDir = path.join(root, 'collector', 'extracted');
+  /* 공고문 고르기는 attachment-text noticeDocFiles 한 곳 — 자격 색인 + 신청서 쪽에서 속이 공고문인 것(내용 판정 · 2026-11-20) */
+  const noticeIndex = loadNoticeDocIndex(extractedDir);
+  const filesFor = (it) => noticeDocFiles(it, { index: noticeIndex, sameTitle });
+  const targets = pickPageTargets({ registered: reg, kosaf, eligIndex, today, extractedDir, kosafDir: path.join(root, 'data', 'kosaf-files'), filesFor });
   const live = new Set(targets.map((t) => t.id));
   /* 🔴 대상이 하나도 없는데 색인에 공고가 있으면 지우지 않는다 — 색인(elig-docs.json)·사본 폴더를 못 읽은 실행(얕은 체크아웃 등)이 결과를 통째로 지우고 커밋한다(리뷰) */
   const skipPrune = !targets.length && Object.keys(index.items).length > 0;

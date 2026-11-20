@@ -478,6 +478,30 @@
    "source": "search",
    "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
    "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000438004"
+   },
+   "url": "https://www.namwon.go.kr/board/post/view.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e&postUid=9be51b0f9b7ccfee019be981374d2d74",
+   "title": "2026년 남원의 별 특별장학생 선발",
+   "note": "검색 색인에서 본 남원시청 게시판 글 — 세션이 직접 열지 못한 미확인 후보",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-20 · 남원시 사이트가 세션의 모든 접속 경로에서 400 — 로봇이 다른 망에서 확인)",
+   "addedAt": "2026-11-20"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000438004"
+   },
+   "url": "https://www.namwon.go.kr/board/post/view.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e&postUid=9be51b0f9b7ccfee019be97eae942c8d",
+   "title": "2026년 남원의 별 특별장학생 선발 안내",
+   "note": "검색 색인에서 본 남원시청 게시판 글 — 세션이 직접 열지 못한 미확인 후보",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-20 · 남원시 사이트가 세션의 모든 접속 경로에서 400 — 로봇이 다른 망에서 확인)",
+   "addedAt": "2026-11-20"
   }
  ]
 }
