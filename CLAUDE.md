@@ -82,8 +82,9 @@
    통과한 것만 자동 등록하고 리포트에 선조치후보고(끄기 `auto-register-config.json` `enabled:false` · 제거 `blockIds`). 애매한 건 '컨펌 대기'로
    리포트에만 — 컨펌은 채팅에서 개발자가 한다. 실시간 공고 피드(제목+링크)는 컨펌 없이 게재.
 3. **선조치후보고** — 방향 결정이 필요하면 최적안으로 먼저 조치하고 "어떤 상황에서 어떤 조치"를 보고.
-4. **양식 = 공고 첨부 신청서 원본 그대로**(2026-10-14 결정 6) — `collector/form-pdf.mjs` 가 PDF 사본을 `data/forms-pdf/` 에 두고 앱은 「원본 양식 그대로 보기」·「양식 채우기」(`formfill.js`). 앱이 양식을 다시 그리는 스키마화는 멈춤(`schematize-config.json` enabled:false · 있는 앱 양식은 그 공고가 닫힐 때까지).
+4. **양식 = 공고 첨부 신청서 원본 그대로**(2026-10-14 결정 6) — `collector/form-pdf.mjs` 가 PDF 사본을 `data/forms-pdf/` 에 두고 앱은 PDF 줄·「양식 채우기」(`formfill.js`). 앱이 양식을 다시 그리는 스키마화는 멈춤(`schematize-config.json` enabled:false · 있는 앱 양식은 그 공고가 닫힐 때까지).
    글꼴은 `collector/install-form-fonts.sh`(없으면 표가 깨진다). 관문 「신청서 원본 → PDF」.
+4-1. **공고문·안내문도 PDF**(2026-11-20 결정 · `docs/designs/all-docs-pdf.md`) — `collector/doc-pdf.mjs` 가 신청서 아닌 한글·워드(층2는 전부)를 바꾼다(원본 글자 98% 대조 · 못 미치면 원본만). 첨부 목록은 PDF 줄 위·올린 목록 맨 밑 그대로(`attachPdfRowsHtml` 한 곳 · 이름 그대로 · 회색 글씨 없음). 관문 「공고문 PDF 사본」.
 5. **정식 등록은 원본 첨부까지 한 세트** — ① 마감 전 등록 공고의 신청서 첨부는 로봇이 스스로 받는다(`pickFormBacklog` · 매일 · 못 받으면 사흘 쉼) ·
    그 밖은 `collector/run-deepfetch.txt` 에 `targets: 키워드` 적어 기본 브랜치 push(원본이 `collector/extracted/` 에 커밋되고 PDF 로봇이 잇는다) ② 새 `forms.json` 양식은 만들지 않는다(옛 `formId` 는 `verify/verify-registered.js`·
    `verify-forms-data.js` 로 검증) ③ 포털 입력형 등은 모든 수단(상세·첨부·재단 홈·정찰)을 쓴 뒤에만 묻는다. 채울 양식이 없으면 `noForm: "사유"`.
@@ -198,7 +199,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml`) — 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
-| `collector/schematize-forms.mjs` `form-pdf.mjs` `form-fields.mjs` | 양식 스키마화(멈춤) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart · 관문 「신청서 원본 → PDF」) · 쪽 그림·빈칸 자리(관문 「신청서 쪽 그림 · 빈칸 자리」) · LibreOffice 변환(전용 프로필·시한·변환기 말)은 `collector/soffice.mjs` 한 곳 |
+| `collector/schematize-forms.mjs` `form-pdf.mjs` `form-fields.mjs` `doc-pdf.mjs` | 양식 스키마화(멈춤) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart · 관문 「신청서 원본 → PDF」) · 쪽 그림·빈칸 자리(관문 「신청서 쪽 그림 · 빈칸 자리」) · LibreOffice 변환(전용 프로필·시한·변환기 말)은 `collector/soffice.mjs` 한 곳 · 공고문·안내문 → PDF(data/docs-pdf · 관문 「공고문 PDF 사본」) |
 | `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 재단 개별 공고 후보(확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
 | `collector/notice-source.mjs` `canon-url.mjs` `url-key.mjs` `clean-title.mjs` | '같은 공고인가'·'원문이 무엇인가' 규칙 한 곳 |
 | `collector/kosaf-*.mjs` | 층2 수확 · 첨부 사본 |

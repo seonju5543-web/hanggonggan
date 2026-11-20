@@ -1574,12 +1574,20 @@ textarea:focus {
 }
 .chat-form {
   display: flex;
+  align-items: center;              /* 입력 칸과 보내기 단추의 가운데를 맞춘다(2026-11-20 실측: 칸 49px · 단추 44px 이 위로만 맞아 어긋났다) */
   gap: 8px;
   padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
 }
+/* 🔴 칸 높이는 **44px 하나로 못 박는다** (2026-11-20 개발자 제보 "입력 칸을 눌렀을 때 레이아웃이 어긋남").
+   예전엔 min-height 만 있어 줄 높이(본문 1.6 × 16px)+위아래 여백으로 49px 이 됐고, 보내기 단추(44px)와
+   윗선만 맞아 아래가 5px 삐져나왔다. 거기에 공용 `input:focus` 의 둘레 그림자(--ring)가 눌렀을 때만 얹혀
+   칸이 한 번 더 굵어 보였다. 줄 높이·상자 크기를 정하고, 눌렀을 때는 테두리 색만 바꾼다. */
 #chat-input {
   flex: 1;
+  box-sizing: border-box;
+  height: 44px;
   min-height: 44px;
+  line-height: 20px;
   padding: 11px 15px;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
@@ -1588,7 +1596,11 @@ textarea:focus {
   font-family: inherit;
   color: var(--text);
 }
-#chat-input:focus { outline: none; border-color: var(--primary); background: var(--surface); }
+#chat-input:focus { outline: none; border-color: var(--primary); background: var(--surface); box-shadow: none; }
+/* 키보드가 올라와 보이는 높이가 줄었을 때(chat.js chatFitKeyboard) — 추천 질문 줄을 접고, 아래 안전 여백(홈 막대 자리)은
+   키보드가 이미 덮고 있으니 뺀다. 남은 높이를 대화 목록에 준다. */
+.chat-sheet.kbd-open .chat-chips { display: none; }
+.chat-sheet.kbd-open .chat-form { padding-bottom: 10px; }
 .chat-send {
   width: 44px;
   height: 44px;
@@ -5248,7 +5260,6 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .fill-pin:focus { outline: none; border-color: var(--accent); background: var(--surface); }
 .fill-undo { white-space: nowrap; }
 .fill-open { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); width: 100%; margin: var(--space-4) 0 var(--space-8); padding: var(--space-12) var(--space-16); background: var(--accent-soft); color: var(--text); border: 1px solid var(--accent-line); text-align: left; }
-.fill-open-m { font-size: var(--t-xs); color: var(--text-sub); font-weight: 500; }
 .fill-slot { list-style: none; }
 @media (max-width: 759px) {
   .fill-panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; border-radius: var(--radius) var(--radius) 0 0; box-shadow: var(--shadow-sheet); transform: translateY(calc(100% - 52px)); transition: transform 0.22s ease; max-height: 62vh; overflow: auto; padding-top: 0; }

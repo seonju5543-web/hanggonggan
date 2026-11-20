@@ -11,7 +11,7 @@ on:
     branches: ['claude/nice-heisenberg-WESq5']
     paths:
       - 'collector/run-deepfetch.txt'   # 이 파일을 수정해 push하면 자동 실행
-  # 매일 03:33 KST (2026-10-23) — 「원본 양식 그대로 보기」(forms-pdf)·「공고문 안 신청서 서식」(form-pages)은 이 워크플로만 만드는데
+  # 매일 03:33 KST (2026-10-23) — 신청서 PDF 줄(forms-pdf)·「공고문 안 신청서 서식」(form-pages)은 이 워크플로만 만드는데
   # 수동·push-to-run 뿐이라 10-16 뒤로 멈춰 새 공고에 양식이 한 건도 붙지 않았다(앱이 받는 data/form-pages/index.json 은 만들어진 적도 없어 「앱 반영 점검」이 매일 빨간불).
   # 홀수 분 · 다른 로봇과 다른 분(관문 「예약 겹침」) · 새벽이라 학교 서버·수집 로봇과 겹치지 않는다.
   schedule:
@@ -41,7 +41,7 @@ jobs:
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
-    timeout-minutes: 54   # 첨부 원본 내려받기 + OCR 4분 (2026-09-17) + 신청서 PDF 8분 (2026-10-12) + 저장 앞 관문 5 · 되돌리기 7 (2026-11-15 G-16)
+    timeout-minutes: 64   # 첨부 원본 내려받기 + OCR 4분 (2026-09-17) + 신청서 PDF 8분 (2026-10-12) + 저장 앞 관문 5 · 되돌리기 7 (2026-11-15 G-16) + 공고문 PDF 10분 (2026-11-20)
     steps:
       - uses: actions/checkout@v7
 
@@ -102,7 +102,7 @@ jobs:
           title: 🚨 신청서 원본 → PDF 단계가 넘어졌어요
           label: form-pdf-step
           body: |
-            신청서 원본을 PDF 로 바꾸는 단계가 끝까지 가지 못했습니다(글꼴·HWP 확장 설치 또는 변환). 그동안 앱의 「원본 양식 그대로 보기」 줄은 옛 사본으로 남습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            신청서 원본을 PDF 로 바꾸는 단계가 끝까지 가지 못했습니다(글꼴·HWP 확장 설치 또는 변환). 그동안 앱의 신청서 PDF 줄은 옛 사본으로 남습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       - name: ✅ 신청서 원본 → PDF 단계 회복 — 경보 닫기
         if: always() && steps.formpdf.outcome == 'success'
         timeout-minutes: 1
@@ -113,6 +113,43 @@ jobs:
           mode: resolve
           title: 🚨 신청서 원본 → PDF 단계가 넘어졌어요
           label: form-pdf-step
+      # 공고문 → PDF (2026-11-20 개발자 결정 "한글이나 독스는 폰에서 바로 안열리니까 … 학생이 열 수 있는 공고들은 다 pdf 로" · docs/designs/all-docs-pdf.md)
+      # collector/doc-pdf.mjs — 마감 전 공고의 한글·워드 첨부(신청서 제외 · 층2 재단 공고문은 전부)를 PDF 로 data/docs-pdf/ 에 · 원본 글자 98% 대조.
+      # 보강 단계(시한 + continue-on-error + 경보 짝) · 설치는 위 단계가 넘어졌을 수 있어 한 번 더(잠금 대기) · pdftotext(poppler)·olefile 은 글자 대조용.
+      - name: 공고문 → PDF (첨부 원본 그대로)
+        id: docpdf
+        timeout-minutes: 10
+        continue-on-error: true
+        # 예산 270초 + 파일 하나 최대 130초(받기 30 · 변환 60 · 글자 뽑기 20×2 — doc-pdf FILE_MAX_SEC) + 설치 여유 3분 ≤ 10분(관문 「공고문 PDF 사본 — 배선」 ④) · 처음 밀린 74개(11-20)는 며칠에 나눠 잇는다
+        env:
+          DOC_PDF_BUDGET_SEC: '270'
+        run: |
+          sudo apt-get install -y -qq -o DPkg::Lock::Timeout=120 libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum fonts-noto-cjk poppler-utils
+          pip install olefile --quiet
+          bash collector/install-h2orestart.sh
+          bash collector/install-form-fonts.sh
+          node collector/doc-pdf.mjs
+      - name: 🚨 공고문 → PDF 단계 실패 알림
+        if: always() && steps.docpdf.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 공고문 → PDF 단계가 넘어졌어요
+          label: doc-pdf-step
+          body: |
+            공고문·안내문(한글·워드)을 PDF 로 바꾸는 단계가 끝까지 가지 못했습니다(설치 또는 변환). 그동안 앱은 옛 사본만 PDF 줄로 보이고, 새 공고는 원본만 맨 밑에 보입니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: ✅ 공고문 → PDF 단계 회복 — 경보 닫기
+        if: always() && steps.docpdf.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 공고문 → PDF 단계가 넘어졌어요
+          label: doc-pdf-step
       # 신청서 쪽 그림 + 빈칸 자리 (양식 5단계 「원본 위에 답 얹기」의 재료 · 2026-10-31 · collector/form-fields.mjs) — 위 PDF 사본마다 쪽 그림(WebP)과
       # 이름표 옆 빈칸 자리(fields.json)를 만든다. 앱의 「양식 채우기」(formfill.js)가 그 위에 학생 답을 얹는다. 보강 단계(시한 + continue-on-error) · 경보 짝.
       # 🔴 설치 실패를 true 로 덮어 삼키지 않는다(위 PDF 단계와 같은 규칙 · 관문 ⑨가 이 구간의 글자를 본다) · Pillow 가 없으면 로봇이 PNG 로 두고 리포트에 센다(멈추지 않는다).
@@ -147,12 +184,35 @@ jobs:
           label: form-fields-step
       # 공고문 뒷장의 신청서 서식 쪽 떼기 (2026-10-13 · collector/form-pages.mjs) — 층1 공고문 첨부 + 층2 재단 공고문 사본의 서식 쪽만 떼어 data/form-pages/ 에.
       # 보강 단계(시한 + continue-on-error) · poppler-utils 는 위 PDF 글자 단계가 깔았다(여기서 한 번 더 — 그 단계가 실패했을 수 있다) · HWP·HWPX 는 위 단계의 LibreOffice+확장을 쓴다.
+      # 🔴 경보 짝·잠금 대기가 빠져 있었다(2026-11-20 · CLAUDE.md 매 세션 7) — 넘어져도 초록불이라 '서식 쪽 0건'을 아무도 모르고, 끊긴 앞 단계 설치 잠금에 0초 실패할 수 있었다(#669 와 같은 구멍).
       - name: 공고문 뒷장 서식 쪽 떼기
+        id: formpages
         timeout-minutes: 6
         continue-on-error: true
         run: |
-          sudo apt-get install -y -qq poppler-utils
+          sudo apt-get install -y -qq -o DPkg::Lock::Timeout=120 poppler-utils
           node collector/form-pages.mjs
+      - name: 🚨 공고문 뒷장 서식 쪽 떼기 단계 실패 알림
+        if: always() && steps.formpages.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 공고문 뒷장 서식 쪽 떼기 단계가 넘어졌어요
+          label: form-pages-step
+          body: |
+            공고문 뒷장의 신청서 서식 쪽을 떼는 단계가 끝까지 가지 못했습니다. 그동안 앱의 「공고문 안 신청서 서식」 줄은 옛 장부로 남습니다(새 공고엔 안 생깁니다). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: ✅ 공고문 뒷장 서식 쪽 떼기 단계 회복 — 경보 닫기
+        if: always() && steps.formpages.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 공고문 뒷장 서식 쪽 떼기 단계가 넘어졌어요
+          label: form-pages-step
 
       # 🔴 저장 직전 관문 (2026-11-15 · 노션 G-16 · 관문 「로봇·도구 점검 관문」 savegate): data/ 를 쓰는 로봇은 규칙 관문(test-collector)과
       #    데이터 감사(audit-data)를 저장 앞에 거친다. 관문 없이 저장한 파일이 규칙을 어기면 그날 돈 다른 로봇 전부가 제 결과를 되돌린다(10-13 사냥꾼).
@@ -172,7 +232,7 @@ jobs:
         if: steps.audit.outcome == 'failure'
         timeout-minutes: 7
         run: |
-          node collector/gate-guard.mjs --note /tmp/gate-note.md --keep-preexisting --stage data/forms-pdf,data/form-pages,collector/extracted || { git checkout -- data/forms-pdf data/form-pages collector/extracted 2>/dev/null; git clean -fdq -- data/forms-pdf data/form-pages collector/extracted; }
+          node collector/gate-guard.mjs --note /tmp/gate-note.md --keep-preexisting --stage data/forms-pdf,data/docs-pdf,data/form-pages,collector/extracted || { git checkout -- data/forms-pdf data/docs-pdf data/form-pages collector/extracted 2>/dev/null; git clean -fdq -- data/forms-pdf data/docs-pdf data/form-pages collector/extracted; }
 
       # 저장은 관문이 초록일 때만 — 처음 통과 · 되돌려서 통과 · 다시 재니 통과(flaky) · 원래 있던 빨간불(kept-preexisting). 끝내 빨가면 저장하지 않는다.
       - name: 저장
@@ -183,6 +243,8 @@ jobs:
           git add collector/extracted
           [ -d data/forms-pdf ] && git add -A data/forms-pdf
           [ -f collector/form-pdf-report.md ] && git add collector/form-pdf-report.md
+          [ -d data/docs-pdf ] && git add -A data/docs-pdf
+          [ -f collector/doc-pdf-report.md ] && git add collector/doc-pdf-report.md
           [ -f collector/form-fields-report.md ] && git add collector/form-fields-report.md
           [ -d data/form-pages ] && git add -A data/form-pages
           [ -f collector/form-pages-report.md ] && git add collector/form-pages-report.md

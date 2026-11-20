@@ -261,9 +261,19 @@ function chatFocusSch() {
 }
 
 /* 질문이 가리키는 공고 하나를 고른다 — 이름으로 못 찾으면 앞에서 말한 그 공고 */
+/* 찾은 공고의 **이름·기관**에 물은 낱말(같은 뜻 무리 포함)이 들어 있는가 — 본문에서만 걸린 것은 '그 공고'가 아니다 */
+function chatNameHit(m, q) {
+  const hay = `${m.sch.name || ''} ${/원문 확인|미확인/.test(String(m.sch.provider || '')) ? '' : m.sch.provider || ''}`.toLowerCase();
+  const raw = chatTokens(q);
+  return chatExpandWords(raw).some((w) => w.length >= 2 && hay.includes(w))
+    || raw.filter(chatIsChosung).some((w) => chatChosung(hay).includes(w));
+}
+
 function chatPickTarget(q) {
+  /* 🔴 **이름에서 찾은 것만** 그 공고로 본다 (2026-11-20). 본문 낱말만으로 고르면 `서류 뭐 준비해?` 가
+     본문에 '서류'가 든 아무 공고 하나의 서류를 답했다 — 일반 질문에는 일반 답(자주 요구하는 서류)이 맞다. */
   const hit = chatSearch(q, 1)[0];
-  if (hit) { chatRemember(hit.sch); return hit; }
+  if (hit && chatNameHit(hit, q)) { chatRemember(hit.sch); return hit; }
   const words = chatTokens(q);
   /* 가리키는 말이 있거나, 찾을 낱말이 아예 없으면(= "서류 뭐야?") 앞 공고를 뜻한다 */
   if (CHAT_PRONOUN.test(String(q)) || !words.length) return chatFocusSch();
@@ -471,13 +481,494 @@ function chatAnswerHelp() {
   return {
     text: '저는 이 앱이 갖고 있는 공고·서류·신청 현황만 보고 답해요. 모르면 모른다고 말씀드릴게요.',
     list: [
+      '"○○장학금 지원 자격 알려줘" — 그 공고의 자격 요건(내 정보로 ✓·✕)',
+      '"○○장학금 원문 링크" · "마감 언제야" · "서류" · "신청 방법" · "문의처" — 공고 한 건의 칸',
       '"지금 뭐 신청할 수 있어?" — 내 조건에 맞는 공고',
       '"마감 임박한 거 알려줘" — 마감이 확인된 순서대로',
       '"서류 뭐 준비해?" — 자주 요구하는 서류와 발급처',
       '"기숙사" 처럼 낱말만 — 그 낱말이 든 공고 찾기',
       '"내 신청 현황" — 준비한 장학금의 진행 단계',
+      '"서류함 어떻게 써?" · "알림 끄는 법" — 앱 사용법',
     ],
     note: '금액과 마감일은 공고 원문에만 있는 경우가 많아요. 그럴 때는 지어내지 않고 원문 링크를 알려 드려요.',
+  };
+}
+
+/* ============================================================
+   공고 한 건의 칸 묻기 · 지식(chat-kb.js) 답 (2026-11-20 개발자 지시)
+   ------------------------------------------------------------
+   *"공고의 세부적인 사항들에 대해 사용자가 요청했을때, 그에 대한 정확한 정보나 지침사항을
+   제시할 수 있어야함 ex) ~공고의 지원자격을 알려줘 / ~공고의 원문 링크는 뭐야?"*
+
+   🔴 칸마다 **앱이 이미 가진 값**만 쓴다 — 상세 시트와 같은 함수(requirementLines·sourceLink·dday·
+      submitChannelLabel)를 부른다. 문장은 원문 그대로(quotes)이고, 없으면 지어내지 않고 원문 링크를 준다.
+   🔴 어느 공고인지는 이름으로만 고른다(chat-nlu nluFindByName). 이름이 둘 이상에 걸리면 **고르지 않고
+      되묻는다** — 엉뚱한 공고의 마감을 말하는 것이 가장 해롭다.
+   ============================================================ */
+/* 토씨 — 받침이 있으면 앞 것(은·이·을), 없으면 뒤 것(는·가·를). 이름 끝의 괄호·기호는 건너뛰고 마지막 한글로 본다 */
+function chatJosa(word, withBatchim, without) {
+  const hs = String(word || '').match(/[가-힣]/g);
+  if (!hs) return `${withBatchim}(${without})`;
+  const c = hs[hs.length - 1].charCodeAt(0) - 0xac00;
+  return c % 28 ? withBatchim : without;
+}
+const chatEun = (w) => `'${w}'${chatJosa(w, '은', '는')}`;
+const chatEul = (w) => `${w}${chatJosa(w, '을', '를')}`;
+
+const CHAT_FIELD_WORD = {
+  elig: '지원 자격', link: '원문 링크', deadline: '마감', announce: '발표', amount: '금액', documents: '제출 서류',
+  attach: '첨부 파일', how: '신청 방법', contact: '문의처', count: '선발 인원', dup: '중복 수혜', provider: '주관 기관', summary: '정보',
+};
+
+/* 이름으로 고를 수 있는 것 전부 — 정식 등록(층2 포함) · 대외활동 · 우리 학교 게시판 글 */
+function chatFieldEntries() {
+  const regs = chatSafe(() => getMatches(), []).map((m) => ({
+    key: 'r:' + m.sch.id, m,
+    names: [m.sch.name, chatSafe(() => cardTitle(m.sch), ''), m.sch.boardTitle, `${m.sch.provider || ''} ${m.sch.name}`],
+  }));
+  const acts = chatSafe(() => (typeof activitiesForMe === 'function' ? activitiesForMe() : []), []).map((a) => ({
+    key: 'a:' + a.url, act: a, names: [a.title, `${a.host || ''} ${a.title}`],
+  }));
+  const notes = chatNotices().map((n) => ({ key: 'n:' + (n.url || n.title), notice: n, names: [n.title] }));
+  return regs.concat(acts, notes);
+}
+function chatEntryName(e) {
+  return e.m ? e.m.sch.name : e.act ? e.act.title : e.notice ? e.notice.title : '';
+}
+
+let chatFocusKey = null;      // 칸 묻기에서 마지막으로 말한 것(정식 등록·활동·게시판 글 모두) — "그거 링크는?"
+function chatFocusEntry() {
+  if (!chatFocusKey) return null;
+  return chatFieldEntries().find((e) => e.key === chatFocusKey) || null;
+}
+
+/* 질문이 가리키는 것 하나 — { entry } · 여럿이면 { ambiguous: [entry…] } · 없으면 null */
+function chatPickEntry(q) {
+  const entries = chatFieldEntries();
+  const found = chatSafe(() => nluFindByName(q, entries.map((e) => ({ key: e.key, names: e.names })), 6), []);
+  const top = found[0];
+  if (top && top.score >= 0.8) {
+    const byKey = (k) => entries.find((e) => e.key === k);
+    const close = found.filter((f) => f.score >= 0.8 && top.score - f.score < 0.035).map((f) => byKey(f.key)).filter(Boolean);
+    if (close.length > 1 && top.score < 0.999) {
+      /* 같은 공고가 여러 자리에 있다 — 정식 등록과 그 학교 게시판 글, 두 캠퍼스에 같은 제목으로 실린 등록.
+         🔴 이름이 같은 후보를 되묻기 칩으로 늘어놓으면 눌러도 또 같은 질문이 돌아온다(실측: 같은 제목 칩 둘).
+         정식 등록이 **한 이름**뿐이면 그것을 고른다(원문을 읽어 칸이 채워진 쪽) · 아니면 이름이 하나뿐일 때 그것. */
+      const nm = (e) => nluNorm(chatEntryName(e));
+      const regNames = [...new Set(close.filter((e) => e.m).map(nm))];
+      if (regNames.length === 1) return { entry: close.find((e) => e.m) };
+      const names = [...new Set(close.map(nm))];
+      if (names.length === 1) return { entry: close[0] };
+      const uniq = names.map((n) => close.find((e) => nm(e) === n));
+      return { ambiguous: uniq };
+    }
+    return { entry: byKey(top.key) };
+  }
+  /* 이름이 아니라 **뜻**으로 가리킨 것 — `기숙사 장학금 마감`(공고 이름엔 '생활관'·'Dorm').
+     낱말 검색(chatSearch · 같은 뜻 무리)이 **이름에서** 찾은 것만 쓴다(chatNameHit) — 본문에서만 걸린 것으로
+     칸을 답하면 엉뚱한 공고의 마감을 말하게 된다. 하나면 그것, 여럿이면 되묻는다. */
+  const rest = chatSafe(() => nluStripAsk(q), '');
+  if (rest && chatTokens(rest).length) {
+    const hits = chatSafe(() => chatSearch(rest, 4), []).filter((m) => chatNameHit(m, rest));
+    const ents = hits.map((m) => entries.find((e) => e.key === 'r:' + m.sch.id)).filter(Boolean);
+    if (ents.length === 1) return { entry: ents[0] };
+    if (ents.length > 1) return { ambiguous: ents };
+  }
+  /* 앞에서 말한 그것 — 가리키는 말이 있을 때만(chat.js ④ 와 같은 규칙: 한 턴만 · 엉뚱한 공고를 붙들지 않는다) */
+  if (CHAT_PRONOUN.test(String(q))) {
+    const f = chatFocusEntry();
+    if (f) return { entry: f };
+    const old = chatFocusSch();                          // 예전 기억(정식 등록 카드)
+    if (old) return { entry: entries.find((e) => e.key === 'r:' + old.sch.id) || null };
+  }
+  return null;
+}
+
+/* 원문 문장 중 꼴에 맞는 것 — 그대로 인용한다(지어내지 않는다) */
+function chatQuoteLines(lines, re, max = 4) {
+  const seen = new Set();
+  return (lines || []).map((t) => String(t && t.text != null ? `${t.label ? t.label + ' : ' : ''}${t.text}` : t || '').replace(/\s+/g, ' ').trim())
+    .filter((t) => t.length >= 4 && re.test(t) && !seen.has(t) && seen.add(t)).slice(0, max);
+}
+
+function chatLinkOf(item, surface) {
+  const link = chatSafe(() => sourceLink(item, surface), null);
+  const href = link ? chatSafe(() => safeUrl(link.href), '') : '';
+  /* 이름표에 이미 '↗' 가 붙어 오는 자리(source-link SURFACE_LABELS)가 있다 — 그리는 쪽이 하나 붙이므로 뗀다 */
+  const label = String(link.label || '원문 공고').replace(/\s*↗\s*$/, '');
+  return href ? { href, label, hint: link.hint || '', caution: link.caution || '' } : null;
+}
+
+function chatAnswerField(q) {
+  const field = chatSafe(() => nluField(q), null);
+  if (!field) return null;
+  const pick = chatPickEntry(q);
+  if (!pick) return null;
+  if (pick.ambiguous) {
+    return {
+      text: `이름이 비슷한 공고가 ${pick.ambiguous.length}건 있어요. 어느 것의 ${chatEul(CHAT_FIELD_WORD[field])} 알려 드릴까요?`,
+      asks: pick.ambiguous.slice(0, 4).map((e) => `${chatEntryName(e)} ${CHAT_FIELD_WORD[field]}`),
+      ambiguous: true,
+    };
+  }
+  const e = pick.entry;
+  if (!e) return null;
+  chatFocusKey = e.key;
+  if (e.m) return chatFieldRegistered(e.m, field);
+  if (e.act) return chatFieldActivity(e.act, field);
+  return chatFieldNotice(e.notice, field);
+}
+
+/* ---- 정식 등록 공고 ---- */
+function chatFieldRegistered(m, field) {
+  const s = m.sch;
+  const name = s.name;
+  const link = chatLinkOf(s, 'detail');
+  const linkActs = link ? { links: [link] } : {};
+  const card = { cards: [m] };
+  const ex = s.excerpts || [];
+  const kosaf = s.sourceKind === 'kosaf';
+  const fromKosaf = kosaf ? '한국장학재단에 재단이 적어 둔 내용이에요. ' : '';
+  const lead = (txt) => ({ text: txt, ...card });
+  const noneSay = (what) => ({
+    text: `'${name}' 공고에서 ${chatEul(what)} 따로 정리해 두지 못했어요.`,
+    note: link ? `아래 "${link.label}" 링크로 공고 글을 열어 보세요.` : '공고 상세를 열어 첨부·안내를 봐 주세요.',
+    ...linkActs, ...card,
+  });
+
+  if (field === 'link') {
+    if (!link) return { text: `${chatEun(name)} 연결할 원문 주소가 없어요.`, note: s.program ? '한국장학재단 공지에서 신청 기간을 확인해 주세요.' : '', ...card };
+    const notes = [];
+    if (link.hint) notes.push(`게시판 목록이 열려요 — 목록에서 "${link.hint}" 제목을 찾아 주세요.`);
+    if (link.caution) notes.push(link.caution);
+    return { text: `'${name}'의 링크예요.`, links: [link], note: notes.join(' '), ...card };
+  }
+
+  if (field === 'elig') {
+    const p = chatSafe(() => state.profile, null);
+    const lines = chatSafe(() => requirementLines(s, null, { all: true }), null) || (s.eligibilityLines || []);
+    const rows = lines.map((t) => {
+      const v = chatSafe(() => requirementMatch(t, p, s), null);
+      return `${v === 'ok' ? '✓' : v === 'no' ? '✕' : '·'} ${t}`;
+    });
+    const scope = [];
+    const el = s.eligibility || {};
+    if (el.schoolOnly) scope.push(`${el.schoolOnly}${el.campusOnly ? ' ' + el.campusOnly : ''} 학생 대상`);
+    if (el.minGpa != null) scope.push(`직전학기 평점 ${el.minGpa} 이상`);
+    if (el.maxBracket != null) scope.push(`학자금 지원구간 ${el.maxBracket}구간 이내`);
+    const all = [...scope.map((t) => `· ${t}`), ...rows];
+    if (!all.length) return noneSay('지원 자격');
+    const st = m.result && m.result.status;
+    const say = st === 'ineligible' ? '내 정보로 맞춰 보면 미달인 요건이 있어요(✕).'
+      : st === 'eligible' ? '내 정보로 맞춰 본 요건은 맞아요(✓).' : '';
+    return {
+      text: `'${name}'의 지원 자격이에요. ${say}`.trim(),
+      list: all.slice(0, 14),
+      note: `${fromKosaf}✓·✕는 내 정보로 맞춰 본 결과이고, · 표시는 내 정보로 판단할 수 없는 요건이에요.${all.length > 14 ? ' 나머지는 공고 상세에서 볼 수 있어요.' : ''}`,
+      ...card,
+    };
+  }
+
+  if (field === 'deadline' || field === 'announce') {
+    if (field === 'announce') {
+      const q = chatQuoteLines(ex, /발표|결과|선정/);
+      if (s.announceDate) return { text: `'${name}'의 발표일은 ${s.announceDate}이에요.`, quotes: q.length ? [{ name, lines: q }] : [], ...linkActs, ...card };
+      if (q.length) return { text: `'${name}'의 발표 관련 원문이에요.`, quotes: [{ name, lines: q }], ...linkActs, ...card };
+      return noneSay('발표일');
+    }
+    const q = chatQuoteLines(ex, /기간|마감|까지|접수|신청일|일시/);
+    if (s.deadline) {
+      const d = chatSafe(() => dday(s.deadline), { label: '', days: 0 });
+      const past = d.days < 0;
+      return {
+        text: `'${name}'의 마감은 ${s.deadline}${d.label ? `(${d.label})` : ''}이에요.${past ? ' 이미 지났어요.' : ''}${s.openDate ? ` 접수 시작은 ${s.openDate}이에요.` : ''}`,
+        quotes: q.length ? [{ name, lines: q }] : [],
+        note: s.period && !q.length ? `공고 기간 표시: ${s.period}` : '',
+        actions: past ? [] : [{ act: 'notify', label: '마감 알림 켜기' }],
+        ...card,
+      };
+    }
+    if (s.program) return { text: `${chatEun(name)} 상시 제도라 정해진 마감일이 없어요. 신청 기간은 매 학기 한국장학재단이 공지해요.`, note: s.period || '', ...linkActs, ...card };
+    if (q.length) return { text: `'${name}'의 접수 기간 관련 원문이에요.`, quotes: [{ name, lines: q }], ...linkActs, ...card };
+    return noneSay('마감일');
+  }
+
+  if (field === 'amount') {
+    const q = chatQuoteLines([...(s.amountLines || []), ...ex], /금액|만\s?원|원\b|지급|등록금|생활비/);
+    if (s.amountValue || s.amountNote) {
+      return {
+        text: `'${name}'의 금액은 ${s.amount || s.amountNote}이에요.`,
+        quotes: q.length ? [{ name, lines: q }] : [],
+        note: `${fromKosaf}실제 지급액은 선발 심사로 정해져요.`,
+        ...card,
+      };
+    }
+    if (q.length) return { text: `'${name}'의 금액 관련 원문이에요.`, quotes: [{ name, lines: q }], ...linkActs, ...card };
+    return noneSay('금액');
+  }
+
+  if (field === 'documents') {
+    const docs = (s.documents || []).filter((d) => !(typeof DOC_PLACEHOLDER !== 'undefined' && DOC_PLACEHOLDER.test(String(d || ''))));
+    if (!docs.length) {
+      const q = chatQuoteLines([...(s.eligibilityLines || []), ...ex], /서류|증명서|사본|확인서|신청서/);
+      return q.length ? { text: `'${name}'의 서류 관련 원문이에요.`, quotes: [{ name, lines: q }], ...linkActs, ...card } : noneSay('제출 서류');
+    }
+    const rows = docs.map((doc) => {
+      const st = chatSafe(() => docWalletStatus(doc), null);
+      return `${st && st.ok ? '✓' : '□'} ${String(doc).replace(/\s*\(.*\)$/, '')}${st && st.ok ? ' — 서류함에 있어요' : ''}`;
+    });
+    return {
+      text: `'${name}'에 필요한 서류예요.`, list: rows, ...card,
+      actions: [{ act: 'detail:' + s.id, label: '신청 준비하기' }, { act: 'mydocs', label: '서류함 열기' }],
+    };
+  }
+
+  if (field === 'attach') {
+    const atts = (s.attachments || []).filter((a) => a && !a.bodyImage && a.name).slice(0, 6);
+    if (!atts.length) return noneSay('첨부 파일');
+    const links = atts.map((a) => ({ href: chatSafe(() => safeUrl(a.url), ''), label: a.name })).filter((l) => l.href);
+    return {
+      text: `'${name}'의 첨부 파일이에요.`,
+      links: links.length ? links : undefined,
+      list: links.length ? [] : atts.map((a) => a.name),
+      note: '신청서 양식이 있는 공고는 상세 화면에서 "원본 양식 그대로 보기"·"양식 채우기"도 쓸 수 있어요.',
+      actions: [{ act: 'detail:' + s.id, label: '공고 상세 열기' }],
+      ...card,
+    };
+  }
+
+  if (field === 'how') {
+    const bits = [];
+    const quotes = [];
+    if (s.applyPortal) { bits.push(`${s.applyPortal}에서 온라인으로 신청해요.`); if (s.applyPortalSource) quotes.push(s.applyPortalSource); }
+    if (s.applyEmail) { bits.push(`메일(${s.applyEmail})로 접수해요.`); if (s.applyEmailSource) quotes.push(s.applyEmailSource); }
+    const label = chatSafe(() => submitChannelLabel(s), '');
+    if (!bits.length && label) bits.push(label);
+    quotes.push(...chatQuoteLines(ex, /신청\s?방법|접수\s?방법|지원\s?방법|제출\s?방법|방문|우편|온라인|홈페이지|이메일|접수처|제출처/, 3));
+    const qs = [...new Set(quotes.map((t) => String(t).replace(/\s+/g, ' ').trim()))].slice(0, 4);
+    if (!bits.length && !qs.length) return noneSay('신청 방법');
+    return {
+      text: `'${name}'의 신청 방법이에요. ${bits.join(' ')}`.trim(),
+      quotes: qs.length ? [{ name, lines: qs }] : [],
+      note: '최종 접수는 학교·재단의 공식 접수처에서 직접 해요. 앱은 신청 준비까지 도와드려요.',
+      actions: [{ act: 'detail:' + s.id, label: '신청 준비하기' }],
+      ...linkActs, ...card,
+    };
+  }
+
+  if (field === 'contact') {
+    const q = chatQuoteLines(ex, /문의|연락|전화|☎|tel|이메일|메일/i);
+    if (kosaf && s.contact) q.unshift(`문의 ${s.contact}`);
+    return q.length ? { text: `'${name}'의 문의처예요.`, quotes: [{ name, lines: q }], ...card } : noneSay('문의처');
+  }
+
+  if (field === 'count') {
+    const q = chatQuoteLines([...(s.eligibilityLines || []), ...ex], /인원|\d+\s?명|명\s?내외|명\s?이내/);
+    return q.length ? { text: `'${name}'의 선발 인원 관련 원문이에요.`, quotes: [{ name, lines: q }], ...card } : noneSay('선발 인원');
+  }
+
+  if (field === 'dup') {
+    const raw = s.exclusivity && s.exclusivity.raw ? String(s.exclusivity.raw).replace(/\s+/g, ' ').trim() : '';
+    const q = raw ? [raw] : chatQuoteLines([...(s.eligibilityLines || []), ...ex], /중복|타\s?장학|이중\s?수혜/);
+    if (q.length) return { text: `'${name}'의 중복 수혜 관련 원문이에요.`, quotes: [{ name, lines: q.slice(0, 3) }], ...card };
+    return noneSay('중복 수혜 조건');
+  }
+
+  if (field === 'provider') {
+    const prov = /원문 확인|미확인/.test(String(s.provider || '')) ? '' : s.provider;
+    if (!prov) return noneSay('주관 기관');
+    return lead(`${chatEun(name)} ${prov}에서 주는 ${s.type === '교내' ? '교내' : '교외'} 장학금이에요.`);
+  }
+
+  /* summary — 한눈에 */
+  const facts = [];
+  const prov = /원문 확인|미확인/.test(String(s.provider || '')) ? '' : s.provider;
+  if (prov) facts.push(`주관: ${prov} (${s.type === '교내' ? '교내' : '교외'})`);
+  if (s.amountValue) facts.push(`금액: ${s.amount}`);
+  if (s.deadline) facts.push(`마감: ${s.deadline} (${chatSafe(() => dday(s.deadline).label, '')})`);
+  else if (s.program) facts.push('마감: 상시 제도(매 학기 재단 공지)');
+  const ch = chatSafe(() => submitChannelLabel(s), '');
+  if (ch) facts.push(`접수: ${ch}`);
+  return {
+    text: s.summary ? `${s.summary}` : `'${name}' 공고예요.`,
+    list: facts,
+    note: '자격·서류·링크도 물어보실 수 있어요. 예: "그거 지원 자격 알려줘", "그거 링크"',
+    ...linkActs, ...card,
+  };
+}
+
+/* ---- 대외활동·공모전 ---- */
+function chatFieldActivity(a, field) {
+  const name = a.title;
+  const link = chatLinkOf(a, 'activity');
+  const base = { links: link ? [link] : undefined, actions: [{ act: 'activity:' + a.url, label: '글 열기' }] };
+  const ex = a.excerpts || [];
+  const q = (re) => chatQuoteLines(ex, re);
+  const none = (what) => ({ text: `'${name}' 글에서 ${chatEul(what)} 따로 정리해 두지 못했어요.`, note: '주최 측 페이지에서 봐 주세요.', ...base });
+  if (field === 'link') return link ? { text: `'${name}'의 링크예요.`, note: link.hint ? `목록에서 "${link.hint}" 제목을 찾아 주세요.` : '', ...base } : none('링크');
+  if (field === 'deadline' || field === 'announce') {
+    const lines = q(/기간|마감|접수|일정|발표/);
+    if (a.deadline && field === 'deadline') {
+      const d = chatSafe(() => dday(a.deadline), { label: '' });
+      return { text: `'${name}'의 마감은 ${a.deadline}${d.label ? `(${d.label})` : ''}이에요.`, quotes: lines.length ? [{ name, lines }] : [], ...base };
+    }
+    return lines.length ? { text: `'${name}'의 일정 관련 원문이에요.`, quotes: [{ name, lines }], ...base } : none(field === 'deadline' ? '마감일' : '발표일');
+  }
+  if (field === 'elig') {
+    const lines = (a.eligibilityLines || []).concat(q(/대상|자격|조건/)).filter((v, i, arr) => arr.indexOf(v) === i).slice(0, 8);
+    return lines.length ? { text: `'${name}'의 참가 대상이에요.`, quotes: [{ name, lines }], ...base } : none('참가 대상');
+  }
+  if (field === 'provider') return a.host ? { text: `${chatEun(name)} ${a.host}에서 여는 ${a.kind || '활동'}이에요.`, ...base } : none('주최');
+  const pat = { amount: /혜택|상금|시상|활동비|지원/, how: /신청|접수|방법|제출/, contact: /문의|연락|전화|메일/, count: /인원|명/, documents: /서류|제출/, attach: /첨부|양식|신청서/ }[field];
+  const lines = pat ? q(pat).concat(chatQuoteLines(a.noticeLines || [], pat, 3)) : [];
+  if (lines.length) return { text: `'${name}'의 ${CHAT_FIELD_WORD[field] || '관련'} 원문이에요.`, quotes: [{ name, lines: lines.slice(0, 5) }], ...base };
+  if (field === 'summary') {
+    const facts = [a.kind, a.host, a.deadline ? `마감 ${a.deadline}` : ''].filter(Boolean);
+    return { text: `'${name}' — ${facts.join(' · ')}`, ...base };
+  }
+  return none(CHAT_FIELD_WORD[field] || '그 내용');
+}
+
+/* ---- 우리 학교 게시판 글 (제목·링크만 아는 글) ---- */
+function chatFieldNotice(n, field) {
+  const link = chatLinkOf(n, 'chat');
+  const links = link ? [link] : undefined;
+  if (field === 'link') return link ? { text: `'${n.title}'의 링크예요.`, links } : { text: `${chatEun(n.title)} 연결할 주소가 없어요.` };
+  return {
+    text: `${chatEun(n.title)} 학교 게시판에서 모은 글이라 제목과 링크만 갖고 있어요. ${CHAT_FIELD_WORD[field] || '자세한 내용'}${chatJosa(CHAT_FIELD_WORD[field] || '내용', '은', '는')} 글을 열어 봐 주세요.`,
+    links,
+  };
+}
+
+/* ---------------- 지식(chat-kb.js) 답 ---------------- */
+let chatKbIndex = null;
+function chatKb() {
+  if (chatKbIndex) return chatKbIndex;
+  if (typeof kbIntents !== 'function' || typeof nluBuildIndex !== 'function') return null;
+  chatKbIndex = nluBuildIndex(kbIntents());
+  return chatKbIndex;
+}
+function chatKbClassify(q) {
+  const idx = chatKb();
+  return idx ? chatSafe(() => nluClassify(idx, q), null) : null;
+}
+let chatKbTurn = 0;
+function chatKbReply(id, q) {
+  const it = chatSafe(() => kbById(id), null);
+  if (!it) return null;
+  if (it.dyn) {
+    const fn = CHAT_DYN[it.dyn];
+    return fn ? chatSafe(() => fn(q), null) : null;
+  }
+  const r = it.reply || {};
+  const text = Array.isArray(r.text) ? r.text[(chatKbTurn++) % r.text.length] : r.text;
+  return { ...r, text };
+}
+
+/* 앱 데이터로 그때그때 만드는 답 — 이름은 chat-kb.js 의 dyn */
+const CHAT_DYN = {
+  applyable: () => chatAnswerApplyable(),
+  deadline: () => chatAnswerDeadline(),
+  amount: () => chatAnswerAmount(),
+  documents: (q) => chatAnswerDocuments(q),
+  howto: (q) => chatAnswerHowTo(q),
+  myapps: () => chatAnswerMyApps(),
+  help: () => chatAnswerHelp(),
+  today: () => {
+    const d = new Date();
+    const wd = '일월화수목금토'[d.getDay()];
+    return { text: `오늘은 ${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${wd}요일이에요.`, list: ['"오늘 마감"', '"이번 주 마감"'] };
+  },
+  dueToday: (q) => {
+    const week = /주|주말|7일/.test(String(q));
+    const tomorrow = /내일/.test(String(q));
+    const max = week ? 7 : tomorrow ? 1 : 0;
+    const list = chatApplyable().filter((m) => m.sch.deadline)
+      .map((m) => ({ m, d: chatSafe(() => dday(m.sch.deadline).days, -1) }))
+      .filter((x) => x.d >= 0 && x.d <= max)
+      .sort((a, b) => a.d - b.d).map((x) => x.m);
+    const span = week ? '이번 주(7일 안)' : tomorrow ? '내일까지' : '오늘';
+    if (!list.length) return { text: `${span} 마감인 공고는 지금 내 조건에서는 없어요.`, actions: [{ act: 'ask:마감 임박', label: '마감 가까운 순으로 보기' }] };
+    return { text: `${span} 마감인 공고가 ${list.length}건 있어요.`, cards: list.slice(0, 4), actions: [{ act: 'notify', label: '마감 알림 켜기' }] };
+  },
+  oncampus: () => chatKindList('교내'),
+  offcampus: () => chatKindList('교외'),
+  board: () => {
+    const list = chatNotices().slice().sort((a, b) => String(b.date || b.foundAt || '').localeCompare(String(a.date || a.foundAt || ''))).slice(0, 6);
+    if (!list.length) return { text: '우리 학교 게시판에서 모은 글이 지금은 없어요.', note: '홈의 소식 띠와 장학금 탭에서 다른 공고를 볼 수 있어요.' };
+    return { text: `우리 학교 게시판의 최근 장학 공고예요.`, notices: list, note: '게시판 공고는 제목과 링크만 확인한 것이라, 자격·금액은 글을 열어 봐 주세요.' };
+  },
+  activities: (q) => {
+    const all = chatSafe(() => (typeof activitiesForMe === 'function' ? activitiesForMe() : []), []);
+    const want = /공모전/.test(String(q)) ? '공모전' : /대외\s?활동|서포터즈|기자단|봉사|인턴/.test(String(q)) ? '대외활동' : '';
+    const list = all.filter((a) => !want || a.kind === want)
+      .filter((a) => !a.deadline || chatSafe(() => dday(a.deadline).days, 0) >= 0)
+      .sort((a, b) => String(a.deadline || '9999').localeCompare(String(b.deadline || '9999'))).slice(0, 5);
+    if (!list.length) return { text: `지금 볼 수 있는 ${want || '대외활동·공모전'} 글이 없어요.`, actions: [{ act: 'activities', label: '대외활동 탭 열기' }] };
+    return {
+      text: `마감이 가까운 ${want || '대외활동·공모전'} ${list.length}건이에요.`,
+      notices: list.map((a) => ({ ...a, title: `${a.title}${a.deadline ? ` (마감 ${a.deadline})` : ''}` })),
+      note: '참가 자격·혜택은 글을 열어 주최 측 페이지에서 봐 주세요. 글 이름과 함께 "자격"·"링크"를 물어보셔도 돼요.',
+      actions: [{ act: 'activities', label: '대외활동 탭 열기' }],
+    };
+  },
+  profile: () => {
+    const p = chatSafe(() => state.profile, null);
+    if (!p) return { text: '아직 입력된 정보가 없어요.' };
+    const rows = [];
+    if (p.school) rows.push(`학교: ${p.school}${p.campus ? ' ' + p.campus : ''}`);
+    if (p.major) rows.push(`학과: ${p.major}`);
+    if (p.year) rows.push(`학년: ${p.year}학년${p.status ? ` (${p.status})` : ''}`);
+    if (p.gpa != null && p.gpa !== '') rows.push(`직전학기 평점: ${p.gpa}`);
+    if (p.bracket != null && p.bracket !== '') rows.push(`학자금 지원구간: ${p.bracket}구간`);
+    return { text: '지금 입력된 내 정보예요. 이 정보로 적합도를 계산해요.', list: rows, actions: [{ act: 'myinfo', label: '내 정보 고치기' }] };
+  },
+  saved: () => {
+    const ids = (chatSafe(() => state.saved, []) || []).map((x) => x.id);
+    const list = chatMatches().filter((m) => ids.includes(m.sch.id));
+    if (!ids.length) return { text: '아직 저장한 공고가 없어요.', note: '공고 카드나 상세의 저장 단추를 누르면 MY → 공고 보관함에 모여요.' };
+    return { text: `저장한 공고가 ${ids.length}건 있어요.`, cards: list.slice(0, 4), actions: [{ act: 'saved', label: '공고 보관함 열기' }] };
+  },
+  docissue: (q) => {
+    const slots = chatSafe(() => DOC_SLOTS, []) || [];
+    const t = chatSafe(() => nluFix(q), String(q));
+    const hit = slots.filter((s) => s.match.test(t) || t.includes(s.label.replace(/\s/g, '')) || t.includes(s.label));
+    const pick = hit.length ? hit : slots;
+    return {
+      text: hit.length ? `${hit.map((s) => s.label).join('·')} 발급처예요.` : '자주 내는 서류의 발급처예요.',
+      list: pick.map((s) => `${s.label} — ${s.issue}`),
+      note: '발급받은 파일을 MY → 서류함에 올려 두면 다음 신청부터 자동으로 함께 준비돼요.',
+      actions: [{ act: 'mydocs', label: '서류함 열기' }],
+    };
+  },
+  kosaf: () => {
+    const list = chatSafe(() => getMatches(), []).filter((m) => m.sch.program);
+    return {
+      text: '국가장학금은 한국장학재단이 운영하는 상시 제도예요. 신청 기간은 매 학기 재단이 공지하고, 한국장학재단 홈페이지·앱에서 신청해요.',
+      cards: list.slice(0, 4),
+      links: [{ href: 'https://www.kosaf.go.kr', label: '한국장학재단 홈페이지' }],
+      note: '정확한 기간·금액은 재단 공지가 기준이에요. 문의는 한국장학재단 콜센터(1599-2000).',
+    };
+  },
+};
+
+function chatKindList(kind) {
+  const list = chatByFit(chatApplyable().filter((m) => (kind === '교내' ? m.sch.type === '교내' : m.sch.type !== '교내')));
+  if (!list.length) return { text: `지금 내 조건으로 신청할 수 있는 ${kind} 장학금을 찾지 못했어요.`, actions: [{ act: 'explore', label: '장학금 탭에서 전체 보기' }] };
+  return {
+    text: `지금 신청할 수 있는 ${kind} 장학금이 ${list.length}건 있어요.`,
+    cards: list.slice(0, 4),
+    note: list.length > 4 ? '적합도가 높은 4건만 보여 드렸어요. 장학금 탭 위의 교내·교외 칸으로 전부 볼 수 있어요.' : '',
+    actions: [{ act: 'explore', label: '장학금 탭에서 전체 보기' }],
+  };
+}
+
+/* 위기의 말 — 장학금 이야기보다 먼저(chat-nlu NLU_CRISIS) */
+function chatAnswerCrisis() {
+  return {
+    text: '많이 힘드시군요. 지금 마음을 이야기할 수 있는 곳이 있어요. 혼자 견디지 않으셔도 돼요.',
+    list: ['자살예방 상담전화 109 (24시간)', '정신건강 위기상담전화 1577-0199', '청소년상담전화 1388 (24세까지)', '긴급한 위험이 있으면 112·119'],
+    note: '학교 학생상담센터에서도 무료로 상담받을 수 있어요.',
   };
 }
 
@@ -486,6 +977,18 @@ function chatAnswerHelp() {
 function chatRoute(q) {
   const s = String(q || '').trim();
   if (!s) return null;
+
+  /* ⓪ 위기의 말 — 무엇보다 먼저 */
+  if (chatSafe(() => typeof nluCrisis === 'function' && nluCrisis(s), false)) return chatAnswerCrisis();
+
+  /* ① 공고 한 건의 칸 — "○○장학금 지원 자격"·"○○ 원문 링크"·"그거 마감" (2026-11-20).
+     이름으로 공고를 **확실히** 고른 때만 답한다 — 못 고르면 아래 일반 답으로 간다. */
+  const field = chatAnswerField(s);
+  /* ② 지식(chat-kb.js) — 학습 문장과 거의 같은 말이면 먼저(오타·띄어쓰기·말끝 변형까지) */
+  const kb = chatKbClassify(s);
+  /* 이름이 여럿에 걸려 되묻는 답보다는, 학습 문장과 거의 같은 지식 답이 낫다(`국장 언제 신청해`) */
+  if (field && !(field.ambiguous && kb && kb.score >= 0.86)) return field;
+  if (kb && (kb.score >= 0.86 || (kb.score >= 0.8 && kb.margin >= 0.1))) { const r = chatKbReply(kb.id, s); if (r) return r; }
 
   if (/^(도움|도움말|help|뭐할|뭘 할|어떻게 써|사용법)/.test(s)) return chatAnswerHelp();
   if (/(안녕|하이|hello|hi)$/.test(s.replace(/[?!.\s]/g, ''))) {
@@ -502,6 +1005,9 @@ function chatRoute(q) {
   const faqExact = chatAnswerFaq(s, { exactOnly: true });
   if (faqExact) return faqExact;
 
+  /* ③ 지식 — 꽤 닮았고 두 번째 후보와 갈리면 답한다 */
+  if (kb && kb.score >= 0.74 && kb.margin >= 0.04) { const r = chatKbReply(kb.id, s); if (r) return r; }
+
   /* 위에 안 걸리면 낱말로 찾아본다 */
   const cards = chatSearch(s);
   const notices = chatSearchNotices(s);
@@ -514,13 +1020,18 @@ function chatRoute(q) {
       cards,
       notices,
       note: notices.length
-        ? '게시판 공고는 제목과 링크만 확인한 것이라, 자격·금액은 원문에서 봐 주세요.'
-        : '',
+        ? '게시판 공고는 제목과 링크만 확인한 것이라, 자격·금액은 원문 글을 열어 봐 주세요.'
+        : '공고 이름과 함께 "자격"·"마감"·"링크"·"서류"를 물으시면 그 칸만 뽑아 드려요.',
     };
   }
   /* 공고에서 못 찾았으면 자주 묻는 질문에서 찾아본다 — 공고가 먼저다(이 앱의 본업) */
   const faq = chatAnswerFaq(s);
   if (faq) return faq;
+
+  /* ④ 지식 — 덜 닮았지만 한 후보가 뚜렷하면 **답하지 않고 되묻는다**(누르면 그 문장으로 다시 묻는다) */
+  if (kb && kb.score >= 0.62 && kb.margin >= 0.15) {
+    return { text: '혹시 이걸 물어보신 건가요?', asks: [kb.utter] };
+  }
   return null;  // 못 알아들음 — AI 자리로 넘어간다
 }
 
@@ -800,6 +1311,15 @@ function chatAnswerHtml(a) {
     }).join('')}</ul>`);
   }
 
+  /* 링크 — 공고 칸 묻기(원문 링크·첨부)의 답. 주소는 만들 때 이미 safeUrl 을 거쳤지만 그리는 자리에서 한 번 더 */
+  if (a.links && a.links.length) {
+    const rows = a.links.map((l) => {
+      const url = chatSafe(() => safeUrl(l.href), '');
+      return url ? `<li><a href="${chatEsc(url)}" target="_blank" rel="noopener noreferrer">${chatEsc(String(l.label).replace(/\s*↗\s*$/, ''))} ↗</a></li>` : '';
+    }).join('');
+    if (rows) parts.push(`<ul class="chat-notices chat-links">${rows}</ul>`);
+  }
+
   /* ② 되묻기 — 후보를 눌러 바로 다시 물을 수 있게 */
   if (a.asks && a.asks.length) {
     parts.push(`<div class="chat-asks">${a.asks.map((t) =>
@@ -839,7 +1359,7 @@ function chatRender() {
 
 function chatPushBot(a) {
   /* 답이 공고 하나를 가리켰으면 기억해 둔다 — 다음 질문의 "그거"가 이것을 뜻한다(④) */
-  if (a && a.cards && a.cards.length === 1) chatRemember(a.cards[0].sch);
+  if (a && a.cards && a.cards.length === 1) { chatRemember(a.cards[0].sch); chatFocusKey = 'r:' + a.cards[0].sch.id; }
   chatHistory.push({ who: 'bot', html: chatAnswerHtml(a) });
   chatRender();
 }
@@ -853,8 +1373,17 @@ function chatDoAction(act) {
     setTimeout(() => chatSafe(() => (typeof exploreShowAll === 'function' ? exploreShowAll() : showScreen('explore'))), 180);
     return;
   }
+  if (act.startsWith('ask:')) { chatSend(act.slice(4)); return; }   // 답 안의 '이걸 물어보세요' 단추
   if (act === 'applications') return go('applications');
   if (act === 'wallet') return go('my');
+  if (act === 'saved') return go('mysaved');
+  if (['home', 'my', 'myinfo', 'mydocs', 'settings', 'trash', 'logins', 'terms', 'support', 'activities'].includes(act)) return go(act);
+  if (act.startsWith('activity:')) {
+    const url = act.slice(9);
+    chatClose();
+    setTimeout(() => chatSafe(() => openActivityDetail(url)), 200);
+    return;
+  }
   if (act === 'faq') return go('faq');   // 설정 → 고객센터 → 자주 묻는 질문 화면 (app.js showScreen)
   if (act === 'notify') {
     chatClose();
@@ -908,6 +1437,42 @@ async function chatSend(q) {
   chatPushBot(chatAnswerUnknown(text));
 }
 
+/* ---------------- 키보드 위에 시트 맞추기 (2026-11-20 개발자 제보 "입력 칸을 눌렀을 때 레이아웃이 어긋남") ----------------
+   휴대폰은 키보드가 올라와도 **화면 높이(innerHeight·dvh)가 그대로**다(아이폰 사파리·안드로이드 크롬 기본값).
+   그래서 바닥에 붙인 시트(78dvh)는 키보드 **뒤로** 들어가고, 브라우저가 입력 칸을 보이려고 화면을 통째로 밀어
+   올려 머리말이 위로 잘리고 대화 목록이 엉뚱한 자리에 남았다. app.js 학교 검색 목록과 같은 해법 —
+   visualViewport 가 알려 주는 **키보드를 뺀 실제 보이는 칸**에 시트 바닥과 높이를 맞춘다.
+   ⚠️ 키보드가 화면을 줄여 주는 브라우저(가린 높이 0)에서는 아무것도 안 한다 — CSS 그대로.
+   ⚠️ 닫을 때 반드시 되돌린다(chatClose) — 남기면 다음에 열 때 시트가 공중에 뜬다. */
+const CHAT_KBD_MIN = 80;   // 이보다 적게 가리면 키보드가 아니다(주소창이 접히는 정도)
+function chatFitKeyboard() {
+  const sheet = document.querySelector('#chat-sheet');
+  if (!sheet || sheet.hidden) return;
+  const vv = window.visualViewport;
+  if (!vv) return;
+  const covered = Math.round(window.innerHeight - (vv.offsetTop + vv.height));
+  if (covered > CHAT_KBD_MIN) {
+    sheet.classList.add('kbd-open');
+    sheet.style.bottom = covered + 'px';
+    /* 보이는 칸을 거의 다 쓴다 — 위로 8px 은 뒤 화면이 보여 '떠 있는 시트'로 읽히게 */
+    const h = Math.max(220, Math.round(vv.height - 8));
+    sheet.style.height = h + 'px';
+    sheet.style.maxHeight = h + 'px';
+  } else {
+    chatUnfitKeyboard(sheet);
+  }
+  const log = document.querySelector('#chat-log');
+  if (log) log.scrollTop = log.scrollHeight;     // 마지막 답이 입력 칸 바로 위에 보이게
+}
+function chatUnfitKeyboard(sheet) {
+  const el = sheet || document.querySelector('#chat-sheet');
+  if (!el) return;
+  el.classList.remove('kbd-open');
+  el.style.bottom = '';
+  el.style.height = '';
+  el.style.maxHeight = '';
+}
+
 /* ---------------- 시트 열고 닫기 ---------------- */
 function chatOpen(prefill) {
   const sheet = document.querySelector('#chat-sheet');
@@ -946,7 +1511,9 @@ function chatClose() {
   if (!sheet || !back) return;
   back.classList.remove('show');
   sheet.classList.remove('show');
-  setTimeout(() => { back.hidden = true; sheet.hidden = true; }, 250);
+  const input = document.querySelector('#chat-input');
+  if (input && document.activeElement === input) input.blur();   // 키보드를 먼저 내린다 — 남으면 뒤 화면이 밀린 채로 남는다
+  setTimeout(() => { back.hidden = true; sheet.hidden = true; chatUnfitKeyboard(sheet); }, 250);
 }
 
 /* ============================================================
@@ -1149,6 +1716,13 @@ function chatBind() {
   const sheet = document.querySelector('#chat-sheet');
   if (!form || !input || !sheet) return;
 
+  /* 키보드 자리 맞춤 — 보이는 칸이 바뀔 때마다(키보드 오르내림·사파리가 화면을 미는 것 모두) */
+  if (window.visualViewport) {
+    ['resize', 'scroll'].forEach((ev) => window.visualViewport.addEventListener(ev, chatFitKeyboard));
+  }
+  input.addEventListener('focus', () => { chatFitKeyboard(); setTimeout(chatFitKeyboard, 300); });   // 키보드는 조금 늦게 올라온다
+  input.addEventListener('blur', () => setTimeout(chatFitKeyboard, 120));
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const q = input.value;
@@ -1233,5 +1807,5 @@ if (typeof document !== 'undefined' && document.querySelector('#chat-sheet')) {
 
 /* Node(검사 도구)에서도 규칙만 따로 불러 볼 수 있게 */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { chatTokens, chatRoute, chatSearch, chatAnswerUnknown, chatAnswerFaq, CHAT_SUGGESTIONS };
+  module.exports = { chatTokens, chatRoute, chatSearch, chatAnswerUnknown, chatAnswerFaq, chatAnswerField, chatKbClassify, chatKbReply, CHAT_DYN, CHAT_SUGGESTIONS };
 }
