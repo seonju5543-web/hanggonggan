@@ -20,49 +20,6 @@
   "at": "2026-11-14",
   "tries": 2
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3506683": {
-  "at": "2026-11-14",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "활동구분",
-   "오프라인",
-   "내손자이뷰다함께돌봄센터에서",
-   "* 안내사항(필독)",
-   "※ 아동복지법, 아동청소년 성보호에 관한 법률 및 사회복지사업법에 명시된 결격사유에 해당하지 않으며 범죄 전력 조회에 동의하는 사람",
-   "※ 자원봉사는 신청자 본인이 직접 참여해야하며, 대리봉사는 금지 됩니다. (대리봉사 사실이 확인될 경우 봉사시간 인정 불가하며 추후 활동 참여에 제한이 있을 수 있습니다.)",
-   "- 활동일시: 월 - 금 (공휴일 제외) 매주 14:00 ~ 18:00 (4시간)",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540291": {
-  "at": "2026-11-14",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "활동구분",
-   "오프라인",
-   "초등 (학기중)",
-   "인원: 화요일 2명, 수요일 1명, 목요일 1명",
-   "진행방식: 1:4 멘토링, 채점 및 오답풀이",
-   "중등(학기중&방학중)",
-   "과목: 국어, 영어, 수학 중 1과목 선택",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541967": {
-  "at": "2026-11-15",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
   "at": "2026-11-15",
   "tries": 1
@@ -143,60 +100,6 @@
   "at": "2026-11-17",
   "tries": 1
  },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12607/view.do?currentPageNo=1": {
-  "at": "2026-11-17",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541969": {
-  "at": "2026-11-18",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141929&article.offset=0&articleLimit=10": {
-  "at": "2026-11-18",
-  "tries": 1,
-  "lines": [
-   "① 교정시력이 매우 나쁘거나 색맹 또는 색약이 있으신 분",
-   "(안경을 착용하지 않으신 분을 우대합니다.)",
-   "② 신경정신과적 병력이 있으신 분",
-   "③ 뇌과학이미징연구단 소속인 분"
-  ],
-  "excludes": [
-   "① 교정시력이 매우 나쁘거나 색맹 또는 색약이 있으신 분",
-   "(안경을 착용하지 않으신 분을 우대합니다.)",
-   "② 신경정신과적 병력이 있으신 분",
-   "③ 뇌과학이미징연구단 소속인 분"
-  ],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542419": {
-  "at": "2026-11-19",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인",
-   "성인 장애인 나들이 프로그램 지원"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545069": {
-  "at": "2026-11-19",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3549336": {
-  "at": "2026-11-19",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인",
-   "장애인과 함께하는 “요리프로그램” 지원"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161847/artclView.do": {
   "at": "2026-11-19",
   "tries": 1
@@ -215,6 +118,27 @@
  },
  "https://www.inha.ac.kr/bbs/kr/8/46177/artclView.do": {
   "at": "2026-11-19",
+  "tries": 1
+ },
+ "https://form.naver.com/response/JsbhhcPWUcK": {
+  "at": "2026-11-20",
+  "tries": 1,
+  "lines": [
+   "참여대상 : 대한민국 국민 누구나"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/272294/artclView.do": {
+  "at": "2026-11-20",
+  "tries": 1
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171774&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
+  "at": "2026-11-20",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/521260": {
+  "at": "2026-11-20",
   "tries": 1
  }
 }
