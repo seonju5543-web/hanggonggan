@@ -743,6 +743,12 @@
    "by": "Claude 세션(개발자 지시 2026-11-20)",
    "action": "linkFix",
    "detail": "원문 주소 1건 — 넣음 영호남 상생 장학생 → https://www.jntle.kr/main/board/2/read/2686"
+  },
+  {
+   "at": "2026-11-20 13:59 KST",
+   "by": "Claude 세션(개발자 지시 2026-11-20)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 교통사고 생계지원금 → https://www.fordrivers.or.kr/board/selectBoardArticle.do?menuId=1070100&bbsId=BBSMSTR_000000000032&nttId=10745&pageIndex=1&cateCode=&searchCnd=0&searchWrd="
   }
  ]
 }
