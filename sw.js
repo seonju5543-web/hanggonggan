@@ -268,7 +268,8 @@ async function backgroundCheck() {
   /* 2026-11-20 유료 관문 — 유료 확인 전 숨김분도 화면과 같은 함수(publishedList)로 거른다 · card-read.json 을 못 받아도 거른다 */
   if (reg && typeof publishedList === 'function') {
     const cardRead = await readJson('data/card-read.json').catch(() => null);
-    reg.items = publishedList(reg.items || [], cardRead);
+    const cardFixes = await readJson('data/card-read-fixes.json').catch(() => null);   // 관리자가 살린 줄 — 화면과 같은 값
+    reg.items = publishedList(reg.items || [], cardRead, null, cardFixes);
   } else if (reg) reg.items = (reg.items || []).filter((s) => !s.paidGate);
   const out = NOTIFY_RULES.evaluate({
     now: Date.now(),

@@ -285,6 +285,10 @@ function guardBulkRemove(targetIds) {
       앱은 source-link.js ⑥(setLinkFixes)이 이 장부를 읽어 학생이 여는 주소와 링크 이름을 정한다.
    🔴 이 장부를 쓰는 곳은 여기 하나다(로봇 몫은 data/link-check.json fix — 둘을 섞지 않는다). */
 const LINK_FIXES = 'data/link-fixes.json';
+/* 유료 확인에서 잡힌 줄을 사람이 정한 것 (2026-11-20 · 관리자 「할 일」) — 앱이 유료 결과에 얹는다(match-engine mergeCardFixes).
+   로봇(card-read)은 이 파일을 안 고친다 — 사람 것이 늘 이긴다(원문 바로잡기 link-fixes 와 같은 짜임) */
+const CARD_FIXES = 'data/card-read-fixes.json';
+const CARD_FIX_FIELDS = ['eligibility', 'excludes', 'priority', 'amount', 'apply', 'documents', 'notes'];
 const LINK_FIX_MAX = 50;   // 한 번에 받는 건수 — 화면은 '적어 두기'로 모아 한 번에 보낸다
 const SL = createRequire(import.meta.url)('../source-link.js');
 const cleanText = (v) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, FIX_TEXT_MAX);
@@ -1246,6 +1250,42 @@ switch (action) {
   }
 
   /* ── 원문 바로잡기 지우기 — 장부에서 열쇠를 뺀다(학생 링크는 데이터 주소로 돌아간다) ── */
+  /* ── 유료 확인에서 잡힌 줄 — 살리기(keep) · 고쳐서 싣기(edit) · 버리기(drop) (2026-11-20) ─────────────
+     payload = { lines: [{ id, field, key, op, text? }] } — key 는 관리자 화면이 본 줄(card-read-review.json 의 「칸|문장」).
+     살리기·고쳐서 싣기는 그 칸에 줄을 더하고(유료 결과가 있는 공고만 — 학생 화면에 실린 카드에 얹는다), 셋 다 그 줄을 「할 일」에서 내린다 */
+  case 'cardLine': {
+    const lines = Array.isArray(payload.lines) ? payload.lines : [];
+    if (!lines.length) fail('정할 줄이 없습니다');
+    if (lines.length > LINK_FIX_MAX) fail(`한 번에 ${LINK_FIX_MAX}줄까지만 받습니다 (받은 것: ${lines.length}줄)`);
+    const cr = readJson('data/card-read.json', null);
+    const doc = readJson(CARD_FIXES, null) || { v: 1, items: {} };
+    if (!doc.items || typeof doc.items !== 'object' || Array.isArray(doc.items)) doc.items = {};
+    const done = [];
+    for (const ln of lines) {
+      const id = String((ln && ln.id) || ''), field = String((ln && ln.field) || ''), key = cleanText(ln && ln.key), op = String((ln && ln.op) || '');
+      const it = reg.items.find((x) => x.id === id);
+      if (!it) fail(`정식 등록에 그 공고가 없습니다: ${id}`);
+      if (!key) fail(`${id} — 어느 줄인지(key)가 없습니다`);
+      if (!['keep', 'edit', 'drop'].includes(op)) fail(`${id} — 모르는 처리입니다: ${op} (keep·edit·drop)`);
+      const e = doc.items[id] || (doc.items[id] = { add: {}, done: [] });
+      if (op !== 'drop') {
+        if (!CARD_FIX_FIELDS.includes(field)) fail(`${id} — 이 칸(${field})은 여기서 싣지 않습니다 — 마감·주는 곳은 공고 고치기(edit)로`);
+        if (!(cr && cr.items && cr.items[id])) fail(`${id} — 유료 결과가 아직 없는 공고라 줄을 얹을 카드가 없습니다`);
+        const text = cleanText(ln.text);
+        if (!text) fail(`${id} — 실을 문장이 비었습니다`);
+        e.add[field] = Array.from(new Set([...(e.add[field] || []), text]));
+      }
+      e.done = Array.from(new Set([...(e.done || []), key]));
+      e.by = actor; e.at = TODAY;
+      done.push(`${{ keep: '살림', edit: '고쳐 실음', drop: '버림' }[op]} ${String(it.name).slice(0, 24)} · ${key.slice(0, 40)}`);
+    }
+    doc.v = 1; doc.updatedAt = `${kstNow()} KST`;
+    writeJson(CARD_FIXES, doc);
+    detail = `유료 확인 잡힌 줄 ${done.length}줄 — ${done.join(' / ')}`.slice(0, 600);
+    touched = true;
+    break;
+  }
+
   case 'linkUnfix': {
     const keys = (Array.isArray(payload.keys) ? payload.keys : []).map((k) => String(k || '')).filter((k) => /^(id|u):\S/.test(k));
     if (!keys.length) fail('지울 열쇠가 없습니다 (id:… 또는 u:…)');

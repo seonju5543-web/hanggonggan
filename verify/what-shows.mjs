@@ -40,7 +40,8 @@ const reg = tidyData(JSON.parse(fs.readFileSync(process.env.WHAT_SHOWS_REGISTERE
    표본 파일로 돌 때(WHAT_SHOWS_REGISTERED)는 얹지 않는다 · 파일이 없으면 그대로(무료 길) */
 if (!process.env.WHAT_SHOWS_REGISTERED) {
   let cr = null; try { cr = tidyData(JSON.parse(fs.readFileSync(new URL('../data/card-read.json', import.meta.url), 'utf8'))); } catch { /* 아직 없음 */ }
-  reg.items = ME.publishedList(reg.items, cr);   // 유료 확인 전 숨김분은 학생 화면에 없다(2026-11-20)
+  let fx = null; try { fx = tidyData(JSON.parse(fs.readFileSync(new URL('../data/card-read-fixes.json', import.meta.url), 'utf8'))); } catch { /* 아직 없음 */ }
+  reg.items = ME.publishedList(reg.items, cr, null, fx);   // 유료 확인 전 숨김분은 학생 화면에 없다(2026-11-20)
 }
 
 const arg = (k, d) => {

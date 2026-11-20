@@ -59,6 +59,10 @@ const DATA = {
      ⚠️ 수집 기록(collector/candidates.json · 1.6MB)은 담지 않는다 — 미리보기에선 「수집 기록에서 찾기」가 못 읽었다고 말한다. */
   'data/link-check.json': readJson('data/link-check.json'),
   'data/link-fixes.json': readJson('data/link-fixes.json'),
+  /* 유료 확인에서 사람이 볼 것 (2026-11-20) — 「할 일」 */
+  'collector/card-read-review.json': readJson('collector/card-read-review.json'),
+  'data/card-read-fixes.json': readJson('data/card-read-fixes.json'),
+  'data/card-read.json': readJson('data/card-read.json'),
   'data/kosaf-open.json': readJson('data/kosaf-open.json'),
   'data/external.json': readJson('data/external.json'),
   'data/notices/index.json': readJson('data/notices/index.json'),

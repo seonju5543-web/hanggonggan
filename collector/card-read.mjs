@@ -319,12 +319,8 @@ function finishEntry(final, held, dropped, unreadable, item, wonIn) {
     const lost = dropped.filter((x) => x.field === k && String(x.line || '').replace(/[\s\-–·.]/g, ''));   // 빈 줄·줄표뿐인 줄은 빠진 요건이 아니다(리뷰)
     if (lost.length && Array.isArray(final[k]) && !final[k].length) final[k] = null;
   }
-  /* 🔴 제외 칸이 보류(null)면 자격 칸도 싣지 않는다 (2026-11-18 리뷰 · 실제 2건) — 앱은 유료 자격이 실리면 무료 길의 자격 줄을 통째로 갈아 끼우는데,
-     무료 길은 「받을 수 없는 경우」 줄을 그 자격 줄 사이에서 골라 보인다. 유료 자격만 실으면 그 줄(「신입생·편입생은 첫 학기 신청 불가」)이 화면 어디에도 없다 */
-  if (final.excludes === null && Array.isArray(final.eligibility)) {
-    held.push(...final.eligibility.map((line) => ({ field: 'eligibility', line, why: '제외 칸이 보류돼 자격 칸도 싣지 않음(무료 길 값 그대로)' })));
-    final.eligibility = null;
-  }
+  /* (11-18 에 둔 「제외 칸이 보류면 자격 칸도 무료 길 값」 막이는 2026-11-20 개발자 결정 「유료를 앱에 띄우는 걸로 · 무료로 바꿔 끼우지 말 것」으로 걷었다.
+     제외 칸이 무료 길 값(null)이면 앱은 무료 길의 「받을 수 없는 경우」 줄을 그대로 보이고(withCardRead), 빠진 제외 줄은 관리자 「할 일」에 있다) */
   const filled = LIST_FIELDS.some((k) => final[k] && final[k].length) || !!final.deadline;
   if (unreadable || !filled) return { entry: null, held, dropped, unreadable: true };
   const entry = { title: final.title, host: final.host };
@@ -405,16 +401,17 @@ export function explainLine(d) {
       `원문에서 이 조건이 「${d.quote || ''}」 그대로인지(${shown(d.q)}) 확인해 주세요.`],
     org: () => [`문장에 있는 기관 이름 「${shown(d.t)}」가 근거로 든 원문 문구에 없습니다.`, '원문에 이 기관 이름이 실제로 적혀 있는지 확인해 주세요.'],
     words: () => ['문장이 근거로 든 원문 문구와 다른 내용을 말합니다.', '문장이 원문 문구와 같은 뜻인지 확인해 주세요.'],
-    quote: () => ['근거로 든 원문 문구를 공고 원문(본문·첨부)에서 찾지 못했습니다.', `원문에 이 ${label} 내용이 실제로 적혀 있는지 확인해 주세요.`],
+    quote: () => [d.quote ? '근거로 든 원문 문구를 공고 원문(본문·첨부)에서 찾지 못했습니다.' : '이 문장을 공고 원문(본문·첨부)에서 그대로 찾지 못했습니다 — 말을 바꿨거나 흩어진 표를 짜 맞췄을 수 있습니다.',
+      `원문에 이 ${label} 내용이 실제로 적혀 있는지 확인해 주세요.`],
     empty: () => ['빈 줄이 들어왔습니다.', '확인할 것 없음 — 버리면 됩니다.'],
     deadline: () => [`마감 ${d.line}을 근거 문구에서 확인하지 못했습니다(${String(d.why || '').replace(/^근거 문구/, '근거 문구가')}).`, '원문에서 신청 마감일을 확인해 주세요(접수 시작일·발표일과 헷갈리지 않았는지).'],
     extension: () => [`「연장」 공고라 마감(${d.line})을 싣지 않았습니다 — 받아 두지 못한 연장 공고문에 진짜 마감이 있을 수 있습니다.`, '연장된 마감일을 원문에서 확인해 주세요.'],
-    agree: () => ['두 번 읽은 결과가 이 줄에서 달랐습니다.', `원문에서 이 ${label} 줄이 맞는지 확인해 주세요.`],
+    agree: () => ['(옛 방식) 두 번 읽었을 때 한쪽만 이 줄을 냈습니다 — 다른 쪽은 이 줄을 내지 않았거나 다르게 잘랐습니다.', `원문에 이 줄이 실제로 있는지, ${label}에 들어갈 줄인지 확인해 주세요.`],
     title: () => ['제목이 공고 제목에서 온 글자가 아닙니다.', '공고 제목을 확인해 주세요.'],
     host: () => ['주는 곳 이름을 원문에서 확인하지 못했습니다.', '원문에서 장학금을 주는 기관 이름을 확인해 주세요.'],
   }[d.kind] || (() => ['기계 검사에서 잡혔습니다.', '원문에서 이 줄이 맞는지 확인해 주세요.']);
   const [reason, check] = pick();
-  return { field: d.field, label, text: d.line, ...(d.quote ? { quote: d.quote } : {}), reason, check };
+  return { field: d.field, label, kind: d.kind || '', text: d.line, ...(d.quote ? { quote: d.quote } : {}), reason, check };
 }
 /* 관리자용 파일 — 공고마다 잡힌 줄(사람 말) · 사람에게 넘긴 숨김분. 앱은 받지 않는다(collector/ 아래) */
 export function reviewOf(ledger, gateHeld) {

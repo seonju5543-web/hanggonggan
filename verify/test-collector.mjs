@@ -10699,7 +10699,7 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       const loaders = ['loadRegistered', 'loadKosaf', 'loadActivities', 'loadExternal', 'loadNotices', 'loadNews'].map((n) => [n, /tidyData\(/.test(takeFnSrc(n))]);
       eq('  받는 곳 여섯(정식 등록·카드 읽기·층2·대외활동·재단 게시판·학교 공고·소식)이 모두 씻는다', loaders.filter(([, ok]) => !ok).map(([n]) => n), []);
       const ws = readText(new URL('./what-shows.mjs', import.meta.url));
-      eq('  what-shows 도 앱처럼 씻은 글자로 말한다 — 읽자마자(카드 읽기를 얹고 찾기 전에) · 카드 읽기 파일도(숨김 거르기와 함께 publishedList 로 · 2026-11-20)', /const reg = tidyData\(JSON\.parse/.test(ws) && /cr = tidyData\(JSON\.parse/.test(ws) && /ME\.publishedList\(reg\.items, cr\)/.test(ws) && /'tidyText', 'tidyData'/.test(ws), true);
+      eq('  what-shows 도 앱처럼 씻은 글자로 말한다 — 읽자마자(카드 읽기를 얹고 찾기 전에) · 카드 읽기 파일도(숨김 거르기와 함께 publishedList 로 · 2026-11-20)', /const reg = tidyData\(JSON\.parse/.test(ws) && /cr = tidyData\(JSON\.parse/.test(ws) && /ME\.publishedList\(reg\.items, cr, null, fx\)/.test(ws) && /'tidyText', 'tidyData'/.test(ws), true);
     }
   }
 
@@ -11696,7 +11696,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'fieldFix', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
+    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'cardLine', 'fieldFix', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 발췌 주인 표식 · 바닥글 — 사람이 쓴 발췌는 로봇이 안 덮고 · 원문 근거로 안 쓴다 (2026-11-17)');
@@ -16621,8 +16621,8 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   eq('  🔴 한쪽 읽기에만 있는 짧은 요건 한 줄(숫자·부정 없음)은 「칸 전체가 거의 같다」로 넘어가지 못한다 — 그 줄은 관리자에게 넘기고 같이 낸 줄은 싣는다 · 줄을 다르게 나눴을 뿐이면 그대로 싣는다',
     [agX.final.eligibility, agX.held.some((h) => h.field === 'eligibility' && h.line === '다자녀 가정의 자녀'), agSplit.final.eligibility], [three, true, three]);
   const beEx = CR.buildEntry(ITEM, SRC, { ...full, excludes: ['대학원생, 휴학생'] }, { ...full, excludes: [] }, wonIn);
-  eq('  🔴 제외 칸이 보류되면 자격 칸도 싣지 않는다 — 유료 자격만 실으면 무료 길이 자격 줄 사이에서 골라 주던 「받을 수 없는 경우」 줄이 화면에서 사라진다(실제 2건)',
-    [beEx.entry.excludes, beEx.entry.eligibility, (beEx.entry.amount || []).length], [null, null, 1]);
+  eq('  제외 칸이 무료 길 값(null)이어도 자격 칸은 유료 줄 그대로 싣는다(2026-11-20 개발자 결정 — 11-18 의 「자격 칸도 무료 길 값」 막이를 걷었다 · 앱은 무료 길 제외 줄을 그대로 보인다)',
+    [beEx.entry.excludes, (beEx.entry.eligibility || []).length, (beEx.entry.amount || []).length], [null, 2, 1]);
   eq('  🔴 「조회수」 바로 뒤가 조회수가 아니라 내용의 숫자(연도·금액·날짜)면 떼지 않는다 — 떼면 바뀐 원문을 같은 원문으로 본다',
     [CR.sourceHash('조회수\n2027학년도 1학기 교내장학') === CR.sourceHash('조회수\n2026학년도 1학기 교내장학'), CR.sourceHash('조회수\n300만원 지급') === CR.sourceHash('조회수\n500만원 지급'), CR.sourceHash('조회수\n11.26까지') === CR.sourceHash('조회수\n12.26까지')], [false, false, false]);
   eq('  🔴 조회수만 바뀐 원문은 같은 원문이다(다시 읽히지 않는다 — 본문을 다시 받을 때마다 숫자만 바뀐다 · 나흘에 839건 중 27건) · 내용의 숫자가 바뀌면 다른 원문',
@@ -16759,8 +16759,8 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     [2, ['휴학생'], 2, 2000000, '2026-11-26', '삼성꿈장학재단']);
   const beBad = CR.buildEntryFixed(ITEM, SRC, { ...fixed, eligibility: [...fixed.eligibility, L('직전 학기 평점평균 3.5 이상인 학생', '직전학기 평점평균 3.0 이상인 자로,')] }, wonIn);
   const beEx = CR.buildEntryFixed(ITEM, SRC, { ...fixed, excludes: [L('휴학생', '휴학생 제외')] }, wonIn);
-  eq('  🔴 떨어진 줄은 빼고 통과한 유료 줄로 싣는다(2026-11-20 「빼고 올려」) · 칸의 줄이 전부 떨어지면 무료 길 값(null) · 제외 칸이 그렇게 비면 자격 칸도 무료 길 값 · 다른 칸은 실린다',
-    [(beBad.entry.eligibility || []).length, beBad.dropped.length, beEx.entry.excludes, beEx.entry.eligibility, (beEx.entry.amount || []).length], [2, 1, null, null, 1]);
+  eq('  🔴 떨어진 줄은 빼고 통과한 유료 줄로 싣는다(2026-11-20 「빼고 올려」) · 칸의 줄이 전부 떨어지면 그 칸만 무료 길 값(null) · 자격 칸은 유료 줄 그대로 · 다른 칸은 실린다',
+    [(beBad.entry.eligibility || []).length, beBad.dropped.length, beEx.entry.excludes, (beEx.entry.eligibility || []).length, (beEx.entry.amount || []).length], [2, 1, null, 2, 1]);
   eq('  「연장」 공고는 마감을 싣지 않는다 · 「읽을 내용 없음」이면 싣지 않는다',
     [CR.buildEntryFixed({ ...ITEM, name: '장학생 선발 연장 공고' }, SRC, fixed, wonIn).entry.deadline, CR.buildEntryFixed(ITEM, SRC, { ...base, unreadable: true }, wonIn).entry], [null, null]);
   eq('  🔴 옛 장부(두 읽기 · 글자 줄)는 옛 길 그대로 — 같은 응답이면 옛 결과와 같다',
@@ -16824,6 +16824,9 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     GL.map((x) => ME.paidGateOpen(x, null, '2026-11-20')), [true, false, false, false, false, false]);
   const pub = ME.publishedList(GL.map((x) => ({ ...x, eligibilityLines: ['무료 길 줄'] })), gdoc, '2026-11-20');
   eq('  publishedList — 거르고 유료 결과를 얹는다(통과한 b 의 자격 줄은 유료 값)', [pub.map((x) => x.id), pub.find((x) => x.id === 'b').eligibilityLines], [['a', 'b', 'e'], ['직전 학기 평점 3.0 이상인 학생']]);
+  const mf = ME.mergeCardFixes({ items: { b: { eligibility: ['가'], excludes: null } } }, { items: { b: { add: { eligibility: ['나', '가'], excludes: ['다'], deadline: ['x'] } }, z: { add: { notes: ['y'] } } } });
+  eq('  사람이 살린 줄(card-read-fixes) — 유료 결과 칸에 덧붙이고(같은 줄은 한 번) · 무료 길 값(null) 칸은 살린 줄로 · 마감 같은 칸·결과 없는 공고는 안 건드린다',
+    [mf.items.b.eligibility, mf.items.b.excludes, mf.items.b.deadline, mf.items.z, ME.mergeCardFixes(null, { items: {} })], [['가', '나'], ['다'], undefined, undefined, null]);
   const fnText = (src, name) => { const at = src.indexOf(`function ${name}(`); return at < 0 ? '' : src.slice(at, src.indexOf('\n}\n', at) + 2); };
   const meSrc = readText(new URL('../match-engine.js', import.meta.url)), pushSrc = readText(new URL('../server/push/worker.js', import.meta.url));
   eq('  🔴 푸시 서버의 사본이 원본과 글자까지 같다(paidGateOpen · 기다리는 날 수 · 오늘 날짜) — 다르면 숨김분으로 폰을 깨운다',
@@ -16833,7 +16836,7 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   eq('  그 공고 목록을 보는 곳이 전부 거른다 — 앱 · 서비스워커 · what-shows · 인스타 · 검색 요약 · 접수 서버 (applyCardRead 를 혼자 부르지 않는다)',
     [/registeredList = typeof publishedList === 'function' \? publishedList\(/.test(src('app-live.js')) && !/applyCardRead\(/.test(src('app-live.js')),
       /reg\.items = publishedList\(reg\.items/.test(src('sw.js')) && !/applyCardRead\(/.test(src('sw.js')),
-      /ME\.publishedList\(reg\.items, cr\)/.test(src('verify/what-shows.mjs')) && !/ME\.applyCardRead\(/.test(src('verify/what-shows.mjs')),
+      /ME\.publishedList\(reg\.items, cr, null, fx\)/.test(src('verify/what-shows.mjs')) && !/ME\.applyCardRead\(/.test(src('verify/what-shows.mjs')),
       /paidGateOpen\(x, cr\)/.test(src('insta/school.mjs')), /filter\(\(s\) => paidGateOpen\(s, cardRead\)\)/.test(src('collector/build-search-index.mjs')),
       /publishedRegistered\(await r\.json\(\), cardRead\)/.test(src('server/apply/worker.js'))], [true, true, true, true, true, true]);
   eq('  자동 등록이 새 공고에 등록일로 표식을 단다 · 관리자는 표식을 지우기만 한다(빈 값 = 무료 값으로 올리기 · 다른 값은 멈춤)',

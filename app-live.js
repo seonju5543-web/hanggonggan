@@ -331,14 +331,16 @@ function loadRegistered() {
     linkChecksWait(),
     /* 유료 카드 읽기 결과(2026-11-15) — 못 받으면 null 이고 그때는 무료 길 값 그대로다(비상망). 받기 실패가 공고 목록을 막지 않는다 */
     fetch('data/card-read.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    /* 관리자가 유료 확인에서 잡힌 줄을 살린 것(2026-11-20) — 못 받으면 유료 결과 그대로 */
+    fetch('data/card-read-fixes.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
   ])
-    .then(([d, , cardRead]) => {
-      tidyData(d); tidyData(cardRead);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
+    .then(([d, , cardRead, cardFixes]) => {
+      tidyData(d); tidyData(cardRead); tidyData(cardFixes);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
       if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
       appsData.registered = 'ok';
       /* match-engine publishedList — 유료 확인 전 숨김분을 거르고 유료 결과를 얹는다(알림·서비스워커도 같은 함수 · 2026-11-20).
          옛 엔진이 캐시에서 오면 숨김분은 통째로 안 보인다(안전한 쪽) */
-      registeredList = typeof publishedList === 'function' ? publishedList(d.items || [], cardRead) : (d.items || []).filter((s) => !s.paidGate);
+      registeredList = typeof publishedList === 'function' ? publishedList(d.items || [], cardRead, null, cardFixes) : (d.items || []).filter((s) => !s.paidGate);
       regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);

@@ -42,7 +42,10 @@
   "auto-ticedoarticleno231554921": {
    "title": "2026-2학기 3대 동문가족 특별장학금 신청 안내",
    "host": "영남대학교",
-   "eligibility": null,
+   "eligibility": [
+    "정규학기 이내 학부 재학생으로서, 직계존속 가족 중 2대가 영남대학교를 졸업하여, 가족 중 본인을 포함한 3대가 우리 대학교 동문인 자",
+    "직전학기 평점평균 2.5 이상인 자"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [
@@ -218,7 +221,10 @@
   "auto-ghaknoticedetail26766866": {
    "title": "2026-2학기 동국사랑1.1.1 장학 신청 안내",
    "host": "동국대학교",
-   "eligibility": null,
+   "eligibility": [
+    "2026-2학기 학부 재학생",
+    "누적학기 성적 3.0 이상(신입생은 성적 부분 지원서로 대체 평가)"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [
@@ -1224,7 +1230,9 @@
   "auto-q1brddate20261105brdseq1": {
    "title": "제9기 서울시립대 언론인회 장학생 선발",
    "host": "서울시립대언론인회",
-   "eligibility": null,
+   "eligibility": [
+    "졸업 후 언론계 진출 희망자"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [
@@ -1508,7 +1516,10 @@
   "auto-0005009002000000seq31571": {
    "title": "2026학년도 2학기 성과형 장학금(자격증) 신청 안내",
    "host": "",
-   "eligibility": null,
+   "eligibility": [
+    "2026학년도 2학기 등록한 학부 재학생",
+    "대상 자격증을 인정 기간(2026. 1. 1.(목) ~ 2026. 12. 7.(월)) 내 취득한 자"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [],
@@ -1945,7 +1956,9 @@
   "auto-ervicenoticedetail521215": {
    "title": "2026학년도 국가우수장학(이공계) 일시지원유형(한 학기) 장학생 선발 안내",
    "host": "한국장학재단",
-   "eligibility": null,
+   "eligibility": [
+    "선발 당시 재학생(휴학생 제외)으로 성적 및 이수학점 기준 충족자"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [],
@@ -1972,7 +1985,13 @@
   "auto-krbbskr846174artclviewdo": {
    "title": "2026학년도 미래의동반자재단 CHUBB Innovation Fund 7기 장학생 선발 안내",
    "host": "주한미국상공회의소 미래의동반자재단",
-   "eligibility": null,
+   "eligibility": [
+    "3, 4학년 학부생",
+    "2026년도 2학기 기준 5학기 이상 재학한 학생",
+    "총 평균 평점 3.0/4.5 이상",
+    "한국장학재단 산정 기준 소득분위 7분위 이하 (2026년도 2학기)",
+    "27년 1월 중에 진행되는 킥오프 미팅에 참석 가능한 학생 (1월 셋째 - 넷째 주 중 하루진행 예정)"
+   ],
    "excludes": null,
    "priority": [],
    "amount": [

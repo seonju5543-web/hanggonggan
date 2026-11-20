@@ -2493,9 +2493,29 @@ function paidGateOpen(sch, doc, today) {
   const waited = (Date.parse(`${today || kstToday()}T00:00:00Z`) - Date.parse(`${String(sch.paidGate).slice(0, 10)}T00:00:00Z`)) / 86400000;
   return Number.isFinite(waited) && waited > PAID_GATE_WAIT_DAYS;
 }
-function publishedList(list, doc, today) {
+/* 관리자가 잡힌 줄을 살린 것(data/card-read-fixes.json · tools/admin-apply cardLine) — 유료 결과 칸에 덧붙인다. 유료 결과가 없는 공고·꼴이 틀린 것은 건드리지 않는다.
+   칸이 무료 길 값(null)이었으면 사람이 살린 줄로 그 칸을 채운다 */
+function mergeCardFixes(doc, fixes) {
+  const fx = fixes && fixes.items;
+  if (!doc || !doc.items || !fx || typeof fx !== 'object') return doc;
+  const items = { ...doc.items };
+  for (const [id, f] of Object.entries(fx)) {
+    const cur = items[id], add = f && f.add;
+    if (!cur || typeof cur !== 'object' || !add || typeof add !== 'object') continue;
+    const next = { ...cur };
+    for (const [k, lines] of Object.entries(add)) {
+      if (!Array.isArray(lines) || !['eligibility', 'excludes', 'priority', 'amount', 'apply', 'documents', 'notes'].includes(k)) continue;
+      const ok = lines.filter((l) => typeof l === 'string' && l.trim());
+      if (ok.length) next[k] = Array.from(new Set([...(Array.isArray(cur[k]) ? cur[k] : []), ...ok]));
+    }
+    items[id] = next;
+  }
+  return { ...doc, items };
+}
+function publishedList(list, doc, today, fixes) {
   const t = today || kstToday();
-  return applyCardRead((list || []).filter((s) => paidGateOpen(s, doc, t)), doc);
+  const d = mergeCardFixes(doc, fixes);
+  return applyCardRead((list || []).filter((s) => paidGateOpen(s, d, t)), d);
 }
 
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
@@ -2510,5 +2530,5 @@ if (typeof module !== 'undefined' && module.exports) {
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile,
                      noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile, BRANCH_LABEL,
-                     applyCardRead, withCardRead, PAID_GATE_WAIT_DAYS, paidGateOpen, publishedList };
+                     applyCardRead, withCardRead, PAID_GATE_WAIT_DAYS, paidGateOpen, publishedList, mergeCardFixes };
 }
