@@ -45,7 +45,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-11-19"
+  "checkedAt": "2026-11-20"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
@@ -108,11 +108,7 @@
   "checkedAt": "2026-11-11"
  },
  "https://www.seoultech.ac.kr/service/info/janghak/": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "page"
-  },
+  "ok": false,
   "checkedAt": "2026-11-20"
  },
  "https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=": {
@@ -209,7 +205,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-11-19"
+  "checkedAt": "2026-11-20"
  },
  "https://www.korea.ac.kr/ko/568/subview.do": {
   "ok": true,
@@ -218,7 +214,7 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-11-19"
+  "checkedAt": "2026-11-20"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": true,
