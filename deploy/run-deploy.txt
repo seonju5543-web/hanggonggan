@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: david/friendly-euler-w6o3wu
-메모: 2026-11-19 #5 — 재단 장학금 39건에 개별 원문 공고 주소 연결(재단·지자체 사이트에서 직접 찾아 열어 확인)
+branch: david/exciting-hypatia-jykmtn
+메모: 2026-11-20 — 대장님 말귀·지식(4,778문장) · 공고 한 건의 칸 묻기(자격·링크·마감…) · 입력 칸 레이아웃·키보드 자리 수리
