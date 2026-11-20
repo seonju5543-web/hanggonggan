@@ -284,7 +284,7 @@ async function backgroundCheck() {
   if (out.events.length) {
     NOTIFY_RULES.pushToInbox(out.ledger, out.events, Date.now());
     const show = out.events.length > 3
-      ? [{ key: 'sum:' + Date.now(), title: `새 알림 ${out.events.length}건 확인하기`, body: out.events[0].title, url: './?screen=notifications' }]
+      ? [{ key: 'sum:' + Date.now(), title: `새 알림 ${out.events.length}건 확인하기`, body: NOTIFY_RULES.summaryBody(out.events), url: './?screen=notifications' }]
       : out.events;
     for (const ev of show) {
       await self.registration.showNotification(ev.title, {
