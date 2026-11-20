@@ -77,6 +77,13 @@ const JS_DOWNLOAD_RULES = [
     path: (m) => `/cmmn/fileDown.do?filename=${encodeURIComponent(m[1].replace(/\\'/g, "'"))}&filepath=${m[2]}&filerealname=${m[3]}` },
 ];
 
+/* 호출 안에 **파일의 절대 주소가 통째로 적힌** 꼴 (2026-11-20 · 공고문 PDF 로봇 첫 실행의 '주소 없음' 3개가 전부 이 꼴이었다):
+   한국대학사회봉사협의회 `javascript:file_down_each('https://kr.object.ncloudstorage.com/…/x.hwp', '이름.hwp')` — 정의(공고 상세 HTML)는
+   그 주소를 /file_down_each.php 에 넘겨 같은 파일을 내려 준다. 쿠키 없는 새 요청으로 그 주소에서 HWP 원본 3개(424~793KB)가 그대로 받아졌다.
+   위 규칙들과 달리 **주소를 짓지 않는다** — 호출에 적힌 글자 그대로라 사이트를 가리지 않는다. 첫 인자가 문서 확장자로 끝나는 http(s) 주소일 때만
+   (경로 조각 `/a/b.hwp` 는 여전히 모른다 — 어디에 붙일지는 사이트마다 달라 짐작이 된다). */
+const JS_ABSOLUTE_FILE = /^javascript:\s*[\w$.]+\(\s*(['"])(https?:\/\/[^'"\s]+?\.(?:hwpx?|docx?|pdf|xlsx?|pptx?|zip))\1/i;
+
 /** `javascript:` 내려받기 호출을 진짜 주소로. 모르는 사이트·모양이면 null */
 export function resolveJsDownload(href, pageUrl) {
   let host;
@@ -86,7 +93,8 @@ export function resolveJsDownload(href, pageUrl) {
     const m = String(href || '').trim().match(r.call);
     if (m) return new URL(r.path(m), pageUrl).href;
   }
-  return null;
+  const abs = String(href || '').trim().match(JS_ABSOLUTE_FILE);
+  return abs ? abs[2] : null;
 }
 
 /* 첨부로 볼 링크인가 — 확장자·내려받기 꼴 주소이거나 이름이 파일 이름일 때 */
@@ -187,8 +195,38 @@ export function linkAttachments(links, pageUrl, max = 6) {
    (두 곳까지는 같은 사업을 두 글로 올린 것일 수 있어 남긴다). 같은 글이 장부·정식 등록 두 파일에 있으면 한 번으로 센다(페이지 주소로 센다).
    데이터 전체를 놓고 세므로 로봇이 저장할 때마다 부르면 지난 것도 저절로 걷힌다. */
 const pageOf = (it) => String((it && (it.sourceUrl || it.url)) || '').split('#')[0];
+
+/* ── 같은 파일이 이름만 달리 두 번 실린 줄 (2026-11-20 · 개발자 지시 *"정리하고 재발하지 않도록"*) ─────────────
+   실측: 광운대 인석장학금 한 공고에 파일 2개가 6줄로 실렸다 — 같은 링크를 세 길이 제각기 읽었다(HTML 길 `Attachment 2026….hwp` ·
+   브라우저 길 `Attachment2026….hwp` · 화면 글자 세기 `2026….hwp`). 겹침을 **이름으로만** 걸러(rescue-plan newAttachments) 이름이 조금만 달라도 새 첨부가 됐다.
+   경희대 점프장학은 학교가 같은 자리의 파일 이름만 바꿔(`…_수정.pdf` → `…_수정_20261001.pdf`) 옛 이름이 남았다.
+   🔴 **주소가 같다고 같은 파일은 아니다** — 내려받기가 스크립트인 게시판은 서로 다른 파일 셋이 전부 공고 화면 주소(`…#;`)를 달고 있다(중앙대·서울시립대 실측).
+      그래서 ① 받을 주소가 글자까지 같고(http · `#` 없음) ② 이름 한쪽이 다른 쪽을 품을 때만 같은 파일로 본다(둘 다 맞아야 — 틀리게 합치면 첨부가 사라진다). */
+const DOC_EXT = /\.(?:hwpx?|docx?|pdf|xlsx?|pptx?|zip)$/i;
+const stemOf = (n) => String(n || '').normalize('NFC').replace(/\s+/g, '').replace(DOC_EXT, '').toLowerCase();
+export function sameFileEntry(a, b) {
+  if (!a || !b || a.bodyImage || b.bodyImage) return false;
+  const u = String(a.url || '');
+  if (!/^https?:\/\//i.test(u) || u.includes('#') || u !== String(b.url || '')) return false;
+  const x = stemOf(a.name), y = stemOf(b.name);
+  return !!x && !!y && (x.includes(y) || y.includes(x));
+}
+/** 한 공고의 첨부에서 같은 파일을 한 줄로 — 자리는 처음 나온 줄 · 이름은 확장자가 있는 쪽, 같으면 짧은 쪽(앞에 붙은 화면 글자가 없는 파일 이름) */
+export function collapseSameFiles(atts) {
+  const out = [];
+  const better = (n, cur) => (DOC_EXT.test(String(n).trim()) !== DOC_EXT.test(String(cur).trim()) ? DOC_EXT.test(String(n).trim()) : stemOf(n).length < stemOf(cur).length);
+  for (const a of atts || []) {
+    const i = out.findIndex((o) => sameFileEntry(o, a));
+    if (i < 0) out.push(a);
+    else if (better(a.name, out[i].name)) out[i] = { ...out[i], name: a.name };
+  }
+  return out;
+}
+
 export const CHROME_MIN_PAGES = 3;
-/** lists: 공고 배열 여럿([notices.items, registered.items, …]). 공통 링크를 **그 자리에서** 걷고 걷어 낸 개수를 돌려준다 */
+/** lists: 공고 배열 여럿([notices.items, registered.items, …]). 첨부 목록을 **그 자리에서** 다듬고 고친 개수를 돌려준다 —
+    ① 게시판 공통 링크 걷기 ② 같은 파일 한 줄로(collapseSameFiles) ③ 이제 풀 수 있게 된 `javascript:` 내려받기 호출을 진짜 주소로(resolveJsDownload —
+    규칙을 더하면 이미 실린 글에도 저절로 닿는다 · 운영 원칙 7 소급). 저장하는 로봇이 저장 직전에 부르므로 지난 글도 다음 실행에 걷힌다 */
 export function stripSiteChrome(lists, min = CHROME_MIN_PAGES) {
   const pages = new Map();
   for (const arr of lists) for (const it of arr || []) for (const a of it.attachments || []) {
@@ -200,8 +238,18 @@ export function stripSiteChrome(lists, min = CHROME_MIN_PAGES) {
   for (const arr of lists) for (const it of arr || []) {
     if (!Array.isArray(it.attachments) || !it.attachments.length) continue;
     const kept = it.attachments.filter((a) => !(a && chrome.has(a.url)));
-    removed += it.attachments.length - kept.length;
-    if (kept.length !== it.attachments.length) it.attachments = kept;
+    let changed = it.attachments.length - kept.length;
+    const page = pageOf(it);
+    const solved = kept.map((a) => {
+      const real = a && /^javascript:/i.test(a.url || '') ? resolveJsDownload(a.url, page) : null;
+      if (!real) return a;
+      changed += 1;
+      return { ...a, url: real };
+    });
+    const one = collapseSameFiles(solved);
+    changed += solved.length - one.length;
+    removed += changed;
+    if (changed) it.attachments = one;
   }
   return removed;
 }

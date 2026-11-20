@@ -269,6 +269,19 @@ export default async function bodies(eq, ctx) {
     eq('  🔴 같은 파일은 한 번만 쌓는다 — 화면 글자 `X.hwp` 와 링크 글자 `X.hwp (다운로드 : 12회)`·`1. X.hwp 미리보기` 는 같은 첨부(리뷰 5 · 서울교대 한 공고에 36개)',
       newAttachments([{ name: '장학금 신청서.hwp (다운로드 : 12회)' }], [{ name: '장학금 신청서.hwp' }, { name: '1. 장학금 신청서.hwp 미리보기' }, { name: '선발 공고문.pdf [1.2MB]' }, { name: '선발 공고문.pdf' }]).map((a) => a.name),
       ['선발 공고문.pdf [1.2MB]']);
+    /* 2026-11-20 — 광운대 인석장학금: 같은 링크를 읽는 길마다 이름이 달라(`Attachment 2026….hwp` · `Attachment2026….hwp` · `2026….hwp`) 파일 2개가 6줄이 됐다.
+       이름만 보던 겹침 판정에 **받을 주소까지 같은 같은 파일**(attachment-link sameFileEntry)을 더했다 — 주소만 같고 이름이 딴판이면 여전히 새 첨부다 */
+    {
+      const U = 'https://www.kw.ac.kr/include/Download.jsp?fuid=35466&ano=53536';
+      const SELF = 'https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&#';
+      eq('  🔴 이름이 조금 달라도 받을 주소가 같은 같은 파일은 다시 쌓지 않는다(이미 적힌 것과 · 이번에 찾은 것끼리) — 주소가 다르면 새 첨부',
+        [newAttachments([{ name: 'Attachment 20261021 인석장학금 체크리스트1.hwp', url: U }], [{ name: 'Attachment20261021 인석장학금 체크리스트1.hwp', url: U }, { name: '20261021 인석장학금 체크리스트1.hwp', url: U }]).length,
+          newAttachments([], [{ name: 'Attachment20261021 인석장학금 체크리스트1.hwp', url: U }, { name: '20261021 인석장학금 체크리스트1.hwp', url: U }]).map((a) => a.name),
+          newAttachments([{ name: 'Attachment 20261021 인석장학금 체크리스트1.hwp', url: U }], [{ name: '20261021 인석장학금 체크리스트1.hwp', url: `${U}9` }]).length],
+        [0, ['Attachment20261021 인석장학금 체크리스트1.hwp'], 1]);
+      eq('  🔴 주소만 같고 이름이 딴판이면 다른 파일이다 — 공고 화면 주소(`…#`)를 같이 단 신청서·자기소개서는 둘 다 적는다(서울시립대 실측 꼴)',
+        newAttachments([{ name: '발전기금 장학생 신청서.hwp', url: SELF }], [{ name: '자기소개서_기본형.hwp', url: SELF }]).map((a) => a.name), ['자기소개서_기본형.hwp']);
+    }
     eq('  받을 수 있는 주소는 http(s) 뿐 — `javascript:`·빈 주소·`#` 는 앱이 이름만 보인다',
       [usableUrl('https://a.example/f.hwp'), usableUrl("javascript:filedown('1')"), usableUrl(''), usableUrl('#'), usableUrl(undefined)], [true, false, false, false, false]);
     eq('  살필 때 — 한 번도 안 살폈으면 · 다 구했으면 다시 안 연다 · 못 구한 것이 남았어도 이레 안이면 쉰다 · 여드레면 다시',

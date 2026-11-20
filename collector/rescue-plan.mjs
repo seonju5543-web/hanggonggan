@@ -15,6 +15,7 @@
    ============================================================ */
 import { createRequire } from 'node:module';
 import { canonUrl } from './canon-url.mjs';
+import { sameFileEntry } from './attachment-link.mjs';   // 같은 파일인가(주소 + 이름 · 2026-11-20) — 수집 로봇의 다듬기와 같은 판정 한 곳
 
 const { notStale } = createRequire(import.meta.url)('../match-engine.js');
 
@@ -93,13 +94,16 @@ export function pruneLedger(ledger, items) {
    (서울교대 한 공고에 그런 첨부가 36개). fileNameIn 은 아래에 있다(함수 선언이라 여기서 불러도 된다) */
 const normName = (n) => { const s = String(n || ''); return (fileNameIn(s) || s).replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim(); };
 
-/** 페이지에서 찾은 첨부 중 아직 기록에 없는 것만 */
+/** 페이지에서 찾은 첨부 중 아직 기록에 없는 것만.
+    🔴 이름만 보지 않는다(2026-11-20) — 같은 링크를 읽는 길마다 이름이 조금씩 달라(`Attachment 2026….hwp` · `Attachment2026….hwp` · `2026….hwp`)
+       광운대 인석장학금은 파일 2개가 6줄이 됐다. 받을 주소까지 같은 같은 파일(attachment-link sameFileEntry)은 새 첨부가 아니다 */
 export function newAttachments(have, found) {
   const had = new Set((have || []).map((a) => normName(a.name)));
   const out = [];
   for (const a of found || []) {
     const k = normName(a.name);
     if (had.has(k)) continue;
+    if ((have || []).some((h) => sameFileEntry(h, a)) || out.some((o) => sameFileEntry(o, a))) continue;
     had.add(k);
     out.push(a);
   }
