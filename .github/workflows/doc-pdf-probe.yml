@@ -19,7 +19,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 15   # 설치 3분 + 파일 몇 개(파일 하나 최대 270초 — doc-pdf FILE_MAX_SEC · 평소 10초 안)
+    timeout-minutes: 15   # 설치 3분 + 파일 몇 개(파일 하나 최대 130초 + 다시 가는 길 140초 — doc-pdf FILE_MAX_SEC · RELAX_MAX_SEC · 평소 10초 안)
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -28,6 +28,7 @@ jobs:
       - name: 변환기·글꼴 설치 (deep-fetch 의 「공고문 → PDF」 단계와 같은 것)
         timeout-minutes: 6
         run: |
+          sudo apt-get update -qq -o DPkg::Lock::Timeout=120
           sudo apt-get install -y -qq -o DPkg::Lock::Timeout=120 libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum fonts-noto-cjk poppler-utils
           pip install olefile --quiet
           bash collector/install-h2orestart.sh

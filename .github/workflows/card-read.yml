@@ -151,6 +151,13 @@ jobs:
           node tools/alert-issue.mjs --mode open --match exact --title '🧾 유료 카드 읽기 알림' \
             --label card-read --label-color 5319E7 --label-description '유료 카드 읽기 로봇 실패' --body "$body"
 
+      # 유료 관문 기록 (2026-11-21 개발자 지시) — 숨김 공고 몇 건 · 통과 · 사람에게 · 건당 비용 · 줄 통과율 · 최종 검토 비용을 실행 요약 칸에(장부에서 센다 · 돈 0)
+      - name: 유료 관문 기록 (비용·통과율)
+        if: always()
+        timeout-minutes: 1
+        continue-on-error: true
+        run: node collector/card-read.mjs --stats >> "$GITHUB_STEP_SUMMARY"
+
       # 🔴 유료가 멈춘 숨김분 (2026-11-20 · 설계 docs/designs/paid-gate-pipeline.md 2-1) — 사흘 넘게 통과를 못 낸 새 공고는 앱이 무료 값으로 올린다(비상망).
       #    조용히 무료로 넘어가지 않게 여기서 경보를 연다. 짝(닫기)은 바로 아래 · 제목이 같아야 닫힌다(tools/alert-issue.mjs)
       - id: stall

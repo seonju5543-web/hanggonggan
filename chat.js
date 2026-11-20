@@ -1737,6 +1737,37 @@ function chatBind() {
   const sheet = document.querySelector('#chat-sheet');
   if (!form || !input || !sheet) return;
 
+  /* 🔴 **대화 창 위에서 밀어도 뒤 화면은 움직이지 않는다** (2026-11-20 개발자 지시 — 아이폰 스크린샷:
+     "아래에서 위로 스크롤할 때 화면이 위로 올라가 … 대장님과의 대화 창 확인 외에는 아예 못하게").
+     키보드가 떠 있는 아이폰은 시트의 머리말·빈 자리·입력 줄에서 위로 밀면 **화면 전체(보이는 칸)** 를 밀어 올렸고,
+     입력 칸 자리에 커서만 떠 남았다. 브라우저 기본 스크롤을 허용하는 손짓은 셋뿐이다.
+       ① 대화 목록이 **그 방향으로 더 굴러갈 수 있을 때** — 끝에 닿으면 막는다(안 막으면 끝에서 뒤 화면으로 넘어간다)
+       ② 추천 칩 줄·입력 칸의 **가로** 밀기(칩 넘기기·커서 옮기기)
+       ③ 아래로 쓸어 닫기 — enableSheetSwipe 가 따로 받는다(여기서 기본 동작을 막아도 그 처리는 그대로 돈다)
+     배경(어두운 막)은 무엇이든 막는다. */
+  let swY = 0, swX = 0;
+  sheet.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    swY = e.touches[0].clientY; swX = e.touches[0].clientX;
+  }, { passive: true });
+  sheet.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    const dy = t.clientY - swY, dx = t.clientX - swX;
+    swY = t.clientY; swX = t.clientX;                               // 방향은 직전 움직임으로 본다
+    const el = e.target && e.target.closest ? e.target : null;
+    if (el && el.closest('.chat-chips, #chat-input') && Math.abs(dx) > Math.abs(dy)) return;   // ②
+    const log = el && el.closest('#chat-log');
+    if (log && dy !== 0) {
+      const canShowBelow = log.scrollTop + log.clientHeight < log.scrollHeight - 1;   // 손가락이 위로(dy<0) = 아래 내용 보기
+      const canShowAbove = log.scrollTop > 0;                                         // 손가락이 아래로(dy>0) = 위 내용 보기
+      if ((dy < 0 && canShowBelow) || (dy > 0 && canShowAbove)) return;              // ①
+    }
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false });
+  const backdrop = document.querySelector('#chat-backdrop');
+  if (backdrop) backdrop.addEventListener('touchmove', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
+
   /* 키보드 자리 맞춤 — 보이는 칸이 바뀔 때마다(키보드 오르내림·사파리가 화면을 미는 것 모두) */
   if (window.visualViewport) {
     ['resize', 'scroll'].forEach((ev) => window.visualViewport.addEventListener(ev, chatFitKeyboard));

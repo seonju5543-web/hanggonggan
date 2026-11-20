@@ -75,6 +75,17 @@ const JS_DOWNLOAD_RULES = [
        이름 안의 따옴표는 `\'` 로 적혀 온다(「웰로 \'Wello\' 앱」) — 그래서 인자를 `\'` 를 건너 읽고 되돌린다 */
     call: /^javascript:\s*downGO\(\s*'((?:\\'|[^'])*)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/i,
     path: (m) => `/cmmn/fileDown.do?filename=${encodeURIComponent(m[1].replace(/\\'/g, "'"))}&filepath=${m[2]}&filerealname=${m[3]}` },
+  /* 서울시립대 장학 게시판 (2026-11-21 · 언론인회 장학금의 신청서·자기소개서를 누르면 파일 대신 공고 화면이 열렸다 — 화면 주소가 첨부 주소로 적혀 있었다).
+     정의(/js/headquarter/scholarship/scholarship.js): function filedown(brdDate, brdSeq, filSeq) { $("#brdDate").val(brdDate); $("#brdSeq").val(brdSeq); $("#filSeq").val(filSeq);
+       $("#sendForm").attr("action", "/scholarship/download.do").submit(); } — sendForm 은 GET 이고 게시판 번호(brdBbsseq)를 숨은 칸으로 들고 있다(공고 주소의 brdBbsseq 와 같은 값).
+     실측(쿠키 없는 새 요청): …/download.do?brdBbsseq=1&brdDate=20261105&brdSeq=1&filSeq=1 → HWP 12.8KB · filSeq=2 → HWP 17.4KB — 내려온 이름(Content-Disposition)이 화면의 첨부 이름과 맞았다.
+     호출은 `href="#"` 의 onclick 에 있다(detailAttachments ⑤). 🔴 게시판 번호를 공고 주소에서 못 읽으면 풀지 않는다(짐작하지 않는다 — path 가 null) */
+  { host: /^scholarship\.uos\.ac\.kr$/i,
+    call: /^javascript:\s*filedown\(\s*'(\d{8})'\s*,\s*'(\d+)'\s*,\s*'(\d+)'\s*\)/i,
+    path: (m, pageUrl) => {
+      const board = new URL(pageUrl).searchParams.get('brdBbsseq');
+      return /^\d+$/.test(board || '') ? `/scholarship/download.do?${new URLSearchParams({ brdBbsseq: board, brdDate: m[1], brdSeq: m[2], filSeq: m[3] })}` : null;
+    } },
 ];
 
 /* 호출 안에 **파일의 절대 주소가 통째로 적힌** 꼴 (2026-11-20 · 공고문 PDF 로봇 첫 실행의 '주소 없음' 3개가 전부 이 꼴이었다):
@@ -91,7 +102,8 @@ export function resolveJsDownload(href, pageUrl) {
   for (const r of JS_DOWNLOAD_RULES) {
     if (!r.host.test(host)) continue;
     const m = String(href || '').trim().match(r.call);
-    if (m) return new URL(r.path(m), pageUrl).href;
+    const p = m ? r.path(m, pageUrl) : null;   // 규칙이 공고 주소에서 읽을 것이 있으면 읽는다(서울시립대 게시판 번호) · 못 읽으면 null — 풀지 않는다
+    if (p) return new URL(p, pageUrl).href;
   }
   const abs = String(href || '').trim().match(JS_ABSOLUTE_FILE);
   return abs ? abs[2] : null;
@@ -196,30 +208,70 @@ export function linkAttachments(links, pageUrl, max = 6) {
    데이터 전체를 놓고 세므로 로봇이 저장할 때마다 부르면 지난 것도 저절로 걷힌다. */
 const pageOf = (it) => String((it && (it.sourceUrl || it.url)) || '').split('#')[0];
 
-/* ── 같은 파일이 이름만 달리 두 번 실린 줄 (2026-11-20 · 개발자 지시 *"정리하고 재발하지 않도록"*) ─────────────
+/* 화면 글자에서 파일 이름 — 확장자로 끝나는 덩어리. 브라우저 안(census)과 관문이 같은 식을 쓴다(FILE_NAME_SRC 를 문자열로 넘긴다).
+   그림 확장자는 뺀다 — 본문 그림은 따로 적고(본문이미지-…), 사이트 로고·배너 파일 이름이 글자로 보이는 일은 드물지만 첨부로 세면 경보가 헛돈다.
+   (2026-11-20 rescue-plan.mjs 에서 옮김 — 아래 「같은 파일」 판정도 이 눈으로 이름을 읽는다 · rescue-plan 은 여기 것을 그대로 다시 내보낸다) */
+export const FILE_NAME_SRC = String.raw`([^\\/:*?"<>|\n\t]{2,120}\.(?:hwp|hwpx|pdf|docx?|xlsx?|pptx?|zip))(?=$|[\s\[\(（【])`;
+const FILE_NAME = new RegExp(FILE_NAME_SRC, 'i');
+/** 글자 한 덩어리에서 파일 이름 하나(없으면 '') — 확장자 바로 뒤에 글자가 이어지면 파일 이름이 아니다(「…신청서.hwp를 작성하여」 — 본문 문장 · 리뷰 1) */
+export function fileNameIn(text) {
+  const m = String(text || '').replace(/\s+/g, ' ').trim().match(FILE_NAME);
+  return m ? m[1].trim() : '';
+}
+
+/* ── 같은 파일이 이름만 달리 여러 번 실린 줄 (2026-11-20 · 개발자 지시 *"정리하고 재발하지 않도록"*) ─────────────
    실측: 광운대 인석장학금 한 공고에 파일 2개가 6줄로 실렸다 — 같은 링크를 세 길이 제각기 읽었다(HTML 길 `Attachment 2026….hwp` ·
-   브라우저 길 `Attachment2026….hwp` · 화면 글자 세기 `2026….hwp`). 겹침을 **이름으로만** 걸러(rescue-plan newAttachments) 이름이 조금만 달라도 새 첨부가 됐다.
-   경희대 점프장학은 학교가 같은 자리의 파일 이름만 바꿔(`…_수정.pdf` → `…_수정_20261001.pdf`) 옛 이름이 남았다.
+   브라우저 길 `Attachment2026….hwp` · 화면 글자 세기 `2026….hwp`). 서울교대 우양재단은 파일 3개가 36줄 — 링크 글자에 붙은 내려받은 횟수
+   (`X.hwp (다운로드 : 11회)` · `… 12회`)가 볼 때마다 달라 새 첨부가 됐다(11-17 에 쌓이는 것은 막았지만 쌓인 줄은 남아 있었다).
    🔴 **주소가 같다고 같은 파일은 아니다** — 내려받기가 스크립트인 게시판은 서로 다른 파일 셋이 전부 공고 화면 주소(`…#;`)를 달고 있다(중앙대·서울시립대 실측).
-      그래서 ① 받을 주소가 글자까지 같고(http · `#` 없음) ② 이름 한쪽이 다른 쪽을 품을 때만 같은 파일로 본다(둘 다 맞아야 — 틀리게 합치면 첨부가 사라진다). */
-const DOC_EXT = /\.(?:hwpx?|docx?|pdf|xlsx?|pptx?|zip)$/i;
-const stemOf = (n) => String(n || '').normalize('NFC').replace(/\s+/g, '').replace(DOC_EXT, '').toLowerCase();
+      틀리게 합치면 첨부가 학생 화면에서 사라진다(겹쳐 보이는 것보다 나쁘다). 그래서 넷이 다 맞을 때만 같은 파일로 본다:
+      ① 받을 주소가 글자까지 같다(http · `#` 없음 · 그 공고 화면 주소가 아님)
+      ② 이름(파일 이름만 읽은 것 — 횟수·아이콘 꼬리·앞 번호를 뗀다)이 같거나, 한쪽 앞에 화면 글자가 더 붙었을 뿐이다(`Attachment…`)
+      ③ 확장자가 둘 다 있으면 같다
+      ④ **그 주소를 단 줄이 전부** 서로 그렇다 — 한 줄이라도 딴 이름이면 그 주소는 파일 하나의 주소가 아니므로 아무것도 합치지 않는다
+   학교가 같은 자리의 파일을 새 이름으로 바꿔 올린 것(경희대 `…_수정.pdf` → `…_수정_20261001.pdf`)은 **합치지 않는다**(리뷰 11-20) — 합치면 새 이름이
+   영영 안 실려 공고문 PDF 로봇이 바뀐 파일을 다시 바꾸지 않는다. */
+const DOC_EXT = /\.(hwpx?|docx?|pdf|xlsx?|pptx?|zip)$/i;
+/* 파일 이름 뒤에 괄호로 붙은 화면 글자(`포스터.jpg (다운로드 : 9회)` · `[13KB]`) — 문서는 fileNameIn 이 떼고, 그림 이름은 여기서 뗀다(서울교대 포스터 12줄) */
+const TAILED = /^(.*?\.(?:hwpx?|docx?|pdf|xlsx?|pptx?|zip|png|jpe?g|gif|bmp|webp))\s*[(\[（【][^)\]）】]{0,40}[)\]）】]\s*$/i;
+const nameKey = (n) => { const s = cleanAttachName(n); return (fileNameIn(s) || s.replace(TAILED, '$1')).replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim(); };
+const nameParts = (n) => { const k = nameKey(n).normalize('NFC').replace(/\s+/g, '').toLowerCase(); const e = (k.match(DOC_EXT) || [, ''])[1]; return { stem: k.replace(DOC_EXT, ''), ext: e }; };
+const fileUrl = (a, pageUrl = '') => { const u = String((a && a.url) || ''); return /^https?:\/\//i.test(u) && !u.includes('#') && u !== pageUrl ? u : ''; };
+function sameName(a, b) {
+  const x = nameParts(a.name), y = nameParts(b.name);
+  if (!x.stem || !y.stem || (x.ext && y.ext && x.ext !== y.ext)) return false;
+  return x.stem === y.stem || x.stem.endsWith(y.stem) || y.stem.endsWith(x.stem);
+}
+/** 두 첨부가 같은 파일인가(①②③) — 줄 둘만 놓고 본다. 목록에 쌓을지는 sameFileAmong(④까지)으로 정한다 */
 export function sameFileEntry(a, b) {
   if (!a || !b || a.bodyImage || b.bodyImage) return false;
-  const u = String(a.url || '');
-  if (!/^https?:\/\//i.test(u) || u.includes('#') || u !== String(b.url || '')) return false;
-  const x = stemOf(a.name), y = stemOf(b.name);
-  return !!x && !!y && (x.includes(y) || y.includes(x));
+  const u = fileUrl(a);
+  return !!u && u === fileUrl(b) && sameName(a, b);
 }
-/** 한 공고의 첨부에서 같은 파일을 한 줄로 — 자리는 처음 나온 줄 · 이름은 확장자가 있는 쪽, 같으면 짧은 쪽(앞에 붙은 화면 글자가 없는 파일 이름) */
-export function collapseSameFiles(atts) {
-  const out = [];
-  const better = (n, cur) => (DOC_EXT.test(String(n).trim()) !== DOC_EXT.test(String(cur).trim()) ? DOC_EXT.test(String(n).trim()) : stemOf(n).length < stemOf(cur).length);
-  for (const a of atts || []) {
-    const i = out.findIndex((o) => sameFileEntry(o, a));
-    if (i < 0) out.push(a);
-    else if (better(a.name, out[i].name)) out[i] = { ...out[i], name: a.name };
+/** 이 줄이 이미 적힌 줄들 가운데 같은 파일인가 — 같은 주소를 단 줄이 있고 **그 전부**와 이름이 맞을 때만(④) */
+export function sameFileAmong(rows, a) {
+  const u = a && !a.bodyImage ? fileUrl(a) : '';
+  if (!u) return false;
+  const g = (rows || []).filter((h) => h && !h.bodyImage && fileUrl(h) === u);
+  return g.length > 0 && g.every((h) => sameName(h, a));
+}
+/** 한 공고의 첨부에서 같은 파일을 한 줄로 — 자리는 처음 나온 줄 · 이름은 파일 이름으로 끝나는 쪽, 같으면 앞에 붙은 글자가 없는(짧은) 쪽.
+    pageUrl(조각 뗀 그 공고 화면 주소)을 주면 그 주소를 단 줄은 보지 않는다 */
+export function collapseSameFiles(atts, pageUrl = '') {
+  const list = atts || [];
+  const groups = new Map();
+  list.forEach((a, i) => { const u = a && !a.bodyImage ? fileUrl(a, pageUrl) : ''; if (u) (groups.get(u) || groups.set(u, []).get(u)).push(i); });
+  const pure = (n) => DOC_EXT.test(cleanAttachName(n));
+  const better = (n, cur) => (pure(n) !== pure(cur) ? pure(n) : nameParts(n).stem.length !== nameParts(cur).stem.length ? nameParts(n).stem.length < nameParts(cur).stem.length : String(n).length < String(cur).length);
+  const drop = new Set(); const rename = new Map();
+  for (const idx of groups.values()) {
+    if (idx.length < 2) continue;
+    if (!idx.every((i, p) => idx.every((k, q) => q <= p || sameName(list[i], list[k])))) continue;   // ④ 한 줄이라도 딴 이름 — 그 주소는 건드리지 않는다
+    rename.set(idx[0], idx.reduce((best, i) => (better(list[i].name, best) ? list[i].name : best), list[idx[0]].name));
+    idx.slice(1).forEach((i) => drop.add(i));
   }
+  const out = [];
+  list.forEach((a, i) => { if (!drop.has(i)) out.push(rename.has(i) && rename.get(i) !== a.name ? { ...a, name: rename.get(i) } : a); });
   return out;
 }
 
@@ -246,7 +298,7 @@ export function stripSiteChrome(lists, min = CHROME_MIN_PAGES) {
       changed += 1;
       return { ...a, url: real };
     });
-    const one = collapseSameFiles(solved);
+    const one = collapseSameFiles(solved, page);
     changed += solved.length - one.length;
     removed += changed;
     if (changed) it.attachments = one;

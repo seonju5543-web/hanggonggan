@@ -1,9 +1,9 @@
 {
- "enabled": false,
+ "enabled": true,
  "maxPerRun": 15,
  "maxUsdPerRun": 3,
  "giveUpAfter": 3,
  "effort": "medium",
  "_무엇인가": "유료 최종 검토 로봇(collector/final-review.mjs)의 스위치와 한 실행의 상한. 설계 docs/designs/paid-gate-pipeline.md 3절.",
- "_enabled": "true 이고 워크플로가 FINAL_REVIEW_ENABLE=1 을 줄 때만 유료 API 를 부른다. 켜는 것은 개발자가 채팅에서 지시할 때만(CLAUDE.md 🔴 8)."
+ "_enabled": "true 이고 워크플로가 FINAL_REVIEW_ENABLE=1 을 줄 때만 유료 API 를 부른다. 켜고 끄는 것은 개발자가 채팅에서 지시할 때만(CLAUDE.md 🔴 8). 2026-11-21 개발자 지시(「위의 두개도 켜서」)로 켰다 — 매일 22:47 KST, 유료 확인을 통과한 숨김 등록분·직접 등록분 가운데 문서·카드가 바뀐 것만 본다."
 }
