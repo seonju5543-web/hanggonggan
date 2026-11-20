@@ -556,7 +556,7 @@ function kosafAsScholarships() {
         ...((i.files || []).length
           ? { attachments: i.files.map((f) => ({ name: f.name, url: f.path, bytes: f.bytes || 0 })) }
           : {}),
-        ...(kosafClean(f['문의처']) ? { contact: kosafClean(f['문의처']) } : {}),
+        ...(knownValue(kosafClean(f['문의처'])) ? { contact: knownValue(kosafClean(f['문의처'])) } : {}),   // 재단이 적어 둔 「※ 기관확인필요」는 문의처가 아니다 — 읽는 곳 셋(시트·신청 준비·도우미)을 여기 한 곳에서(2026-11-20 티앤씨재단)
         /* 층2 줄에 함께 보여 줄 **재단이 적어 둔 칸** (2026-09-07 캘린더).
            자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
         ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
@@ -698,8 +698,12 @@ function noticeCardHtml(n, opts) {
      🔴 주소도 이름과 같은 link 에서 — 바로잡은 원문(source-link.js ⑥)이 있으면 그 주소다. n.url 로 열면 이름은 「원문」인데 목록이 열린다(리뷰 2026-10-04) */
   const href = safeUrl(link.href);
   const sp = !thumb && o.schoolPhoto && SCHOOL_PHOTO_RE.test(o.schoolPhoto.src || '') ? o.schoolPhoto : null;
+  /* o.sheet — 누르면 원문으로 나가지 않고 상세 시트(openBoardDetail)를 연다 (2026-11-20 개발자 지적: 장학금 찾기 '교내' 칸에서
+     "카드가 안 열리고 그대로 원문 링크로 들어가지는" 것 — 그 칸의 다른 카드는 전부 시트를 연다). 원문은 시트 맨 아래 「원문」 절이 준다 */
+  const tag = o.sheet ? 'button' : 'a';
+  const open = o.sheet ? ` type="button" data-board="${esc(n.url || '')}"` : (href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : '');
   return `
-    <a class="sch-card notice-card${thumb || sp ? ' has-thumb' : ''}"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+    <${tag} class="sch-card notice-card${thumb || sp ? ' has-thumb' : ''}"${open}>
       ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
            예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
            걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
@@ -741,7 +745,7 @@ function noticeCardHtml(n, opts) {
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
       ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) && hintShort(n.deadlineHint) ? `<p class="sch-provider">${esc(hintShort(n.deadlineHint))}</p>` : ''}
       ${/* 링크 이름은 sourceLink 한 곳(card) — 목록·홈페이지·로봇이 확인한 문제 주소는 '원문'이라 부르지 않는다 (2026-10-03) */ ''}
-      <p class="sch-provider">${[(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개` : '', o.dateTop || !n.foundAt ? '' : `${esc(shortDay(n.foundAt))} 수집`, link.label ? esc(link.label) : ''].filter(Boolean).join(' · ')}</p>
+      <p class="sch-provider">${[(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개` : '', o.dateTop || !n.foundAt ? '' : `${esc(shortDay(n.foundAt))} 수집`, link.label && !o.sheet ? esc(link.label) : ''].filter(Boolean).join(' · ')}</p>
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
@@ -749,7 +753,38 @@ function noticeCardHtml(n, opts) {
            🔴 사진 위 「학교 사진」 표시는 **개발자 지시로 뺐다**(같은 날 *"학교사진에 '학교사진' 이라는 디스크립션 빼"*) — 다시 붙이지 말 것(관문이 잠근다).
            출처 줄(작가·라이선스 — 열린 라이선스의 표기 의무)은 구역 아래 한 번(schoolNewsHtml) · 학교 사진인지는 클래스(notice-thumb-school)로만 안다 */ ''}
       ${sp ? `<img class="notice-thumb notice-thumb-school" src="${esc(sp.src)}" alt="" loading="lazy" decoding="async" width="72" height="72"${PHOTO_FOCUS_RE.test(sp.focus || '') ? ` style="object-position:${esc(sp.focus)}"` : ''} />` : ''}
-    </a>`;
+    </${tag}>`;
+}
+
+/* 게시판 글 상세 시트 — 장학 시트와 같은 머리줄·절(sheetSectionsHtml). 우리가 읽은 것은 제목·기간 토막·첨부·주소뿐이라
+   그것만 적는다(원칙 8-1 · 자격 줄이 없으면 「지원 자격」 칸은 안 그린다). 주최를 모르므로 칩은 「장학」 하나 · 윗줄은 카드와 같은 「○○ 게시판」.
+   주소는 sourceUrl 로 넘겨 원문 링크 이름·바로잡기가 sourceLink 한 곳을 거친다 */
+function openBoardDetail(url) {
+  const n = boardNoticesForMe().find((x) => x.url === url);
+  if (!n) return;
+  if (typeof trackUse === 'function') trackUse('detail', url);
+  { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = url; }
+  const tSplit = splitTitleDates(unent(n.title));
+  const full = n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintShort(n.deadlineHint, Infinity) : '';   // 카드와 같은 기간 한 줄(다음 항목 앞에서 끊는다) · 카드의 44자 상한은 풀어 마감 날짜까지 보인다
+  /* 다음 한글 항목(「나. 신청방법 …」) 앞에서도 끊는다 — 끊고도 날짜가 남을 때만(「신청 기간 및 방법 가. 신청 기간: …」 은 앞토막에 날짜가 없어 통째로 둔다 · 실데이터 853줄 비교 2026-11-20) */
+  const cut = full.split(/\s(?=[가나다라마바사아자차카타파하]\s?\.\s*[가-힣])/)[0];
+  const hint = /\d/.test(cut) ? cut : full;
+  const sch = {
+    id: `board:${url}`, name: tSplit.title, type: '', provider: `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판`,
+    eligibility: {}, documents: [], deadline: n.deadline || null, period: hint || tSplit.dates.join(' · '),
+    attachments: n.attachments || [], sourceUrl: n.url,
+    title: n.title, boardTitle: n.boardTitle,   // 링크가 목록일 때 「목록에서 찾을 제목」은 게시판에 적힌 그대로(sourceLink hint)
+  };
+  const d = n.deadline ? dday(n.deadline) : null;
+  sheetBack = null;   // 돌아갈 곳이 없다 — 내리면 닫힌다
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      ${sheetHeadHtml({ x: sch, d, save: '' })}
+      <h3 class="sheet-title">${esc(sch.name)}</h3>
+      ${sheetSectionsHtml({ sch, result: evaluateFor(sch, state.profile), fit: 0, fd: null })}
+    </div>`;
+  openSheetShell();
 }
 
 /* 학교 사진 고르기 — 학교에 여러 장이면 구역에서 사진 없는 카드의 차례(k)대로 돌아가며 쓴다(이웃 카드끼리 같은 사진이 이어지지 않게).
