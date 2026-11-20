@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: david/friendly-euler-w6o3wu
-메모: 2026-11-19 #5 — 재단 장학금 39건에 개별 원문 공고 주소 연결(재단·지자체 사이트에서 직접 찾아 열어 확인)
+branch: david/exciting-hypatia-jykmtn
+메모: 2026-11-20 #2 — 대장님 입력 칸: 아이폰에서 키보드가 올라오면 대화 창이 키보드 뒤로 들어가던 것 수리

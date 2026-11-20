@@ -150,15 +150,26 @@ vm.runInContext([
     'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'JUNK_CHARS', 'OCR_URL_GARBLE', 'TIDY_SKIP_KEY', 'OCR_TEXT_KEY', 'OCR_MARK'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
   ...['esc', 'unent', 'tidyOcr', 'tidyText', 'tidyData', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // knownValue: 층2 공고 안내 칸 값이 부른다 · attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
-    'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy'].map(takeFn),
+    'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy',
+    'formPdfsFor', 'docPdfsFor', 'pdfRowHtml', 'attachPdfRowsHtml', 'sheetAttachments'].map(takeFn),   // 「첨부」 칸 — 위 PDF 줄 · 맨 밑 올린 목록(2026-11-20 승인 시안)
   /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
   'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
+  'var formsPdfIndex = { items: {} }; var docsPdfIndex = { items: {} };',   // 아래에서 앱이 받는 색인 그대로 넣는다
   /* 「공고 안내」 블록(NS_LABELS … noticeSummaryHtml) — 활동 시트의 셋째 칸을 앱 함수 그대로 그린다(test-collector 「공고 카드 품질」과 같은 자르기) */
   appSrc.slice(appSrc.indexOf('const NS_LABELS = ['), appSrc.indexOf('\nfunction sourceNoteHtml(')),
 ].join('\n\n'), linkCtx, { filename: 'app.js(링크 자리)' });
 linkCtx.joinSpacedSyllables = ME.joinSpacedSyllables;   // noticeSummaryHtml 의 tidyChars 가 쓴다(match-engine)
 linkCtx.stripListNumber = ME.stripListNumber;   // noticeSummaryRows 의 번호 떼기도 match-engine 한 곳(2026-11-17)
 const linkFn = (n) => vm.runInContext(n, linkCtx);
+/* 「첨부」 칸 (2026-11-20 승인 시안 · docs/designs/all-docs-pdf.md) — 앱이 받는 두 사본 색인을 넣고 앱 함수(attachPdfRowsHtml · sheetAttachments)로 그대로 센다 */
+for (const [k, rel] of [['formsPdfIndex', '../data/forms-pdf/index.json'], ['docsPdfIndex', '../data/docs-pdf/index.json']]) {
+  try { linkCtx[k] = linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(rel, import.meta.url), 'utf8'))); } catch { /* 없으면 빈 색인 — 앱도 그때 PDF 줄이 없다 */ }   // 앱처럼 다듬는다
+}
+function attachLines(it) {
+  const atts = linkFn('sheetAttachments')(it.attachments);
+  const rows = [...String(linkFn('attachPdfRowsHtml')(it, atts)).matchAll(/<a href="([^"]*)"[^>]*>([^<]*)<\/a>/g)].map((m) => `${htmlText(m[2])}${/data\/(forms|docs)-pdf\//.test(m[1]) ? ' (사본)' : ''}`);
+  return [`   ─ 첨부 — 위 PDF 줄 ${rows.length}개${rows.length ? ` · ${rows.join(' · ').slice(0, 90)}` : ''} · 맨 밑 올린 목록 ${atts.length}개`];
+}
 const LEDGER = new URL('../data/link-check.json', import.meta.url);
 const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;
 linkFn('setLinkChecks')(ledger);
@@ -237,6 +248,7 @@ function linkLines(it, where) {
     out.push(`   ─ 제출 서류 (${(it.documents || []).length}줄${(it.documents || []).length ? '' : ' · 칸 접힘'})`);
     for (const d of it.documents || []) out.push(`       · ${String(d).slice(0, 84)}`);
     out.push(`   ─ 신청서 양식 PDF ${pdfs.length}개${pdfs.length ? ` (${pdfs.map((f) => f.name).join(' · ').slice(0, 80)})` : ' · 칸 접힘'} · 첨부 ${(it.attachments || []).length}개 · 마감 ${it.deadline || '(없음)'}`);
+    out.push(...attachLines(it));
   }
   return out;
 }
@@ -256,6 +268,7 @@ function kosafFitLines(sch) {
     const v = ME.requirementMatch(text, p, sch);
     out.push(`       ${v === 'ok' ? '✓' : v === 'no' ? '✕' : '?'} ${group ? `[택1 ${group}] ` : ''}${String(text).slice(0, 84)}`);
   }
+  out.push(...attachLines(sch));   // 「첨부」 칸 — 위 PDF 줄 · 맨 밑 올린 목록(2026-11-20)
   return out;
 }
 
@@ -429,6 +442,7 @@ for (const sch of hits) {
   for (const l of exLines) console.log(`       ✗ ${String(l).slice(0, 84)}`);
   const why = (result.reasons || []).filter((r) => /미달|없어|불가/.test(r));
   if (why.length) console.log(`   ─ 미달 사유\n       ${why.map((w) => w.slice(0, 90)).join('\n       ')}`);
+  for (const l of attachLines(sch)) console.log(l);
   for (const l of linkLines(sch, 'sch')) console.log(l);
   for (const l of formSlotLines(sch)) console.log(l);
 }

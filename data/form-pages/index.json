@@ -725,6 +725,41 @@
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-11-20"
    }
+  ],
+  "auto-bbssc58944388artclviewdo": [
+   {
+    "src": "form-xjufyc-2.pdf",
+    "srcBytes": 637609,
+    "none": true,
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-amepagescholarshipnotice-0ywblu5": [
+   {
+    "src": "elig-10zmzq-1.pdf",
+    "srcBytes": 119243,
+    "none": true,
+    "at": "2026-11-20"
+   },
+   {
+    "src": "elig-10zmzq-2.pdf",
+    "srcBytes": 1906185,
+    "none": true,
+    "at": "2026-11-20"
+   }
+  ],
+  "kosaf-2000446027": [
+   {
+    "file": "kosaf-2000446027/1-2026년_영호남_상생_장학생_모집_공고문_p4-7.pdf",
+    "name": "공고문 안 신청서 서식 (4, 6~7쪽)",
+    "pages": 3,
+    "bytes": 429381,
+    "src": "2026년_영호남_상생_장학생_모집_공고문.hwp",
+    "srcBytes": 71168,
+    "srcPages": "4, 6~7",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-20"
+   }
   ]
  }
 }

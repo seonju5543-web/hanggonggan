@@ -170,5 +170,18 @@ ok(RULES.shouldSelfUnsubscribe(undefined, true) === false,
 ok(RULES.normalizeLedger(null).enabled === false,
   '(원인 확인) 못 읽은 장부는 여전히 enabled:false로 채워진다 — 그래서 위 구분이 필요하다');
 
+console.log('\n[15] 한꺼번에 여러 건을 하나로 묶을 때 — 본문에 공고 이름 (2026-11-20 개발자 지시)');
+// 예전 본문은 첫 알림 제목뿐이라 '오늘 마감 — 지금 확인하기 외 6건' 처럼 어떤 공고인지 몰랐다
+r = run({
+  ledger: JSON.parse(JSON.stringify(base)),
+  scholarships: [mk('a', { deadline: day(0) }), mk('b', { deadline: day(1) }), mk('c', { deadline: day(0) }), mk('new1')],
+});
+const sum = RULES.summaryBody(r.events);
+ok(r.events.length === 4, '규칙이 4건을 낸다(새 공고 1 + 마감 3)', r.events.map((e) => e.key));
+ok(sum === 'a 장학금 오늘 마감 · c 장학금 오늘 마감 외 2건', '오늘 마감 공고 이름 둘이 앞에(내일 마감보다 먼저) · 나머지는 「외 n건」', sum);
+ok(!/지금 확인하기|지금 준비하기/.test(sum), '할 일 문구가 아니라 공고 이름이 들어간다', sum);
+ok(r.events.every((e) => e.label), '알림마다 묶음용 짧은 이름(label)이 있다', r.events.filter((e) => !e.label).map((e) => e.key));
+ok(RULES.summaryBody([{ title: '옛 알림' }]) === '옛 알림', '이름표가 없는 알림은 제목으로 물러난다');
+
 console.log(fail ? `\n❌ 실패 ${fail}건\n` : '\n✅ 알림 규칙 전부 통과\n');
 process.exit(fail ? 1 : 0);

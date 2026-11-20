@@ -380,6 +380,11 @@ function bindEvents() {
     const card = e.target.closest('[data-activity]');
     if (card) openActivityDetail(card.dataset.activity);
   });
+  /* '교내' 칸의 게시판 글 카드 → 상세 시트 (2026-11-20 · 원문으로 바로 나가지 않는다) */
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest('[data-board]');
+    if (card) openBoardDetail(card.dataset.board);
+  });
 
   document.addEventListener('click', (e) => {
     /* 🔴 카드를 민 직후에 오는 click은 '열기'가 아니다 — 밀었는데 상세가 열리면

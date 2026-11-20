@@ -718,6 +718,42 @@
     "fonts": "ko-nanum-1",
     "at": "2026-11-20"
    }
+  ],
+  "auto-2570viewdocurrentpageno1": [
+   {
+    "file": "auto-2570viewdocurrentpageno1/1-_서식_글로벌여성리더장학금.pdf",
+    "name": "[서식]글로벌여성리더장학금.hwp",
+    "pages": 3,
+    "bytes": 126781,
+    "srcBytes": 53248,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
+  ],
+  "auto-2582viewdocurrentpageno1": [
+   {
+    "file": "auto-2582viewdocurrentpageno1/1-_서식_차세대여성리더장학금.pdf",
+    "name": "[서식]차세대여성리더장학금.hwp",
+    "pages": 3,
+    "bytes": 129598,
+    "srcBytes": 57344,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
+  ],
+  "act-1swq1aj": [
+   {
+    "file": "act-1swq1aj/1-Attachment_붙임_2._참가신청서1.pdf",
+    "name": "Attachment 붙임 2. 참가신청서1.hwpx",
+    "pages": 3,
+    "bytes": 172669,
+    "srcBytes": 56839,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-20"
+   }
   ]
  },
  "roles": {
@@ -726,6 +762,12 @@
   },
   "auto-ent2431269444artclviewdo": {
    "붙임2.[생활비] 온라인 체크리스트.pdf": "form"
+  },
+  "auto-2570viewdocurrentpageno1": {
+   "[서식]글로벌여성리더장학금.hwp": "form"
+  },
+  "auto-2582viewdocurrentpageno1": {
+   "[서식]차세대여성리더장학금.hwp": "form"
   },
   "auto-0713no2516266sitedvscdkr": {
    "[서식] 1~3.hwp": "form"

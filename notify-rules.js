@@ -214,6 +214,7 @@ var NOTIFY_RULES = (function () {
           title: '새 장학금 ' + fresh.length + '건 확인하기',
           body: fresh.slice(0, 2).map(function (s) { return s.name; }).join(', ')
             + ' 외 ' + (fresh.length - 2) + '건',
+          label: '새 장학금 ' + fresh.length + '건',
           url: './?screen=explore',
         });
       } else {
@@ -227,6 +228,7 @@ var NOTIFY_RULES = (function () {
             type: 'newMatch',
             title: s.name + (d != null ? ' · ' + (d === 0 ? '오늘 마감' : 'D-' + d) : ''),
             body: ['내 조건에 맞아요', amt].filter(Boolean).join(' · '),
+            label: s.name + ' 새 공고',
             schId: s.id,
           });
         });
@@ -256,6 +258,7 @@ var NOTIFY_RULES = (function () {
           title: (d === 1 ? '내일 마감 — ' : '오늘 마감 — ')
             + (app ? '제출만 남았어요' : (d === 1 ? '지금 준비하기' : '지금 확인하기')),
           body: s.name,
+          label: s.name + (d === 1 ? ' 내일 마감' : ' 오늘 마감'),
           schId: s.id,
         });
       });
@@ -274,6 +277,7 @@ var NOTIFY_RULES = (function () {
           type: 'submit',
           title: s.name + ' 제출 완료 표시하기',
           body: '마감 ' + (d === 0 ? '당일' : 'D-' + d) + ' · 이미 냈다면 한 번만 눌러 주세요.',
+          label: s.name + ' 제출 표시',
           schId: s.id,
         });
       });
@@ -316,6 +320,7 @@ var NOTIFY_RULES = (function () {
         title: profile.school + ' 새 장학 공고 ' + freshNotices.length + '건 보기',
         body: freshNotices[0].title
           + (freshNotices.length > 1 ? ' 외 ' + (freshNotices.length - 1) + '건' : ''),
+        label: profile.school + ' 새 공고 ' + freshNotices.length + '건',
         url: './?screen=explore',
       });
     }
@@ -333,6 +338,7 @@ var NOTIFY_RULES = (function () {
           type: 'result',
           title: s.name + ' 결과 기록하기',
           body: '마감 후 2주가 지났어요.',
+          label: s.name + ' 결과 기록',
           schId: s.id,
         });
       });
@@ -348,6 +354,21 @@ var NOTIFY_RULES = (function () {
     ledger.lastCheck = now;
 
     return { events: events, ledger: ledger };
+  }
+
+  /* 한꺼번에 여러 건이라 하나로 묶어 띄울 때의 본문 (2026-11-20 개발자 지시 — 예전엔 첫 알림 제목만 보여
+     '오늘 마감 — 지금 확인하기 외 6건' 처럼 어떤 공고인지 몰랐다). 급한 것(마감)부터 공고 이름 둘 + '외 n건'.
+     화면(notify.js)과 서비스워커(sw.js)가 이 한 곳을 부른다 — 갈라지지 않게. */
+  var SUMMARY_ORDER = { deadline: 1, submit: 2, newMatch: 3, feed: 4, result: 5 };
+  function summaryRank(e) {
+    if (e.type === 'deadline' && /:0$/.test(e.key || '')) return 0;   // 오늘 마감('dl:<id>:0')이 내일 마감보다 먼저
+    var x = SUMMARY_ORDER[e.type];
+    return x == null ? 9 : x;
+  }
+  function summaryBody(events) {
+    var list = (events || []).slice().sort(function (a, b) { return summaryRank(a) - summaryRank(b); });
+    var head = list.slice(0, 2).map(function (e) { return e.label || e.title; }).join(' · ');
+    return head + (list.length > 2 ? ' 외 ' + (list.length - 2) + '건' : '');
   }
 
   /* 알림함에 쌓기 — OS 알림이 꺼져 있어도 사용자가 놓치지 않도록 앱 안에 남긴다 */
@@ -375,6 +396,7 @@ var NOTIFY_RULES = (function () {
     shouldSelfUnsubscribe: shouldSelfUnsubscribe,
     evaluate: evaluate,
     pushToInbox: pushToInbox,
+    summaryBody: summaryBody,
     unreadCount: unreadCount,
     daysUntil: daysUntil,
   };
