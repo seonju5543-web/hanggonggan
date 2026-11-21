@@ -502,30 +502,39 @@ function openDetail(id) {
       ${sheetSectionsHtml({ sch, result, fit, fd, noticeLines: [...(sch.noticeLines || []), ...(sch.excerpts || [])] })}
 
       ${app && !app.pending ? (() => {
+        /* 🔴 신청 내역 진행 화면 (2026-11-21 개발자 지시 — *"불필요한 버튼이나 내용들이 너무 많아서 가독성을 떨어뜨리고 전문성이 낮아보이게 해 … 레이아웃 배치도"*).
+           예전에는 같은 말이 세 번 나왔다 — 체크리스트 「제출 서류 확인·증명서 준비·제출 방법 확인」 · 아래 「증명서류 체크리스트」 · 「최종 제출 방법」 절,
+           제출처 이름도 세 번(담김 줄 · 기록 단추 밑 · 제출 방법) · 큰 단추가 아홉 개 · 「공식 제출 완료로 기록」이 제출 방법보다 **먼저** 나왔다 · 맨 밑엔 누를 수 없는 회색 단추.
+           이제 한 흐름이다: 단계 막대 → 「제출 전 준비」 네 줄(줄마다 그 내용이 바로 밑에 붙는다) → 제출하기(큰 단추 하나 + 글자 단추) → 다 냈으면 기록.
+           🔴 준비 네 항목의 뜻·판정은 그대로다(prepChecklist 한 곳 · data-prep-toggle) — 바뀐 것은 놓는 자리뿐이다. 관문 「신청 내역 진행 화면 — 한 흐름」. */
         const step = effectiveStep(app, sch);
         const stepLabels = APP_STEPS.map((s, i) => (i === 3 && app.result === 'lost') ? '결과 확인' : s);
-        return `
+        const chLink = `${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}${ch.note ? ` <span class="doc-legend">${esc(ch.note)}</span>` : ''}`;
+        /* 다 쓴 문서 — 큰 단추 넷 대신 문서 한 줄 + 글자 단추(저장·인쇄·공유·다시 작성) */
+        const docsHtml = `${app.formAns && formTplIdFor(sch, true) ? `
+          <div class="prep-file">
+            <span class="prep-file-name">작성한 양식 문서</span>
+            <span class="prep-file-acts">
+              <button class="link-btn" id="btn-form-save">.doc 저장</button>
+              <button class="link-btn" id="btn-form-print">인쇄 · PDF</button>
+              <button class="link-btn" id="btn-form-share">공유</button>
+              <button class="link-btn" id="btn-form-edit">다시 작성</button>
+            </span>
+          </div>` : ''}${app.docs && app.docs.length ? `
+          <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
+            ${app.docs.map((t) => `<h4>${esc(t.doc)}</h4><pre>${esc(t.text)}</pre>`).join('')}
+          </details>` : ''}`;
+        const head = `
         <div class="app-progress">
           ${stepLabels.map((s, i) => `
             <div class="ap-step ${i <= step ? 'done' : ''}">
               <span class="ap-dot"></span><span class="ap-label">${s}</span>
             </div>`).join('')}
         </div>
-        ${(() => {
-          /* 준비 체크리스트 (2026-10-13 ③) — 첫 단계에서만 · 자동 항목은 ✓/— 로 보이고 나머지는 학생이 누른다 */
-          if (step !== 0) return '';
-          const pc = prepChecklist(app, sch);
-          return `<h4>신청 준비 체크리스트 <span class="channel-tag">${pc.done}/${pc.total}</span></h4>
-          <ul class="doc-list doc-badged prep-check">${pc.items.map((it) => `
-            <li>${it.done ? '<span class="doc-auto">✓</span>' : '<span class="doc-manual">□</span>'} ${esc(it.label)}${it.auto && it.done ? ' <span class="doc-legend">자동 확인</span>' : ''}${
-              it.manual && !(it.auto && it.done) ? ` <button class="link-btn" data-prep-toggle="${it.key}">${it.done ? '되돌리기' : '확인했어요'}</button>` : ''}${
-              it.key === 'write' && !it.done ? ' <span class="doc-legend">「서류 작성 이어서 하기」로</span>' : ''}</li>`).join('')}
-          </ul>`;
-        })()}
-        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '신청내역에 담김 · 준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}${ch.note ? ` <span class="doc-legend">${esc(ch.note)}</span>` : ''}</p>
-        ${step === 0 ? `
-          <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">공식 제출 완료로 기록</button>
-          <p class="dp-note">최종 제출은 ${esc(ch.label)}에서 이루어집니다. 제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>` : ''}
+        <p class="applied-at">${app.appliedAt} 신청내역에 담김</p>`;
+        if (step !== 0) {
+          /* 제출을 적은 뒤 — 그 단계에서 할 일 한 가지와 쓴 문서만. 제출 방법·복사 단추는 이미 쓸 일이 없다 */
+          return `${head}
         ${step === 1 ? `
           <p class="progress-note">${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시됩니다` : ''}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">제출 기록 취소</button>` : ''}
@@ -540,29 +549,51 @@ function openDetail(id) {
             ? `${esc(app.resultAt)} 선정${(() => { const t = amountLine(sch).text.replace(/^금액 · /, ''); return t ? ` · ${esc(t)}` : ''; })()}`   /* 금액은 카드와 같은 amountLine — 모르면 「선정」까지만(예전 「선정 · 금액 원문 확인」 · 2026-11-16) */
             : `${esc(app.resultAt)} 미선정으로 기록됨`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
-        ${app.docs && app.docs.length ? `
-          <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
-            ${app.docs.map((t) => `<h4>${esc(t.doc)}</h4><pre>${esc(t.text)}</pre>`).join('')}
-          </details>` : ''}
-        ${app.formAns && formTplIdFor(sch, true) ? `
-          <h4>작성한 양식 문서</h4>
-          <div class="submit-actions">
-            <button class="btn btn-outline" id="btn-form-save">.doc 저장</button>
-            <button class="btn btn-outline" id="btn-form-print">인쇄 · PDF</button>
-            <button class="btn btn-outline" id="btn-form-share">공유</button>
+        ${docsHtml}`;
+        }
+        /* 준비 체크리스트 (2026-10-13 ③) — 자동 항목은 ✓ 로 보이고 나머지는 학생이 누른다. 줄마다 그 줄의 내용이 밑에 붙는다:
+           ① 제출 서류 확인 ← 서류 목록과 보관함 상태(certStatusListHtml 의 목록) · ② 서류 작성 ← 쓴 문서 · ④ 제출 방법 확인 ← 제출처·방법 */
+        const pc = prepChecklist(app, sch);
+        const certList = certStatusListHtml(sch, { bare: true });
+        const detailOf = (key) => key === 'docs' ? certList
+          : key === 'write' ? docsHtml
+          : key === 'submit' ? `
+            <p class="prep-where">제출처 ${chLink}</p>
+            <p class="prep-where"><span class="channel-tag">${submitChannelLabel(sch)}</span></p>
+            <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
+            ${schoolPortalNote(sch)}`
+          : '';
+        const items = pc.items.map((it) => {
+          const toggle = it.manual && !(it.auto && it.done)
+            ? `<button class="prep-toggle${it.done ? ' is-undo' : ''}" data-prep-toggle="${it.key}">${it.done ? '되돌리기' : '확인했어요'}</button>` : '';
+          const legend = it.auto && it.done ? '<span class="doc-legend">자동 확인</span>'
+            : it.key === 'write' && !it.done ? '<span class="doc-legend">「서류 작성 이어서 하기」로</span>' : '';
+          const detail = detailOf(it.key);
+          return `
+            <li class="prep-item${it.done ? ' is-done' : ''}">
+              <div class="prep-row"><span class="prep-mark" aria-hidden="true">${it.done ? '✓' : ''}</span><span class="prep-label">${esc(it.label)} ${legend}</span>${toggle}</div>
+              ${detail ? `<div class="prep-detail">${detail}</div>` : ''}
+            </li>`;
+        }).join('');
+        /* 제출 단추는 하나만 크게 — 메일로 받는 공고는 메일이 곧 제출이다 */
+        const primary = sch.applyEmail
+          ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply">접수 메일 열기 (내용 자동 완성)</button>`
+          : (ch.url || sch.sourceUrl) ? `<button class="btn btn-primary btn-lg" id="btn-go-submit">내용 복사하고 제출처 열기 ↗</button>` : '';
+        return `${head}
+        <div class="prep-head"><h4>제출 전 준비</h4><span class="channel-tag">${pc.done}/${pc.total}</span></div>
+        <ol class="prep-check">${items}
+        </ol>
+        <div class="prep-submit">
+          ${primary}
+          <div class="prep-sub-acts">
+            <button class="link-btn" id="btn-copy-docs">서류 내용 복사</button>
+            <button class="link-btn" id="btn-share-docs">파일과 함께 공유</button>
           </div>
-          <button class="btn btn-outline" id="btn-form-edit" style="width:100%;margin-bottom:14px">양식 다시 작성</button>` : ''}
-        ${certStatusListHtml(sch)}
-        <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
-        <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
-        ${schoolPortalNote(sch)}
-        ${(ch.url || sch.sourceUrl) && step < 1 ? `
-        <button class="btn btn-primary" id="btn-go-submit" style="width:100%;margin-bottom:8px">내용 복사하고 제출처 열기 ↗</button>` : ''}
-        <div class="submit-actions">
-          <button class="btn btn-outline" id="btn-copy-docs">서류 내용 복사</button>
-          <button class="btn btn-outline" id="btn-share-docs">파일과 함께 공유</button>
         </div>
-        ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">접수 메일 열기 (내용 자동 완성)</button>` : ''}`;
+        <div class="prep-record">
+          <button class="btn btn-outline" id="btn-mark-submitted">공식 제출 완료로 기록</button>
+          <p class="dp-note">제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>
+        </div>`;
       })() : ''}
 
       ${/* 🔴 판정이 못 미더울 때 **막는 대신 말한다** (2026-09-13 · 핵심-2).
@@ -580,7 +611,9 @@ function openDetail(id) {
         ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
         : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
       ${lock.noApply ? `<p class="dp-note">원문: 「${esc(sch.noApply)}」</p>` : ''}
-      <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
+      <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}${app && !app.pending ? ' hidden' : ''}>${btnLabel}</button>
+      ${/* 🔴 담아 둔 공고(app && !app.pending)에선 이 단추를 **숨긴다** (2026-11-21) — 늘 잠긴 회색 단추로 「준비 중 1/4 — 아래 체크리스트」만 되풀이했다
+           (체크리스트는 위에 있다). 할 일은 위 「제출 전 준비」·제출 단추가 말한다. 요소는 남긴다 — 검사·도구가 이 단추로 잠금을 읽는다 */ ''}
       ${/* 단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」 한 마디도 2026-10-29 개발자 지시로 뺐다(2026-10-15 "happy talk 전부 삭제" 뒤 남아 있던 마지막 줄).
            제출처는 신청 준비 화면(「최종 제출 방법」 절)이 말한다 */ ''}
     </div>`;

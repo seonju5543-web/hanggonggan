@@ -234,17 +234,21 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
           { mem: [{ pending: false }], disk: [{ pending: false }] });
         await closedAfter(500);
         await open(pick.A.id);
-        eq('  다시 열면 버튼이 「신청 준비 완료됨」 으로 잠긴다', await page.evaluate(() => {
+        /* 2026-11-21 개발자 지시(가독성) — 담아 둔 공고에선 늘 잠긴 회색 단추(「준비 중 1/4 — 아래 체크리스트」)를 숨기고,
+           준비 정도는 「제출 전 준비」 머리의 n/4 가 말한다. 잠금 자체(disabled)는 그대로다 */
+        eq('  다시 열면 신청 단추는 잠긴 채 숨고, 「제출 전 준비」 머리가 1/4 를 말한다', await page.evaluate(() => {
           const b = document.querySelector('#btn-apply-one');
-          return b && { label: b.textContent.trim(), disabled: b.disabled };
-        }), { label: '준비 중 1/4 — 아래 체크리스트', disabled: true });   /* 문서는 썼고(1/4) 서류·증명서·제출 방법 확인이 남았다 (2026-10-13 ③ 체크리스트) */
-        eq('  준비 체크리스트가 보이고, 「확인했어요」를 누르면 2/4 가 된다', await page.evaluate(async () => {
-          const li = document.querySelectorAll('#detail-sheet .prep-check li').length;
+          const h = document.querySelector('#detail-sheet .prep-head');
+          return b && { disabled: b.disabled, shown: !!b.offsetParent, head: h && h.textContent.replace(/\s+/g, '') };
+        }), { disabled: true, shown: false, head: '제출전준비1/4' });   /* 문서는 썼고(1/4) 서류·증명서·제출 방법 확인이 남았다 (2026-10-13 ③ 체크리스트) */
+        eq('  준비 네 줄이 보이고, 「확인했어요」를 누르면 2/4 가 되며 그 줄에 ✓ 가 선다', await page.evaluate(async () => {
+          const li = document.querySelectorAll('#detail-sheet .prep-check > li').length;
           const b = document.querySelector('#detail-sheet [data-prep-toggle="docs"]');
-          if (!b) return { li, btn: 'no-toggle' };
+          if (!b) return { li, head: 'no-toggle' };
           b.click(); await new Promise((r) => setTimeout(r, 300));
-          return { li, btn: document.querySelector('#btn-apply-one').textContent.trim() };
-        }), { li: 4, btn: '준비 중 2/4 — 아래 체크리스트' });
+          const first = document.querySelector('#detail-sheet .prep-check > li');
+          return { li, head: document.querySelector('#detail-sheet .prep-head').textContent.replace(/\s+/g, ''), done: first.classList.contains('is-done') };
+        }), { li: 4, head: '제출전준비2/4', done: true });
         await page.keyboard.press('Escape');
         await closedAfter(500);
       }

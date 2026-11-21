@@ -1952,6 +1952,42 @@ console.log('\n■ 신청 준비 체크리스트 — 준비 완료는 네 항목
   eq('  낱말 「서류 작성 필요」 는 그대로 pending 이 말한다 (옛 관문과 같은 모양)', /app\.pending \? '서류 작성 필요'/.test(app), true);
 }
 
+/* 2026-11-21 개발자 지시 — 신청 내역 진행 화면이 *"불필요한 버튼이나 내용들이 너무 많아서 가독성을 떨어뜨리고 전문성이 낮아보이게"* 했다.
+   같은 말이 세 번(체크리스트·증명서류 체크리스트·최종 제출 방법) · 제출처 이름 세 번 · 큰 단추 아홉 · 「공식 제출 완료로 기록」이 제출 방법보다 먼저 · 늘 잠긴 회색 단추.
+   이제 한 흐름: 단계 막대 → 「제출 전 준비」 네 줄(줄 밑에 그 내용) → 제출 단추 하나 → 다 냈으면 기록. 되돌아가면 여기서 빨간불. */
+console.log('\n■ 신청 내역 진행 화면 — 한 흐름 (2026-11-21)');
+{
+  const app = appSource();
+  const take = (name) => { const s0 = app.indexOf(`function ${name}(`); let d = 0, seen = false; for (let i = app.indexOf('{', s0); i < app.length; i += 1) { if (app[i] === '{') { d += 1; seen = true; } else if (app[i] === '}') { d -= 1; if (seen && !d) return app.slice(s0, i + 1); } } throw new Error(name); };
+  const od = take('openDetail').replace(/\/\*[\s\S]*?\*\//g, '');
+  const from = od.indexOf('${app && !app.pending ? (() => {');
+  const block = from >= 0 ? od.slice(from, od.indexOf("})() : ''}", from)) : '';
+  eq('  진행 화면 자리를 찾았다', block.length > 0, true);
+  const step0 = block.slice(block.indexOf('const pc = prepChecklist('));
+  /* 순서는 **그리는 글자**(마지막 return 의 틀)에서 잰다 — 제출 단추는 그 위에서 primary 로 미리 만든다 */
+  const tpl = step0.slice(step0.lastIndexOf('return `${head}'));
+  const at = (s) => tpl.indexOf(s);
+  eq('🔴 순서가 「제출 전 준비」 → 제출 단추 → 「공식 제출 완료로 기록」이다 (기록 단추가 제출 방법보다 먼저 나오지 않는다)',
+    [at('class="prep-check"') > 0, at('class="prep-check"') < at('${primary}'), at('${primary}') < at('id="btn-mark-submitted"'), at('class="prep-submit"') < at('class="prep-record"'), /id="btn-go-submit"/.test(step0.slice(step0.indexOf('const primary'), step0.lastIndexOf('return `${head}')))], [true, true, true, true, true]);
+  eq('🔴 같은 내용을 따로 된 절로 되풀이하지 않는다 — 「증명서류 체크리스트」·「최종 제출 방법」 머리가 없고, 서류 목록·제출 방법은 준비 줄 밑에 붙는다',
+    [/증명서류 체크리스트|>최종 제출 방법/.test(block), /certStatusListHtml\(sch, \{ bare: true \}\)/.test(step0), /key === 'submit' \?[\s\S]*?ch\.guide\.map/.test(step0)], [false, true, true]);
+  eq('  제출처 이름은 한 번만(「제출 방법 확인」 줄 밑) — 담김 줄과 기록 단추 밑에서 다시 말하지 않는다',
+    [(step0.match(/\$\{chLink\}/g) || []).length, (step0.match(/esc\(ch\.label\)/g) || []).length, /class="applied-at">\$\{app\.appliedAt\} 신청내역에 담김<\/p>/.test(block)], [1, 0, true]);
+  eq('🔴 큰 단추는 제출 하나(메일 접수면 메일, 아니면 제출처 열기 — 둘 중 하나)와 기록 하나뿐 · 복사·공유·문서 저장은 글자 단추',
+    [(step0.match(/class="btn /g) || []).length, /sch\.applyEmail\s*\?\s*`<button class="btn btn-primary btn-lg" id="btn-mail-apply">[\s\S]*?:\s*\(ch\.url \|\| sch\.sourceUrl\) \? `<button class="btn btn-primary btn-lg" id="btn-go-submit">/.test(step0),
+      ['btn-copy-docs', 'btn-share-docs', 'btn-form-save', 'btn-form-print', 'btn-form-share', 'btn-form-edit'].filter((id) => !new RegExp(`class="link-btn" id="${id}"`).test(block))],
+    [3, true, []]);
+  eq('🔴 담아 둔 공고(app && !app.pending)에선 늘 잠긴 신청 단추를 숨긴다(요소는 남는다 — 도구가 잠금을 읽는다)',
+    /id="btn-apply-one" \$\{canApply \? '' : 'disabled'\}\$\{app && !app\.pending \? ' hidden' : ''\}/.test(od), true);
+  eq('  준비 네 줄은 여전히 prepChecklist 한 곳 · 학생이 누르는 줄은 data-prep-toggle', [/pc\.items\.map/.test(step0), /data-prep-toggle="\$\{it\.key\}"/.test(step0)], [true, true]);
+  /* 서류 목록(bare) — 머리 없이 · 줄마다 되풀이되던 꼬리말 없이. 머리 있는 목록(신청 준비 시트)은 그대로 */
+  const ph = new RegExp(app.match(/const DOC_PLACEHOLDER = \/(.*)\/;/)[1]);
+  const cert = new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc', `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => null, (s) => s);
+  const sch = { documents: ['학업지원 신청서', '재학증명서'] };
+  eq('  준비 줄 밑 서류 목록은 머리·반복 꼬리말이 없고, 신청 준비 시트의 목록은 예전 그대로다',
+    [/<h4>|공식 제출 시 함께 준비하세요/.test(cert(sch, { bare: true })), /<h4>증명서류 체크리스트<\/h4>/.test(cert(sch)), (cert(sch).match(/공식 제출 시 함께 준비하세요/g) || []).length], [false, true, 2]);
+}
+
 /* 2026-08-20 — 자격 절을 어디서 끊나. 개발자가 "본문에 다 써 있는데 못 읽는 것 같다"고
    짚어 준 뒤 판 결과, 절 경계를 **길이로 재던 것**이 진짜 원인이었다.
    `EXCERPTS_AS_LIB=1`로 발췌기를 라이브러리처럼 불러 **규칙 함수를 직접 돌린다**
