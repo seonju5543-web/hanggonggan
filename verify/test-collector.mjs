@@ -10969,6 +10969,24 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       && /const soon = applyable\.filter/.test(home), true);
     eq('  칸을 누르면 간다 (장식으로 두지 않는다)',
       /\$\('#hero-tiles'\)\.addEventListener\('click'/.test(appSrc2), true);
+
+    /* 🔴 학교 바로가기 주소는 확인한 것만 (2026-11-21) — 표의 주소마다 확인 기록(docs/designs/school-links-evidence.json 의 같은 주소 + 확인 방법)이 있어야 한다.
+       확인 없이 한 줄 더 넣으면 여기서 막힌다(UI-20 SCHOOL_PORTALS 의 verifiedTitle 과 같은 뜻 · 흔히 떠올리는 주소가 없는 주소였던 적이 있다). */
+    const SL = createRequire(import.meta.url)('../school-links.js');
+    const EV = JSON.parse(fs.readFileSync(new URL('../docs/designs/school-links-evidence.json', import.meta.url), 'utf8'));
+    const servedNow = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
+    eq('학교 바로가기 표의 학교는 앱이 보여 주는 학교(SERVED_SCHOOLS)뿐이다',
+      Object.keys(SL.SCHOOL_LINKS).filter((s) => !servedNow.includes(s)), []);
+    const noProof = [];
+    for (const [s, row] of Object.entries(SL.SCHOOL_LINKS)) {
+      for (const [k, url] of Object.entries(row)) {
+        const ev = EV[s] || {};
+        if (!SL.SCHOOL_LINK_KINDS.includes(k) || !/^https:\/\//.test(url) || ev[k] !== url || !String((ev.evidence || {})[k] || '').trim()) noProof.push(`${s}.${k}`);
+      }
+    }
+    eq('  🔴 표의 주소마다 확인 기록이 있다 (같은 주소 · 확인 방법 · https · 아는 칸 넷뿐)', noProof, []);
+    eq('  표에 없는 학교·칸은 빈 주소 — 그 칸은 홈에 안 뜬다',
+      [SL.schoolLinkFor({ school: '없는대학교' }, 'home'), SL.schoolLinkFor({ school: '경희대학교' }, 'cafe'), SL.schoolLinkFor(null, 'home')], ['', '', '']);
   }
 
   /* 🔴 장학금 상세 시트 — 마감일·중복 수혜 · 문의 · 원문 링크는 맨 아래 한 묶음 (2026-10-02 CTO 지시).
