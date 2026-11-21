@@ -71,21 +71,46 @@
     return out;
   }
 
-  /* 가죽 사장 의자 — 수령 가능액을 가리킬 때 밀려 들어와 앉는다(11-21 개발자 지시 4차). 몸 너비(bw)·뒤쪽 끝(back)에 맞춰 크기를 정한다 · 장면(바닥)에 둔다 */
+  /* 회장님 의자(11-21 개발자 지시 5차 — "비싸 보이는 회장님 의자") — 고급 사무용 임원 의자의 공통 모습:
+     머리 위까지 오는 높은 등받이 + 머리 받침 · 다이아몬드 단추 누빔(체스터필드) 가죽 · 두툼하게 말린 팔걸이 · 호두나무 장식 · 금빛 다섯 갈래 바퀴 다리.
+     가죽은 짙은 와인색(옥스블러드) · 단추·바퀴 다리는 금. 몸 너비(bw)·높이(bh)·등 자리(back)에 맞춘다 · 장면(바닥)에 둔다 */
   function makeChair(bw, back, seatTop, bh) {
-    const g = new T.Group(), leather = mat(0x3a2519, 0.45, 0.05), seam = mat(0x2a1a11, 0.6), chrome = mat(0xc9cdd4, 0.18, 1.0), gold = mat(0xd4a93c, 0.25, 1.0);
-    const W = bw * 1.12, D = 0.95;
-    const seat = box(W, 0.2, D, leather); seat.position.set(0, seatTop - 0.1, -0.05); g.add(seat);
-    const cushion = box(W * 0.92, 0.06, D * 0.86, seam); cushion.position.set(0, seatTop + 0.005, -0.03); g.add(cushion);
-    const backH = Math.min(bw * 0.95, (bh || 2) * 0.5), backr = box(W, backH, 0.24, leather); backr.position.set(0, seatTop + backH / 2 - 0.05, back - 0.16); backr.rotation.x = -0.12; g.add(backr);
-    [0.3, 0.55, 0.8].forEach((u) => { const st = box(W * 0.86, 0.03, 0.02, seam); st.position.set(0, seatTop + backH * u, back - 0.02 - 0.12 * u * 0.12); st.rotation.x = -0.12; g.add(st); });   // 누빈 줄
+    const g = new T.Group();
+    const leather = mat(0x5a1a1f, 0.42, 0.05), leatherDk = mat(0x3d1014, 0.5, 0.05), wood = mat(0x5b3418, 0.35, 0.1), gold = mat(0xd8ac45, 0.2, 1.0), black = mat(0x1a1a1e, 0.5, 0.2);
+    gold.emissive = new T.Color(0x4a3000); gold.emissiveIntensity = 0.3;
+    const W = bw * 1.18, D = Math.max(0.9, bw * 0.75), H = Math.max(1.6, (bh || 2) * 0.95);
+    const soft = (w, h, d, m, r) => {   // 모서리 둥근 쿠션(누빈 가죽)
+      const sh = new T.Shape(), x = -w / 2, y = -h / 2; r = Math.min(r, w / 2, h / 2);
+      sh.moveTo(x + r, y); sh.lineTo(x + w - r, y); sh.quadraticCurveTo(x + w, y, x + w, y + r); sh.lineTo(x + w, y + h - r); sh.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      sh.lineTo(x + r, y + h); sh.quadraticCurveTo(x, y + h, x, y + h - r); sh.lineTo(x, y + r); sh.quadraticCurveTo(x, y, x + r, y);
+      const geo = new T.ExtrudeGeometry(sh, { depth: d, bevelEnabled: true, bevelThickness: Math.min(0.06, d * 0.3), bevelSize: Math.min(0.05, r * 0.5), bevelSegments: 3, curveSegments: 8 });
+      geo.translate(0, 0, -d / 2); return new T.Mesh(geo, m);
+    };
+    // 앉는 쿠션
+    const seat = soft(W, D, 0.2, leather, 0.12); seat.rotation.x = -Math.PI / 2; seat.position.set(0, seatTop - 0.1, -0.02); g.add(seat);
+    // 높은 등받이 — 살짝 뒤로 기울고, 위가 넓다(날개) · 다이아몬드 단추 누빔 · 머리 받침
+    const backG = new T.Group(); backG.position.set(0, seatTop, back - 0.18); backG.rotation.x = -0.16; g.add(backG);
+    const bk = soft(W * 1.02, H, 0.26, leather, 0.22); bk.position.y = H / 2; backG.add(bk);
+    [-1, 1].forEach((s) => { const wing = soft(0.16, H * 0.55, 0.42, leatherDk, 0.07); wing.position.set(s * (W * 0.51 + 0.02), H * 0.66, 0.12); wing.rotation.y = s * -0.35; backG.add(wing); });
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+      const x = (c - 1.5) * W * 0.22 + (r % 2 ? W * 0.11 : 0); if (Math.abs(x) > W * 0.4) continue;
+      backG.add(sph(0.028, gold, x, H * (0.22 + r * 0.16), 0.2));
+    }
+    const pillow = soft(W * 0.7, H * 0.17, 0.18, leatherDk, 0.08); pillow.position.set(0, H * 0.9, 0.18); backG.add(pillow);
+    const trim = soft(W * 1.04, 0.07, 0.3, wood, 0.03); trim.position.set(0, H + 0.02, 0); backG.add(trim);   // 위 호두나무 테
+    // 두툼하게 말린 팔걸이 + 호두나무 앞머리
     [-1, 1].forEach((s) => {
-      const arm = box(0.16, 0.12, D * 0.9, leather); arm.position.set(s * (W / 2 + 0.06), seatTop + 0.34, 0); g.add(arm);
-      const post = cyl(0.035, 0.035, 0.34, chrome, 10); post.position.set(s * (W / 2 + 0.06), seatTop + 0.17, 0.1); g.add(post);
-      [-1, 1].forEach((k) => g.add(sph(0.025, gold, s * (W / 2 + 0.06), seatTop + 0.34, k * D * 0.38)));   // 금 징
+      const arm = new T.Mesh(new T.CapsuleGeometry(0.11, D * 0.75, 6, 14), leather); arm.rotation.x = Math.PI / 2; arm.position.set(s * (W / 2 + 0.06), seatTop + 0.34, 0); g.add(arm);
+      const cap = sph(0.115, wood, s * (W / 2 + 0.06), seatTop + 0.34, D * 0.45, 1, 1, 0.55); g.add(cap);
+      const post = soft(0.1, 0.34, 0.5, leatherDk, 0.04); post.position.set(s * (W / 2 + 0.06), seatTop + 0.15, -0.05); g.add(post);
     });
-    const stem = cyl(0.06, 0.08, seatTop - 0.25, chrome, 14); stem.position.y = (seatTop - 0.25) / 2 + 0.1; g.add(stem);
-    for (let i = 0; i < 5; i++) { const a = (i / 5) * Math.PI * 2, leg = box(0.07, 0.05, 0.55, chrome); leg.position.set(Math.sin(a) * 0.26, 0.1, Math.cos(a) * 0.26 - 0.05); leg.rotation.y = a; g.add(leg); g.add(sph(0.06, mat(0x1b1d22, 0.6), Math.sin(a) * 0.52, 0.05, Math.cos(a) * 0.52 - 0.05)); }
+    // 금빛 다섯 갈래 다리 · 바퀴 · 크롬 기둥
+    const stem = cyl(0.06, 0.07, Math.max(0.1, seatTop - 0.3), mat(0xc9cdd4, 0.18, 1.0), 14); stem.position.y = (seatTop - 0.3) / 2 + 0.14; g.add(stem);
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2, leg = box(0.08, 0.06, 0.6, gold); leg.position.set(Math.sin(a) * 0.29, 0.13, Math.cos(a) * 0.29 - 0.05); leg.rotation.y = a; g.add(leg);
+      g.add(sph(0.065, black, Math.sin(a) * 0.57, 0.06, Math.cos(a) * 0.57 - 0.05, 1, 1, 0.8));
+    }
+    g.userData.armY = seatTop + 0.45; g.userData.armX = W / 2 + 0.06; g.userData.armZ = D * 0.25;
     g.visible = false; return g;
   }
 
@@ -147,7 +172,9 @@
     }
     // 식은땀 — 머리 옆 물방울
     {
-      const d = new T.Group(); d.add(sph(er * 0.55, mat(0x9fd8ff, 0.2), 0, 0, 0, 0.8, 1.1, 0.6)); const tip = new T.Mesh(new T.ConeGeometry(er * 0.42, er * 0.9, 12), mat(0x9fd8ff, 0.2)); tip.position.y = er * 0.75; d.add(tip);
+      const sw = mat(0x8fd3ff, 0.1, 0.1); sw.emissive = new T.Color(0x2a6a9a); sw.emissiveIntensity = 0.35;
+      const d = new T.Group(); d.add(sph(er * 0.6, sw, 0, 0, 0, 0.85, 1.1, 0.7)); const tip = new T.Mesh(new T.ConeGeometry(er * 0.47, er * 1.0, 14), sw); tip.position.y = er * 0.82; d.add(tip);
+      d.add(sph(er * 0.16, new T.MeshBasicMaterial({ color: 0xffffff }), -er * 0.2, er * 0.15, er * 0.38));   // 반짝이
       d.position.set(hw * 0.82, top * 0.45, front * 0.55); d.visible = false; head.add(d); rig.sweat = d;
     }
     // 손 자리(지폐를 뿌리는 곳 · 몽둥이를 쥐는 곳) — 팔 묶음의 맨 아래
@@ -155,35 +182,160 @@
        원래 팔은 한 덩어리(긴 소매 공 하나 + 소맷단 + 손)라 굽지 않는다 — 소매 공을 위·아래 두 개로 바꿔 끼우고, 팔꿈치 아래 부품(소맷단·손·손가락)을 팔꿈치 묶음으로 옮긴다.
        가만히 있을 때 모양은 예전과 같다(두 공이 이어져 한 소매처럼 보인다).
        소매·맨팔(과잠을 손으로 벗는 연출): 벗을 때 소매 부품을 과잠 묶음으로 옮겨 붙이면(attach — 그 자리 그대로) 팔이 빠져나가며 소매가 남는다. 그 밑에 맨팔을 숨겨 둔다 */
+    /* 🔴 팔 묶음의 '고르지 않은 크기'(길이 0.6 · 굵기 0.72 같은)를 부품 쪽으로 옮겨 굽는다 — 그대로 두면 팔꿈치를 굽히거나 부품을 다른 묶음으로 옮길 때
+       비틀린 모양(층밀림)이 생긴다(11-21 개발자 지적 "과잠을 벗는 모션에서 마스코트가 일그러져"). 보이는 모양은 그대로다 */
+    (ch.arms || []).forEach((a) => {
+      const S = a.scale.clone(); if (Math.abs(S.x - S.y) < 1e-6 && Math.abs(S.y - S.z) < 1e-6) return;
+      const Sm = new T.Matrix4().makeScale(S.x, S.y, S.z);
+      a.children.slice().forEach((o) => { o.updateMatrix(); const m = new T.Matrix4().multiplyMatrices(Sm, o.matrix); m.decompose(o.position, o.quaternion, o.scale); });
+      a.scale.set(1, 1, 1); a.userData.baked = S;
+    });
     rig.limbs = (ch.arms || []).map((a) => {
       const meshes = a.children.filter((o) => o.isMesh);
       if (!meshes.length) return null;
       const handY = Math.min.apply(null, meshes.map((o) => o.position.y));
       const hand = meshes.find((o) => o.position.y === handY);
-      const sleeve = meshes.find((o) => o !== hand && o.position.y < -0.25 && o.position.y > -0.6 && o.scale.y > o.scale.x * 1.6);
-      const top = sleeve ? sleeve.position.y + sleeve.scale.y : 0, bot = handY;
-      const EY = sleeve ? sleeve.position.y - 0.02 : (top + bot) / 2;        // 팔꿈치 높이 — 소매 한가운데
+      // 소매 = 위아래로 가장 길쭉한 공(손 말고) · 팔 길이에 맞춰 잰다(굽기 뒤라 숫자가 캐릭터마다 다르다)
+      const sleeve = meshes.filter((o) => o !== hand && o.geometry && o.geometry.type === 'SphereGeometry' && o.scale.y > o.scale.x * 1.5).sort((p, q) => q.scale.y - p.scale.y)[0] || null;
+      const L = Math.max(0.1, -handY);
+      const EY = sleeve ? sleeve.position.y : handY * 0.5;          // 팔꿈치 — 소매 한가운데(없으면 팔 중간)
       const elbow = new T.Group(); elbow.position.y = EY; a.add(elbow);
-      const parts = [];
+      const sleeveParts = [];
+      let r0 = L * 0.18;
       if (sleeve) {
-        const r = sleeve.scale.x, m = sleeve.material, half = (top - bot > 0 ? Math.abs(sleeve.scale.y) : 0.4);
-        const up = sph(r, m, 0, (top + EY) / 2, 0, 1, (top - EY) / 2 / r * 1.15, 1); a.add(up);
-        const lo = sph(r * 0.96, m, 0, (sleeve.position.y - sleeve.scale.y - EY) / 2, 0, 1, (EY - (sleeve.position.y - sleeve.scale.y)) / 2 / (r * 0.96) * 1.15, 1); elbow.add(lo);
-        sleeve.visible = false; void half;
-        parts.push(up, lo);
+        const r = sleeve.scale.x, ry = sleeve.scale.y, top = sleeve.position.y + ry, bot = sleeve.position.y - ry; r0 = r;
+        const up = sph(r, sleeve.material, 0, (top + EY) / 2, 0, 1, (top - EY) / 2 / r * 1.18, 1); a.add(up);
+        const lo = sph(r * 0.96, sleeve.material, 0, (bot - EY) / 2, 0, 1, (EY - bot) / 2 / (r * 0.96) * 1.18, 1); elbow.add(lo);
+        sleeve.visible = false; sleeveParts.push(up, lo);
       }
-      // 팔꿈치 아래 부품을 팔꿈치 묶음으로(그 자리 그대로)
-      meshes.filter((o) => o !== sleeve && o.position.y < EY - 0.05).forEach((o) => { elbow.attach(o); if (o !== hand && ch.jacket && o.position.y > handY - EY + 0.08) parts.push(o); });
-      // 맨팔 — 위팔·아래팔 따로(손과 같은 색)
-      const skin = hand ? hand.material : mat(0xffffff);
-      const bu = new T.Mesh(new T.CapsuleGeometry(0.1, Math.max(0.05, -EY - 0.15), 4, 10), skin); bu.position.y = EY / 2; bu.visible = false; a.add(bu);
-      const bl = new T.Mesh(new T.CapsuleGeometry(0.095, Math.max(0.05, EY - handY - 0.2), 4, 10), skin); bl.position.y = (handY - EY) / 2; bl.visible = false; elbow.add(bl);
-      return { arm: a, elbow, hand, parts: parts.map((o) => ({ o, par: o.parent, p: o.position.clone(), r: o.rotation.clone(), s: o.scale.clone() })), bare: [bu, bl], off: false };
+      // 팔꿈치 아래 부품을 팔꿈치 묶음으로(그 자리 그대로 — 팔 묶음이 고른 크기라 비틀리지 않는다)
+      meshes.filter((o) => o !== sleeve && o.position.y < EY - L * 0.05).forEach((o) => { elbow.attach(o); if (o !== hand && ch.jacket && o.position.y > handY - EY + L * 0.1) sleeveParts.push(o); });
+      // 맨팔 — 위팔·아래팔(손과 같은 색 · 소매보다 가늘게)
+      const skin = hand ? hand.material : mat(0xffffff), br = r0 * 0.5;
+      const bu = new T.Mesh(new T.CapsuleGeometry(br, Math.max(0.02, -EY - br), 4, 10), skin); bu.position.y = EY / 2; bu.visible = false; a.add(bu);
+      const bl = new T.Mesh(new T.CapsuleGeometry(br * 0.95, Math.max(0.02, EY - handY - br * 2), 4, 10), skin); bl.position.y = (handY - EY) / 2; bl.visible = false; elbow.add(bl);
+      return { arm: a, elbow, hand, L, EY, r: r0, sleeveParts, bare: [bu, bl], off: false };
     });
     rig.elbows = rig.limbs.map((l) => (l ? l.elbow : null));
     rig.handLocal = (i) => { const l = rig.limbs[i]; return l && l.hand ? l.hand.position.clone() : new T.Vector3(0, -0.3, 0); };   // 팔꿈치 묶음 안의 손 자리
-    rig.undress = (i) => { const sl = rig.limbs[i]; if (!sl || sl.off || !ch.jacket || !sl.parts.length) return; sl.parts.forEach((x) => ch.jacket.attach(x.o)); sl.bare.forEach((b) => { b.visible = true; }); sl.off = true; };
-    rig.dress = () => rig.limbs.forEach((sl) => { if (!sl || !sl.off) return; sl.parts.forEach((x) => { x.par.add(x.o); x.o.position.copy(x.p); x.o.rotation.copy(x.r); x.o.scale.copy(x.s); }); sl.bare.forEach((b) => { b.visible = false; }); sl.off = false; });
+    /* 손 닿기 풀이(IK) — 손을 목표 자리(캐릭터 기준 좌표)에 가장 가깝게 두는 어깨·팔꿈치 각을 찾는다. 캐릭터마다 팔 길이가 달라
+       각을 손으로 정하면 어떤 캐릭터는 손이 머리를 뚫고 어떤 캐릭터는 안 닿는다 — 자세마다 한 번 풀어 기억한다(rig.poses).
+       q = [어깨 벌림(옆으로 · 0 내림 ~ π 위), 어깨 앞뒤(− 앞 · + 뒤), 팔꿈치 안쪽 굽힘, 팔꿈치 앞뒤 굽힘(− 앞 · + 뒤)] */
+    const _inv = new T.Matrix4(), _h = new T.Vector3(), _e = new T.Vector3();
+    function armHand(i, q) {
+      const sl = rig.limbs[i]; const a = sl.arm, el = sl.elbow, sd = a.userData.side;
+      a.rotation.set(q[1], 0, sd * q[0]); el.rotation.set(q[3], 0, sd * q[2]);
+      ch.root.updateWorldMatrix(true, true); _inv.copy(ch.root.matrixWorld).invert();
+      el.localToWorld(_e.set(0, 0, 0)).applyMatrix4(_inv);
+      return el.localToWorld(_h.copy(sl.hand ? sl.hand.position : new T.Vector3(0, -0.2, 0))).applyMatrix4(_inv);
+    }
+    rig.solveArm = (i, target, init, lo, hi, extra) => {
+      const sl = rig.limbs[i]; if (!sl) return init.slice();
+      const keepA = sl.arm.rotation.clone(), keepE = sl.elbow.rotation.clone(), keepH = ch.head.rotation.clone();
+      ch.head.rotation.set(0, 0, 0);
+      const cost = (q) => { const h = armHand(i, q); return h.distanceToSquared(target) + (extra ? extra(h, q, _e) : 0); };
+      let q = init.slice(), best = cost(q);
+      for (let step = 0.5; step > 0.01; step *= 0.6) {
+        for (let it = 0; it < 6; it++) { let moved = false;
+          for (let k = 0; k < 4; k++) for (const d of [step, -step]) { const n = q.slice(); n[k] = clamp(n[k] + d, lo[k], hi[k]); const c = cost(n); if (c < best - 1e-6) { best = c; q = n; moved = true; } }
+          if (!moved) break; }
+      }
+      sl.arm.rotation.copy(keepA); sl.elbow.rotation.copy(keepE); ch.head.rotation.copy(keepH);
+      ch.root.updateWorldMatrix(true, true);
+      return q;
+    };
+    rig.poses = {};
+    /* 팔걸이에 얹은 손 — 의자(rig.chair)의 팔걸이 끝 · 앉은 자세(들어 올림·뒤로 기댐)를 반영해 한 번 푼다 */
+    rig.armrestPose = (i) => {
+      rig.poses.armrest = rig.poses.armrest || [];
+      if (rig.poses.armrest[i]) return rig.poses.armrest[i];
+      const sl = rig.limbs[i], cd = rig.chair && rig.chair.userData; if (!sl || !cd) return [0.5, -0.3, 0, -0.5];
+      const k = ch.root.scale.x || 1, sd = sl.arm.userData.side;
+      // 의자 팔걸이 끝(바닥 기준) → 앉은 캐릭터 기준 좌표(들어 올림 · 뒤로 물러남 · 뒤로 기댐을 되돌려)
+      const seated = new T.Matrix4().compose(new T.Vector3(0, rig.seatLift, -0.14), new T.Quaternion().setFromEuler(new T.Euler(-0.24, 0, 0)), new T.Vector3(k, k, k));
+      const target = new T.Vector3(sd * cd.armX * 0.92 * k, (cd.armY + 0.04) * k, cd.armZ * k).applyMatrix4(seated.invert());
+      rig.poses.armrest[i] = rig.solveArm(i, target, [0.5, -0.4, 0, -0.6], [0.0, -1.6, -1.2, -2.0], [1.4, 0.8, 1.2, 0.6]);
+      return rig.poses.armrest[i];
+    };
+    /* 몸수색 자세 — 손을 뒤통수(머리 뒤쪽 가운데 가까이)에 · 손이 머리보다 앞으로 나오면 벌점(앞에서 보이면 안 된다) · 팔꿈치는 옆으로 벌린 쪽을 좋아한다 */
+    rig.friskPose = () => {
+      if (rig.poses.frisk) return rig.poses.frisk;
+      const hb2 = localBox(ch.head, ch.head), zc = (hb2.max.z + hb2.min.z) / 2, yc = (hb2.max.y + hb2.min.y) / 2;
+      rig.poses.frisk = rig.limbs.map((sl, i) => {
+        if (!sl) return null; const s = sl.arm.userData.side;
+        const target = rig.headToRoot(new T.Vector3(s * rig.hw * 0.22, yc + (hb2.max.y - yc) * 0.15, zc - (zc - hb2.min.z) * 0.75));
+        const front = rig.headToRoot(new T.Vector3(0, yc, zc)).z, hx = rig.headToRoot(new T.Vector3(hb2.max.x, yc, zc)).x;
+        return rig.solveArm(i, target, [2.3, 0.5, 1.3, 1.0], [1.2, -0.6, -0.4, -0.3], [3.0, 1.5, 2.7, 2.8],
+          (h, q, e) => (h.z > front - 0.05 ? 6 * (h.z - front + 0.05) * (h.z - front + 0.05) : 0)
+            + (Math.abs(e.x) < hx * 1.08 ? 4 * (hx * 1.08 - Math.abs(e.x)) * (hx * 1.08 - Math.abs(e.x)) : 0));   // 팔꿈치는 머리 밖으로 보이게
+      });
+      return rig.poses.frisk;
+    };
+    rig.setArm = (i, q, k) => { const sl = rig.limbs[i]; if (!sl) return; const sd = sl.arm.userData.side, w = k == null ? 1 : k;
+      sl.arm.rotation.z = lerp(sl.arm.rotation.z, sd * q[0], w); sl.arm.rotation.x = lerp(sl.arm.rotation.x, q[1], w);
+      sl.elbow.rotation.z = lerp(sl.elbow.rotation.z, sd * q[2], w); sl.elbow.rotation.x = lerp(sl.elbow.rotation.x, q[3], w); };
+    // 머리 묶음 좌표 → 캐릭터 기준 좌표
+    rig.headToRoot = (v) => { const kh = ch.head.rotation.clone(); ch.head.rotation.set(0, 0, 0); ch.root.updateWorldMatrix(true, true); const out = ch.head.localToWorld(v.clone()).applyMatrix4(new T.Matrix4().copy(ch.root.matrixWorld).invert()); ch.head.rotation.copy(kh); return out; };
+    /* 몸통 크기(머리·팔 빼고) — 가슴·허리 자리를 정하는 데 쓴다 */
+    {
+      ch.root.updateWorldMatrix(true, true); const inv = new T.Matrix4().copy(ch.root.matrixWorld).invert(), bb = new T.Box3(), skip = new Set((ch.arms || []).concat([ch.head]));
+      (function walk(o) { if (skip.has(o)) return; if (o.isMesh && o.geometry && o.visible !== false) { if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); _b.copy(o.geometry.boundingBox).applyMatrix4(_m.multiplyMatrices(inv, o.matrixWorld)); bb.union(_b); } o.children.forEach(walk); })(ch.squash);
+      const hb3 = localBox(ch.head, ch.root);
+      rig.body = { top: Math.min(bb.max.y, hb3.min.y + (hb3.max.y - hb3.min.y) * 0.25), bot: bb.min.y, front: bb.max.z, w: bb.max.x - bb.min.x };
+      rig.body.chest = lerp(rig.body.bot, rig.body.top, 0.72); rig.body.waist = lerp(rig.body.bot, rig.body.top, 0.38);
+    }
+    /* 빈 소매 — 과잠에 달린 채 늘어진 소매(벗은 뒤 보인다) · 팔 소매와 같은 색 · 과잠 묶음 안이라 같이 움직인다 */
+    rig.emptySleeves = rig.limbs.map((sl) => {
+      if (!sl || !ch.jacket || !sl.sleeveParts.length) return null;
+      const g = new T.Group(), sd = sl.arm.userData.side; g.position.copy(sl.arm.position); g.rotation.z = sd * 0.22;
+      const tube = new T.Mesh(new T.CapsuleGeometry(sl.r * 0.92, sl.L * 0.62, 4, 12), sl.sleeveParts[0].material); tube.position.y = -sl.L * 0.42; g.add(tube);
+      const cuffSrc = sl.sleeveParts.find((o) => o.geometry && o.geometry.type === 'TorusGeometry');
+      if (cuffSrc) { const cf = new T.Mesh(cuffSrc.geometry, cuffSrc.material); cf.rotation.x = Math.PI / 2; cf.position.y = -sl.L * 0.8; cf.scale.copy(cuffSrc.scale); g.add(cf); }
+      g.visible = false; ch.jacket.add(g); return g;
+    });
+    /* 과잠을 손에 쥐기 · 바닥에 두기 — 과잠 묶음(몸 묶음 안)을 옮길 뿐이다(부품을 옮겨 붙이지 않는다 → 비틀림 없음) */
+    if (ch.jacket) {
+      const jb = localBox(ch.jacket, ch.squash); rig.collar = new T.Vector3(0, jb.max.y - 0.04, (jb.max.z + jb.min.z) / 2);
+      const held = { p: new T.Vector3(), r: new T.Euler() };
+      rig.jacketToHand = (i) => {
+        const sl = rig.limbs[i]; if (!sl) return;
+        ch.root.updateWorldMatrix(true, true);
+        const hw2 = sl.elbow.localToWorld(rig.handLocal(i)), hl = ch.squash.worldToLocal(hw2);
+        ch.jacket.rotation.set(0.15, 0, Math.sin(performance.now() / 1000 * 9) * 0.12); ch.jacket.scale.set(1, 1, 1);
+        const c = rig.collar.clone().applyEuler(ch.jacket.rotation);
+        ch.jacket.position.copy(hl).sub(c); held.p.copy(ch.jacket.position); held.r.copy(ch.jacket.rotation);
+      };
+      const FL = { p: new T.Vector3(-0.8, 0.02, 0.25), rz: 1.5, s: new T.Vector3(0.42, 0.9, 0.5) };
+      rig.jacketFloor = (g) => {
+        const k = clamp(g, 0, 1);
+        ch.jacket.position.set(lerp(held.p.x, FL.p.x, k), lerp(held.p.y, FL.p.y, k) + Math.sin(k * Math.PI) * 0.25, lerp(held.p.z, FL.p.z, k));
+        ch.jacket.rotation.set(held.r.x * (1 - k), 0, lerp(held.r.z, FL.rz, k));
+        ch.jacket.scale.set(lerp(1, FL.s.x, k), lerp(1, FL.s.y, k), lerp(1, FL.s.z, k));
+      };
+    } else { rig.jacketToHand = () => {}; rig.jacketFloor = () => {}; }
+    /* 화남 자세 — 손으로 정한 각 + 캐릭터마다 손 닿기로 푼 각(앞섶 잡기 · 와인드업 · 허리에 손) · 한 번 풀어 기억한다
+       q = [어깨 벌림, 어깨 앞뒤(+뒤), 팔꿈치 옆 굽힘(+바깥), 팔꿈치 앞뒤 굽힘(+뒤 · −앞)] */
+    rig.angryPoses = () => {
+      if (rig.poses.angry) return rig.poses.angry;
+      const B = rig.body, lo = [-1.2, -2.8, -2.0, -2.8], hi = [3.0, 1.6, 2.0, 2.0];
+      const solveAll = (fn, init) => rig.limbs.map((sl, i) => (sl ? rig.solveArm(i, fn(sl.arm.userData.side), init, lo, hi) : null));
+      const lapel = solveAll((sd) => new T.Vector3(sd * B.w * 0.13, B.chest + (B.top - B.chest) * 0.5, B.front + 0.04), [0.2, -1.0, -0.3, -1.2]);
+      const hips = rig.limbs.map((sl, i) => (sl ? rig.solveArm(i, new T.Vector3(sl.arm.userData.side * B.w * 0.5, B.waist, B.front * 0.25), [0.9, 0.2, -1.0, 0], lo, hi,
+        (h, q, e) => (Math.abs(e.x) < B.w * 0.62 ? 3 * (B.w * 0.62 - Math.abs(e.x)) * (B.w * 0.62 - Math.abs(e.x)) : 0)) : null));   // 팔꿈치는 바깥으로
+      const iT = (ch.arms || []).findIndex((a) => a.userData.side === 1);
+      const windup = iT >= 0 ? rig.solveArm(iT, new T.Vector3(-B.w * 0.05, B.chest, B.front + 0.18), [0.0, -1.2, -0.6, -1.2], lo, hi) : [0, -1.2, 0, -1.2];
+      const balance = rig.limbs.map((sl, i) => (sl && i !== iT ? rig.solveArm(i, new T.Vector3(B.w * 0.02, B.chest, B.front + 0.2), [0.0, -1.2, -0.6, -1.2], lo, hi) : null)).find(Boolean) || [0.2, -1.2, 0, -1.2];
+      rig.poses.angry = {
+        rest: [0.3, 0, 0, 0], lapel, hips, yank: [1.05, 0.75, 0.1, -0.35], shake: [0.35, 0.95, 0, 0],
+        catchBack: [0.45, 1.25, 0, 0.3], swingUp: [2.35, 0.25, 0.3, 0], slam: [0.75, -0.95, 0, 0], reachFloor: [0.25, -0.95, 0, -0.35],
+        windup, balance, armBack: [0.6, 1.1, 0, 0], lead: [0.9, -1.35, 0, 0], cocked: [1.55, 0.3, 1.45, 0.95], release: [1.9, -1.15, 0.15, -0.1],
+        follow: [-0.45, -1.1, 0, -0.3], pullIn: [0.35, -0.5, -0.4, -1.3],
+      };
+      return rig.poses.angry;
+    };
+    /* 벗기·입기 — 🔴 부품을 다른 묶음으로 옮기지 않는다(옮기면 비틀렸다). 팔의 소매는 숨기고 맨팔을 보이며, 과잠 쪽 '빈 소매'(아래 jacketSleeves)를 켠다 */
+    rig.undress = (i) => { const sl = rig.limbs[i]; if (!sl || sl.off || !ch.jacket || !sl.sleeveParts.length) return; sl.sleeveParts.forEach((o) => { o.visible = false; }); sl.bare.forEach((b) => { b.visible = true; }); if (rig.emptySleeves && rig.emptySleeves[i]) rig.emptySleeves[i].visible = true; sl.off = true; };
+    rig.dress = () => rig.limbs.forEach((sl, i) => { if (!sl || !sl.off) return; sl.sleeveParts.forEach((o) => { o.visible = true; }); sl.bare.forEach((b) => { b.visible = false; }); if (rig.emptySleeves && rig.emptySleeves[i]) rig.emptySleeves[i].visible = false; sl.off = false; });
     // 다리·발(다리 꼬기) — 몸 묶음의 바로 아래 자식 중 바닥 가까운 것
     { /* 몸 크기 — 팔은 빼고 잰다(팔까지 재면 의자가 두 배가 됐다 · 11-21 시안 실측) */
       ch.root.updateWorldMatrix(true, true); const inv = new T.Matrix4().copy(ch.root.matrixWorld).invert(), bb = new T.Box3(), armsSet = new Set(ch.arms || []);
@@ -226,6 +378,15 @@
     const stars = [0, 1, 2].map(() => { const z = canvasSprite(128, 128, glyph('★', '#f2b632', 110), 0.26); scene.add(z); return z; });
     const steamMat = new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, depthWrite: false });
     const steam = Array.from({ length: 10 }, () => { const p = sph(0.12, steamMat.clone()); p.visible = false; p.userData = { life: 9 }; scene.add(p); return p; });
+    // 튀는 땀방울
+    const dropMat = mat(0x8fd3ff, 0.12, 0.1); dropMat.emissive = new T.Color(0x2a6a9a); dropMat.emissiveIntensity = 0.35;
+    const drops = Array.from({ length: 16 }, () => { const d = sph(0.06, dropMat, 0, 0, 0, 0.8, 1.15, 0.8); d.visible = false; d.userData = { life: 9, v: new T.Vector3(), s: 1 }; scene.add(d); return d; });
+    function emitDrop(side) {
+      const d = drops.find((q) => !q.visible); if (!d) return;
+      rig.ch.head.localToWorld(W.set(side * rig.hw * 0.85, rig.top * rand(0.25, 0.6), rig.front * 0.2));
+      d.position.copy(W); d.visible = true; d.userData.life = 0; d.userData.s = rand(0.9, 1.5) * rig.ch.root.scale.x;
+      d.userData.v.set(side * rand(1.2, 2.2), rand(1.4, 2.4), rand(0, 0.6));
+    }
     const BILL_TEX = billTex(), BILL_GEO = new T.PlaneGeometry(0.34, 0.17);
     const bills = Array.from({ length: 28 }, () => { const m = new T.Mesh(BILL_GEO, new T.MeshStandardMaterial({ map: BILL_TEX, side: T.DoubleSide, roughness: 0.8 })); m.visible = false; m.userData = { on: false, v: new T.Vector3(), w: new T.Vector3(), life: 0, ph: 0 }; scene.add(m); return m; });
 
@@ -317,95 +478,105 @@
       const pointSide = P ? (P.x < 0 ? -1 : 1) : 0;
 
       if (M.mode === 'angry') {
-        /* 화남 — 11-21 개발자 지시 셋째 판(말풍선 없음 · "과잠을 직접 손으로 벗어야")
-           0~0.4 표정(눈썹·빨간 볼·김) · 과잠 벗기: 0.4~0.8 두 손으로 깃을 잡고 → 0.8~1.25 어깨를 뒤로 젖혀 과잠을 어깨에서 내린다 →
-           1.25~1.75 왼팔을 앞으로 빼며 소매에서 빠져나온다(소매는 과잠에 남고 맨팔이 보인다) → 1.75~2.25 오른팔도 → 2.25~2.7 벗은 과잠을 옆 바닥에 내팽개친다 ·
-           2.7~3.4 몸을 숙여 바닥의 몽둥이를 줍고 · 3.4~4.2 머리 위로 치켜들어 화면으로 던진다(4.18 onThrow — 앱 화면 전체로 날아와 유리가 깨진다) ·
-           4.3~5.4 허리에 손 · 고개 홱 · 발 동동 · 5.4~5.9 과잠을 집어 어깨에 걸치고 → 5.9 두 팔을 소매에 다시 넣고 → 6.2 여민다 · 6.3 끝 */
+        /* 화남 — 11-21 개발자 지시 5차(실제 동작 리서치 반영 · 눈썹·말풍선 없음)
+           과잠 벗기(실제로 사람이 벗는 차례를 빠르게): 0.4~0.65 두 손으로 앞섶을 움켜쥔다 → 0.65~0.95 확 젖혀 어깨 뒤로 밀어낸다 →
+             0.95~1.25 두 팔을 뒤로 쭉 뻗어 털면 소매에서 팔이 빠진다(소매는 과잠에 남는다) → 1.25~1.5 떨어지는 과잠 깃을 한 손으로 낚아채고 →
+             1.5~1.9 옆 바닥에 패대기친다
+           몽둥이: 1.9~2.6 몸을 숙여 줍는다
+           던지기(투구 동작 순서 — 와인드업 → 내딛기 → 팔 뒤로 젖히기 → 가속 → 놓기 → 팔로우스루): 2.6~2.9 몸을 옆으로 틀며 앞발을 들고 몽둥이를 가슴 앞에 모은다 →
+             2.9~3.15 앞발을 화면 쪽으로 내딛고 던질 팔을 아래·뒤로 → 3.15~3.35 팔꿈치를 어깨 높이로 들고 아래팔을 세워 몽둥이를 머리 뒤로 젖힌다 →
+             3.35~3.45 몸을 화면 쪽으로 홱 돌리며 팔꿈치를 쭉 편다 · 3.43 놓는다(ScreenHit) → 3.45~3.9 팔이 몸을 가로질러 반대쪽 아래로 · 몸은 앞으로 숙인다
+           3.9~5.0 허리에 손 · 고개 홱 · 발 동동 · 5.0~5.8 과잠을 주워 어깨 뒤에 걸치고 팔을 넣어 여민다 · 5.9 끝 */
         const thrower = armOf(1) || ch.arms[1], other = armOf(-1) || ch.arms[0];
-        const ts = thrower ? thrower.userData.side : 1, iOf = (a) => ch.arms.indexOf(a);
-        browOn = 1; browAng = 0.55; blush = 0.6; mark.visible = t < 5.4;
+        const ts = thrower ? thrower.userData.side : 1, iT = ch.arms.indexOf(thrower), iO = ch.arms.indexOf(other);
+        blush = 0.6; mark.visible = t < 5.0;
         headTopWorld(W, 0.05); mark.position.set(W.x + 0.42 * ch.root.scale.x, W.y + 0.05, W.z); mark.scale.setScalar(0.42 * (1 + Math.sin(t * 14) * 0.08));
-        if (t < 5.4 && Math.floor(t * 8) !== Math.floor((t - dt) * 8)) { emitSteam(-1); emitSteam(1); }
+        if (t < 5.0 && Math.floor(t * 8) !== Math.floor((t - dt) * 8)) { emitSteam(-1); emitSteam(1); }
         if (REDUCED) { if (t > 2.2) stop(); }
         else {
           if (t < 0.4) ch.root.position.x += Math.sin(t * 55) * 0.02;
-          const jk = ch.jacket || null;
-          const POSE_B = { z: -0.22, y: -0.12, rx: 0.3 }, FLOOR = { x: -0.6, y: 0.02, z: 0.15, rz: 1.5, sx: 0.42, sy: 0.9, sz: 0.5 };
-          const setJ = (x, y, z, rx, rz, sx, sy, sz) => { if (!jk) return; jk.position.set(x, y, z); jk.rotation.set(rx, 0, rz); jk.scale.set(sx, sy, sz); };
-          const armSet = (a, th, rx) => { if (a) { a.rotation.z = a.userData.side * th; a.rotation.x = rx; } };
-          // ① 깃을 잡는다 → ② 어깨를 젖혀 내린다
-          if (t >= 0.4 && t < 1.25) {
-            const a = ease(seg(t, 0.4, 0.8)), b = ease(seg(t, 0.8, 1.25));
-            ch.arms.forEach((arm) => armSet(arm, lerp(lerp(0.3, -0.35, a), 0.9, b), lerp(lerp(0, -2.3, a), 0.7, b)));
-            setJ(0, POSE_B.y * b, POSE_B.z * b, POSE_B.rx * b, 0, 1, 1, 1);
-            ch.root.rotation.x = 0.1 * b;
+          const jk = ch.jacket || null, P0 = rig.angryPoses();
+          const setA = (i, q, k) => rig.setArm(i, q, k == null ? 1 : k);
+          const blend = (q1, q2, u) => q1.map((v, k) => lerp(v, q2[k], u));
+          // ── 과잠 벗기 ──
+          if (t >= 0.4 && t < 1.9) {
+            const a = ease(seg(t, 0.4, 0.65)), b = ease(seg(t, 0.65, 0.95)), c = ease(seg(t, 0.95, 1.25));
+            for (const i of [iO, iT]) {
+              let q = blend(P0.rest, P0.lapel[i] || P0.rest, a);
+              q = blend(q, P0.yank, b); q = blend(q, P0.shake, c);
+              setA(i, q);
+            }
+            if (jk) {
+              // 앞섶을 젖혀 어깨 뒤로(b) → 팔을 털며 아래·뒤로 흘러내린다(c)
+              jk.position.set(0, -0.15 * b - 0.35 * c, -0.25 * b - 0.2 * c); jk.rotation.set(0.35 * b + 0.25 * c, 0, 0);
+              if (t >= 1.05) { rig.undress(iO); rig.undress(iT); }
+              ch.root.rotation.x = 0.12 * b - 0.05 * c; ch.root.rotation.z = Math.sin(t * 18) * 0.05 * c;
+            }
+            if (t >= 1.25) {
+              // 한 손(반대쪽)이 뒤로 떨어지는 과잠 깃을 낚아채 → 옆으로 크게 휘둘러 바닥에 패대기
+              const d = ease(seg(t, 1.25, 1.42)), e = ease(seg(t, 1.42, 1.62)), f = ease(seg(t, 1.62, 1.78));
+              let q = blend(P0.shake, P0.catchBack, d); q = blend(q, P0.swingUp, e); q = blend(q, P0.slam, f); setA(iO, q);
+              setA(iT, blend(P0.shake, P0.rest, d));
+              if (jk && t < 1.72) rig.jacketToHand(iO);
+              else if (jk) { const g = ease(seg(t, 1.72, 1.9)); rig.jacketFloor(g); }
+              ch.root.rotation.y += -ts * -0.3 * e; ch.root.rotation.x = 0.25 * f;
+            }
+          } else if (jk && t >= 1.9 && t < 5.0) rig.jacketFloor(1);
+          if (!jk && ch.cap) {   // 대장님 — 학사모를 손으로 벗어 바닥에
+            if (t >= 0.4 && t < 5.0) { const u = ease(seg(t, 0.6, 1.4)); ch.cap.position.y = 0.7 + Math.sin(u * Math.PI) * 0.6 - u * 1.45; ch.cap.position.x = -0.9 * u; ch.cap.rotation.z = 1.4 * u; }
+            else if (t >= 5.0) { const u = ease(seg(t, 5.0, 5.6)); ch.cap.position.y = lerp(0.7 - 1.45, 0.7, u) + Math.sin(u * Math.PI) * 0.8; ch.cap.position.x = -0.9 * (1 - u); ch.cap.rotation.z = 1.4 * (1 - u); }
           }
-          // ③ 왼팔 빼기 → ④ 오른팔 빼기 (소매는 과잠에 남는다)
-          if (t >= 1.25 && t < 2.25) {
-            setJ(0, POSE_B.y, POSE_B.z, POSE_B.rx, 0, 1, 1, 1);
-            const c1 = ease(seg(t, 1.25, 1.7)), c2 = ease(seg(t, 1.75, 2.2));
-            if (jk) { rig.undress(iOf(other)); if (t >= 1.75) rig.undress(iOf(thrower)); }
-            armSet(other, lerp(0.9, 0.35, c1), lerp(0.7, -0.45, c1));
-            armSet(thrower, lerp(0.9, 0.35, c2), lerp(0.7, -0.45, c2));
-            ch.root.rotation.z = Math.sin(t * 16) * 0.06; ch.root.rotation.x = 0.1;
+          // ── 몽둥이 줍기 ──
+          rig.club.visible = t < 3.43;
+          if (t >= 1.9 && t < 2.6) {
+            const u = ease(seg(t, 1.9, 2.2)) * (1 - ease(seg(t, 2.35, 2.6)));
+            ch.root.rotation.x = 0.42 * u; ch.root.rotation.y += -ts * 0.3 * u;
+            setA(iT, blend(P0.rest, P0.reachFloor, u)); setA(iO, P0.rest);
           }
-          // ⑤ 벗은 과잠을 옆 바닥에 내팽개친다
-          if (t >= 2.25 && t < 5.4) {
-            const d = ease(seg(t, 2.25, 2.7));
-            setJ(lerp(0, FLOOR.x, d), lerp(POSE_B.y, FLOOR.y, d) + Math.sin(d * Math.PI) * 0.5, lerp(POSE_B.z, FLOOR.z, d), POSE_B.rx * (1 - d), FLOOR.rz * d, lerp(1, FLOOR.sx, d), lerp(1, FLOOR.sy, d), lerp(1, FLOOR.sz, d));
-            if (t < 2.7) { armSet(other, 0.35 + Math.sin(d * Math.PI) * 0.9, -0.45 + d * 0.3); armSet(thrower, 0.35, -0.2); }
+          if (t >= 2.25 && t < 3.43 && thrower && rig.club.parent !== rig.elbows[iT]) {
+            const el = rig.elbows[iT]; el.add(rig.club); rig.club.position.copy(rig.handLocal(iT)); rig.club.rotation.set(0, 0, Math.PI); rig.club.scale.setScalar(1);
           }
-          if (!jk && ch.cap) {   // 대장님 — 과잠 대신 학사모를 손으로 벗어 바닥에
-            if (t >= 0.4 && t < 5.4) { const u = ease(seg(t, 0.6, 1.4)); ch.cap.position.y = 0.7 + Math.sin(u * Math.PI) * 0.6 - u * 1.45; ch.cap.position.x = -0.9 * u; ch.cap.rotation.z = 1.4 * u; armSet(other, t < 1.4 ? lerp(0.3, 2.6, ease(seg(t, 0.4, 0.7))) * (1 - ease(seg(t, 1.1, 1.4))) + 0.3 : 0.3, 0); }
-            else if (t >= 5.4) { const u = ease(seg(t, 5.4, 6.0)); ch.cap.position.y = lerp(0.7 - 1.45, 0.7, u) + Math.sin(u * Math.PI) * 0.8; ch.cap.position.x = -0.9 * (1 - u); ch.cap.rotation.z = 1.4 * (1 - u); }
-          }
-          // ⑥ 몽둥이 줍기
-          rig.club.visible = t < 4.18;
-          if (t >= 2.7 && t < 3.4) {
-            const u = ease(seg(t, 2.7, 3.05)) * (1 - ease(seg(t, 3.15, 3.4)));
-            ch.root.rotation.x = 0.42 * u; ch.root.rotation.y += -ts * 0.35 * u;
-            armSet(thrower, 0.2, -0.9 * u); armSet(other, 0.6, 0);
-            const el = rig.elbows[iOf(thrower)]; if (el) el.rotation.x = -0.5 * u;   // 바닥으로 손을 뻗으며 팔꿈치를 살짝 굽혀 쥔다
-          }
-          if (t >= 3.05 && t < 4.18 && thrower && rig.club.parent !== (rig.elbows[iOf(thrower)] || thrower)) {   // 손에 쥔다
-            const el = rig.elbows[iOf(thrower)] || thrower; el.add(rig.club); rig.club.position.copy(rig.handLocal(iOf(thrower))); rig.club.rotation.set(0, 0, Math.PI); rig.club.scale.setScalar(1 / Math.max(0.3, thrower.scale.y));
-          }
-          // ⑦ 치켜들기 → 팔꿈치를 굽혀 몽둥이를 머리 뒤로 젖혔다가(3.4~3.9) → 어깨가 앞으로 나오며 팔꿈치를 쭉 펴서 던진다(3.95~4.2) · 참고: 오버핸드 던지기 자세
-          if (t >= 3.4 && t < 4.3 && thrower) {
-            /* 3.4~3.7 팔을 머리 위로 쭉 · 3.7~3.95 팔꿈치를 굽혀 몽둥이를 머리 뒤로 젖힌다 · 3.95~4.2 어깨를 앞으로 휘두르며 팔꿈치를 쭉 편다 → 4.18 놓는다 */
-            const raise = ease(seg(t, 3.4, 3.7)), cock = ease(seg(t, 3.7, 3.95)), whip = ease(seg(t, 3.95, 4.2)), ext = ease(seg(t, 4.0, 4.18)), wind = raise;
-            thrower.rotation.z = ts * lerp(0.3, 2.75, raise) * (1 - whip * 0.45);
-            thrower.rotation.x = 0.15 * cock - whip * 1.8;
-            const el = rig.elbows[iOf(thrower)]; if (el) { el.rotation.x = 1.75 * cock * (1 - ext) - 0.15 * ext; el.rotation.z = 0; }
-            ch.root.rotation.x = -0.12 * wind + 0.25 * whip; ch.root.rotation.y += -ts * 0.25 * wind + ts * 0.35 * whip;
-            armSet(other, 0.7 + 0.5 * wind, 0);
-            if (t >= 4.18 && !M.thrown) {
+          // ── 던지기 ──
+          if (t >= 2.6 && t < 3.9 && thrower) {
+            const w = ease(seg(t, 2.6, 2.9)), st = ease(seg(t, 2.9, 3.15)), ck = ease(seg(t, 3.15, 3.35)), ac = ease(seg(t, 3.35, 3.45)), ft = ease(seg(t, 3.45, 3.85));
+            let q = blend(P0.rest, P0.windup, w); q = blend(q, P0.armBack, st); q = blend(q, P0.cocked, ck); q = blend(q, P0.release, ac); q = blend(q, P0.follow, ft); setA(iT, q);
+            let o = blend(P0.rest, P0.balance, w); o = blend(o, P0.lead, st); o = blend(o, P0.pullIn, ac); o = blend(o, P0.rest, ft); setA(iO, o);
+            // 몸 — 옆으로 틀었다가(와인드업·젖히기) 화면 쪽으로 홱(가속) · 팔로우스루에서 앞으로 숙임
+            ch.root.rotation.y += -ts * (0.95 * w * (1 - ac)) + ts * 0.35 * ac * (1 - ft * 0.6);
+            ch.root.rotation.x = -0.1 * ck + 0.35 * ac * (1 - ft * 0.3) + 0.15 * ft;
+            // 발 — 앞발(반대쪽) 들기 → 화면 쪽으로 내딛기 · 뒷발은 팔로우스루에서 살짝 든다
+            const lift = Math.sin(seg(t, 2.6, 3.15) * Math.PI) * 0.22, stride = st;
+            rig.legs.forEach((l) => { if (l.s === -ts) l.o.position.set(l.x, l.y + lift, l.z + 0.28 * stride); else l.o.position.set(l.x, l.y + 0.1 * ft * (1 - ft) * 4, l.z - 0.08 * ft); });
+            if (t >= 3.43 && !M.thrown) {
               M.thrown = true; rig.club.visible = false;
-              (rig.elbows[iOf(thrower)] || thrower).localToWorld(W.copy(rig.handLocal(iOf(thrower)))); W.project(cx.cam);
+              rig.elbows[iT].localToWorld(W.copy(rig.handLocal(iT))); W.project(cx.cam);
               const r = cx.btn.getBoundingClientRect();
               if (opt.onThrow) opt.onThrow({ x: r.left + (W.x + 1) / 2 * r.width, y: r.top + (1 - W.y) / 2 * r.height });
             }
           }
-          // ⑧ 허리에 손 · 고개 홱 · 발 동동
-          if (t >= 4.3 && t < 5.4) {
-            ch.arms.forEach((a) => armSet(a, 0.78, 0.4));
-            ch.head.rotation.y += 0.5 * ease(seg(t, 4.3, 4.5));
+          // ── 허리에 손 · 고개 홱 · 발 동동 ──
+          if (t >= 3.9 && t < 5.0) {
+            const u = ease(seg(t, 3.9, 4.1));
+            setA(iT, P0.hips[iT] || P0.rest, u); setA(iO, P0.hips[iO] || P0.rest, u);
+            ch.head.rotation.y += 0.5 * ease(seg(t, 3.95, 4.15));
             ch.root.position.y += Math.abs(Math.sin(t * 18)) * 0.05;
           }
-          // ⑨ 다시 입기 — 과잠을 집어 어깨 뒤에 걸치고(소매가 팔 자리로 온다) → 소매에 팔을 넣고 → 여민다
-          if (t >= 5.4) {
-            const u = ease(seg(t, 5.4, 5.9)), w = ease(seg(t, 5.95, 6.25));
-            if (t < 5.95) {
-              setJ(lerp(FLOOR.x, 0, u), lerp(FLOOR.y, POSE_B.y, u) + Math.sin(u * Math.PI) * 0.9, lerp(FLOOR.z, POSE_B.z, u), POSE_B.rx * u, FLOOR.rz * (1 - u), lerp(FLOOR.sx, 1, u), lerp(FLOOR.sy, 1, u), lerp(FLOOR.sz, 1, u));
-              ch.arms.forEach((a) => armSet(a, lerp(0.35, 0.9, u), lerp(-0.2, 0.7, u)));
-            } else {
-              rig.dress();
-              setJ(0, POSE_B.y * (1 - w), POSE_B.z * (1 - w), POSE_B.rx * (1 - w), 0, 1, 1, 1);
-              ch.arms.forEach((a) => armSet(a, lerp(0.9, 0.3, w), lerp(0.7, 0, w)));
+          // ── 다시 입기 — 줍고(5.0~5.25) → 어깨 뒤로 휙 걸치고(5.25~5.5) → 팔을 뒤로 넣어 소매에 끼우고(5.5) → 앞으로 여민다(5.5~5.8) ──
+          if (t >= 5.0) {
+            const p1 = ease(seg(t, 5.0, 5.25)), p2 = ease(seg(t, 5.25, 5.5)), p3 = ease(seg(t, 5.55, 5.8));
+            if (jk) {
+              if (t < 5.25) { rig.jacketFloor(1 - p1 * 0.15); setA(iO, blend(P0.rest, P0.reachFloor, p1)); ch.root.rotation.x = 0.3 * p1; }
+              else if (t < 5.55) {
+                jk.position.set(0, -0.15 - 0.35 * (1 - p2), -0.25 - 0.2 * (1 - p2)); jk.rotation.set(0.35 + 0.25 * (1 - p2), 0, 0); jk.scale.set(1, 1, 1);
+                setA(iO, blend(P0.reachFloor, P0.shake, p2)); setA(iT, blend(P0.rest, P0.shake, p2));
+              } else {
+                rig.dress();
+                jk.position.set(0, -0.15 * (1 - p3), -0.25 * (1 - p3)); jk.rotation.set(0.35 * (1 - p3), 0, 0);
+                setA(iO, blend(P0.yank, P0.rest, p3)); setA(iT, blend(P0.yank, P0.rest, p3));
+              }
             }
           }
-          if (t > 6.3) { stop(); M.thrown = false; rig.dress(); rig.clubFloor(); }
+          if (t > 5.9) { stop(); M.thrown = false; rig.dress(); rig.clubFloor(); }
         }
       } else if (M.mode === 'dizzy') {
         const u = seg(t, 0, 2.2), fade = 1 - ease(seg(t, 1.6, 2.2));
@@ -448,24 +619,32 @@
       } else {
         // 가리키는 줄에 따른 연출 — 손짓 연출이 없을 때만
         if (M.line === 'amount' && P) {
-          /* 거만하게(11-21 개발자 지시 4차 — "의자에 앉아서 거만하게 다리를 꼬고 무심한 듯 돈을 위로") · 참고: 등받이 의자에 기대 다리를 꼰 사장님 그림
-             가죽 사장 의자가 밀려 들어오고 → 걸터앉아 뒤로 기대고 → 한쪽 다리를 다른 무릎 위로 꼰다 → 가리키지 않는 손은 팔걸이에 얹어 두었다가 손목만 툭 — 지폐가 위로 */
+          /* 거만하게(11-21 개발자 지시 5차 — "회장님 의자 · 다리를 꼬고 앉은 모습이 어색") · 리서치: 등받이에 깊이 기대고, 무릎 위로 다리를 꼬고, 팔은 팔걸이에 늘어뜨리고, 턱은 살짝 든다
+             회장님 의자가 빙글 돌며 굴러 들어오고 → 깊숙이 앉아 등을 기댄다 → 두 발은 의자 앞에 걸치고(무릎이 굽은 것처럼) 한쪽 발을 다른 무릎 위로 꼬아 까딱인다 →
+             가리키지 않는 손은 팔걸이 끝에 얹은 채(손 닿기 풀이) 이따금 손목만 툭 — 지폐가 위로 */
           shades = 1;
-          const sit = ease(Math.min(1, M.sh * 1.15));
-          chairOn = sit;
+          const sit = ease(clamp((M.chair - 0.55) / 0.45, 0, 1));   // 의자가 다 들어온 뒤에 앉는다
+          chairOn = 1;
           ch.root.position.y += rig.seatLift * sit;
-          ch.root.position.z += -0.08 * sit;
-          ch.root.rotation.x = -0.2 * sit; ch.root.rotation.z = -pointSide * 0.04 * sit;
-          // 다리 꼬기 — 가리키지 않는 쪽 다리를 반대편 무릎 위로
-          rig.legs.forEach((l) => { if (l.s === -pointSide) l.o.position.set(l.x - l.s * 0.42 * sit, l.y + 0.3 * sit, l.z + 0.3 * sit); else l.o.position.set(l.x, l.y + 0.08 * sit, l.z + 0.16 * sit); });
+          ch.root.position.z += -0.14 * sit;
+          ch.root.rotation.x = -0.24 * sit; ch.root.rotation.z = -pointSide * 0.04 * sit;
+          ch.head.rotation.x -= 0.1 * sit;   // 턱을 살짝 든다
+          // 다리 — 의자 앞에 걸친 두 발 · 꼰 발은 반대쪽 무릎 위로 올라가 까딱
+          const bob = Math.sin(t * 2.2) * 0.04;
+          rig.legs.forEach((l) => {
+            if (l.s === -pointSide) l.o.position.set(lerp(l.x, -l.x * 0.35, sit), l.y + (0.44 + bob) * sit, l.z + 0.46 * sit);
+            else l.o.position.set(l.x * 0.95, l.y + 0.2 * sit, l.z + 0.34 * sit);
+          });
           const other = armOf(-pointSide), oi = ch.arms.indexOf(other);
-          if (other) {
-            other.rotation.z = other.userData.side * lerp(0.3, 0.55, sit); other.rotation.x = -0.35 * sit;   // 팔걸이에 얹은 팔
-            if (!REDUCED && sit > 0.9) {
-              const ph = (t * 0.6) % 1, flick = ph > 0.8 ? Math.sin((ph - 0.8) / 0.2 * Math.PI) : 0;
-              if (rig.elbows[oi]) rig.elbows[oi].rotation.x = -0.5 - 1.3 * flick;   // 손목·아래팔만 툭 — 무심하게
-              if (ph > 0.88 && ph - dt * 0.6 <= 0.88) throwBills(other, 4, true);
-            } else if (rig.elbows[oi]) rig.elbows[oi].rotation.x = -0.5 * sit;
+          if (other && oi >= 0) {
+            const rest = rig.armrestPose(oi);
+            rig.setArm(oi, rest, sit);
+            if (!REDUCED && sit > 0.95) {
+              const ph = (t * 0.55) % 1, flick = ph > 0.78 ? Math.sin((ph - 0.78) / 0.22 * Math.PI) : 0;
+              if (rig.elbows[oi]) rig.elbows[oi].rotation.x += -1.1 * flick;   // 손목·아래팔만 툭 — 무심하게
+              other.rotation.z += other.userData.side * 0.25 * flick;
+              if (ph > 0.87 && ph - dt * 0.55 <= 0.87) throwBills(other, 3, true);
+            }
           }
           // 렌즈에 반짝 — 가끔
           const gl = ((t + 0.3) * 0.5) % 1;
@@ -475,11 +654,9 @@
              팔꿈치를 양옆으로 벌리고 두 손은 뒤통수로 · 고개는 살짝 뒤로 젖혀 멍하니 · 눈은 커진다 · 발 동동 · 식은땀 */
           sweat = true;
           const k = ease(seg(M.dueT, 0, 0.35));
-          ch.arms.forEach((a, i) => {
-            const s = a.userData.side;
-            a.rotation.z = s * lerp(0.3, 2.3, k); a.rotation.x = 0.55 * k;
-            const el = rig.elbows[i]; if (el) { el.rotation.z = s * 1.35 * k; el.rotation.x = 1.05 * k + Math.sin(t * 9 + s) * 0.04 * k; }   // 손이 뒤통수로
-          });
+          /* 몸수색 받을 때처럼 — 팔꿈치를 양옆으로 활짝, 두 손은 뒤통수에 붙여 앞에서는 안 보이게(손 닿기 풀이로 캐릭터마다 맞춘다) */
+          const fr = rig.friskPose();
+          ch.arms.forEach((a, i) => { if (fr[i]) rig.setArm(i, fr[i], k); });
           ch.head.rotation.x -= 0.16 * k; rig.eyes.forEach((e) => { if (e.obj) e.obj.scale.set(1.12, 1.25 * (e.obj.scale.y || 1), 1); });
           if (!REDUCED) {
             ch.root.position.y += Math.abs(Math.sin(t * 15)) * 0.05;
@@ -491,14 +668,20 @@
       }
 
       // 부품 그리기
-      M.chair = lerp(M.chair || 0, chairOn, 1 - Math.pow(0.002, dt));
+      M.chair = chairOn ? Math.min(1, (M.chair || 0) + dt / 0.9) : Math.max(0, (M.chair || 0) - dt / 0.4);   // 0.9초 동안 굴러 들어온다
       rig.chair.visible = M.chair > 0.02;
-      if (rig.chair.visible) { const k = ch.root.scale.x; rig.chair.scale.setScalar(k * Math.max(0.01, M.chair)); rig.chair.position.set(0, 0, -1.4 * (1 - M.chair)); rig.chair.rotation.y = ch.root.rotation.y; }
+      if (rig.chair.visible) { const k = ch.root.scale.x, u = ease(M.chair); rig.chair.scale.setScalar(k * Math.max(0.01, Math.min(1, M.chair * 1.6))); rig.chair.position.set(0, 0, -1.6 * (1 - u)); rig.chair.rotation.y = ch.root.rotation.y + (1 - u) * Math.PI * 1.3; }   // 빙글 돌며 굴러 들어온다
       rig.brows.forEach((b) => { b.visible = browOn > 0; b.rotation.z = b.userData.s * -browAng; b.position.y = rig.eyes[0].c.y + rig.er * (browAng > 0 ? 1.12 : 1.4); });
       rig.blushMat.color.setHex(blushColor); rig.blushMat.opacity = lerp(rig.blushMat.opacity, blush, 1 - Math.pow(0.001, dt));
       M.sh = lerp(M.sh, shades, 1 - Math.pow(0.0005, dt));
       rig.shades.visible = M.sh > 0.02; rig.shades.position.y = rig.mid.y + (1 - M.sh) * 0.7; rig.shades.scale.setScalar(Math.max(0.01, M.sh));
-      if (sweat) { rig.sweat.visible = true; const u = (t * 0.9) % 1; rig.sweat.position.y = rig.top * (0.55 - u * 0.4); rig.sweat.scale.setScalar(Math.sin(u * Math.PI) + 0.01); } else rig.sweat.visible = false;
+      /* 땀 — 더 크게(11-21 개발자 지시 5차): 머리 옆 큰 땀방울이 흘러내리고 · 양옆으로 작은 땀방울이 튄다 */
+      if (sweat) {
+        rig.sweat.visible = true; const u = (t * 1.1) % 1;
+        rig.sweat.position.y = rig.top * (0.62 - u * 0.5); rig.sweat.scale.setScalar(1.6 * (Math.min(1, u * 5) * (1 - Math.max(0, u - 0.85) / 0.15)) + 0.01);
+        if (!REDUCED && Math.floor(t * 7) !== Math.floor((t - dt) * 7)) { emitDrop(-1); emitDrop(1); }
+      } else rig.sweat.visible = false;
+      drops.forEach((d) => { if (!d.visible) return; const v = d.userData.v; d.userData.life += dt; v.y -= 9 * dt; d.position.addScaledVector(v, dt); { const k = 0.06 * d.userData.s * Math.max(0.001, 1 - d.userData.life / 0.7); d.scale.set(k * 0.8, k * 1.15, k * 0.8); } if (d.userData.life > 0.7) d.visible = false; });
       if (shades && M.mode === 'idle') rig.eyes.forEach((e) => { if (e.obj) e.obj.visible = false; });
 
       // 김 · 하트 · 말풍선 · 지폐
