@@ -3,6 +3,10 @@
  "updatedAt": "2026-11-21",
  "schools": 45,
  "files": {
+  "부경대학교": {
+   "file": "n1nesasz.json",
+   "count": 40
+  },
   "국민대학교": {
    "file": "n1tasrsl.json",
    "count": 15
@@ -69,10 +73,6 @@
   },
   "계명대학교": {
    "file": "n1nel147.json",
-   "count": 40
-  },
-  "부경대학교": {
-   "file": "n1nesasz.json",
    "count": 40
   },
   "동국대학교": {
