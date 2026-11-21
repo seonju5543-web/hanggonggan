@@ -156,7 +156,7 @@ function prFormHtml(r, staff) {
     <label class="field"><span class="field-label">지원 금액·혜택 (선택)</span><input name="amount" maxlength="300" value="${esc(x.amount || '')}"></label>
     <label class="field"><span class="field-label">운영자에게 남길 말 (선택)</span><textarea name="memo" rows="3" maxlength="2000">${esc(x.memo || '')}</textarea></label>
     <p class="auth-err" id="pr-err" ${pr.err ? '' : 'hidden'}>${esc(pr.err)}</p>
-    <button type="submit" class="btn btn-primary pr-wide" ${pr.busy ? 'disabled' : ''}>${r ? '수정 저장' : '게시 요청 보내기'}</button>
+    <button type="submit" class="btn btn-primary btn-lg pr-wide" ${pr.busy ? 'disabled' : ''}>${r ? '수정 저장' : '게시 요청 보내기'}</button>
     ${r ? '<button type="button" class="btn btn-outline pr-wide" data-pr="cancel-edit">취소</button>' : ''}
   </form>`;
 }
@@ -172,7 +172,7 @@ function prLoginHtml() {
       <label class="field"><span class="field-label">${up ? '비밀번호 (6자 이상)' : '비밀번호'}</span><input type="password" name="pw" autocomplete="${up ? 'new-password' : 'current-password'}"></label>
       ${up ? `<label class="check-item consent-item"><input type="checkbox" name="agree"><span>(필수) <a href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a>에 동의합니다</span></label>` : ''}
       <p class="auth-err" id="pr-err" ${pr.err ? '' : 'hidden'}>${esc(pr.err)}</p>
-      <button type="submit" class="btn btn-primary pr-wide" ${pr.busy ? 'disabled' : ''}>${up ? '가입하기' : '로그인'}</button>
+      <button type="submit" class="btn btn-primary btn-lg pr-wide" ${pr.busy ? 'disabled' : ''}>${up ? '가입하기' : '로그인'}</button>
       <button type="button" class="btn btn-outline pr-wide" data-pr="swap">${up ? '담당자 로그인으로' : '담당자 가입'}</button>
     </form>`;
 }
@@ -184,7 +184,7 @@ function prStaffFormHtml() {
       <label class="field"><span class="field-label">담당자 이름</span><input name="name" maxlength="50" autocomplete="name"></label>
       <label class="field"><span class="field-label">연락처 (전화 또는 이메일)</span><input name="contact" maxlength="100"></label>
       <p class="auth-err" id="pr-err" ${pr.err ? '' : 'hidden'}>${esc(pr.err)}</p>
-      <button type="submit" class="btn btn-primary pr-wide" ${pr.busy ? 'disabled' : ''}>저장하고 시작하기</button>
+      <button type="submit" class="btn btn-primary btn-lg pr-wide" ${pr.busy ? 'disabled' : ''}>저장하고 시작하기</button>
     </form>`;
 }
 function prDetailHtml(r) {
@@ -211,7 +211,7 @@ function prDetailHtml(r) {
       <form id="pr-comment" class="pr-cm-form" novalidate>
         <textarea name="body" rows="3" maxlength="2000" placeholder="운영자에게 남길 말"></textarea>
         <p class="auth-err" id="pr-err" ${pr.err ? '' : 'hidden'}>${esc(pr.err)}</p>
-        <button type="submit" class="btn btn-primary pr-wide" ${pr.busy ? 'disabled' : ''}>댓글 달기</button>
+        <button type="submit" class="btn btn-primary btn-lg pr-wide" ${pr.busy ? 'disabled' : ''}>댓글 달기</button>
       </form>
     </div>`;
 }
@@ -219,7 +219,7 @@ function prManageHtml() {
   if (pr.list == null) return '<div class="my-card"><p class="sup-desc">게시 요청을 불러오는 중이에요</p></div>';
   const open = pr.open != null && pr.list.find((r) => r.id === pr.open);
   if (open) return prDetailHtml(open);
-  if (!pr.list.length) return '<div class="my-card"><p class="sup-desc">아직 보낸 게시 요청이 없어요.</p><button type="button" class="btn btn-primary pr-wide" data-pr-tab="new">게시 요청하기</button></div>';
+  if (!pr.list.length) return '<div class="my-card"><p class="sup-desc">아직 보낸 게시 요청이 없어요.</p><button type="button" class="btn btn-primary btn-lg pr-wide" data-pr-tab="new">게시 요청하기</button></div>';
   const count = (s) => pr.list.filter((r) => r.status === s).length;
   const sum = Object.keys(PR_STATUS).filter((s) => count(s)).map((s) => `${PR_STATUS[s].label} ${count(s)}`).join(' · ');
   return `<div class="my-card">

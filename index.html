@@ -783,6 +783,18 @@
       <div id="postreq-body"></div>
     </section>
 
+    <!-- ============ 광고 문의 (2026-11-21 개발자 지시 · ad-inquiry.js) ============
+         적은 내용을 담아 메일 앱을 연다(앱이 대신 보내지 않는다) · 받는 주소는 support-config.js 하나 -->
+    <section id="screen-adinq" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-adinq-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>광고 문의</h2>
+      </header>
+      <div id="adinq-body"></div>
+    </section>
+
     <!-- ============ 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ============ -->
     <section id="screen-perms" class="screen" hidden>
       <header class="sub-header sub-header-stick">
@@ -985,7 +997,8 @@
   <script src="app-mascot.js"></script>   <!-- 3D 마스코트 연결(엔진은 늦게 싣는다) — app.js 가 그릴 때 부른다 -->
   <script src="app.js"></script>
   <script src="formfill.js"></script>   <!-- 양식 채우기 — app.js 의 전역을 쓴다(뒤에 싣는다) -->
-  <script src="post-request.js"></script>   <!-- 게시 요청(기관 담당자 로그인·게시물 관리) — app.js·supabase-client.js 의 전역을 쓴다 -->
+  <script src="post-request.js"></script>
+  <script src="ad-inquiry.js"></script>   <!-- 광고 문의(메일 앱으로) — app.js·support-config.js 의 전역을 쓴다 -->   <!-- 게시 요청(기관 담당자 로그인·게시물 관리) — app.js·supabase-client.js 의 전역을 쓴다 -->
   <script src="essay-config.js"></script>
   <script src="essay-quality.js"></script>
   <!-- 제출 전 점검표 판정 — essay.js 가 전역으로 참조하므로 먼저 실어야 한다 -->

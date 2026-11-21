@@ -244,11 +244,14 @@ const HERO_TILES = [
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 5h14v7a7 7 0 01-14 0z" fill="#f1b03b"/><path d="M9 7.5H5.5a4 4 0 004 5M23 7.5h3.5a4 4 0 01-4 5" fill="none" stroke="#d9952a" stroke-width="2" stroke-linecap="round"/><rect x="14" y="18" width="4" height="5" fill="#d9952a"/><rect x="9.5" y="23" width="13" height="5" rx="1.5" fill="#7a5cc4"/><path d="M16 8.2l1.1 2.2 2.4.3-1.8 1.7.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.7 2.4-.3z" fill="#fff"/></svg>' },
   { go: 'applications', name: '신청 내역', tone: 'gold',
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="19" height="25" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M9 9h11M9 13.5h11M9 18h7" stroke="#9db2d8" stroke-width="2" stroke-linecap="round"/><g transform="rotate(38 22 19)"><rect x="19.5" y="7" width="5" height="17" rx="1" fill="#f1b03b"/><rect x="19.5" y="7" width="5" height="3" fill="#e98c9b"/><path d="M19.5 24h5L22 28.5z" fill="#f2d7ae"/><path d="M21.3 27.1h1.4L22 28.5z" fill="#33231f"/></g></svg>' },
-  /* 아래 다섯 칸 (2026-11-21 개발자 지시 "게시요청 탭, 학교 홈 탭(학교 홈페이지 연결), 종정시 탭, e class 탭, 도서관 탭을 추가").
+  /* 아래 칸들 (2026-11-21 개발자 지시 "게시요청 탭, 학교 홈 탭(학교 홈페이지 연결), 종정시 탭, e class 탭, 도서관 탭을 추가").
      게시 요청 = 기관 담당자 화면(post-request.js · 담당자 로그인 따로) · 나머지 넷 = 그 학교 사이트를 새 탭으로(school-links.js 표 · 확인한 주소만).
      🔴 주소가 없는 학교는 그 칸을 **안 그린다**(renderHome) — 지어낸 주소로 보내지 않는다 · 로그인은 학생이 그 사이트에서 직접 한다(운영 원칙 9). */
   { go: 'postreq', name: '게시 요청', tone: 'violet',
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="4" width="18" height="24" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M9 10h10M9 14.5h10M9 19h6" stroke="#b9a9e0" stroke-width="2" stroke-linecap="round"/><circle cx="23.5" cy="23.5" r="6" fill="#7a5cc4"/><path d="M23.5 20.5v6M20.5 23.5h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>' },
+  /* 광고 문의 (2026-11-21 개발자 지시 "광고 문의 탭도 함께 추가") — 회사·기관용 · 적은 내용을 담아 메일 앱을 연다(ad-inquiry.js) */
+  { go: 'adinq', name: '광고 문의', tone: 'gold',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3.5" y="7" width="25" height="18" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M4.5 8.5L16 17l11.5-8.5" fill="none" stroke="#d9952a" stroke-width="2" stroke-linejoin="round"/><circle cx="24.5" cy="23.5" r="5.5" fill="#f1b03b"/><path d="M24.5 20.8v3.4M24.5 26.1v.2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>' },
   { go: 'link:home', name: '학교 홈', tone: 'green', link: 'home',
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15L16 5l12 10" fill="none" stroke="#c4553f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13.5V27h18V13.5L16 6z" fill="#f1c56c"/><rect x="13" y="19" width="6" height="8" rx="1" fill="#8a5a2b"/><circle cx="16" cy="13.5" r="2.2" fill="#fff"/></svg>' },
   { go: 'link:portal', name: '종정시', tone: 'navy', link: 'portal',
