@@ -1,6 +1,6 @@
-## 🖥 브라우저형 수집 리포트 (2026-11-21 12:55 KST)
+## 🖥 브라우저형 수집 리포트 (2026-11-21 19:52 KST)
 
-🚨 **여러 번 연속 공고를 못 읽은 학교**: 서울시립대학교(7회 연속 · 열렸지만 장학 공고 0건) — 게시판 주소 확인이 필요해요(정찰: collector/run-probe.txt). 일반 로봇이 같은 학교를 정상으로 읽고 있으면 browser-targets.json 의 보관(parked)으로 옮기면 됩니다(schools.json _collector 규칙).
+🚨 **여러 번 연속 공고를 못 읽은 학교**: 서울시립대학교(8회 연속 · 열렸지만 장학 공고 0건) — 게시판 주소 확인이 필요해요(정찰: collector/run-probe.txt). 일반 로봇이 같은 학교를 정상으로 읽고 있으면 browser-targets.json 의 보관(parked)으로 옮기면 됩니다(schools.json _collector 규칙).
 
 ### 한국외국어대학교
 - ✅ 링크 83 · 장학 공고 13 · https://dep.hufs.ac.kr/student/12767/subview.do
@@ -17,9 +17,8 @@
 - ⚪ 링크 4 · 장학 공고 0 · https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1
 
 ### 중앙대학교
-- ✅ 링크 652 · 장학 공고 1 · 이미 아는 공고 13건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
+- ⚪ 링크 651 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
   - ⏭ 남은 후보 1곳은 열지 않음(앞 주소에서 읽었다)
-  - [수집] 2027학년도 1학기 국가장학금 및 사전장학 1차 신청 안내
 
 ### 동국대학교
   - 📄 2페이지에서 장학 공고 19건 더 읽음
@@ -34,14 +33,14 @@
 - ✅ 링크 760 · 장학 공고 2 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
 
 ### 계명대학교
-  - 📄 2페이지에서 장학 공고 22건 더 읽음
-- ✅ 링크 1034 · 장학 공고 39 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
+- ✅ 링크 517 · 장학 공고 17 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ### 부산대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
+  - 📄 2페이지에서 장학 공고 10건 더 읽음
+- ✅ 링크 90 · 장학 공고 2 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ⚪ 링크 370 · 장학 공고 0 · 이미 아는 공고 11건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ⚪ 링크 373 · 장학 공고 0 · 이미 아는 공고 11건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 서울과학기술대학교
 - ✅ 링크 295 · 장학 공고 18 · https://www.seoultech.ac.kr/service/info/janghak/
@@ -53,18 +52,12 @@
 - ✅ 링크 414 · 장학 공고 9 · https://www.mju.ac.kr/mjukr/259/subview.do
 
 ### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
-**부산대학교**
-  - 📄 2페이지에서 장학 공고 14건 더 읽음
-- ✅ 링크 94 · 장학 공고 6 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
-  - [수집] ★2027학년도 1학기 국가장학금 1차 신청 기간 안내★
-  - [수집] 2027학년도 지방 국립대학교 전액장학금 안내(★2027학년도 신입생 필독)
-
 **건국대학교**
 - ✅ 링크 432 · 장학 공고 27 · https://www.konkuk.ac.kr/konkuk/2239/subview.do
 
 ---
-이번 실행 신규 수집: **3건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 5분 / 예산 22분 · 학교 14/14곳 처리
+이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+⏱ 소요 1분 / 예산 22분 · 학교 14/14곳 처리
 ⚪ **열렸지만 장학 공고를 하나도 못 알아본 학교 1곳**: 서울시립대학교 — 게시판 화면은 열렸는데 장학 공고로 보이는 줄이 없었어요(무엇을 봤는지는 위 학교 줄의 '본 링크'·'본 글자').
 **⏳ 스키마화 대기 중 122건** (원본 확보됨 — collector/pending-forms.json)
 
