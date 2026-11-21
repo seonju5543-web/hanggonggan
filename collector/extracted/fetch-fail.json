@@ -1,22 +1,4 @@
 {
- "act-0qklvg8|붙임 2. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 지원서.hwp": {
-  "at": "2026-11-19",
-  "why": "스크립트 주소를 못 풀었음",
-  "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ms4XQUrj_0fa4a0f4a56ed532b3bcda0b05753ffcd7bdfc64.hwp', '붙임 2. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 지원서.hwp')",
-  "n": 1
- },
- "auto-q1brddate20261105brdseq1|자기소개서_기본형 (1).hwp": {
-  "at": "2026-11-19",
-  "why": "받은 것이 웹페이지(로그인·차단 화면일 수 있다)",
-  "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#",
-  "n": 1
- },
- "auto-q1brddate20261105brdseq1|발전기금 장학생 신청서(2026년2학기) (1).hwp": {
-  "at": "2026-11-19",
-  "why": "받은 것이 웹페이지(로그인·차단 화면일 수 있다)",
-  "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#",
-  "n": 1
- },
  "auto-archgbn0searchordersort0-1gbjq10|(공지용)2026-2학기 KNU핵심역량 장학생 선발계획.hwp": {
   "at": "2026-11-20",
   "why": "TypeError · fetch failed · UND_ERR_SOCKET",
@@ -36,9 +18,21 @@
   "n": 1
  },
  "auto-scho332282297artclviewdo|(예시) 전체성적 캡쳐본.pdf": {
-  "at": "2026-11-21",
+  "at": "2026-11-22",
   "why": "TypeError · fetch failed · ECONNRESET",
   "url": "https://www3.chosun.ac.kr/bbs/scho/332/379628/download.do",
+  "n": 2
+ },
+ "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학생 신청 안내(~11/12(목)까지)|붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf": {
+  "at": "2026-11-22",
+  "why": "HTTP 404",
+  "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=D5BD8A0C455743548A5C9F52B98AF6C6_.jpg&ogrfname=%EB%B6%99%EC%9E%842_2026%EB%85%84+2%ED%95%99%EA%B8%B0+%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80+%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88%282%EC%B0%A8%29+%EC%8",
+  "n": 2
+ },
+ "act-1flnnjr|해커톤 홍보물.pdf": {
+  "at": "2026-11-22",
+  "why": "HTTP 404",
+  "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=597977C60FCD4D47AB4B72243C88AEE5_.pdf&ogrfname=%ED%95%B4%EC%BB%A4%ED%86%A4+%ED%99%8D%EB%B3%B4%EB%AC%BC.pdf",
   "n": 1
  }
 }
