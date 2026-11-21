@@ -586,7 +586,7 @@ const APP_STEPS = ['신청 준비 완료', '공식 제출', '심사', '선정 �
 /* 🔴 앱 판 번호는 **여기 한 곳**이다 (2026-09-13 고객센터 신설).
    MY 아래 줄과 고객센터의 진단 정보가 같은 값을 써야 한다 — 두 곳에 적어 두면
    한쪽만 고쳐져 학생이 알려 준 판 번호가 실제와 달라진다. */
-const APP_VERSION = 'v0.3 (MVP)';
+const APP_VERSION = 'v0.3';
 
 /* 진척도 판정 — 앱이 학교·재단 시스템을 들여다볼 수 없으므로(정직 원칙)
    '공식 제출'과 '발표 결과'는 사용자가 직접 기록하고,
@@ -2159,8 +2159,8 @@ function certStatusListHtml(sch) {
     return `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
   }).join('');
   /* doc-check — 줄마다 ✓·□·△ 표식이 있어 목록 점은 뺀다(표식이 두 겹이던 자리 · 2026-10-15 · style.css) */
-  return `<h4>증명서류 체크리스트</h4><ul class="doc-list doc-check">${rows}</ul>
-    <p class="dp-note">보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.</p>`;
+  /* 목록 밑 「보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.」는 2026-11-21 개발자 지시로 지웠다(학생이 읽지 않는 안내 · 서류함 상태는 각 줄이 말한다) */
+  return `<h4>증명서류 체크리스트</h4><ul class="doc-list doc-check">${rows}</ul>`;
 }
 
 function personLine(p) {
@@ -2275,7 +2275,6 @@ function renderDocPrep() {
           </div>`).join('')}
         ${certStatusListHtml(sch)}
         <button class="btn btn-primary btn-lg" id="btn-dp-confirm">이대로 신청 준비 완료</button>
-        <p class="dp-note">완료하면 작성한 서류가 저장되고 최종 제출처가 표시됩니다.</p>
       </div>`;
 
     $$('.dp-text').forEach((ta) =>
@@ -2575,8 +2574,7 @@ function externalNoticesHtml() {
     ? `<button type="button" class="link-btn home-more" id="external-more" data-external-more
          aria-expanded="${shown >= mine.length ? 'true' : 'false'}">${shown >= mine.length ? '접기' : '더보기'}</button>`
     : '';
-  return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
-    <span class="section-note">${liveExternal.updatedAt ? esc(shortDay(liveExternal.updatedAt)) + ' 갱신' : ''}</span></div>`
+  return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3></div>`
     + `<div class="card-list" id="external-list">`
     + mine.slice(0, shown).map((n) => noticeCardHtml(n, { org: n.host, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
     + `</div>${more}<div style="margin-bottom:18px"></div>`;
@@ -2644,12 +2642,6 @@ function schoolNewsHtml() {
   }).join('')}</div>`;
 }
 
-/* 오늘 올라온 글인가 — 게시일(없으면 수집일)이 오늘. todayStart 는 부를 때마다 오늘을 읽는다(PWA 가 며칠 살아 있어도 맞다) */
-function newsIsToday(n) {
-  const d = String(n.postedAt || n.foundAt || '').slice(0, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
-  return new Date(d + 'T00:00:00').getTime() === todayStart().getTime();
-}
 /* 날짜 짧게 — 띠 카드 윗줄의 'MM.DD' (게시일, 없으면 수집일) */
 const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}.${m[2]}` : ''; };
 
@@ -2661,9 +2653,8 @@ const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/
 function homeNewsHtml() {
   const p = state.profile;
   if (!p) return '';
-  /* 오늘 올라온 글 수 — 「오늘 날짜 기준」(2026-10-10 업무 분장 8번). 머리줄 아래 설명 줄은 두지 않는다(10-03 개발자 지시) — 제목 옆 작은 알약 하나 */
-  const todayN = liveNews ? schoolNewsForMe().filter((n) => newsIsToday(n)).length : 0;
-  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식${todayN ? ` <span class="news-today">오늘 ${todayN}</span>` : ''}</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
+  /* 🔴 제목 옆 「오늘 n」 알약은 없앴다(2026-11-21 개발자 지시 — 'AI 티가 나고 학생이 읽지 않는 글자'). 날짜는 카드마다 적혀 있다. 되살리지 말 것 */
+  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
   if (!liveNews) return head(false) + `<div class="news-strip" aria-busy="true">${'<span class="news-tile is-skel"><span class="news-tile-photo"></span><span class="news-tile-meta">&nbsp;</span><span class="news-tile-title">&nbsp;</span></span>'.repeat(3)}</div>`;
   const mine = schoolNewsForMe();
   if (!mine.length) return '';
@@ -2701,7 +2692,7 @@ function openNewsSheet() {
     <div class="sheet-handle"></div>
     <div class="sheet-body">
       <h3 class="sheet-title">우리 학교 소식</h3>
-      <p class="sheet-provider">${esc(p.school || '')} 공지 게시판${liveNews && liveNews.updatedAt ? ` · ${esc(liveNews.updatedAt)} 갱신` : ''}</p>
+      <p class="sheet-provider">${esc(p.school || '')} 공지 게시판</p>
       ${schoolNewsHtml()}
     </div>`;
   openSheetShell();

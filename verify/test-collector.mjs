@@ -9641,9 +9641,8 @@ console.log('\n■ 화면이 「전국 모든 대학」을 약속하지 않는�
   const strip = (t) => t.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
   eq('화면 문구에 「전국 모든 대학」이 없다', /전국\s*모든\s*대학/.test(strip(html) + strip(app)), false);
   eq('  MY 아래줄이 「전국 대학 지원」이라고 하지 않는다', /전국 대학 지원/.test(strip(app)), false);
-  /* 🔴 숫자를 손으로 적지 않는다 — 학교가 늘면 저절로 맞아야 한다(데이터가 세어 말한다) */
-  eq('  대신 데이터에서 센다 (교내 학교 수 · 층2 재단 수)',
-    /schoolOnly\)\.filter\(Boolean\)/.test(app) && /kosafList\.length/.test(app), true);
+  /* 2026-11-21 개발자 지시 — 데이터가 센 숫자(「교내 공고 n개교 · 한국장학재단 n곳」)도 학생이 읽지 않는 앱 자랑이라 지웠다. 판 번호만 */
+  eq('  MY 아래줄은 판 번호뿐 (숫자 자랑 없음 · 2026-11-21)', /ver\.textContent = `한대장 \$\{APP_VERSION\}`;/.test(app) && !/교내 공고 \$\{inSchools/.test(app), true);
 }
 
 /* ══ 시작 화면 — 승인받은 컷 A 그대로인가 (2026-09-18 · 노션 UI-3) ═══════════
@@ -10914,7 +10913,8 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const appN = appSource();
     const robotN = readText(new URL('../collector/collect-news-desc.mjs', import.meta.url));
     eq('  앱 — 요약이 있는 글만 요약 줄을 그린다 (홈 띠 · 전체 보기 카드)', [/\$\{n\.desc \? `<span class="news-tile-desc">/.test(appN), /\$\{o\.desc \? `<p class="sch-desc">/.test(appN), /desc: n\.desc \}\)/.test(appN)], [true, true, true]);
-    eq('  앱 — 「오늘 n」 은 부를 때마다 오늘을 읽는다 (todayStart · 날짜를 굳히지 않는다)', /function newsIsToday[\s\S]{0,300}todayStart\(\)/.test(appN), true);
+    /* 「오늘 n」 알약은 2026-11-21 개발자 지시로 없앴다('AI 티 · 학생이 안 읽는 글자') — 되살아나지 않는가 */
+    eq('  앱 — 우리 학교 소식 제목 옆 「오늘 n」 알약이 없다 (2026-11-21)', /news-today|오늘 \$\{todayN\}/.test(appN), false);
     eqWf('  워크플로 — 요약 단계는 보강(continue-on-error) · 장부를 저장하고 감사 실패 땐 되돌린다',
       [/collect-news-desc\.mjs/.test(wf), /name: 교내 소식 요약[\s\S]{0,120}continue-on-error: true/.test(wf),
         /git add collector\/news-desc\.json/.test(wf), /git checkout -- collector\/news-desc\.json/.test(wf)], [true, true, true, true]);
@@ -14427,7 +14427,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   /* 2026-11-07 개발자 지시 "지원자격에 넣을 내용이 없는 경우에는 지원자격 칸 자체를 없애기" — 11-02 의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다. 되돌리면 빨갛다 */
   eq('  자격 0줄이고 물을 것도 없으면 「지원 자격」 칸 자체가 없다(「원문에서 확인」 자리표시 줄 없음 · 2026-11-07) · 제외 조건은 같은 목록 안 ✗(r-x)',
     [/const elig = \(rows \|\| ask\) \? `<div class="sheet-verdict">/.test(sec), /자격은 원문에서 확인해 주세요/.test(sec), /class="r-elig r-x">✗ /.test(fnOf('eligibilityRowsHtml')), /지원 제외 대상/.test(fnOf('eligibilityRowsHtml'))], [true, false, true, false]);
-  eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period, true\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /재단 선발 공고문·홈페이지가 정한 접수 방법/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, true]);
+  eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period, true\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /'재단 선발 공고문·홈페이지가 정한 접수 방법'/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, false]);   // 마지막: 아무것도 알려 주지 않는 층2 「방법」 줄은 2026-11-21 개발자 지시로 지웠다
   /* 2026-11-15 은서 지시 — 「더 보기」 뒤 줄 수(「(2줄)」)는 뺀다 · 시트 목록 앞 점도 뺀다(style.css #detail-sheet 블록) */
   eq('  「공고 안내」 는 다섯 줄 뒤 「더 보기」(줄 수 없이) · 층2 재단 칸(선발방법·선발인원·추천필요여부)도 같은 줄로', [/NS_SHOWN/.test(fnOf('noticeSummaryHtml')), /<summary>더 보기<\/summary>/.test(fnOf('noticeSummaryHtml')) && !/더 보기 \(/.test(fnOf('noticeSummaryHtml')), /\['선발방법', '선발인원', '추천필요여부'\]/.test(fnOf('kosafAsScholarships'))], [true, true, true]);
   eq('  「첨부」 — 층2는 꼬리표 「재단 선발 공고문」 · 「공고 원본 첨부 양식」 이름은 없다', [/<h4>첨부\$\{sch\.sourceKind === 'kosaf' \? ' <span class="channel-tag">재단 선발 공고문<\/span>' : ''\}<\/h4>/.test(sec), /공고 원본 첨부 양식|공고 원본 첨부</.test(appV)], [true, false]);

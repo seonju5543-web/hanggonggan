@@ -256,10 +256,9 @@ function loadTuition() {
 }
 
 /* 정식 등록 공고 (수집 → 큐레이션 → 매칭·신청 지원) */
-/* 언제 받은 목록인가 — 홈 맨 아래에 적는다 (2026-09-01 개발자 요청).
-   dataFetchedAt 은 **이 폰이 받아 온 시각**, regUpdatedAt 은 **로봇이 발행한 날**이다. */
+/* 목록을 받아 왔는가 — 못 받았을 때만 홈 맨 아래에 알린다. dataFetchedAt 은 **이 폰이 받아 온 시각**이다.
+   (받은 시각·로봇 발행일을 적던 두 줄은 2026-11-21 개발자 지시로 지웠다) */
 let dataFetchedAt = null;
-let regUpdatedAt = '';
 
 function renderHomeUpdated() {
   const el = $('#home-updated');
@@ -269,13 +268,9 @@ function renderHomeUpdated() {
     el.textContent = '장학금 목록을 아직 받지 못했어요 · 인터넷 연결을 확인해 주세요';
     return;
   }
-  const t = dataFetchedAt;
-  const two = (n) => String(n).padStart(2, '0');
-  const when = `${t.getMonth() + 1}월 ${t.getDate()}일 ${two(t.getHours())}:${two(t.getMinutes())}`;
-  /* 두 줄로 나눈다 — 한 줄로 두면 오른쪽 끝이 도우미 동그라미에 가린다(실측).
-     두 가지가 서로 다른 사실이기도 하다. */
-  el.innerHTML = `<span>장학금 목록 마지막 확인 ${esc(when)}</span>`
-    + (regUpdatedAt ? `<span>공고 갱신 ${esc(regUpdatedAt)}</span>` : '');
+  /* 🔴 받아 왔으면 아무것도 적지 않는다 — 「장학금 목록 마지막 확인 …」「공고 갱신 …」 두 줄은 2026-11-21 개발자 지시로 없앴다
+     ('학생이 읽지 않는 앱 사정'). 못 받았을 때의 안내(위)만 남긴다 — 그건 학생이 할 일(연결 확인)이 있다 */
+  el.textContent = '';
 }
 
 /* 원문 링크 확인 장부 (2026-10-03 · 원문 링크 정직성 — 개발자 보고 P0 *"원문 공고를 누르면 재단·장학금 페이지 전체가 열린다"*).
@@ -390,7 +385,6 @@ function loadRegistered() {
       /* match-engine publishedList — 유료 확인 전 숨김분을 거르고 유료 결과를 얹는다(알림·서비스워커도 같은 함수 · 2026-11-20).
          옛 엔진이 캐시에서 오면 숨김분은 통째로 안 보인다(안전한 쪽) */
       registeredList = typeof publishedList === 'function' ? publishedList(d.items || [], cardRead, null, cardFixes) : (d.items || []).filter((s) => !s.paidGate);
-      regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);
     })
@@ -591,15 +585,14 @@ function kosafAsScholarships() {
 /* 🔴 이름이 '우리 학교 실시간 공고' 였다 → **'우리 학교 게시판 새 공고'** (2026-09-18).
    홈으로 옮기면서 이름이 하는 일이 달라졌다 — 여기서 말해야 하는 것은 '실시간'이 아니라
    **이게 어디서 온 글인가**다(우리가 읽은 공고가 아니라 학교 게시판에 올라온 글). */
-function liveNoticesHead(updatedAt) {
+function liveNoticesHead() {
   /* ⚠️ 두 토막이 한 줄에 들어가야 한다 — 그려 놓고 재 보니 제목이 한 글자 길어지고 오른쪽
      글이 길어서 **둘 다 두 줄로 꺾였다**(390px). 제목은 옛 길이(11자)로, 오른쪽은 날짜만. */
   /* ⚠️ 제목 아래 설명 한 줄(`.section-sub`)을 2026-10-03 에 붙였다가 **같은 날 개발자 지시로
      걷었다** — 홈 아래 세 구역(학교 게시판 공고 · 우리 학교 소식 · 재단·지자체 새 공고)에
      전부 있었다. 다시 붙이지 말 것. */
-  /* 🔴 갱신 날짜는 **누를 수 없는 글자**라 파랑(link-btn — 이 앱에서 '누를 수 있음')을 쓰지 않는다 (2026-10-10 팀 업무 분장 11번 · 은서) */
-  return `<div class="section-head" style="margin-top:4px"><h3>우리 학교 게시판 공고</h3>
-    <span class="section-note">${updatedAt ? esc(shortDay(updatedAt)) + ' 갱신' : '매일 아침 갱신'}</span></div>`;
+  /* 🔴 머리줄 오른쪽 「MM.DD 갱신」·「매일 아침 갱신」은 없앴다(2026-11-21 개발자 지시 — 학생이 읽지 않는 앱 사정). 카드마다 날짜가 있다. 되살리지 말 것 */
+  return `<div class="section-head" style="margin-top:4px"><h3>우리 학교 게시판 공고</h3></div>`;
 }
 
 /* ⚠️ 검색 인자를 걷었다 (2026-09-18) — 이 목록이 탐색 화면에 있던 시절에는 그 화면의
@@ -663,13 +656,13 @@ function liveNoticesHtml() {
         실패하면 `null` 로 남기 때문이다. 그래서 아래 loadNotices 가 실패해도 **빈 문서**를
         넣어 이 구역이 '없음'으로 정직하게 내려앉게 한다. */
   if (!liveNotices) {
-    return liveNoticesHead('') + (typeof skeletonRows === 'function' ? skeletonRows(3) : '');
+    return liveNoticesHead() + (typeof skeletonRows === 'function' ? skeletonRows(3) : '');
   }
   /* 🔴 **상한을 걷었다** (2026-09-12 · UI-16). 8+2 는 이 목록이 '전체' 카드 **아래에**
      얹혀 있던 시절의 자리 다툼 때문이었다 — 제 칸이 생겼으니 학생이 보러 온 것을 잘라서
      보여 줄 이유가 없다(실측: 한국외국어대학교 22건 · 경희대학교 17건). */
   const mine = boardNoticesForMe();
-  const head = liveNoticesHead(liveNotices.updatedAt);
+  const head = liveNoticesHead();
   if (!mine.length) {
     return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
   }

@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: david/quirky-fermat-7vcky7
-메모: 2026-11-21 앱 안 알림 리뷰 반영 — 서버 오류 문구가 체크로 보이던 것 바로잡음
+branch: david/awesome-brown-9p5gvb
+메모: 2026-11-21 학생이 읽지 않는 글자 전수 정리(소식 「오늘 n」·갱신 날짜·목록 끝 ※ 안내·MY 숫자 줄 등)
