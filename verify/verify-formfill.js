@@ -145,7 +145,10 @@ const PROFILE = {
   eq('폰(390px)에서 칸 목록은 아래 서랍이다 (접힌 채 · 손잡이만 보인다)', [drawer.pos, drawer.open, drawer.handle !== 'none', drawer.top > drawer.vh * 0.8], ['fixed', false, true, true]);
   await page.click('#fill-handle');
   await page.waitForTimeout(400);
-  eq('  손잡이를 누르면 펼쳐진다', await page.evaluate(() => { const p = document.querySelector('#fill-panel'); return [p.classList.contains('open'), Math.round(p.getBoundingClientRect().top) < window.innerHeight * 0.6]; }), [true, true]);
+  /* 🔴 서랍 높이는 칸 수만큼(최대 62vh) — 「화면 60% 위로 올라온다」로 재면 칸이 적은 공고를 고른 날 정상인데 빨갛다(2026-11-21 · 로봇 데이터만 바뀐 커밋에서 빨간불).
+     칸 수와 상관없이 「끝까지 올라왔다」로 잰다: 숨김 이동(translateY)이 0 · 바닥이 화면 바닥 · 접혔을 때보다 위 */
+  eq('  손잡이를 누르면 펼쳐진다 (끝까지 올라온다 — 칸 수와 상관없이)', await page.evaluate((closedTop) => { const p = document.querySelector('#fill-panel'); const r = p.getBoundingClientRect(); const m = new DOMMatrixReadOnly(getComputedStyle(p).transform);
+    return [p.classList.contains('open'), Math.round(m.m42) === 0, Math.abs(Math.round(r.bottom) - window.innerHeight) <= 1, Math.round(r.top) < closedTop]; }, drawer.top), [true, true, true, true]);
   await page.setViewportSize({ width: 1024, height: 900 });
   await page.waitForTimeout(400);
   const wide = await page.evaluate(() => { const p = document.querySelector('#fill-panel').getBoundingClientRect(); const g = document.querySelector('#fill-pages').getBoundingClientRect(); return { side: p.left > g.left + g.width - 2, pos: getComputedStyle(document.querySelector('#fill-panel')).position, handle: getComputedStyle(document.querySelector('#fill-handle')).display }; });
