@@ -1,6 +1,6 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-11-20",
+ "updatedAt": "2026-11-21",
  "items": [
   {
    "title": "[공지] 맛있는 점심과 함께하는 'AI 캠퍼스 프리뷰 클래스'에 초대합니다!",
@@ -22,7 +22,8 @@
    "school": "동국대학교",
    "campus": "",
    "src": "d521f12e",
-   "foundAt": "2026-11-20"
+   "foundAt": "2026-11-20",
+   "desc": "※ 작업 진행 상황에 따라 종료 시간이 변경될 수 있습니다. 2. 작업 내용 : 교내 방화벽 OS 패치 작업"
   },
   {
    "title": "[동국대학교 인권센터] 2026학년도 인권실태조사 참여 안내 (2026.11.17~11.24)",
@@ -436,17 +437,6 @@
    "src": "d521f12e",
    "foundAt": "2026-10-22",
    "thumb": "data/news/img/ab954605c53fa4aa.webp"
-  },
-  {
-   "title": "(예비군연대) 2026년 11월 각 군 모집계획 안내",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766690",
-   "postedAt": "2026-10-21",
-   "postId": "26766690",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/1a4f6e842b382123.webp"
   }
  ]
 }

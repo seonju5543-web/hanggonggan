@@ -1,6 +1,6 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-11-20",
+ "updatedAt": "2026-11-21",
  "items": [
   {
    "title": "서울 (~12.1) [Counseling Center (Seoul)] 2026 Stress Manage...",
@@ -412,18 +412,6 @@
    "foundAt": "2026-10-22",
    "thumb": "data/news/img/98940754a1962ed3.webp",
    "desc": "안녕하세요. 국제교육원 외국어교육부입니다. 2026-5차 무료 영어회화 샘플강의 일정 및 ZOOM 주소 안내를 드립니다."
-  },
-  {
-   "title": "공통 [코스모웍스] 광학실험(렌즈)/전기전자 연구개발 직무 추천채용",
-   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323370",
-   "postedAt": "2026-10-21",
-   "postId": "323370",
-   "kind": "채용",
-   "school": "경희대학교",
-   "campus": "",
-   "src": "a92b27ac",
-   "foundAt": "2026-10-21",
-   "desc": "1. 제출방법 ① 추천채용 서류 미래인재센터 이메일 제출 ▶ work_register@khu.ac.kr"
   }
  ]
 }
