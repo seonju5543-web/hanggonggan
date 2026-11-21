@@ -140,5 +140,24 @@
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521260": {
   "at": "2026-11-20",
   "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542414": {
+  "at": "2026-11-21",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인",
+   "★소사본복지관 다문화아동 부천 스타필드 문화활동 봉사자 모집"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3539116": {
+  "at": "2026-11-21",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  }
 }
