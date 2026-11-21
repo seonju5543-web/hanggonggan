@@ -30,7 +30,6 @@ colors:
   semantic-danger: "#8f3a2e"
   semantic-danger-weak: "#f5e9e6"
   brand-mascot: "#b8912f"
-  semantic-overlay: "rgba(16, 22, 38, 0.94)"
 
 typography:
   display-hero:

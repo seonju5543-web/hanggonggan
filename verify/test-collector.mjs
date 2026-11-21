@@ -14337,10 +14337,15 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     [/background: var\(--surface\)/.test(box), /color: var\(--text\)/.test(box), /border: 1px solid var\(--rule\)/.test(box), /box-shadow: var\(--shadow-lift\)/.test(box)], [true, true, true, true]);
   eq('  왼쪽 정렬 · 화면 양옆 16px · 하단 탭 위(safe-area 포함)',
     [/text-align: left/.test(box), /width: calc\(100% - 32px\)/.test(box), /bottom: calc\(74px \+ env\(safe-area-inset-bottom\)\)/.test(box)], [true, true, true]);
-  eq('  설명 줄은 회색(--text-sub) · 되돌리기는 놋쇠(--accent)',
+  eq('  설명 줄은 회색(--text-sub) · 되돌리기는 강조색(--accent)',
     [/color: var\(--text-sub\)/.test(rule('.toast-sub')), /color: var\(--accent\)/.test(rule('#toast .toast-undo'))], [true, true]);
-  eq('  아이콘은 24px 원 · 됐다=연초록 체크(--green-weak/--green)',
-    [/width: 24px; height: 24px; border-radius: 50%/.test(rule('.toast-ico')), /background: var\(--green-weak\); color: var\(--green\)/.test(rule('.toast-ico'))], [true, true]);
+  eq('  아이콘은 24px 원 · 됐다=연초록 체크 · 안 됐다=연붉은 느낌표 · 안내=회색',
+    [/width: 24px; height: 24px; border-radius: 50%/.test(rule('.toast-ico')), /background: var\(--green-weak\); color: var\(--green\)/.test(rule('.toast-ico')),
+     /background: var\(--red-weak\); color: var\(--red\)/.test(rule('.toast-ico[data-tone="warn"]')), /background: var\(--surface-2\); color: var\(--text-sub\)/.test(rule('.toast-ico[data-tone="info"]'))],
+    [true, true, true, true]);
+  /* 판은 손가락을 통과시키고 단추만 받는다 — 넓은 판이 2.6초 동안 도우미 버튼을 삼키지 않게 */
+  eq('  알림 판은 누름을 통과시키고 되돌리기 단추만 받는다',
+    [/pointer-events: none/.test(box), /pointer-events: auto/.test(rule('#toast .toast-undo'))], [true, true]);
   /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
   const cut = appT.slice(appT.indexOf('const TOAST_WARN'), appT.indexOf('const TOAST_ICONS'));
   const partsAt = appT.indexOf('function toastParts(');
@@ -14355,8 +14360,21 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
      '지원문서 작성 완료 · 내용을 옮겨 제출하세요', '저장을 해제했어요', '3건 삭제', '알림을 켰습니다. 새 공고와 마감을 알립니다',
      '새 알림 2건', '알림은 MY 화면에서 언제든 켜기 가능'].map(T.toastTone),
     ['warn', 'warn', 'warn', 'warn', 'done', 'done', 'done', 'done', 'info', 'info']);
+  /* 🔴 실제 실패 문구가 체크로 새지 않는다 — 서버 오류(authErrorText)·입력 막음(input-guard·GUARD_KIND_MSG)·초안 거절(essay.js).
+     '문제가 생겼어요'는 끝난 말꼴이라 한때 초록 체크였다: 서버 정보 삭제 실패가 '됐다'로 보였다(리뷰 2026-11-21) */
+  eq('  서버 오류·입력 막음·초안 거절은 체크가 아니다(느낌표)',
+    ['문제가 생겼어요 (Internal error)', '문제가 생겼어요. 잠시 후 다시 시도해 주세요', '인터넷 연결을 확인해 주세요', '이메일 또는 비밀번호가 맞지 않아요',
+     '로그인 상태가 아니에요', '학번은 숫자·영문만 적을 수 있어요', '생년월일은 2005.03.14 처럼 적어 주세요', '있을 수 없는 생년월일이에요 — 다시 확인해 주세요',
+     '민감정보가 섞여 있어 보내지 않았어요 — 그 부분은 직접 써 주세요', '로그인이 끝났어요. 다시 로그인해 주세요', '재료에 없는 사실: "수상"'].map(T.toastTone),
+    Array(11).fill('warn'));
+  const sbSrc = readText(new URL('../supabase-client.js', import.meta.url));
+  const aeAt = sbSrc.indexOf('function authErrorText(');
+  const authMsgs = [...sbSrc.slice(aeAt, sbSrc.indexOf('\n}\n', aeAt)).matchAll(/return [`']([^`']+)[`']/g)].map((m) => m[1].replace(/\$\{m\}/, 'x'));
+  eq('  authErrorText 가 내는 문구는 하나도 체크가 아니다(전수)', authMsgs.length >= 6 && authMsgs.filter((m) => T.toastTone(m) === 'done'), []);
   const toastAt = appT.indexOf('function toast(msg');
   const toastFn = appT.slice(toastAt, appT.indexOf('\nfunction ', toastAt + 10));
+  eq('  toast() 가 실제로 성격을 가려 그 아이콘을 단다(함수만 있고 안 쓰이는 일이 없다)',
+    [/const tone = toastTone\(msg\);/.test(toastFn), /dataset\.tone = tone/.test(toastFn), /TOAST_ICONS\[tone\]/.test(toastFn), /toastParts\(msg\)/.test(toastFn)], [true, true, true, true]);
   eq('  알림 글은 textContent 로만 넣는다(그림만 고정 글자)',
     [/h\.textContent = head;/.test(toastFn), /d\.textContent = sub;/.test(toastFn), /innerHTML = [^;]*\b(msg|head|sub)\b/.test(toastFn)], [true, true, false]);
 }
