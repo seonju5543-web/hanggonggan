@@ -663,6 +663,32 @@ function refreshProgressViews(id) {
   if (wasOpen) { if (appSch(id)) openDetail(id); else closeSheet(); }   // 결과를 적어 사라진 줄의 시트는 닫는다
 }
 
+/* 알림 글을 머리·설명으로 가른다 — 첫 ` · ` 또는 ` — ` 에서 한 번만.
+   머리가 너무 길면(문장 하나짜리 경고 등) 가르지 않는다: 머리만 굵어져 오히려 무겁다. */
+function toastParts(msg) {
+  const t = String(msg == null ? '' : msg).trim();
+  const m = t.match(/^(.+?)\s+[·—]\s+(.+)$/s);
+  if (!m || m[1].length > 24) return { head: t, sub: '' };
+  return { head: m[1], sub: m[2] };
+}
+
+/* 알림의 성격 — 아이콘을 고른다(승인 시안 C · 2026-11-21).
+   안 된 일(실패·차단·막음)을 먼저 본다: '서류를 지우지 못했어요' 처럼 '지웠'·'완료'류 낱말이 섞여도 실패다.
+   된 일은 끝난 말꼴(완료·했어요·했습니다…)로만 · 둘 다 아니면 안내(새 알림 n건 · 켜기 가능 등). */
+const TOAST_WARN = /실패|미지원|못\s?[가-힣]|차단|벗어나|사이만|이하 (파일|사진)|이미 다른|필요$|^먼저|골라 주세요|읽을 수 없|찾지 못/;
+const TOAST_DONE = /완료|[했됐웠겼렸왔켰] ?(어요|습니다)|해제했|저장했|기록했|되살|불러왔|^로그아웃|\d+건 삭제/;
+function toastTone(msg) {
+  const t = String(msg == null ? '' : msg);
+  if (TOAST_WARN.test(t)) return 'warn';
+  if (TOAST_DONE.test(t)) return 'done';
+  return 'info';
+}
+const TOAST_ICONS = {
+  done: '<path d="M5 12.5l4.2 4.2L19 7"/>',
+  warn: '<path d="M12 6.5v7"/><path d="M12 17.6v.01"/>',
+  info: '<path d="M12 11v6.5"/><path d="M12 6.6v.01"/>',
+};
+
 function toast(msg, action) {
   const el = $('#toast');
   /* 🔴 사라지는 중에 새 알림이 뜨면 **옛 숨김 타이머가 새 알림을 지운다** — 2600ms 타이머만
@@ -670,7 +696,33 @@ function toast(msg, action) {
      (반쯤 뜬 채로 사라진다). 두 타이머를 한자리에서 끈다. */
   clearTimeout(toast._t);
   clearTimeout(toast._h);
-  el.textContent = msg;
+  /* 머리 한 줄 + 설명 한 줄 (2026-11-21 개발자 요청 — "조금 더 프로페셔널하고 깔끔하게").
+     부르는 쪽은 이미 `결과 · 할 일` / `결과 — 할 일` 꼴로 적고 있다. 긴 문장을 가운데 정렬로
+     네댓 줄 쌓으면 무엇이 끝났고 무엇을 하라는지가 섞였다 → 첫 구분자 앞을 굵게, 뒤를 흐리게.
+     부르는 자리(60여 곳)는 손대지 않는다 · 글자는 여전히 textContent 로만 넣는다(태그 해석 없음). */
+  const { head, sub } = toastParts(msg);
+  el.textContent = '';
+  const tone = toastTone(msg);
+  const ico = document.createElement('span');
+  ico.className = 'toast-ico';
+  ico.dataset.tone = tone;
+  ico.setAttribute('aria-hidden', 'true');
+  /* 고정된 그림 글자만 넣는다(알림 글은 아래에서 textContent 로) */
+  ico.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${TOAST_ICONS[tone]}</svg>`;
+  el.appendChild(ico);
+  const body = document.createElement('div');
+  body.className = 'toast-body';
+  const h = document.createElement('div');
+  h.className = 'toast-head';
+  h.textContent = head;
+  body.appendChild(h);
+  if (sub) {
+    const d = document.createElement('div');
+    d.className = 'toast-sub';
+    d.textContent = sub;
+    body.appendChild(d);
+  }
+  el.appendChild(body);
   /* 되돌리기처럼 **되살릴 수 있는 실수**는 단추를 함께 준다.
      터치 타깃 44px은 style.css의 .toast-undo가 지킨다. */
   if (action) {

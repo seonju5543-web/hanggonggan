@@ -1057,29 +1057,48 @@ textarea:focus {
 
 /* ---------------- 토스트 ---------------- */
 .toast {
-  /* 🔴 하단 탭(높이 약 62px) 바로 위에 낮게 띄운다 — 예전 100px 은 화면 한가운데
-     가까이 떠서 보던 목록을 가렸다. 내용만큼만 넓어지도록 inline-flex 를 쓴다
-     (block + max-width:90% 이라 짧은 글에도 상자가 넓게 남았다). */
+  /* 🔴 하단 탭 바로 위에 낮게 띄운다 — 예전 100px 은 화면 한가운데 가까이 떠서 보던 목록을 가렸다.
+     🔴 홈 표시줄이 있는 아이폰에서는 탭이 그만큼 높다(.bottom-nav 의 safe-area 여백) — 74px 만 두면
+        알림이 탭 아이콘 위에 겹쳤다(2026-11-21 개발자 스크린샷). 도우미 버튼과 같은 자리 셈을 쓴다.
+     🔴 **승인 시안 C「흰 카드」(2026-11-21 개발자 선택 · docs/designs/mockups/toast-options.png)** —
+     흰 바탕(앱 카드와 같은 재질) · 얇은 테두리 · 왼쪽 동그란 아이콘 · 굵은 머리 한 줄 + 회색 설명 ·
+     되돌리기 단추는 오른쪽 끝 놋쇠 글자. 폭은 화면 양옆 16px 을 뺀 만큼(앱 폭 상한 안).
+     관문: test-collector 「승인받은 화면 그대로인가 — 앱 안 알림 시안 C」. 바꾸려면 다시 보여 주고 검사도 같이. */
   position: fixed;
-  bottom: 74px;
+  bottom: calc(74px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%) translateY(8px);
-  display: inline-flex;
+  width: calc(100% - 32px);
+  max-width: 448px;
+  display: flex;
   align-items: center;
-  background: rgba(16, 22, 38, 0.94);
-  color: #fff;
+  gap: var(--sp-2);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--rule);
   font-size: var(--t-sm);
-  font-weight: 600;
-  padding: 9px 16px;
+  line-height: 1.45;
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) 16px;
   border-radius: var(--radius-sm);
   z-index: 200;
   opacity: 0;
   transition: opacity 0.25s, transform 0.25s;
-  max-width: 90%;
-  text-align: center;
+  text-align: left;
   box-shadow: var(--shadow-lift);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-body { flex: 1; min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.toast-head { font-weight: 700; letter-spacing: -0.01em; }
+.toast-sub { font-size: var(--t-xs); font-weight: 500; color: var(--text-sub); }
+/* 왼쪽 아이콘 — 알림의 성격대로(toastTone): 됐다 = 연초록 체크 · 안 됐다 = 연붉은 느낌표 · 안내 = 회색 i.
+   🔴 실패 알림에 체크를 달면 '안 됐는데 됐다'고 말하게 된다 — 그래서 셋으로 가른다. */
+.toast-ico {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; align-self: flex-start; margin-top: 1px;
+  background: var(--green-weak); color: var(--green);
+}
+.toast-ico[data-tone="warn"] { background: var(--red-weak); color: var(--red); }
+.toast-ico[data-tone="info"] { background: var(--surface-2); color: var(--text-sub); }
 
 /* ---------------- 데스크톱 프레임 ---------------- */
 @media (min-width: 520px) {
@@ -1931,8 +1950,9 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 #toast .toast-undo {
   /* 손가락 목표는 44px 이 권장이지만, 그 높이가 알림 상자를 통째로 키우고 있었다.
      36px + 좌우 여백으로 줄인다 — 알림은 몇 초만 떠 있고 바로 옆에 다른 버튼이 없다. */
-  margin-left: 10px; background: transparent; border: 0; cursor: pointer;
-  color: #7cc4ff; font-weight: 700; font-size: var(--t-sm);
+  /* 되돌리기 글자는 놋쇠(--accent · 흰 바탕 위 4.6:1) — 예전 하늘색(#7cc4ff)은 팔레트에서 걷어낸 'AI 블루'였다 */
+  flex: none; margin: calc(var(--sp-1) * -1) 0; background: transparent; border: 0; cursor: pointer;
+  color: var(--accent); font-weight: 700; font-size: var(--t-sm);
   min-height: 36px; padding: 0 6px; white-space: nowrap;
 }
 @media (prefers-reduced-motion: reduce) {

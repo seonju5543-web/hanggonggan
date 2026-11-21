@@ -14323,6 +14323,44 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  지원 가능 알약(STATUS_META)은 활동 시트에 없다 — 구조화 조건이 없어 늘 가능이라 거짓 안심', /STATUS_META\[/.test((() => { const a = appX.indexOf('function openActivityDetail'); return appX.slice(a, appX.indexOf('\nfunction ', a + 10)); })()), false);
 }
 
+/* ══ 승인받은 화면 그대로인가 — 앱 안 알림 시안 C「흰 카드」 (2026-11-21 · docs/designs/mockups/toast-options.png) ══
+   개발자가 시안 5종(A 진한 판 · B 진한 판+아이콘 · C 흰 카드 · D 위쪽 배너 · E 알약) 중 "C로 진행하자".
+   흰 바탕 · 얇은 테두리 · 왼쪽 동그란 아이콘 · 굵은 머리 + 회색 설명 · 되돌리기는 오른쪽 놋쇠 글자.
+   🔴 검사만 고쳐 통과시키지 말 것 — 화면을 바꾸려면 개발자에게 다시 보여 주고 승인받은 뒤 여기도 같이(스킬 approved-design). */
+{
+  console.log('\n■ 승인받은 화면 그대로인가 — 앱 안 알림 시안 C (2026-11-21)');
+  const appT = appSource();
+  const cssT = readText(new URL('../style.css', import.meta.url));
+  const rule = (sel) => { const a = cssT.indexOf(`\n${sel} {`); return a < 0 ? '' : cssT.slice(a, cssT.indexOf('}', a)); };
+  const box = rule('.toast');
+  eq('알림 판은 흰 바탕(--surface) · 잉크 글자 · 얇은 테두리(--rule) · 떠 있는 그림자(--shadow-lift)',
+    [/background: var\(--surface\)/.test(box), /color: var\(--text\)/.test(box), /border: 1px solid var\(--rule\)/.test(box), /box-shadow: var\(--shadow-lift\)/.test(box)], [true, true, true, true]);
+  eq('  왼쪽 정렬 · 화면 양옆 16px · 하단 탭 위(safe-area 포함)',
+    [/text-align: left/.test(box), /width: calc\(100% - 32px\)/.test(box), /bottom: calc\(74px \+ env\(safe-area-inset-bottom\)\)/.test(box)], [true, true, true]);
+  eq('  설명 줄은 회색(--text-sub) · 되돌리기는 놋쇠(--accent)',
+    [/color: var\(--text-sub\)/.test(rule('.toast-sub')), /color: var\(--accent\)/.test(rule('#toast .toast-undo'))], [true, true]);
+  eq('  아이콘은 24px 원 · 됐다=연초록 체크(--green-weak/--green)',
+    [/width: 24px; height: 24px; border-radius: 50%/.test(rule('.toast-ico')), /background: var\(--green-weak\); color: var\(--green\)/.test(rule('.toast-ico'))], [true, true]);
+  /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
+  const cut = appT.slice(appT.indexOf('const TOAST_WARN'), appT.indexOf('const TOAST_ICONS'));
+  const partsAt = appT.indexOf('function toastParts(');
+  const partsSrc = appT.slice(partsAt, appT.indexOf('\n}\n', partsAt) + 2);
+  const T = new Function(`${cut}\n${partsSrc}\nreturn { toastTone, toastParts };`)();
+  eq('머리·설명은 첫 「 · 」·「 — 」에서 한 번만 가른다 · 앞이 길면 가르지 않는다',
+    [T.toastParts('지원문서 작성 완료 · 내용을 옮겨 제출하세요 · 끝').sub, T.toastParts('비밀번호 변경 완료').sub, T.toastParts('저장돼 있던 평점·태어난 해 값이 범위를 벗어나 비웠어요 — 내 정보에서 다시 적어 주세요').sub],
+    ['내용을 옮겨 제출하세요 · 끝', '', '']);
+  /* 🔴 실패 알림에 체크를 달면 '안 됐는데 됐다'가 된다 — 실패 낱말이 섞이면 완료 낱말보다 먼저 본다 */
+  eq('  안 된 일은 느낌표 · 된 일은 체크 · 나머지는 안내',
+    ['서류를 지우지 못했어요 · 서류 보관함에서 직접 지워 주세요', '복사 실패', '팝업이 차단됐습니다. 브라우저 설정을 확인해 주세요', '학교명 입력 필요',
+     '지원문서 작성 완료 · 내용을 옮겨 제출하세요', '저장을 해제했어요', '3건 삭제', '알림을 켰습니다. 새 공고와 마감을 알립니다',
+     '새 알림 2건', '알림은 MY 화면에서 언제든 켜기 가능'].map(T.toastTone),
+    ['warn', 'warn', 'warn', 'warn', 'done', 'done', 'done', 'done', 'info', 'info']);
+  const toastAt = appT.indexOf('function toast(msg');
+  const toastFn = appT.slice(toastAt, appT.indexOf('\nfunction ', toastAt + 10));
+  eq('  알림 글은 textContent 로만 넣는다(그림만 고정 글자)',
+    [/h\.textContent = head;/.test(toastFn), /d\.textContent = sub;/.test(toastFn), /innerHTML = [^;]*\b(msg|head|sub)\b/.test(toastFn)], [true, true, false]);
+}
+
 /* ══ 승인받은 화면 그대로인가 — 목록 카드 시안 B · 상세 시트 한 벌 (2026-11-02 · docs/designs/mockups/card-consistency.html 「시안 B」 · sheet-consistency.html) ══
    개발자 결정(같은 날 "제안대로"): 마감 D-day 는 카드 아랫줄 오른쪽 그대로 · 적합도 알약은 윗줄 칩·주최 옆 그대로.
    🔴 검사만 고쳐 통과시키지 말 것 — 화면을 바꾸려면 개발자에게 다시 보여 주고 승인받은 뒤 여기도 같이 고친다(스킬 approved-design). */
