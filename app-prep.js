@@ -31,7 +31,9 @@ function applyTo(sch) {
     startFormFill(sch);
     return;
   }
-  if (essayDefsFor(sch).length) {
+  /* 6-1 (2026-11-21) — 공고가 올린 신청서 원본이 있으면 앱이 만든 문서(지원문서·서류 도우미)를 띄우지 않는다.
+     원본 PDF 와 「양식 채우기」가 놓인 「신청 준비」 시트로 간다(hasOriginalForm · app-live 한 곳) */
+  if (!hasOriginalForm(sch) && essayDefsFor(sch).length) {
     startDocPrep(sch);
     return;
   }
@@ -62,7 +64,10 @@ function renderApplyPrep(sch) {
   /* 본문 사진(bodyImage)은 공고 원문 그 자체다 — '첨부 파일'로 늘어놓지 않는다(원문 링크가 준다) */
   const otherAtts = atts.filter((a) => a && !a.bodyImage && !formAtts.includes(a));
   /* 2026-11-20 승인 시안(docs/designs/all-docs-pdf.md) — 묶음마다 위는 PDF 줄(attachPdfRowsHtml 한 곳 · 첨부 차례), 맨 밑은 올린 원본(아이콘 · 이름 · ↓ · 작은 글씨 없음) */
-  const listOf = (list) => `<ul class="doc-list">${attachPdfRowsHtml(sch, list)}${list.map((a) => attachRowHtml(a)).join('')}</ul>`;
+  /* 공고문에서 뗀 서식 쪽(form-pages)도 여기 선다(2026-11-21 · 6-1 — 원본이 있는 공고가 이제 이 시트로 온다) — 자리는 지원문서 머리(prepOriginalsHtml)와 같다:
+     PDF 줄 → 서식 쪽 → 올린 원본. 층1은 신청서 묶음에, 층2는 선발 공고문 묶음에 */
+  const pageRows = formPageRowsHtml(sch);
+  const listOf = (list, pages = '') => `<ul class="doc-list">${attachPdfRowsHtml(sch, list)}${pages}${list.map((a) => attachRowHtml(a)).join('')}</ul>`;
   const excerpts = sch.excerpts || [];
   const certHtml = certStatusListHtml(sch);
   $('#detail-sheet').innerHTML = `
@@ -70,12 +75,12 @@ function renderApplyPrep(sch) {
     <div class="sheet-body" id="apply-prep">
       <h3 class="sheet-title">신청 준비</h3>
       <p class="sheet-provider">${esc(sch.name)} · 준비할 것을 확인하고 담아 두세요</p>
-      ${formAtts.length ? `
+      ${(formAtts.length || (!kosaf && pageRows)) ? `
       <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
-      ${listOf(formAtts)}` : ''}
-      ${otherAtts.length ? `
+      ${listOf(formAtts, kosaf ? '' : pageRows)}` : ''}
+      ${(otherAtts.length || (kosaf && pageRows)) ? `
       <h4>${kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 첨부 파일'}</h4>
-      ${listOf(otherAtts)}` : ''}
+      ${listOf(otherAtts, kosaf ? pageRows : '')}` : ''}
       ${noticeSummaryHtml(excerpts)}
       ${certHtml}
       <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
@@ -83,8 +88,8 @@ function renderApplyPrep(sch) {
       ${schoolPortalNote(sch)}
       ${(kosaf && sch.contact) ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
       ${sourceNoteHtml(sch)}
-      ${/* 🔴 '완료'라는 말을 학생이 아무것도 안 한 시점에 쓰지 않는다 (2026-10-13 개발자 결정 — 이 시트는 이제
-           앱 지원문서가 없는 상시 제도·층2에서만 뜬다 · 그 밖은 양식 작성 화면이 먼저다) */ ''}
+      ${/* 🔴 '완료'라는 말을 학생이 아무것도 안 한 시점에 쓰지 않는다 (2026-10-13 개발자 결정). 이 시트가 뜨는 곳 —
+           공고가 올린 신청서 원본이 있는 공고(2026-11-21 · 6-1) · 앱 지원문서가 없는 상시 제도. 그 밖은 앱 지원문서 작성 화면이 먼저다 */ ''}
       <button class="btn btn-primary btn-lg" id="btn-prep-confirm">확인했어요 — 신청내역에 담기</button>
       ${/* 정직한 신청 상태(원칙 1)는 한 마디로 — 긴 설명은 뺐다(2026-10-15) */ ''}
       <p class="dp-note">신청내역에 담길 뿐, 학교·재단에 접수되지는 않아요.</p>

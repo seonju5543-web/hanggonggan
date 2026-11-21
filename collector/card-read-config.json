@@ -8,8 +8,8 @@
  "roleMaxUsdPerRun": 1,
  "roleEffort": "low",
  "roleMaxMs": 270000,
- "_무엇인가": "유료 카드 읽기 로봇(collector/card-read.mjs)의 스위치와 한 실행의 상한. 설계 docs/designs/paid-card-reading.md.",
+ "_무엇인가": "유료 카드 읽기 로봇(4번 · collector/card-read.mjs)의 스위치와 한 실행의 상한. 설계 docs/designs/paid-gate-pipeline.md 「2026-11-21 개정」 · 앞선 설계 docs/designs/paid-card-reading.md.",
  "_enabled": "true 라고 적혀 있고 워크플로가 CARD_READ_ENABLE=1 을 줄 때만 유료 API 를 부른다. 2026-11-15 리뷰가 심각한 문제 넷을 찾아 껐다가, 고친 뒤 2026-11-18 개발자 지시(「읽혀줘」)로 다시 켰다.",
- "_상한": "실측(2026-11-15 · 표본 6건) 공고 1건에 두 번 읽기 합쳐 약 0.07달러. maxPerRun 20 · maxUsdPerRun 3 이면 한 실행이 3달러를 넘지 못한다. 원문 해시가 같은 공고는 다시 읽지 않는다.",
+ "_상한": "maxPerRun 20 · maxUsdPerRun 3 이면 한 실행이 3달러를 넘지 못한다. 원문 해시가 같은 공고는 다시 읽지 않는다. 2026-11-21 부터 AI 하나가 한 번 읽는다(그 전 두 번 읽기의 실측은 공고 1건에 약 0.07달러 · 2026-11-15 표본 6건) — 지금 건당 비용은 워크플로 실행 요약의 「유료 관문 기록」에 찍힌다.",
  "_첨부판정": "유료 첨부 판정(collector/attach-role-read.mjs · 2026-11-20 개발자 지시 「유료로 해」) — 글자로 못 가른 스캔 PDF·그림 첨부만 파일째 모델 둘에게 보여 신청서/공고문을 묻는다. 스위치는 위 enabled 와 같고, 한 실행 상한은 roleMaxPerRun(파일 수)·roleMaxUsdPerRun(달러). 같은 바이트는 다시 안 묻는다."
 }

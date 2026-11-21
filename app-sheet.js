@@ -544,7 +544,7 @@ function openDetail(id) {
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
             ${app.docs.map((t) => `<h4>${esc(t.doc)}</h4><pre>${esc(t.text)}</pre>`).join('')}
           </details>` : ''}
-        ${app.formAns && formTplIdFor(sch) ? `
+        ${app.formAns && formTplIdFor(sch, true) ? `
           <h4>작성한 양식 문서</h4>
           <div class="submit-actions">
             <button class="btn btn-outline" id="btn-form-save">.doc 저장</button>
@@ -620,12 +620,17 @@ function openDetail(id) {
     const url = safeUrl(ch.url || effectiveLinkUrl(sch));   // 제출처 표가 없으면 원문 — 바로잡은 원문이 있으면 그 주소(source-link.js ⑥)
     if (url) window.open(url, '_blank', 'noopener');
   });
-  if (app && app.formAns && formTplIdFor(sch)) {
-    const tpl = FORM_TEMPLATES[formTplIdFor(sch)];
+  /* 다 쓴 문서는 그 공고에 원본 신청서가 나중에 생겼어도 열린다(formTplIdFor 의 written — 이미 쓴 글을 뺏지 않는다 · 6-1 리뷰 2026-11-22) */
+  if (app && app.formAns && formTplIdFor(sch, true)) {
+    const tpl = FORM_TEMPLATES[formTplIdFor(sch, true)];
     $('#btn-form-save').addEventListener('click', () => downloadFormDoc(tpl, state.profile, app.formAns));
     $('#btn-form-print').addEventListener('click', () => printFormDoc(tpl, state.profile, app.formAns));
     $('#btn-form-share').addEventListener('click', () => shareFormDoc(tpl, state.profile, app.formAns, sch));
-    $('#btn-form-edit').addEventListener('click', () => { startFormFill(sch); formFill.ans = app.formAns; formFill.stage = 'preview'; renderFormFill(); });
+    $('#btn-form-edit').addEventListener('click', () => {
+      startFormFill(sch, { ans: app.formAns, quiet: true });   // 쓴 글이 있다(restore.ans) — 원본이 생긴 공고라도 그 문서를 연다
+      if (!formFill || formFill.schId !== sch.id) return;       // 문서를 못 열었으면(준비 시트로 갔다) 남의 formFill 을 건드리지 않는다
+      formFill.ans = app.formAns; formFill.stage = 'preview'; renderFormFill();
+    });
   }
   const copyBtn = $('#btn-copy-docs');
   if (copyBtn) copyBtn.addEventListener('click', () => copyText(buildSubmissionText(sch, app)));

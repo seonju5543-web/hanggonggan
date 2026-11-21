@@ -102,7 +102,10 @@ function loadFormPagesIndex() {
     .then((d) => { if (d && d.items) formPagesIndex = d.items; })
     .catch(() => { /* 없으면 그 줄만 안 그린다 */ });
 }
-function formPagesFor(sch) { return ((sch && formPagesIndex[sch.id]) || []).filter((f) => f && f.file); }
+/* 여러 줄로 둔다 — verify/what-shows.mjs 의 takeFn 은 줄 머리의 `}` 까지 가져간다(formPdfsFor 와 같은 이유) */
+function formPagesFor(sch) {
+  return ((sch && formPagesIndex[sch.id]) || []).filter((f) => f && f.file);
+}
 /* 서식 쪽도 빈칸을 찾았으면 「양식 채우기」(formfill.js · 2026-11-18) — 줄 꼴은 PDF 줄 한 벌(pdfRowHtml) · 이름은 로봇이 붙인 「공고문 안 신청서 서식 (n~m쪽)」(떼어 낸 쪽이라 원래 파일 이름이 없다) */
 function formPageRowsHtml(sch) {
   return formPagesFor(sch).map((f) => pdfRowHtml({ href: `data/form-pages/${f.file}`, name: f.name || '공고문 안 신청서 서식', slot: f.file })).join('');
@@ -123,11 +126,23 @@ function prepOriginalsHtml(sch) {
       <ul class="doc-list">${pdfRows}${pageRows}${atts.map((a) => attachRowHtml(a)).join('')}</ul>`;
 }
 
-/* 이 공고에서 쓸 양식 템플릿 id — 공식 양식이 우선, 없으면 준비용 문서 */
-function formTplIdFor(sch) {
+/* 이 공고에 **공고가 올린 신청서 원본**이 있는가 (2026-11-21 개발자 지시 6-1 — *"사본이 있는데도 불구하고 앱 자체 양식으로 띄우고 있어서"* ·
+   *"자체제작문서는 신청양식이 없는 경우에만"*). 신청서 PDF 사본(forms-pdf) · 공고문에서 뗀 서식 쪽(form-pages) · 신청서 첨부(attIsForm — 로봇이 원본 내용으로 가른 것이 먼저)
+   가운데 하나라도 있으면 원본이 있는 것이다. 층2 첨부는 재단이 올린 **선발 공고문**이라 신청서로 세지 않는다(서식 쪽을 뗀 것만 센다).
+   🔴 「원본이 있다」를 다른 곳에서 새로 세지 말 것 — 신청 버튼(applyTo)·지원문서 연결(formTplIdFor)·what-shows 가 이 한 함수를 쓴다 */
+function hasOriginalForm(sch) {
+  if (!sch) return false;
+  if (formPdfsFor(sch).length || formPagesFor(sch).length) return true;
+  return sch.sourceKind !== 'kosaf' && (sch.attachments || []).some((a) => a && !a.bodyImage && attIsForm(sch, a));
+}
+/* 이 공고에서 쓸 양식 템플릿 id — 공식 양식이 우선, 없으면 준비용 문서.
+   🔴 준비용 문서(앱이 만든 지원문서)는 **원본 신청서가 없을 때만**(6-1) — 원본이 있으면 null 이라 신청 버튼이 원본이 놓인 「신청 준비」 시트로 간다.
+   🔴 **이미 쓴 글은 뺏지 않는다**(written — 리뷰 2026-11-22): 그 문서로 쓰던 글·다 쓴 문서가 있으면 원본이 (나중에) 생겼어도 그 문서를 돌려준다.
+      PDF 사본은 등록 다음 날 새벽에 생긴다 — 첫날 쓰기 시작한 학생의 글이 이튿날 사라지거나 「작성한 양식 문서」가 열리지 않으면 안 된다. 새로 시작하는 길(applyTo)은 written 없이 부른다 */
+function formTplIdFor(sch, written) {
   if (typeof FORM_TEMPLATES === 'undefined') return null;
   if (sch.formId && FORM_TEMPLATES[sch.formId]) return sch.formId;
-  if (sch.prepFormId && FORM_TEMPLATES[sch.prepFormId]) return sch.prepFormId;
+  if (sch.prepFormId && FORM_TEMPLATES[sch.prepFormId] && (written || !hasOriginalForm(sch))) return sch.prepFormId;
   return null;
 }
 

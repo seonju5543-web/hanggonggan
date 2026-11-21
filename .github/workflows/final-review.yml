@@ -1,18 +1,26 @@
-# 유료 확인 2 — 최종 검토 (2026-11-20 개발자 지시 · 설계 docs/designs/paid-gate-pipeline.md 3절)
+# 유료 최종 검토 (6번) — 둘째 AI 가 공고를 통째로 다시 읽고 카드·첨부 구분·변환 PDF 를 바로잡는다
+# (2026-11-20 개발자 지시 · 2026-11-21 개정 「기계 검사는 없다 — 6번에게 다 넘긴다」 · 설계 docs/designs/paid-gate-pipeline.md)
 #
 # 🔴 돈이 나가는 워크플로다. 켜고 끄는 곳은 collector/final-review-config.json 의 enabled 하나(꺼져 있으면 돌아도 부르지 않는다 ·
-#    켜는 것은 개발자가 채팅에서 지시할 때만 — CLAUDE.md 🔴 8). 한 실행의 상한은 같은 파일의 maxPerRun · maxUsdPerRun.
-#    같은 문서·카드는 다시 보지 않는다(해시) — 평소에는 새로 유료 확인을 통과한 공고만 본다.
+#    켜는 것은 개발자가 채팅에서 지시할 때만 — CLAUDE.md 🔴 8). 한 실행의 상한은 같은 파일의 maxPerRun · maxUsdPerRun · maxPdfPages.
+#    원문·카드·첨부 구분·PDF 사본이 그대로인 공고는 다시 보지 않는다(해시) — 평소에는 새로 읽힌 공고와 사본이 새로 생긴 공고만 본다.
 #
-# 하는 일: 앱이 보이는 문서가 원본과 같은가 · 이 공고의 문서인가 · 신청 양식인가 · 내용이 있는가 · 그 내용이 카드에 다 들어갔나.
-#   카드에 빠진 내용은 사실 검사를 통과하면 data/card-read.json 에 자동으로 넣는다(2026-11-21 개발자 결정) · 문서 문제는 보고만 → collector/final-review.json(관리자 「할 일」).
+# 하는 일: 4번(유료 카드 읽기)이 쓴 카드를 원문과 대조해 틀린 줄을 고치고 빠진 내용을 채운 완성본으로 바꾼다(data/card-read.json) ·
+#   첨부의 내용 문서 / 신청 양식 구분을 다시 본다 · 앱이 보여 주는 PDF 사본을 파일째 보고 원본과 같은지 판정한다(collector/final-review.json).
+# 언제: 유료 카드 읽기가 끝난 직후(카드를 바로 고친다) · 새벽 심층 수집(PDF 변환)이 끝난 직후(사본을 본다) · 22:47 KST(둘 다 놓쳤을 때의 대비)
 
 name: 유료 최종 검토
 
 on:
   workflow_dispatch:
+  # 앞 단계가 끝나면 바로 잇는다 — 4번(카드 쓰기) 뒤에는 카드를, 5번(새벽 PDF 변환) 뒤에는 사본을 본다. 앞 단계가 일부 실패로 끝나도 돈다(읽은 것은 저장돼 있다).
+  # workflow_run 은 기본 브랜치의 이 파일로만 돈다 — 아래 job 의 if 가 한 번 더 막는다
+  workflow_run:
+    workflows: ['유료 카드 읽기', '공고 원문 심층 수집']
+    types: [completed]
+    branches: [claude/nice-heisenberg-WESq5]
   schedule:
-    - cron: '47 13 * * *'   # 22:47 KST — 저녁 유료 카드 읽기(21:17) 뒤 · 신청서 PDF(새벽 심층 수집)는 그 전날 것
+    - cron: '47 13 * * *'   # 22:47 KST — 위 두 실행을 놓쳤을 때의 대비(바뀐 것이 없으면 아무것도 부르지 않는다)
 
 permissions:
   contents: write
@@ -27,7 +35,7 @@ jobs:
   review:
     runs-on: ubuntu-latest
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
-    timeout-minutes: 55   # 단계 상한의 합(사전 관문 12 + 글자 도구 4 + 검토 12 + 규칙 관문 12 + 감사 5 + 저장·알림)보다 길게
+    timeout-minutes: 55   # 단계 상한의 합(사전 관문 12 + 검토 12 + 규칙 관문 12 + 감사 5 + 저장·알림)보다 길게
     steps:
       - uses: actions/checkout@v7
         with:
@@ -38,13 +46,7 @@ jobs:
         with:
           node-version: 22
       - run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
-      # 신청서 PDF 사본의 글자를 뽑는 도구(pdftotext) — 없으면 「원본과 같은가」를 못 재고 그 칸만 비운다(실패로 만들지 않는다)
-      - name: PDF 글자 도구
-        timeout-minutes: 4
-        continue-on-error: true
-        run: sudo apt-get install -y -qq poppler-utils >/dev/null
-
-      # 부르기 전에 안전장치를 가짜 응답으로 시험한다(돈 0) — 기계 대조·일치 검사가 무력해졌으면 여기서 멈춘다.
+      # 부르기 전에 안전장치를 가짜 응답으로 시험한다(돈 0) — 스위치·상한·「한 번 본 것은 다시 안 본다」가 무력해졌으면 여기서 멈춘다.
       # 🔴 pipefail 을 건다 — 안 걸면 이 단계의 성패가 `tail` 의 것이라 관문이 빨개도 다음 유료 단계가 돈다(2026-11-15 리뷰 C3)
       - name: 사전 관문 (가짜 응답 — 돈 0)
         timeout-minutes: 12
@@ -67,8 +69,8 @@ jobs:
           node collector/final-review.mjs --write | tee /tmp/final-review.txt
 
       # 저장 앞 관문 — 결과 파일의 꼴(앱이 받는 파일) · 규칙 관문 · 데이터 감사. 하나라도 빨가면 저장하지 않고 멈춘다.
-      # 그때 돈을 쓴 결과를 잃지 않게 장부(응답 원본이 들어 있다)를 아티팩트로 남긴다 — 되살린 뒤 `--recheck --write` 로 돈 없이 다시 만든다
-      # 빠진 내용을 카드에 넣으면 앱이 받는 유료 결과 파일을 고친다(2026-11-21) — 저장 앞에 그 파일의 꼴을 잰다(카드 읽기 로봇과 같은 검사)
+      # 그때 돈을 쓴 결과를 잃지 않게 세 파일(장부 · 결과 · 고친 카드 파일)을 아티팩트로 남긴다 — 되살릴 때는 그 세 파일을 그대로 되돌려 놓는다(6번에는 다시 만들기가 없다)
+      # 카드를 고치면 앱이 받는 유료 결과 파일이 바뀐다(2026-11-21) — 저장 앞에 그 파일의 꼴을 잰다(카드 읽기 로봇과 같은 검사)
       - name: 결과 파일 꼴 검사
         timeout-minutes: 2
         run: node collector/card-read.mjs --check
@@ -85,15 +87,17 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          [ -f data/card-read.json ] && git add data/card-read.json   # 카드에 자동으로 넣은 빠진 내용(2026-11-21)
-          [ -f collector/final-review.json ] && git add collector/final-review.json
+          [ -f data/card-read.json ] && git add data/card-read.json   # 둘째 AI 가 고친 카드(2026-11-21)
+          [ -f collector/final-review.json ] && git add collector/final-review.json   # 무엇을 고쳤나 · 첨부 구분(6번의 답) · PDF 사본 판정
           [ -f collector/final-review-ledger.json ] && git add collector/final-review-ledger.json
           if ! git diff --cached --quiet; then
             git commit -m "유료 최종 검토: $(grep -o '검토 [0-9]*건' /tmp/final-review.txt | tail -1 || echo '결과 갱신')"
             pushed=0
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
-              git pull --rebase --autostash origin "${{ github.ref_name }}"
+              # 🔴 다시 얹기(rebase)가 충돌하면 그만둔다(abort) — 안 그만두면 HEAD 가 저쪽 끝에 멈춘 채라 다음 push 가 「보낼 것 없음」으로 성공해,
+              #    돈 주고 읽은 결과가 초록불로 사라진다(리뷰 2026-11-22 실측 · data/card-read.json 은 두 유료 로봇이 통째로 다시 쓰는 파일이라 자동으로 못 합친다)
+              git pull --rebase --autostash origin "${{ github.ref_name }}" || git rebase --abort || true
             done
             if [ "$pushed" != "1" ]; then
               echo "::error::유료 최종 검토 결과 push 실패 — 3회 재시도 모두 실패."
@@ -101,7 +105,7 @@ jobs:
             fi
           fi
 
-      # 유료 관문 기록 (2026-11-21 개발자 지시) — 숨김 공고 몇 건 · 통과 · 사람에게 · 건당 비용 · 줄 통과율 · 최종 검토 비용을 실행 요약 칸에(장부에서 센다 · 돈 0)
+      # 유료 관문 기록 (2026-11-21 개발자 지시) — 숨김 공고 몇 건 · 학생 화면에 오른 것 · 사람에게 · 건당 비용 · 6번이 고친 것을 실행 요약 칸에(장부에서 센다 · 돈 0)
       - name: 유료 관문 기록 (비용·통과율)
         if: always()
         timeout-minutes: 1
@@ -132,7 +136,7 @@ jobs:
           $(tail -5 /tmp/final-review.txt 2>/dev/null || true)
 
           실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          학생 화면은 그대로입니다(최종 검토는 보고만 한다). 잔액 부족이면 콘솔 Billing 을 확인하세요.
+          못 본 공고의 카드는 4번이 쓴 그대로 학생 화면에 있습니다(고친 것은 건마다 저장됩니다 — 다음 실행이 남은 공고를 이어서 봅니다). 잔액 부족이면 콘솔 Billing 을 확인하세요.
           다음 실행이 성공하면 이 이슈는 저절로 닫힙니다."
           node tools/alert-issue.mjs --mode open --match exact --title '🧾 유료 최종 검토 알림' \
             --label final-review --label-color 5319E7 --label-description '유료 최종 검토 로봇 실패' --body "$body"

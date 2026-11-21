@@ -866,8 +866,21 @@ function paidReviewTodo() {
   }
   return out;
 }
-/* 최종 검토(collector/final-review.mjs)가 낸 것 — 문서 문제(원본과 다름·다른 공고·양식 아님·내용 없음) · 카드에 빠진 내용 */
+/* 최종 검토(6번 · collector/final-review.mjs)가 사람에게 넘긴 것 — 둘째 AI 가 스스로 못 고친 것만: 변환이 잘못된 PDF 사본 · 이 공고 문서가 아닌 사본 · 읽을 내용이 없다고 본 공고.
+   카드의 틀린 줄·빠진 내용·첨부 구분은 둘째 AI 가 스스로 고친다(2026-11-21 · 기계 검사 없음) — 그 기록은 finalChangesList 가 접어서 보여 준다(할 일 아님) */
 const finalKey = (p) => (p.kind === 'missing' ? `final|${p.field}|${p.text}` : `final|${p.kind}|${p.doc}`);
+function finalChangesList() {
+  const live = new Map(D.reg.map((it) => [it.id, it]));
+  return Object.entries(D.finalReview || {}).map(([id, r]) => ({ it: live.get(id), summary: (r && r.summary) || '', changes: (r && r.changes) || [] }))
+    .filter((x) => x.it && openForStudents(x.it) && x.changes.length);
+}
+const CHANGE_KO = { add: '넣음', remove: '뺌', set: '바꿈', role: '구분 바꿈' };
+function finalChangeHtml(c) {
+  const body = (c.kind === 'set' || c.kind === 'role')
+    ? `${c.kind === 'role' ? `${esc(c.text || '')} — ` : ''}${esc(c.before || '(없음)')} → ${esc(c.after || '(없음)')}`
+    : esc(c.text || '');
+  return `<div style="padding:var(--space-4) 0"><span class="pill">${esc(c.label || '')}</span> <b>${esc(CHANGE_KO[c.kind] || '')}</b> ${body}</div>`;
+}
 function finalReviewTodo() {
   const live = new Map(D.reg.map((it) => [it.id, it]));
   const out = [];
@@ -891,8 +904,8 @@ function paidReviewCard() {
   const n = paidReviewTodo().reduce((a, x) => a + x.lines.filter((l) => !isLegacyLine(l)).length, 0) + gateHeldTodo().length
     + finalReviewTodo().reduce((a, x) => a + x.problems.length, 0);
   return { n, tone: 'is-warn', k: '유료 확인에서 사람이 볼 것',
-    d: '기계 검사가 카드에서 뺀 줄과, 유료 확인을 못 해 아직 학생 화면에 없는 공고입니다. 줄마다 무엇을 확인하면 되는지 적혀 있습니다.',
-    btn: '<button class="btn btn-sm" data-paid-card>아래에서 보기</button>', okD: '유료 확인이 뺀 줄도, 멈춘 공고도 없습니다' };
+    d: '유료 확인을 못 해 아직 학생 화면에 없는 공고와, 최종 검토(둘째 AI)가 스스로 고치지 못해 넘긴 것입니다. 무엇을 확인하면 되는지 적혀 있습니다.',
+    btn: '<button class="btn btn-sm" data-paid-card>아래에서 보기</button>', okD: '유료 확인이 사람에게 넘긴 것이 없습니다' };
 }
 const GATE_WHY = {
   'no-source': '등록한 지 사흘이 지나도 공고 원문(본문·첨부)을 받지 못해 유료 확인을 못 했습니다.',
@@ -926,17 +939,17 @@ function finalProblemHtml(it, p) {
       <div class="btn-row"><button class="btn btn-sm" data-paid-op="drop">확인했어요(목록에서 내리기)</button></div></div></div>`;
 }
 function paidReviewHtml() {
-  const all = paidReviewTodo(), held = gateHeldTodo(), fin = finalReviewTodo();
+  const all = paidReviewTodo(), held = gateHeldTodo(), fin = finalReviewTodo(), fixed = finalChangesList();
   const pick = (legacy) => all.map(({ it, lines: ls }) => ({ it, lines: ls.filter((l) => isLegacyLine(l) === legacy) })).filter((x) => x.lines.length);
   const lines = pick(false), legacy = pick(true);
-  if (!all.length && !held.length && !fin.length) return '';
+  if (!all.length && !held.length && !fin.length && !fixed.length) return '';
   const group = ({ it, lines: ls }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${ls.length}줄</span></h3>
         <div>${ls.map((l) => paidLineHtml(it, l)).join('')}</div></div>`;
   const link = (it) => (it.sourceUrl ? `<a href="${esc(it.sourceUrl)}" target="_blank" rel="noopener">원문 열기 ↗</a>` : '');
   return `
     <details id="todo-paid" data-paid-section>
-      <summary>유료 확인에서 사람이 볼 것 — 기계 검사가 카드에서 뺀 줄 ${lines.reduce((a, x) => a + x.lines.length, 0)}줄(${lines.length}건) · 유료 확인을 못 한 공고 ${held.length}건 · 최종 검토에서 나온 것 ${fin.reduce((a, x) => a + x.problems.length, 0)}건</summary>
-      <p class="muted">학생 화면에는 이 줄들이 빠진 채 공고가 올라가 있습니다(한 칸의 줄이 전부 빠진 경우엔 그 칸만 무료 값으로). 원문을 열어 확인한 뒤 살리기·고쳐서 싣기·버리기 중 하나를 누르면 바로 저장됩니다.</p>
+      <summary>유료 확인에서 사람이 볼 것 — 유료 확인을 못 한 공고 ${held.length}건 · 최종 검토가 넘긴 것 ${fin.reduce((a, x) => a + x.problems.length, 0)}건 · 옛 방식에서 빠진 줄 ${lines.reduce((a, x) => a + x.lines.length, 0)}줄(${lines.length}건)</summary>
+      <p class="muted">새 공고는 AI 가 카드를 쓰고 둘째 AI(최종 검토)가 원문과 대조해 스스로 고칩니다 — 여기에는 스스로 못 고친 것만 옵니다. 「옛 방식에서 빠진 줄」은 11월 20일 전에 읽은 공고의 것으로, 학생 화면에는 그 줄이 빠진 채 올라가 있습니다(원문을 확인한 뒤 살리기·고쳐서 싣기·버리기).</p>
       ${held.length ? `<div class="pgroup"><h3>유료 확인을 못 해 아직 학생 화면에 없는 공고</h3><div>${held.map(({ it, why }) => `
         <div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-gate-row="${esc(it.id)}"><div>
           <div><b>${esc(it.name)}</b> ${link(it)}</div>
@@ -945,11 +958,14 @@ function paidReviewHtml() {
           <div class="btn-row"><button class="btn btn-sm" data-gate-op="open">올리기(무료 값으로)</button>
             <button class="btn btn-sm" data-gate-op="revert">빼기(재등록 차단)</button></div>
         </div></div>`).join('')}</div></div>` : ''}
-      ${fin.length ? `<div class="pgroup"><h3>최종 검토 — 앱의 문서·카드를 원문과 맞춰 본 결과</h3>${fin.map(({ it, problems }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${problems.length}건</span></h3>
+      ${fin.length ? `<div class="pgroup"><h3>최종 검토 — 둘째 AI 가 스스로 고치지 못해 넘긴 것</h3>${fin.map(({ it, problems }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${problems.length}건</span></h3>
         <div>${problems.map((p) => finalProblemHtml(it, p)).join('')}</div></div>`).join('')}</div>` : ''}
       ${lines.map(group).join('')}
       ${legacy.length ? `<details><summary>옛 방식(두 번 읽기)에서 한쪽만 낸 줄 ${legacy.reduce((a, x) => a + x.lines.length, 0)}줄(${legacy.length}건) — 11월 20일 전에 읽은 공고라 마감되면 저절로 사라집니다</summary>
         ${legacy.map(group).join('')}</details>` : ''}
+      ${fixed.length ? `<details data-final-changes><summary>둘째 AI(최종 검토)가 스스로 고친 것 ${fixed.reduce((a, x) => a + x.changes.length, 0)}건(공고 ${fixed.length}건) — 확인할 일이 아니라 기록입니다</summary>
+        ${fixed.map(({ it, summary, changes }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${changes.length}건</span></h3>
+          ${summary ? `<p class="muted">${esc(summary)}</p>` : ''}<div>${changes.map(finalChangeHtml).join('')}</div></div>`).join('')}</details>` : ''}
     </details>`;
 }
 function bindPaidReview(root = byId('screen-todo')) {

@@ -1,14 +1,16 @@
-# 유료 카드 읽기 — 공고 한 건을 통째로 모델 둘에게 읽혀 카드의 모든 칸을 채운다 (2026-11-15 개발자 지시)
+# 유료 카드 읽기 (4번) — AI 하나가 공고 한 건을 통째로 읽어 카드의 모든 칸을 쓰고, 첨부를 내용 문서 / 신청 양식으로 가른다
+# (2026-11-15 개발자 지시 · 2026-11-21 개정 「기계 검사는 없다 · 4번은 AI 하나」 · 설계 docs/designs/paid-gate-pipeline.md)
 #
 # 🔴 돈이 나가는 워크플로다. 켜고 끄는 곳은 collector/card-read-config.json 의 enabled 하나
 #    (꺼져 있으면 이 워크플로가 돌아도 부르지 않는다). 한 실행의 상한은 같은 파일의 maxPerRun · maxUsdPerRun.
 #    원문이 같은 공고는 다시 읽지 않으므로(해시) 평소에는 새로 올라온 공고만 읽는다.
 #
-# 하는 일 · 안전장치: collector/card-read.mjs 첫머리 · docs/designs/paid-card-reading.md
-#   ① 글자가 원문에 있는가(기계 대조) ② 두 모델이 같은 말을 했는가 — 둘 다 통과한 줄만 data/card-read.json 에 싣는다.
+# 하는 일: collector/card-read.mjs 첫머리 — AI 가 쓴 카드를 그대로 data/card-read.json 에 싣고(여기 실려야 숨김 등록분이 학생 화면에 나온다),
+#   첨부 구분은 collector/attach-role-ai.json 에 적는다. 맞는지 틀린지는 이 워크플로가 끝나면 바로 이어 도는 「유료 최종 검토」(6번 · 둘째 AI)가 원문과 대조해 고친다.
 #   registered.json 은 안 건드린다 — 결과 파일이 없거나 비면 앱은 무료 길 값 그대로다(비상망).
 #
-# 되돌리는 법: data/card-read.json 을 `{"items":{}}` 로 비우거나 이 워크플로의 커밋을 revert 한다. 앱은 곧바로 무료 길로 돌아간다.
+# 되돌리는 법: 이 워크플로의 커밋을 revert 한다(스위치는 collector/card-read-config.json enabled). 옛 등록분은 결과가 없으면 곧바로 무료 길로 돌아간다.
+#   🔴 숨김 등록분(paidGate)은 결과가 없으면 학생 화면에서 **사라진다**(사흘 뒤 무료 값 + 경보) — data/card-read.json 을 통째로 비우지 말 것.
 
 name: 유료 카드 읽기
 
@@ -48,7 +50,7 @@ jobs:
           node-version: 22
       - run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
 
-      # 부르기 전에 안전장치를 가짜 응답으로 시험한다(돈 0) — 기계 대조·일치 검사가 무력해졌으면 여기서 멈춘다.
+      # 부르기 전에 안전장치를 가짜 응답으로 시험한다(돈 0) — 스위치·상한·「같은 원문은 다시 안 읽는다」가 무력해졌으면 여기서 멈춘다.
       # 🔴 pipefail 을 건다 — 안 걸면 이 단계의 성패가 `tail` 의 것이라 관문이 빨개도 다음 유료 단계가 돈다(2026-11-15 리뷰 C3)
       - name: 사전 관문 (가짜 응답 — 돈 0)
         timeout-minutes: 12
@@ -108,12 +110,15 @@ jobs:
           [ -f collector/card-read-ledger.json ] && git add collector/card-read-ledger.json
           [ -f collector/card-read-review.json ] && git add collector/card-read-review.json
           [ -f collector/attach-role-paid.json ] && git add collector/attach-role-paid.json
+          [ -f collector/attach-role-ai.json ] && git add collector/attach-role-ai.json   # 4-1 첨부 구분(내용 문서 / 신청 양식 · 2026-11-21) — 6번이 다시 본다
           if ! git diff --cached --quiet; then
             git commit -m "유료 카드 읽기: $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/card-read.txt | tail -1 || echo '결과 갱신') · 첨부 판정 $(grep -o '물음 [0-9]*개(실음 [0-9]*)' /tmp/attach-role.txt | tail -1 || echo '없음')"
             pushed=0
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
-              git pull --rebase --autostash origin "${{ github.ref_name }}"
+              # 🔴 다시 얹기(rebase)가 충돌하면 그만둔다(abort) — 안 그만두면 HEAD 가 저쪽 끝에 멈춘 채라 다음 push 가 「보낼 것 없음」으로 성공해,
+              #    돈 주고 읽은 결과가 초록불로 사라진다(리뷰 2026-11-22 실측 · data/card-read.json 은 두 유료 로봇이 통째로 다시 쓰는 파일이라 자동으로 못 합친다)
+              git pull --rebase --autostash origin "${{ github.ref_name }}" || git rebase --abort || true
             done
             if [ "$pushed" != "1" ]; then
               echo "::error::유료 카드 읽기 결과 push 실패 — 3회 재시도 모두 실패."
@@ -131,6 +136,7 @@ jobs:
             collector/card-read-ledger.json
             data/card-read.json
             collector/attach-role-paid.json
+            collector/attach-role-ai.json
           retention-days: 14
 
       - name: 🚨 실패 알림
@@ -151,7 +157,7 @@ jobs:
           node tools/alert-issue.mjs --mode open --match exact --title '🧾 유료 카드 읽기 알림' \
             --label card-read --label-color 5319E7 --label-description '유료 카드 읽기 로봇 실패' --body "$body"
 
-      # 유료 관문 기록 (2026-11-21 개발자 지시) — 숨김 공고 몇 건 · 통과 · 사람에게 · 건당 비용 · 줄 통과율 · 최종 검토 비용을 실행 요약 칸에(장부에서 센다 · 돈 0)
+      # 유료 관문 기록 (2026-11-21 개발자 지시) — 숨김 공고 몇 건 · 학생 화면에 오른 것 · 사람에게 · 건당 비용 · 6번이 고친 것을 실행 요약 칸에(장부에서 센다 · 돈 0)
       - name: 유료 관문 기록 (비용·통과율)
         if: always()
         timeout-minutes: 1

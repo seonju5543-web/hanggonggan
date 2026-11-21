@@ -4,6 +4,8 @@
  "maxUsdPerRun": 3,
  "giveUpAfter": 3,
  "effort": "medium",
- "_무엇인가": "유료 최종 검토 로봇(collector/final-review.mjs)의 스위치와 한 실행의 상한. 설계 docs/designs/paid-gate-pipeline.md 3절.",
- "_enabled": "true 이고 워크플로가 FINAL_REVIEW_ENABLE=1 을 줄 때만 유료 API 를 부른다. 켜고 끄는 것은 개발자가 채팅에서 지시할 때만(CLAUDE.md 🔴 8). 2026-11-21 개발자 지시(「위의 두개도 켜서」)로 켰다 — 매일 22:47 KST, 유료 확인을 통과한 숨김 등록분·직접 등록분 가운데 문서·카드가 바뀐 것만 본다."
+ "maxPdfPages": 24,
+ "_무엇인가": "유료 최종 검토 로봇(6번 · collector/final-review.mjs)의 스위치와 한 실행의 상한. 설계 docs/designs/paid-gate-pipeline.md 「2026-11-21 개정」.",
+ "_enabled": "true 이고 워크플로가 FINAL_REVIEW_ENABLE=1 을 줄 때만 유료 API 를 부른다. 켜고 끄는 것은 개발자가 채팅에서 지시할 때만(CLAUDE.md 🔴 8). 2026-11-21 개발자 지시(「위의 두개도 켜서」)로 켰다 — 유료 카드 읽기 직후 · 새벽 PDF 변환 직후 · 22:47 KST(대비)에 돌고, 원문·카드·첨부 구분·PDF 사본이 바뀐 숨김·직접 등록분만 본다.",
+ "_maxPdfPages": "공고 하나를 볼 때 둘째 AI 에게 파일째 보내는 PDF 사본의 쪽 수 합 상한(쪽마다 그림으로 읽혀 돈이 든다). 넘는 사본은 보내지 않고 판정도 하지 않는다."
 }

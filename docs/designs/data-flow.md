@@ -60,8 +60,8 @@ notices.json 의 새 공고
 ```
 
 🔴 **유료 관문 (2026-11-20 · `docs/designs/paid-gate-pipeline.md`)** — 자동 등록분은 `paidGate` 를 달고 숨은 채 원문을 받는다 →
-`collector/card-read.mjs`(읽기 → 고치기 → 사실 검사) 를 통과해 `data/card-read.json` 에 실려야 학생 화면에 나온다(`match-engine.js` `publishedList`) →
-신청서 PDF 뒤 `collector/final-review.mjs` 가 문서·카드를 원문과 맞춰 보고만 한다(`collector/final-review.json` → 관리자 「할 일」).
+`collector/card-read.mjs`(4번 — AI 하나가 카드를 쓰고 첨부를 내용 문서/신청 양식으로 가른다 · 2026-11-21 기계 검사 없음) 가 `data/card-read.json` 에 실어야 학생 화면에 나온다(`match-engine.js` `publishedList`) →
+`collector/final-review.mjs`(6번 — 둘째 AI)가 카드 읽기 직후와 새벽 PDF 변환 직후에 원문·카드·첨부 구분·PDF 사본을 다시 보고 카드를 고친 완성본으로 바꾼다(`collector/final-review.json` 에 무엇을 고쳤나 · 스스로 못 고친 것만 관리자 「할 일」).
 
 🔴 **저장 직전에 데이터 관문**(`verify/audit-data.js`)이 선다. 통과 못 하면 **그 실행이 새로
 등록한 것만 골라 되돌리고**(`revert-auto.mjs`) 리포트에 🚨 를 남긴다. 잘못된 공고가 앱에 하루도 못 나간다.

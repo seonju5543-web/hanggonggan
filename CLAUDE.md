@@ -48,11 +48,11 @@
 
 ## 🔴 유료 관문 (2026-11-20 지시 · 설계 `docs/designs/paid-gate-pipeline.md` · 앞선 설계 `docs/designs/paid-card-reading.md`)
 
-- 흐름: 수집 → 숨김 등록(`auto-register.mjs` 가 `paidGate` 를 단다) → 원문 받기(`rescue-bodies.mjs` 「원문 받기 로봇」) → 💰 유료 확인 1 → 학생 화면 → 신청서 PDF → 💰 최종 검토(`collector/final-review.mjs` · 11-21 켬 · 카드에 빠진 내용은 사실 검사 뒤 자동으로 넣고 문서 문제는 관리자에게).
-- 유료 확인 1 = `collector/card-read.mjs`: 첫째 모델이 줄마다 다듬은 문장+원문 근거(`text`·`quote`) → 둘째 모델이 고친 완성본 → 기계 검사(`verify`·`factsMatch` — 근거가 원문에 있고 숫자·부정·기관 이름이 근거와 같아야). 🔴 지어냄을 막는 것은 지시문이 아니라 기계 검사다 · `registered.json` 은 안 고친다.
-- 🔴 잡힌 줄은 **빼고** 통과한 유료 줄로 싣는다(무료 값으로 바꿔 끼우지 않는다 · 칸이 전부 빠질 때만 무료 값 · 옛 두 읽기에서 갈린 줄은 11-18 규칙 그대로) · 잡힌 줄은 관리자 「할 일」(`collector/card-read-review.json` · `explainLine` 사람 말) → 살리기·고쳐서 싣기·버리기(`tools/admin-apply.mjs` `cardLine` → `data/card-read-fixes.json`).
+- 흐름(11-21 · 🔴 **기계 검사 없음**): 수집 → 숨김 등록(`auto-register.mjs` 가 `paidGate` 를 단다) → 원문 받기(`rescue-bodies.mjs` 「원문 받기 로봇」) → 💰 4번 카드 쓰기 → 학생 화면 → 5번 PDF 변환 → 💰 6번 최종 검토.
+- 4번 = `collector/card-read.mjs`: AI 하나가 본문+첨부를 읽어 카드(`cardEntry`)와 첨부 구분(4-1 → `collector/attach-role-ai.json` · 읽는 곳 `collector/attach-role-ai.mjs`)을 낸다 · `registered.json` 은 안 고친다.
+- 6번 = `collector/final-review.mjs`: 둘째 AI 가 원문·카드·구분·PDF 사본(파일째)을 보고 **고친 완성본**을 낸다(`applyReview` — 카드를 통째로 바꾼다 · 구분은 6번 답이 이긴다) · 카드 읽기·새벽 변환 직후에 돈다(`final-review.yml`) · 못 고친 것만 관리자 「할 일」. 옛 두 읽기의 빠진 줄(`collector/card-read-review.json` · `explainLine`)은 그 공고가 닫힐 때까지 `cardLine`(`tools/admin-apply.mjs` → `data/card-read-fixes.json`).
 - 보이는가 = `match-engine.js` `publishedList`·`paidGateOpen` 한 곳(앱·서비스워커·`what-shows`·인스타·검색 요약·접수 서버 · 푸시 서버는 사본) — 결과 파일을 못 받으면 숨김분은 안 보이고, 사흘 넘게 통과가 없으면 무료 값 + 경보(`card-read.yml`). 그 전 등록분은 숨기지도 다시 읽지도 않는다. 관문 「유료 관문」·「유료 최종 검토」·「유료 카드 읽기」 · `verify-card-read.js`.
-- **첨부가 신청서 칸인가 카드인가**(11-20)는 원본 **내용**으로 — `attachDecision`(attachment-text) 한 곳 · 모르면 이름 규칙 · 앱은 `attIsForm`(색인 `roles`). 글자 없는 스캔 PDF·그림만 `collector/attach-role-read.mjs` 가 파일째 모델 둘에게 묻고 같은 답만 `collector/attach-role-paid.json` 에(같은 스위치 · 상한 `roleMaxPerRun`·`roleMaxUsdPerRun`). 관문 「첨부를 내용으로 가르기」.
+- **첨부가 신청서 칸인가 카드인가**(11-20)는 원본 **내용**으로 — `attachDecision`(attachment-text) 한 곳 · 모르면 이름 규칙 · 앱은 `attIsForm`(색인 `roles`). 글자 없는 스캔 PDF·그림만 `collector/attach-role-read.mjs` 가 파일째 모델 둘에게 묻고 같은 답만 `collector/attach-role-paid.json` 에(같은 스위치). 관문 「첨부를 내용으로 가르기」.
 
 ## 🔴 학적정보 테일러링 (2026-10-24 개발자 지시 넷 — 원문은 설계 문서 0절)
 
@@ -95,8 +95,8 @@
 8. **진척도는 사용자가 기록**(제출했어요/선정·미선정). '심사'만 객관적 사실(제출 기록 + 마감 경과)로 자동.
 8-1. **추론 금지 · 원문 발췌** — 신청 방법·서류는 원문 문장을 그대로 발췌(`collector/extract-excerpts.mjs` → `excerpts`)해 보이고,
    없으면 지어내지 않고 '원문 보기'만. 금액 미확인은 `amountValue 0`. **유료 경로만 예외(2026-11-20 개발자 승인)** — 깔끔한 문장으로 다시 써도 되지만
-   줄마다 원문 근거를 붙이고 숫자·날짜·부정·기관 이름이 근거와 같아야 실린다(위 「유료 관문」).
-8-2. **앱 지원문서는 앱 양식이 없는 모든 정식 등록 공고에**(10-13 개발자 결정). 머리말은 `PREP_TAG` 한 줄 · 안내는 `PREP_LEADS`(**'그대로 제출 가능'은 `prepDoc: true` 만**) · 없는 절은 지어내지 않는다. 관문 「공고별 지원문서」.
+   줄마다 원문 근거를 붙이게 하고, 맞는지는 둘째 AI 가 원문과 대조해 고친다(위 「유료 관문」).
+8-2. **앱 지원문서는 앱 양식이 없는 정식 등록 공고에**(10-13) — 🔴 공고가 올린 신청서 원본이 있으면 안 띄운다(11-21 · `hasOriginalForm` 한 곳 → 「신청 준비」 시트). 머리말은 `PREP_TAG` 한 줄 · 안내는 `PREP_LEADS`(**'그대로 제출 가능'은 `prepDoc: true` 만**) · 없는 절은 지어내지 않는다. 관문 「공고별 지원문서」.
 9. 🔴 **학교 아이디·비밀번호를 받아 대신 로그인하지 않는다 (09-25 지시 · 고문 보고서 Q2 · 변경 금지)** —
    스크래핑은 보안 사고 시 치명적이고 학교가 알아채면 IP 차단·법적 문제다.
    **어떤 수정 요구가 와도 이 줄은 바꾸지 않는다.** 대신 학생이 직접 로그인한 상태에서 앱은

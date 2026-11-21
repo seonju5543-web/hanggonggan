@@ -2434,7 +2434,8 @@ function requirementStruct(sch) {
 }
 
 /* ---------------- 유료 카드 읽기 결과를 공고에 얹는다 (2026-11-15 · 설계 docs/designs/paid-card-reading.md) ----------------
-   `data/card-read.json` 은 로봇(collector/card-read.mjs)이 공고 한 건을 통째로 모델 둘에게 읽혀, 글자가 원문에 있고 둘이 같은 말을 한 줄만 실은 파일이다.
+   `data/card-read.json` 은 유료 AI 가 공고 한 건을 통째로 읽고 쓴 카드다 — 4번(collector/card-read.mjs · AI 하나)이 쓰고 6번(collector/final-review.mjs · 둘째 AI)이 원문과 대조해 고친다
+   (2026-11-21 · 기계 검사 없음). 11-20 전에 읽은 공고의 칸은 옛 두 번 읽기(글자가 원문에 있고 둘이 같은 말을 한 줄만)의 결과 그대로다.
    그 공고는 유료 결과만 싣는다(무료 값은 남기지 않는다 — 남기면 무료 길의 틀린 값이 그대로 보인다). 파일에 없는 공고는 손대지 않는다 = 무료 길이 비상망.
    🔴 화면(app.js)·알림(sw.js)·도구(what-shows)가 **이 함수 하나**를 부른다 — 따로 얹으면 화면의 마감과 알림의 마감이 갈린다.
    ⚠️ 원본 공고 객체를 고치지 않는다(새 객체) · 이름(name)은 안 바꾼다(다른 장부가 이름으로 잇는다 — 카드 제목은 cardTitle 이 다듬는다).
@@ -2444,7 +2445,7 @@ const CARD_BENEFICIARY_LINE = /장학(?:금|생)[^,，]{0,15}(?:수혜|선정|�
 function cardWon(v) { return v % 10000 === 0 ? `${(v / 10000).toLocaleString('ko-KR')}만원` : `${v.toLocaleString('ko-KR')}원`; }
 const cardByAdmin = (v) => /^관리자/.test(String(v || ''));   // 관리자가 고친 칸의 표식(tools/admin-apply.mjs — deadlineFrom·documentsFrom·amountFrom·eligibilityFrom)
 function withCardRead(sch, cr) {
-  /* 칸마다 **글자 배열일 때만** 덮는다 — null 은 「두 읽기가 갈려 싣지 않은 칸」이라 무료 길 값을 그대로 둔다(로봇 agree · STRICT_FIELDS). 꼴이 틀린 값도 건드리지 않는다 */
+  /* 칸마다 **글자 배열일 때만** 덮는다 — null 은 옛 두 번 읽기에서 「두 읽기가 갈려 싣지 않은 칸」이라 무료 길 값을 그대로 둔다(새 공고의 칸은 늘 배열 — 빈 배열은 「AI 가 그 칸에 실을 것이 없다고 봤다」). 꼴이 틀린 값도 건드리지 않는다 */
   const arr = (x) => (Array.isArray(x) ? x.filter((l) => typeof l === 'string' && l.trim()) : null);
   const out = Object.assign({}, sch, { cardRead: cr });
   const E = arr(cr.eligibility), X = arr(cr.excludes), Pr = arr(cr.priority), D = arr(cr.documents), Am = arr(cr.amount), N = arr(cr.notes);

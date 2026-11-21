@@ -318,8 +318,12 @@ vm.runInContext(`Object.assign(FORM_TEMPLATES, ${JSON.stringify(JSON.parse(fs.re
   const dataSrc = fs.readFileSync(new URL('../data.js', import.meta.url), 'utf8');
   const isForm = dataSrc.match(/^function isFormAttachment\([\s\S]*?^\}/m);
   if (!isForm) throw new Error('data.js 에서 isFormAttachment() 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.');
-  vm.runInContext([isForm[0], takeBlockConst('ESSAY_DEFS'),
-    ...['essayDefsFor', 'formTplIdFor', 'attachPrepTemplate', 'attachPrepTemplates', 'applyTo'].map(takeFn)].join('\n\n'),
+  const isApp = dataSrc.match(/^function isApplicationForm\([\s\S]*?^\}/m);
+  if (!isApp) throw new Error('data.js 에서 isApplicationForm() 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.');
+  /* 6-1 (2026-11-21) — 신청 버튼은 「공고가 올린 신청서 원본이 있는가」(app-live hasOriginalForm)를 본다. 앱이 받는 두 색인을 그대로 싣고 그 이웃도 이름으로 떼어 온다 */
+  vm.runInContext(`let formsPdfIndex = ${JSON.stringify(formsIdx)}; let formPagesIndex = ${JSON.stringify(pagesIdx)};`, pressCtx);
+  vm.runInContext([isForm[0], isApp[0], takeBlockConst('ESSAY_DEFS'),
+    ...['essayDefsFor', 'formPdfsFor', 'formPagesFor', 'attIsForm', 'hasOriginalForm', 'formTplIdFor', 'attachPrepTemplate', 'attachPrepTemplates', 'applyTo'].map(takeFn)].join('\n\n'),
     pressCtx, { filename: 'app.js(신청 버튼)' });
 }
 function pressRoute(sch) {
@@ -345,7 +349,10 @@ function pressRoute(sch) {
     const roles = (() => { try { return (JSON.parse(fs.readFileSync(new URL('../data/forms-pdf/index.json', import.meta.url), 'utf8')).roles || {})[s.id] || {}; } catch { return {}; } })();
     const isForm = run('isFormAttachment');
     const n = (s.attachments || []).filter((a) => (roles[a.name] ? roles[a.name] === 'form' : isForm(a))).length;
-    return `신청 준비 시트 — 확인을 눌러야 담긴다 (내려받을 신청서 양식 첨부 ${n}개)`;
+    /* 6-1 — 공고가 올린 신청서 원본이 있어서 이 시트로 온 것인지 밝힌다(앱 지원문서는 원본이 없을 때만) */
+    const orig = run('hasOriginalForm')(s);
+    const copies = run('formPdfsFor')(s).length, pages = run('formPagesFor')(s).length;
+    return `신청 준비 시트 — 확인을 눌러야 담긴다 (${orig ? `공고 원본 신청서가 있어 앱 지원문서는 안 띄운다 · PDF 사본 ${copies}개 · 공고문에서 뗀 서식 ${pages}개 · ` : ''}내려받을 신청서 양식 첨부 ${n}개)`;
   }
   return `(알 수 없음: ${got.join(',') || '아무것도 안 부름'})`;
 }

@@ -119,7 +119,11 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
     const A = l1.slice().sort((a, b) => score(b) - score(a))[0] || null;
     /* B 는 머리말이 **'첨부 신청서'(attached)** 인 공고 — 같은 첨부가 있어도 원문이 메일·포털 접수를 말하면 머리말은 그 접수 방법이다(forms.js prepKindFor 순서).
        데이터가 메일 접수 주소를 새로 읽자 영남대 다문화가정(신청서.hwp + 「이메일 접수」)이 B 로 골려 ② 의 둘째 줄 대조가 헛돌았다(2026-11-16) */
-    const B = l1.find((s) => s !== A && hasFormAtt(s) && prepKindFor(s) === 'attached') || null;
+    /* 🔴 6-1 (2026-11-21 개발자 지시 — *"사본이 있는데도 불구하고 앱 자체 양식으로 띄우고 있어서"* · *"자체제작문서는 신청양식이 없는 경우에만"*):
+          공고가 올린 신청서 원본이 있는 공고(app-live hasOriginalForm)는 앱 지원문서가 아니라 「신청 준비」 시트로 간다. B·P 는 그 공고에서 고른다
+          (그 전에는 지원문서가 붙은 l1 에서 골랐다 — 이제 l1 에는 원본이 있는 공고가 없다) */
+    const orig1 = live.filter((s) => regIds.has(s.id) && s.sourceKind !== 'kosaf' && !s.formId && hasOriginalForm(s));   // 🔴 formTplIdFor 로 거르지 않는다 — 앱이 지원문서를 띄우면 아래 🔴 검사가 잡아야 한다
+    const B = orig1.find((s) => hasFormAtt(s)) || null;
     /* 층2도 2026-10-13 부터 앱 지원문서가 붙는다(① · 머리말 'kosaf') — 대상은 그 문서가 붙은 것 */
     const l2 = live.filter((s) => s.sourceKind === 'kosaf' && s.prepFormId && formTplIdFor(s) === s.prepFormId);
     const C = l2.find((s) => (s.attachments || []).length) || l2[0] || null;
@@ -127,7 +131,7 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
        A(지원문서 공고)와 같은 공고가 잡혀 ①에서 이미 '신청 준비'한 뒤 ⑦에서 「버튼이 열려 있다」가 거짓이 된다(2026-10-16 verify-ui 빨간불 실측). */
     const F = live.find((s) => s.formId && formTplIdFor(s) === s.formId) || null;
     /* P — 로봇이 원본 PDF 로 바꿔 둔 신청서가 있는 공고(승인 시안 A · 2026-10-14). 색인은 앱이 받은 formsPdfIndex 그대로 */
-    const P = l1.find((s) => hasFormAtt(s) && formPdfsFor(s).length) || null;
+    const P = orig1.find((s) => hasFormAtt(s) && formPdfsFor(s).length) || null;
     const brief = (s) => s && ({ id: s.id, name: s.name.slice(0, 40), src: !!s.sourceUrl,
       atts: (s.attachments || []).length,
       formAtts: (s.attachments || []).filter(isApplicationForm).map((a) => ({ name: a.name, href: safeUrl(a.url) })),
@@ -136,7 +140,7 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
       origForms: (s.attachments || []).filter((a) => a && !a.bodyImage && (attIsForm(s, a) || formPdfsFor(s).some((f) => f.name === a.name))).map((a) => unent(String(a.name || '')).replace(/\s+/g, ' ').trim()),
       ph: s.documents.some((d) => PH.test(d)) });
     return { A: brief(A), B: brief(B), C: brief(C), F: brief(F), P: brief(P),
-      counts: { l1: l1.length, l2: l2.length, pdf: Object.keys((formsPdfIndex && formsPdfIndex.items) || {}).length } };
+      counts: { l1: l1.length, orig1: orig1.length, l2: l2.length, pdf: Object.keys((formsPdfIndex && formsPdfIndex.items) || {}).length } };
   }, PLACEHOLDER_RE.source);
   console.log(`  · 후보 — 층1 양식 없음 ${pick.counts.l1}건 · 층2 ${pick.counts.l2}건 · 원본 PDF 색인 ${pick.counts.pdf}건`);
 
@@ -247,26 +251,25 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
     } else { fail++; console.log('  ✕ 질문 화면이 안 떠 문서를 만들 수 없다'); }
   }
 
-  /* ══ ② 이어서 — 첨부에 신청서 양식이 있는 공고 ══════════════════════════ */
-  console.log('\n■ ② 첨부에 신청서 양식이 있으면 질문 화면 위 「신청서 양식」 아래 그 파일을 준다');
-  if (!pick.B) console.log('  · 첨부에 신청서 양식이 있는 양식 없음 층1 공고가 지금 없어 건너뜀');
-  else {
+  /* ══ ② 이어서 — 첨부에 신청서 양식이 있는 공고 (6-1 · 2026-11-21: 앱 지원문서가 아니라 원본이 놓인 「신청 준비」 시트) ══ */
+  console.log('\n■ ② 공고가 올린 신청서 원본이 있으면 앱 지원문서를 띄우지 않고 「신청 준비」 시트의 「신청서 양식」 아래 그 파일을 준다 (6-1)');
+  eq('공고가 올린 신청서 첨부가 있고 마감 전인 층1 공고가 있다 (없으면 이 검사는 무의미하다)', !!pick.B, true);
+  if (pick.B) {
     console.log(`  · 대상: ${pick.B.name} (${pick.B.id})`);
     await open(pick.B.id);
-    const r = await pressApplyForm();
-    eq('  지원문서 질문 화면이 뜬다', r.form, true);
-    if (r.form) {
+    const r = await pressApply();
+    eq('🔴 누르면 「신청 준비」 시트(#apply-prep)가 뜬다 — 앱 지원문서 질문 화면(#btn-ff-generate)이 아니다', [r.prep, !!(await page.$('#btn-ff-generate'))], [true, false]);
+    if (r.prep) {
       const got = await page.evaluate(() => {
-        const h = [...document.querySelectorAll('#detail-sheet h4')].find((x) => x.textContent.trim().startsWith('신청서 양식'));
+        const h = [...document.querySelectorAll('#apply-prep h4')].find((x) => x.textContent.trim().startsWith('신청서 양식'));
         if (!h) return null;
         const ul = h.nextElementSibling;
         return ul && ul.matches('ul') ? [...ul.querySelectorAll('a')].map((a) => ({ name: a.textContent.trim(), href: a.href })) : [];
       });
       eq('  「신청서 양식」 머리가 있다 (승인 시안 A 의 머리 그대로)', got !== null, true);
-      /* 로봇이 PDF 로 바꿔 둔 사본이 있으면 그 줄이 첨부 줄을 대신한다 — 이름은 어느 쪽이든 공고의 양식 파일 이름이어야 한다 */
+      /* 로봇이 PDF 로 바꿔 둔 사본이 있으면 그 줄이 위에 서고 올린 원본은 맨 밑 — 이름은 어느 쪽이든 공고의 양식 파일 이름이어야 한다 */
       eq('  그 아래에 공고의 양식 파일(이름)이 그대로 있다', (got || []).length >= 1 && pick.B.formAtts.every((f) => (got || []).some((g) => g.name === f.name)), true);
-      eq('  둘째 줄이 "제출은 원본 양식으로"라고 말한다', await page.evaluate(() => /원본 양식/.test(document.querySelector('#detail-sheet .sheet-provider').textContent)), true);
-      eq('  아직 신청내역에 없다', await appsOf(pick.B.id), { mem: [], disk: [] });
+      eq('  🔴 그 순간 신청내역에 없다 (확인을 눌러야 담긴다)', await appsOf(pick.B.id), { mem: [], disk: [] });
       await page.keyboard.press('Escape');
       eq('  ESC 로 닫힌다', await closedAfter(600), true);
       eq('  닫아도 신청내역에 없다', await appsOf(pick.B.id), { mem: [], disk: [] });
@@ -274,17 +277,18 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
   }
 
   /* ══ ②-A 승인 시안 A(2026-10-14) — 로봇이 바꿔 둔 「원본 양식 그대로 보기」 줄 ══════
-     10-13 개발자 결정 뒤 층1은 지원문서 질문 화면이 먼저 뜨므로, 시안 A 의 줄은 그 화면 머리(prepOriginalsHtml)에 선다. 신청 준비 시트(층2·상시)에선 같은 함수 꼴로 그린다. */
-  console.log('\n■ ②-A 원본 PDF 가 있는 공고는 질문 화면 머리 「신청서 양식」 맨 위에 PDF 줄(첨부 이름 그대로)이 서고 원본 신청서는 맨 밑 (승인 시안 A → 2026-11-20 시안)');
+     6-1(2026-11-21) 뒤로 원본 PDF 가 있는 공고는 「신청 준비」 시트가 뜬다 — 시안의 줄(PDF 줄 → 서식 쪽 → 올린 원본)은 그 시트의 「신청서 양식」 묶음에 선다
+     (원본이 없는 공고의 지원문서 질문 화면 머리 prepOriginalsHtml 과 같은 줄 함수 attachPdfRowsHtml 한 곳). */
+  console.log('\n■ ②-A 원본 PDF 가 있는 공고는 「신청 준비」 시트 「신청서 양식」 맨 위에 PDF 줄(첨부 이름 그대로)이 서고 원본 신청서는 맨 밑 (승인 시안 A → 2026-11-20 시안 · 6-1)');
   eq('로봇이 PDF 로 바꿔 둔 신청서가 있고 마감 전인 층1 공고가 있다 (없으면 이 검사는 무의미하다)', !!pick.P, true);
   if (pick.P) {
     console.log(`  · 대상: ${pick.P.name} (${pick.P.id}) · PDF ${pick.P.pdfs.length}건`);
     await open(pick.P.id);
-    const r = await pressApplyForm();
-    eq('  지원문서 질문 화면이 뜬다', r.form, true);
-    if (r.form) {
+    const r = await pressApply();
+    eq('🔴 「신청 준비」 시트가 뜬다 — 사본이 있는데 앱 지원문서를 띄우지 않는다', [r.prep, !!(await page.$('#btn-ff-generate'))], [true, false]);
+    if (r.prep) {
       const got = await page.evaluate(() => {
-        const h = [...document.querySelectorAll('#detail-sheet h4')].find((x) => x.textContent.trim().startsWith('신청서 양식'));
+        const h = [...document.querySelectorAll('#apply-prep h4')].find((x) => x.textContent.trim().startsWith('신청서 양식'));
         const ul = h && h.nextElementSibling;
         const rows = ul ? [...ul.querySelectorAll('li.att')] : [];
         const row = (li) => ({ cls: li.className, icon: (li.querySelector('.att-ic') || {}).textContent, go: (li.querySelector('.att-go') || {}).textContent,
@@ -313,6 +317,46 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
       await page.keyboard.press('Escape');
       await closedAfter(600);
     }
+  }
+
+  /* ══ ②-B 6-1 — 쓰던 앱 지원문서가 남아 있는데 그 공고에 원본 신청서가 생겼다 (PDF 사본은 등록 다음 날 새벽에 생긴다 · 색인이 늦게 올 수도 있다) ══
+     이어보기(app.js resumePlan)·히어로 「이어서 쓰기」(app-prep renderDraftSheet)·「다시 작성」이 모두 startFormFill 로 온다.
+     🔴 리뷰 2026-11-22: **이미 쓴 글은 뺏지 않는다** — 새로 시작하는 길만 원본으로 가고(위 ②·②-A), 쓰던 글·다 쓴 문서는 그대로 열린다. 템플릿 없이 그려 화면이 멈춰도 안 된다 */
+  console.log('\n■ ②-B 원본이 (나중에) 생긴 공고라도 쓰던 지원문서·다 쓴 문서는 그대로 열린다 — 이미 쓴 글을 뺏지 않는다 (6-1)');
+  if (!pick.P) console.log('  · 원본 PDF 가 있는 층1 공고가 없어 건너뜀');
+  else {
+    const r2 = await page.evaluate((id) => {
+      const sch = findSch(id);
+      resumeSave({ sheet: { kind: 'form', id }, form: { schId: id, tplId: 'prep:' + id, stage: 'q', ans: {}, at: Date.now() } });
+      const dr = resumeDraft();
+      let threw = '';
+      try { openSheetShell(); startFormFill(sch, dr && dr.prog); } catch (e) { threw = String(e && e.message); }
+      return { before: !!dr, threw, q: !!document.querySelector('#btn-ff-generate'), prep: !!document.querySelector('#apply-prep'), after: !!resumeDraft(), tpl: formFill && formFill.tplId };
+    }, pick.P.id);
+    eq('🔴 쓰던 글이 있으면 쓰던 지원문서가 그대로 열린다(준비 시트로 보내 글을 잃게 하지 않는다) · 화면이 멈추지 않는다 · 쓰던 것 표시도 남는다',
+      r2, { before: true, threw: '', q: true, prep: false, after: true, tpl: 'prep:' + pick.P.id });
+    await page.evaluate(() => resumeSave({ form: null, sheet: null }));
+    await page.keyboard.press('Escape');
+    await closedAfter(600);
+    const r3 = await page.evaluate(async (id) => {
+      const sch = findSch(id);
+      state.applications.push({ id, name: sch.name, appliedAt: nowStamp(), step: 0, docs: null, pending: false, prep: {}, formAns: {} });
+      let threw = '';
+      try { openDetail(id); } catch (e) { threw = String(e && e.message); }
+      await new Promise((r) => setTimeout(r, 500));
+      const has = ['#btn-form-save', '#btn-form-print', '#btn-form-edit'].map((q) => !!document.querySelector(q));
+      const b = document.querySelector('#btn-form-edit');
+      if (b) b.click();
+      await new Promise((r) => setTimeout(r, 400));
+      const edit = { stage: formFill && formFill.stage, tpl: formFill && formFill.tplId, sch: formFill && formFill.schId === id };
+      state.applications = state.applications.filter((a) => a.id !== id);
+      resumeSave({ form: null, sheet: null });
+      return { threw, has, edit };
+    }, pick.P.id);
+    eq('  다 쓴 문서(작성한 양식 문서)는 원본이 생긴 뒤에도 저장·인쇄·다시 작성 단추가 있고, 「다시 작성」이 그 문서를 미리보기로 연다',
+      r3, { threw: '', has: [true, true, true], edit: { stage: 'preview', tpl: 'prep:' + pick.P.id, sch: true } });
+    await page.keyboard.press('Escape');
+    await closedAfter(600);
   }
 
   /* ══ ⑤ 층2(한국장학재단 목록) — 질문 화면이 먼저 · 첨부는 「선발 공고문」 (2026-10-13 ① 층2 지원문서) ═════ */

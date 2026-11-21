@@ -2235,10 +2235,15 @@ function renderDocPrep() {
 }
 
 /* ---------------- 실제 양식 채움 플로우 ---------------- */
-let formFill = null; // { schId, stage:'q'|'preview', ans }
+let formFill = null; // { schId, tplId, stage:'q'|'preview', ans } — tplId 는 startFormFill 이 한 번 정한다
 
 function startFormFill(sch, restore) {
-  formFill = { schId: sch.id, stage: 'q', ans: null };
+  /* 6-1 (2026-11-21) — 앱 지원문서를 띄울 공고가 아니면 질문 화면을 그리지 않고 원본이 놓인 「신청 준비」 시트로 간다(템플릿 없이 그리면 FORM_TEMPLATES[null] 이라 화면이 멈춘다).
+     🔴 쓰던 글이 있으면(restore.ans — 이어보기·히어로 「이어서 쓰기」·「다시 작성」) 그 사이 원본이 생겼어도 쓰던 문서를 그대로 연다 — 이미 쓴 글을 뺏지 않는다(리뷰 2026-11-22).
+     🔴 템플릿은 여기서 한 번 정해 formFill.tplId 에 둔다 — 그릴 때마다 다시 고르면, 쓰는 도중에 색인이 도착해 원본이 생긴 순간 다음 그리기가 템플릿을 잃고 멈춘다 */
+  const tplId = formTplIdFor(sch, !!(restore && restore.ans));
+  if (!tplId) { renderApplyPrep(sch); return; }
+  formFill = { schId: sch.id, tplId, stage: 'q', ans: null };
   /* 프로필이 바뀌었을 수 있으니 질문 설계를 다시 짠다 */
   if (typeof formInvalidatePlan === 'function') formInvalidatePlan();
   renderFormFill(restore);
@@ -2262,7 +2267,7 @@ function formProgressSave(now) {
        올라온 뒤에 모으면 칸이 하나도 없어 **빈 답이 좋은 답을 덮는다**(코드 리뷰). */
     if (formFill.stage === 'q' && !$('#btn-ff-generate')) return;
     const sch = findSch(formFill.schId);
-    const tplId = sch && formTplIdFor(sch);
+    const tplId = sch && formFill.tplId;   // 시작할 때 정한 그 문서(startFormFill) — 다시 고르지 않는다
     const tpl = tplId && FORM_TEMPLATES[tplId];
     if (!tpl) return;
     /* 미리보기 단계에서는 화면에 질문 칸이 없다 — 그때는 이미 모아 둔 답을 그대로 적는다 */
@@ -2284,7 +2289,7 @@ function formProgressClear() {
 
 function renderFormFill(restore) {
   const sch = findSch(formFill.schId);
-  const tpl = FORM_TEMPLATES[formTplIdFor(sch)];
+  const tpl = FORM_TEMPLATES[formFill.tplId];   // 시작할 때 정한 그 문서(startFormFill)
   const sheet = $('#detail-sheet');
 
   if (formFill.stage === 'q') {
