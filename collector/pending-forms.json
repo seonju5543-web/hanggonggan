@@ -1274,9 +1274,8 @@
    "name": "[교외] KC미래장학재단 장학생 선발 안내(12/23 마감, 이공계열, 생활비 400만원)",
    "target": "KC미래장학재단 장학생 선발 안내(12/23 마감, 이",
    "added": "2026-11-20",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 2,
    "lastTryAt": "2026-11-21"
   }
  ]
