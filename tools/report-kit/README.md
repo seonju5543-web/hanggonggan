@@ -22,7 +22,7 @@ node tools/report-kit/build.mjs <명세.json> --out <보고서.pdf> --png <미�
 | `※` 참고 · `붙임` · 문서 끝 `끝.` | 공문서 관행 | `note` 블록 · 붙임 장 · 끝 표시 |
 | 보안 등급 표기 | 사내 문서 관행 | 표지 · 모든 쪽 머리글 · 바닥글 |
 
-색과 로고는 앱에서 왔다: 남색(`style.css` primary `#1e2b42` · 아이콘 바탕 `#101d3d`) · 파랑(accent `#27508f`) · 금색(학사모 술 `#b8912f`) · 로고는 `icons/icon.svg` 그대로.
+색과 로고는 앱에서 왔다: 남색(`style.css` primary `#222c3b` · 아이콘 바탕 `#101d3d`) · 파랑(accent `#2f4d78`) · 금색(학사모 술 `#b8912f`) · 로고는 `icons/icon.svg` 그대로.
 
 ## 쪽 구성 (모든 보고서가 같다)
 

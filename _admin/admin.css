@@ -39,12 +39,12 @@
   --text-weak:  #888e97;   /* 3.30:1 — 14px 이상에만 */
 
   /* 동작 = 잉크 · 강조 = 잉크블루 하나 */
-  --primary:      #1e2b42;
-  --primary-dark: #131c2c;
+  --primary:      #222c3b;
+  --primary-dark: #171e29;
   --primary-weak: rgba(23, 25, 28, 0.055);   /* 눌린 면 */
-  --accent:       #27508f;
-  --accent-soft:  rgba(39, 80, 143, 0.09);
-  --accent-line:  rgba(39, 80, 143, 0.24);
+  --accent:       #2f4d78;
+  --accent-soft:  rgba(47, 77, 120, 0.09);
+  --accent-line:  rgba(47, 77, 120, 0.24);
 
   /* 뜻 색 — 앱1 의 빨강·초록 + 관리자 확장인 놋쇠 */
   --red:    #8f3a2e;  --red-weak:   #f5e9e6;
@@ -69,9 +69,9 @@
   --radius: 19px; --radius-lg: 27px; --radius-pill: 999px;
 
   /* 그림자 — 🔴 **떠 있는 것에만** (앱1 규칙). 면 위에 놓인 카드·표에는 붙이지 않는다 */
-  --shadow:       0 1px 2px rgba(24, 35, 56, 0.05), 0 8px 22px rgba(24, 35, 56, 0.07);
-  --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);
-  --ring:         0 0 0 2px #27508f;
+  --shadow:       0 1px 2px rgba(28, 36, 51, 0.05), 0 8px 22px rgba(28, 36, 51, 0.07);
+  --shadow-sheet: 0 -14px 48px rgba(22, 28, 38, 0.20);
+  --ring:         0 0 0 2px #2f4d78;
   /* 앱1 의 '떠 있는 버튼' 그림자 — 값은 style.css 실효값 그대로 */
   --shadow-btn:       0 6px 18px rgba(35, 32, 26, 0.22);
   --shadow-btn-hover: 0 8px 24px rgba(35, 32, 26, 0.28);
