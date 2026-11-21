@@ -1,4 +1,4 @@
-## 🛰 공공 API 로봇 리포트 (2026-11-21)
+## 🛰 공공 API 로봇 리포트 (2026-11-22)
 
 - ✅ **K-Startup 사업공고** — 받은 행 126 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 101 · 상한 15건 초과 10
   - 자격 줄 있는 글 15/15 · 원문 안내 있는 글 15/15
@@ -80,6 +80,6 @@
     - 20260421005400212793 · 청년 체인지메이커 아카데미 운영 → https://jejuyouthdream.com/policy/detail/70 · 살핀 칸: aplyUrlAddr=https://www.jeju.go.kr/index.htm(0) · refUrlAddr1=https://jejuyouthdream.com/policy/detail/70(1)
     - 20260413005400212702 · 대학생 봉사활동 활성화 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236(2)
 
-data/activities.json — API 글 49 → **49건** (전체 201건)
+data/activities.json — API 글 49 → **49건** (전체 200건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
