@@ -195,7 +195,7 @@ function applySectionHtml(sch, opts) {
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource
-    : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
+    /* 층2 재단의 「재단 선발 공고문·홈페이지가 정한 접수 방법」 줄은 2026-11-21 개발자 지시로 지웠다 — 아무것도 알려 주지 않는 문장(원문 링크가 아래에 있다) */
     : '';
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
   const row = (k, v, plain) => `<li><b class="ns-k">${k}</b>${plain ? esc(v) : nsBodyHtml(v)}</li>`;   // 기간 줄은 plain — 80자에서 잘린 기간 토막의 주소를 진짜 같은 링크로 만들지 않는다(리뷰 2026-11-17)

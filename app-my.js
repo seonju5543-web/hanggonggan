@@ -220,8 +220,8 @@ function renderApplications() {
          ${/* 합이 0 이면 금액 두 줄을 안 그린다(2026-11-15 · 예전 「금액 미확인」 — '0원'도 쓰지 않는다: 한 푼도 못 받는다로 읽힌다) */ ''}
          ${shownAmount ? `<p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${won(shownAmount)}</p>` : ''}
-         <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록${
-           shownAmount && unknownAmount ? ` · 금액을 못 읽은 ${unknownAmount}건 제외` : ''}</p>
+         ${/* 「제출·발표는 각 공식 채널에서 · 결과는 여기에 기록」은 2026-11-21 개발자 지시로 지웠다 — 금액에서 뺀 건수만 남긴다 */ ''}
+         ${shownAmount && unknownAmount ? `<p class="summary-note">금액을 못 읽은 ${unknownAmount}건 제외</p>` : ''}
        </div>`
     : '';
 
@@ -355,19 +355,9 @@ function forgetLearned(key) {
 function renderMy() {
   /* 판 번호는 APP_VERSION 한 곳에서 온다 — 프로필이 없어 일찍 돌아가더라도 적어 둔다 */
   const ver = $('#my-version');
-  /* 🔴 "· 전국 대학 지원" 이라고 적혀 있었다 (2026-09-13 수정). 학교는 전국에서 고를 수
-     있지만 **교내 공고가 있는 학교는 두 곳뿐**이라, 그 말은 학생이 확인할 수 없는 약속이다.
-     지금은 **데이터가 세어 말한다** — 숫자를 손으로 적지 않으므로 학교가 늘면 저절로 맞는다.
-     ⚠️ 층2(한국장학재단)는 전국 재단이라 학교와 무관하다 — 그래서 따로 센다. */
-  if (ver) {
-    const inSchools = new Set(registeredList
-      .map((s) => s.eligibility && s.eligibility.schoolOnly).filter(Boolean));
-    const kosafN = kosafList.length;
-    const parts = [`한대장 ${APP_VERSION}`];
-    if (inSchools.size) parts.push(`교내 공고 ${inSchools.size}개교`);
-    if (kosafN) parts.push(`한국장학재단 ${kosafN}곳`);
-    ver.textContent = parts.join(' · ');
-  }
+  /* 🔴 판 번호만 적는다. 「· 전국 대학 지원」(09-13 지움 — 확인할 수 없는 약속) → 「교내 공고 n개교 · 한국장학재단 n곳」(데이터가 센 숫자)도
+     2026-11-21 개발자 지시로 지웠다 — 학생이 읽지 않는 앱 자랑이다. 숫자 줄을 되살리지 말 것 */
+  if (ver) ver.textContent = `한대장 ${APP_VERSION}`;
 
   /* 계정(로그인) 절 — 프로필이 없어도 그린다(새 기기에서 로그인해 프로필을 받아 오는 길 · 2026-10-10 MY 로 옮김) */
   renderAccountCard();
@@ -813,7 +803,6 @@ function renderSupport() {
 
     <div class="my-card">
       <p class="wallet-title">바로 물어보기</p>
-      <p class="sup-desc">대장님은 앱이 <strong>이미 아는 것</strong>(등록된 공고·서류·내 신청 현황·공고 원문)을 찾아 줍니다. 모르면 지어내지 않고 못 찾았다고 말해요.</p>
       <button type="button" class="btn btn-outline" id="btn-support-chat">대장님에게 물어보기</button>
     </div>
 

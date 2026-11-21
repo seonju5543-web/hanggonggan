@@ -296,7 +296,7 @@ function notifyConsentSheet() {
          장식이라 정보가 없었고, 이 앱의 다른 시트와 달리 가운데 정렬이라 더 눈에 띄었다. */ ''}
     <div class="nf-consent-hero">
       <h3 class="sheet-title">장학금 알림 받기</h3>
-      <p class="sheet-summary" style="margin-top:6px">마감을 놓쳐서 못 받는 장학금이 가장 아깝습니다. 꼭 필요한 것만 골라서 알립니다.</p>
+      ${/* 제목 밑 「마감을 놓쳐서 못 받는 장학금이 가장 아깝습니다…」 한 줄은 2026-11-21 개발자 지시로 지웠다(읽지 않는 권유 문구) */ ''}
     </div>
     <ul class="nf-type-list">${typeRows}</ul>
     <p class="sheet-note">${pushConfigured()

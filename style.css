@@ -1217,6 +1217,8 @@ textarea:focus {
    ⚠️ 목록의 줄별 아이콘(.nf-ico)은 남긴다 — 그건 장식이 아니라 **어떤 알림인지**를 말한다. */
 .nf-consent-hero { padding-top: 4px; }
 .nf-type-list { list-style: none; display: grid; gap: 12px; margin: 4px 0 18px; }
+/* 제목 밑 권유 문장을 지운 뒤(2026-11-21) 제목과 목록 사이 — 덩어리 사이만큼 */
+.nf-consent-hero + .nf-type-list { margin-top: var(--sp-2); }
 .nf-type-list li {
   display: flex; gap: 11px; align-items: flex-start;
   font-size: var(--t-md);
@@ -3027,6 +3029,8 @@ body::after { opacity: 0.26; }
 /* 온보딩 — 칸 사이를 하나로 */
 .onboard-body h2 { margin-bottom: var(--sp-1); }
 .onboard-sub { margin: 0 0 var(--sp-4); }
+/* 부제 없이 제목 바로 밑에 칸이 오는 단계(1 학적 · 2 성적) — 제목과 첫 칸 사이도 절 사이만큼 (2026-11-21 부제를 지우며) */
+.onboard-body h2 + .field { margin-top: calc(var(--sp-4) - var(--sp-1)); }
 .field { margin-bottom: var(--sp-3); }
 .field-label { margin-bottom: var(--sp-1); }
 .chip-group { gap: 7px; }
@@ -5174,20 +5178,12 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    큰 제목 「계정」과 위 여백이 프로필 표와 가른다. */
 #screen-my #my-account.my-card { border-top: 0; }
 
-/* 구역 머리줄 오른쪽의 누를 수 없는 글자(갱신 날짜) — 파랑은 '누를 수 있음'이라 쓰지 않는다 (2026-10-10) */
-.section-head .section-note { font-size: var(--t-xs); font-weight: 600; color: var(--text-weak); white-space: nowrap; }
-
 /* 교내 소식 요약 (2026-10-10 업무 분장 8번) — 원문 첫 문장 발췌. 두 줄에서 자른다 */
 .news-tile-desc, .sch-desc {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   font-size: var(--t-xs); line-height: 1.5; color: var(--text-sub); font-weight: 500;
 }
 .sch-desc { margin-top: var(--space-4); }
-.news-today {
-  display: inline-block; vertical-align: middle; margin-left: var(--space-4);
-  padding: 0 var(--sp-2); border-radius: var(--radius-pill);
-  background: var(--red-weak); color: var(--red); font-size: var(--t-2xs); font-weight: 800; line-height: 1.7;
-}
 
 /* ── MY 첫 화면 (2026-10-10 은서 「저번 C안처럼」 — 구조만 C안 · 색·글꼴은 지금 앱 토큰) ──
    머리줄(사진·이름·학교) → 흰 카드 한 장 안의 메뉴 줄 넷(누르면 안쪽 화면) → 로그인 카드. */
