@@ -682,7 +682,7 @@ a.btn { text-decoration: none; }
     var(--grad-navy);
   border-radius: var(--radius);
   padding: 20px;
-  color: rgba(232, 234, 238, 0.8);
+  color: rgba(232, 239, 254, 0.8);
   font-size: var(--t-sm);
   box-shadow: var(--shadow-lift);
 }
@@ -937,7 +937,7 @@ a.btn { text-decoration: none; }
 
 .sheet-note {
   font-size: var(--t-sm);
-  color: #3b4656;
+  color: #2c447e;
   background: var(--primary-weak);
   border: 1px solid rgba(138, 106, 31, 0.14);
   border-radius: var(--radius-sm);
@@ -2180,10 +2180,10 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
   background: var(--grad-navy);
   border-radius: var(--radius); padding: 17px 18px 16px; color: #fff; margin: 4px 0 2px;
 }
-.ad-total-lb  { font-size: var(--t-xs); font-weight: 600; color: rgba(232,234,238,.75); }
+.ad-total-lb  { font-size: var(--t-xs); font-weight: 600; color: rgba(232,239,254,.75); }
 .ad-total-amt { font-size: var(--t-3xl); font-weight: 800; letter-spacing: -.03em; margin: 5px 0 3px;
                 font-variant-numeric: tabular-nums; }
-.ad-total-sub { font-size: var(--t-xs); color: rgba(232,234,238,.72); }
+.ad-total-sub { font-size: var(--t-xs); color: rgba(232,239,254,.72); }
 
 .ad-grp { margin-top: 17px; }
 .ad-grp-h { display: flex; align-items: baseline; gap: 7px; margin-bottom: 7px; padding: 0 3px; }
@@ -2513,15 +2513,15 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 :root {
   /* 채도를 낮춘 잉크블루 — 베이지 위 7.4:1. 형광 파랑(#2f6bff)으로 돌아가지 말 것:
      그 색 하나가 이 앱을 다시 '흔한 AI 화면'으로 만든다(Taste 진단서 1순위). */
-  --accent:      #3a5070;   /* 2026-11-21 톤 낮춤 두 단계 — #27508f(채도 57%) → #2f4d78(44%) → 32% · 흰 바탕 위 8.2:1 */
-  --accent-soft: rgba(58, 80, 112, 0.09);
-  --accent-line: rgba(58, 80, 112, 0.24);
-  --ring:        0 0 0 3px rgba(58, 80, 112, 0.18);
+  --accent:      #27508f;
+  --accent-soft: rgba(39, 80, 143, 0.09);
+  --accent-line: rgba(39, 80, 143, 0.24);
+  --ring:        0 0 0 3px rgba(39, 80, 143, 0.18);
   /* 히어로 패널의 방사광도 같은 파랑으로 */
   --grad-navy:
-    radial-gradient(120% 130% at 78% -18%, rgba(140, 154, 176, 0.14) 0%, rgba(140, 154, 176, 0) 58%),
+    radial-gradient(120% 130% at 78% -18%, rgba(96, 140, 210, 0.26) 0%, rgba(96, 140, 210, 0) 58%),
     radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 60%),
-    #1f252f;
+    #1b1f27;
 }
 
 /* ── ① 장학 목록 = 체크리스트 ────────────────────────────────────────
@@ -2669,11 +2669,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .empty { border-radius: 0; background: transparent; border-top: 1px solid var(--line); padding: 30px 20px; }
 
 /* ── ⑤ 파랑으로 바뀌는 자리들 ─────────────────────────────────── */
-.badge-fit.fit-red    { background: rgba(58, 80, 112, 0.05); color: #8a8d95; }
-.badge-fit.fit-orange { background: rgba(58, 80, 112, 0.08); color: #6f7a8c; }
-.badge-fit.fit-yellow { background: rgba(58, 80, 112, 0.12); color: #566880; }
-.badge-fit.fit-green  { background: rgba(58, 80, 112, 0.16); color: #4f5e72; }
-.badge-fit.fit-blue   { background: rgba(58, 80, 112, 0.20); color: var(--accent); }
+.badge-fit.fit-red    { background: rgba(39, 80, 143, 0.05); color: #8a8d95; }
+.badge-fit.fit-orange { background: rgba(39, 80, 143, 0.08); color: #6f7a8c; }
+.badge-fit.fit-yellow { background: rgba(39, 80, 143, 0.12); color: #566880; }
+.badge-fit.fit-green  { background: rgba(39, 80, 143, 0.16); color: #3d5c8a; }
+.badge-fit.fit-blue   { background: rgba(39, 80, 143, 0.20); color: var(--accent); }
 .nav-item.active::after { background: var(--accent); }
 .bell-badge, .nf-dot { background: var(--accent); }
 .link-btn, .btn-link, .my-edit-hint, .acc-on { color: var(--accent); }
@@ -2792,20 +2792,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   --line:      rgba(25, 25, 32, 0.085);
   --rule:      rgba(25, 25, 32, 0.13);
 
-  /* 어두운 패널 — 남색. 강조 파랑(#3a5070)과 같은 계열의 어두운 끝이다.
-     🔴 2026-11-21 개발자 지시 "네이비 톤을 낮춰 professional navy 로" — 채도를 37~40% → 25~29% 로
-     낮추고(색상 216° 유지) 히어로 방사광도 파랑 30% → 회청 18% 로 죽였다. 밝기는 그대로.
-     같은 날 "한 단계만 더" — 남색 채도 ~20% · 강조 32% · 방사광 14% (차콜에 가까운 남색). */
+  /* 어두운 패널 — 남색. 강조 파랑(#27508f)과 같은 계열의 어두운 끝이다 */
   --grad-navy:
-    radial-gradient(120% 130% at 78% -18%, rgba(140, 154, 176, 0.14) 0%, rgba(140, 154, 176, 0) 58%),
+    radial-gradient(120% 130% at 78% -18%, rgba(104, 148, 216, 0.30) 0%, rgba(104, 148, 216, 0) 58%),
     radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 60%),
-    #1f252f;
+    #182338;
   /* 주 버튼·아바타도 같은 남색으로 — 먹빛 검정과 섞이면 두 계열이 된다 */
-  --primary:      #262d38;
-  --primary-dark: #1a1f27;
-  --primary-weak: rgba(38, 45, 56, 0.06);
-  --navy-1:       #1f252f;
-  --navy-2:       #343c49;
+  --primary:      #1e2b42;
+  --primary-dark: #131c2c;
+  --primary-weak: rgba(30, 43, 66, 0.06);
+  --navy-1:       #182338;
+  --navy-2:       #2b3a55;
 }
 .avatar { background: var(--primary); }
 
@@ -2858,7 +2855,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   background: var(--accent-soft);
   box-shadow: inset 3px 0 0 var(--accent);
 }
-#explore-list .sch-card:has(.badge-applied):hover { background: rgba(58, 80, 112, 0.13); }
+#explore-list .sch-card:has(.badge-applied):hover { background: rgba(39, 80, 143, 0.13); }
 #explore-list .sch-card:has(.badge-applied) .sch-name { color: var(--accent); }
 
 /* 알림 절의 버튼 줄이 사라졌으니 남는 여백을 정리한다 */
@@ -2910,11 +2907,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .mini-progress div { height: 100%; background: var(--accent); border-radius: var(--radius-hair); transition: width var(--dur-slow) var(--ease), background var(--dur-slow) var(--ease); }
 
 /* 단계별 색 — 목록을 훑기만 해도 어느 장학금이 어디까지 왔는지 보인다 */
-.app-step-s0 .mini-progress div { background: #2c3440; }   /* 신청 준비 완료 */
+.app-step-s0 .mini-progress div { background: #22304d; }   /* 신청 준비 완료 */
 .app-step-s1 .mini-progress div { background: #5a3f78; }   /* 공식 제출 */
 .app-step-s2 .mini-progress div { background: #9c3f63; }   /* 심사 */
 .app-step-s3 .mini-progress div { background: #cf4436; }   /* 선정 발표 */
-.app-step-s0 .app-step-head span { color: #2c3440; }
+.app-step-s0 .app-step-head span { color: #22304d; }
 .app-step-s1 .app-step-head span { color: #5a3f78; }
 .app-step-s2 .app-step-head span { color: #9c3f63; }
 .app-step-s3 .app-step-head span { color: #cf4436; }
@@ -2957,11 +2954,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   --rule:      rgba(23, 25, 28, 0.14);
 
   /* 그림자를 갈색에서 남색 계열로 — 넓은 면에 깔리는 색이라 여기가 제일 크게 보인다 */
-  --shadow:       0 1px 2px rgba(31, 37, 47, 0.05), 0 8px 22px rgba(31, 37, 47, 0.07);
-  --shadow-chip:  0 4px 14px rgba(58, 80, 112, 0.26);      /* 남색 판의 칩 — 이 값이 실제로 뜬다 */
-  --shadow-lift:  0 2px 6px rgba(31, 37, 47, 0.07), 0 18px 40px rgba(31, 37, 47, 0.14);
-  --shadow-sheet: 0 -14px 48px rgba(24, 28, 35, 0.20);
-  --knob:         0 1px 3px rgba(31, 37, 47, 0.26);
+  --shadow:       0 1px 2px rgba(24, 35, 56, 0.05), 0 8px 22px rgba(24, 35, 56, 0.07);
+  --shadow-chip:  0 4px 14px rgba(39, 80, 143, 0.26);      /* 남색 판의 칩 — 이 값이 실제로 뜬다 */
+  --shadow-lift:  0 2px 6px rgba(24, 35, 56, 0.07), 0 18px 40px rgba(24, 35, 56, 0.14);
+  --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);
+  --knob:         0 1px 3px rgba(24, 35, 56, 0.26);
   --primary-weak: rgba(23, 25, 28, 0.055);
 }
 /* 결(노이즈)도 옅게 — 진하면 그것 자체가 누런 얼룩으로 보인다 */
@@ -4280,7 +4277,7 @@ body,
   --orange:      #8f3a2e;
   --orange-weak: #f5e9e6;
   /* 13 · 포커스 링 — Linear 값(2px · 50%). 전엔 3px 18% 라 폰에서 거의 안 보였다 */
-  --ring:        0 0 0 2px rgba(58, 80, 112, 0.5);
+  --ring:        0 0 0 2px rgba(39, 80, 143, 0.5);
 }
 /* 12 · 팔레트 밖에 남아 있던 주황 한 곳도 같은 색조로 */
 .esc-badge.esc-soft { color: var(--orange); }
@@ -4349,7 +4346,7 @@ input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus
 :root {
   /* 13 · 포커스 링 — Apple 값(2px · 불투명). 아침에 넣은 50% 는 흰 입력칸 위에서 옅은 하늘색으로 보였다.
      🔴 값에 var() 를 쓰지 않는다 — 이 토큰은 :root 안이라 팔레트 밖 유채색으로 세지 않는다. */
-  --ring: 0 0 0 2px #3a5070;
+  --ring: 0 0 0 2px #27508f;
 }
 
 /* 7 · 선택 칩 — Apple 방식(configurator-option-chip-selected): 칠하지도(8/31) 올리지도(오늘 아침 Linear 방식)

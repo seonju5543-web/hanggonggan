@@ -4,9 +4,9 @@
    쪽 머리글·바닥글은 build.mjs 가 @page 칸으로 넣는다(모든 본문 쪽이 같은 틀).
    ============================================================ */
 :root {
-  --navy: #262d38;       /* 앱 primary */
+  --navy: #1e2b42;       /* 앱 primary */
   --navy-deep: #101d3d;  /* 아이콘 바탕 */
-  --blue: #3a5070;       /* 앱 accent */
+  --blue: #27508f;       /* 앱 accent */
   --blue-soft: #e9eef6;
   --gold: #b8912f;       /* 학사모 술 */
   --gold-soft: #f5eedd;
