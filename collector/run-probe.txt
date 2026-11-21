@@ -9,7 +9,7 @@
 
 # 2026-11-21 (Apple 로그인) — Supabase 에 Apple 을 켠 뒤 로그인 시작 주소가 애플 로그인 화면(appleid.apple.com)으로 가는지 본다.
 #   invalid_client·invalid_request 면 Services ID·반환 주소·비밀 키 중 하나가 어긋난 것 — 버튼은 이 답을 보고 붙인다.
-checkUrl: https://ffnzmiorcojbhpqwqgcy.supabase.co/auth/v1/authorize?provider=apple&redirect_to=https%3A%2F%2Fseonju5543-web.github.io%2Fhanggonggan%2F
+# (답 받음 2026-11-21 · appleid.apple.com 로그인 화면 「Handaejang Web에 로그인」 client_id=kr.handaejang.web) checkUrl: https://ffnzmiorcojbhpqwqgcy.supabase.co/auth/v1/authorize?provider=apple&redirect_to=https%3A%2F%2Fseonju5543-web.github.io%2Fhanggonggan%2F
 
 # 2026-10-30 (카드 채움 작업) — 마감 전인데 원문 본문을 못 받는 등록 공고 둘. 자격·마감이 '원문 확인'으로만 떠 있다(원인 단정 금지 — 답을 보고 고친다).
 #   서울과기대 푸른등대(~11/12): 수집기 fetch 가 FETCH_ERROR TypeError 로 끝난다 — 열리는 화면·리다이렉트·인증서를 본다.
