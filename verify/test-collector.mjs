@@ -18462,5 +18462,34 @@ console.log('\n■ 대장님 말귀 — 오타·변형 알아듣기 · 공고 �
   eq('  🔴 일반 질문(`서류 뭐 준비해?`)에는 본문에만 낱말이 든 공고 하나를 고르지 않는다 — 이름에서 찾은 것만(chatNameHit)', /if \(hit && chatNameHit\(hit, q\)\)/.test(chatSrc), true);
 }
 
+console.log('■ 로그인 판 — 소셜 로그인도 로그인 상태로 보인다 (2026-11-21 · 개발자 지적 "로그인이 되어도 로그인·회원가입이 뜬다")');
+{
+  /* 구글·애플 로그인은 토큰만 들고 돌아와 사용자 번호가 없다 — 서버에 다시 묻는 요청(authFetchUser)이 실패하면 번호가 빈 채 남아
+     authUser() 가 null → MY 계정 카드(renderAccountCard)가 로그인·회원가입을 그렸다. 토큰(JWT) 안의 sub·email 로 읽는다(supabase-client.js jwtClaims) */
+  const vm = createRequire(import.meta.url)('node:vm');
+  const store = {};
+  const ctx = { localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } },
+    SUPABASE_CONFIG: { url: 'https://x.supabase.co', anonKey: 'k' }, atob, TextDecoder, Uint8Array, console, setTimeout, clearTimeout, location: { hash: '', pathname: '/', search: '' }, navigator: {}, window: {} };
+  vm.createContext(ctx);
+  vm.runInContext(readText(new URL('../supabase-client.js', import.meta.url)), ctx, { filename: 'supabase-client.js' });
+  const b64u = (o) => Buffer.from(JSON.stringify(o)).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const jwt = (p) => `${b64u({ alg: 'HS256' })}.${b64u(p)}.sig`;
+  const put = (o) => ctx.localStorage.setItem('handaejang.auth', JSON.stringify(o));
+  ctx.authStore({ access_token: jwt({ sub: 'u-123', email: '한글@x.kr' }), expires_in: 3600 });
+  const social = ctx.authUser();
+  put({ accessToken: jwt({ sub: 'u-9', email: 'b@x.kr' }), userId: '' });
+  const stuck = ctx.authUser();
+  put({ accessToken: 'not-a-jwt', userId: '' });
+  const broken = ctx.authUser();
+  put({ accessToken: jwt({ sub: 'old' }), userId: 'old', email: 'old@x.kr' });
+  ctx.authStore({ access_token: jwt({ sub: 'new', email: 'new@x.kr' }) });
+  const switched = ctx.authUser();
+  eq('소셜 로그인(사용자 정보 없이 토큰만) — 토큰 안의 번호·메일로 로그인 상태(한글 메일도)', social, { userId: 'u-123', email: '한글@x.kr' });
+  eq('  번호가 빈 채 저장된 기기(이미 그 사고를 겪은 기기)도 다시 로그인하지 않고 로그인 상태로 보인다', stuck, { userId: 'u-9', email: 'b@x.kr' });
+  eq('  토큰 꼴이 아니면 로그인 아님(넘어지지 않는다)', broken, null);
+  eq('  로그아웃 없이 다른 계정으로 로그인하면 새 사람 — 앞사람 번호가 남지 않는다', switched, { userId: 'new', email: 'new@x.kr' });
+  eq('  MY 계정 카드는 authUser() 하나로 로그아웃/로그인을 가른다(다른 판정을 새로 만들지 않는다)', /const u = authUser\(\);\s*el\.innerHTML = u\s*\?[\s\S]{0,200}?id="btn-acc-out"/.test(readText(new URL('../app-account.js', import.meta.url))), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
