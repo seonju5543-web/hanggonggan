@@ -2155,8 +2155,8 @@ function certStatusListHtml(sch) {
     return `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
   }).join('');
   /* doc-check — 줄마다 ✓·□·△ 표식이 있어 목록 점은 뺀다(표식이 두 겹이던 자리 · 2026-10-15 · style.css) */
-  return `<h4>증명서류 체크리스트</h4><ul class="doc-list doc-check">${rows}</ul>
-    <p class="dp-note">보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.</p>`;
+  /* 목록 밑 「보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.」는 2026-11-21 개발자 지시로 지웠다(학생이 읽지 않는 안내 · 서류함 상태는 각 줄이 말한다) */
+  return `<h4>증명서류 체크리스트</h4><ul class="doc-list doc-check">${rows}</ul>`;
 }
 
 function personLine(p) {
@@ -2271,7 +2271,6 @@ function renderDocPrep() {
           </div>`).join('')}
         ${certStatusListHtml(sch)}
         <button class="btn btn-primary btn-lg" id="btn-dp-confirm">이대로 신청 준비 완료</button>
-        <p class="dp-note">완료하면 작성한 서류가 저장되고 최종 제출처가 표시됩니다.</p>
       </div>`;
 
     $$('.dp-text').forEach((ta) =>
