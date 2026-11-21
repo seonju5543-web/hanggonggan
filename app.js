@@ -663,6 +663,15 @@ function refreshProgressViews(id) {
   if (wasOpen) { if (appSch(id)) openDetail(id); else closeSheet(); }   // 결과를 적어 사라진 줄의 시트는 닫는다
 }
 
+/* 알림 글을 머리·설명으로 가른다 — 첫 ` · ` 또는 ` — ` 에서 한 번만.
+   머리가 너무 길면(문장 하나짜리 경고 등) 가르지 않는다: 머리만 굵어져 오히려 무겁다. */
+function toastParts(msg) {
+  const t = String(msg == null ? '' : msg).trim();
+  const m = t.match(/^(.+?)\s+[·—]\s+(.+)$/s);
+  if (!m || m[1].length > 24) return { head: t, sub: '' };
+  return { head: m[1], sub: m[2] };
+}
+
 function toast(msg, action) {
   const el = $('#toast');
   /* 🔴 사라지는 중에 새 알림이 뜨면 **옛 숨김 타이머가 새 알림을 지운다** — 2600ms 타이머만
@@ -670,7 +679,25 @@ function toast(msg, action) {
      (반쯤 뜬 채로 사라진다). 두 타이머를 한자리에서 끈다. */
   clearTimeout(toast._t);
   clearTimeout(toast._h);
-  el.textContent = msg;
+  /* 머리 한 줄 + 설명 한 줄 (2026-11-21 개발자 요청 — "조금 더 프로페셔널하고 깔끔하게").
+     부르는 쪽은 이미 `결과 · 할 일` / `결과 — 할 일` 꼴로 적고 있다. 긴 문장을 가운데 정렬로
+     네댓 줄 쌓으면 무엇이 끝났고 무엇을 하라는지가 섞였다 → 첫 구분자 앞을 굵게, 뒤를 흐리게.
+     부르는 자리(60여 곳)는 손대지 않는다 · 글자는 여전히 textContent 로만 넣는다(태그 해석 없음). */
+  const { head, sub } = toastParts(msg);
+  el.textContent = '';
+  const body = document.createElement('div');
+  body.className = 'toast-body';
+  const h = document.createElement('div');
+  h.className = 'toast-head';
+  h.textContent = head;
+  body.appendChild(h);
+  if (sub) {
+    const d = document.createElement('div');
+    d.className = 'toast-sub';
+    d.textContent = sub;
+    body.appendChild(d);
+  }
+  el.appendChild(body);
   /* 되돌리기처럼 **되살릴 수 있는 실수**는 단추를 함께 준다.
      터치 타깃 44px은 style.css의 .toast-undo가 지킨다. */
   if (action) {

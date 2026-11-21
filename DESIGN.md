@@ -245,11 +245,11 @@ components:
     rounded: "{rounded.hair}"
     height: 73px
   toast:
-    backgroundColor: "{colors.semantic-overlay}"
+    backgroundColor: "{colors.primary}"
     textColor: "{colors.inverse-ink}"
     typography: "{typography.body-sm}"
     rounded: "{rounded.sm}"
-    padding: 8px 16px
+    padding: 14px 14px 14px 16px
   avatar:
     backgroundColor: "{colors.primary}"
     textColor: "#f6f0e2"
@@ -546,7 +546,7 @@ Apple 에서만 받은 것도 있다. **"알약은 고르는 것의 모양"** �
 
 **`mascot-fab`** — 도우미 진입. 56px 원 · `{colors.inverse-canvas}` · 그림자 34%. 끌어서 옮길 수 있다("끌어서 이동 가능" 툴팁). 탭바 바로 위에 떠서 목록 마지막 항목을 가린다(UI-7 · 열려 있음).
 
-**`toast`** — `{colors.semantic-overlay}` 94% · 흰 글자 · `{rounded.sm}` · 8px 16px · 아래에서 올라온다.
+**`toast`** — `{colors.primary}` · 흰 글자 · `{rounded.sm}` · 왼쪽 정렬 판(화면 양옆 16px · 최대 448px) · 굵은 머리 한 줄 + 흐린 설명(첫 ` · `/` — ` 에서 가름 · `toastParts`) · 되돌리기 단추는 오른쪽 끝 놋쇠 글자 · 하단 탭 위(safe-area 포함) · 아래에서 올라온다(2026-11-21).
 
 ## 하는 것 · 하지 않는 것
 
