@@ -87,7 +87,8 @@ async function staffSignUp(email, password) {
 async function staffSignOut() {
   const t = staffLoad();
   staffClear();
-  if (t) sbFetch('/auth/v1/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + t.accessToken } });   // 기다리지 않는다
+  /* scope=local — 이 담당자 세션만 끝낸다. 기본값(global)이면 같은 계정으로 이 폰에 학생 로그인도 해 둔 사람의 학생 세션까지 끊긴다 */
+  if (t) sbFetch('/auth/v1/logout?scope=local', { method: 'POST', headers: { Authorization: 'Bearer ' + t.accessToken } });   // 기다리지 않는다
 }
 
 /* ── 서버 읽기·쓰기 (PostgREST) ─────────────────────────── */

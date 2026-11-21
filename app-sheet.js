@@ -739,6 +739,7 @@ const SWIPE_BACK_TO = {
   faq: 'settings',
   support: 'settings',
   perms: 'settings',
+  postreq: 'home',   // 게시 요청(2026-11-21 · post-request.js) — 홈 그림 칸에서 들어온다
 };
 
 function enableScreenSwipeBack(root) {
