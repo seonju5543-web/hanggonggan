@@ -98,7 +98,7 @@ export function renderHtml(spec) {
   const security = m.security || '사내 한정';
   const headLeft = `url("${logoDataUri(13)}") "  한대장  |  ${cssStr(m.runningTitle || m.title)}"`;
   const pageCss = `@page { size: A4; margin: 20mm 16mm 17mm 16mm;
-    @top-left { content: ${headLeft}; font: 600 7.6pt Pretendard, sans-serif; color: #222c3b; vertical-align: bottom; padding-bottom: 3mm; border-bottom: 0.25mm solid #d9dde4; }
+    @top-left { content: ${headLeft}; font: 600 7.6pt Pretendard, sans-serif; color: #262d38; vertical-align: bottom; padding-bottom: 3mm; border-bottom: 0.25mm solid #d9dde4; }
     @top-right { content: "${cssStr(m.docNo || '')}   ${cssStr(security)}"; font: 600 7.6pt Pretendard, sans-serif; color: #858b96; vertical-align: bottom; padding-bottom: 3mm; border-bottom: 0.25mm solid #d9dde4; }
     @bottom-left { content: "${cssStr(m.footer || `한대장 · ${security} · 외부 공유 금지`)}"; font: 500 7.2pt Pretendard, sans-serif; color: #858b96; vertical-align: top; padding-top: 3mm; border-top: 0.25mm solid #d9dde4; }
     @bottom-right { content: "- " counter(page) " / " counter(pages) " -"; font: 600 7.4pt Pretendard, sans-serif; color: #4a505c; vertical-align: top; padding-top: 3mm; border-top: 0.25mm solid #d9dde4; } }
