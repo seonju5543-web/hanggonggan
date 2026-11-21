@@ -18335,6 +18335,29 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
     [/Mascot\.syncHome\(state\.profile && state\.profile\.school\)/.test(appSource()), /Mascot\.syncApps\(apps\.length > 0 && !calMode\)/.test(appSource())], [true, true]);
 }
 
+console.log('\n■ PDF 보기 — 설치한 앱에서 돌아올 길 (2026-11-21 개발자 제보 — 양식을 열면 뒤로 버튼이 없어 앱을 껐다 켜야 했다)');
+{
+  /* 설치한 앱(standalone)엔 뒤로 버튼이 없다 — 같은 집 PDF(data/…pdf)는 target=_blank 여도 앱 창이 그대로 PDF 로 넘어간다.
+     pdf-view.js 가 그 클릭만 가로채 뒤로 단추가 있는 판에 그린다(아이폰 iframe 은 첫 쪽만 보여 쓰지 않는다 · 엔진 pdfjs/).
+     브라우저에서 연 앱은 새 탭 그대로다(2026-11-20 결정 (가)). 아래 셋 중 하나만 빠져도 다시 갇힌다 */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  const pv = readText(new URL('../pdf-view.js', import.meta.url));
+  eq('  pdf-view.js 를 index.html 이 싣고 서비스워커가 담는다 · 엔진 두 파일이 저장소에 있다 · index.html 은 엔진을 직접 싣지 않는다(처음 열 때 싣는다)',
+    [/<script src="pdf-view\.js"><\/script>/.test(html), sw.includes("'pdf-view.js'"),
+      fs.existsSync(new URL('../pdfjs/pdf.min.mjs', import.meta.url)), fs.existsSync(new URL('../pdfjs/pdf.worker.min.mjs', import.meta.url)), /src="pdfjs\//.test(html)],
+    [true, true, true, true, false]);
+  eq('  엔진 주소가 실제 파일 이름과 같다 (틀리면 판이 「열지 못했어요」만 띄운다)',
+    [pv.includes("const PDFV_LIB = 'pdfjs/pdf.min.mjs'"), pv.includes("const PDFV_WORKER = 'pdfjs/pdf.worker.min.mjs'")], [true, true]);
+  eq('  가로채는 조건 = 설치한 앱 + 같은 집 .pdf — 브라우저는 새 탭 그대로 · 바깥 PDF 는 폰이 「완료」 있는 창으로 연다',
+    [/!pdfvStandalone\(\) \|\| !pdfvOwnPdf\(/.test(pv), /navigator\.standalone === true/.test(pv), /display-mode: standalone/.test(pv), /u\.origin === location\.origin && \/\\\.pdf\$\/i\.test\(u\.pathname\)/.test(pv)],
+    [true, true, true, true]);
+  eq('  판에 뒤로(닫기) 단추가 있고 닫기가 판을 감춘다', [/class="sub-back pdfv-close" aria-label="닫기"/.test(pv), /querySelector\('\.pdfv-close'\)\.addEventListener\('click', closePdfView\)/.test(pv), /el\.hidden = true/.test(pv)], [true, true, true]);
+  eq('  🔴 iframe·embed 로 PDF 를 넣지 않는다 (아이폰은 첫 쪽만 그림처럼 보인다 · 주석은 빼고 본다)', /<iframe|<embed|<object/.test(pv.replace(/\/\*[\s\S]*?\*\//g, '')), false);
+  eq('  PDF 줄(pdfRowHtml)은 지금도 같은 집 data/ 주소를 건다 — 바뀌면 이 관문의 전제를 다시 본다',
+    ['data/forms-pdf/', 'data/docs-pdf/', 'data/form-pages/'].filter((d) => !readText(new URL('../app-live.js', import.meta.url)).includes('`' + d)), []);
+}
+
 console.log('\n■ 대장님 말귀 — 오타·변형 알아듣기 · 공고 한 건의 칸 (2026-11-20 개발자 지시)');
 {
   /* 개발자 지시: "입력된 값을 1000-10000개 수준으로 늘려서 … 오타를 내거나 같은 의미에서 변형된 말을 해도 알아듣고 …

@@ -5389,3 +5389,20 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
 .has-mascot > .apps-summary .summary-label { color: var(--text-sub); opacity: 1; }
 .has-mascot > .apps-summary .summary-amount { color: var(--text); }
 #mascot-apps .mascot-stage { height: 220px; }
+/* PDF 보기 (2026-11-21 · pdf-view.js) — 설치한 앱에서 앱 안 PDF 를 열 때만 뜬다. 맨 위 뒤로 단추가 돌아올 길이다(시트 위 · 부팅 화면 아래).
+   🔴 이 판 안쪽만 굴러간다(.pdfv-scroll) — 문서는 굴러가지 않는다 규칙 그대로 */
+.pdfv { position: fixed; inset: 0; z-index: 150; display: flex; flex-direction: column; background: var(--bg); }
+.pdfv[hidden] { display: none !important; }
+.pdfv-bar { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: calc(env(safe-area-inset-top) + var(--space-8)) var(--space-16) var(--space-8); background: var(--surface); border-bottom: 1px solid var(--line); }
+.pdfv-bar .sub-back { margin-left: calc(var(--space-8) * -1); }
+.pdfv-title { flex: 1; min-width: 0; margin: 0; display: flex; flex-direction: column; }
+.pdfv-name { font-size: var(--t-md); font-weight: 700; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pdfv-pages { font-size: var(--t-xs); color: var(--text-sub); }
+.pdfv-share { flex: none; font-size: var(--t-sm); font-weight: 700; color: var(--accent); padding: var(--space-8); }
+.pdfv-scroll { flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: var(--space-12) var(--space-12) calc(env(safe-area-inset-bottom) + 72px); }
+.pdfv-doc { min-width: 100%; margin: 0 auto; }
+.pdfv-page { width: 100%; background: var(--surface); border: 1px solid var(--line); margin-bottom: var(--space-12); }
+.pdfv-page canvas { display: block; width: 100%; height: 100%; }
+.pdfv-msg { margin: var(--space-24) 0; text-align: center; font-size: var(--t-sm); color: var(--text-sub); }
+.pdfv-zoom { position: absolute; right: var(--space-16); bottom: calc(env(safe-area-inset-bottom) + var(--space-16)); display: flex; gap: var(--space-8); }
+.pdfv-zoom button { width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--surface); border: 1px solid var(--line); font-size: var(--t-lg); font-weight: 700; color: var(--text); }
