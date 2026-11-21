@@ -9641,9 +9641,8 @@ console.log('\n■ 화면이 「전국 모든 대학」을 약속하지 않는�
   const strip = (t) => t.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
   eq('화면 문구에 「전국 모든 대학」이 없다', /전국\s*모든\s*대학/.test(strip(html) + strip(app)), false);
   eq('  MY 아래줄이 「전국 대학 지원」이라고 하지 않는다', /전국 대학 지원/.test(strip(app)), false);
-  /* 🔴 숫자를 손으로 적지 않는다 — 학교가 늘면 저절로 맞아야 한다(데이터가 세어 말한다) */
-  eq('  대신 데이터에서 센다 (교내 학교 수 · 층2 재단 수)',
-    /schoolOnly\)\.filter\(Boolean\)/.test(app) && /kosafList\.length/.test(app), true);
+  /* 2026-11-21 개발자 지시 — 데이터가 센 숫자(「교내 공고 n개교 · 한국장학재단 n곳」)도 학생이 읽지 않는 앱 자랑이라 지웠다. 판 번호만 */
+  eq('  MY 아래줄은 판 번호뿐 (숫자 자랑 없음 · 2026-11-21)', /ver\.textContent = `한대장 \$\{APP_VERSION\}`;/.test(app) && !/교내 공고 \$\{inSchools/.test(app), true);
 }
 
 /* ══ 시작 화면 — 승인받은 컷 A 그대로인가 (2026-09-18 · 노션 UI-3) ═══════════
@@ -10914,7 +10913,8 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const appN = appSource();
     const robotN = readText(new URL('../collector/collect-news-desc.mjs', import.meta.url));
     eq('  앱 — 요약이 있는 글만 요약 줄을 그린다 (홈 띠 · 전체 보기 카드)', [/\$\{n\.desc \? `<span class="news-tile-desc">/.test(appN), /\$\{o\.desc \? `<p class="sch-desc">/.test(appN), /desc: n\.desc \}\)/.test(appN)], [true, true, true]);
-    eq('  앱 — 「오늘 n」 은 부를 때마다 오늘을 읽는다 (todayStart · 날짜를 굳히지 않는다)', /function newsIsToday[\s\S]{0,300}todayStart\(\)/.test(appN), true);
+    /* 「오늘 n」 알약은 2026-11-21 개발자 지시로 없앴다('AI 티 · 학생이 안 읽는 글자') — 되살아나지 않는가 */
+    eq('  앱 — 우리 학교 소식 제목 옆 「오늘 n」 알약이 없다 (2026-11-21)', /news-today|오늘 \$\{todayN\}/.test(appN), false);
     eqWf('  워크플로 — 요약 단계는 보강(continue-on-error) · 장부를 저장하고 감사 실패 땐 되돌린다',
       [/collect-news-desc\.mjs/.test(wf), /name: 교내 소식 요약[\s\S]{0,120}continue-on-error: true/.test(wf),
         /git add collector\/news-desc\.json/.test(wf), /git checkout -- collector\/news-desc\.json/.test(wf)], [true, true, true, true]);
@@ -14323,6 +14323,62 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  지원 가능 알약(STATUS_META)은 활동 시트에 없다 — 구조화 조건이 없어 늘 가능이라 거짓 안심', /STATUS_META\[/.test((() => { const a = appX.indexOf('function openActivityDetail'); return appX.slice(a, appX.indexOf('\nfunction ', a + 10)); })()), false);
 }
 
+/* ══ 승인받은 화면 그대로인가 — 앱 안 알림 시안 C「흰 카드」 (2026-11-21 · docs/designs/mockups/toast-options.png) ══
+   개발자가 시안 5종(A 진한 판 · B 진한 판+아이콘 · C 흰 카드 · D 위쪽 배너 · E 알약) 중 "C로 진행하자".
+   흰 바탕 · 얇은 테두리 · 왼쪽 동그란 아이콘 · 굵은 머리 + 회색 설명 · 되돌리기는 오른쪽 놋쇠 글자.
+   🔴 검사만 고쳐 통과시키지 말 것 — 화면을 바꾸려면 개발자에게 다시 보여 주고 승인받은 뒤 여기도 같이(스킬 approved-design). */
+{
+  console.log('\n■ 승인받은 화면 그대로인가 — 앱 안 알림 시안 C (2026-11-21)');
+  const appT = appSource();
+  const cssT = readText(new URL('../style.css', import.meta.url));
+  const rule = (sel) => { const a = cssT.indexOf(`\n${sel} {`); return a < 0 ? '' : cssT.slice(a, cssT.indexOf('}', a)); };
+  const box = rule('.toast');
+  eq('알림 판은 흰 바탕(--surface) · 잉크 글자 · 얇은 테두리(--rule) · 떠 있는 그림자(--shadow-lift)',
+    [/background: var\(--surface\)/.test(box), /color: var\(--text\)/.test(box), /border: 1px solid var\(--rule\)/.test(box), /box-shadow: var\(--shadow-lift\)/.test(box)], [true, true, true, true]);
+  eq('  왼쪽 정렬 · 화면 양옆 16px · 하단 탭 위(safe-area 포함)',
+    [/text-align: left/.test(box), /width: calc\(100% - 32px\)/.test(box), /bottom: calc\(74px \+ env\(safe-area-inset-bottom\)\)/.test(box)], [true, true, true]);
+  eq('  설명 줄은 회색(--text-sub) · 되돌리기는 강조색(--accent)',
+    [/color: var\(--text-sub\)/.test(rule('.toast-sub')), /color: var\(--accent\)/.test(rule('#toast .toast-undo'))], [true, true]);
+  eq('  아이콘은 24px 원 · 됐다=연초록 체크 · 안 됐다=연붉은 느낌표 · 안내=회색',
+    [/width: 24px; height: 24px; border-radius: 50%/.test(rule('.toast-ico')), /background: var\(--green-weak\); color: var\(--green\)/.test(rule('.toast-ico')),
+     /background: var\(--red-weak\); color: var\(--red\)/.test(rule('.toast-ico[data-tone="warn"]')), /background: var\(--surface-2\); color: var\(--text-sub\)/.test(rule('.toast-ico[data-tone="info"]'))],
+    [true, true, true, true]);
+  /* 판은 손가락을 통과시키고 단추만 받는다 — 넓은 판이 2.6초 동안 도우미 버튼을 삼키지 않게 */
+  eq('  알림 판은 누름을 통과시키고 되돌리기 단추만 받는다',
+    [/pointer-events: none/.test(box), /pointer-events: auto/.test(rule('#toast .toast-undo'))], [true, true]);
+  /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
+  const cut = appT.slice(appT.indexOf('const TOAST_WARN'), appT.indexOf('const TOAST_ICONS'));
+  const partsAt = appT.indexOf('function toastParts(');
+  const partsSrc = appT.slice(partsAt, appT.indexOf('\n}\n', partsAt) + 2);
+  const T = new Function(`${cut}\n${partsSrc}\nreturn { toastTone, toastParts };`)();
+  eq('머리·설명은 첫 「 · 」·「 — 」에서 한 번만 가른다 · 앞이 길면 가르지 않는다',
+    [T.toastParts('지원문서 작성 완료 · 내용을 옮겨 제출하세요 · 끝').sub, T.toastParts('비밀번호 변경 완료').sub, T.toastParts('저장돼 있던 평점·태어난 해 값이 범위를 벗어나 비웠어요 — 내 정보에서 다시 적어 주세요').sub],
+    ['내용을 옮겨 제출하세요 · 끝', '', '']);
+  /* 🔴 실패 알림에 체크를 달면 '안 됐는데 됐다'가 된다 — 실패 낱말이 섞이면 완료 낱말보다 먼저 본다 */
+  eq('  안 된 일은 느낌표 · 된 일은 체크 · 나머지는 안내',
+    ['서류를 지우지 못했어요 · 서류 보관함에서 직접 지워 주세요', '복사 실패', '팝업이 차단됐습니다. 브라우저 설정을 확인해 주세요', '학교명 입력 필요',
+     '지원문서 작성 완료 · 내용을 옮겨 제출하세요', '저장을 해제했어요', '3건 삭제', '알림을 켰습니다. 새 공고와 마감을 알립니다',
+     '새 알림 2건', '알림은 MY 화면에서 언제든 켜기 가능'].map(T.toastTone),
+    ['warn', 'warn', 'warn', 'warn', 'done', 'done', 'done', 'done', 'info', 'info']);
+  /* 🔴 실제 실패 문구가 체크로 새지 않는다 — 서버 오류(authErrorText)·입력 막음(input-guard·GUARD_KIND_MSG)·초안 거절(essay.js).
+     '문제가 생겼어요'는 끝난 말꼴이라 한때 초록 체크였다: 서버 정보 삭제 실패가 '됐다'로 보였다(리뷰 2026-11-21) */
+  eq('  서버 오류·입력 막음·초안 거절은 체크가 아니다(느낌표)',
+    ['문제가 생겼어요 (Internal error)', '문제가 생겼어요. 잠시 후 다시 시도해 주세요', '인터넷 연결을 확인해 주세요', '이메일 또는 비밀번호가 맞지 않아요',
+     '로그인 상태가 아니에요', '학번은 숫자·영문만 적을 수 있어요', '생년월일은 2005.03.14 처럼 적어 주세요', '있을 수 없는 생년월일이에요 — 다시 확인해 주세요',
+     '민감정보가 섞여 있어 보내지 않았어요 — 그 부분은 직접 써 주세요', '로그인이 끝났어요. 다시 로그인해 주세요', '재료에 없는 사실: "수상"'].map(T.toastTone),
+    Array(11).fill('warn'));
+  const sbSrc = readText(new URL('../supabase-client.js', import.meta.url));
+  const aeAt = sbSrc.indexOf('function authErrorText(');
+  const authMsgs = [...sbSrc.slice(aeAt, sbSrc.indexOf('\n}\n', aeAt)).matchAll(/return [`']([^`']+)[`']/g)].map((m) => m[1].replace(/\$\{m\}/, 'x'));
+  eq('  authErrorText 가 내는 문구는 하나도 체크가 아니다(전수)', authMsgs.length >= 6 && authMsgs.filter((m) => T.toastTone(m) === 'done'), []);
+  const toastAt = appT.indexOf('function toast(msg');
+  const toastFn = appT.slice(toastAt, appT.indexOf('\nfunction ', toastAt + 10));
+  eq('  toast() 가 실제로 성격을 가려 그 아이콘을 단다(함수만 있고 안 쓰이는 일이 없다)',
+    [/const tone = toastTone\(msg\);/.test(toastFn), /dataset\.tone = tone/.test(toastFn), /TOAST_ICONS\[tone\]/.test(toastFn), /toastParts\(msg\)/.test(toastFn)], [true, true, true, true]);
+  eq('  알림 글은 textContent 로만 넣는다(그림만 고정 글자)',
+    [/h\.textContent = head;/.test(toastFn), /d\.textContent = sub;/.test(toastFn), /innerHTML = [^;]*\b(msg|head|sub)\b/.test(toastFn)], [true, true, false]);
+}
+
 /* ══ 승인받은 화면 그대로인가 — 목록 카드 시안 B · 상세 시트 한 벌 (2026-11-02 · docs/designs/mockups/card-consistency.html 「시안 B」 · sheet-consistency.html) ══
    개발자 결정(같은 날 "제안대로"): 마감 D-day 는 카드 아랫줄 오른쪽 그대로 · 적합도 알약은 윗줄 칩·주최 옆 그대로.
    🔴 검사만 고쳐 통과시키지 말 것 — 화면을 바꾸려면 개발자에게 다시 보여 주고 승인받은 뒤 여기도 같이 고친다(스킬 approved-design). */
@@ -14371,7 +14427,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   /* 2026-11-07 개발자 지시 "지원자격에 넣을 내용이 없는 경우에는 지원자격 칸 자체를 없애기" — 11-02 의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다. 되돌리면 빨갛다 */
   eq('  자격 0줄이고 물을 것도 없으면 「지원 자격」 칸 자체가 없다(「원문에서 확인」 자리표시 줄 없음 · 2026-11-07) · 제외 조건은 같은 목록 안 ✗(r-x)',
     [/const elig = \(rows \|\| ask\) \? `<div class="sheet-verdict">/.test(sec), /자격은 원문에서 확인해 주세요/.test(sec), /class="r-elig r-x">✗ /.test(fnOf('eligibilityRowsHtml')), /지원 제외 대상/.test(fnOf('eligibilityRowsHtml'))], [true, false, true, false]);
-  eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period, true\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /재단 선발 공고문·홈페이지가 정한 접수 방법/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, true]);
+  eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period, true\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /'재단 선발 공고문·홈페이지가 정한 접수 방법'/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, false]);   // 마지막: 아무것도 알려 주지 않는 층2 「방법」 줄은 2026-11-21 개발자 지시로 지웠다
   /* 2026-11-15 은서 지시 — 「더 보기」 뒤 줄 수(「(2줄)」)는 뺀다 · 시트 목록 앞 점도 뺀다(style.css #detail-sheet 블록) */
   eq('  「공고 안내」 는 다섯 줄 뒤 「더 보기」(줄 수 없이) · 층2 재단 칸(선발방법·선발인원·추천필요여부)도 같은 줄로', [/NS_SHOWN/.test(fnOf('noticeSummaryHtml')), /<summary>더 보기<\/summary>/.test(fnOf('noticeSummaryHtml')) && !/더 보기 \(/.test(fnOf('noticeSummaryHtml')), /\['선발방법', '선발인원', '추천필요여부'\]/.test(fnOf('kosafAsScholarships'))], [true, true, true]);
   eq('  「첨부」 — 층2는 꼬리표 「재단 선발 공고문」 · 「공고 원본 첨부 양식」 이름은 없다', [/<h4>첨부\$\{sch\.sourceKind === 'kosaf' \? ' <span class="channel-tag">재단 선발 공고문<\/span>' : ''\}<\/h4>/.test(sec), /공고 원본 첨부 양식|공고 원본 첨부</.test(appV)], [true, false]);

@@ -147,7 +147,7 @@ function activityGateShow(on) {
   $('#activities-gate').hidden = !on;
   $('#act-gate-bar').hidden = on;
   ['#screen-activities .search-box', '#activities-filters', '#activities-field-filters', '#activities-list',
-    '#screen-activities .data-note', '#screen-activities .sort-wrap'].forEach((sel) => { const el = $(sel); if (el) el.hidden = on; });
+    '#screen-activities .sort-wrap'].forEach((sel) => { const el = $(sel); if (el) el.hidden = on; });
   if (!on) {
     const p = state.profile || {};
     const n = (p.interestFields || []).length;
