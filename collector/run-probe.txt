@@ -7,6 +7,10 @@
 #    같은 줄을 다시 보려면 그 줄을 지웠다 다시 넣어 push 하거나, Actions 에서 수동 실행(전부 연다).
 #    답을 받은 줄은 '# (답 받음 날짜 · 근거) ' 를 앞에 붙여 막는다(수동 실행에서도 안 열리게).
 
+# 2026-11-21 (Apple 로그인) — Supabase 에 Apple 을 켠 뒤 로그인 시작 주소가 애플 로그인 화면(appleid.apple.com)으로 가는지 본다.
+#   invalid_client·invalid_request 면 Services ID·반환 주소·비밀 키 중 하나가 어긋난 것 — 버튼은 이 답을 보고 붙인다.
+checkUrl: https://ffnzmiorcojbhpqwqgcy.supabase.co/auth/v1/authorize?provider=apple&redirect_to=https%3A%2F%2Fseonju5543-web.github.io%2Fhanggonggan%2F
+
 # 2026-10-30 (카드 채움 작업) — 마감 전인데 원문 본문을 못 받는 등록 공고 둘. 자격·마감이 '원문 확인'으로만 떠 있다(원인 단정 금지 — 답을 보고 고친다).
 #   서울과기대 푸른등대(~11/12): 수집기 fetch 가 FETCH_ERROR TypeError 로 끝난다 — 열리는 화면·리다이렉트·인증서를 본다.
 #   경기대 장학사정관장학금(11월): 받은 글자가 사이트 메뉴뿐(통합 공지사항 껍데기) — 본문이 어느 요청(프레임·스크립트·API)으로 오는지 본다.
