@@ -672,6 +672,23 @@ function toastParts(msg) {
   return { head: m[1], sub: m[2] };
 }
 
+/* 알림의 성격 — 아이콘을 고른다(승인 시안 C · 2026-11-21).
+   안 된 일(실패·차단·막음)을 먼저 본다: '서류를 지우지 못했어요' 처럼 '지웠'·'완료'류 낱말이 섞여도 실패다.
+   된 일은 끝난 말꼴(완료·했어요·했습니다…)로만 · 둘 다 아니면 안내(새 알림 n건 · 켜기 가능 등). */
+const TOAST_WARN = /실패|미지원|못\s?[가-힣]|차단|벗어나|사이만|이하 (파일|사진)|이미 다른|필요$|^먼저|골라 주세요|읽을 수 없|찾지 못/;
+const TOAST_DONE = /완료|[했됐웠겼렸왔켰] ?(어요|습니다)|해제했|저장했|기록했|되살|불러왔|^로그아웃|\d+건 삭제/;
+function toastTone(msg) {
+  const t = String(msg == null ? '' : msg);
+  if (TOAST_WARN.test(t)) return 'warn';
+  if (TOAST_DONE.test(t)) return 'done';
+  return 'info';
+}
+const TOAST_ICONS = {
+  done: '<path d="M5 12.5l4.2 4.2L19 7"/>',
+  warn: '<path d="M12 6.5v7"/><path d="M12 17.6v.01"/>',
+  info: '<path d="M12 11v6.5"/><path d="M12 6.6v.01"/>',
+};
+
 function toast(msg, action) {
   const el = $('#toast');
   /* 🔴 사라지는 중에 새 알림이 뜨면 **옛 숨김 타이머가 새 알림을 지운다** — 2600ms 타이머만
@@ -685,6 +702,14 @@ function toast(msg, action) {
      부르는 자리(60여 곳)는 손대지 않는다 · 글자는 여전히 textContent 로만 넣는다(태그 해석 없음). */
   const { head, sub } = toastParts(msg);
   el.textContent = '';
+  const tone = toastTone(msg);
+  const ico = document.createElement('span');
+  ico.className = 'toast-ico';
+  ico.dataset.tone = tone;
+  ico.setAttribute('aria-hidden', 'true');
+  /* 고정된 그림 글자만 넣는다(알림 글은 아래에서 textContent 로) */
+  ico.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${TOAST_ICONS[tone]}</svg>`;
+  el.appendChild(ico);
   const body = document.createElement('div');
   body.className = 'toast-body';
   const h = document.createElement('div');
