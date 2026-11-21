@@ -56,6 +56,42 @@
     "role": "unknown",
     "evidence": "「전체 성적이 나오도록 본 화면을 캡쳐 후 증빙자료로 제출」 — 토익 성적확인/성적표발급 화면 캡처 예시일 뿐, 학생이 채우는 신청 서식도 아니고 지원자격·신청기간 등을 안내하는 공고문도 아님"
    }
+  },
+  "auto-amepagescholarshipnotice-0d1tyil|(첨부1) DAC List of Aid Recipients - 2025 flows.pdf": {
+   "id": "auto-amepagescholarshipnotice-0d1tyil",
+   "name": "(첨부1) DAC List of Aid Recipients - 2025 flows.pdf",
+   "hash": "a89df16d37946936",
+   "file": "form-1mxo4j-3.pdf",
+   "tries": 0,
+   "done": true,
+   "usd": 0.0311,
+   "at": "2026-11-21",
+   "a": {
+    "role": "unknown",
+    "evidence": "파일은 OECD의 「DAC List of ODA Recipients | Effective for reporting on 2025 flows」 국가 목록입니다. 장학금 공고문(지원자격·신청기간 안내)이나 신청 서식이 아니라 참고 자료이므로 unknown으로 판단했습니다."
+   },
+   "b": {
+    "role": "unknown",
+    "evidence": "「DAC List of ODA Recipients | Effective for reporting on 2025 flows」 — OECD가 만든 ODA 수원국 목록(국가 분류표)으로, 신청서 빈칸이나 서명란도 없고 지원자격·신청기간 같은 안내도 없어 공고문인지 서식인지 판단할 수 없는 참고자료입니다."
+   }
+  },
+  "auto-amepagescholarshipnotice-0d1tyil|첨부1. DAC List of Aid Recipients - 2025 flows.pdf": {
+   "id": "auto-amepagescholarshipnotice-0d1tyil",
+   "name": "첨부1. DAC List of Aid Recipients - 2025 flows.pdf",
+   "hash": "a89df16d37946936",
+   "file": "form-1mxo4j-5.pdf",
+   "tries": 0,
+   "done": true,
+   "usd": 0.0309,
+   "at": "2026-11-21",
+   "a": {
+    "role": "unknown",
+    "evidence": "「DAC List of ODA Recipients | Effective for reporting on 2025 flows」 — OECD의 ODA 수혜국 목록으로, 장학금 공고문이나 신청 서식이 아닌 참고자료임"
+   },
+   "b": {
+    "role": "unknown",
+    "evidence": "「DAC List of ODA Recipients | Effective for reporting on 2025 flows」 — OECD가 만든 ODA 수원국 분류표(국가 목록)로, 신청 빈칸·서명란도 없고 지원자격·신청기간 같은 공고 안내도 없어 서식인지 공고문인지 확신할 수 없음. 공고의 지원자격 참고용 자료로 보이나 파일 자체에는 장학금 내용이 없음."
+   }
   }
  }
 }
