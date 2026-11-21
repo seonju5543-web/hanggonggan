@@ -244,6 +244,19 @@ const HERO_TILES = [
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 5h14v7a7 7 0 01-14 0z" fill="#f1b03b"/><path d="M9 7.5H5.5a4 4 0 004 5M23 7.5h3.5a4 4 0 01-4 5" fill="none" stroke="#d9952a" stroke-width="2" stroke-linecap="round"/><rect x="14" y="18" width="4" height="5" fill="#d9952a"/><rect x="9.5" y="23" width="13" height="5" rx="1.5" fill="#7a5cc4"/><path d="M16 8.2l1.1 2.2 2.4.3-1.8 1.7.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.7 2.4-.3z" fill="#fff"/></svg>' },
   { go: 'applications', name: '신청 내역', tone: 'gold',
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="19" height="25" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M9 9h11M9 13.5h11M9 18h7" stroke="#9db2d8" stroke-width="2" stroke-linecap="round"/><g transform="rotate(38 22 19)"><rect x="19.5" y="7" width="5" height="17" rx="1" fill="#f1b03b"/><rect x="19.5" y="7" width="5" height="3" fill="#e98c9b"/><path d="M19.5 24h5L22 28.5z" fill="#f2d7ae"/><path d="M21.3 27.1h1.4L22 28.5z" fill="#33231f"/></g></svg>' },
+  /* 아래 다섯 칸 (2026-11-21 개발자 지시 "게시요청 탭, 학교 홈 탭(학교 홈페이지 연결), 종정시 탭, e class 탭, 도서관 탭을 추가").
+     게시 요청 = 기관 담당자 화면(post-request.js · 담당자 로그인 따로) · 나머지 넷 = 그 학교 사이트를 새 탭으로(school-links.js 표 · 확인한 주소만).
+     🔴 주소가 없는 학교는 그 칸을 **안 그린다**(renderHome) — 지어낸 주소로 보내지 않는다 · 로그인은 학생이 그 사이트에서 직접 한다(운영 원칙 9). */
+  { go: 'postreq', name: '게시 요청', tone: 'violet',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="4" width="18" height="24" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M9 10h10M9 14.5h10M9 19h6" stroke="#b9a9e0" stroke-width="2" stroke-linecap="round"/><circle cx="23.5" cy="23.5" r="6" fill="#7a5cc4"/><path d="M23.5 20.5v6M20.5 23.5h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>' },
+  { go: 'link:home', name: '학교 홈', tone: 'green', link: 'home',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 15L16 5l12 10" fill="none" stroke="#c4553f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13.5V27h18V13.5L16 6z" fill="#f1c56c"/><rect x="13" y="19" width="6" height="8" rx="1" fill="#8a5a2b"/><circle cx="16" cy="13.5" r="2.2" fill="#fff"/></svg>' },
+  { go: 'link:portal', name: '종정시', tone: 'navy', link: 'portal',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3.5" y="6" width="25" height="17" rx="2.5" fill="#55709f"/><rect x="6" y="8.5" width="20" height="12" rx="1" fill="#e9eef7"/><path d="M9 12h8M9 15.5h12M9 18h5" stroke="#6f87ba" stroke-width="1.6" stroke-linecap="round"/><path d="M12 27h8M16 23v4" stroke="#3f5788" stroke-width="2.2" stroke-linecap="round"/></svg>' },
+  { go: 'link:eclass', name: 'e-class', tone: 'orange', link: 'eclass',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 6L2.5 12.5 16 19l13.5-6.5z" fill="#f08a3c"/><path d="M8 15.5v6c0 2 3.6 3.8 8 3.8s8-1.8 8-3.8v-6L16 19z" fill="#c4651f"/><path d="M27 13.5v7" stroke="#8a4a1f" stroke-width="1.8" stroke-linecap="round"/><circle cx="27" cy="21.5" r="1.6" fill="#f1c56c"/></svg>' },
+  { go: 'link:library', name: '도서관', tone: 'red', link: 'library',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="6" width="5" height="21" rx="1" fill="#dd5d4b"/><rect x="10" y="9" width="5" height="18" rx="1" fill="#f1c56c"/><rect x="16" y="6" width="5" height="21" rx="1" fill="#6f87ba"/><path d="M22.5 9.5l4.6-1.2 4 17.2-4.6 1.2z" fill="#7a5cc4" transform="translate(-2 0)"/><path d="M3 27.5h26" stroke="#5a2a22" stroke-width="2" stroke-linecap="round"/></svg>' },
 ];
 function loadTuition() {
   return fetch('data/tuition.json', { cache: 'no-store' })

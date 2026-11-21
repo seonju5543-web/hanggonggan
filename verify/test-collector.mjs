@@ -1865,7 +1865,7 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
   eq('  빈칸을 찾은 파일에만 단추 — 없으면 자리를 숨긴다(칸을 지어내지 않는다)', /if \(!e\) \{ slot\.hidden = true; continue; \}/.test(ff), true);
   eq('  학적정보 자동 채움은 프로필 칸에서만 · 없는 key 는 빈 글자', /case 'studentId': return c\.studentId \|\| '';/.test(ff) && /default: return '';/.test(ff), true);
   eq('  칸은 쪽 크기에 대한 % 로 놓인다 · 글자 크기는 --ffpt(쪽마다 계산)', /ffPct\(f\.x, pg\.w\)/.test(ff) && /setProperty\('--ffpt'/.test(ff) && /--ffpt: 1px;/.test(css) && /calc\(var\(--ffpt\) \* 9\.5\)/.test(css), true);
-  eq('  화면이 showScreen 목록·안쪽 화면 목록에 있고 아래 탭을 숨긴다', /'perms', 'formfill'\]\.forEach/.test(app) && /'perms', 'formfill'\];/.test(app) && /name === 'onboarding' \|\| name === 'formfill'/.test(app), true);
+  eq('  화면이 showScreen 목록·안쪽 화면 목록에 있고 아래 탭을 숨긴다', /'perms', 'formfill'(, 'postreq')?\]\.forEach/.test(app) && /'perms', 'formfill'(, 'postreq')?\];/.test(app) && /name === 'onboarding' \|\| name === 'formfill'/.test(app), true);
   eq('  index.html 에 화면 틀이 있고 formfill.js 를 app.js 뒤에 싣는다 · 서비스워커가 미리 담는다',
     [/id="screen-formfill"/.test(html), html.indexOf('src="app.js"') < html.indexOf('src="formfill.js"'), /'formfill\.js'/.test(sw)], [true, true, true]);
   eq('  인쇄 CSS 는 쪽 그림만 남기고 쪽마다 넘긴다 (결정 4) · 화면 글자에 「신청 완료」가 없다(주석은 뺀다)',
@@ -10947,9 +10947,14 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const tiles = appSrc2.slice(appSrc2.indexOf('const HERO_TILES = ['), appSrc2.indexOf('];', appSrc2.indexOf('const HERO_TILES = [')));
     const gos = [...tiles.matchAll(/go: '([^']+)'/g)].map((m) => m[1]);
     /* 2026-10-10 팀 업무 분장 4번(은서) — 대외활동·공모전 칸을 더해 여섯 칸 · 칸은 작게 */
-    eq('히어로 그림 칸은 여섯 — 마감 임박 · 교내 · 교외 · 대외활동 · 공모전 · 신청 내역', gos, ['deadline', '교내', '교외', '대외활동', '공모전', 'applications']);
+    /* 2026-11-21 개발자 지시 — 게시 요청 · 학교 홈 · 종정시 · e-class · 도서관 다섯 칸을 더했다(학교 바로가기 넷은 주소를 확인한 학교만 그린다 · school-links.js) */
+    eq('히어로 그림 칸은 열하나 — 마감 임박 · 교내 · 교외 · 대외활동 · 공모전 · 신청 내역 · 게시 요청 · 학교 홈 · 종정시 · e-class · 도서관', gos,
+      ['deadline', '교내', '교외', '대외활동', '공모전', 'applications', 'postreq', 'link:home', 'link:portal', 'link:eclass', 'link:library']);
     eq('  그림은 SVG 다 (이모지 아님 — 폰마다 그림이 달라지지 않게)',
-      (tiles.match(/svg: '<svg /g) || []).length, 6);
+      (tiles.match(/svg: '<svg /g) || []).length, 11);
+    eq('  학교 바로가기 칸은 주소가 있는 학교만 그린다 (지어낸 주소로 보내지 않는다) · 새 탭으로 연다',
+      /HERO_TILES\.filter\(\(t\) => !t\.link \|\| \(typeof schoolLinkFor === 'function' && schoolLinkFor\(state\.profile, t\.link\)\)\)/.test(appSrc2)
+      && /go\.startsWith\('link:'\)[\s\S]{0,300}window\.open\(url, '_blank', 'noopener'\)/.test(appSrc2), true);
     eq('  대외활동·공모전 칸은 그 종류 칩을 켠 채 대외활동 화면을 연다',
       /go === '대외활동' \|\| go === '공모전'[\s\S]{0,400}activitiesFilter = go;[\s\S]{0,300}showScreen\('activities'\)/.test(appSrc2), true);
     eq('  활동 목록이 아직 안 왔으면 0 이 아니라 배지를 숨긴다 (모름 ≠ 없음)',

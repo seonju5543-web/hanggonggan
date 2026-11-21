@@ -70,7 +70,7 @@ function htmlTexts(src) {
 const SCREEN_FILES = ['app.js', 'app-account.js', 'app-activities.js', 'app-prep.js', 'app-events.js', 'app-mascot.js', 'app-live.js', 'app-sheet.js', 'app-my.js', 'app-applications.js', 'app-onboarding.js', 'index.html', 'match-engine.js', 'source-link.js', 'data.js', 'apply-channel.js', 'forms.js', 'form-plan.js',
   'notify-rules.js', 'notify.js', 'parse-amount.js', 'parse-requirements.js', 'section-head.js', 'formfill.js', 'essay.js', 'essay-ask.js', 'essay-quality.js',
   'essay-submit-check.js', 'chat.js', 'chat-kb.js', 'chat-nlu.js', 'resume.js', 'boot.js', 'sw.js', 'interactions.js', 'elig-ask.js', 'input-guard.js', 'major-track.js', 'about.js', 'supabase-client.js',
-  'error-report.js', 'usage-report.js', 'terms.html'];
+  'error-report.js', 'usage-report.js', 'post-request.js', 'school-links.js', 'terms.html'];
 
 /* 파일 하나 훑기 → [{ file, line, word, text }] — allow 는 { 'app.js:낱말:글자 일부': '까닭' } 꼴이 아니라 [{ file, has, why, exact? }]
    exact 는 문자열 **전체**가 has 와 같을 때만 넘긴다(짧은 낱말 하나를 has 로 두면 그 파일의 같은 낱말이 전부 풀리므로) */

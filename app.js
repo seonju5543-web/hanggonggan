@@ -1299,13 +1299,13 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, appScroller().scrollTop);
   }
-  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms', 'formfill'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms', 'formfill', 'postreq'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding' || name === 'formfill';   // 양식 채우기는 쪽 그림이 화면을 다 써야 한다(formfill.js)
   /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
-  const navOn = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : (name === 'formfill' ? 'applications' : name);
+  const navOn = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : (name === 'formfill' ? 'applications' : name === 'postreq' ? 'home' : name);
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
 
   /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
@@ -1314,7 +1314,7 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  const SUB = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms', 'formfill'];
+  const SUB = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms', 'formfill', 'postreq'];
   /* 🔴 안쪽 화면에서는 **가로 손짓이 우리 것**이라고 앱 전체에 표시해 둔다 (2026-09-12).
      짧은 화면 아래 빈 자리는 화면이 아니라 `#app` 이라, 화면에만 주면 거기서 시작한
      손짓을 브라우저가 세로 스크롤로 가져간다. 안쪽 화면일 때만 켜는 이유는 style.css 에. */
@@ -1342,6 +1342,7 @@ function showScreen(name, opts) {
   if (name === 'faq') renderFaq();
   if (name === 'support') renderSupport();
   if (name === 'perms') renderPerms();
+  if (name === 'postreq' && typeof renderPostReq === 'function') renderPostReq();
 
   /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
      `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
@@ -1579,12 +1580,17 @@ function saveBtnHtml(id) {
 /* 쓰던 신청서 — 창(4시간)을 넘겨 들어와도 진행분은 안 버린다(docs/designs/first-run-and-resume.md).
    예전엔 홈의 「쓰던 신청서」 띠(#home-resume)였는데 2026-11-20 승인 시안으로 히어로의 「이어서 쓰기」 줄이 그 일을 맡았다.
    여기서는 **있는지와 무엇인지**만 돌려준다 — 줄을 그리는 것은 renderHome, 여는 것은 renderDraftSheet(app-prep.js). */
+/* 🔴 쓰던 것은 둘이다 (2026-11-21 개발자 지시 "이어서 쓰기 클릭 시 전의 작성 내용이"): 앱 신청서(`form` · 답째 장부에) · 원본 양식 채우기(`fill` · 답은 state.formFills, 장부엔 어느 공고·파일인가만).
+   둘 다 살아 있으면 **나중에 쓴 것** 하나를 돌려준다. kind 로 여는 길을 가른다(renderDraftSheet). */
 function resumeDraft() {
   const saved = typeof resumeLoad === 'function' ? resumeLoad() : null;
-  const prog = saved && saved.form;
-  const alive = typeof resumeProgressAlive === 'function' && resumeProgressAlive(prog, Date.now());
-  const sch = alive && findSch(prog.schId);
-  return sch ? { sch, prog } : null;
+  const now = Date.now();
+  const alive = (p) => typeof resumeProgressAlive === 'function' && resumeProgressAlive(p, now);
+  const form = saved && alive(saved.form) && findSch(saved.form.schId) ? { kind: 'form', sch: findSch(saved.form.schId), prog: saved.form } : null;
+  const fillSch = saved && alive(saved.fill) && (typeof fillTargetFor === 'function' ? fillTargetFor(saved.fill.schId) : findSch(saved.fill.schId));
+  const fill = fillSch ? { kind: 'fill', sch: fillSch, prog: saved.fill } : null;
+  if (form && fill) return fill.prog.at > form.prog.at ? fill : form;
+  return form || fill;
 }
 /* 히어로 줄 숫자 한 칸 — 그 줄로 넘어올 때 app-mascot.js 가 같은 값·같은 모양으로 다시 올린다(dataset 두 칸) */
 const HERO_FMT = new Map();
@@ -1728,7 +1734,9 @@ function renderHome() {
   /* 대외활동·공모전 칸 — 목록이 아직 안 왔으면 0 이 아니라 '모름'이라 배지를 숨긴다(없다고 말하지 않는다) */
   const acts = liveActivities ? activitiesForMe() : null;
   ['대외활동', '공모전'].forEach((k) => { tileN[k] = acts ? acts.filter((n) => (n.kind || '대외활동') === k).length : null; });
-  $('#hero-tiles').innerHTML = HERO_TILES.map((t) => `
+  /* 학교 바로가기 칸은 그 학교 주소를 확인한 것만 그린다(school-links.js · 지어낸 주소로 보내지 않는다) */
+  const heroTiles = HERO_TILES.filter((t) => !t.link || (typeof schoolLinkFor === 'function' && schoolLinkFor(state.profile, t.link)));
+  $('#hero-tiles').innerHTML = heroTiles.map((t) => `
     <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name}${tileN[t.go] == null ? '' : ` ${tileN[t.go]}건`}">
       <span class="hero-ico ${t.tone}">${t.svg}${tileN[t.go] == null ? '' : `<span class="hero-badge${tileN[t.go] ? '' : ' zero'}">${tileN[t.go]}</span>`}</span>
       <span class="hero-tile-name">${t.name}</span>
@@ -2954,8 +2962,10 @@ else if (resumePlan.screen === 'onboarding') {
   showScreen(resumePlan.screen, { scroll: resumePlan.scroll });
   /* 보던 시트·쓰던 신청서는 화면이 그려진 **뒤에** 올린다. 공고·양식 데이터가 아직 오는
      중일 수 있어 조금 기다린다 — 못 찾으면 조용히 넘어간다(홈은 이미 떠 있다). */
-  if (resumePlan.form || resumePlan.sheet) {
+  if (resumePlan.form || resumePlan.sheet || resumePlan.fill) {
     setTimeout(() => {
+      /* 원본 양식 채우기 화면에 있다가 나갔다 돌아왔다 — 그 양식을 다시 연다(칸 값은 state.formFills 에서 · formfill.js) */
+      if (resumePlan.fill && typeof resumeOpenFill === 'function' && resumeOpenFill(resumePlan.fill)) return;
       if (resumePlan.form) {
         const sch = findSch(resumePlan.form.schId);
         /* 🔴 마감·자격은 여기서 다시 보지 않는다 — 이미 쓴 글을 뺏지 않는다.
@@ -2976,9 +2986,9 @@ else bootHoldRelease();
 
 /* 앱이 숨는 순간에 본 시각·스크롤을 확실히 적어 둔다 (formProgressSave 머리말 참조) */
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') { resumeMark(); formProgressSave(true); }
+  if (document.visibilityState === 'hidden') { resumeMark(); formProgressSave(true); if (typeof ffFlush === 'function') ffFlush(); }
 });
-window.addEventListener('pagehide', () => { resumeMark(); formProgressSave(true); });
+window.addEventListener('pagehide', () => { resumeMark(); formProgressSave(true); if (typeof ffFlush === 'function') ffFlush(); });
 /* 🔴 소셜 로그인·비밀번호 재설정 메일은 **주소 뒤에 토큰을 붙여** 이 앱으로 돌아온다.
    그걸 먼저 주워 담아야(그리고 주소창에서 지워야) 로그인 상태로 이어진다.
    그 뒤에 서버와 맞춘다 — 기기 우선이라 여기서 기다리지 않는다. 인터넷이 없으면

@@ -272,7 +272,12 @@ function renderDraftSheet() {
     </div>`;
   openSheetShell();
   sheetListRender = null;
-  $('#btn-hero-draft').addEventListener('click', () => { sheetBack = null; startFormFill(dr.sch, dr.prog); });
+  $('#btn-hero-draft').addEventListener('click', () => {
+    sheetBack = null;
+    /* 원본 양식 채우기 — 쪽 그림 위 칸 값은 그 양식을 열면 state.formFills 에서 그대로 되살아난다(formfill.js openFormFill) */
+    if (dr.kind === 'fill') { if (typeof resumeOpenFill === 'function') resumeOpenFill(dr.prog); return; }
+    startFormFill(dr.sch, dr.prog);
+  });
   return true;
 }
 

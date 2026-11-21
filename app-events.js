@@ -193,6 +193,13 @@ function bindEvents() {
     if (!t) return;
     const go = t.dataset.heroGo;
     if (go === 'applications') { showScreen('applications'); return; }
+    if (go === 'postreq') { if (typeof openPostReq === 'function') openPostReq(); return; }
+    if (go.startsWith('link:')) {
+      /* 학교 사이트는 새 탭으로 — 로그인은 학생이 그 사이트에서 직접 한다(운영 원칙 9 · 우리는 주소만 넘긴다) */
+      const url = typeof schoolLinkFor === 'function' && schoolLinkFor(state.profile, go.slice(5));
+      if (url) window.open(url, '_blank', 'noopener');
+      return;
+    }
     if (go === '대외활동' || go === '공모전') {
       /* 종류 칩을 켠 채로 연다 — 칩을 직접 누른 것과 같은 상태(분야는 푼다 · 칩 배선 주석과 같은 이유) */
       activitiesFilter = go;

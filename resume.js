@@ -61,6 +61,7 @@ function resumeProgressAlive(prog, now) {
      onboard   … 되살릴 온보딩 진행분 (없으면 null)
      scroll    … 그 화면에서 되살릴 스크롤
      resumeCard… 홈에 '신청서 마저 쓰기' 줄을 놓을 진행분 (없으면 null)
+     fill      … 다시 열 원본 양식 채우기 { schId, file, at } (창 안에서 그 화면에 있었을 때만 · 없으면 null)
      fresh     … 창 안이었나 (설명·검사용) */
 function resumeDecide(opts) {
   var o = opts || {};
@@ -68,7 +69,7 @@ function resumeDecide(opts) {
   var saved = resumeValid(o.saved) ? o.saved : null;
   var out = {
     skip: false, screen: 'home', sheet: null, form: null, onboard: null,
-    scroll: 0, resumeCard: null, fresh: false,
+    scroll: 0, resumeCard: null, fresh: false, fill: null,
   };
 
   if (resumeHijacked(o.search, o.hash)) { out.skip = true; return out; }
@@ -94,6 +95,11 @@ function resumeDecide(opts) {
     out.screen = resumeIsTab(saved.screen) ? saved.screen : 'home';
     out.scroll = (saved.scroll && saved.scroll[out.screen]) || 0;
     out.sheet = (saved.sheet && saved.sheet.id) || null;
+    /* 원본 양식 채우기 화면에 있었으면 그 양식을 다시 연다(2026-11-21 · 칸 값은 앱 저장분 state.formFills — 여기엔 어느 공고·파일인가만) */
+    if (saved.screen === 'formfill') {
+      out.screen = 'home';
+      if (resumeProgressAlive(saved.fill, now)) out.fill = saved.fill;
+    }
     /* 시트가 신청서였으면 그 신청서를 이어서 연다 — 공고 상세보다 이쪽이 우선이다 */
     if (prog && saved.sheet && saved.sheet.kind === 'form') { out.form = prog; out.sheet = null; }
     else if (prog) out.resumeCard = prog;   // 다른 화면에 있었어도 쓰던 것은 알려 준다

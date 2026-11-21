@@ -56,6 +56,11 @@ auth.users (Supabase 가 관리)
             device text  ← '아이폰 · Safari' 정도의 거친 이름 (원문 UA 아님)
             client text  ← 이 설치본을 가리키는 **뜻 없는 난수**(기기 지문 아님)
           index (user_id, at desc)
+   └─1:1─ post_staff          ← 기관 담당자 표시(0008 · 2026-11-21 · 앱 post-request.js · 학생 로그인과 다른 세션)
+            user_id uuid PK · org · name · contact text · verified boolean(운영자만)
+   └─1:N─ post_requests       ← 게시 요청(자기 것만 읽고 · 게시 전만 고치고 · 상태는 운영자만 — 트리거)
+            id bigint PK · kind · org · title · url · deadline · target · amount · memo · status
+            └─1:N─ post_comments  ← 댓글(지우기·고치기 없음 · author staff|admin · 운영자 댓글은 대시보드로)
 ```
 
 ### 어느 마이그레이션이 **실제 DB에 들어가 있는가**
@@ -69,6 +74,7 @@ auth.users (Supabase 가 관리)
 | `0002_login_events.sql` | ❓ **확인한 적 없다** | 확인 안 한 것을 들어갔다고 적지 않는다. 필요하면 대시보드에서 표가 있는지 본다 |
 | `0003_apply_sends.sql` | ⛔ 아직 | 접수 대행 발송을 켤 때 한다(`server/apply/README.md` ③-1) |
 | `0004_profile_columns.sql` | ✅ **2026-09-26 개발자가 붙여넣고 확인** | 칸 열하나 · 검사 제약 여섯을 대시보드에서 눈으로 확인 |
+| `0008_post_requests.sql` | ⛔ **아직** | 2026-11-21 게시 요청(담당자 로그인·게시물 관리). 붙여넣기 전에는 담당자 화면이 '불러오지 못했어요'에서 멈춘다 |
 
 ⚠️ 새 마이그레이션을 만들면 이 표에 줄을 더한다. ⚠️ 그래도 **서버는 이 표를 전제하지 않는다** —
 `server/apply/apply-guard.mjs` 가 같은 범위를 한 번 더 보는 이유가 그것이다(붙여넣기 전에도 막혀야 한다).
