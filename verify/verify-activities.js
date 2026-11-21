@@ -387,8 +387,13 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       calMineKind(calContext()).list.map((s) => (isActivityId(s.id) ? 'act' : 'sch')).sort()]);
     await page.evaluate(() => { calKind = 'all'; calCursor = null; showScreen('applications'); calMode = true; renderApplications(); renderCalendar(); });
     eq('⑥-3 달력에 칩 셋(숫자 없음) · 처음엔 전체', await calView(), [['*전체', '장학금', '대외활동'], ['act', 'sch']]);
-    await page.evaluate(() => document.querySelector('#apps-calendar [data-cal-kind="act"]').click()); await page.waitForTimeout(150);
+    /* 키보드로 고른다 — 다시 그려도 초점이 누른 칩에 남아야 한다(화면 낭독기 · 리뷰 2026-11-21) */
+    await page.focus('#apps-calendar [data-cal-kind="act"]'); await page.keyboard.press('Enter'); await page.waitForTimeout(150);
     eq('⑥-3 「대외활동」을 누르면 활동만', await calView(), [['전체', '장학금', '*대외활동'], ['act']]);
+    eq('⑥-3 다시 그려도 초점은 누른 칩에', await page.evaluate(() => (document.activeElement && document.activeElement.dataset || {}).calKind), 'act');
+    /* 거른 때는 거른 쪽 이름으로 말한다 — 「이 달에는 내 공고가 없어요」·「이날 마감되는 공고가 없어요」는 거른 장학이 있으면 틀린 말(리뷰 2026-11-21) */
+    eq('⑥-3 거른 때 이 달 줄·빈 날짜 줄은 「대외활동」으로', await page.evaluate(() => { const sum = document.querySelector('#apps-calendar .cal-sum').textContent.trim(); const box = document.createElement('div'); box.innerHTML = calDayHtml('2099-01-15');
+      return [/^(내 대외활동 \d+건|이 달에는 내 대외활동이 없어요)/.test(sum), !/공고/.test(sum), box.querySelector('.empty').textContent.trim()]; }), [true, true, '이날 마감되는 내 대외활동이 없어요']);
     /* 담아 둔 장학의 마감일을 연다 — 거르지 않으면 그 줄이 「내 공고」에 뜬다(거르기를 꺼서 빨간불 확인 · 리뷰 2026-11-21) */
     eq('⑥-3 대외활동만 볼 때 날짜 목록에 장학 줄이 없다(내 공고·이날 마감 모두)', await page.evaluate((id) => { const d = calContext().mine.find((x) => x.id === id); if (!d || !d.deadline) return 'no-deadline'; const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
       return [...box.querySelectorAll('.cal-row')].every((r) => isActivityId(r.dataset.detail)); }, SCH1), true);

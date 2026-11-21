@@ -368,6 +368,7 @@ const CAL_DOTS_MAX = 3;
 /* 달력 장학금 · 대외활동 칩 (2026-11-21 개발자 「신청내역에서 대외활동과 장학금이 구분되게」) — 보관함과 같은 kindFilter ·
    점·이 달 숫자·날짜 목록이 고른 쪽만 · 대외활동만 볼 때는 「이날 마감되는 공고」(장학)도 뺀다 · 고른 칩은 앱을 닫을 때까지(기기에 저장하지 않는다 — 보관함 칩과 같다) */
 let calKind = 'all';
+const CAL_KIND_NOUN = { all: '공고', sch: '장학금', act: '대외활동' };   // 「이 달에는 내 ○○이 없어요」 — 셋 다 받침이 있어 「이」
 function calMineKind(ctx) {
   const kf = kindFilter(ctx.mine, calKind, 'cal-kind', { counts: false });
   calKind = kf.kind;
@@ -415,7 +416,8 @@ function renderCalendar() {
       <span class="cal-month">${ms.getFullYear()}년 ${ms.getMonth() + 1}월</span>
       <button class="cal-nav" data-cal-move="1" aria-label="다음 달">›</button>
     </div>
-    <p class="cal-sum">${mineCount ? `내 공고 ${mineCount}건${waitCount ? ` · 발표 ${waitCount}건` : ''}` : '이 달에는 내 공고가 없어요'}</p>
+    ${/* 칩으로 거른 때는 이름도 그쪽으로 — 「이 달에는 내 공고가 없어요」는 거른 다른 쪽이 있으면 틀린 말이 된다(리뷰 2026-11-21) */ ''}
+    <p class="cal-sum">${mineCount ? `내 ${CAL_KIND_NOUN[kf.kind]} ${mineCount}건${waitCount ? ` · 발표 ${waitCount}건` : ''}` : `이 달에는 내 ${CAL_KIND_NOUN[kf.kind]}이 없어요`}</p>
     <div class="cal-dow">${CAL_DOW.map((w) => `<span>${w}</span>`).join('')}</div>
     <div class="cal-grid">${cells}</div>
     ${/* 🔴 범례는 **두 종류**다 (2026-09-07 개발자 지시: "간단하고 명확히").
@@ -494,5 +496,6 @@ function calDayHtml(iso) {
         <p class="cal-note">재단이 적어 둔 칸을 그대로 보여 줍니다 — 자격은 재단 홈페이지에서 확인하세요.</p>
         ${layer2.map((s) => calRowHtml(s, { badge: false })).join('')}
       </details>` : ''}
-    ${!mineRows && !layer1.length && !layer2.length ? '<p class="empty">이날 마감되는 공고가 없어요</p>' : ''}`;
+    ${/* 거른 때는 거른 쪽만 말한다 — 대외활동만 볼 때는 장학 목록을 안 붙이므로 「내 대외활동」(리뷰 2026-11-21) */ ''}
+    ${!mineRows && !layer1.length && !layer2.length ? `<p class="empty">${calKind === 'act' ? '이날 마감되는 내 대외활동이 없어요' : calKind === 'sch' ? '이날 마감되는 장학금이 없어요' : '이날 마감되는 공고가 없어요'}</p>` : ''}`;
 }
