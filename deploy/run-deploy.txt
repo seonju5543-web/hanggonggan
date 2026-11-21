@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: david/elegant-cannon-2vtxj3
-메모: 2026-11-20 #6 — 금액 상세는 「자격 요건 매칭」 하나(추정·어림은 「약」) · 매칭된 공고 줄은 안 연다
+branch: david/zen-shannon-e5th3t
+메모: 2026-11-21 정기 — 재단 장학금 원문 1건 연결(고성군 다자녀가정 대학등록금 → 강원 고성군청 공지)

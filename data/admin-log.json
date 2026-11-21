@@ -749,6 +749,12 @@
    "by": "Claude 세션(개발자 지시 2026-11-20)",
    "action": "linkFix",
    "detail": "원문 주소 1건 — 넣음 교통사고 생계지원금 → https://www.fordrivers.or.kr/board/selectBoardArticle.do?menuId=1070100&bbsId=BBSMSTR_000000000032&nttId=10745&pageIndex=1&cateCode=&searchCnd=0&searchWrd="
+  },
+  {
+   "at": "2026-11-21 13:22 KST",
+   "by": "Claude 정기 세션",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 다자녀가정 대학등록금 → https://www.gwgs.go.kr/prog/bbsArticle/BBSMSTR_000000000412/view.do?nttId=B000000076178Ek7xK9q (확인: 1)"
   }
  ]
 }
