@@ -336,6 +336,11 @@ function bindEvents() {
 
   /* 달력 — 달 이동과 날짜 펼치기 */
   document.addEventListener('click', (e) => {
+    const ck = e.target.closest('[data-cal-kind]');
+    if (ck) {
+      if (ck.dataset.calKind !== calKind) { calKind = ck.dataset.calKind; renderCalendar(); }
+      return;
+    }
     const mv = e.target.closest('[data-cal-move]');
     if (mv) {
       const ms = calMonthStart();

@@ -11,17 +11,26 @@
    한쪽만 담겼으면 칩을 안 그린다 · 고른 칩은 이 화면을 떠 있는 동안만(기기에 저장하지 않는다) · 위 숫자(sub)는 늘 전체 */
 let savedKind = 'all';
 const SAVED_KINDS = [['all', '전체'], ['sch', '장학금'], ['act', '대외활동']];
+/* 나눠 보기 한 곳 — 보관함(savedKind)·신청 내역 달력(calKind · 2026-11-21 개발자 「공고보관함과 신청내역에서 대외활동과 장학금이 구분되게」)이 같이 쓴다.
+   둘 다 있을 때만 칩을 그리고, 한쪽만 남으면 '전체'로 돌아간다(돌려주는 kind 를 받아 적는다). counts:false 면 숫자 없이(달력은 이 달 숫자가 따로 있다) */
+function kindFilter(items, cur, attr, { counts: showCounts = true } = {}) {
+  const nAct = items.filter((s) => isActivityId(s.id)).length;
+  const counts = { all: items.length, act: nAct, sch: items.length - nAct };
+  const both = counts.act > 0 && counts.sch > 0;
+  const kind = both ? cur : 'all';
+  const list = kind === 'all' ? items : items.filter((s) => (kind === 'act') === isActivityId(s.id));
+  const row = both ? `<div class="filter-row saved-kinds" role="group" aria-label="공고 종류">${SAVED_KINDS.map(([k, label]) =>
+    `<button type="button" class="filter-chip${k === kind ? ' active' : ''}" data-${attr}="${k}" aria-pressed="${k === kind}">${label}${showCounts ? ` ${counts[k]}` : ''}</button>`).join('')}</div>` : '';
+  return { kind, list, row };
+}
 function renderSaved() {
   const el = $('#my-saved');
   if (!el) return;
   const all = savedScholarships();
-  const nAct = all.filter((s) => isActivityId(s.id)).length;
-  const counts = { all: all.length, act: nAct, sch: all.length - nAct };
-  const both = counts.act > 0 && counts.sch > 0;
-  if (!both) savedKind = 'all';
-  const list = savedKind === 'all' ? all : all.filter((s) => (savedKind === 'act') === isActivityId(s.id));
-  const kindRow = both ? `<div class="filter-row saved-kinds" role="group" aria-label="공고 종류">${SAVED_KINDS.map(([k, label]) =>
-    `<button type="button" class="filter-chip${k === savedKind ? ' active' : ''}" data-saved-kind="${k}" aria-pressed="${k === savedKind}">${label} ${counts[k]}</button>`).join('')}</div>` : '';
+  const kf = kindFilter(all, savedKind, 'saved-kind');
+  savedKind = kf.kind;
+  const list = kf.list;
+  const kindRow = kf.row;
   { const sub = $('#my-sub-saved'); if (sub) { const n = all.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = all.length ? `${all.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
   if (!list.length) {
     el.innerHTML = (`

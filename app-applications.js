@@ -49,7 +49,7 @@ function appCard(app, sch) {
          aria-label="${esc(sch.name)} 선택" />` : ''}
       <button class="sch-card" data-detail="${sch.id}" tabindex="-1">
         <div class="sch-top">
-          <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>${closedBadge}
+          ${kindChipHtml(sch)}${closedBadge}${/* 갈래 칩 — 카드·시트·보관함 줄과 같은 「장학 · 교내」 · 활동이면 공모전·대외활동(2026-11-21) */ ''}
         </div>
         <p class="sch-name">${esc(sch.name)}</p>
         <div class="app-step app-step-s${step}${app.result === 'lost' ? ' app-step-lost' : ''}${app.pending ? ' app-step-wait' : ''}${deadPrep ? ' app-step-closed' : ''}">
@@ -365,12 +365,21 @@ const CAL_DOW = ['일', '월', '화', '수', '목', '금', '토'];
 const CAL_KIND_ORDER = { wait: 0, mine: 1 };
 const CAL_DOTS_MAX = 3;
 
+/* 달력 장학금 · 대외활동 칩 (2026-11-21 개발자 「신청내역에서 대외활동과 장학금이 구분되게」) — 보관함과 같은 kindFilter ·
+   점·이 달 숫자·날짜 목록이 고른 쪽만 · 대외활동만 볼 때는 「이날 마감되는 공고」(장학)도 뺀다 · 고른 칩은 앱을 닫을 때까지(기기에 저장하지 않는다 — 보관함 칩과 같다) */
+let calKind = 'all';
+function calMineKind(ctx) {
+  const kf = kindFilter(ctx.mine, calKind, 'cal-kind', { counts: false });
+  calKind = kf.kind;
+  return kf;
+}
 function renderCalendar() {
   const box = $('#apps-calendar');
   if (!box) return;
   const ms = calMonthStart();
   const ctx = calContext();
-  const marks = calMarks(ms, ctx.mine);
+  const kf = calMineKind(ctx);
+  const marks = calMarks(ms, kf.list);
   const today = isoOf(todayStart());
   const days = new Date(ms.getFullYear(), ms.getMonth() + 1, 0).getDate();
   const lead = new Date(ms.getFullYear(), ms.getMonth(), 1).getDay();
@@ -400,7 +409,7 @@ function renderCalendar() {
       </button>`;
   }
 
-  box.innerHTML = `
+  box.innerHTML = `${kf.row}
     <div class="cal-head">
       <button class="cal-nav" data-cal-move="-1" aria-label="이전 달">‹</button>
       <span class="cal-month">${ms.getFullYear()}년 ${ms.getMonth() + 1}월</span>
@@ -430,10 +439,15 @@ function calRowHtml(sch, { badge = true, save = false } = {}) {
     const result = evaluateFor(sch, state.profile);
     mark = fitBadgeHtml(fitScore(sch, result, state.profile), fitDetailFor(sch, state.profile));
   }
+  /* 갈래 칩 (2026-11-21 개발자 「공고보관함과 신청내역에서 대외활동과 장학금이 구분되게」) — 카드와 같은 kindChipHtml 한 곳 ·
+     활동은 피드 모양 원본(activityItem)으로 갈래를 읽는다(act: 줄은 늘 활동 칩 — 글에 kind 가 없어도 「장학」으로 안 읽히게) · 칩이 종류를 말하므로 활동 둘째 줄은 주최만(종류를 두 번 적지 않는다) */
+  const act = isActivityId(sch.id) ? (activityItem(sch.id.slice(4)) || null) : null;
+  const sub = isActivityId(sch.id) ? (act ? activityHostLine(act) : '')
+    : [amountLine(sch).text.replace(/^금액 · /, ''), knownValue(sch.headcount)].filter(Boolean).join(' · ');
   const row = `<button class="cal-row" data-detail="${esc(sch.id)}">
-      <span class="cal-row-top">${mark}${d ? `<span class="badge badge-dday ${d.cls}">${d.label}</span>` : ''}${sch.formId ? '<span class="badge badge-form">앱에서 작성</span>' : ''}</span>
+      <span class="cal-row-top">${kindChipHtml(act ? { ...act, activity: true } : sch)}${mark}${d ? `<span class="badge badge-dday ${d.cls}">${d.label}</span>` : ''}${sch.formId ? '<span class="badge badge-form">앱에서 작성</span>' : ''}</span>
       <span class="cal-row-name">${esc(sch.name)}</span>
-      ${(() => { const sub = [amountLine(sch).text.replace(/^금액 · /, ''), knownValue(sch.headcount)].filter(Boolean).join(' · '); return sub ? `<span class="cal-row-sub">${esc(sub)}</span>` : ''; })()}
+      ${sub ? `<span class="cal-row-sub">${esc(sub)}</span>` : ''}
     </button>`;
   /* 보관함에서는 **여기서 바로 해제**할 수 있어야 한다 — 담는 곳과 빼는 곳이 다르면
      학생이 뺄 방법을 못 찾는다. 카드와 같은 이유로 단추는 줄 **바깥**에 둔다. */
@@ -444,8 +458,8 @@ function calRowHtml(sch, { badge = true, save = false } = {}) {
 function calDayHtml(iso) {
   const [y, m, d] = iso.split('-').map(Number);
   const ctx = calContext();
-  const mineAll = ctx.mine;
-  const marks = (calMarks(new Date(y, m - 1, 1), ctx.mine)[iso] || []);
+  const mineAll = calMineKind(ctx).list;
+  const marks = (calMarks(new Date(y, m - 1, 1), mineAll)[iso] || []);
   const seen = new Set();
   const mineRows = marks.map((k) => {
     if (seen.has(k.id)) return '';
@@ -462,7 +476,7 @@ function calDayHtml(iso) {
     return `<p class="cal-why">${why}</p>` + calRowHtml(sch, { badge: false });
   }).join('');
 
-  const others = calOthersOn(iso, ctx);
+  const others = calKind === 'act' ? [] : calOthersOn(iso, ctx);   // 대외활동만 볼 때는 장학 공고 목록을 안 붙인다
   const layer1 = others.filter((s) => s.sourceKind !== 'kosaf');
   const layer2 = others.filter((s) => s.sourceKind === 'kosaf');
 

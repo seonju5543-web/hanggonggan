@@ -343,8 +343,9 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.click(`#activities-list .save-btn[data-save="act:${ACT1}"]`); await page.waitForTimeout(300);
     eq('⑥ 누르면 담긴다 · 글 사본도 함께(피드에서 빠져도 남게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); return [!!s, !!(s && s.snap && s.snap.title)]; }, ACT1), [true, true]);
     eq('⑥ 단추가 켜진다', await page.$eval(`#activities-list .save-btn[data-save="act:${ACT1}"]`, (b) => b.classList.contains('on')), true);
-    eq('⑥ 보관함에 장학과 같은 줄로(둘째 줄은 종류 · 학교 게시판 글은 주최 없음 — 2026-11-02 개발자 결정)', await page.evaluate(() => { showScreen('my'); return [...document.querySelectorAll('#my-saved .cal-row')].map((r) => [r.querySelector('.cal-row-name').textContent.trim(), r.querySelector('.cal-row-sub').textContent.trim()]); }),
-      [['2026 대학생 해외봉사단 모집', '대외활동']]);
+    /* 2026-11-21 선주 「공고보관함과 신청내역에서 대외활동과 장학금이 구분되게」 — 종류는 윗줄 갈래 칩이 말하고 둘째 줄은 주최만(학교 게시판 글은 주최 없음 → 둘째 줄 없음) */
+    eq('⑥ 보관함에 장학과 같은 줄로(윗줄 갈래 칩 — 활동 카드와 같은 「봉사」 · 학교 게시판 글은 둘째 줄 없음 — 2026-11-02 개발자 결정)', await page.evaluate(() => { showScreen('my'); return [...document.querySelectorAll('#my-saved .cal-row')].map((r) => [(r.querySelector('.cal-row-top .badge-kind') || {}).textContent, r.querySelector('.cal-row-name').textContent.trim(), !!r.querySelector('.cal-row-sub')]); }),
+      [['봉사', '2026 대학생 해외봉사단 모집', false]]);
     eq('⑥ 달력에 마감 점(파랑) — 내 공고로 센다', await page.evaluate((u) => { const ctx = calContext(); const d = ctx.mine.find((x) => x.id === `act:${u}`); if (!d) return null;
       const [y, m] = d.deadline.split('-').map(Number); const mk = calMarks(new Date(y, m - 1, 1), ctx.mine)[d.deadline] || []; return mk.filter((k) => k.id === `act:${u}`).map((k) => k.kind); }, ACT1), ['mine']);
     await page.evaluate(() => document.querySelector('#my-saved .cal-row').click()); await page.waitForTimeout(500);
@@ -365,13 +366,13 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       document.querySelector('#toast .toast-undo').click(); await new Promise((r) => setTimeout(r, 50));
       const s = state.saved.find((x) => x.id === `act:${u}`); liveActivities.items = keep; return [gone, !!(s && s.snap)]; }, ACT1), [true, true]);
     /* 달력 날짜를 열었을 때 '내 공고' 줄로 나오는가 — 점만 재면 줄이 깨져도 모른다(리뷰) */
-    eq('⑥ 달력 날짜를 열면 「내 공고」에 활동 줄(종류 둘째 줄 · 학교 게시판 글은 주최 없음)', await page.evaluate((u) => { const d = calContext().mine.find((x) => x.id === `act:${u}`); const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
-      const row = box.querySelector(`.cal-row[data-detail="act:${u}"]`); return row ? [row.querySelector('.cal-row-name').textContent.trim(), row.querySelector('.cal-row-sub').textContent.trim(), /내 공고/.test(box.textContent)] : null; }, ACT1),
-      ['2026 대학생 해외봉사단 모집', '대외활동', true]);
+    eq('⑥ 달력 날짜를 열면 「내 공고」에 활동 줄(갈래 칩 · 학교 게시판 글은 주최 없음)', await page.evaluate((u) => { const d = calContext().mine.find((x) => x.id === `act:${u}`); const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
+      const row = box.querySelector(`.cal-row[data-detail="act:${u}"]`); return row ? [(row.querySelector('.cal-row-top .badge-kind') || {}).textContent, row.querySelector('.cal-row-name').textContent.trim(), !!row.querySelector('.cal-row-sub'), /내 공고/.test(box.textContent)] : null; }, ACT1),
+      ['봉사', '2026 대학생 해외봉사단 모집', false, true]);
     eq('⑥ 피드가 새로 오면 담아 둔 사본도 새 글로(옛 마감을 말하지 않게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); s.snap = { ...s.snap, deadline: '2000-01-01' }; refreshActivitySnaps(); return s.snap.deadline !== '2000-01-01'; }, ACT1), true);
     /* ── ⑥-2 보관함 장학금·대외활동 칩 (2026-11-16 은서 「공고보관함에서 대외활동과 장학금이 구분되게」) ── */
     eq('⑥-2 한쪽만 담겼으면 칩이 없다', await page.evaluate(() => { showScreen('mysaved'); return document.querySelectorAll('#my-saved [data-saved-kind]').length; }), 0);
-    const SCH1 = await page.evaluate(() => { const s = allScholarships().find((x) => !isActivityId(x.id)); toggleSave(s.id); return s.id; });
+    const SCH1 = await page.evaluate(() => { const s = allScholarships().find((x) => !isActivityId(x.id) && x.deadline) || allScholarships().find((x) => !isActivityId(x.id)); toggleSave(s.id); return s.id; });
     const kindView = () => page.evaluate(() => [[...document.querySelectorAll('#my-saved [data-saved-kind]')].map((c) => (c.classList.contains('active') ? '*' : '') + c.textContent.trim()),
       [...document.querySelectorAll('#my-saved .cal-row')].map((r) => (isActivityId(r.dataset.detail) ? 'act' : 'sch')).sort()]);
     eq('⑥-2 둘 다 담기면 칩 셋 · 처음엔 전체', await page.evaluate(() => { showScreen('mysaved'); return 0; }).then(kindView), [['*전체 2', '장학금 1', '대외활동 1'], ['act', 'sch']]);
@@ -380,6 +381,20 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.click('#my-saved [data-saved-kind="sch"]'); await page.waitForTimeout(150);
     eq('⑥-2 「장학금」을 누르면 장학만', await kindView(), [['전체 2', '*장학금 1', '대외활동 1'], ['sch']]);
     eq('⑥-2 MY 메뉴 숫자는 늘 전체', await page.$eval('#my-sub-saved', (e) => e.textContent.trim().startsWith('2개')), true);
+    eq('⑥-2 장학 줄은 「장학」 갈래 칩(활동 줄과 갈린다)', await page.evaluate((id) => { savedKind = 'all'; renderSaved(); const r = document.querySelector(`#my-saved .cal-row[data-detail="${CSS.escape(id)}"]`); return r ? /^장학/.test(r.querySelector('.cal-row-top .badge-kind').textContent) : null; }, SCH1), true);
+    /* ── ⑥-3 신청 내역 달력 장학금·대외활동 칩 (2026-11-21 선주 「…신청내역에서 대외활동과 장학금이 구분되게」) — 보관함과 같은 kindFilter · 숫자 없이 ── */
+    const calView = () => page.evaluate(() => [[...document.querySelectorAll('#apps-calendar [data-cal-kind]')].map((c) => (c.classList.contains('active') ? '*' : '') + c.textContent.trim()),
+      calMineKind(calContext()).list.map((s) => (isActivityId(s.id) ? 'act' : 'sch')).sort()]);
+    await page.evaluate(() => { calKind = 'all'; calCursor = null; showScreen('applications'); calMode = true; renderApplications(); renderCalendar(); });
+    eq('⑥-3 달력에 칩 셋(숫자 없음) · 처음엔 전체', await calView(), [['*전체', '장학금', '대외활동'], ['act', 'sch']]);
+    await page.evaluate(() => document.querySelector('#apps-calendar [data-cal-kind="act"]').click()); await page.waitForTimeout(150);
+    eq('⑥-3 「대외활동」을 누르면 활동만', await calView(), [['전체', '장학금', '*대외활동'], ['act']]);
+    /* 담아 둔 장학의 마감일을 연다 — 거르지 않으면 그 줄이 「내 공고」에 뜬다(거르기를 꺼서 빨간불 확인 · 리뷰 2026-11-21) */
+    eq('⑥-3 대외활동만 볼 때 날짜 목록에 장학 줄이 없다(내 공고·이날 마감 모두)', await page.evaluate((id) => { const d = calContext().mine.find((x) => x.id === id); if (!d || !d.deadline) return 'no-deadline'; const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
+      return [...box.querySelectorAll('.cal-row')].every((r) => isActivityId(r.dataset.detail)); }, SCH1), true);
+    await page.evaluate(() => document.querySelector('#apps-calendar [data-cal-kind="sch"]').click()); await page.waitForTimeout(150);
+    eq('⑥-3 「장학금」을 누르면 장학만', await calView(), [['전체', '*장학금', '대외활동'], ['sch']]);
+    await page.evaluate(() => { calKind = 'all'; calMode = false; renderApplications(); showScreen('mysaved'); });
     eq('⑥-2 한쪽을 다 빼면 칩이 사라지고 전체로 돌아간다', await page.evaluate((id) => { toggleSave(id); renderSaved(); return [document.querySelectorAll('#my-saved [data-saved-kind]').length, document.querySelectorAll('#my-saved .cal-row').length]; }, SCH1), [0, 1]);
     eq('페이지 오류 없음', errors, []);
     await page.context().close();
