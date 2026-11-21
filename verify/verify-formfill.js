@@ -33,8 +33,12 @@ const PROFILE = {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 900 }, hasTouch: true });
   let page = await ctx.newPage();
   const errors = [];
-  page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-  page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
+  /* 오류 듣기는 탭마다 — ⑤ 에서 새 탭으로 다시 켤 때도 같은 것을 단다(빠지면 「콘솔 오류 없음」이 새 탭을 못 본다) */
+  const watch = (pg) => {
+    pg.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+    pg.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
+  };
+  watch(page);
   await page.addInitScript((p) => {
     localStorage.setItem('handaejang.v1', JSON.stringify({ profile: p, applications: [] }));
     localStorage.removeItem('handaejang.resume');
@@ -170,6 +174,7 @@ const PROFILE = {
   await page.waitForSelector('#screen-formfill:not([hidden])', { timeout: 4000 });
   /* 치기와 나가기를 한 순간에 — 디바운스(0.25초) 안에 나간다. 따로 누르면 그 사이 타이머가 먼저 돌아 고친 것이 빠져도 초록이다(red-green 으로 확인) */
   await page.evaluate((fid) => {
+    resumeSave({ fill: null, fillOpen: null });   // 앞 단계가 남긴 기록을 비운다 — 아래 「장부에 적힌다」가 이 나가기의 저장만 재게(리뷰 2026-11-21)
     const el = document.querySelector(`#fill-pages .fillp-field[data-fid="${fid}"]`);
     el.value = '이어쓸값';
     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -184,7 +189,7 @@ const PROFILE = {
   /* 다시 켜기 = 같은 브라우저의 새 탭(기기 저장소는 같다) — 첫 탭의 시작 준비(프로필 심기·장부 비우기)는 그 탭에만 걸려 있어 새 탭에서는 안 돈다 */
   const page1 = page;
   page = await ctx.newPage();
-  page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+  watch(page);
   await page1.close();
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });

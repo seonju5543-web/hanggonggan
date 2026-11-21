@@ -1589,7 +1589,9 @@ function resumeDraft() {
   const alive = (p) => typeof resumeProgressAlive === 'function' && resumeProgressAlive(p, now);
   const form = saved && alive(saved.form) && findSch(saved.form.schId) ? { kind: 'form', sch: findSch(saved.form.schId), prog: saved.form } : null;
   const fillSch = saved && alive(saved.fill) && (typeof fillTargetFor === 'function' ? fillTargetFor(saved.fill.schId) : findSch(saved.fill.schId));
-  const fill = fillSch ? { kind: 'fill', sch: fillSch, prog: saved.fill } : null;
+  /* 🔴 그 양식(PDF 사본·서식 쪽)이 아직 실려 있을 때만 — 마감 뒤 로봇이 사본을 지우면 열 수 없는 줄이 7일 남고, 더 늦게 쓴 그것이 열리는 앱 신청서를 가린다(리뷰 2026-11-21) */
+  const fillOpenable = fillSch && ((typeof formPdfsFor === 'function' && formPdfsFor(fillSch).length) || (typeof formPagesFor === 'function' && formPagesFor(fillSch).length));
+  const fill = fillOpenable ? { kind: 'fill', sch: fillSch, prog: saved.fill } : null;
   if (form && fill) return fill.prog.at > form.prog.at ? fill : form;
   return form || fill;
 }

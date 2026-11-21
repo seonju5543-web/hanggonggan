@@ -368,6 +368,8 @@ async function authCaptureFromUrl() {
   if (!supabaseConfigured()) return null;
   const hash = String(location.hash || '').replace(/^#/, '');
   if (!hash || hash.indexOf('access_token=') < 0) return null;
+  /* 🔴 담당자 가입 확인 링크(?staff=1 · post-request.js staffRedirectTo)는 학생 세션으로 담지 않는다 — 담당자 화면이 따로 받는다(2026-11-21) */
+  try { if (new URLSearchParams(location.search).get('staff') === '1') return null; } catch (e) { /* 무시 */ }
   const q = new URLSearchParams(hash);
   const kind = q.get('type') === 'recovery' ? 'recovery' : 'signin';
   authStore({

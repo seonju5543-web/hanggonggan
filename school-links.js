@@ -6,11 +6,14 @@
    🔴 열쇠는 UNIVERSITIES·SERVED_SCHOOLS 의 학교 이름 그대로(분교는 별개 학교 — '연세대학교 미래캠퍼스').
    🔴 우리는 주소만 넘긴다 — 로그인은 학생이 그 사이트에서 직접 한다(운영 원칙 9 · 아이디·비밀번호를 받지 않는다).
    확인한 방법은 학교·칸마다 docs/designs/school-links-evidence.json 에 적었다(2026-11-21 조사 · 못 확인한 5칸은 비웠다 — 성균관대 종정시·도서관, 홍익대·계명대 e-class, 방송대 종정시).
+   캠퍼스마다 다른 칸 — campus:{ 칸: '캠퍼스 이름' } 이 있으면 프로필 캠퍼스가 **그 이름일 때만** 그 칸을 준다(외대·중앙대 도서관은 서울캠퍼스 것 ·
+      캠퍼스를 안 고른 학생에게도 안 준다 — 다른 캠퍼스 학생을 엉뚱한 도서관으로 보내지 않는다). 강원대 종정시는 춘천·삼척용이라(강릉·원주는 다른 주소)
+      앱이 강원대 캠퍼스를 모르는 지금은 비웠다(리뷰 2026-11-21).
    칸: home(학교 홈페이지) · portal(종합정보시스템·학사 포털) · eclass(LMS) · library(중앙도서관)
    ============================================================ */
 const SCHOOL_LINKS = {
   "경희대학교": {"home":"https://www.khu.ac.kr","portal":"https://info21.khu.ac.kr","eclass":"https://e-campus.khu.ac.kr","library":"https://lib.khu.ac.kr"},
-  "한국외국어대학교": {"home":"https://www.hufs.ac.kr","portal":"https://wis.hufs.ac.kr/src08/jsp/index.jsp","eclass":"https://eclass.hufs.ac.kr","library":"https://lib.hufs.ac.kr"},
+  "한국외국어대학교": {"home":"https://www.hufs.ac.kr","portal":"https://wis.hufs.ac.kr/src08/jsp/index.jsp","eclass":"https://eclass.hufs.ac.kr","library":"https://lib.hufs.ac.kr","campus":{"library":"서울캠퍼스"}},
   "서울대학교": {"home":"https://www.snu.ac.kr","portal":"https://my.snu.ac.kr","eclass":"https://myetl.snu.ac.kr","library":"https://lib.snu.ac.kr"},
   "연세대학교": {"home":"https://www.yonsei.ac.kr","portal":"https://portal.yonsei.ac.kr","eclass":"https://ys.learnus.org","library":"https://library.yonsei.ac.kr"},
   "연세대학교 미래캠퍼스": {"home":"https://mirae.yonsei.ac.kr","portal":"https://portal.yonsei.ac.kr","eclass":"https://ys.learnus.org","library":"https://wlib.yonsei.ac.kr"},
@@ -19,7 +22,7 @@ const SCHOOL_LINKS = {
   "서강대학교": {"home":"https://www.sogang.ac.kr","portal":"https://saint.sogang.ac.kr/irj/portal","eclass":"https://eclass.sogang.ac.kr","library":"https://library.sogang.ac.kr"},
   "성균관대학교": {"home":"https://www.skku.edu","eclass":"https://canvas.skku.edu"},
   "한양대학교": {"home":"https://www.hanyang.ac.kr","portal":"https://portal.hanyang.ac.kr","eclass":"https://learning.hanyang.ac.kr","library":"https://library.hanyang.ac.kr"},
-  "중앙대학교": {"home":"https://www.cau.ac.kr","portal":"https://mportal.cau.ac.kr","eclass":"https://eclass3.cau.ac.kr","library":"https://library.cau.ac.kr"},
+  "중앙대학교": {"home":"https://www.cau.ac.kr","portal":"https://mportal.cau.ac.kr","eclass":"https://eclass3.cau.ac.kr","library":"https://library.cau.ac.kr","campus":{"library":"서울캠퍼스"}},
   "서울시립대학교": {"home":"https://www.uos.ac.kr","portal":"https://portal.uos.ac.kr","eclass":"https://uclass.uos.ac.kr","library":"https://library.uos.ac.kr"},
   "건국대학교": {"home":"https://www.konkuk.ac.kr","portal":"https://kuis.konkuk.ac.kr","eclass":"https://ecampus.konkuk.ac.kr","library":"https://library.konkuk.ac.kr"},
   "동국대학교": {"home":"https://www.dongguk.edu","portal":"https://nportal.dongguk.edu","eclass":"https://eclass.dongguk.edu","library":"https://lib.dongguk.edu"},
@@ -52,7 +55,7 @@ const SCHOOL_LINKS = {
   "조선대학교": {"home":"https://www.chosun.ac.kr","portal":"https://p.chosun.ac.kr","eclass":"https://clc.chosun.ac.kr","library":"https://library.chosun.ac.kr"},
   "충북대학교": {"home":"https://www.chungbuk.ac.kr","portal":"https://eis.cbnu.ac.kr","eclass":"https://lms.chungbuk.ac.kr","library":"https://cbnul.chungbuk.ac.kr"},
   "부경대학교": {"home":"https://www.pknu.ac.kr","portal":"https://portal.pknu.ac.kr","eclass":"https://lms.pknu.ac.kr","library":"https://libweb.pknu.ac.kr"},
-  "강원대학교": {"home":"https://www.kangwon.ac.kr","portal":"https://kcloud.kangwon.ac.kr","eclass":"https://eruri.kangwon.ac.kr","library":"https://library.kangwon.ac.kr"},
+  "강원대학교": {"home":"https://www.kangwon.ac.kr","eclass":"https://eruri.kangwon.ac.kr","library":"https://library.kangwon.ac.kr"},
   "성신여자대학교": {"home":"https://www.sungshin.ac.kr","portal":"https://portal.sungshin.ac.kr","eclass":"https://slms.sungshin.ac.kr","library":"https://lib.sungshin.ac.kr"},
 };
 const SCHOOL_LINK_KINDS = ['home', 'portal', 'eclass', 'library'];
@@ -61,6 +64,8 @@ const SCHOOL_LINK_KINDS = ['home', 'portal', 'eclass', 'library'];
 function schoolLinkFor(profile, kind) {
   const row = profile && profile.school && SCHOOL_LINKS[profile.school];
   const url = row && SCHOOL_LINK_KINDS.indexOf(kind) >= 0 ? row[kind] : '';
+  const onlyCampus = row && row.campus && row.campus[kind];
+  if (onlyCampus && profile.campus !== onlyCampus) return '';
   return typeof url === 'string' && /^https?:\/\//.test(url) ? url : '';
 }
 

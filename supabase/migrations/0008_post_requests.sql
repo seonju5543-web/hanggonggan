@@ -15,6 +15,10 @@
 --      예외는 하나: 보완 요청을 받은 담당자가 내용을 고치면 다시 '접수'로 돌아간다(트리거가 한다).
 --   ③ 게시된 요청은 담당자가 고치거나 지우지 못한다 — 고칠 것은 댓글로 요청한다.
 --   ④ 댓글은 지우거나 고치지 못한다(주고받은 기록이다). 운영자 댓글은 대시보드·service_role 로만 넣는다.
+--      요청 거두기(삭제)도 운영자가 답글을 단 뒤에는 못 한다 — 거두면 댓글이 함께 지워지기 때문이다.
+--   ⚠️ 담당자 표시(post_staff)는 **스스로 적는다** — 어떤 계정이든(학생 계정도) 기관명을 적으면 요청을 낼 수 있다.
+--      그래서 이 표는 '학생을 막는 장치'가 아니다. 기관 담당자가 맞는지는 운영자가 확인하고 verified 를 켠다(앱에 따로 보이지는 않는다).
+--      verified 는 담당자가 기관명·이름·연락처를 고치면 다시 꺼진다(확인한 내용이 바뀌었으니).
 --   ⑤ 운영자(대시보드 SQL·service_role)는 JWT 사용자가 없다(auth.uid() 가 null) — 트리거는 그때 손을 뗀다.
 --      anon 열쇠만으로는 RLS 정책이 하나도 안 맞아 아무것도 못 한다.
 --
@@ -55,7 +59,11 @@ create or replace function public.post_staff_guard() returns trigger
 language plpgsql as $$
 begin
   if auth.uid() is not null then
-    if tg_op = 'UPDATE' then new.verified := old.verified; new.created_at := old.created_at; end if;
+    if tg_op = 'UPDATE' then
+      new.created_at := old.created_at;
+      new.verified := old.verified and new.org is not distinct from old.org
+        and new.name is not distinct from old.name and new.contact is not distinct from old.contact;
+    end if;
     if tg_op = 'INSERT' then new.verified := false; end if;
   end if;
   new.updated_at := now();
@@ -98,7 +106,8 @@ alter table public.post_requests enable row level security;
 drop policy if exists "담당자는 자기 요청만 읽는다" on public.post_requests;
 create policy "담당자는 자기 요청만 읽는다" on public.post_requests
   for select using (auth.uid() = user_id);
--- 🔴 담당자 표시(post_staff)가 있는 사람만 요청한다 — 학생 계정 토큰으로 요청을 쌓지 못하게
+-- 담당자 정보(post_staff)를 먼저 적은 계정만 요청한다 — 연락할 곳 없는 요청이 쌓이지 않게.
+-- ⚠️ 아무 계정이나 스스로 적을 수 있으므로 학생 계정을 막는 장치는 아니다(머리말 ⚠️ · 확인은 운영자 verified)
 drop policy if exists "담당자는 자기 이름으로만 요청한다" on public.post_requests;
 create policy "담당자는 자기 이름으로만 요청한다" on public.post_requests
   for insert with check (
@@ -111,7 +120,11 @@ create policy "담당자는 게시 전 자기 요청만 고친다" on public.pos
   with check (auth.uid() = user_id);
 drop policy if exists "담당자는 게시 전 자기 요청만 거둔다" on public.post_requests;
 create policy "담당자는 게시 전 자기 요청만 거둔다" on public.post_requests
-  for delete using (auth.uid() = user_id and status in ('submitted', 'needs_info', 'rejected'));
+  for delete using (
+    auth.uid() = user_id and status in ('submitted', 'needs_info')
+    -- 운영자 답글이 달린 요청은 거두지 못한다(거두면 댓글이 cascade 로 함께 지워진다 — ④)
+    and not exists (select 1 from public.post_comments c where c.request_id = post_requests.id and c.author = 'admin')
+  );
 
 -- 상태는 운영자만 — 담당자가 고치면 상태는 그대로, 보완 요청 중이었으면 다시 '접수'로
 create or replace function public.post_requests_guard() returns trigger

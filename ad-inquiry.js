@@ -13,6 +13,8 @@
 const ADINQ_DRAFT_KEY = 'handaejang.adinq.draft';
 const ADINQ_KINDS = ['앱 안 광고', '인스타그램 카드뉴스', '제휴·협업', '기타'];
 const ADINQ_FIELDS = ['org', 'name', 'contact', 'kind', 'period', 'body'];
+/* 메일 주소(mailto) 글자 수 한도 — PC 메일 앱이 2,000자 남짓에서 자르거나 안 연다. 넘으면 내용을 복사해 두고 제목만 담아 연다 */
+const ADINQ_MAILTO_MAX = 1800;
 
 function adinqLoad() {
   try { const d = JSON.parse(localStorage.getItem(ADINQ_DRAFT_KEY)); return d && typeof d === 'object' ? d : {}; } catch (e) { return {}; }
@@ -123,7 +125,19 @@ if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded
     if (miss) { err(miss); return; }
     err('');
     /* 🔴 메일 앱을 여는 것뿐이다 — 보내기는 문의하는 사람이 누른다. '보냈어요'라고 하지 않는다 */
-    location.href = adinqMailto(d);
+    const url = adinqMailto(d);
+    if (url.length > ADINQ_MAILTO_MAX) {
+      /* 한글은 주소 안에서 몇 배로 길어진다 — 너무 긴 메일 주소는 메일 앱(특히 PC)이 잘라 먹거나 안 연다(리뷰 2026-11-21).
+         그래서 내용은 복사해 두고 메일 앱은 제목만 담아 연다 · 붙여 넣으라고 말한다 */
+      const m = adinqMail(d);
+      const go = (copied) => {
+        location.href = `mailto:${encodeURIComponent(SUPPORT_CONFIG.email)}?subject=${encodeURIComponent(m.subject)}`;
+        toast(copied ? '내용이 길어 복사해 두었어요 · 메일 본문에 붙여 넣고 보내기를 눌러 주세요' : `내용이 길어요 · ${SUPPORT_CONFIG.email} 로 직접 보내 주세요`);
+      };
+      try { navigator.clipboard.writeText(m.body).then(() => go(true), () => go(false)); } catch (e2) { go(false); }
+      return;
+    }
+    location.href = url;
     toast('메일 앱에서 보내기를 눌러 주세요');
   });
 });

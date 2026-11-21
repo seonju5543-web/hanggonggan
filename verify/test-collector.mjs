@@ -10959,7 +10959,7 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       const AQ = createRequire(import.meta.url)('../ad-inquiry.js');
       const m = AQ.adinqMail({ org: '가나재단', name: '홍길동', contact: '02-000-0000', kind: '', period: '', body: '배너 문의' });
       eq('  광고 문의: 메일 앱을 열고(mailto · SUPPORT_CONFIG.email) 화면 글자에 「보냈어요·전송 완료」가 없다 · 빈 칸은 메일에 줄째 안 담는다',
-        [/location\.href = adinqMailto\(d\)/.test(adq), /mailto:\$\{encodeURIComponent\(SUPPORT_CONFIG\.email\)\}/.test(adq),
+        [/const url = adinqMailto\(d\);[\s\S]{0,1800}if \(url\.length > ADINQ_MAILTO_MAX\)[\s\S]{0,1800}location\.href = url;/.test(adq), /mailto:\$\{encodeURIComponent\(SUPPORT_CONFIG\.email\)\}/.test(adq),
           /보냈어요|전송 완료|접수 완료|접수되었/.test(adq.replace(/\/\*[\s\S]*?\*\//g, '')), /광고 종류|희망 기간/.test(m.body), /가나재단/.test(m.subject),
           AQ.adinqMissing({ org: '가나재단', name: '홍길동', contact: '02', body: 'x' }) !== ''],
         [true, true, false, false, true, true]);
@@ -10992,11 +10992,18 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const noProof = [];
     for (const [s, row] of Object.entries(SL.SCHOOL_LINKS)) {
       for (const [k, url] of Object.entries(row)) {
+        if (k === 'campus') continue;   // 캠퍼스 제한 칸(주소 아님) — 아래에서 따로 잰다
         const ev = EV[s] || {};
         if (!SL.SCHOOL_LINK_KINDS.includes(k) || !/^https:\/\//.test(url) || ev[k] !== url || !String((ev.evidence || {})[k] || '').trim()) noProof.push(`${s}.${k}`);
       }
     }
     eq('  🔴 표의 주소마다 확인 기록이 있다 (같은 주소 · 확인 방법 · https · 아는 칸 넷뿐)', noProof, []);
+    eq('  캠퍼스마다 다른 칸은 그 캠퍼스 학생에게만 — 외대 도서관은 서울캠퍼스만(글로벌·캠퍼스 모름은 안 뜬다) · 제한 칸 이름은 그 학교 캠퍼스 목록에 있다',
+      [SL.schoolLinkFor({ school: '한국외국어대학교', campus: '서울캠퍼스' }, 'library') !== '', SL.schoolLinkFor({ school: '한국외국어대학교', campus: '글로벌캠퍼스(용인)' }, 'library'),
+        SL.schoolLinkFor({ school: '한국외국어대학교', campus: '' }, 'library'), SL.schoolLinkFor({ school: '한국외국어대학교', campus: '글로벌캠퍼스(용인)' }, 'home') !== '',
+        (() => { const dj = readText(new URL('../data.js', import.meta.url)); const cbs = dj.slice(dj.indexOf('const CAMPUSES_BY_SCHOOL = {'), dj.indexOf('};', dj.indexOf('const CAMPUSES_BY_SCHOOL = {')));
+          return Object.entries(SL.SCHOOL_LINKS).filter(([, r]) => r.campus).every(([sc, r]) => Object.values(r.campus).every((c) => cbs.split('\n').some((ln) => ln.includes(`'${sc}':`) && ln.includes(`'${c}'`)))); })()],
+      [true, '', '', true, true]);
     eq('  표에 없는 학교·칸은 빈 주소 — 그 칸은 홈에 안 뜬다',
       [SL.schoolLinkFor({ school: '없는대학교' }, 'home'), SL.schoolLinkFor({ school: '경희대학교' }, 'cafe'), SL.schoolLinkFor(null, 'home')], ['', '', '']);
   }

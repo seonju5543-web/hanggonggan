@@ -77,12 +77,27 @@ async function staffSignIn(email, password) {
   staffStore(res.json);
   return { ok: true };
 }
+/* 가입 확인 메일의 링크는 앱으로 돌아오며 주소 뒤에 토큰을 붙인다 — 표시(?staff=1)를 달아 보내야 학생 로그인 쪽(authCaptureFromUrl)이 그 토큰을
+   학생 세션으로 주워 담지 않고 아래 staffCaptureFromUrl 이 담당자 세션으로 받는다(리뷰 2026-11-21).
+   ⚠️ Supabase 의 Redirect URLs 에 이 주소(앱 주소 + ?staff=1)가 허용돼 있어야 표시가 살아 돌아온다 — 없으면 Supabase 가 기본 주소로 돌려보내 학생 세션으로 들어간다 */
+function staffRedirectTo() { return (typeof authRedirectTo === 'function' ? authRedirectTo() : location.origin + location.pathname) + '?staff=1'; }
 async function staffSignUp(email, password) {
-  const res = await sbFetch('/auth/v1/signup', { method: 'POST', body: { email, password } });
+  const res = await sbFetch('/auth/v1/signup?redirect_to=' + encodeURIComponent(staffRedirectTo()), { method: 'POST', body: { email, password } });
   if (!res.ok) return { ok: false, error: authErrorText(res) };
   if (!res.json || !res.json.access_token) return { ok: true, needsEmailConfirm: true };
   staffStore(res.json);
   return { ok: true };
+}
+/* 가입 확인 링크로 돌아왔다(?staff=1 + 주소 뒤 토큰) — 담당자 세션으로 담고 주소창에서 지운다. 담았으면 true */
+function staffCaptureFromUrl() {
+  let staffMark = false;
+  try { staffMark = new URLSearchParams(location.search).get('staff') === '1'; } catch (e) { return false; }
+  if (!staffMark) return false;
+  const hash = String(location.hash || '').replace(/^#/, '');
+  const q = new URLSearchParams(hash);
+  const ok = !!q.get('access_token') && !!staffStore({ access_token: q.get('access_token'), refresh_token: q.get('refresh_token') || '', expires_in: Number(q.get('expires_in') || 3600) });
+  try { history.replaceState(null, '', location.pathname); } catch (e) { /* 무시 */ }
+  return ok;
 }
 async function staffSignOut() {
   const t = staffLoad();
@@ -90,6 +105,9 @@ async function staffSignOut() {
   /* scope=local — 이 담당자 세션만 끝낸다. 기본값(global)이면 같은 계정으로 이 폰에 학생 로그인도 해 둔 사람의 학생 세션까지 끊긴다 */
   if (t) sbFetch('/auth/v1/logout?scope=local', { method: 'POST', headers: { Authorization: 'Bearer ' + t.accessToken } });   // 기다리지 않는다
 }
+
+/* 계정이 바뀌거나 세션이 끝나면 지난 계정의 목록·댓글을 버린다 — 남기면 다음 사람에게 앞사람 요청이 보인다 */
+function prResetAccount() { Object.assign(pr, { staff: undefined, list: null, comments: {}, open: null, edit: false, err: '' }); }
 
 /* ── 서버 읽기·쓰기 (PostgREST) ─────────────────────────── */
 const prEnc = encodeURIComponent;
@@ -110,19 +128,22 @@ async function prLoadComments(id) {
 const PR_RET = { Prefer: 'return=representation' };
 
 /* 서버가 준 오류는 화면에 옮기지 않는다(행이 통째로 들어 있을 수 있다 — CLAUDE.md 원칙 10) — 사람 말 한 줄로 */
-function prErrText(res) {
+function prErrText(res, formId) {
   if (!res || res.status === 0) return '인터넷 연결을 확인해 주세요';
   if (res.status === 401) return '담당자 로그인이 끝났어요. 다시 로그인해 주세요';
   if (res.status === 403 || res.status === 404) return '이 요청은 지금 고칠 수 없어요';
-  if (res.status === 400 || res.status === 409 || res.status === 422) return '적은 내용을 다시 확인해 주세요(링크는 http 로 시작해야 해요)';
+  if (res.status === 400 || res.status === 409 || res.status === 422) return formId === 'pr-form' ? '적은 내용을 다시 확인해 주세요(링크는 http 로 시작해야 해요)' : '적은 내용을 다시 확인해 주세요';
   return '저장하지 못했어요. 잠시 후 다시 시도해 주세요';
 }
 
 /* 폼 → 서버로 보낼 칸. 빈 칸은 null(지어내지 않는다) · 링크는 http(s) 만 */
 function prCollect(root) {
   const v = (n) => { const el = root.querySelector(`[name="${n}"]`); return el ? String(el.value || '').trim() : ''; };
+  /* 🔴 종류는 **눌린** 단추에서 읽는다 — 이름만으로 찾으면 늘 첫 단추(장학금)가 읽혀 고른 종류가 저장되지 않는다(리뷰 2026-11-21) */
+  const ck = root.querySelector('input[name="kind"]:checked');
+  const kindV = ck ? ck.value : '';
   const row = {
-    kind: PR_KINDS.includes(v('kind')) ? v('kind') : '장학금',
+    kind: PR_KINDS.includes(kindV) ? kindV : '장학금',
     org: v('org'), title: v('title'), url: v('url'),
     deadline: /^\d{4}-\d{2}-\d{2}$/.test(v('deadline')) ? v('deadline') : null,
     target: v('target') || null, amount: v('amount') || null, memo: v('memo') || null,
@@ -185,6 +206,7 @@ function prStaffFormHtml() {
       <label class="field"><span class="field-label">연락처 (전화 또는 이메일)</span><input name="contact" maxlength="100"></label>
       <p class="auth-err" id="pr-err" ${pr.err ? '' : 'hidden'}>${esc(pr.err)}</p>
       <button type="submit" class="btn btn-primary btn-lg pr-wide" ${pr.busy ? 'disabled' : ''}>저장하고 시작하기</button>
+      <button type="button" class="link-btn" data-pr="logout">담당자 로그아웃</button>
     </form>`;
 }
 function prDetailHtml(r) {
@@ -194,6 +216,7 @@ function prDetailHtml(r) {
     .filter(([, v]) => v).map(([k, v]) => `<div class="pr-row"><span>${esc(k)}</span><p>${esc(v)}</p></div>`).join('');
   const cm = pr.comments[r.id];
   const cmHtml = cm == null ? '<p class="sup-desc">댓글을 불러오는 중이에요</p>'
+    : cm === false ? '<p class="sup-desc">댓글을 불러오지 못했어요.</p><button type="button" class="link-btn" data-pr="reload-cm">다시 불러오기</button>'
     : cm.length ? cm.map((c) => `<div class="pr-cm ${c.author === 'admin' ? 'pr-cm-admin' : ''}"><b>${c.author === 'admin' ? '한대장 운영자' : '나'}</b><span>${esc(prDate(c.created_at))}</span><p>${esc(c.body)}</p></div>`).join('')
       : '<p class="sup-desc">아직 댓글이 없어요. 운영자에게 물을 것이 있으면 남겨 주세요.</p>';
   return `<div class="my-card">
@@ -203,7 +226,7 @@ function prDetailHtml(r) {
       <a class="pr-link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.url)}</a>
       ${rows}
       ${editable ? `<button type="button" class="btn btn-outline pr-wide" data-pr="edit">정보 수정</button>` : ''}
-      ${r.status !== 'published' && r.status !== 'reviewing' ? `<button type="button" class="link-btn pr-danger" data-pr="withdraw">요청 거두기</button>` : ''}
+      ${editable && Array.isArray(cm) && !cm.some((c) => c.author === 'admin') ? `<button type="button" class="link-btn pr-danger" data-pr="withdraw">요청 거두기</button>` : ''}
     </div>
     <div class="my-card">
       <p class="wallet-title">댓글</p>
@@ -255,15 +278,24 @@ async function prRefresh() {
   if (!staffSignedIn()) { renderPostReq(); return; }
   const staff = await prLoadStaff();
   if (!staffSignedIn()) { pr.staff = undefined; renderPostReq(); return; }   // 갱신 실패로 세션이 끝났다
-  if (staff === undefined) { pr.err = ''; $('#postreq-body').innerHTML = '<div class="my-card"><p class="sup-desc">담당자 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</p><button type="button" class="btn btn-outline pr-wide" data-pr="retry">다시 시도</button></div>'; return; }
+  if (staff === undefined) { prLoadFail('담당자 정보를 불러오지 못했어요'); return; }
+  /* 🔴 목록을 못 받으면 '요청 없음'으로 그리지 않는다 — 빈 목록과 못 읽음은 다른 말이다(리뷰 2026-11-21) */
+  const list = staff ? await prLoadList() : [];
+  if (staff && !list) { pr.staff = staff; prLoadFail('게시 요청을 불러오지 못했어요'); return; }
   pr.staff = staff;
-  if (staff) pr.list = await prLoadList() || pr.list || [];
+  pr.list = list;
   renderPostReq();
   if (pr.open != null && pr.comments[pr.open] == null) prOpenComments(pr.open);
 }
+function prLoadFail(what) {
+  pr.err = '';
+  $('#postreq-body').innerHTML = `<div class="my-card"><p class="sup-desc">${esc(what)}. 잠시 후 다시 시도해 주세요.</p>
+    <button type="button" class="btn btn-outline pr-wide" data-pr="retry">다시 시도</button>
+    <button type="button" class="link-btn" data-pr="logout">담당자 로그아웃</button></div>`;
+}
 async function prOpenComments(id) {
   const cm = await prLoadComments(id);
-  pr.comments[id] = cm || [];
+  pr.comments[id] = cm || false;   // false = 못 받음(빈 목록 [] 과 다르다 — 화면이 '다시 불러오기'를 단다)
   if (pr.open === id && currentScreen === 'postreq') renderPostReq();
 }
 function prShowErr(msg) {
@@ -283,6 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!root) return;
   const back = $('#btn-postreq-back');
   if (back) back.addEventListener('click', () => showScreen('home', { back: true }));
+  /* 가입 확인 링크로 돌아왔으면 담당자로 들어온 채 게시 요청 화면을 연다(첫 화면이 다 그려진 뒤) */
+  if (staffCaptureFromUrl()) setTimeout(() => { prResetAccount(); openPostReq(); toast('담당자 가입을 확인했어요'); }, 1200);
 
   root.addEventListener('click', async (ev) => {
     const kind = ev.target.closest('.pr-kind');
@@ -296,7 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const act = b.dataset.pr;
     if (act === 'swap') { pr.mode = pr.mode === 'up' ? 'in' : 'up'; pr.err = ''; renderPostReq(); return; }
     if (act === 'retry') { prRefresh(); return; }
-    if (act === 'logout') { await staffSignOut(); Object.assign(pr, { staff: undefined, list: null, comments: {}, open: null, edit: false, err: '' }); renderPostReq(); toast('담당자 로그아웃했어요'); return; }
+    if (act === 'reload-cm') { delete pr.comments[pr.open]; renderPostReq(); prOpenComments(pr.open); return; }
+    if (act === 'logout') { await staffSignOut(); prResetAccount(); renderPostReq(); toast('담당자 로그아웃했어요'); return; }
     if (act === 'close') { pr.open = null; pr.edit = false; pr.err = ''; renderPostReq(); return; }
     if (act === 'edit') { pr.edit = true; pr.err = ''; renderPostReq(); return; }
     if (act === 'cancel-edit') { pr.edit = false; pr.err = ''; renderPostReq(); return; }
@@ -322,14 +357,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const r = pr.mode === 'up' ? await staffSignUp(email, pw) : await staffSignIn(email, pw);
         if (!r.ok) { prShowErr(r.error); return; }
         if (r.needsEmailConfirm) { pr.mode = 'in'; pr.err = ''; renderPostReq(); toast('가입 확인 메일의 링크를 누른 뒤 로그인해 주세요'); return; }
-        pr.err = ''; pr.staff = undefined; pr.tab = 'manage'; done(); renderPostReq();
+        prResetAccount(); pr.tab = 'manage'; done(); renderPostReq();
         return;
       }
       if (f.id === 'pr-staff') {
         const row = { user_id: (staffLoad() || {}).userId, org: f.org.value.trim(), name: f.name.value.trim(), contact: f.contact.value.trim() };
         if (!row.org || !row.name || row.contact.length < 3) { prShowErr('기관명·이름·연락처를 모두 적어 주세요'); return; }
         const res = await staffFetch('/rest/v1/post_staff', { method: 'POST', body: row, headers: PR_RET });
-        if (!res.ok) { prShowErr(prErrText(res)); return; }
+        if (res.status === 409) { done(); pr.staff = undefined; prRefresh(); return; }   // 이미 적어 둔 계정 — 다시 받아 다음 화면으로
+        if (!res.ok) { prShowErr(prErrText(res, 'pr-staff')); return; }
         pr.staff = (res.json && res.json[0]) || row; pr.list = []; pr.tab = 'new'; pr.err = ''; done(); renderPostReq();
         return;
       }
@@ -341,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ? await staffFetch(`/rest/v1/post_requests?id=eq.${prEnc(pr.open)}`, { method: 'PATCH', body: c.row, headers: PR_RET })
           : await staffFetch('/rest/v1/post_requests', { method: 'POST', body: Object.assign({ user_id: (staffLoad() || {}).userId }, c.row), headers: PR_RET });
         /* PATCH 는 정책이 막으면 오류가 아니라 0행이다 — 그것도 실패로 본다(게시 뒤에는 못 고친다) */
-        if (!res.ok || !Array.isArray(res.json) || !res.json.length) { prShowErr(res.ok ? '이 요청은 지금 고칠 수 없어요' : prErrText(res)); return; }
+        if (!res.ok || !Array.isArray(res.json) || !res.json.length) { prShowErr(res.ok ? '이 요청은 지금 고칠 수 없어요' : prErrText(res, 'pr-form')); return; }
         const saved = res.json[0];
         pr.list = [saved].concat((pr.list || []).filter((r) => r.id !== saved.id)).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
         pr.tab = 'manage'; pr.open = saved.id; pr.edit = false; pr.err = ''; done(); renderPostReq(); appScrollTo(0);
@@ -353,8 +389,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const body = f.body.value.trim();
         if (!body) { prShowErr('댓글 내용을 적어 주세요'); return; }
         const res = await staffFetch('/rest/v1/post_comments', { method: 'POST', body: { request_id: pr.open, user_id: (staffLoad() || {}).userId, author: 'staff', body }, headers: PR_RET });
-        if (!res.ok || !Array.isArray(res.json)) { prShowErr(prErrText(res)); return; }
-        pr.comments[pr.open] = (pr.comments[pr.open] || []).concat(res.json);
+        if (!res.ok || !Array.isArray(res.json)) { prShowErr(prErrText(res, 'pr-comment')); return; }
+        pr.comments[pr.open] = (Array.isArray(pr.comments[pr.open]) ? pr.comments[pr.open] : []).concat(res.json);
         pr.err = ''; done(); renderPostReq();
       }
     } finally { done(); }

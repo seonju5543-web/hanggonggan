@@ -98,7 +98,9 @@ function resumeDecide(opts) {
     /* 원본 양식 채우기 화면에 있었으면 그 양식을 다시 연다(2026-11-21 · 칸 값은 앱 저장분 state.formFills — 여기엔 어느 공고·파일인가만) */
     if (saved.screen === 'formfill') {
       out.screen = 'home';
-      if (resumeProgressAlive(saved.fill, now)) out.fill = saved.fill;
+      /* 화면에 띄워 둔 양식(fillOpen)이 먼저 — 없으면(옛 장부) 마지막으로 쓴 양식 */
+      if (resumeProgressAlive(saved.fillOpen, now)) out.fill = saved.fillOpen;
+      else if (resumeProgressAlive(saved.fill, now)) out.fill = saved.fill;
     }
     /* 시트가 신청서였으면 그 신청서를 이어서 연다 — 공고 상세보다 이쪽이 우선이다 */
     if (prog && saved.sheet && saved.sheet.kind === 'form') { out.form = prog; out.sheet = null; }

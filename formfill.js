@@ -89,6 +89,9 @@ function openFormFill(sch, file) {
   const { rel, F } = e;
   ffCur = { sch, file, rel, F, from: (typeof currentScreen !== 'undefined' && currentScreen) || 'applications' };
   if (typeof trackUse === 'function') trackUse('form_open', sch.id);   // 이용 횟수(usage-report.js)
+  /* 지금 화면에 띄운 양식 — 4시간 안에 다시 켜면 **이 양식**으로 돌아온다(리뷰 2026-11-21: 친 것만 적으면 앞서 쓴 다른 양식이 열렸다).
+     히어로 「이어서 쓰기」는 실제로 쓴 양식(fill · ffFlush)만 본다 — 열어 보기만 한 양식까지 '쓰던 것'이라 하지 않는다 */
+  if (typeof resumeSave === 'function') resumeSave({ fillOpen: { schId: sch.id, file, at: Date.now() } });
   const saved = ffSaved(sch, rel);
   const pagesHtml = F.pages.map((pg) => {
     const fields = F.fields.filter((f) => f.page === pg.n);
@@ -162,7 +165,14 @@ function resumeOpenFill(fill) {
     : (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === fill.schId);
   if (!sch) return false;
   loadFormFields(sch).then((fj) => {
-    if (!ffFileEntry(fj, fill.file)) return;
+    if (!ffFileEntry(fj, fill.file)) {
+      /* 그 양식을 더는 열 수 없다(마감 뒤 사본이 지워졌다 등) — 말없이 멈추지 않고 알린 뒤 기록을 지운다(다음부터 「이어서 쓰기」에 안 뜬다) */
+      if (typeof resumeSave === 'function') resumeSave({ fill: null, fillOpen: null });
+      if (typeof closeSheet === 'function' && typeof currentScreen !== 'undefined' && currentScreen !== 'formfill') closeSheet();
+      if (typeof toast === 'function') toast('이 양식은 이제 열 수 없어요');
+      if (typeof renderHome === 'function' && typeof currentScreen !== 'undefined' && currentScreen === 'home') renderHome();
+      return;
+    }
     openFormFill(sch, fill.file);
     if (typeof toast === 'function') toast('쓰던 양식을 그대로 불러왔어요');
   });
