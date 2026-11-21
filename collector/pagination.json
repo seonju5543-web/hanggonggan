@@ -200,11 +200,7 @@
   "checkedAt": "2026-10-30"
  },
  "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "pageNo"
-  },
+  "ok": false,
   "checkedAt": "2026-11-21"
  },
  "https://www.korea.ac.kr/ko/568/subview.do": {

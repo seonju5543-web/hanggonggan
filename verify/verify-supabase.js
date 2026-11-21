@@ -181,8 +181,8 @@ function makeAppCopy(configured) {
      (저장소에 'google' 하나가 실제로 채워지자 이 검사가 1개만 세고 실패했다 —
       푸시 검사에서 겪은 것과 같은 종류의 함정이다.) */
   if (configured) {
-    cfg = cfg.replace(/\bproviders:\s*\[[^\]]*\]/, "providers: ['google', 'kakao', 'naver']");
-    if (!/providers:\s*\['google', 'kakao', 'naver'\]/.test(cfg)) {
+    cfg = cfg.replace(/\bproviders:\s*\[[^\]]*\]/, "providers: ['google', 'kakao', 'naver', 'apple']");
+    if (!/providers:\s*\['google', 'kakao', 'naver', 'apple'\]/.test(cfg)) {
       throw new Error('supabase-config.js 의 providers 를 바꾸지 못했습니다 — 파일 모양이 바뀐 것 같습니다');
     }
   }
@@ -503,7 +503,8 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     ok(await page.locator('#in-auth-remember').count() === 1, '로그인 화면에 아이디 저장이 있다');
     ok(await page.locator('#btn-auth-forgot').count() === 1, '비밀번호를 잊으셨나요 링크가 있다');
     const social = await page.locator('#detail-sheet [data-oauth]').count();
-    ok(social === 3, '소셜 버튼이 providers 수만큼 나온다', social);
+    ok(social === 4, '소셜 버튼이 providers 수만큼 나온다', social);
+    ok(await page.locator('#detail-sheet [data-oauth="apple"].auth-apple svg path[fill="#fff"]').count() === 1, 'Apple 버튼은 검은 바탕 · 흰 사과 로고 (애플 디자인 규칙)');
     const gUrl = await page.evaluate(() => authOAuthUrl('google'));
     ok(gUrl.includes('/auth/v1/authorize?provider=google') && gUrl.includes('redirect_to='),
       '소셜 주소가 제공자와 돌아올 주소를 담는다', gUrl);

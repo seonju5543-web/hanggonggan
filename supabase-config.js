@@ -48,8 +48,10 @@ const SUPABASE_CONFIG = {
         그리고 Authentication → URL Configuration 에 아래 두 곳을 등록해야 돌아온다(앱 주소 = server/shared/app-address.mjs 의 APP_BASE · 도메인을 옮기면 새 주소를 추가):
           Site URL          https://seonju5543-web.github.io/hanggonggan/
           Redirect URLs     https://seonju5543-web.github.io/hanggonggan/
-     쓸 수 있는 값: 'google' · 'kakao' (Supabase 가 공식 지원한다) */
-  providers: ['google'],
+     쓸 수 있는 값: 'google' · 'kakao' · 'apple' (Supabase 가 공식 지원한다)
+     🍎 apple (2026-11-21 은서): 애플 개발자 계정(개인 · 팀 메일 아이디) → Services ID kr.handaejang.web · Key(.p8) → Supabase Apple 에 비밀 키(JWT).
+        🔴 그 비밀 키는 **6개월마다 만료**(애플 규칙) — docs/backend/keys.json 「Apple 로그인 비밀 키」 만료 경보 · 다시 만들어 Supabase 칸만 바꾸면 된다 */
+  providers: ['google', 'apple'],
   /* 🔴 카카오 — 설정은 다 됐는데 **켤 수 없다** (2026-08-26).
      한 줄 요약: 카카오는 이메일을 비즈 앱에만 주는데, Supabase 는 이메일을 반드시 요청한다.
 

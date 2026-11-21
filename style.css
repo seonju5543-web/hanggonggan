@@ -2120,6 +2120,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .auth-kakao { background: #fee500; border-color: #f2da00; }
 .auth-naver { background: #03c75a; border-color: #02b351; }
 .auth-naver svg { width: 22px; height: 22px; }
+.auth-apple { background: #000; border-color: #000; }
 .auth-social-note { font-size: var(--t-xs); color: var(--text-weak); text-align: center; line-height: 1.6; margin-bottom: 10px; }
 /* ── 적합도 색깔 (2026-08-24 개발자 지시) ────────────────────────────
    빨강 → 주황 → 노랑 → 초록 → 파랑. 제일 딸리는 게 빨강, 제일 적합한 게 파랑.

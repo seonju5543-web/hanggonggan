@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-21",
+ "updatedAt": "2026-11-22",
  "items": {
   "r:auto-082f26ec8898eab98ceca780": {
    "attempts": 0,
@@ -443,11 +443,11 @@
    "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261116&brdSeq=3&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
   },
   "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%20%EB%AC%B8%EC%9A%B0%EB%A6%BC%20%EC%A0%9C6%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91": {
-   "attempts": 3,
+   "attempts": 4,
    "title": "[교외] 문우림 제6기 장학생 모집",
-   "lastTried": "2026-11-19",
+   "lastTried": "2026-11-22",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-11-22",
+   "nextTryAt": "2026-11-29",
    "status": "",
    "likelyGone": true,
    "escalated": true

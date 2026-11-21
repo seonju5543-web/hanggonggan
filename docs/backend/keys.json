@@ -29,6 +29,8 @@
   { "name": "SUPABASE_URL", "where": "Cloudflare(apply 서버 · 아직 안 켬)", "for": "회원 장부 주소(공개값)", "owner": "이선주", "expires": "없음", "renew": "바뀌지 않는다" },
   { "name": "SUPABASE_ANON_KEY", "where": "Cloudflare(apply 서버) · supabase-config.js(공개값)", "for": "회원 장부 공개 열쇠", "owner": "이선주", "expires": "없음", "renew": "Supabase → Settings → API Keys" },
   { "name": "아침 지표 열쇠", "where": "Supabase report_keys 표 · 각자 관리자 사이트 브라우저", "for": "관리자 사이트 「아침 지표」가 이용 횟수·오류 보고서를 읽는다(usage_report)", "owner": "은서", "expires": "없음", "renew": "새어 나갔으면 SQL Editor 에서 delete from report_keys; 뒤 0007 을 다시 실행해 새 열쇠를 만든다" },
+  { "name": "애플 개발자 멤버십", "where": "developer.apple.com(개인 · 팀 메일 아이디)", "for": "앱스토어 출시·Apple 로그인 — 끊기면 앱스토어에서 앱이 내려가고 Apple 로그인이 멈춘다", "owner": "유은서", "expires": "2027-11-21", "renew": "developer.apple.com/account → 멤버십 세부 사항 · 연회비 결제(자동 갱신 확인)" },
+  { "name": "Apple 로그인 비밀 키", "where": "Supabase → Authentication → Sign In / Providers → Apple(Secret Key)", "for": "Apple 로그인 — 만료되면 Apple 로그인이 멈춘다", "owner": "유은서", "expires": "2027-05-21", "renew": "Supabase 문서 Apple 로그인의 생성 도구에 .p8(Key ID W654NP2ZYN · Team 7MZR8WFZPQ · Services ID kr.handaejang.web)을 넣어 새로 만들고 그 칸만 바꾼다 · 애플 규칙상 최대 6개월" },
   { "name": "SUPABASE_SERVICE_KEY", "where": "Cloudflare(apply 서버 · 아직 안 켬)", "for": "회원 장부 만능 열쇠 — 🔴 저장소·채팅에 절대 넣지 않는다", "owner": "이선주", "expires": "없음", "renew": "Supabase → Settings → API Keys(새어 나갔으면 즉시 교체)" }
  ]
 }
