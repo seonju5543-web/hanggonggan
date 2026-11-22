@@ -91,6 +91,7 @@
   /* 가장 빠른 마감이 오늘인가 — 마감 줄이 보이고 D-Day 표시(urgent)일 때 · app.js renderHome 이 정한다(여기서 세지 않는다) */
   function isDday() { const d = lineOf('due'); return !!(d && !d.hidden && d.classList.contains('urgent')); }
   function homeShown() { const h = $id('screen-home'); return !!(h && !h.hidden); }
+  function sheetOnScreen() { const sh = $id('detail-sheet'); return !!(sh && !sh.hidden); }   // 닫는 움직임(0.25초)이 끝나야 hidden 이 된다
   function sheetOpen() { const sh = $id('detail-sheet'); return !!(sh && !sh.hidden && sh.classList.contains('show')); }
   function bindHero() {
     if (hero.bound || !$id('hero-lines')) return;
@@ -135,7 +136,10 @@
       st.home = K.Stage(wrap.querySelector('.mascot-stage'), { screenX: 0.33, coins: 8, spread: 1.0, jump: 0.28, camY: 1.4, lookY: 1.22, dist: 8.0,
         onTap() { hold(); const k = nextKey(); if (k) setActive(k, 'mascot'); },
         /* 반응 연출(mascot/mood.js) — 무대가 정한 자세 위에 얹는다 · 연출이 가져간 누르기는 동전·다음 줄 없이 */
-        after: (dt, c) => { if (hero.mood) hero.mood.after(dt, c); }, beforeTap: () => (hero.mood ? hero.mood.beforeTap() : true) });
+        after: (dt, c) => { if (hero.mood) hero.mood.after(dt, c); }, beforeTap: () => (hero.mood ? hero.mood.beforeTap() : true),
+        /* 상세 시트가 화면에 있는 동안(올라오고·내려가는 움직임 포함)은 그리지 않는다 — 멈췄다가 시트가 걷히면 그 자리에서 잇는다.
+           덮인 의자 장면을 그리느라 시트가 내려가는 움직임이 밀렸다(11-22 verify-sheet-back 실측 — 밀기 한 번 635ms) */
+        paused: sheetOnScreen });
       if (!st.home) { st.failed = true; return; }
       if (K.Mood) {
         hero.fx = K.ScreenHit(fxLayer(), $id('screen-home'));   // 깨진 유리는 화면 전체 한 장에 · 흔들리는 것은 홈 화면

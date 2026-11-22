@@ -350,7 +350,9 @@
       requestAnimationFrame(frame);
       if (S.tJump < 0 && !S.drag && appear >= 1 && !S.busy && (skip = !skip)) return;   // 쉬는 동안은 한 프레임 걸러 (전력) · 연출 중(S.busy)은 매 프레임
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      if (!S.visible || !ch) return;
+      /* paused(): 밖에서 '지금은 그리지 마' — 홈 히어로는 시트가 무대를 덮고 있을 때(app-mascot.js). 덮인 무대를 그리면 느린 폰(과 소프트웨어 렌더링 검사)에서
+         시트 애니메이션이 밀렸다(11-22 verify-sheet-back 실측) · 없으면 예전 그대로 */
+      if (!S.visible || !ch || (opt.paused && opt.paused())) return;
       S.time += dt;
       // 돌리기 — 놓으면 용수철로 제자리
       if (!S.drag || !moved) { S.yawV += (-S.yaw * 60 - S.yawV * 7) * dt; S.yaw += S.yawV * dt; }

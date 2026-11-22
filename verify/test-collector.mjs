@@ -18395,6 +18395,8 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
       [/hero\.mood\.setLine\(k, \{ dday: isDday\(\) \}\)/.test(am), /hero\.mood\.poke\(\)/.test(am), /if \(hero\.mood && hero\.mood\.mode !== 'idle'\) return;/.test(am), /classList\.contains\('urgent'\)/.test(am)], [true, true, true, true]);
     eq('  던진 몽둥이는 휴대폰 화면 전체에(고정된 한 장 · 누르기를 막지 않는다) · 흔드는 것은 홈 화면(앱 틀을 흔들면 아래 탭이 튄다)',
       [/K\.ScreenHit\(fxLayer\(\), \$id\('screen-home'\)\)/.test(am), /\.mascot-fx \{ position: fixed; inset: 0; pointer-events: none;/.test(css)], [true, true]);
+    eq('  상세 시트가 화면에 있는 동안(움직임 포함)은 무대를 그리지 않는다 — 덮인 장면을 그리느라 시트 움직임이 밀렸다(verify-sheet-back)',
+      [/paused: sheetOnScreen/.test(am), /function sheetOnScreen\(\) \{ const sh = \$id\('detail-sheet'\); return !!\(sh && !sh\.hidden\); \}/.test(am), /\(opt\.paused && opt\.paused\(\)\)\) return;/.test(readText(new URL('../mascot/kit.js', import.meta.url)))], [true, true, true]);
     eq('  무대에서는 손가락이 화면을 굴리지 않는다(아래로 끌기·빙글 돌리기 — 시안 그대로)', /\.hero > \.mascot-wrap \.mascot-stage \{[^}]*touch-action: none;/.test(css), true);
     eq('  시안의 금지 — 눈썹 없음(5차 "못생겼다") · 말풍선 없음(3차) · 땀은 머리 옆 물방울 하나(11-22 "땀을 기존으로")',
       [/rig\.brows|browOn/.test(mood), /bubble|말풍선을 띄/.test(mood.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')), /rig\.sweat = d;/.test(mood), /sweatLayers|tex\('drop'\)/.test(mood)], [false, false, true, false]);
