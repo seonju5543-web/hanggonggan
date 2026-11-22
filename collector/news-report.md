@@ -1,12 +1,12 @@
 ## 🗞 교내 소식 수집 리포트 (2026-11-22)
 
-새 글 **12건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 45개교 · 게시판 아는 학교 45/45 · 둘째 게시판 3곳)
+새 글 **4건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 45개교 · 게시판 아는 학교 45/45 · 둘째 게시판 3곳)
 
-⏱ 게시판 48곳을 3분 24초에 다 돌았습니다(예산 4분).
+⏱ 게시판 48곳을 3분 39초에 다 돌았습니다(예산 4분).
 
 ### 🚨 연속 실패 — 게시판 주소 확인 필요
-- 한양대학교 (51회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
-- 아주대학교 (64회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+- 한양대학교 (52회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
+- 아주대학교 (65회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 🙋 열리지만 글을 못 읽는 게시판 1곳 — 개발자에게 학생이 보는 공지 목록 주소를 요청합니다
 - 고려대학교
@@ -24,7 +24,7 @@
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
 
 ### 경북대학교
-상태: ✅ 정상 (공지 글 12건 감지 · 새 글 0)
+상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 영남대학교
 상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
@@ -48,9 +48,7 @@
 상태: ✅ 정상 (공지 글 12건 감지 · 새 글 0)
 
 ### 강원대학교
-상태: ✅ 정상 (공지 글 23건 감지 · 새 글 2)
-- [[산업대학원(원주)]2027년도 전기 신입생 모집 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11678&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-11-21
-- [[사회융합대학원/원주캠퍼스]2027년도 전기 신입생 모집 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11677&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-11-21
+상태: ✅ 정상 (공지 글 23건 감지 · 새 글 0)
 
 ### 성신여자대학교
 상태: ✅ 정상 (공지 글 11건 감지 · 새 글 0)
@@ -89,7 +87,8 @@
 상태: ✅ 정상 (공지 글 13건 감지 · 새 글 0)
 
 ### 성균관대학교
-상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 1)
+- [행사] [사회과학대학 제42회 수선포럼 개최 안내: 2026.12.16.(수) 16:00~17:30](https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142176&article.offset=0&articleLimit=10) — 2026-11-22
 
 ### 한양대학교
 상태: ⚠️ 접속 실패 (HTTP 403) — 주소 수정 필요
@@ -137,20 +136,13 @@
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
 
 ### 세종대학교
-상태: ✅ 정상 (공지 글 8건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 1)
+- [「2026 OPEN LAB WEEK」 참가 학생 모집 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=896817&article.offset=0&articleLimit=10) — 2026-11-22
 
 ### 이화여자대학교
-상태: ✅ 정상 (공지 글 14건 감지 · 새 글 10)
-- [학사] [[학부] 2026학년도 겨울 계절학기 폐강교과목 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368061&article.offset=0&articleLimit=10&no=334) — 2026-11-19
-- [2027학년도 수시모집 논술고사 시행에 따른 교내 차량 전면 통제 안내 (11.28.(토)~29.(일))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367962&article.offset=0&articleLimit=10&no=334) — 2026-11-16
-- [[학생지원팀/교육부] 수능 종료 후 인파밀집에 따른 안전사고 예방 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368078&article.offset=0&articleLimit=10&no=333) — 2026-11-20
-- [[학생지원팀/배달의민족] 캠퍼스 내 다회용기로 배달 주문 시 1만원 할인 쿠폰 증정 (선착순·조기 마감 가능)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368067&article.offset=0&articleLimit=10&no=332) — 2026-11-20
-- [[교육혁신센터] 2026-2학기 또래코치(가르치는 학생) 모집 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368066&article.offset=0&articleLimit=10&no=331) — 2026-11-20
-- [학사] [2027학년도 전기 2차/수시 외국어교육특수대학원 석사학위과정 신입생 모집 안내 / Spring 2027(R2) Ewha TFL Admission Guide](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368065&article.offset=0&articleLimit=10&no=330) — 2026-11-20
-- [채용] [[채용] 교무처 교원인사팀 계약직원 채용 공고(~11/27(금))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368064&article.offset=0&articleLimit=10&no=329) — 2026-11-20
-- [[안전팀] 겨울철 화재가 아닌 경우 발생하는 경보 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368063&article.offset=0&articleLimit=10&no=328) — 2026-11-20
-- [[학생지원팀/외교부] 외교부 해외안전여행 앱, 영사안전콜센터 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368054&article.offset=0&articleLimit=10&no=325) — 2026-11-19
-- [채용] [[연장][채용] 데이터사이언스대학원 행정실 계약직원 모집(~11/24까지)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368053&article.offset=0&articleLimit=10&no=324) — 2026-11-19
+상태: ✅ 정상 (공지 글 14건 감지 · 새 글 2)
+- [학사] [[학부] 2026학년도 겨울 계절학기 폐강교과목 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368061&article.offset=0&articleLimit=10&no=335) — 2026-11-19
+- [[건축팀] 국제교육관 주변 크레인 작업 안내 (11.26.목)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368083&article.offset=0&articleLimit=10&no=334) — 2026-11-22
 
 ### 인하대학교
 상태: ✅ 정상 (공지 글 12건 감지 · 새 글 0)

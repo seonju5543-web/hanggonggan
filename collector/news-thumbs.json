@@ -25387,6 +25387,54 @@
    "at": "2026-11-22",
    "school": "이화여자대학교",
    "none": "글에 그림이 없음"
+  },
+  "url:https://www.sejong.ac.kr/kor/intro/notice1.do?article.offset=0&articleLimit=10&articleNo=896817&mode=view": {
+   "at": "2026-11-22",
+   "school": "세종대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 가로세로가 치우침 (564×141 · 띠 배너로 보임))"
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142176&mode=view": {
+   "at": "2026-11-22",
+   "school": "성균관대학교",
+   "file": "data/news/img/2dd365561cbb7fc7.webp",
+   "src": "https://www.skku.edu/_attach/image/2026/11/QFkcfAOqtOqDcJnJsoum.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368083&mode=view&no=334": {
+   "at": "2026-11-22",
+   "school": "이화여자대학교",
+   "file": "data/news/img/c2d6f20556d3d60a.webp",
+   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZshhAIgSQIIAsDyAleAHAUwE0ATRAW0wC0A3ACQBUAbAOjwDsBzIA%20",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368061&mode=view&no=335": {
+   "at": "2026-11-22",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368054&mode=view&no=325": {
+   "at": "2026-11-22",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368053&mode=view&no=324": {
+   "at": "2026-11-22",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367962&mode=view&no=334": {
+   "at": "2026-11-22",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367744&mode=view&no=340": {
+   "at": "2026-11-22",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(같은 파일))"
   }
  },
  "srcSeen": {
@@ -26253,6 +26301,9 @@
    ],
    "https://www.sejong.ac.kr/_attach/sejong/editor-image/2026/11/XjOcXVndrVfJywBQllxXQwWapD.png": [
     "url:https://www.sejong.ac.kr/kor/intro/notice1.do?article.offset=0&articleLimit=10&articleNo=896528&mode=view"
+   ],
+   "https://www.sejong.ac.kr/_attach/sejong/editor-image/2026/11/mzcCPiJuYMdGcttbleQgDEVFaS.png": [
+    "url:https://www.sejong.ac.kr/kor/intro/notice1.do?article.offset=0&articleLimit=10&articleNo=896817&mode=view"
    ]
   },
   "부경대학교": {
@@ -26931,6 +26982,9 @@
    ],
    "https://www.skku.edu/cms/plugin/editorImage.do?EwBmDYHoEZshBAxgRQFIDEDKAvACgLQBMBpAKwDcBxAGwHUAjXAMwAsA6ABwDsBzIA%20": [
     "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142158&mode=view"
+   ],
+   "https://www.skku.edu/_attach/image/2026/11/QFkcfAOqtOqDcJnJsoum.png": [
+    "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142176&mode=view"
    ]
   },
   "광운대학교": {
@@ -28539,6 +28593,12 @@
    ],
    "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgvAygEQA4DkAyBLASgWQCsBFATwHMAxAD2IHVSAFAawDpUA7coA%20": [
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367760&mode=view&no=340"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZshhAIgSQIIAsDyAleAHAUwE0ATRAW0wC0A3ACQBUAbAOjwDsBzIA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368083&mode=view&no=334"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgFAFgOQJoE8DqBlAEgEQHdMBhASUQCN0BxAZwCkBHAOgAcA7AcyA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367744&mode=view&no=340"
    ]
   },
   "충북대학교": {

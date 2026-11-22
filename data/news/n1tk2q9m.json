@@ -4,7 +4,7 @@
  "items": [
   {
    "title": "[학부] 2026학년도 겨울 계절학기 폐강교과목 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368061&article.offset=0&articleLimit=10&no=334",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368061&article.offset=0&articleLimit=10&no=335",
    "postedAt": "2026-11-19",
    "kind": "학사",
    "school": "이화여자대학교",
@@ -14,13 +14,25 @@
    "desc": "학수번호 교과목명 과학,기술과사회 ※ 수강신청 취소 및 변경기간: 2026.12.7.(월) 09:00~2026.12.9.(수) 15:00 ( 기존 신청학점 내에서만 변경/취소 가능 ) 수강신청 취소 및 변경기간…"
   },
   {
+   "title": "[건축팀] 국제교육관 주변 크레인 작업 안내 (11.26.목)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368083&article.offset=0&articleLimit=10&no=334",
+   "postedAt": "2026-11-22",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-22",
+   "thumb": "data/news/img/c2d6f20556d3d60a.webp",
+   "desc": "100주년기념중앙박물관 노후 항온항습설비 교체를 위한 크레인 작업을 아래와 같이 안내드리오니 양해와 협조 부탁 드립니다."
+  },
+  {
    "title": "2027학년도 수시모집 논술고사 시행에 따른 교내 차량 전면 통제 안내 (11.28.(토)~29.(일))",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367962&article.offset=0&articleLimit=10&no=334",
    "postedAt": "2026-11-16",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-11-22"
+   "foundAt": "2026-11-22",
+   "desc": "2027학년도 수시모집 논술고사 시행에 따라 수험생 및 학부모 등 대규모 인원의 교내 방문이 예정되어 있습니다."
   },
   {
    "title": "[학생지원팀/교육부] 수능 종료 후 인파밀집에 따른 안전사고 예방 안내",
@@ -101,7 +113,8 @@
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-11-22"
+   "foundAt": "2026-11-22",
+   "desc": "이화여자대학교 데이터사이언스대학원 행정실에서는 아래와 같이 계약직원을 모집하오니 관심있는 분들의 많은 지원 바랍니다."
   },
   {
    "title": "[글로벌소통교육실] 2026 겨울 고급영어글쓰기, 스피킹 마스터 프로그램 신청 안내",
@@ -407,16 +420,6 @@
    "src": "ec6597da",
    "foundAt": "2026-11-16",
    "desc": "이화여자대학교 조형예술대학 도자예술전공에서 아래와 같이 계약직원을 모집하오니 관심있는 분들의 많은 지원 바랍니다 ."
-  },
-  {
-   "title": "[언어교육원] 2026학년도 겨울 12월 NTU 위탁 과정 한국어 도우미 모집",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367933&article.offset=0&articleLimit=10&no=322",
-   "postedAt": "2026-11-13",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-16",
-   "desc": "1.신청자격: 봉사활동에 뜻을 가지고 책임감 있게 활동할 한국국적의 이화여대 대학(원)생 *휴학생 및 예전 한국어도우미 활동자 재신청 가능 *언어교육원수강생들의 수업시간은 월~금 오전9:00~13:00입니다."
   }
  ]
 }
