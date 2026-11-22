@@ -139,7 +139,7 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   await page.click('#apps-list .sch-card');
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(350);
-  console.log('STEP applied detail official link:', await page.$eval('.applied-at', (el) => el.textContent.trim()));
+  console.log('STEP applied detail official link:', await page.$eval('.prep-where', (el) => el.textContent.trim()));   // 제출처 줄은 2026-11-21 부터 「제출 방법 확인」 줄 밑(prep-where)
   console.log('STEP saved docs section exists:', await page.locator('.dp-saved').count());
   console.log('STEP submit guide steps:', await page.locator('.guide-list li').count());
   await page.click('#btn-copy-docs');

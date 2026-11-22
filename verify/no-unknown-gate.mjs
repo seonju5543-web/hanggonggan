@@ -97,7 +97,7 @@ export function runNoUnknownGate(eq, readText) {
   fifth['문제 주소 — 게시판·소식 카드'] = run('noticeCardHtml')({ title: '표본 소식', url: 'https://www.pyobon.ac.kr/news/7', school: '표본대학교', foundAt: iso(-1) }, {});
   fifth['문제 주소 — 도우미·활동'] = ['chat', 'activity', 'activityButton'].map((w) => run('sourceLink')({ url: 'https://www.pyobon.ac.kr/news/7' }, w).label).join('\n');
   fifth['문제 주소 — 신청 내역 제출처 줄'] = (run('(a) => { state.applications = a; }')([{ id: 'g-unread', appliedAt: iso(-1) }]), A.sheetHtml('g-unread'));
-  const troubleSays = [screenText(run('sourceLinkHtml')(reg1)), run('sourceLink')({ url: 'https://www.pyobon.ac.kr/news/7' }, 'card').label, /이 주소가 열리지 않았어요 \(2026-11-10 확인\)/.test((fifth['문제 주소 — 신청 내역 제출처 줄'].match(/<p class="applied-at">[\s\S]*?<\/p>/) || [''])[0])];
+  const troubleSays = [screenText(run('sourceLinkHtml')(reg1)), run('sourceLink')({ url: 'https://www.pyobon.ac.kr/news/7' }, 'card').label, /이 주소가 열리지 않았어요 \(2026-11-10 확인\)/.test((fifth['문제 주소 — 신청 내역 제출처 줄'].match(/<p class="prep-where">제출처 [\s\S]*?<\/p>/) || [''])[0])];   /* 제출처 줄은 2026-11-21 부터 「제출 전 준비」의 「제출 방법 확인」 줄 밑(prep-where) — 담김 줄(applied-at)엔 날짜만 */
   run('(a) => { state.applications = a; }')([]);
   run('setLinkChecks')(null);
   const fifthDirty = Object.entries(fifth).filter(([, h]) => Object.keys(hits(h)).length).map(([k, h]) => `${k}·${Object.keys(hits(h)).join('/')}`);

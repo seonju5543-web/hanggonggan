@@ -5449,6 +5449,53 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
 .pdfv-zoom { position: absolute; right: var(--space-16); bottom: calc(env(safe-area-inset-bottom) + var(--space-16)); display: flex; gap: var(--space-8); }
 .pdfv-zoom button { width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--surface); border: 1px solid var(--line); font-size: var(--t-lg); font-weight: 700; color: var(--text); }
 
+/* ── 신청 내역 진행 화면 — 한 흐름 (2026-11-21 개발자 지시 · app-sheet.js openDetail) ──
+   *"불필요한 버튼이나 내용들이 너무 많아서 가독성을 떨어뜨리고 전문성이 낮아보이게 해"*
+   단계 막대 → 「제출 전 준비」 네 줄(줄 밑에 그 내용) → 제출 단추 하나 → 제출 기록. 큰 단추는 둘뿐이고 나머지는 글자 단추다. */
+#detail-sheet .applied-at { margin: var(--space-12) 0 var(--sp-3); }
+.prep-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+.prep-head h4 { margin: 0; font-size: var(--t-md); font-weight: 800; color: var(--text); }
+.prep-head .channel-tag { margin-left: 0; font-variant-numeric: tabular-nums; }
+.prep-check { list-style: none; margin: 0 0 var(--sp-3); padding: 0; border-top: 1px solid var(--line); }
+.prep-item { border-bottom: 1px solid var(--line); padding: var(--space-12) 0; }
+.prep-row { display: flex; align-items: center; gap: var(--space-12); min-height: 28px; }
+.prep-mark {
+  flex: none; width: 22px; height: 22px; border-radius: var(--radius-pill);
+  border: 1.5px solid var(--rule); display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--t-2xs); font-weight: 800; color: var(--surface); line-height: 1;
+}
+.prep-item.is-done .prep-mark { background: var(--primary); border-color: var(--primary); }
+.prep-label { flex: 1; min-width: 0; font-size: var(--t-md); font-weight: 700; color: var(--text); }
+.prep-item.is-done .prep-label { color: var(--text-sub); font-weight: 600; }
+.prep-label .doc-legend { margin-left: var(--space-4); }
+.prep-toggle {
+  flex: none; font-size: var(--t-xs); font-weight: 700; color: var(--text);
+  border: 1px solid var(--rule); border-radius: var(--radius-pill); padding: var(--space-6) var(--space-12); background: var(--surface);
+}
+.prep-toggle.is-undo { border-color: transparent; color: var(--text-weak); font-weight: 600; padding-right: 0; }
+/* 줄 밑 내용 — 표식(22px) + 틈(12px) 만큼 들여서 줄 이름 아래에 선다 */
+.prep-detail { margin: var(--space-8) 0 0 34px; }
+.prep-detail .doc-list.doc-check li { padding: var(--space-4) 0; font-size: var(--t-sm); color: var(--text-sub); }
+.prep-detail .dp-note { text-align: left; margin-top: var(--space-6); }
+.prep-detail .guide-list { margin: var(--space-6) 0 0 var(--space-16); font-size: var(--t-sm); gap: var(--space-4); }
+.prep-where { margin: 0 0 var(--space-4); font-size: var(--t-sm); color: var(--text-sub); line-height: 1.55; }
+.prep-where a { color: var(--text); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.prep-where .channel-tag { margin-left: 0; }
+/* 다 쓴 문서 — 문서 한 줄 + 글자 단추 넷 */
+.prep-file { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-12); padding: var(--space-12) var(--space-16); background: var(--surface-2); border-radius: var(--radius-sm); margin-bottom: var(--space-8); }
+.prep-file-name { flex: 1 1 auto; font-size: var(--t-sm); font-weight: 700; color: var(--text); }
+.prep-file-acts { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-12); }
+.prep-file-acts .link-btn, .prep-sub-acts .link-btn { font-size: var(--t-xs); font-weight: 700; color: var(--text-sub); padding: var(--space-4) 0; }
+.prep-detail .dp-saved { margin-top: var(--space-4); }
+/* 제출하기 — 큰 단추 하나 + 그 밑 글자 단추 둘 */
+.prep-submit { margin-bottom: var(--sp-3); }
+.prep-submit .btn-lg { width: 100%; }
+.prep-sub-acts { display: flex; justify-content: center; gap: var(--space-24); margin-top: var(--space-8); }
+/* 다 냈으면 기록 — 맨 끝, 선 하나 위 */
+.prep-record { border-top: 1px solid var(--line); padding-top: var(--sp-2); margin-bottom: var(--sp-2); }
+.prep-record .btn { width: 100%; }
+.prep-record .dp-note { margin-top: var(--space-8); }
+
 /* ── 게시 요청 — 기관 담당자 화면 (2026-11-21 · post-request.js) ── */
 #postreq-body { padding: 0 var(--sp-4) var(--sp-4); }
 .pr-wide { width: 100%; margin-top: var(--sp-2); }

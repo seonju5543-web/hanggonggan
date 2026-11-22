@@ -2155,8 +2155,9 @@ function prepStateLabel(app, sch, stepLabel) {
   return !pc.complete && !app.submittedAt && !app.result ? `준비 중 ${pc.done}/${pc.total}` : stepLabel;
 }
 
-/* 증명서류(작성형 제외)의 보관함 상태 목록 HTML */
-function certStatusListHtml(sch) {
+/* 증명서류(작성형 제외)의 보관함 상태 목록 HTML
+   opts.bare — 머리글 없이 목록과 보관함 한 줄만(신청 내역 「제출 전 준비」의 「제출 서류 확인」 줄 밑에 붙는다 · 2026-11-21) */
+function certStatusListHtml(sch, opts) {
   const certDocs = sch.documents.filter((doc) => !ESSAY_DEFS.some((e) => e.match.test(doc)) && !DOC_PLACEHOLDER.test(doc));
   if (!certDocs.length) return '';
   const rows = certDocs.map((doc) => {
@@ -2173,7 +2174,8 @@ function certStatusListHtml(sch) {
   }).join('');
   /* doc-check — 줄마다 ✓·□·△ 표식이 있어 목록 점은 뺀다(표식이 두 겹이던 자리 · 2026-10-15 · style.css) */
   /* 목록 밑 「보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.」는 2026-11-21 개발자 지시로 지웠다(학생이 읽지 않는 안내 · 서류함 상태는 각 줄이 말한다) */
-  return `<h4>증명서류 체크리스트</h4><ul class="doc-list doc-check">${rows}</ul>`;
+  const list = `<ul class="doc-list doc-check">${rows}</ul>`;
+  return opts && opts.bare ? list : `<h4>증명서류 체크리스트</h4>${list}`;
 }
 
 function personLine(p) {
