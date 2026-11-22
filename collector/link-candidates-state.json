@@ -170,22 +170,6 @@
   "round": "2026-11-23",
   "decidedAt": "2026-11-17"
  },
- "kosaf|1768681003|board:https://www.busan.go.kr/nbnews": {
-  "ds": "kosaf",
-  "key": "1768681003",
-  "url": "",
-  "board": "https://www.busan.go.kr/nbnews",
-  "source": "board",
-  "by": "로봇(층2 글 사냥꾼)",
-  "firstAt": "2026-10-13",
-  "lastAt": "2026-10-23",
-  "tries": 3,
-  "status": "pending",
-  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
-  "checks": {},
-  "round": "2026-10-28",
-  "nextAt": "2026-10-30"
- },
  "kosaf|1814024001|board:https://www.redcross.or.kr/main/pp/prcplView/selectPrcplView.do?mi=2590": {
   "ds": "kosaf",
   "key": "1814024001",
@@ -842,22 +826,6 @@
   "round": "2026-12-31",
   "decidedAt": "2026-11-21"
  },
- "kosaf|2000439007|board:https://www.iksan.go.kr/business/board/post/list.do?boardUid=ff8080819927194f01994bc5f5fa30a0&menuUid=ff8080819927194f019936f6b61b1bc6": {
-  "ds": "kosaf",
-  "key": "2000439007",
-  "url": "",
-  "board": "https://www.iksan.go.kr/business/board/post/list.do?boardUid=ff8080819927194f01994bc5f5fa30a0&menuUid=ff8080819927194f019936f6b61b1bc6",
-  "source": "board",
-  "by": "로봇(층2 글 사냥꾼)",
-  "firstAt": "2026-10-23",
-  "lastAt": "2026-10-23",
-  "tries": 1,
-  "status": "rejected",
-  "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
-  "checks": {},
-  "round": "2026-11-03",
-  "decidedAt": "2026-10-23"
- },
  "kosaf|2000480007|https://www.rhof.or.kr/sub/sub0401_view.jsp?headerId=B00001100": {
   "ds": "kosaf",
   "key": "2000480007",
@@ -1503,15 +1471,15 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "2026학년도 창암장학생 지원 공고 안내",
   "firstAt": "2026-11-17",
-  "lastAt": "2026-11-22",
-  "tries": 6,
+  "lastAt": "2026-11-23",
+  "tries": 7,
   "status": "rejected",
   "why": "다른 공고의 링크와 같은 주소([학부·대학원-교외장학] 2026학년도 창암장학생 지원 공고 안내)",
   "checks": {
    "C": "fail"
   },
   "round": "2026-11-20",
-  "decidedAt": "2026-11-22"
+  "decidedAt": "2026-11-23"
  },
  "kosaf|2703692001|https://koreashe.org/notice/?uid=95478&mod=document&pageid=1": {
   "ds": "kosaf",
