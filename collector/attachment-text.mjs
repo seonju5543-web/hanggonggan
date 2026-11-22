@@ -107,10 +107,20 @@ export const roleText = (filePath) => {
 /* 학생이 아니라 남(교수·학과장)이 쓰거나 선발 **뒤에** 내는 서식 — 내용이 서식이어도 신청서 칸에 두지 않는다(data.js isApplicationForm 과 같은 선) */
 const NOT_STUDENT_FORM = (n) => /추천서|보고서|영수증|점검표|수료\s*확인서/.test(n) && !/자기소개서|(신청서|지원서)\s*(및|와|과|[,·&+])\s*(장학생\s*)?추천서/.test(n);
 
-/** 첨부 하나의 행선지 — { form: 앱 신청서 칸에 둔다, notice: 카드(자격·마감·서류)를 읽는 데 쓴다, role, by: 'content'|'name' }
-    name = 첨부 이름 · text = 그 파일 글자(roleText) · nameForm = 이름 규칙(data.js isApplicationForm · PDF 꼴) */
-export function attachDecision(name, text, nameForm, paidRole = null) {
+/** 첨부 하나의 행선지 — { form: 앱 신청서 칸에 둔다, notice: 카드(자격·마감·서류)를 읽는 데 쓴다, role, by: 'ai'|'content'|'paid'|'name' }
+    name = 첨부 이름 · text = 그 파일 글자(roleText) · nameForm = 이름 규칙(data.js isApplicationForm · PDF 꼴)
+    aiRole = AI(4번 카드 읽기 · 6번 최종 검토)가 그 파일에 정한 갈래 — 'notice'|'form'|'mixed'|'other'(collector/attach-role-ai.mjs toDecisionRole) · 부르는 쪽이 찾아서 넘긴다 */
+export function attachDecision(name, text, nameForm, paidRole = null, aiRole = null) {
   const n = String(name || '');
+  /* 🔴 AI 가 답한 파일은 그 답이 갈래다 (2026-11-21 개발자 지시 — *"(첨부 구분은) 기계검사가 아니라 지능이 있는 ai 가 해야해"*) — 글자 표식·유료 첨부 판정·이름 규칙으로 뒤집지 않는다.
+     추천서처럼 남이 쓰는 서식을 거르는 것도 AI 의 몫이다(card-read ATTACH_RULES — 그런 파일은 content 로 답한다) · other 는 어느 쪽도 아니다.
+     🔴 붙은 문서(mixed)의 행선지는 글자 표식으로 가른 붙은 문서와 **같다**(아래 mixed 줄 · 2026-11-22): 카드는 읽고, 신청서 칸에는 이름이 신청서일 때만 통째로 선다 —
+        그 파일의 서식 쪽은 form-pages 가 따로 떼지만, 쪽을 못 떼거나 뗀 사본이 내려가도 이름이 신청서인 파일은 신청서 칸을 잃지 않는다.
+        이름이 신청서가 아닌 붙은 문서만 PDF 둘로 갈린다(읽는 글 쪽 = doc-pdf · 서식 쪽 = form-pages)
+     🔴 이름이 신청서인 파일의 other 는 답이 없는 것으로 본다(리뷰 2026-11-23) — other 는 「뽑은 글자가 깨졌거나 비었다」는 뜻이기도 하다(글자에 대한 말이지 파일에 대한 말이 아니다).
+        그 말로 신청서 칸을 빼앗지 않는다 — 아래 예전 길(글자 표식 → 유료 첨부 판정 → 이름 규칙)이 정한다. 이름이 신청서가 아닌 파일에는 other 가 그대로 이긴다 */
+  if (aiRole === 'mixed') return { form: !!nameForm && !NOT_STUDENT_FORM(n), notice: true, role: 'mixed', by: 'ai' };
+  if (['notice', 'form'].includes(aiRole) || (aiRole === 'other' && !nameForm)) return { form: aiRole === 'form', notice: aiRole === 'notice', role: aiRole, by: 'ai' };
   const sig = docRoleSignals(text);
   let role = docRole(text, sig);
   /* 글자로 못 가른 파일(스캔 PDF·그림)만 — 유료 첨부 판정(모델 둘이 같은 답 · collector/attach-role-read.mjs)의 답을 쓴다. 글자로 가른 것은 그대로(무료 길이 먼저) */
@@ -440,25 +450,34 @@ function fileHash(p) {
 /* 신청서 쪽 원본을 카드 읽기에 쓰는가 — 🔴 공고문인지는 **원본 내용**으로(attachDecision · 2026-11-20): 이름이 애매한 「붙임1.hwp」·「…시행(안).hwp」·FAQ 도
    속이 안내문이면 읽는다. 🔴 단 **이름이 서식 꼴**(신청서·지원서·서식·동의서…)인 파일은 속이 **안내문뿐**(서식 표식 0)일 때만 읽는다 —
    공고문 몇 줄이 앞에 붙은 신청서(「仁松 선발 지원서」·「헌혈기부권 신청서식」)를 읽으면 개인정보 동의 문구가 자격이 된다(2026-08-20 사고 · 위 머리말 · 리뷰).
-   이름이 공고문인 파일은 예전처럼 늘 읽는다(isNoticeDoc) — 이 함수가 **더하는** 것은 이름이 애매하거나 이름과 속이 다른 공고문뿐이다 */
-function noticeByContent(name, filePath) {
+   이름이 공고문인 파일은 예전처럼 늘 읽는다(isNoticeDoc) — 이 함수가 **더하는** 것은 이름이 애매하거나 이름과 속이 다른 공고문뿐이다.
+   🔴 AI 가 답한 파일(aiRole · 2026-11-21)은 이름도 표식도 보지 않는다 — 이름이 서식 꼴이어도 붙은 문서(mixed)·내용 문서면 넣고, 이름이 공고문이어도 신청 양식·이 공고 문서 아님이면 뺀다 */
+function noticeByContent(name, filePath, aiRole = null) {
+  if (aiRole) return attachDecision(name, '', false, null, aiRole).notice;
   if (isNoticeDoc(name)) return true;
   const formish = FORMISH.test(String(name || ''));
   const d = attachDecision(name, roleText(filePath), formish);
   return formish ? d.role === 'notice' : d.notice;
 }
-/** 이 공고의 공고문 첨부 파일 이름들(extracted/ 기준) — 원문 글자(HWP·DOCX)가 먼저(docOrder) */
-export function noticeDocFiles(it, { index, formPath = true, sameTitle = null } = {}) {
+/** 이 공고의 신청서 쪽 색인 줄(forms-index) — id 칸이 있으면 id · 없으면(옛 줄) 같은 제목 + 그 공고의 첨부 이름(sameTitle 을 안 넘기면 id 줄만).
+    공고문 고르기(아래)와 서식 쪽 떼기(form-pages — 「양식 PDF 로봇이 맡는 파일인가」)가 같이 쓴다 */
+export function noticeFormRows(it, idx, sameTitle = null) {
+  if (!it) return [];
+  const attNames = new Set((it.attachments || []).map((a) => a && a.name).filter(Boolean));
+  const titles = [it.boardTitle, it.name, it.title].filter(Boolean);
+  return ((idx && idx.forms) || []).filter((r) => (r.id ? r.id === it.id : (!!sameTitle && attNames.has(r.attach) && titles.some((t) => sameTitle(t, r.title)))));
+}
+/** 이 공고의 공고문 첨부 파일 이름들(extracted/ 기준) — 원문 글자(HWP·DOCX)가 먼저(docOrder)
+    aiRoles — AI 가 그 파일에 정한 갈래를 찾아 주는 함수 (공고 id, 파일 이름, 실제 경로) → 'notice'|'form'|'mixed'|'other'|null. sameTitle 처럼 **부르는 쪽이 넘긴다**
+    (이 파일은 이웃을 pdf-text 하나만 불러온다). 넘기는 곳은 서식 쪽 떼기(form-pages) 하나 — 안 넘기는 발췌기·금액 로봇은 예전 그대로다 */
+export function noticeDocFiles(it, { index, formPath = true, sameTitle = null, aiRoles = null } = {}) {
   const idx = index || (defaultIndex ??= loadNoticeDocIndex());
   const out = [...(((idx.elig || {})[it && it.id] || {}).files || [])];
   if (formPath && it) {
-    const attNames = new Set((it.attachments || []).map((a) => a && a.name).filter(Boolean));
-    const titles = [it.boardTitle, it.name, it.title].filter(Boolean);
     const seen = new Set(out.map((f) => fileHash(`${idx.dir}/${f}`)).filter(Boolean));
-    for (const r of idx.forms || []) {
+    for (const r of noticeFormRows(it, idx, sameTitle)) {   // 그 공고 줄인지 먼저(싸다) — 내용 판정은 파일을 연다
       if (out.includes(r.file)) continue;
-      const mine = r.id ? r.id === it.id : (!!sameTitle && attNames.has(r.attach) && titles.some((t) => sameTitle(t, r.title)));
-      if (!mine || !noticeByContent(r.attach, `${idx.dir}/${r.file}`)) continue;   // 그 공고 줄인지 먼저(싸다) — 내용 판정은 파일을 연다
+      if (!noticeByContent(r.attach, `${idx.dir}/${r.file}`, aiRoles ? aiRoles(it.id, r.file, `${idx.dir}/${r.file}`) : null)) continue;
       const h = fileHash(`${idx.dir}/${r.file}`);
       if (!h || seen.has(h)) continue;   // 파일이 없거나 이미 든 파일의 사본
       seen.add(h); out.push(r.file);

@@ -77,7 +77,7 @@ jobs:
             git add collector/extracted/ts-*.* 2>/dev/null || true
             git commit -m "두 학교 장학 공고 전수 조사 결과 (앱 데이터 무변경)" || echo "변경 없음"
             for i in 1 2 3; do
-              git pull --rebase origin claude/external-expert-consultation-questions-o8bik7 || true
+              git pull --rebase origin claude/external-expert-consultation-questions-o8bik7 || git rebase --abort || true
               git push origin HEAD:claude/external-expert-consultation-questions-o8bik7 && break
               sleep $((i*4))
             done

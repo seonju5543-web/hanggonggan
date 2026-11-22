@@ -136,7 +136,7 @@ jobs:
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
               # --autostash: 저장 목록 밖의 파일이 남아 있어도 재시도가 죽지 않게 (2026-08-02)
-              git pull --rebase --autostash origin "${{ github.ref_name }}"
+              git pull --rebase --autostash origin "${{ github.ref_name }}" || git rebase --abort || true
             done
             if [ "$pushed" != "1" ]; then
               echo "::error::원문 링크 확인 결과 push 실패 — 3회 재시도 모두 실패."

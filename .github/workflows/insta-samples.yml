@@ -47,7 +47,7 @@ jobs:
           git diff --cached --quiet && { echo '변화 없음'; exit 0; }
           git commit -m '인스타: 판형 견본 갱신'
           for i in 1 2 3; do
-            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE" || git rebase --abort || true; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기록을 못 올렸습니다'; exit 1; }
           done
           # main 에는 밀지 않는다 — 로봇 저장 위치 원칙(CLAUDE.md): 로봇은 기본 브랜치에만 쓰고 배포는 deploy-sync 가 맡는다.

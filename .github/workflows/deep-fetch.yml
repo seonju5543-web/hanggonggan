@@ -255,9 +255,22 @@ jobs:
             # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도
             for i in 1 2 3; do
               if git push; then pushed=1; break; fi
+              # 🔴 사본 색인 셋(data/forms-pdf · data/docs-pdf · data/form-pages 의 index.json)은 병합 때 「내 것」(merge=ours)이다 — 다시 얹을 때 「내 것」은 저쪽(먼저 올린 최종 검토)이라
+              #    이 실행이 쓴 색인 줄은 버려지고 사본 파일 지우기·새로 만들기만 실린다: 색인 줄이 지운 파일을 가리켜 학생이 깨진 링크를 누른다(리뷰 2026-11-23).
+              #    그래서 이 실행의 색인(변환 로봇이 방금 쓴 것 — 가장 새것)을 따로 두었다가 얹은 뒤 되돌려 놓고, 그사이 최종 검토가 내린 사본을 다시 내린다(색인만 · collector/pdf-verdicts.mjs)
+              keep=$(mktemp -d)
+              for d in forms-pdf docs-pdf form-pages; do [ -f "data/$d/index.json" ] && cp "data/$d/index.json" "$keep/$d.json"; done
               # --autostash: 저장 목록에 안 든 파일이 남아 있어도 재시도가 죽지 않게 (2026-08-02).
               # 이게 없으면 "cannot pull with rebase: You have unstaged changes"로 실행 전체가 날아간다.
-              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+              # 다시 얹기가 충돌하면 그만둔다(abort) — 멈춘 채로 두면 다음 바퀴가 엉킨 판에서 돈다
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || git rebase --abort || true
+              for d in forms-pdf docs-pdf form-pages; do [ -f "$keep/$d.json" ] && cp "$keep/$d.json" "data/$d/index.json"; done
+              node -e "import('./collector/pdf-verdicts.mjs').then((m) => m.applyPdfVerdicts({ root: '.', verdicts: m.loadPdfVerdicts('.'), today: new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10), deleteFiles: false }))" || echo "::warning::최종 검토의 사본 판정을 다시 적용하지 못했습니다 — 변환 로봇이 다음 실행에서 다시 내립니다"
+              # 담는 경로는 글자로 적는다 — 변수가 든 경로는 저장 관문 검사가 「모르는 경로」로 본다(관문 「로봇·도구 점검 관문」 savegate)
+              [ -f data/forms-pdf/index.json ] && git add data/forms-pdf/index.json
+              [ -f data/docs-pdf/index.json ] && git add data/docs-pdf/index.json
+              [ -f data/form-pages/index.json ] && git add data/form-pages/index.json
+              git diff --cached --quiet || git commit -m "deepfetch: 사본 색인 되살림 (다시 얹을 때 버려진 이 실행의 색인 · 최종 검토 판정 다시 적용)"
             done
             # 3번 다 실패하면 조용히 넘어가지 않는다 (양식 원본은 다음 수집 때 갈아엎히므로 유실됨)
             if [ "$pushed" != "1" ]; then

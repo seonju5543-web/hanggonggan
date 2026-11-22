@@ -13,6 +13,7 @@
    어떻게 — pdf 는 그대로 복사 · 나머지는 LibreOffice(soffice --headless --convert-to pdf). HWP·HWPX 는 가져오기 확장(H2Orestart ·
             collector/install-h2orestart.sh)이 깔려 있어야 한다 — 없으면 '변환기가 못 읽음'으로 적는다(조용히 0건이 되지 않게 리포트가 센다).
    어디에 — data/forms-pdf/<공고 id>/<n>-<파일 이름>.pdf + data/forms-pdf/index.json({ updatedAt, items: { <id>: [{ file, name, pages, bytes, from, at }] } }).
+            색인의 다른 칸 둘: roles(원본 내용으로 이름과 다르게 가른 첨부 — 앱 신청서 칸이 먼저 본다) · rejected(최종 검토가 내린 사본의 표시 — isRejected · 있을 때만).
             🔴 registered.json 은 건드리지 않는다(쓰는 로봇이 둘이면 그 파일은 자동 병합에서 빠져 있어 통째로 충돌한다).
             마감이 지난 공고의 폴더는 지운다(저장소가 자라지 않게 · 결정 1 "마감 전 것만") · 파일 하나 5MB 상한.
    언제 — deep-fetch.yml 의 보강 단계(continue-on-error · 시한) · 첨부를 받은 직후.
@@ -29,6 +30,8 @@ import { fileURLToPath } from 'node:url';
 import { sameTitle } from './detail-url.mjs';
 import { loadFormRules, cleanAttachName, sameAttach, attachExt } from './form-rules.mjs';
 import { attachDecision, roleText, isNoticeDoc } from './attachment-text.mjs';
+import { loadAiRoles, aiRoleFor, toDecisionRole } from './attach-role-ai.mjs';   // AI 가 정한 첨부 갈래(4번 카드 읽기 · 6번 최종 검토) — 있으면 그 답이 먼저다
+import { applyPdfVerdicts, loadPdfVerdicts } from './pdf-verdicts.mjs';         // 6번이 ok 가 아니라고 본 사본을 내린다(되돌려진 색인에도 다시 올라오지 않게 시작할 때 한 번 더)
 import { SOFFICE_TIMEOUT_MS, sofficeToPdf } from './soffice.mjs';   // LibreOffice 변환 한 곳(전용 프로필 · 시한 · 변환기 말) — 쪽 그림 로봇과 같이 쓴다
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
@@ -67,12 +70,15 @@ export const isOpen = (it, today) => !it.deadline || String(it.deadline) >= toda
 
 /* 받은 원본의 글자로 신청서인가를 가른다(2026-11-20 · attachment-text attachDecision 한 곳) — 글자를 못 읽으면 이름 규칙 그대로 */
 /* paid — 유료 첨부 판정(collector/attach-role-read.mjs)의 결과 { items: { '<id>|<첨부 이름>': { file, role } } } · 글자가 없어 무료 판정이 '모름'인 파일에만 쓴다 */
-export const contentDecide = (extractedDir, paid = {}) => (a, row, nameForm, it) => {
+/* aiRoles — AI 가 정한 갈래의 표(collector/attach-role-ai.mjs loadAiRoles · 2026-11-21) · 🔴 그 파일에 AI 의 답이 있으면 그 답이 갈래다(글자 표식·유료 첨부 판정·이름 규칙보다 먼저 —
+   개발자 *"기계검사가 아니라 지능이 있는 ai 가 해야해"*) · 답이 없는 파일(옛 공고 전부)은 아래 예전 길 그대로 */
+export const contentDecide = (extractedDir, paid = {}, aiRoles = {}) => (a, row, nameForm, it) => {
   const file = path.join(extractedDir, row.file);
   const p = ((paid && paid.items) || {})[`${it && it.id}|${a.name}`];
   /* 🔴 같은 이름에 다른 바이트가 덮였으면 옛 답을 안 쓴다(바이트 해시 · attach-role-read 와 같은 셈 · 리뷰) */
   const same = p && p.role && p.file === row.file && p.hash === fileHash16(file);
-  return attachDecision(a.name, roleText(file), nameForm, same ? p.role : null);
+  const ai = aiRoleFor(aiRoles, it && it.id, row.file, file);
+  return attachDecision(a.name, roleText(file), nameForm, same ? p.role : null, ai ? toDecisionRole(ai.role) : null);
 };
 const fileHash16 = (f) => { try { return crypto.createHash('sha1').update(fs.readFileSync(f)).digest('hex').slice(0, 16); } catch { return ''; } };
 /** 공고 첨부 하나의 원본 줄(forms-index) — 🔴 id 가 적힌 줄은 **그 공고 것만** 쓴다(제목이 같은 다른 학교 글에 넘기지 않는다) · id 없는 옛 줄(사람 표적)은 제목으로.
@@ -87,9 +93,11 @@ const nameDecide = (a, row, nameForm) => ({ form: nameForm, notice: false, role:
  *  🔴 2026-11-20 — 신청서인지는 **받은 원본의 내용**이 정한다(decide · 기본은 옛 이름 규칙 — 관문이 순수하게 부른다).
  *     그래서 문서 첨부(HWP·HWPX·DOC·DOCX·PDF)는 이름과 상관없이 전부 본다: `[서식] 1~3.hwp`·`공적활동확인서.hwp` 처럼 이름에 '신청서'가 없는
  *     진짜 서식이 앱에 안 올라왔다(마감 전 등록 실측). 원본이 없으면 이름이 신청서인 것은 missing, 그 밖은 unread(받아서 읽어 볼 것)에 적는다.
- *  roles — 내용 판정이 이름 규칙과 **다른** 첨부만 { [공고 id]: { [첨부 이름]: 'form'|'notice' } } — 앱 신청서 칸이 이것을 먼저 본다(app-live attIsForm) */
+ *  roles — 내용 판정이 이름 규칙과 **다른** 첨부만 { [공고 id]: { [첨부 이름]: 'form'|'notice' } } — 앱 신청서 칸이 이것을 먼저 본다(app-live attIsForm)
+ *          AI 가 붙은 문서(mixed)·이 공고 문서 아님(other)이라 한 이름이 신청서인 파일도 여기 'notice' 로 적힌다(신청서 칸에 안 선다 · 공고문 PDF 로봇 몫이 된다)
+ *  notForm — AI 가 「신청서가 아니다」라고 한 첨부 이름들 { [공고 id]: [첨부 이름] } — 이름도 신청서가 아니라 roles 에 안 적히는 것까지(본편이 그 옛 사본을 지운다) */
 export function pickFormTargets(items, indexRows, { today, isApplicationForm, decide = nameDecide }) {
-  const out = []; const missing = []; const unread = []; const roles = {};
+  const out = []; const missing = []; const unread = []; const roles = {}; const notForm = {};
   for (const it of items || []) {
     if (!it || !it.id || it.program || it.hidden || !isOpen(it, today)) continue;
     /* 🔴 아이콘 꼬리(`… .hwp chevron_forward`)를 뗀 이름으로 본다 · 같은 첨부가 꼬리 있는 것·없는 것 두 줄로 실린 공고는 하나로 (2026-11-15 · 강원대 도전장학금) */
@@ -113,12 +121,21 @@ export function pickFormTargets(items, indexRows, { today, isApplicationForm, de
       if (!row) { if (nameForm) missing.push({ id: it.id, name: a.name }); else if (!isNoticeDoc(a.name) && !/\.doc$/i.test(cleanAttachName(a.name))) unread.push({ id: it.id, name: a.name }); continue; }
       const d = decide(a, row, nameForm, it);
       if (d.form !== nameForm && d.by !== 'name') (roles[it.id] ||= {})[a.name] = d.form ? 'form' : 'notice';
+      if (!d.form && d.by === 'ai') (notForm[it.id] ||= []).push(a.name);
       if (d.form) files.push({ src: row.file, name: a.name, srcBytes: row.bytes || 0 });
     }
     if (files.length) out.push({ id: it.id, name: it.name || it.title || it.id, deadline: it.deadline || '', files });
   }
-  return { targets: out, missing, unread, roles };
+  return { targets: out, missing, unread, roles, notForm };
 }
+
+/** 최종 검토(6번)가 내린 신청서 사본인가 — 표시는 collector/pdf-verdicts.mjs 가 색인의 rejected["<공고 id>|<첨부 이름>"] 에 적는다.
+ *  같은 원본(크기)을 같은 글꼴 표로 다시 바꾸면 같은 사본이 나온다 — 그래서 원본이 바뀌거나(학교가 다시 올림) 글꼴 표(FONT_STAMP)가 바뀔 때까지 만들지도 싣지도 않는다.
+ *  🔴 이것이 없으면 새벽마다 같은 사본을 다시 만들고 6번이 돈을 내고 다시 내린다 */
+export const isRejected = (index, key, srcBytes) => {
+  const r = ((index && index.rejected) || {})[key];
+  return !!r && (r.srcBytes || 0) === (srcBytes || 0) && r.fonts === FONT_STAMP;
+};
 
 /* ── 아직 못 받은 신청서 원본을 로봇이 스스로 고른다 (2026-10-30) ───────────────────────────
    🔴 왜: 신청서 원본을 받는 로봇(deepfetch --forms-only · 매일 03:33)은 사람이 run-deepfetch.txt 에 적은 제목만 받았다.
@@ -227,7 +244,7 @@ export function prune(index, liveIds, dir) {
   return dropped;
 }
 
-export function buildReport({ today, targets, missing, done, failed, dropped, skippedSame, left = [], budgetSec = BUDGET_SEC, roles = {}, unread = [] }) {
+export function buildReport({ today, targets, missing, done, failed, dropped, skippedSame, left = [], budgetSec = BUDGET_SEC, roles = {}, unread = [], rejected = [] }) {
   const L = [];
   L.push(`## 📄 신청서 원본 → PDF 리포트 (${today})`);
   L.push('');
@@ -253,6 +270,12 @@ export function buildReport({ today, targets, missing, done, failed, dropped, sk
     L.push('');
   }
   if (dropped.length) { L.push(`### 마감이 지나 지운 공고 — ${dropped.length}건`); dropped.slice(0, 30).forEach((d) => L.push(`- ${d}`)); L.push(''); }
+  /* 최종 검토(6번)가 내린 사본 — 만들지도 싣지도 않는다(isRejected) · 선조치후보고 */
+  if (rejected.length) {
+    L.push(`### 최종 검토가 내린 사본 — ${rejected.length}개 (다시 만들지 않는다 · 원본이나 글꼴 표가 바뀌면 다시 만든다 · 그때까지 앱에는 원본 파일만)`);
+    rejected.slice(0, 30).forEach((r) => L.push(`- ${r.id} · ${r.name}`));
+    L.push('');
+  }
   /* 내용 판정(attachDecision)이 이름 규칙을 뒤집은 것 — 선조치후보고 */
   const flips = Object.entries(roles).flatMap(([id, m]) => Object.entries(m).map(([name, r]) => ({ id, name, r })));
   if (flips.length) {
@@ -271,22 +294,28 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
   const outDir = path.join(root, 'data', 'forms-pdf');
   const indexPath = path.join(outDir, 'index.json');
   const reportPath = path.join(root, 'collector', 'form-pdf-report.md');
+  /* 최종 검토(6번)가 ok 가 아니라고 본 사본을 내린다 — 검토 로봇이 그 자리에서 내리지만, 색인이 옛 판으로 되돌려졌을 때(부딪힌 저장 · 관문 되돌리기)를 위해 시작할 때 한 번 더(색인을 읽기 전에) */
+  if (!dry) applyPdfVerdicts({ root, verdicts: loadPdfVerdicts(root), today });
   const reg = JSON.parse(fs.readFileSync(regPath, 'utf8'));
   /* 대외활동·공모전 글도 같은 로봇이 바꾼다(2026-10-30 · 공동개발자 "공모전 신청 양식이 매우 미흡") — 열쇠는 수집 로봇이 준 id('act-…' · api-…) · 숨긴 글은 뺀다 */
   const items = [...(reg.items || []), ...loadActivities(root)];
   const rows = fs.existsSync(idxPath) ? parseFormsIndex(fs.readFileSync(idxPath, 'utf8')) : [];
   const { isApplicationForm } = loadFormRules(root);
+  /* AI 가 정한 첨부 갈래(4번 카드 읽기 · 6번 최종 검토 — 없으면 빈 표) — 답이 있는 파일은 그 답으로 가른다(contentDecide) */
+  const aiRoles = loadAiRoles(path.join(root, 'collector'));
   /* 유료 첨부 판정 결과(없으면 빈 것) — 글자 없는 PDF·그림의 신청서/공고문 답(모델 둘이 같은 답일 때만 실린다 · attach-role-read.mjs) */
   let paid = {};
   try { paid = JSON.parse(fs.readFileSync(path.join(root, 'collector', 'attach-role-paid.json'), 'utf8')); } catch { /* 아직 없음 */ }
-  const { targets, missing, unread, roles } = pickFormTargets(items, rows, { today, isApplicationForm, decide: contentDecide(path.join(root, 'collector', 'extracted'), paid) });
+  const { targets, missing, unread, roles, notForm } = pickFormTargets(items, rows, { today, isApplicationForm, decide: contentDecide(path.join(root, 'collector', 'extracted'), paid, aiRoles) });
   let index = { updatedAt: today, items: {} };
   try { const j = JSON.parse(fs.readFileSync(indexPath, 'utf8')); if (j && j.items && typeof j.items === 'object') index = { ...j, items: j.items }; } catch { /* 첫 실행 */ }
   /* 내용 판정이 이름과 다른 첨부 — 앱 신청서 칸이 먼저 본다(app-live attIsForm) · 마감 전 공고만(pickFormTargets 가 거른다) · 매 실행 새로 쓴다 */
   index.roles = roles;
   const live = new Set(items.filter((it) => it && it.id && !it.hidden && isOpen(it, today)).map((it) => it.id));
   const dropped = dry ? Object.keys(index.items).filter((id) => !live.has(id)) : prune(index, live, outDir);
-  const done = []; const failed = []; const left = []; let skippedSame = 0;
+  /* 최종 검토가 내린 사본의 표시(rejected) — 목록에서 빠진·마감 지난 공고의 표시는 지운다(자라기만 하지 않게) */
+  if (!dry) for (const k of Object.keys(index.rejected || {})) if (!live.has(k.slice(0, k.indexOf('|')))) delete index.rejected[k];
+  const done = []; const failed = []; const left = []; const rejected = []; let skippedSame = 0;
   const t0 = Date.now();
   /* 🔴 파일 하나는 최대 SOFFICE_TIMEOUT_MS 까지 돈다 — 「예산을 넘었나」만 보면 4분 59초에 시작한 파일이 1분 더 돌아
      단계 시한(워크플로 timeout-minutes)에 강제로 끊긴다(2026-11-19 · 8분 13초에 끊겨 경보 #668 · 끊긴 설치의 잠금으로 다음 단계도 0초 실패 #669).
@@ -294,11 +323,25 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
   const overBudget = () => (Date.now() - t0) / 1000 + SOFFICE_TIMEOUT_MS / 1000 > budgetSec;
   /* 🔴 넘어져도 지금까지 바꾼 것은 남는다 — 색인은 파일 하나 끝날 때마다 쓴다(단계 시한에 죽으면 끝에 한 번 쓰는 색인은 통째로 사라진다 · 리뷰 2026-10-12) */
   const flush = () => { if (dry) return; fs.mkdirSync(outDir, { recursive: true }); index.updatedAt = today; fs.writeFileSync(indexPath, JSON.stringify(index, null, 1) + '\n'); };
+  /* 공고 폴더 하나의 정리 — 색인(rows)에 없는 파일(첨부가 빠지거나 순서가 바뀐 옛 결과 · 최종 검토가 색인에서 내린 사본)은 지운다 — 폴더째 지우는 prune 이 못 보는 고아.
+     🔴 뒤 단계(form-fields.mjs)의 결과물은 고아가 아니다 — fields.json 과 살아 있는 PDF 의 「<이름>-pages」 폴더는 둔다.
+        여기서 지우면 그 로봇이 **매일 26개 전부를 다시 그린다**(2026-11-09 실측 · 리포트 「그대로 0」) · 죽은 PDF 의 쪽 폴더는 그 로봇이 스스로 지운다. */
+  const sweep = (id, rows) => {
+    const dir = path.join(outDir, id);
+    if (dry || !fs.existsSync(dir)) return;
+    const keep = new Set(rows.flatMap((h) => [path.basename(h.file), `${path.basename(h.file).replace(/\.pdf$/i, '')}-pages`]).concat(['fields.json', 'fields-fix.json']));   // fields-fix.json = 사람이 지정한 칸 장부(tools/admin-apply fieldFix · 2026-11-18) — 지우면 관리자 칸이 밤마다 사라진다
+    for (const fn of fs.readdirSync(dir)) if (!keep.has(fn)) { try { fs.rmSync(path.join(dir, fn), { recursive: true, force: true }); } catch { /* 무시 */ } }
+    if (!rows.length) { try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* 무시 */ } }
+  };
   for (const t of targets) {
     const have = index.items[t.id] || [];
     const next = [];
     t.files.forEach((f, i) => {
       const file = `${t.id}/${i + 1}-${safeName(f.name)}.pdf`;
+      /* 🔴 최종 검토가 내린 사본 — 같은 원본·같은 글꼴 표인 동안은 만들지도 싣지도 않는다(학생에게는 원본 파일만 보인다 · isRejected). 원본이나 글꼴 표가 바뀌었으면 표시를 지우고 다시 만든다 */
+      const key = `${t.id}|${f.name}`;
+      if (isRejected(index, key, f.srcBytes)) { rejected.push({ id: t.id, name: f.name }); return; }
+      if (index.rejected) delete index.rejected[key];
       /* 같은 이름·같은 자리·같은 원본 크기면 건너뛴다 — 학교가 같은 이름으로 다시 올리면(크기가 다르면) 다시 바꾼다 */
       const prev = have.find((h) => h.name === f.name && h.file === file && (h.srcBytes || 0) === (f.srcBytes || 0) && (h.fonts || '') === FONT_STAMP && fs.existsSync(path.join(outDir, h.file)));
       if (prev) { next.push(prev); skippedSame += 1; return; }
@@ -312,32 +355,33 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
     });
     if (next.length) index.items[t.id] = next;
     else if (!dry) delete index.items[t.id];
-    /* 그 공고 폴더에서 색인에 없는 파일(첨부가 빠지거나 순서가 바뀐 옛 결과)은 지운다 — 폴더째 지우는 prune 이 못 보는 고아.
-       🔴 뒤 단계(form-fields.mjs)의 결과물은 고아가 아니다 — fields.json 과 살아 있는 PDF 의 「<이름>-pages」 폴더는 둔다.
-          여기서 지우면 그 로봇이 **매일 26개 전부를 다시 그린다**(2026-11-09 실측 · 리포트 「그대로 0」) · 죽은 PDF 의 쪽 폴더는 그 로봇이 스스로 지운다. */
-    if (!dry && fs.existsSync(path.join(outDir, t.id))) {
-      const keep = new Set(next.flatMap((h) => [path.basename(h.file), `${path.basename(h.file).replace(/\.pdf$/i, '')}-pages`]).concat(['fields.json', 'fields-fix.json']));   // fields-fix.json = 사람이 지정한 칸 장부(tools/admin-apply fieldFix · 2026-11-18) — 지우면 관리자 칸이 밤마다 사라진다
-      for (const fn of fs.readdirSync(path.join(outDir, t.id))) if (!keep.has(fn)) { try { fs.rmSync(path.join(outDir, t.id, fn), { recursive: true, force: true }); } catch { /* 무시 */ } }
-      if (!next.length) { try { fs.rmSync(path.join(outDir, t.id), { recursive: true, force: true }); } catch { /* 무시 */ } }
-    }
+    sweep(t.id, next);
   }
   /* 🔴 내용 판정이 신청서 칸에서 뺀 첨부(roles 'notice')의 옛 PDF 는 지운다 — 공고의 신청서가 전부 빠지면 그 공고는 targets 에 없어 위 고리가 안 돌고,
-     살아 있는 공고라 prune 도 안 지워 「원본 양식 그대로 보기」에 안내문이 마감까지 남는다(리뷰) */
-  if (!dry) for (const [id, m] of Object.entries(roles)) {
+     살아 있는 공고라 prune 도 안 지워 「원본 양식 그대로 보기」에 안내문이 마감까지 남는다(리뷰).
+     🔴 AI 가 신청서가 아니라고 한 첨부(notForm)도 같다 — 이름이 신청서가 아니라 roles 에 안 적히는 것까지(어제는 글자 표식으로 신청서였다가 오늘 AI 가 내용 문서·붙은 문서라 한 파일) */
+  if (!dry) for (const id of new Set([...Object.keys(roles), ...Object.keys(notForm)])) {
     const have = index.items[id];
     if (!have) continue;
-    const gone = have.filter((h) => m[h.name] === 'notice');
+    const m = roles[id] || {}; const out = new Set(notForm[id] || []);
+    const isGone = (h) => m[h.name] === 'notice' || out.has(h.name);
+    const gone = have.filter(isGone);
     if (!gone.length) continue;
     for (const h of gone) { try { fs.rmSync(path.join(outDir, h.file), { force: true }); fs.rmSync(path.join(outDir, h.file.replace(/\.pdf$/i, '-pages')), { recursive: true, force: true }); } catch { /* 무시 */ } }
-    const keep = have.filter((h) => m[h.name] !== 'notice');
+    const keep = have.filter((h) => !isGone(h));
     if (keep.length) index.items[id] = keep;
     else { delete index.items[id]; try { fs.rmSync(path.join(outDir, id), { recursive: true, force: true }); } catch { /* 무시 */ } }
   }   // 뺀 것은 리포트 「원본 내용을 읽고 이름과 다르게 가른 첨부」 ➖ 줄이 알린다
+  /* 🔴 이번 대상이 아닌 공고(원본이 색인에서 빠져 옛 사본만 남은 공고)의 폴더도 같은 정리를 한다(2026-11-22) — 최종 검토는 색인 줄만 내리고 파일은 두므로
+     (collector/pdf-verdicts.mjs deleteFiles:false), 색인에서 빠진 그 사본은 이 로봇이 그 실행에서 지워야 한다. 줄이 하나도 없는 공고의 폴더는 위 prune 이 지운다 */
+  const swept = new Set(targets.map((t) => t.id));
+  for (const [id, rows] of Object.entries(index.items)) if (!swept.has(id)) sweep(id, rows);
+  if (index.rejected && !Object.keys(index.rejected).length) delete index.rejected;   // 표시가 다 풀렸으면 칸도 없앤다(표시가 없는 색인은 예전 꼴 그대로)
   index.updatedAt = today;
-  const report = buildReport({ today, targets, missing, done, failed, dropped, skippedSame, left, budgetSec, roles, unread });
+  const report = buildReport({ today, targets, missing, done, failed, dropped, skippedSame, left, budgetSec, roles, unread, rejected });
   if (!dry) { flush(); fs.writeFileSync(reportPath, report + '\n'); }
   log(report);
-  return { targets, missing, done, failed, dropped, left, index };
+  return { targets, missing, done, failed, dropped, left, rejected, index };
 }
 
 if (!process.env.FORM_PDF_AS_LIB) {

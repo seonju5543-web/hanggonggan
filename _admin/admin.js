@@ -871,13 +871,18 @@ function paidReviewTodo() {
 const finalKey = (p) => (p.kind === 'missing' ? `final|${p.field}|${p.text}` : `final|${p.kind}|${p.doc}`);
 function finalChangesList() {
   const live = new Map(D.reg.map((it) => [it.id, it]));
-  return Object.entries(D.finalReview || {}).map(([id, r]) => ({ it: live.get(id), summary: (r && r.summary) || '', changes: (r && r.changes) || [] }))
+  /* 내린 PDF 사본(dropped — 둘째 AI 가 「원본과 다르다·이 공고 문서가 아니다·내용이 없다」고 본 사본을 로봇이 내렸다 · 학생 화면에는 올린 원본만 남는다)도 같은 기록에 싣는다 */
+  const dropOf = (d) => ({ kind: 'drop', label: PDF_KIND_KO[d.kind] || 'PDF 사본', text: d.name || '', why: [PDF_VERDICT_KO[d.verdict], d.why].filter(Boolean).join(' — ') });
+  return Object.entries(D.finalReview || {}).map(([id, r]) => ({ it: live.get(id), summary: (r && r.summary) || '', changes: [...((r && r.changes) || []), ...((r && r.dropped) || []).map(dropOf)] }))
     .filter((x) => x.it && openForStudents(x.it) && x.changes.length);
 }
-const CHANGE_KO = { add: '넣음', remove: '뺌', set: '바꿈', role: '구분 바꿈' };
+const CHANGE_KO = { add: '넣음', remove: '뺌', set: '바꿈', role: '구분 바꿈', drop: '사본 내림(학생 화면에는 원본만)' };
+const PDF_KIND_KO = { form: '신청서 사본', pages: '공고문에서 뗀 서식 쪽', doc: '공고문 사본' };
+const PDF_VERDICT_KO = { broken: '변환이 잘못됨', wrong: '이 공고 문서가 아님', empty: '읽을 내용 없음' };
 function finalChangeHtml(c) {
   const body = (c.kind === 'set' || c.kind === 'role')
     ? `${c.kind === 'role' ? `${esc(c.text || '')} — ` : ''}${esc(c.before || '(없음)')} → ${esc(c.after || '(없음)')}`
+    : c.kind === 'drop' ? `${esc(c.text || '')}${c.why ? ` — ${esc(c.why)}` : ''}`
     : esc(c.text || '');
   return `<div style="padding:var(--space-4) 0"><span class="pill">${esc(c.label || '')}</span> <b>${esc(CHANGE_KO[c.kind] || '')}</b> ${body}</div>`;
 }

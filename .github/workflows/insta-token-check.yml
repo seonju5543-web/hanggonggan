@@ -67,7 +67,7 @@ jobs:
           git diff --cached --quiet && { echo '변화 없음'; exit 0; }
           git commit -m '인스타: 토큰 지문 기록'
           for i in 1 2 3; do
-            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE" || git rebase --abort || true; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기록을 못 올렸습니다'; exit 1; }
           done
 

@@ -5231,7 +5231,7 @@ console.log('\n■ 첨부를 내용으로 가르기 — 신청서 칸인가 카�
     eq('  배선 — 유료 카드 읽기 워크플로가 같은 스위치로 돌리고(시한·실패해도 저장) 답 파일을 저장·보관하고 실패를 알린다 · 양식 PDF 로봇이 답 파일을 읽는다',
       [/id: role[\s\S]{0,200}timeout-minutes: 6[\s\S]{0,60}continue-on-error: true[\s\S]{0,200}CARD_READ_ENABLE: '1'[\s\S]{0,120}attach-role-read\.mjs --write/.test(crSrc),
         /git add collector\/attach-role-paid\.json/.test(crSrc), /steps\.role\.outcome == 'failure'/.test(crSrc),
-        /attach-role-paid\.json[\s\S]{0,300}contentDecide\(path\.join\(root, 'collector', 'extracted'\), paid\)/.test(fpSrc2)],
+        /attach-role-paid\.json[\s\S]{0,300}contentDecide\(path\.join\(root, 'collector', 'extracted'\), paid, aiRoles\)/.test(fpSrc2)],   // 2026-11-21 — 셋째 인자: AI 가 정한 갈래의 표(「5번 연결」 절이 잰다)
       [true, true, true, true]);
   }
 }
@@ -17751,6 +17751,599 @@ module.exports = class Anthropic {
     } finally { sb.done(); }
   }
 
+  /* ── 5번 연결 (2026-11-21 개발자 지시) — 변환 로봇 셋(양식 PDF · 공고문 PDF · 서식 쪽 떼기)이 AI 의 첨부 구분과 사본 판정을 쓴다 ──
+     *"3번에서 받은 첨부파일 중에서 내용 문서랑 신청 양식을 미리 1차로 구분해놓고(지능이 있는 ai 가) if 한 문서에 신청양식이랑 내용문서가 동시에 들어있는 경우 -> 분리해서 2개의 pdf 로"* ·
+     *"(첨부 구분은) 기계검사가 아니라 지능이 있는 ai 가 해야해"* · *"문서 문제도 그냥 너가 잡아서 올바른 버전으로 수정해서 푸쉬하면 안되나 앱에"*
+     재는 것 셋: ① AI 의 답이 있는 첨부는 그 답이 갈래다(답이 없는 옛 공고는 예전 그대로) ② 6번이 ok 가 아니라고 본 사본은 앱에서 내려가고 다시 올라오지 않는다
+                ③ 한 파일에 공고문과 신청 양식이 함께 든 문서는 PDF 둘(서식 쪽 · 읽는 글 쪽)이 된다.
+     🔴 변환기(LibreOffice)·쪽 도구(poppler)가 없는 곳에서도 돈다 — 순수 함수 · 가짜 변환기 · 넘겨주는 가짜 쪽 찾기로 잰다 · 돈 0(가짜 응답 · 가짜 유료 SDK) */
+  console.log('\n■ 5번 연결 — 변환 로봇이 AI 의 구분·판정을 쓴다 (2026-11-21)');
+  {
+    process.env.FORM_PDF_AS_LIB = '1'; process.env.DOC_PDF_AS_LIB = '1'; process.env.FORM_PAGES_AS_LIB = '1';   // 세 로봇은 이 표시가 없으면 불러오는 순간 본편이 돈다
+    const FPD = await import(new URL('../collector/form-pdf.mjs', import.meta.url));
+    const DPD = await import(new URL('../collector/doc-pdf.mjs', import.meta.url));
+    const FPG = await import(new URL('../collector/form-pages.mjs', import.meta.url));
+    const PV = await import(new URL('../collector/pdf-verdicts.mjs', import.meta.url));
+    const fpdSrc = src('collector/form-pdf.mjs'), dpdSrc = src('collector/doc-pdf.mjs'), fpgSrc = src('collector/form-pages.mjs'), pvSrc = src('collector/pdf-verdicts.mjs');
+    const T = plus(0), LATER = plus(30), DAY = plus(-1), quiet = () => {};
+    /* 글자 표식(docRole)으로는 서식인 글 · 공고문인 글 — AI 의 답이 그것과 다를 때 누가 이기는지를 잰다 */
+    const FORM_T = '장학금 신청서\n성 명\n학 번\n학 과\n연락처\n위와 같이 장학금을 신청합니다.\n2026년   월   일\n신청인            (서명 또는 인)\n○○장학재단 이사장 귀하';
+    const NOTE_T = '2026학년도 2학기 장학생 선발 안내\n다음과 같이 선발하오니 많은 신청 바랍니다.\n1. 신청자격 : 2026학년도 2학기 재학생\n2. 신청기간 : 2026. 11. 23. ~ 2026. 12. 4.\n3. 제출서류 : 신청서 1부\n4. 선발인원 : 10명\n5. 문의 : 장학팀';
+    /* 가짜 변환기 — soffice 처럼 --outdir 에 <이름>.pdf 를 둔다(진짜 LibreOffice 없이 변환 길을 잰다 · 「신청서 원본 → PDF」 절과 같은 꼴) */
+    const fakeSoffice = (box) => {
+      box.write('fake-soffice.sh', '#!/bin/sh\nout=""; while [ $# -gt 1 ]; do [ "$1" = "--outdir" ] && out="$2"; shift; done\nsrc="$1"; base=$(basename "$src"); '
+        + 'printf \'%s\' \'%PDF-1.4 1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj 2 0 obj << /Type /Pages /Count 1 /Kids [3 0 R] >> endobj 3 0 obj << /Type /Page >> endobj %%EOF\' > "$out/${base%.*}.pdf"\n');
+      fs.chmodSync(box.abs('fake-soffice.sh'), 0o755);
+      return box.abs('fake-soffice.sh');
+    };
+
+    /* ① 판정기(attachment-text attachDecision) — AI 의 답이 갈래다 */
+    const dec = (...a) => { const d = AT.attachDecision(...a); return [d.form, d.notice, d.role, d.by]; };
+    eq('① 🔴 AI 가 답한 첨부는 그 답이 갈래다(attachDecision 다섯째 인자) — 글자 표식·유료 첨부 판정·이름 규칙이 뒤집지 않는다: 이름도 글자도 신청서인 파일을 AI 가 내용 문서라 하면 신청서가 아니고 · 이름도 글자도 공고문인 파일을 AI 가 신청 양식이라 하면 신청서다 · 이름이 신청서가 아닌 파일의 이 공고 문서 아님(other)은 어느 쪽도 아니다(글자 표식이 서식이어도) · 유료 첨부 판정이 신청서라 해도 AI 의 답이 이긴다',
+      [[AT.docRole(FORM_T), AT.docRole(NOTE_T)], dec('2026 특별장학금 신청서.hwp', FORM_T, true, null, 'notice'), dec('2026 장학생 선발 공고.hwp', NOTE_T, false, null, 'form'),
+        dec('붙임1.hwp', FORM_T, false, null, 'other'), dec('붙임1.pdf', '', false, 'form', 'notice')],
+      [['form', 'notice'], [false, true, 'notice', 'ai'], [true, false, 'form', 'ai'], [false, false, 'other', 'ai'], [false, true, 'notice', 'ai']]);
+    eq('  🔴 이름이 신청서인 파일의 other 는 답이 없는 것으로 본다(리뷰 2026-11-23) — other 는 「뽑은 글자가 깨졌거나 비었다」는 말이기도 하다(글자에 대한 말이지 파일에 대한 말이 아니다): 신청서 칸을 빼앗지 않고 예전 길이 정한다 — 글자 표식이 서식이면 서식 · 글자가 없으면 이름 규칙 · 글자로 못 가르면 유료 첨부 판정 · 그 셋의 결과가 AI 의 답이 없을 때와 한 글자도 같다',
+      [dec('2026 특별장학금 신청서.hwp', FORM_T, true, null, 'other'), dec('2026 장학금 신청서.hwp', '', true, null, 'other'), dec('장학금 신청서.pdf', '', true, 'notice', 'other'),
+        [['2026 특별장학금 신청서.hwp', FORM_T, true, null], ['2026 장학금 신청서.hwp', '', true, null], ['장학금 신청서.pdf', '', true, 'notice']].every((a) => JSON.stringify(AT.attachDecision(...a, 'other')) === JSON.stringify(AT.attachDecision(...a)))],
+      [[true, false, 'form', 'content'], [true, false, null, 'name'], [false, true, 'notice', 'paid'], true]);
+    eq('  🔴 붙은 문서(AI: mixed)의 행선지는 글자 표식으로 가른 붙은 문서와 같다 — 카드는 늘 읽고 · 신청서 칸에는 **이름이 신청서일 때** 통째로 선다(쪽을 못 떼거나 뗀 사본이 내려가도 신청서 칸을 잃지 않는다) · 이름이 신청서가 아니면 서지 않는다(읽는 글 쪽·서식 쪽을 따로 낸다) · 이름이 남이 쓰는 서식(추천서)이면 서지 않는다',
+      [dec('2026 특별장학금 신청서.hwp', FORM_T, true, null, 'mixed'), dec('2026 특별장학금 신청서.hwp', `${NOTE_T}\n${FORM_T}`, true).slice(0, 3), dec('2026 장학생 선발 공고.hwp', NOTE_T, false, null, 'mixed'), dec('붙임1.hwp', FORM_T, false, null, 'mixed'),
+        dec('장학생 추천서 양식.hwp', FORM_T, true, null, 'mixed')],
+      [[true, true, 'mixed', 'ai'], [true, true, 'mixed'], [false, true, 'mixed', 'ai'], [false, true, 'mixed', 'ai'], [false, true, 'mixed', 'ai']]);
+    eq('  이름으로 갈래를 바꾸던 두 줄도 AI 의 답에는 안 걸린다 — 이름이 공고문인 서식(글자 표식만이면 「붙은 문서」로 바뀐다)을 AI 가 신청 양식이라 하면 신청서 · 이름이 신청서인 공고문(글자 표식만이면 「붙은 문서」)을 AI 가 내용 문서라 하면 내용 문서 · 남이 쓰는 서식(추천서)을 이름으로 거르던 것도 AI 의 몫이다 — 지시문이 그런 파일을 content 로 답하게 한다(form 은 학생이 직접 채워 내는 서식만)',
+      [dec('2026 장학생 선발 공고문(발췌본).hwpx', FORM_T, false), dec('2026 장학생 선발 공고문(발췌본).hwpx', FORM_T, false, null, 'form'),
+        dec('장학금 신청서.hwp', `${NOTE_T}\n귀하`, true), dec('장학금 신청서.hwp', `${NOTE_T}\n귀하`, true, null, 'notice'),
+        dec('교수 추천서.hwp', FORM_T, false), dec('교수 추천서.hwp', FORM_T, false, null, 'form'),
+        CR.ATTACH_RULES.includes('form — 학생이 직접 채워서 내는 서식만 든 파일(신청서·지원서·자기소개서·학업계획서·서약서·개인정보 동의서).'),
+        CR.ATTACH_RULES.includes('교수·기관이 써 주는 서식(추천서·확인서)만 든 파일은 form 이 아니라 content 입니다(학생이 채우는 것이 아닙니다).'),
+        CR.ATTACH_RULES.includes('mixed — 한 파일 안에 읽는 글(공고문)과 학생이 채워 내는 서식이 **둘 다** 있다.'), /추천서 양식\)/.test(CR.ATTACH_RULES)],
+      [[false, true, 'mixed', 'content'], [true, false, 'form', 'ai'], [true, true, 'mixed', 'content'], [false, true, 'notice', 'ai'], [false, false, 'form', 'content'], [true, false, 'form', 'ai'], true, true, true, false]);
+    const OLD = [['[서식] 1~3.hwp', FORM_T, false], ['2026 특별장학금 신청서.hwp', NOTE_T, true], ['2026 장학금 신청서.hwp', '', true], ['2026 장학생 선발 공고.hwp', '', false], ['붙임1.pdf', '', false, 'form'],
+      ['2026 장학생 선발 공고문(발췌본).hwpx', FORM_T, false], ['교수 추천서.pdf', '', false, 'form']];
+    const whole = (...a) => JSON.stringify(AT.attachDecision(...a));
+    eq('🔴 AI 의 답이 없는 첨부(옛 공고 전부)는 예전 그대로다 — 내용 판정·유료 첨부 판정·이름 규칙의 결과가 바뀌지 않는다(「첨부를 내용으로 가르기」 절의 기대 그대로) · 다섯째 인자가 없어도 · null 이어도 · 판정기의 말이 아닌 값이어도(AI 의 말 content 를 toDecisionRole 없이 넘긴 것) 같다',
+      [OLD.map((a) => dec(...a)), OLD.every((a) => [null, undefined, '', 'content', '모르는 값'].every((x) => whole(a[0], a[1], a[2], a[3] ?? null, x) === whole(...a)))],
+      [[[true, false, 'form', 'content'], [false, true, 'notice', 'content'], [true, false, null, 'name'], [false, true, null, 'name'], [true, false, 'form', 'paid'], [false, true, 'mixed', 'content'], [false, false, 'form', 'paid']], true]);
+
+    /* ② AI 의 답을 읽는 한 곳(attach-role-ai.mjs) — 4번·6번의 답을 둘 다 들고 그 파일의 바이트와 맞는 쪽을 쓴다 · 같은 바이트의 다른 이름 · 첨부 이름으로 찾기 */
+    {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-ai-pick-'));
+      try {
+        const put = (f, body) => fs.writeFileSync(path.join(dir, f), body);
+        const at = (f) => path.join(dir, f), h = (f) => AR.fileHash16(at(f));
+        put('form-n-1.hwp', '붙은 문서의 바이트'); put('elig-n-1.hwp', '붙은 문서의 바이트');   // 같은 바이트의 두 이름 — 신청서 로봇이 받은 것 · 자격 로봇이 받은 사본
+        put('form-n-2.hwp', '옛 바이트'); const OLD_H = h('form-n-2.hwp');
+        put('form-n-2.hwp', '다시 받은 새 바이트'); const NEW_H = h('form-n-2.hwp');
+        put('elig-n-3.hwp', '아무도 안 읽은 바이트');
+        put('attach-role-ai.json', JSON.stringify({ items: { n: { docs: [
+          { file: 'form-n-1.hwp', attach: '선발 공고 및 신청서.hwp', hash: h('form-n-1.hwp'), role: 'mixed', formStart: '[별지 1] 장학금 신청서', why: '4번' },
+          { file: 'form-n-2.hwp', attach: '안내.hwp', hash: NEW_H, role: 'form', formStart: '', why: '4번이 새 바이트를 다시 읽었다' },
+          { file: 'elig-n-9.pdf', attach: null, hash: 'feedfeedfeedfeed', role: 'content', formStart: '', why: '이름을 모르는 공고문류' }] } } }));
+        put('final-review.json', JSON.stringify({ items: { n: { roles: [{ file: 'form-n-2.hwp', attach: '안내.hwp', hash: OLD_H, role: 'content', formStart: '', why: '6번은 옛 바이트를 봤다' }] } } }));
+        const roles = AR.loadAiRoles(dir);
+        const pick = (d) => (d ? [d.role, d.by] : null);
+        eq('② 같은 바이트의 다른 이름(aiRoleFor) — 카드 읽기는 바이트가 같은 사본을 한 번만 읽힌다: 답이 `form-…` 이름에 적혀 있어도 자격 색인의 `elig-…` 사본으로 물으면 그 답을 준다(바이트로 찾는다) · 실제 파일을 안 주면 못 찾는다 · 아무도 안 읽은 바이트·모르는 공고는 답이 없다',
+          [pick(AR.aiRoleFor(roles, 'n', 'elig-n-1.hwp', at('elig-n-1.hwp'))), AR.aiRoleFor(roles, 'n', 'elig-n-1.hwp'), AR.aiRoleFor(roles, 'n', 'elig-n-3.hwp', at('elig-n-3.hwp')), AR.aiRoleFor(roles, 'zz', 'elig-n-1.hwp', at('elig-n-1.hwp'))],
+          [['mixed', 'read'], null, null, null]);
+        const fresh = pick(AR.aiRoleFor(roles, 'n', 'form-n-2.hwp', at('form-n-2.hwp')));
+        put('form-n-2.hwp', '옛 바이트'); const old = pick(AR.aiRoleFor(roles, 'n', 'form-n-2.hwp', at('form-n-2.hwp')));
+        put('form-n-2.hwp', '또 다른 바이트'); const none = AR.aiRoleFor(roles, 'n', 'form-n-2.hwp', at('form-n-2.hwp'));
+        eq('  4번과 6번의 답을 둘 다 들고 있다(loadAiRoles) — 파일을 다시 받아 4번만 새 바이트를 읽었으면, 옛 바이트를 본 6번의 답이 새 답을 가리지 않는다(4번 답을 쓴다) · 바이트가 6번이 본 것이면 6번 답 · 어느 쪽도 아니면 답 없음 · 실제 파일을 안 주면 6번 답 먼저',
+          [fresh, old, none, pick(AR.aiRoleFor(roles, 'n', 'form-n-2.hwp')), [roles.n['form-n-2.hwp'].by, (roles.n['form-n-2.hwp'].read || {}).by, 'read' in roles.n['form-n-1.hwp']]],
+          [['form', 'read'], ['content', 'review'], null, ['content', 'review'], ['review', 'read', false]]);
+        eq('  첨부 이름으로 찾기(aiRoleByName · 공고문 PDF 로봇) — 이름만 주면 그 이름의 답(6번 먼저) · 받은 원본의 바이트 해시를 주면 그 바이트의 답만(새 바이트 = 4번 답 · 옛 바이트 = 6번 답 · 모르는 바이트 = 없음) · 이름을 모르는 답(자격 로봇이 받은 공고문류)은 바이트로 찾는다 · 모르는 이름·모르는 공고는 없음',
+          [pick(AR.aiRoleByName(roles, 'n', '선발 공고 및 신청서.hwp')), pick(AR.aiRoleByName(roles, 'n', '안내.hwp')), pick(AR.aiRoleByName(roles, 'n', '안내.hwp', NEW_H)), pick(AR.aiRoleByName(roles, 'n', '안내.hwp', OLD_H)),
+            AR.aiRoleByName(roles, 'n', '안내.hwp', 'ffffffffffffffff'), pick(AR.aiRoleByName(roles, 'n', '올린 이름을 모르는 첨부.hwp', 'feedfeedfeedfeed')), AR.aiRoleByName(roles, 'n', '올린 이름을 모르는 첨부.hwp'), AR.aiRoleByName(roles, 'zz', '안내.hwp'), AR.aiRoleByName(null, 'n', '안내.hwp')],
+          [['mixed', 'read'], ['content', 'review'], ['form', 'read'], ['content', 'review'], null, ['content', 'read'], null, null, null]);
+        eq('  색인 줄에 적는 「이 답으로 만들었다」 표시(aiSig) — 갈래 + 서식이 시작되는 줄(빈칸을 전부 걷고 — 같은 줄을 띄어쓰기만 달리 적은 답은 같은 표시다) · 답이 없으면 빈 글자(AI 답 없이 만든 예전 줄과 같다)',
+          [AR.aiSig({ role: 'mixed', formStart: '[별지 1] 장학금 신청서' }), AR.aiSig({ role: 'mixed', formStart: ' [별지1]  장학금\n신청서 ' }), AR.aiSig({ role: 'content', formStart: '' }), AR.aiSig({ role: 'form' }), AR.aiSig(null), AR.aiSig({})],
+          ['mixed|[별지1]장학금신청서', 'mixed|[별지1]장학금신청서', 'content|', 'form|', '', '']);
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    }
+
+    /* ③ 양식 PDF 로봇(form-pdf) — AI 의 답으로 대상을 고른다 · 앱 신청서 칸이 보는 roles · 신청서가 아니게 된 첨부의 옛 사본 */
+    {
+      const sb = paidBox('hdj-ai-form-');
+      try {
+        const { isApplicationForm } = (await import(new URL('../collector/form-rules.mjs', import.meta.url))).loadFormRules(sb.dir);
+        /* D 의 첨부 다섯 — 붙은 문서 둘(이름이 신청서인 것 · 아닌 것) · AI 가 내용 문서라 한 신청서 이름 · AI 가 신청 양식이라 한 공고문 이름 · 이 공고 문서가 아닌 신청서 이름 */
+        const MIXED = '선발 공고 및 신청서.hwp', NAMED = '2026 특별장학금 신청서.hwp', PLAIN = '붙임1.hwp', NOTICE = '2026 장학생 선발 공고.hwp', STRAY = '옛 신청서.hwp';
+        const texts = { 'form-d-0.hwp': `${NOTE_T}\n${FORM_T}`, 'form-d-1.hwp': FORM_T, 'form-d-2.hwp': FORM_T, 'form-d-3.hwp': NOTE_T, 'form-d-4.hwp': FORM_T, 'form-e-1.hwp': FORM_T };
+        for (const [f, t] of Object.entries(texts)) { sb.write(`collector/extracted/${f}`, `원본 바이트 ${f}`); sb.write(`collector/extracted/${f}.body.txt`, t); }
+        const h = (f) => AR.fileHash16(sb.abs(`collector/extracted/${f}`));
+        const D = { id: 'D', name: '가 장학생 선발', deadline: LATER, attachments: [MIXED, NAMED, PLAIN, NOTICE, STRAY].map((name, i) => ({ name, url: `u${i}` })) };
+        const E = { id: 'E', name: '나 장학생 선발', deadline: LATER, attachments: [{ name: '붙임2.hwp', url: 'u5' }] };
+        const rows = [['form-d-0.hwp', D, 0, 10], ['form-d-1.hwp', D, 1, 11], ['form-d-2.hwp', D, 2, 12], ['form-d-3.hwp', D, 3, 13], ['form-d-4.hwp', D, 4, 14], ['form-e-1.hwp', E, 0, 15]]
+          .map(([file, it, i, bytes]) => ({ file, title: it.name, attach: it.attachments[i].name, bytes, id: it.id }));
+        const ai = (role, f, attach, formStart = '') => ({ file: f, attach, hash: h(f), role, formStart, why: '표본' });
+        const answers = { D: { at: T, docs: [ai('mixed', 'form-d-0.hwp', MIXED, '장학금 신청서'), ai('content', 'form-d-1.hwp', NAMED), ai('mixed', 'form-d-2.hwp', PLAIN, '장학금 신청서'), ai('form', 'form-d-3.hwp', NOTICE), ai('other', 'form-d-4.hwp', STRAY)] },
+          E: { at: T, docs: [ai('content', 'form-e-1.hwp', '붙임2.hwp')] } };
+        const stale = { ...answers, D: { at: T, docs: answers.D.docs.map((d) => (d.attach === NAMED ? { ...d, hash: 'deadbeefdeadbeef' } : d)) } };   // 「특별장학금 신청서」의 답이 다른 바이트에 대한 것
+        const tableOf = (items) => { sb.write('collector/attach-role-ai.json', { items }); return AR.loadAiRoles(sb.abs('collector')); };
+        const pk = (table) => FPD.pickFormTargets([D, E], rows, { today: T, isApplicationForm, decide: FPD.contentDecide(sb.abs('collector/extracted'), {}, table) });
+        const names = (r) => r.targets.map((t) => [t.id, t.files.map((f) => f.name)]);
+        const noAi = pk({}), withAi = pk(tableOf(answers));
+        eq('③ 양식 PDF 로봇(contentDecide 셋째 인자 = AI 가 정한 갈래의 표) — 답이 없으면 예전처럼 글자 표식·이름으로 고른다 · 답이 있으면 그 답으로: 신청서가 아니라 한 것(내용 문서 · 이름이 신청서가 아닌 붙은 문서)은 대상에서 빠지고 · 신청 양식이라 한 공고문 이름의 파일이 대상이 된다 · 🔴 이름이 신청서인 붙은 문서는 그대로 대상이다(통째로 신청서 — 신청서 칸을 잃지 않는다) · 🔴 이름이 신청서인 파일의 이 공고 문서 아님(other)도 그대로 대상이다(other 는 글자가 깨졌다는 말이기도 하다 — 예전 길이 정한다 · 리뷰 2026-11-23) · 다른 바이트에 대한 답(같은 이름에 새 파일이 덮였다)은 안 쓴다',
+          [names(noAi), names(withAi), names(pk(tableOf(stale)))],
+          [[['D', [MIXED, NAMED, PLAIN, STRAY]], ['E', ['붙임2.hwp']]], [['D', [MIXED, NOTICE, STRAY]]], [['D', [MIXED, NAMED, NOTICE, STRAY]]]]);
+        eq('  앱 신청서 칸이 보는 roles(이름 규칙과 다른 답만 · form / notice 둘뿐) — 이름이 신청서인데 AI 가 내용 문서라 한 것은 notice · 이름이 공고문인데 신청 양식이라 한 것은 form · 붙은 문서는 적지 않는다(이름 규칙과 같은 답 — 🔴 이름이 신청서인 붙은 문서를 notice 로 덮지 않는다) · 이름이 신청서인 파일의 other 도 적지 않는다(예전 길도 신청서) · notForm 에는 AI 가 신청서가 아니라 한 첨부(옛 사본을 지울 목록) · 공고문 PDF 로봇은 그 roles 로 신청서가 아닌 것만 맡는다(이름이 신청서인 붙은 문서는 안 맡는다 — 자른 사본이 안 생긴다)',
+          [noAi.roles, noAi.notForm, withAi.roles, withAi.notForm,
+            DPD.pickDocTargets({ registered: [D] }, { today: T, isApplicationForm, roles: withAi.roles }).map((t) => t.files.map((f) => f.name))],
+          [{ D: { [PLAIN]: 'form' }, E: { '붙임2.hwp': 'form' } }, {}, { D: { [NAMED]: 'notice', [NOTICE]: 'form' } },
+            { D: [NAMED, PLAIN], E: ['붙임2.hwp'] }, [[NAMED, PLAIN]]]);
+        /* 본편 — 어제까지 글자 표식·이름으로 신청서였던 사본 다섯(D 넷 · E 하나)이 앱에 실려 있다 */
+        const pdfOld = '%PDF-1.4 어제 만든 사본';
+        const oldRow = (id, n, name, srcBytes) => ({ file: `${id}/${n}-${FPD.safeName(name)}.pdf`, name, pages: 1, bytes: Buffer.byteLength(pdfOld), srcBytes, from: '원본 그대로 변환', fonts: FPD.FONT_STAMP, at: DAY });
+        const before = { D: [oldRow('D', 1, MIXED, 10), oldRow('D', 2, NAMED, 11), oldRow('D', 3, PLAIN, 12), oldRow('D', 4, STRAY, 14)], E: [oldRow('E', 1, '붙임2.hwp', 15)] };
+        for (const r of Object.values(before).flat()) sb.write(`data/forms-pdf/${r.file}`, pdfOld);
+        sb.write('data/forms-pdf/index.json', { updatedAt: DAY, items: before, roles: {} });
+        sb.write('data/registered.json', { items: [D, E] });
+        sb.write('collector/extracted/forms-index.txt', rows.map((r) => [r.file, r.title, r.attach, r.bytes, r.id].join('\t')).join('\n'));
+        const soffice = fakeSoffice(sb);
+        const listed = () => { const j = sb.json('data/forms-pdf/index.json') || { items: {} }; return [Object.fromEntries(Object.entries(j.items).map(([id, rs]) => [id, rs.map((r) => r.file)])), j.roles]; };
+        sb.write('collector/attach-role-ai.json', { items: {} });
+        const run0 = FPD.runFormPdf({ root: sb.dir, today: T, soffice, log: quiet }), idx0 = listed();
+        sb.write('collector/attach-role-ai.json', { items: answers });
+        const run1 = FPD.runFormPdf({ root: sb.dir, today: T, soffice, log: quiet }), idx1 = listed();
+        eq('  본편 — AI 의 답이 없는 동안은 실려 있던 사본 다섯이 그대로다(다시 바꾸지도 지우지도 않는다) · 답이 오면: 🔴 이름이 신청서인 붙은 문서의 사본은 그대로 남는다(다시 바꾸지도 않는다 — 2단계 전과 같다) · 신청 양식이라 한 공고문 이름의 파일을 바꿔 싣고, 신청서가 아니라 한 첨부의 옛 사본은 색인·파일에서 지운다 — 🔴 그 공고에 신청서가 하나도 안 남아도(E — 이름도 신청서가 아니라 roles 에 안 적히는 첨부) · 🔴 이름이 신청서인 파일의 other(옛 신청서)는 신청서 칸에 그대로 선다(앞 줄들이 빠져 자리 번호가 바뀌어 새 자리로 다시 바꾼다) · roles 도 그 답대로',
+          [run0.done.length, idx0, run1.done.map((d) => d.name), idx1, Object.values(before).flat().filter((r) => sb.exists(`data/forms-pdf/${r.file}`)).map((r) => r.name), sb.exists('data/forms-pdf/E'), sb.exists('data/forms-pdf/D/2-2026_장학생_선발_공고.pdf')],
+          [0, [{ D: before.D.map((r) => r.file), E: before.E.map((r) => r.file) }, { D: { [PLAIN]: 'form' }, E: { '붙임2.hwp': 'form' } }],
+            [NOTICE, STRAY], [{ D: ['D/1-선발_공고_및_신청서.pdf', 'D/2-2026_장학생_선발_공고.pdf', 'D/3-옛_신청서.pdf'] }, { D: { [NAMED]: 'notice', [NOTICE]: 'form' } }], [MIXED], false, true]);
+      } finally { sb.done(); }
+    }
+
+    /* ④ 공고문 고르기(attachment-text noticeDocFiles · aiRoles) — 서식 쪽 떼기 로봇이 볼 파일 */
+    {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-ai-notice-'));
+      try {
+        const put = (f, body) => fs.writeFileSync(path.join(dir, f), body);
+        const set = [['form-r-1.hwp', '(서식) 장학생 선발 지원서.hwp', `${NOTE_T}\n${FORM_T}`, 'mixed'], ['form-r-2.hwp', '2026 장학생 선발 공고.hwp', NOTE_T, 'form'],
+          ['form-r-3.hwp', '선발 요강.hwp', NOTE_T, 'other'], ['form-r-4.hwp', '붙임1.hwp', NOTE_T, null], ['form-r-5.hwp', '2026 특별장학금 신청서.hwp', FORM_T, 'content']];
+        for (const [f, , t] of set) { put(f, `원본 바이트 ${f}`); put(`${f}.body.txt`, t); }
+        put('elig-docs.json', '{}');
+        put('forms-index.txt', set.map(([f, attach]) => `${f}\tT\t${attach}\t10\tR`).join('\n'));
+        put('attach-role-ai.json', JSON.stringify({ items: { R: { docs: set.filter((x) => x[3]).map(([f, attach, , role]) => ({ file: f, attach, hash: AR.fileHash16(path.join(dir, f)), role, formStart: role === 'mixed' ? '장학금 신청서' : '', why: '표본' })) } } }));
+        const table = AR.loadAiRoles(dir), index = AT.loadNoticeDocIndex(dir);
+        const aiRoles = (id, file, abs) => AR.toDecisionRole((AR.aiRoleFor(table, id, file, abs) || {}).role);   // 서식 쪽 떼기(form-pages)가 넘기는 꼴 그대로
+        eq('④ 공고문 고르기(noticeDocFiles · aiRoles) — 안 넘기면 예전 그대로(이름이 공고문이면 읽고 · 이름이 서식 꼴이고 속에 서식이 있으면 안 읽는다) · 넘기면 AI 의 답대로: 이름이 서식 꼴이어도 붙은 문서(mixed)·내용 문서면 넣고 · 이름이 공고문이어도 신청 양식(form)·이 공고 문서 아님(other)이면 뺀다 · 답이 없는 파일은 예전 그대로 · 서식 쪽 떼기 로봇이 그렇게 넘긴다(이 파일은 답을 읽는 파일을 불러오지 않는다 — 부르는 쪽이 넘긴다)',
+          [AT.noticeDocFiles({ id: 'R' }, { index }), AT.noticeDocFiles({ id: 'R' }, { index, aiRoles }),
+            /noticeDocFiles\(it, \{ index: noticeIndex, sameTitle, aiRoles: \(id, file, abs\) => toDecisionRole\(\(aiRoleFor\(aiRoles, id, file, abs\) \|\| \{\}\)\.role\) \}\)/.test(fpgSrc)],
+          [['form-r-2.hwp', 'form-r-3.hwp', 'form-r-4.hwp'], ['form-r-1.hwp', 'form-r-4.hwp', 'form-r-5.hwp'], true]);
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    }
+
+    /* ⑤ 사본 내리기(pdf-verdicts applyPdfVerdicts) · ⑥ 세 로봇이 그 표시를 지킨다 */
+    {
+      const vb = paidBox('hdj-pdf-verdict-');
+      try {
+        const size = (rel) => fs.statSync(vb.abs(rel)).size;
+        const FILES = { a: 'data/forms-pdf/n1/1-a.pdf', b: 'data/forms-pdf/n1/2-b.pdf', g: 'data/forms-pdf/n2/1-g.pdf', c: 'data/docs-pdf/n1/1-c.pdf', d: 'data/docs-pdf/n1/2-d.pdf', h: 'data/docs-pdf/n1/3-h.pdf', e: 'data/form-pages/n1/1-e_p3-4.pdf' };
+        for (const [k, rel] of Object.entries(FILES)) vb.write(rel, `%PDF-1.4 표본 사본 ${k.repeat(k.charCodeAt(0) - 96)}`);   // 크기가 서로 다르게
+        vb.write('data/forms-pdf/n1/1-a-pages/1.webp', '쪽 그림');
+        const FONT = FPD.FONT_STAMP;
+        const IDX = { form: 'data/forms-pdf/index.json', doc: 'data/docs-pdf/index.json', pages: 'data/form-pages/index.json' };
+        vb.write(IDX.form, { updatedAt: DAY, items: {
+          n1: [{ file: 'n1/1-a.pdf', name: '가 신청서.hwp', pages: 1, bytes: size(FILES.a), srcBytes: 10, from: '원본 그대로 변환', fonts: FONT, at: DAY }, { file: 'n1/2-b.pdf', name: '나 신청서.hwp', pages: 1, bytes: size(FILES.b), srcBytes: 20, from: '원본 그대로 변환', fonts: FONT, at: DAY }],
+          n2: [{ file: 'n2/1-g.pdf', name: '사 신청서.hwp', pages: 1, bytes: size(FILES.g), srcBytes: 70, from: '원본 그대로 변환', fonts: FONT, at: DAY }] }, roles: {} });
+        vb.write(IDX.doc, { updatedAt: DAY, items: { n1: [{ file: 'n1/1-c.pdf', name: '다 공고문.hwp', pages: 2, bytes: size(FILES.c), fonts: FONT, kept: 1, at: DAY },   // 판 번호(mk)를 적기 전에 만든 줄
+          { file: 'n1/2-d.pdf', name: '라 안내.hwp', pages: 2, bytes: size(FILES.d), fonts: FONT, kept: 1, mk: DPD.MAKER, at: DAY }, { file: 'n1/3-h.pdf', name: '아 안내.hwp', pages: 1, fonts: FONT, kept: 1, at: DAY }] }, tried: {} });   // 끝 줄 — 크기(bytes)가 안 적힌 줄
+        vb.write(IDX.pages, { updatedAt: DAY, items: { n1: [{ file: 'n1/1-e_p3-4.pdf', name: '공고문 안 신청서 서식 (3~4쪽)', pages: 2, bytes: size(FILES.e), src: 'elig-n1-1.hwp', srcBytes: 30, srcPages: '3~4', from: '공고문 서식 쪽 떼기', at: DAY, ai: 'mixed|[별지1]' }] } });
+        const V = (kind, k, verdict, why, over = {}) => ({ id: 'n1', kind, file: FILES[k].slice('data/'.length), bytes: size(FILES[k]), verdict, why, ...over });
+        const still = [V('form', 'b', 'ok', '원본과 같다'), V('doc', 'd', 'broken', '그사이 다시 만든 사본', { bytes: size(FILES.d) + 1 }), V('form', 'a', 'broken', '색인에 없는 줄', { file: 'forms-pdf/n1/9-z.pdf' }),
+          V('form', 'a', 'broken', '다른 공고', { id: 'zz' }), V('poster', 'a', 'broken', '모르는 갈래'), V('doc', 'a', 'broken', '갈래와 폴더가 안 맞는다'), V('form', 'a', '이상함', '모르는 판정'), V('form', 'a', 'broken', '크기를 모르는 판정', { bytes: undefined }),
+          V('doc', 'h', 'broken', '줄에도 판정에도 크기가 없다(없는 것끼리 같다고 내리지 않는다)', { bytes: undefined }), null];
+        const drops = [V('form', 'a', 'broken', '2쪽의 표가 무너졌다'), V('doc', 'c', 'wrong', '2025학년도 공고문이다'), V('pages', 'e', 'empty', '빈 쪽뿐이다'), V('form', 'g', 'empty', '그림 하나뿐이다', { id: 'n2' })];
+        const texts = () => Object.values(IDX).map((rel) => vb.read(rel));
+        const before = texts();
+        const r0 = PV.applyPdfVerdicts({ root: vb.dir, verdicts: still, today: T });
+        eq('⑤ 🔴 사본 내리기(applyPdfVerdicts)가 건드리지 않는 것 — ok 판정 · 크기가 다른 사본(그사이 다시 만들었다 — 이 판정이 본 사본이 아니다) · 색인에 없는 줄 · 다른 공고 · 모르는 갈래 · 갈래와 폴더가 안 맞는 판정 · 모르는 판정 · 크기를 모르는 판정: 색인 셋이 한 글자도 안 바뀌고 파일도 그대로다',
+          [r0.dropped, JSON.stringify(texts()) === JSON.stringify(before), Object.values(FILES).every((rel) => vb.exists(rel))], [[], true, true]);
+        /* 색인 쓰기가 넘어지면(디스크·권한) — 던지되 파일은 하나도 안 지운다(줄은 있는데 파일이 없는 상태를 만들지 않는다) */
+        let threw = '';
+        try { PV.applyPdfVerdicts({ root: vb.dir, verdicts: drops, today: T, write: () => { throw new Error('ENOSPC: 디스크가 찼다'); } }); } catch (e) { threw = e.message; }
+        eq('  색인을 먼저 쓰고 파일은 그 뒤에 지운다 — 색인 쓰기가 넘어지면 던지고(부른 쪽이 안다) 파일도 색인도 그대로다(줄은 있는데 파일이 없어 학생이 깨진 링크를 누르는 일이 없다)',
+          [threw, JSON.stringify(texts()) === JSON.stringify(before), Object.values(FILES).every((rel) => vb.exists(rel)), vb.exists('data/forms-pdf/n1/1-a-pages/1.webp')], ['ENOSPC: 디스크가 찼다', true, true, true]);
+        /* 최종 검토가 부르는 꼴(deleteFiles: false) — 색인만 고치고 파일은 둔다(n2 의 하나뿐인 사본) */
+        const soft = PV.applyPdfVerdicts({ root: vb.dir, verdicts: drops.filter((v) => v.id === 'n2'), today: T, deleteFiles: false });
+        const fiSoft = { items: {}, ...(vb.json(IDX.form) || {}) };
+        eq('  🔴 색인만 고치는 꼴(deleteFiles: false · 최종 검토가 이렇게 부른다) — 줄이 사라지고 표시가 남지만 **파일은 그대로 둔다**: 최종 검토와 새벽 변환이 같은 때 저장해 색인 고침이 버려져도(세 색인은 병합 때 「내 것」) 「줄은 있는데 파일이 없는」 깨진 링크가 생기지 않는다 · 색인에서 빠진 파일은 변환 로봇이 제 실행에서 지운다',
+          [soft.dropped.map((d) => [d.id, d.kind, d.name, d.verdict]), 'n2' in fiSoft.items, Object.keys(fiSoft.rejected || {}), vb.exists(FILES.g)], [[['n2', 'form', '사 신청서.hwp', 'empty']], false, ['n2|사 신청서.hwp'], true]);
+        const r1 = PV.applyPdfVerdicts({ root: vb.dir, verdicts: [...still, ...drops], today: T });
+        const [fi, di, pi] = Object.values(IDX).map((rel) => ({ items: {}, ...(vb.json(rel) || {}) }));
+        eq('  ok 가 아닌 판정이고 색인 줄이 그대로(같은 크기)면 내린다(변환 로봇이 시작할 때 부르는 꼴 — 파일도 지운다) — 신청서 사본: 줄·파일·쪽 그림 폴더가 사라지고 색인 rejected 에 「다시 만들지 말 것」(그 줄의 원본 크기·글꼴 표 · 판정 · 날짜 — 🔴 AI 가 쓴 까닭은 앱이 받는 색인에 옮기지 않는다) · 마지막 줄이 빠진 공고는 칸째 사라진다 · 다른 줄·다른 파일은 그대로 · 이미 색인에서 빠진 사본(n2)은 다시 건드리지 않는다',
+          [r1.dropped.map((d) => [d.id, d.kind, d.file, d.name, d.verdict]), (fi.items.n1 || []).map((r) => r.name), 'n2' in fi.items, fi.rejected, [FILES.a, 'data/forms-pdf/n1/1-a-pages', FILES.g, FILES.b].map((rel) => vb.exists(rel))],
+          [[['n1', 'form', 'forms-pdf/n1/1-a.pdf', '가 신청서.hwp', 'broken'], ['n1', 'doc', 'docs-pdf/n1/1-c.pdf', '다 공고문.hwp', 'wrong'], ['n1', 'pages', 'form-pages/n1/1-e_p3-4.pdf', '공고문 안 신청서 서식 (3~4쪽)', 'empty']],
+            ['나 신청서.hwp'], false, { 'n2|사 신청서.hwp': { srcBytes: 70, fonts: FONT, verdict: 'empty', at: T }, 'n1|가 신청서.hwp': { srcBytes: 10, fonts: FONT, verdict: 'broken', at: T } },
+            [false, false, true, true]]);
+        eq('  공고문 사본: 줄·파일이 사라지고 실패 장부(tried)에 review 표시(판정 · 날짜 · 판 번호 — 그 줄의 것, 없으면(판 번호를 적기 전에 만든 줄) 색인에 적힌 가장 큰 번호) · 서식 쪽: 줄을 지우지 않고 「서식 쪽 없음」 줄로 바꾼다(원본 이름·크기 · 판정 · 그 줄을 만든 AI 답을 그대로 들고) · 세 표시 어디에도 AI 가 쓴 까닭이 없다',
+          [(di.items.n1 || []).map((r) => r.name), di.tried, vb.exists(FILES.c), vb.exists(FILES.d), pi.items.n1, vb.exists(FILES.e), /무너졌다|공고문이다|빈 쪽뿐이다|그림 하나뿐이다/.test(texts().join('\n'))],
+          [['라 안내.hwp', '아 안내.hwp'], { 'n1|다 공고문.hwp': { at: T, verdict: 'wrong', mk: DPD.MAKER, review: true } }, false, true,
+            [{ src: 'elig-n1-1.hwp', srcBytes: 30, none: true, at: T, verdict: 'empty', ai: 'mixed|[별지1]' }], false, false]);
+        const robotFormat = texts().map(sameFormat);
+        for (const rel of Object.values(IDX)) vb.write(rel, JSON.stringify(vb.json(rel)));   // 내용은 같고 꼴만 다른 글로 바꿔 둔다 — 다시 쓰면 로봇 형식으로 돌아와 들킨다
+        const squeezed = texts();
+        const r2 = PV.applyPdfVerdicts({ root: vb.dir, verdicts: [...still, ...drops], today: plus(1) });
+        eq('  바뀐 색인은 로봇 형식(JSON.stringify(x, null, 1) + 개행)으로 쓴다 · 두 번 불러도 같다 — 내릴 것이 없으면 색인 파일을 다시 쓰지 않는다',
+          [robotFormat, r2.dropped, JSON.stringify(texts()) === JSON.stringify(squeezed)], [[true, true, true], [], true]);
+
+        /* ⑥ 세 로봇이 그 표시를 지킨다 — 안 지키면 새벽마다 같은 사본을 다시 만들고 6번이 돈을 내고 다시 내린다 */
+        eq('⑥ 🔴 양식 PDF 로봇(isRejected) — 내린 사본은 같은 원본 크기·같은 글꼴 표인 동안 「내린 사본」이다 · 원본이 바뀌었거나(크기) 글꼴 표가 바뀌었으면 아니다(다시 만든다) · 표시가 없는 첨부는 아니다',
+          [FPD.isRejected(fi, 'n1|가 신청서.hwp', 10), FPD.isRejected(fi, 'n1|가 신청서.hwp', 11), FPD.isRejected({ rejected: { k: { srcBytes: 10, fonts: '옛 글꼴 표' } } }, 'k', 10),
+            FPD.isRejected(fi, 'n1|나 신청서.hwp', 20), FPD.isRejected({}, 'k', 10), FPD.isRejected(null, 'k', 10)], [true, false, false, false, false, false]);
+        eq('  🔴 공고문 PDF 로봇(resting) — 최종 검토가 내린 사본의 표시(review)는 날수와 상관없이 쉰다(석 달 뒤에도) · 만드는 법(MAKER)이 바뀌면 풀린다(표시의 판 번호가 지금 판과 다르다) · 보통 실패는 예전처럼 사흘만 쉰다',
+          [DPD.resting(di.tried, 'n1|다 공고문.hwp', plus(90)), DPD.resting({ k: { at: T, why: 'x', mk: DPD.MAKER - 1, review: true } }, 'k', T), DPD.resting({ k: { at: T, why: 'x', mk: DPD.MAKER + 1, review: true } }, 'k', T),
+            DPD.resting({ k: { at: plus(-2), mk: DPD.MAKER } }, 'k', T), DPD.resting({ k: { at: plus(-3), mk: DPD.MAKER } }, 'k', T), DPD.resting({ k: { at: plus(-90), mk: DPD.MAKER } }, 'k', T)],
+          [true, false, false, true, false, false]);
+        const noneRow = (pi.items.n1 || [])[0] || {};
+        eq('  🔴 서식 쪽 떼기 로봇(sameSource) — 내린 서식 쪽은 「서식 쪽 없음」 줄로 남아 같은 원본·같은 AI 답인 동안 다시 떼지 않는다 · 원본이 바뀌면(크기) 다시 · AI 의 답이 바뀌면(서식이 시작되는 줄) 다시 · AI 답 없이 만든 예전 줄은 예전 그대로(답이 생기면 다시) · 본편이 none 줄을 이 셈으로 건너뛴다',
+          [FPG.sameSource(noneRow, 'elig-n1-1.hwp', 30, 'mixed|[별지1]'), FPG.sameSource(noneRow, 'elig-n1-1.hwp', 31, 'mixed|[별지1]'), FPG.sameSource(noneRow, 'elig-n1-1.hwp', 30, 'mixed|[별지2]'), FPG.sameSource(noneRow, 'elig-n1-2.hwp', 30, 'mixed|[별지1]'),
+            FPG.sameSource({ src: 'a.pdf', srcBytes: 5, none: true, at: DAY }, 'a.pdf', 5), FPG.sameSource({ src: 'a.pdf', srcBytes: 5, none: true, at: DAY }, 'a.pdf', 5, 'content|'), FPG.sameSource(null, 'a.pdf', 5),
+            /const prevNone = have\.find\(\(h\) => h\.none && sameSource\(h, f\.name, srcBytes, sig\)\);\s*\n\s*if \(prevNone\) \{ next\.push\(prevNone\); skipped \+= 1; return; \}/.test(fpgSrc)],
+          [true, false, false, false, true, false, false, true]);
+      } finally { vb.done(); }
+    }
+    /* 본편에서(양식 PDF 로봇) — 내린 사본은 만들지도 싣지도 않고 · 원본이 바뀌면 표시를 지우고 다시 만든다 */
+    {
+      const fb = paidBox('hdj-rejected-');
+      try {
+        fb.write('data/registered.json', { items: [{ id: 'F1', name: '우양재단 동행 장학생 모집', deadline: LATER, attachments: [{ name: '지원서.docx' }] }] });
+        const indexRow = (bytes) => fb.write('collector/extracted/forms-index.txt', `form-f1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t${bytes}\tF1\n`);
+        indexRow(100); fb.write('collector/extracted/form-f1-1.docx', 'docx-bytes');
+        fb.write('data/forms-pdf/index.json', { updatedAt: DAY, items: {}, rejected: { 'F1|지원서.docx': { srcBytes: 100, fonts: FPD.FONT_STAMP, verdict: 'broken', why: '표가 무너졌다', at: DAY },
+          '없는공고|옛 신청서.hwp': { srcBytes: 1, fonts: FPD.FONT_STAMP, verdict: 'empty', why: '', at: DAY } } });
+        const soffice = fakeSoffice(fb);
+        const held = FPD.runFormPdf({ root: fb.dir, today: T, soffice, log: quiet });
+        const i1 = fb.json('data/forms-pdf/index.json') || {}, rep1 = fb.read('collector/form-pdf-report.md') || '', dir1 = fb.exists('data/forms-pdf/F1');
+        indexRow(101);   // 학교가 같은 이름으로 다시 올렸다(원본 크기가 다르다)
+        const lifted = FPD.runFormPdf({ root: fb.dir, today: T, soffice, log: quiet });
+        const i2 = fb.json('data/forms-pdf/index.json') || {};
+        eq('  🔴 본편(양식 PDF 로봇) — 최종 검토가 내린 사본은 만들지도 싣지도 않는다(바꾼 것 0 · 색인에 줄이 없다 · 폴더도 안 생긴다 · 리포트에 「최종 검토가 내린 사본 — 1개」) · 목록에서 빠진 공고의 표시는 지운다 · 원본이 바뀌면(크기) 표시를 지우고 다시 만들어 싣는다',
+          [held.done.length, held.rejected, 'F1' in (i1.items || {}), Object.keys(i1.rejected || {}), dir1, /### 최종 검토가 내린 사본 — 1개/.test(rep1),
+            lifted.done.map((d) => d.name), ((i2.items || {}).F1 || []).map((r) => [r.name, r.srcBytes]), 'rejected' in i2, fb.exists('data/forms-pdf/F1/1-지원서.pdf')],
+          [0, [{ id: 'F1', name: '지원서.docx' }], false, ['F1|지원서.docx'], false, true, ['지원서.docx'], [['지원서.docx', 101]], false, true]);
+      } finally { fb.done(); }
+    }
+
+    /* ⑦ 붙은 문서 → PDF 둘: 서식이 시작되는 쪽부터 끝까지(서식 쪽 떼기) · 그 앞쪽까지(공고문 PDF) — 같은 쪽 찾기로 */
+    const PAGES = ['2026 장학생 선발 공고\n3. 제출서류: 장학금 신청서 1부, 재학증명서 1부\n4. 문의: 장학팀', '5. 유의사항\n선발 결과는 개별 통보합니다', '[별지 제1호 서식]\n장 학 금   신 청 서\n성 명            학 번',
+      '개인정보 수집·이용 동의서\n□ 동의함   □ 동의하지 않음\n2026년   월   일\n신청인 :            (서명)'];
+    const page = (line, pages = PAGES.length) => FPG.formStartPage('/없는/사본.pdf', line, { pageText: (pdf, n) => PAGES[n - 1], pages });
+    eq('⑦ 서식이 시작되는 쪽 찾기(formStartPage) — 빈칸을 전부 걷고 견준다(쪽 글자는 글자 사이를 벌려 놓는다) · 줄 머리에서만 찾는다: 서식의 제목 줄(3쪽)은 찾고 · 본문 줄 가운데 든 「제출서류: 장학금 신청서」(1쪽)는 어느 길로도 안 잡힌다(그 앞 두 쪽에서만 찾아도 null) · 한 줄로 없으면 이어지는 줄들이 덮는 쪽(줄이 다른 자리에서 꺾여도) · 그것도 없으면 앞 12자로 · 4자 못 되는 줄·빈 줄·어디에도 없는 줄은 null · 쪽 글자는 넘겨받은 함수로 읽는다(쪽 도구 없이 잰다)',
+      [page('장학금 신청서'), page('[별지  제1호 서식]'), page('제출서류: 장학금 신청서'), page('장학금 신청서 성 명 학 번'), page('[별지 제1호 서식] 장학금 신청서 (앞면)'), page('개인정보 수집·이용 동의서'),
+        page('신청서'), page(''), page(null), page('어디에도 없는 서식의 첫 줄입니다'), page('장학금 신청서', 2), page('장학금 신청서', 0)],
+      [3, 3, null, 3, 3, 4, null, null, null, null, null, null]);
+    {
+      /* 리뷰 2026-11-23 의 두 재현 — 공고 본문은 제출 서류 목록에서 그 서식을 이름으로 부른다 · 진짜 서식 쪽의 머리 줄에는 오른쪽 「(앞쪽)」 칸이 붙고 제목은 다음 줄로 꺾인다 */
+      const FORM_BOX = '[별지 제1호 서식]                                        (앞쪽)\n장 학 금   신 청 서\n접수번호 |        | 접수일 |        |\n성 명 |        | 학 번 |        |\n위와 같이 장학금을 신청합니다.\n2026년   월   일\n신청인            (서명 또는 인)\n○○장학재단 이사장 귀하';
+      const COVER = '2026학년도 ○○장학재단 장학생 선발 공고\n1. 지원자격 : 학부 재학생\n2. 선발인원 : 10명';
+      const A4 = [COVER, '3. 제출서류\n 가. 장학금 신청서 1부([별지 제1호 서식])\n 나. 재학증명서 1부\n4. 신청기간 : 2026. 12. 1. ~ 12. 10.', '5. 접수 방법 : 장학팀 방문 제출\n6. 선발 결과 발표 : 2026. 12. 20.', FORM_BOX];
+      const B5 = [COVER, '3. 제출서류\n 가. [별지 제1호 서식] 장학금 신청서 1부\n 나. 재학증명서 1부', '4. 신청기간 : 2026. 12. 1. ~ 12. 10.\n5. 접수 방법 : 장학팀 방문 제출', '6. 유의사항\n 가. 선발 결과는 개별 통보합니다', FORM_BOX];
+      const LIST = [COVER, '[붙임]\n[별지 제1호 서식] 장학금 신청서 1부\n[별지 제2호 서식] 개인정보 수집·이용 동의서 1부', '4. 신청기간 : 2026. 12. 1. ~ 12. 10.', FORM_BOX];   // 목록 줄이 줄 머리에서 그 서식 이름으로 시작한다
+      const CONSENT = '개인정보 수집·이용 동의서\n□ 동의함   □ 동의하지 않음\n2026년   월   일\n신청인 :            (서명)';
+      const MULTI = [COVER, `${FORM_BOX}\n※ 붙임: 개인정보 수집·이용 동의서 1부`, CONSENT];   // 앞 서식(신청서) 쪽 본문 가운데에 뒤 서식(동의서)의 이름이 나온다 — 두 쪽 다 서식 쪽이다
+      const at = (P, line) => FPG.formStartPage('/없는/사본.pdf', line, { pageText: (pdf, n) => P[n - 1], pages: P.length });
+      let threw = '';
+      try { FPG.formStartPage('/없는/사본.pdf', '장학금 신청서', { pageText: () => FORM_BOX }); } catch (e) { threw = e.message ? '던짐' : ''; }
+      eq('  🔴 공고 본문이 제출 서류 목록에서 부른 서식 이름(앞쪽)에서 자르지 않는다(리뷰 2026-11-23) — 4쪽 공고(2쪽 「가. 장학금 신청서 1부([별지 제1호 서식])」 · 4쪽 서식 머리 줄 끝에 「(앞쪽)」 칸)는 4쪽 · 5쪽 공고(2쪽 「가. [별지 제1호 서식] 장학금 신청서 1부」 · 머리글과 제목을 한 줄로 적은 답 — PDF 는 「(앞쪽)」 칸을 붙이고 두 줄로 꺾는다)는 5쪽 · 제목만 적은 답도 5쪽 · 🔴 목록 줄이 줄 머리에서 그 이름으로 시작해도 그 쪽이 서식 쪽(classifyPage)이 아니면 그 쪽에서 자르지 않고, 그 줄이 걸린 뒤쪽의 진짜 서식 쪽(4쪽)을 고른다(2026-11-23 — 첫 번째로 걸린 쪽만 보고 포기하면 AI 의 답을 버린다) · 🔴 앞 서식 쪽 본문 가운데 든 뒤 서식의 이름(「※ 붙임: 개인정보 수집·이용 동의서 1부」)에서 그 서식을 시작하지 않는다 — 줄 머리에서만 찾는다(3쪽) · 쪽 수를 못 읽으면(쪽 도구 없음) 던진다(「서식 쪽 없음」으로 적지 않게)',
+        [at(A4, '[별지 제1호 서식]'), at(B5, '[별지 제1호 서식] 장학금 신청서'), at(B5, '장학금 신청서'), at(LIST, '[별지 제1호 서식]'), at(MULTI, '개인정보 수집·이용 동의서'),
+          [A4, B5, LIST, MULTI].map((P) => P.map((t, i) => FPG.classifyPage(t, i + 1)).join('')), threw],
+        [4, 5, 5, 4, 3, ['noticenoticenoticeform', 'noticenoticenoticenoticeform', 'noticenoticenoticeform', 'noticeformform'], '던짐']);
+    }
+    const asked = [];
+    eq('  서식 쪽 구간(form-pages aiFormRange) — 붙은 문서(mixed)이고 그 줄을 찾았으면 그 쪽부터 끝까지 한 구간(찾기에는 AI 가 짚은 줄을 넘긴다) · 못 찾았으면 null(쪽 글자 표식으로 고르는 예전 길) · AI 의 답이 없어도 null(예전 길) · 내용 문서·통째로 신청 양식·이 공고 문서 아님은 none(그 파일에서는 떼지 않는다) · 통째로 신청 양식은 양식 PDF 로봇이 맡는 파일이면 none, 그 로봇이 못 보는 파일이면 전부가 서식 쪽(2026-11-22) · 본편이 이 셈으로 떼고, none 이면 바꾸지도 않고 그렇게 적는다',
+      [FPG.aiFormRange({ role: 'mixed', formStart: '[별지 1]' }, 7, (line) => { asked.push(line); return 5; }), asked, FPG.aiFormRange({ role: 'mixed', formStart: '[별지 1]' }, 7, () => 1), FPG.aiFormRange({ role: 'mixed', formStart: '[별지 1]' }, 7, () => null),
+        FPG.aiFormRange(null, 7, () => 5), ['content', 'form', 'other'].map((role) => FPG.aiFormRange({ role, formStart: '' }, 7, () => 5)), FPG.aiFormRange({ role: 'form', formStart: '' }, 7, () => 5, false),
+        /let ranges = aiFormRange\(ai, pc\.pages, \(line\) => formStartPage\(conv\.pdf, line, \{ pages: pc\.pages \}\), handled\);\s*\n\s*if \(!Array\.isArray\(ranges\)\) \{/.test(fpgSrc),
+        /if \(aiFormRange\(ai, 0, \(\) => null, handled\) === 'none'\) \{ next\.push\(\{ src: f\.name, srcBytes, none: true, at: today, why: AI_NONE\[ai\.role\], ai: sig \}\); return; \}/.test(fpgSrc)],
+      [[[5, 7]], ['[별지 1]'], [[1, 7]], null, null, ['none', 'none', 'none'], [[1, 7]], true, true]);
+    {
+      /* 통째로 신청 양식(AI: form)을 누가 PDF 로 올리나 — 양식 PDF 로봇은 신청서 로봇이 받은 원본(forms-index · 이 공고의 줄)만 본다 */
+      const hashOf = (f) => ({ 'form-x-1.hwp': 'hA', 'form-x-2.hwp': 'hB' }[f] || '');
+      eq('  🔴 통째로 신청 양식(AI: form)은 양식 PDF 로봇이 맡는 파일이면(이 공고의 신청서 원본 목록에 그 파일 — 이름이 같거나 바이트가 같다) 서식 쪽 떼기가 안 뗀다 · 그 목록에 없는 파일(「붙임2.hwp」처럼 이름에 신청서 티가 없어 자격 색인에만 있는 것)은 서식 쪽 떼기가 통째로 올린다 — 안 그러면 그 신청서는 앱 어디에도 안 선다(formPdfHandles · 본편이 이 셈을 쓴다)',
+        [FPG.formPdfHandles([{ file: 'form-x-1.hwp' }], 'form-x-1.hwp', 'hZ', hashOf), FPG.formPdfHandles([{ file: 'form-x-1.hwp' }], 'elig-x-1.hwp', 'hA', hashOf),
+          FPG.formPdfHandles([{ file: 'form-x-2.hwp' }], 'elig-x-1.hwp', 'hA', hashOf), FPG.formPdfHandles([], 'elig-x-1.hwp', 'hA', hashOf), FPG.formPdfHandles([{ file: 'form-x-1.hwp' }], 'elig-x-1.hwp', '', hashOf),
+          /const handled = !!ai && ai\.role === 'form' && formPdfHandles\(formRows, f\.name, fileHash16\(f\.src\), \(file\) => fileHash16\(path\.join\(extractedDir, file\)\)\);/.test(fpgSrc),
+          /const formRows = noticeFormRows\(regById\.get\(t\.id\), noticeIndex, sameTitle\);/.test(fpgSrc)],
+        [true, true, false, false, false, true, true]);
+    }
+    eq('  읽는 글 쪽 구간(doc-pdf cutRange) — 붙은 문서이고 서식이 2쪽 이후에 시작할 때만 그 앞쪽까지 · 첫 쪽부터 서식이거나 그 줄을 못 찾았으면 자르지 않는다(통째로 둔다) · 붙은 문서가 아니면 자르지 않는다',
+      [DPD.cutRange({ role: 'mixed' }, 5), DPD.cutRange({ role: 'mixed' }, 2), DPD.cutRange({ role: 'mixed' }, 1), DPD.cutRange({ role: 'mixed' }, null), DPD.cutRange({ role: 'content' }, 5), DPD.cutRange(null, 5)],
+      [[[1, 4]], [[1, 1]], null, null, null, null]);
+    {
+      const db = paidBox('hdj-doc-cut-');
+      try {
+        const NOTICE = '2026 장학생 선발 공고.hwp', GUIDE = '선발 안내.hwp', KEY = `m1|${GUIDE}`;
+        db.write('data/registered.json', { items: [{ id: 'm1', name: '붙은 문서가 달린 공고', deadline: LATER, sourceUrl: 'https://x.ac.kr/v?id=1', attachments: [{ name: NOTICE, url: 'https://x.ac.kr/f/1' }, { name: GUIDE, url: 'https://x.ac.kr/f/2' }] }] });
+        db.write('data/activities.json', { items: [] }); db.write('data/kosaf-open.json', { items: [] });
+        const BYTES = { '/f/1': Buffer.alloc(2000, 0x41), '/f/2': Buffer.alloc(2000, 0x42) };
+        db.write('src-1.bin', BYTES['/f/1']); db.write('src-2.bin', BYTES['/f/2']);
+        const H1 = AR.fileHash16(db.abs('src-1.bin')), H2 = AR.fileHash16(db.abs('src-2.bin'));
+        /* AI 의 답 — 공고문은 자격 로봇이 받아 올린 이름을 모르는 답(attach 없음 — 받은 원본의 바이트로 찾는다) · 안내문은 이름을 아는 답(내용 문서) */
+        const table = (formStart) => ({ m1: { 'elig-m1-1.hwp': { file: 'elig-m1-1.hwp', attach: null, hash: H1, role: 'mixed', formStart, why: '표본', by: 'read' },
+          'form-m1-2.hwp': { file: 'form-m1-2.hwp', attach: GUIDE, hash: H2, role: 'content', formStart: '', why: '표본', by: 'read' } } });
+        const calls = [], lines = [], cuts = [];
+        const TXT = '가나다라마바사아자차카타파하'.repeat(5);
+        const opts = { root: db.dir, today: T, isApplicationForm: () => false, log: quiet, relax: () => ({ ok: false, why: '시험 — 다시 가지 않음' }), origText: () => TXT, pdfText: () => TXT,
+          fetchImpl: async (url) => { const p = new URL(url).pathname; calls.push(p); return { ok: true, status: 200, arrayBuffer: async () => BYTES[p] }; },
+          convert: (from, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, '%PDF-1.4 통째 사본'); return { ok: true, out, pages: 5, bytes: 22 }; },
+          cutPdf: (from, ranges, out) => { cuts.push(ranges); fs.writeFileSync(out, '%PDF 읽는 글 쪽'); return { ok: true, pages: ranges[0][1], bytes: 15 }; } };
+        const run = async (over) => {
+          calls.length = 0;
+          const r = await DPD.runDocPdf({ ...opts, ...over });
+          const idx = db.json('data/docs-pdf/index.json') || { items: {}, tried: {} };
+          const rows = Object.fromEntries((idx.items.m1 || []).map((x) => [x.name, x]));
+          return { r, calls: [...calls], rows, tried: idx.tried || {}, text: Object.fromEntries(Object.values(rows).map((x) => [x.name, db.read(`data/docs-pdf/${x.file}`)])), report: db.read('collector/doc-pdf-report.md') || '' };
+        };
+        const first = await run({ aiRoles: table('[별지 1] 장학금 신청서'), startPage: (pdf, line) => { lines.push(line); return 4; } }), firstCuts = cuts.slice();
+        const again = await run({ aiRoles: table('[별지 1] 장학금 신청서'), startPage: () => 4 });
+        const moved = await run({ aiRoles: table('장학금 신청서'), startPage: () => 1 });
+        const steady = await run({ aiRoles: table('장학금 신청서'), startPage: () => 1 });
+        const noTool = await run({ aiRoles: table('[서식 1]'), startPage: () => 4, cutPdf: () => ({ ok: false, why: '쪽 도구 없음' }) });
+        const retry = await run({ aiRoles: table('[서식 1]'), startPage: () => 4 });   // 같은 답 · 쪽 도구가 돌아왔다
+        const gone = await run({ aiRoles: {}, startPage: () => 4 });
+        const none = await run({ aiRoles: table('[서식 3]'), startPage: () => null }), noneAgain = await run({ aiRoles: table('[서식 3]'), startPage: () => null });
+        const crash = await run({ aiRoles: table('[서식 2]'), startPage: () => 4, cutPdf: () => { throw new Error('ENOSPC: no space left on device'); } });
+        const lost = await run({ aiRoles: table('[서식 2]'), startPage: () => { throw new Error('도구 없음(pdfinfo)'); } });   // 쪽 수를 못 읽어 쪽 찾기가 던진다(formStartPage)
+        const n1 = first.rows[NOTICE] || {}, g1 = first.rows[GUIDE] || {};
+        eq('  본편(공고문 PDF 로봇) — 붙은 문서는 읽는 글 쪽만 남긴다: 서식이 4쪽에서 시작하면 1~3쪽만(cut · 쪽 수·크기는 자른 사본의 것 · 글자 대조는 자르기 전 사본 전체로 잰 값 그대로) · 이름을 모르는 답은 받은 원본의 바이트로 찾는다 · 쪽 찾기에는 AI 가 짚은 줄을 넘긴다 · 줄에 그 답(ai)과 원본의 바이트 해시(srcHash)를 적는다 · 내용 문서는 통째로(자르지 않는다 · ai 칸도 없다) · 리포트에 한 줄',
+          [first.calls, [n1.cut, n1.pages, n1.bytes, n1.kept, n1.ai, n1.srcHash === H1], first.text[NOTICE], ['cut' in g1, 'ai' in g1, g1.pages, g1.bytes, g1.srcHash === H2], first.text[GUIDE], lines, firstCuts,
+            /읽는 글 쪽만 남긴 사본 1개/.test(first.report)],
+          [['/f/1', '/f/2'], ['1~3쪽', 3, 15, 1, 'mixed|[별지1]장학금신청서', true], '%PDF 읽는 글 쪽', [false, false, 5, 22, true], '%PDF-1.4 통째 사본', ['[별지 1] 장학금 신청서'], [[[1, 3]]], true]);
+        const m = moved.rows[NOTICE] || {}, t = noTool.rows[NOTICE] || {}, c = crash.rows[NOTICE] || {}, z = gone.rows[NOTICE] || {};
+        eq('  같은 답이면 다시 받지 않는다(받기 0번 — 줄의 srcHash 로 같은 답을 찾는다) · AI 가 짚은 줄이 바뀌면 그 첨부만 다시 만든다: 서식이 첫 쪽부터면 통째로(자르지 않고 그 답만 적어 둔다 — 날마다 다시 받지 않게) · 쪽을 못 떼어도(도구가 못 한다고 하든 · 던지든) 사본을 버리지 않는다(통째로 싣는다 · 실패 0) · AI 의 답이 사라지면 자른 사본을 통째 사본으로 되돌린다',
+          [again.calls, again.r.skipped, moved.calls, ['cut' in m, m.pages, m.ai, moved.text[NOTICE]], steady.calls, noTool.calls, ['cut' in t, noTool.text[NOTICE]],
+            [crash.r.failed.length, 'cut' in c, crash.text[NOTICE]], [(retry.rows[NOTICE] || {}).cut, gone.calls, 'cut' in z, 'ai' in z, gone.text[NOTICE]]],
+          [[], 2, ['/f/1'], [false, 5, 'mixed|장학금신청서', '%PDF-1.4 통째 사본'], [], ['/f/1'], [false, '%PDF-1.4 통째 사본'], [0, false, '%PDF-1.4 통째 사본'], ['1~3쪽', ['/f/1'], false, false, '%PDF-1.4 통째 사본']]);
+        const rt = retry.rows[NOTICE] || {}, nn = none.rows[NOTICE] || {}, ls = lost.rows[NOTICE] || {};
+        eq('  🔴 쪽을 못 뗐으면(쪽 도구가 못 한다고 하든 · 던지든 · 쪽 수를 못 읽어 쪽 찾기가 던지든) 그 답(ai)을 줄에 적지 않는다(리뷰 2026-11-23) — 다음 실행이 다시 받아 자른다(한 번 못 뗀 통째 사본이 「그 답으로 만들었다」로 끝까지 남지 않게 · 실패 0) · 서식 쪽을 못 찾았거나 첫 쪽부터 서식이면 그 답을 적는다(자를 것이 없다 — 날마다 다시 받지 않게)',
+          [['ai' in t, retry.calls, rt.cut, rt.ai], ['ai' in c, lost.calls, 'ai' in ls, lost.r.failed.length, lost.text[NOTICE]], [nn.ai, 'cut' in nn, noneAgain.calls], m.ai],
+          [[false, ['/f/1'], '1~3쪽', 'mixed|[서식1]'], [false, ['/f/1'], false, 0, '%PDF-1.4 통째 사본'], ['mixed|[서식3]', false, []], 'mixed|장학금신청서']);
+        /* 최종 검토가 안내문 사본을 내렸다 — 줄이 없고 실패 장부에 review 표시(한 달 전) */
+        const idx = db.json('data/docs-pdf/index.json');
+        const mark = (mk) => db.write('data/docs-pdf/index.json', { ...idx, items: { m1: idx.items.m1.filter((x) => x.name !== GUIDE) }, tried: { [KEY]: { at: plus(-30), verdict: 'broken', mk, review: true } } });
+        const guideFile = `data/docs-pdf/${(idx.items.m1.find((x) => x.name === GUIDE) || {}).file}`, guideBefore = db.exists(guideFile);   // 최종 검토는 색인만 고친다 — 그 사본 파일은 남아 있다
+        mark(DPD.MAKER);
+        const rest = await run({ aiRoles: {} });
+        const guideAfter = db.exists(guideFile);
+        mark(DPD.MAKER - 1);
+        const lift = await run({ aiRoles: {} });
+        eq('  🔴 본편(공고문 PDF 로봇) — 최종 검토가 내린 사본은 한 달이 지나도 다시 받지도 만들지도 않는다(받기 0번 · 쉬는 중 1 · 줄 없음 · 표시 그대로 · 최종 검토가 색인만 고치고 남긴 그 사본 파일은 공고 폴더 정리가 지운다) · 만드는 법의 판 번호가 바뀌면 다시 만들고 표시를 지운다',
+          [rest.calls, rest.r.rested, GUIDE in rest.rows, Object.keys(rest.tried), [guideBefore, guideAfter], lift.calls, GUIDE in lift.rows, Object.keys(lift.tried)],
+          [[], 1, false, [KEY], [true, false], ['/f/2'], true, []]);
+        /* 6번이 자른 공고문 사본을 「읽는 글 쪽이 빠졌다」고 내렸다(최종 검토와 같은 꼴 — 색인만) · 그 검토가 서식이 시작되는 줄을 새로 냈다(resplit) */
+        const cutRun = await run({ aiRoles: table('[별지 1] 장학금 신청서'), startPage: () => 4 });
+        const cutRow = cutRun.rows[NOTICE] || {};
+        PV.applyPdfVerdicts({ root: db.dir, verdicts: [{ id: 'm1', kind: 'doc', file: `docs-pdf/${cutRow.file}`, bytes: cutRow.bytes, verdict: 'broken', why: '제출 서류 쪽이 빠졌다' }], today: T, deleteFiles: false });
+        const markNow = ((db.json('data/docs-pdf/index.json') || {}).tried || {})[`m1|${NOTICE}`] || {};
+        const held = await run({ aiRoles: table('[별지 1] 장학금 신청서'), startPage: () => 4 });
+        const resplit = await run({ aiRoles: table('[별지 제1호 서식]'), startPage: () => 3 });
+        const re = resplit.rows[NOTICE] || {};
+        eq('  🔴 본편(공고문 PDF 로봇) — 최종 검토가 내린 자른 사본의 표시에는 그 사본을 만든 AI 의 답(ai)과 원본 바이트(srcHash)가 남는다 · 그 답이 그대로인 동안은 쉰다(받기 0번 · 줄 없음) · 6번이 갈라낸 자리를 고쳐 서식이 시작되는 줄이 바뀌면(resplit) 표시를 풀고 새 자리로 다시 만든다(리뷰 2026-11-23 — 안 그러면 서식 쪽 떼기만 새 줄로 다시 떼고 그 공고는 공고문 사본이 끝까지 없다)',
+          [[cutRow.cut, markNow.review, markNow.ai, markNow.srcHash === H1, markNow.verdict], [held.calls, NOTICE in held.rows, held.r.rested], [resplit.calls, re.cut, re.ai, `m1|${NOTICE}` in resplit.tried]],
+          [['1~3쪽', true, 'mixed|[별지1]장학금신청서', true, 'broken'], [[], false, 1], [['/f/1'], '1~2쪽', 'mixed|[별지제1호서식]', false]]);
+      } finally { db.done(); }
+    }
+    {
+      /* AI 가 통째로 신청 양식이라 한, 이름이 공고문인 첨부 — 그 파일의 사본은 신청서 칸이 맡는다(양식 PDF · 자격 색인에만 있으면 서식 쪽 떼기가 통째로) */
+      const qb = paidBox('hdj-doc-asform-');
+      try {
+        const NAMED = '2026 장학생 선발 공고.hwp', BYHASH = '선발 안내.hwp', OLD = 'data/docs-pdf/q1/1-2026_장학생_선발_공고.pdf';
+        qb.write('data/registered.json', { items: [{ id: 'q1', name: '서식만 든 공고문 이름의 첨부', deadline: LATER, sourceUrl: 'https://x.ac.kr/v?id=3', attachments: [{ name: NAMED, url: 'https://x.ac.kr/f/a' }, { name: BYHASH, url: 'https://x.ac.kr/f/b' }] }] });
+        qb.write('data/activities.json', { items: [] }); qb.write('data/kosaf-open.json', { items: [] });
+        const BYTES = { '/f/a': Buffer.alloc(2000, 0x51), '/f/b': Buffer.alloc(2000, 0x52) };
+        qb.write('b.bin', BYTES['/f/b']);
+        const HB = AR.fileHash16(qb.abs('b.bin'));
+        qb.write(OLD, '%PDF-1.4 답이 오기 전에 바꿔 둔 사본');   // AI 의 답이 오기 전에 실린 공고문 사본
+        qb.write('data/docs-pdf/index.json', { updatedAt: DAY, items: { q1: [{ file: 'q1/1-2026_장학생_선발_공고.pdf', name: NAMED, pages: 1, bytes: 30, fonts: FPD.FONT_STAMP, kept: 1, mk: DPD.MAKER, at: DAY }] }, tried: {} });
+        /* 하나는 이름을 아는 답(신청서 로봇이 받은 것) · 하나는 이름을 모르는 답(자격 로봇이 받은 것 — 받은 바이트로만 찾는다) */
+        const table = (roleB) => ({ q1: { 'form-q1-1.hwp': { file: 'form-q1-1.hwp', attach: NAMED, hash: 'ffffffffffffffff', role: 'form', formStart: '', why: '표본', by: 'read' },
+          'elig-q1-2.hwp': { file: 'elig-q1-2.hwp', attach: null, hash: HB, role: roleB, formStart: '', why: '표본', by: 'read' } } });
+        const calls = [], TXT = '가나다라마바사아자차카타파하'.repeat(5);
+        const run = async (aiRoles) => {
+          calls.length = 0;
+          const r = await DPD.runDocPdf({ root: qb.dir, today: T, isApplicationForm: () => false, log: quiet, relax: () => ({ ok: false, why: '시험' }), origText: () => TXT, pdfText: () => TXT, aiRoles,
+            fetchImpl: async (url) => { const p = new URL(url).pathname; calls.push(p); return { ok: true, status: 200, arrayBuffer: async () => BYTES[p] }; },
+            convert: (from, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, '%PDF-1.4 통째 사본'); return { ok: true, out, pages: 2, bytes: 22 }; } });
+          const idx = qb.json('data/docs-pdf/index.json') || { items: {}, tried: {} };
+          return { r, calls: [...calls], rows: ((idx.items || {}).q1 || []).map((x) => x.name), tried: idx.tried || {}, report: qb.read('collector/doc-pdf-report.md') || '' };
+        };
+        const asForm = await run(table('form')), still = await run(table('form')), flipped = await run(table('content'));
+        const tb = asForm.tried[`q1|${BYHASH}`] || {};
+        eq('  🔴 본편(공고문 PDF 로봇) — AI 가 통째로 신청 양식이라 한 첨부는 바꾸지 않는다(리뷰 2026-11-23 — 바꾸면 같은 파일의 사본이 둘이 되고 6번이 둘 다 돈 내고 본다): 이름을 아는 답이면 받지도 않고 · 이름을 모르는 답은 받은 바이트로 알아보고 안 바꾸며 그 바이트를 장부에 적어 다음 실행은 받지 않는다 · 답이 오기 전에 실린 사본은 내린다(줄·파일) · 실패로 세지 않고 리포트에 한 줄 · AI 의 답이 바뀌면(내용 문서) 사흘 쉬지 않고 바로 바꾼다',
+          [[asForm.calls, asForm.rows, qb.exists(OLD), asForm.r.asForm.map((x) => x.name), asForm.r.failed.length, [tb.form, tb.srcHash === HB], /AI 가 통째로 신청 양식이라 한 첨부 2개/.test(asForm.report)],
+            [still.calls, still.rows, still.r.asForm.length], [flipped.calls, flipped.rows, `q1|${BYHASH}` in flipped.tried]],
+          [[['/f/b'], [], false, [NAMED, BYHASH], 0, [true, true], true], [[], [], 2], [['/f/b'], [BYHASH], false]]);
+      } finally { qb.done(); }
+    }
+
+    /* 본편에서(서식 쪽 떼기 로봇 · 두 로봇의 같은 쪽 찾기) — 쪽 도구(poppler) 넷을 가짜로 세워 진짜 본편을 돌린다(이 컴퓨터에도 로봇 러너에도 진짜 도구가 있든 없든 같은 결과):
+       쪽 글자는 그 PDF 곁의 표본 글(<파일>.p<쪽>.txt)에서 읽고 · 쪽 수는 그 표본 글의 개수 · 뗀 쪽은 「<파일> n쪽」 한 줄짜리 파일로 낸다 */
+    {
+      const pb = paidBox('hdj-form-pages-run-');
+      const PATH0 = process.env.PATH;
+      try {
+        const tool = (name, body) => { pb.write(`bin/${name}`, `#!/bin/sh\n${body}\n`); fs.chmodSync(pb.abs(`bin/${name}`), 0o755); };
+        tool('pdfinfo', '[ "$1" = "-v" ] && { echo "pdfinfo version 0"; exit 0; }\necho "Pages:          $(ls "$1".p*.txt 2>/dev/null | wc -l | tr -d " ")"');
+        tool('pdftotext', 'cat "$6.p$3.txt" 2>/dev/null\nexit 0');
+        tool('pdfseparate', 'p="$2"; while [ "$p" -le "$4" ]; do printf \'%%PDF-1.4 %s %s쪽\\n\' "$(basename "$5")" "$p" > "$(printf "$6" "$p")"; p=$((p+1)); done');
+        tool('pdfunite', 'for last; do :; done\n: > "$last"\nwhile [ $# -gt 1 ]; do cat "$1" >> "$last"; shift; done');
+        process.env.PATH = `${pb.abs('bin')}${path.delimiter}${PATH0}`;
+        const NOTICE_P = '2026년 ○○장학회 장학생 선발 공고\n1. 지원자격 : 재학생\n2. 제출서류: [별지 1호 서식] 1부, 재학증명서 1부\n3. 신청기간 : 10.1~10.20';
+        const FORM_P = '[별지 1호 서식]\n장학생 신청서\n성   명 |          | 생년월일 |        |\n학   과 |          | 학   번  |        |\n위와 같이 신청합니다.\n2026년   월   일\n신청인 :            (서명 또는 인)\n○○장학회 귀하';
+        const GUIDE_P = '작성 요령\n1. 정자로 기재합니다\n2. 증빙 서류를 뒤에 붙입니다';
+        const doc = (f, pages) => { pb.write(`collector/extracted/${f}`, `%PDF-1.4 표본 원본 ${f}`); pages.forEach((text, i) => pb.write(`collector/extracted/${f}.p${i + 1}.txt`, text)); };
+        doc('elig-p1-1.pdf', [NOTICE_P, GUIDE_P, FORM_P, GUIDE_P]);   // 붙은 문서 — 서식은 3쪽에서 시작한다(1쪽 본문에 그 서식 이름이 한 번 나오고 · 4쪽은 쪽 글자 표식으로는 서식이 아니다)
+        doc('elig-p1-2.pdf', [NOTICE_P, FORM_P]);                     // AI 는 내용 문서라 한다(쪽 글자 표식으로는 2쪽이 서식)
+        doc('elig-p1-3.pdf', [NOTICE_P, FORM_P]);                     // AI 의 답이 없다
+        pb.write('collector/extracted/elig-docs.json', { P1: { files: ['elig-p1-1.pdf', 'elig-p1-2.pdf', 'elig-p1-3.pdf'] } });
+        pb.write('data/registered.json', { items: [{ id: 'P1', name: '붙은 문서가 달린 공고', deadline: LATER, attachments: [] }] });
+        const h = (f) => AR.fileHash16(pb.abs(`collector/extracted/${f}`));
+        const answers = (formStart) => pb.write('collector/attach-role-ai.json', { items: { P1: { at: T, docs: [
+          { file: 'elig-p1-1.pdf', attach: null, hash: h('elig-p1-1.pdf'), role: 'mixed', formStart, why: '표본' }, { file: 'elig-p1-2.pdf', attach: null, hash: h('elig-p1-2.pdf'), role: 'content', formStart: '', why: '표본' }] } } });
+        const listed = () => ((pb.json('data/form-pages/index.json') || { items: {} }).items.P1 || []);
+        const run = () => { const r = FPG.runFormPages({ root: pb.dir, today: T, log: quiet }); return { done: r.done.length, failed: r.failed.map((f) => f.why), rows: listed().map((x) => [x.src, x.file || null, x.srcPages || null, x.none ? x.why || x.verdict || '' : null, x.ai || null]) }; };
+        const machine = run();
+        answers('[별지 1호 서식]');
+        const guided = run(), text1 = pb.read('data/form-pages/P1/1-elig-p1-1_p3-4.pdf'), olds = ['P1/1-elig-p1-1_p3-3.pdf', 'P1/2-elig-p1-2_p2-2.pdf'].map((f) => pb.exists(`data/form-pages/${f}`));
+        const kept = run();
+        const row = listed()[0] || {};
+        PV.applyPdfVerdicts({ root: pb.dir, verdicts: [{ id: 'P1', kind: 'pages', file: `form-pages/${row.file}`, bytes: row.bytes, verdict: 'wrong', why: '읽는 글이 들었다' }], today: T, deleteFiles: false });   // 최종 검토와 같은 꼴 — 색인만 고친다(파일은 남는다)
+        const downed = run(), downFile = pb.exists('data/form-pages/P1/1-elig-p1-1_p3-4.pdf');
+        answers('장학생 신청서');
+        const reAsked = run();
+        const SIG = 'mixed|[별지1호서식]', OTHER = ['elig-p1-3.pdf', 'P1/3-elig-p1-3_p2-2.pdf', '2', null, null];
+        eq('  본편(서식 쪽 떼기 로봇 · 가짜 쪽 도구) — AI 의 답이 없으면 예전처럼 쪽 글자 표식으로 고른다(3쪽만) · 붙은 문서라는 답이 오면 AI 가 짚은 줄이 **한 줄로 통째** 있는 쪽(3쪽 — 본문에 그 이름이 나오는 1쪽이 아니다)부터 끝까지(3~4쪽)를 다시 떼고 옛 사본은 지운다 · 내용 문서라 한 파일은 떼지 않고 그렇게 적는다(옛 사본을 지운다) · 답이 없는 파일은 그대로 · 같은 답이면 다시 안 한다',
+          [machine, [guided.done, guided.failed, guided.rows], text1, olds, [kept.done, JSON.stringify(kept.rows) === JSON.stringify(guided.rows)]],
+          [{ done: 3, failed: [], rows: [['elig-p1-1.pdf', 'P1/1-elig-p1-1_p3-3.pdf', '3', null, null], ['elig-p1-2.pdf', 'P1/2-elig-p1-2_p2-2.pdf', '2', null, null], OTHER] },
+            [1, [], [['elig-p1-1.pdf', 'P1/1-elig-p1-1_p3-4.pdf', '3~4', null, SIG], ['elig-p1-2.pdf', null, null, 'AI: 서식 없는 내용 문서', 'content|'], OTHER]],
+            '%PDF-1.4 elig-p1-1.pdf 3쪽\n%PDF-1.4 elig-p1-1.pdf 4쪽\n', [false, false], [0, true]]);
+        eq('  🔴 본편(서식 쪽 떼기 로봇) — 최종 검토가 내린 서식 쪽은 다시 떼지 않는다(뗀 것 0 · 줄은 「서식 쪽 없음」 그대로 · 줄에는 판정만 — AI 의 까닭은 앱이 받는 색인에 안 옮긴다) · 🔴 최종 검토가 색인만 고치고 남긴 그 파일은 이 로봇이 공고 폴더 정리에서 지운다(파일 없음) · AI 가 짚은 줄이 바뀌면 그때 다시 뗀다',
+          [downed.done, downed.rows[0], downFile, reAsked.done, reAsked.rows[0], pb.exists('data/form-pages/P1/1-elig-p1-1_p3-4.pdf')],
+          [0, ['elig-p1-1.pdf', null, null, 'wrong', SIG], false, 1, ['elig-p1-1.pdf', 'P1/1-elig-p1-1_p3-4.pdf', '3~4', null, 'mixed|장학생신청서'], true]);
+        /* 공고문 PDF 로봇도 같은 쪽 찾기·쪽 떼기를 쓴다(넘겨주지 않은 기본값 — form-pages 의 formStartPage · extractRanges) — 가짜 변환이 4쪽짜리 사본과 그 쪽 글을 낸다 */
+        pb.write('data/registered.json', { items: [{ id: 'P2', name: '붙은 문서가 달린 공고 둘', deadline: LATER, sourceUrl: 'https://x.ac.kr/v?id=2', attachments: [{ name: '2026 장학생 선발 공고.hwp', url: 'https://x.ac.kr/f/9' }] }] });
+        pb.write('data/activities.json', { items: [] }); pb.write('data/kosaf-open.json', { items: [] });
+        const BYTES = Buffer.alloc(2000, 0x43); pb.write('src-9.bin', BYTES);
+        const TXT = '가나다라마바사아자차카타파하'.repeat(5);
+        const dr = await DPD.runDocPdf({ root: pb.dir, today: T, isApplicationForm: () => false, log: quiet, relax: () => ({ ok: false, why: '시험 — 다시 가지 않음' }), origText: () => TXT, pdfText: () => TXT,
+          fetchImpl: async () => ({ ok: true, status: 200, arrayBuffer: async () => BYTES }),
+          convert: (from, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, '%PDF-1.4 통째 사본'); [NOTICE_P, GUIDE_P, FORM_P, GUIDE_P].forEach((text, i) => fs.writeFileSync(`${out}.p${i + 1}.txt`, text)); return { ok: true, out, pages: 4, bytes: 22 }; },
+          aiRoles: { P2: { 'elig-p2-1.hwp': { file: 'elig-p2-1.hwp', attach: null, hash: AR.fileHash16(pb.abs('src-9.bin')), role: 'mixed', formStart: '[별지 1호 서식]', why: '표본', by: 'read' } } } });
+        const made = ((pb.json('data/docs-pdf/index.json') || { items: {} }).items.P2 || [])[0] || {};
+        eq('  본편(공고문 PDF 로봇 · 같은 가짜 쪽 도구 · 쪽 찾기와 쪽 떼기는 넘겨주지 않은 기본값) — 서식 쪽 떼기 로봇과 **같은 쪽**(3쪽)에서 가른다: 읽는 글 쪽은 1~2쪽 · 사본 파일에는 그 두 쪽만',
+          [dr.done.length, dr.failed.map((f) => f.why), made.cut, made.pages, pb.read(`data/docs-pdf/${made.file}`)], [1, [], '1~2쪽', 2, '%PDF-1.4 out.pdf 1쪽\n%PDF-1.4 out.pdf 2쪽\n']);
+      } finally { process.env.PATH = PATH0; pb.done(); }
+    }
+
+    /* ⑦-2 서식이 시작되는 줄은 한 번 정해지면 그대로 둔다(final-review keepFormStart · 2026-11-22) — 둘째 AI 가 같은 줄을 말만 바꿔 적을 때마다
+       변환 로봇이 다시 떼고 다시 받으면, 그렇게 새로 생긴 사본을 6번이 돈 내고 또 본다 */
+    {
+      const parts = [{ tag: 'A1', file: 'form-k1-1.hwp', attach: '붙임1.hwp', hash: 'hk', label: '첨부 [A1] 붙임1.hwp', text: '장학생 선발 공고와 신청서' }];
+      const roles4 = [{ file: 'form-k1-1.hwp', attach: '붙임1.hwp', hash: 'hk', role: 'mixed', formStart: '[별지 제1호 서식] 장학금 신청서', why: '공고문 뒤에 신청서' }];
+      const entry0 = { title: '', host: '', eligibility: ['다문화가정의 자녀인 학부 재학생'], excludes: [], priority: [], amount: [], apply: [], documents: [], notes: [], multi: false, head: 0, deadline: null, hash: 'h', readAt: plus(-1) };
+      const answer = (pdfs) => ({ ...base, eligibility: [L('다문화가정의 자녀인 학부 재학생')], attachments: [{ tag: 'A1', role: 'mixed', formStart: '장학금 신청서 (별지 제1호 서식)', why: '공고문 뒤에 신청서' }], pdfs, summary: '고친 것 없음' });
+      const sent = [{ tag: 'P1', kind: 'pages', file: 'form-pages/k1/1-x_p4-5.pdf', name: '공고문 안 신청서 서식 (4~5쪽)', bytes: 10, pages: 2, sent: true }];
+      const review = (verdict) => FR.applyReview({ it: { id: 'k1', name: '장학생 선발 공고' }, parts, entry: entry0, roles4, out: answer([{ tag: 'P1', verdict, why: '' }]), pdfs: sent, wonIn, today: plus(0) });
+      const same = review('ok'), resplit = review('wrong');
+      eq('⑦-2 🔴 서식이 시작되는 줄은 한 번 정해지면 그대로 둔다(keepFormStart) — 둘째 AI 가 같은 줄을 말만 바꿔 적어도 앞선 줄(4번의 답)을 싣는다 · 변환 로봇의 「같은 답인가」(aiSig)도 같다 → 다시 떼지도 다시 받지도 않는다 · 구분이 바뀐 것으로 적지 않는다 · 🔴 그 공고의 갈라낸 사본(서식 쪽)을 잘못됐다고 본 검토면 새 줄을 싣는다(그 줄로 가른 자리가 틀렸다는 뜻)',
+        [same.roles.map((d) => d.formStart), AR.aiSig(same.roles[0]) === AR.aiSig(roles4[0]), same.changes.filter((c) => c.field === 'attachments').length, resplit.roles.map((d) => d.formStart)],
+        [['[별지 제1호 서식] 장학금 신청서'], true, 0, ['장학금 신청서 (별지 제1호 서식)']]);
+      const R = (role, formStart, hash = 'hk') => ({ file: 'form-k1-1.hwp', attach: '붙임1.hwp', hash, role, formStart, why: '' });
+      const ks = (roles, opt) => FR.keepFormStart(roles, opt).map((d) => [d.role, d.formStart]);
+      eq('  앞선 줄을 고르는 차례 — 지난 검토의 답(그 파일의 바이트가 그대로일 때) → 4번의 답 · 지난 검토가 다른 바이트를 봤으면 4번의 답 · 앞선 답에 줄이 없거나 붙은 문서가 아니었으면 새 줄 · 이번 답이 붙은 문서가 아니면 그 답 그대로',
+        [ks([R('mixed', '새 줄')], { prevRoles: [R('mixed', '지난 검토의 줄')], roles4: [R('mixed', '4번의 줄')] }), ks([R('mixed', '새 줄')], { prevRoles: [R('mixed', '지난 검토의 줄', 'old')], roles4: [R('mixed', '4번의 줄')] }),
+          ks([R('mixed', '새 줄')], { roles4: [R('mixed', '')] }), ks([R('mixed', '새 줄')], { roles4: [R('content', '')] }), ks([R('content', '')], { roles4: [R('mixed', '4번의 줄')] })],
+        [[['mixed', '지난 검토의 줄']], [['mixed', '4번의 줄']], [['mixed', '새 줄']], [['mixed', '새 줄']], [['content', '']]]);
+    }
+    /* ⑧ 최종 검토가 그 자리에서 내린다 — 진짜 로봇을 임시 폴더에서(가짜 응답 · 돈 0) */
+    {
+      const sb = paidBox('hdj-final-drop-');
+      try {
+        const soon = plus(20), FORM = '장학금 신청서.hwp', COPY = 'data/forms-pdf/v-1/1-장학금_신청서.pdf', DOCCOPY = 'data/docs-pdf/v-1/1-안내문.pdf';
+        const it = { id: 'v-1', name: '다문화9 가정 장학금 신청 안내', type: '교외', sourceUrl: 'https://v9.example.ac.kr/v?no=9', deadline: plus(10), listedAt: plus(-5), paidGate: plus(-2), amountValue: 0, attachments: [{ name: FORM, url: 'u' }], eligibility: {} };
+        sb.write('data/registered.json', { items: [it] });
+        sb.write('collector/extracted/notices-text.json', [{ title: it.name, school: '시험대학교', url: it.sourceUrl, text: [it.name, '지원자격: 다문화가정의 자녀인 학부 재학생', `접수기간: ${soon} 까지`, '장학생 선발 안내 본문입니다 '.repeat(12)].join('\n') }]);
+        sb.write('collector/extracted/form-v1-1.hwp', 'hwp-form'); sb.write('collector/extracted/form-v1-1.hwp.body.txt', '장학금 신청서\n성명 학번 학과 연락처 주소 은행 계좌번호 보호자 성명\n본인은 위 내용이 사실임을 확인하며 장학금을 신청합니다');
+        sb.write('collector/extracted/forms-index.txt', `form-v1-1.hwp\tT\t${FORM}\t10\tv-1`);
+        const partsIn = CR.makeSources({ texts: sb.json('collector/extracted/notices-text.json'), browserBodies: {}, eligDocs: {}, formRows: AT.loadNoticeDocIndex(sb.abs('collector/extracted')).forms, extractedDir: sb.abs('collector/extracted') });
+        const card = { title: '', host: '', eligibility: ['다문화가정의 자녀인 학부 재학생'], excludes: [], priority: [], amount: [], apply: [], documents: [], notes: [], multi: false, head: 0, deadline: null, hash: CR.sourceHash(CR.sourceText(partsIn(it))), readAt: DAY };
+        sb.write('data/card-read.json', { items: { 'v-1': card }, updatedAt: DAY, gateHeld: {} });
+        sb.write('collector/attach-role-ai.json', { items: { 'v-1': { at: DAY, docs: [{ file: 'form-v1-1.hwp', attach: FORM, hash: AR.fileHash16(sb.abs('collector/extracted/form-v1-1.hwp')), role: 'form', formStart: '', why: '학생이 채워 내는 신청서' }] } } });
+        const pdf = (label) => `%PDF-1.4 ${label}\n1 0 obj << /Type /Page >> endobj\n2 0 obj << /Type /Page >> endobj\n`;   // 작은 표본 사본(2쪽)
+        sb.write(COPY, pdf('깨진 신청서 사본')); sb.write(DOCCOPY, pdf('멀쩡한 공고문 사본'));
+        const bytes = (rel) => fs.statSync(sb.abs(rel)).size;
+        sb.write('data/forms-pdf/index.json', { updatedAt: DAY, items: { 'v-1': [{ file: 'v-1/1-장학금_신청서.pdf', name: FORM, pages: 2, bytes: bytes(COPY), srcBytes: 10, from: '원본 그대로 변환', fonts: FPD.FONT_STAMP, at: DAY }] }, roles: {} });
+        sb.write('data/docs-pdf/index.json', { updatedAt: DAY, items: { 'v-1': [{ file: 'v-1/1-안내문.pdf', name: '안내문.hwp', pages: 2, bytes: bytes(DOCCOPY), fonts: FPD.FONT_STAMP, kept: 1, mk: DPD.MAKER, at: DAY }] }, tried: {} });
+        const formsBefore = sb.read('data/forms-pdf/index.json'), docsBefore = sb.read('data/docs-pdf/index.json');
+        const WHY = '2쪽의 표가 무너져 칸을 알아볼 수 없다';
+        const answer = { ...base, eligibility: [L('다문화가정의 자녀인 학부 재학생')], attachments: [{ tag: 'A1', role: 'form', formStart: '', why: '학생이 채워 내는 신청서' }],
+          pdfs: [{ tag: 'P1', verdict: 'broken', why: WHY }, { tag: 'P2', verdict: 'ok', why: '원본과 같다' }], summary: '고친 것 없음' };
+        sb.write('fake.json', { 'v-1': answer });
+        const fakeRun = () => sb.run('collector/final-review.mjs', ['--write'], { ...NOENV, FINAL_REVIEW_FAKE: sb.abs('fake.json') }, 30000);
+        const result = () => ((sb.json('collector/final-review.json') || {}).items || {})['v-1'] || {};
+        const run1 = fakeRun();
+        if (run1.status !== 0) console.log(run1.out.slice(-600));
+        const fidx = sb.json('data/forms-pdf/index.json') || {}, res = result(), led = (sb.json('collector/final-review-ledger.json') || {})['v-1'] || {};
+        const rej = (fidx.rejected || {})[`v-1|${FORM}`] || {};
+        eq('⑧ 최종 검토가 그 자리에서 내린다(가짜 응답 · 돈 0) — 둘째 AI 가 「변환이 잘못됐다」고 본 신청서 사본: 앱이 받는 색인에서 줄이 사라지고 · 색인에 「다시 만들지 말 것」 표시가 남는다(판정·날짜만 — AI 의 까닭은 앱이 받는 색인에 안 옮긴다 · 로봇 형식) · 🔴 파일은 그대로 둔다(최종 검토는 색인만 고친다 — 두 워크플로가 같은 때 저장해 한쪽 색인 고침이 버려져도 「줄은 있는데 파일이 없는」 깨진 링크가 안 생긴다) · ok 사본의 색인과 파일은 한 글자도 안 바뀐다',
+          [run1.status, 'v-1' in (fidx.items || {}), sb.exists(COPY), [rej.srcBytes, rej.fonts === FPD.FONT_STAMP, rej.verdict, 'why' in rej, !!rej.at && rej.at === led.at], sameFormat(sb.read('data/forms-pdf/index.json')), sb.read('data/docs-pdf/index.json') === docsBefore, sb.exists(DOCCOPY)],
+          [0, false, true, [10, true, 'broken', false, true], true, true, true]);
+        const p0 = (res.problems || [])[0] || {};
+        eq('  검토 결과에 남는다 — 사본 판정(pdfs)은 그대로 · 내린 기록(dropped: 갈래·이름·판정·까닭·날짜) · 사람이 볼 것의 그 줄은 「앱에 올렸던 … 이 사본은 앱에서 내렸습니다 — 학생에게는 올린 원본 파일만 보입니다」(확인할 것 한 문장 · 🔴 로봇 말이 섞이지 않는다)',
+          [(res.pdfs || []).map((p) => [p.file, p.verdict]), (res.dropped || []).map((d) => [d.kind, d.name, d.verdict, d.why, !!d.at && d.at === led.at]), [p0.kind, p0.doc],
+            p0.reason === `앱에 올렸던 신청서 사본 「${FORM}」의 변환이 잘못됐습니다 — ${WHY}. 이 사본은 앱에서 내렸습니다 — 학생에게는 올린 원본 파일만 보입니다.`, /확인해 주세요/.test(p0.check || ''),
+            /verdict|broken|wrong|empty|hash|null|undefined|kind|sent|skip|formStart|pdfs?\b/i.test(`${p0.reason}${p0.check}`)],
+          [[['forms-pdf/v-1/1-장학금_신청서.pdf', 'broken'], ['docs-pdf/v-1/1-안내문.pdf', 'ok']], [['form', FORM, 'broken', WHY, true]], ['pdf-broken', FORM], true, true, false]);
+        const run2 = fakeRun();
+        eq('  🔴 바로 다시 돌려도 대상 0건 — 장부의 해시를 **내린 뒤의 사본 목록**으로 잡는다(내리기 전 목록으로 잡으면 제가 내린 사본 때문에 「사본 목록이 바뀌었다」며 같은 공고를 돈 내고 또 본다) · 장부의 해시 = 결과의 해시',
+          [/대상 0건/.test(run2.out), /검토 0건/.test(run2.out), !!led.hash && led.hash === res.hash], [true, true, true]);
+        /* 내린 것이 병합에서 버려졌다 — 새벽 변환이 먼저 저장해 이 로봇의 색인 고침이 「내 것」(merge=ours)에 밀렸다: 줄이 되살아나고(같은 크기) 표시가 없다 · 파일은 원래 그대로다 */
+        const kept = sb.read('data/forms-pdf/index.json');
+        sb.write('data/forms-pdf/index.json', formsBefore);
+        const run2b = fakeRun(), fidxB = sb.json('data/forms-pdf/index.json') || {};
+        eq('  🔴 내린 것이 병합에서 버려져 그 줄이 되살아나도(리뷰 2026-11-23) 같은 공고를 다시 사지 않는다(대상 0건 — 앞서 ok 가 아니라고 본 그 파일·그 크기의 사본은 사본 목록에서 뺀다 withoutJudged · 해시가 같다) · 🔴 반영 길에서 앞선 판정을 다시 적용해 그 줄을 다시 내린다(표시도 다시 · 색인만 — 파일은 그대로) · 다시 내린 색인은 버려지기 전과 같다',
+          [/대상 0건/.test(run2b.out), /검토 0건/.test(run2b.out), 'v-1' in (fidxB.items || {}), Object.keys(fidxB.rejected || {}), sb.exists(COPY), sb.read('data/forms-pdf/index.json') === kept,
+            /const pdfs = pickPdfs\(withoutJudged\(pdfsOf\(it, \{ \.\.\.pdfCtx, parts \}\), \(result\.items\[it\.id\] \|\| \{\}\)\.pdfs\), \{ maxPages: cfg\.maxPdfPages \}\);/.test(frSrc),
+            /const pdfsNow = withoutJudged\(down\.length \? [^\n]* : t\.pdfs, a\.pdfs\);/.test(frSrc),
+            FR.withoutJudged([{ file: 'f/a.pdf', bytes: 9 }, { file: 'f/a.pdf', bytes: 10 }, { file: 'f/b.pdf', bytes: 9 }], [{ file: 'f/a.pdf', bytes: 9, verdict: 'broken' }, { file: 'f/b.pdf', bytes: 9, verdict: 'ok' }]).map((p) => `${p.file}|${p.bytes}`)],
+          [true, true, false, [`v-1|${FORM}`], true, true, true, true, ['f/a.pdf|10', 'f/b.pdf|9']]);
+        /* 🔴 최종 검토는 색인만 고쳤다 — 색인에서 빠진 그 사본 파일은 양식 PDF 로봇이 다음 실행에서 지운다(공고 폴더 정리) */
+        const swept = FPD.runFormPdf({ root: sb.dir, today: T, soffice: fakeSoffice(sb), log: quiet });
+        const fidxS = sb.json('data/forms-pdf/index.json') || {};
+        eq('  🔴 최종 검토가 남겨 둔 사본 파일(색인에서는 빠졌다)은 다음 변환 실행이 지운다 — 그 사본을 다시 만들지도 않는다(바꾼 것 0 · 줄 없음 · 표시 그대로)',
+          [sb.exists(COPY), swept.done.length, swept.rejected, 'v-1' in (fidxS.items || {}), Object.keys(fidxS.rejected || {})], [false, 0, [{ id: 'v-1', name: FORM }], false, [`v-1|${FORM}`]]);
+        /* 색인이 옛 판으로 되돌려졌다(부딪힌 저장 · 관문 되돌리기) — 줄과 파일이 돌아오고 표시는 없다. 판정은 검토 결과 파일에 아직 있다 */
+        sb.write('data/forms-pdf/index.json', formsBefore); sb.write(COPY, pdf('깨진 신청서 사본'));
+        const back = FPD.runFormPdf({ root: sb.dir, today: T, soffice: fakeSoffice(sb), log: quiet });
+        const fidx2 = sb.json('data/forms-pdf/index.json') || {};
+        eq('  🔴 색인이 옛 판으로 되돌려져도(줄·파일이 돌아오고 표시가 없다) 변환 로봇이 시작할 때 그 판정을 다시 적용한다 — 줄·파일이 다시 사라지고 표시가 다시 남고 · 그 사본을 다시 만들지 않는다',
+          [back.done.length, back.rejected, 'v-1' in (fidx2.items || {}), Object.keys(fidx2.rejected || {}), sb.exists(COPY)], [0, [{ id: 'v-1', name: FORM }], false, [`v-1|${FORM}`], false]);
+        /* 4번이 그 공고를 다시 읽었다(카드가 바뀌었다) — 다시 보는 검토의 사본 목록에는 내린 사본이 없다 */
+        sb.write('data/card-read.json', { items: { 'v-1': { ...card, eligibility: [...card.eligibility, '직전 학기 평점 3.0 이상인 학생'], readAt: T } }, updatedAt: T, gateHeld: {} });
+        sb.write('fake.json', { 'v-1': { ...answer, eligibility: [L('다문화가정의 자녀인 학부 재학생'), L('직전 학기 평점 3.0 이상인 학생')], pdfs: [{ tag: 'P1', verdict: 'ok', why: '원본과 같다' }] } });
+        const run3 = fakeRun(), res3 = result();
+        eq('  내린 기록은 다음 검토에도 남는다 — 내린 사본은 다음 검토의 사본 목록에 없어 pdfs·problems 에서 사라지지만 dropped 는 이어 붙는다(내린 사실이 남는 곳은 여기뿐이다) · 색인의 표시도 그대로',
+          [/✓ v-1/.test(run3.out), (res3.pdfs || []).map((p) => [p.file, p.verdict]), (res3.problems || []).length, (res3.dropped || []).map((d) => [d.kind, d.name, d.verdict]), Object.keys((sb.json('data/forms-pdf/index.json') || {}).rejected || {})],
+          [true, [['docs-pdf/v-1/1-안내문.pdf', 'ok']], 0, [['form', FORM, 'broken']], [`v-1|${FORM}`]]);
+        eq('  유료 SDK 는 끝까지 한 번도 불리지 않았다', sb.exists('sdk-called.txt'), false);
+      } finally { sb.done(); }
+    }
+    /* 내린 사본을 검토 결과에 적는 셈(withDropped · 순수 함수) · 읽는 글 쪽만 남긴 사본을 둘째 AI 에게 일러 주기 */
+    {
+      const judged = { pdfs: [{ kind: 'form', file: 'forms-pdf/a/1.pdf', name: '가 신청서.hwp', bytes: 9, verdict: 'broken', why: '표가 무너졌다' }, { kind: 'doc', file: 'docs-pdf/a/1.pdf', name: '나 공고문.hwp', bytes: 9, verdict: 'wrong', why: '다른 공고다' },
+        { kind: 'pages', file: 'form-pages/a/p3.pdf', name: '공고문 안 신청서 서식 (3쪽)', bytes: 9, verdict: 'ok', why: '' }],
+      problems: [{ kind: 'unreadable', doc: '공고 카드', reason: '까닭', check: '원문을 확인해 주세요.' }, { kind: 'pdf-broken', doc: '가 신청서.hwp', reason: '내리기 전의 말', check: '내리기 전의 말' }, { kind: 'pdf-wrong', doc: '나 공고문.hwp', reason: '내리기 전의 말', check: '내리기 전의 말' }] };
+      const past = [{ kind: 'doc', name: '옛 공고문.hwp', verdict: 'empty', why: '빈 쪽뿐이다', at: '2026-11-01' }, { kind: 'pages', name: '공고문 안 신청서 서식 (3쪽)', verdict: 'wrong', why: '읽는 글이 들었다', at: '2026-11-01' }];
+      const wd = FR.withDropped(judged, [{ id: 'a', kind: 'form', file: 'forms-pdf/a/1.pdf', name: '가 신청서.hwp', verdict: 'broken' }], past, T);
+      eq('  내린 사본을 검토 결과에 적는 셈(withDropped) — 사람이 볼 것: 카드 줄은 맨 앞 그대로 · 내린 사본의 줄은 「앱에 올렸던 … 이 사본은 앱에서 내렸습니다 — 학생에게는 올린 원본 파일만 보입니다」 · 못 내린 사본(그사이 다시 만들어졌다)의 줄은 「앱이 보여 주는 …」 그대로 · 내린 기록: 지난 기록에 이어 붙이되 이번에 다시 판정한 사본의 옛 줄은 뺀다(다시 만들어져 ok 가 된 서식 쪽) · 내린 것이 없으면 빈 기록',
+        [wd.problems.map((p) => [p.kind, p.doc]), wd.problems[1].reason, wd.problems[2].reason, wd.problems.every((p) => /확인해 주세요/.test(p.check)), wd.dropped, FR.withDropped(judged, [], undefined, T).dropped],
+        [[['unreadable', '공고 카드'], ['pdf-broken', '가 신청서.hwp'], ['pdf-wrong', '나 공고문.hwp']], '앱에 올렸던 신청서 사본 「가 신청서.hwp」의 변환이 잘못됐습니다 — 표가 무너졌다. 이 사본은 앱에서 내렸습니다 — 학생에게는 올린 원본 파일만 보입니다.',
+          '앱이 보여 주는 공고문·안내문 사본 「나 공고문.hwp」이 이 공고의 문서(서식)가 아닙니다 — 다른 공고다.', true,
+          [past[0], { kind: 'form', name: '가 신청서.hwp', verdict: 'broken', why: '표가 무너졌다', at: T }], []]);
+      const cutCopy = FR.pdfsOf({ id: 'a' }, { dataDir: '/D', size: () => 100, pages: () => 3, docsPdf: { a: [{ file: 'a/1.pdf', name: '선발 공고.hwp', pages: 3, cut: '1~3쪽' }, { file: 'a/2.pdf', name: '안내.hwp', pages: 2 }] } });
+      const told = FR.reviewContent({ id: 'a', name: '공고' }, { source: '원문', entry: { title: '' }, pdfs: FR.pickPdfs(cutCopy), read: () => 'B64' })[0].text;
+      eq('  붙은 문서의 공고문 사본은 「읽는 글 쪽만 남긴 사본」이라고 둘째 AI 에게 일러 준다(안 일러 주면 원본의 서식 쪽이 빠졌다며 멀쩡한 사본을 변환 잘못으로 보고 내린다) · 🔴 그래도 서식 앞의 읽는 글 쪽이 하나라도 빠졌으면 broken 이라고 일러 준다(리뷰 2026-11-23 — 자른 자리가 틀린 사본을 「짧은 것이 당연하다」며 넘기지 않게) · 자르지 않은 사본의 줄에는 그 말이 없다',
+        [cutCopy.map((p) => p.cut || null), /\[P1\] 공고문·안내문 사본 「선발 공고\.hwp」 · [^\n]* · 원본의 1~3쪽\(읽는 글\)만 남긴 사본입니다 — 뒤의 신청 양식 쪽은 따로 떼어 냈으니 서식 쪽이 없는 것은 문제가 아닙니다/.test(told),
+          /\[P1\][^\n]*다만 서식이 시작되기 전의 읽는 글 쪽\(제출 서류·일정·접수 방법 같은 공고 쪽\)이 하나라도 빠졌으면 broken 입니다/.test(told), /\[P2\][^\n]*읽는 글/.test(told)],
+        [['1~3쪽', null], true, true, false]);
+    }
+
+    /* ⑨ 배선 — 세 로봇의 시작 · 사본 내리기 파일의 홀로서기 · 최종 검토 워크플로의 저장 */
+    const startCall = /if \(!dry\) applyPdfVerdicts\(\{ root, verdicts: loadPdfVerdicts\(root\), today \}\);/;
+    const readsIndex = [/JSON\.parse\(fs\.readFileSync\(indexPath, 'utf8'\)\)/, /const prev = readJson\('data\/docs-pdf\/index\.json', null\);/, /JSON\.parse\(fs\.readFileSync\(indexPath, 'utf8'\)\)/];
+    eq('⑨ 배선 — 변환 로봇 셋이 시작할 때 사본 판정을 다시 적용한다(제 색인을 읽기 전에 · 미리보기 --dry 에서는 안 한다) · 사본 내리기 파일은 변환 로봇을 불러오지 않는다(그 셋은 불러오는 순간 본편이 돈다 — 최종 검토가 이 파일을 불러 쓴다) · 최종 검토는 반영(--write) 길에서만 내리고, 내리다 넘어져도 그 검토를 실패로 치지 않는다(돈을 쓴 결과 — 판정은 결과 파일에 남아 변환 로봇이 다시 내린다)',
+      [[fpdSrc, dpdSrc, fpgSrc].map((s, i) => { const at = s.search(startCall); return at > 0 && at < s.search(readsIndex[i]); }), [...pvSrc.matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1]), /\bimport\(/.test(pvSrc),
+        /import \{ applyPdfVerdicts, loadPdfVerdicts \} from '\.\/pdf-verdicts\.mjs'/.test(frSrc), frSrc.indexOf('if (!WRITE) {') > 0 && frSrc.indexOf('if (!WRITE) {') < frSrc.indexOf('applyPdfVerdicts({ root: P('),
+        /let down = \[\];\s*\n\s*try \{ down = applyPdfVerdicts\(\{ root: P\('\.\.'\), [^\n]*\}\)\.dropped; \}\s*\n\s*catch \(e\) \{ log\(/.test(frSrc)],
+      [[true, true, true], ['node:fs', 'node:path'], false, true, true, true]);
+    const saveStep = wff.slice(wff.indexOf('- name: 결과 저장'), wff.indexOf('- name: 유료 관문 기록'));
+    eq('  최종 검토 워크플로의 저장 — 사본을 내린 세 폴더(data/forms-pdf · data/docs-pdf · data/form-pages)를 함께 싣는다(-A 라야 지운 파일이 실린다 · 폴더가 없으면 건너뛴다) · 커밋 앞에 · 배포 감시(deploy-sync)가 이 워크플로의 이름을 안다',
+      [['forms-pdf', 'docs-pdf', 'form-pages'].map((d) => saveStep.includes(`\n          [ -d data/${d} ] && git add -A data/${d}\n`)), saveStep.indexOf('git add -A data/form-pages') > 0 && saveStep.indexOf('git add -A data/form-pages') < saveStep.indexOf('git diff --cached --quiet'),
+        src('.github/workflows/deploy-sync.yml').includes(`'${(wff.match(/^name: (.+)$/m) || [])[1]}'`)],
+      [[true, true, true], true, true]);
+  }
+
   /* ── 리뷰 2026-11-22 — 기계 검사가 없어진 뒤 남은 구멍: 같은 공고를 두 번 사는 길 · 실패한 호출의 돈 · 부딪힌 저장 ── */
   console.log('\n■ 유료 관문 — 리뷰 2026-11-22: 같은 공고를 두 번 사지 않는다 · 실패한 호출의 돈도 센다 · 부딪힌 저장은 조용히 넘어가지 않는다');
   {
@@ -17796,6 +18389,46 @@ module.exports = class Anthropic {
 
     eq('🔴 두 유료 워크플로의 저장: 다시 얹기가 충돌하면 그만둔다(abort) — 안 그러면 다음 push 가 「보낼 것 없음」으로 성공해, 돈 주고 읽은 결과가 초록불로 사라진다',
       [wfc, wff].map((w) => /git pull --rebase --autostash origin "\$\{\{ github\.ref_name \}\}" \|\| git rebase --abort/.test(w)), [true, true]);
+    {
+      /* 심층 수집의 저장 고리 (리뷰 2026-11-23) — 사본 색인 셋은 병합 때 「내 것」(merge=ours)이다. 다시 얹을 때 「내 것」은 저쪽(먼저 올린 최종 검토)이라
+         늦게 올린 이 실행의 색인 줄은 버려지고 파일 지우기·새로 만들기만 실려, 색인 줄이 지운 파일을 가리켰다(학생이 깨진 링크를 누른다) */
+      const dfy = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
+      const from = dfy.indexOf('      - name: 저장\n');
+      const code = dfy.slice(from, dfy.indexOf('\n      - name: ', from + 1)).split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+      const loop = code.slice(code.indexOf('for i in 1 2 3; do'), code.indexOf('\n            done', code.indexOf('for i in 1 2 3; do')));
+      const at = (re) => { const m = re.exec(loop); return m ? m.index : -1; };
+      const order = [at(/if git push; then pushed=1; break; fi/),
+        at(/keep=\$\(mktemp -d\)\n\s*for d in forms-pdf docs-pdf form-pages; do \[ -f "data\/\$d\/index\.json" \] && cp "data\/\$d\/index\.json" "\$keep\/\$d\.json"; done/),
+        at(/git pull --rebase --autostash origin "\$\{GITHUB_REF_NAME\}" \|\| git rebase --abort \|\| true/),
+        at(/for d in forms-pdf docs-pdf form-pages; do \[ -f "\$keep\/\$d\.json" \] && cp "\$keep\/\$d\.json" "data\/\$d\/index\.json"; done/),
+        at(/node -e "import\('\.\/collector\/pdf-verdicts\.mjs'\)\.then\(\(m\) => m\.applyPdfVerdicts\(\{ root: '\.', verdicts: m\.loadPdfVerdicts\('\.'\), today: [^"]*, deleteFiles: false \}\)\)"/),
+        at(/\[ -f data\/forms-pdf\/index\.json \] && git add data\/forms-pdf\/index\.json\n\s*\[ -f data\/docs-pdf\/index\.json \] && git add data\/docs-pdf\/index\.json\n\s*\[ -f data\/form-pages\/index\.json \] && git add data\/form-pages\/index\.json\n\s*git diff --cached --quiet \|\| git commit -m "[^"]+"/)];
+      eq('🔴 심층 수집의 저장 고리 — 다시 얹기(pull --rebase) 전에 이 실행의 사본 색인 셋을 따로 두고 · 충돌하면 그만두고(abort) · 얹은 뒤 되돌려 놓고(이 실행의 변환 결과가 가장 새것) · 최종 검토의 사본 판정을 다시 적용하고(색인만 — deleteFiles: false) · 바뀌었으면 담아 커밋한 뒤 다음 바퀴에 올린다 · 차례 그대로 · 맨몸 pull 없음',
+        [order.map((x) => x >= 0), order.every((x, i) => !i || x > order[i - 1]), /git pull --rebase(?! --autostash)/.test(code)], [[true, true, true, true, true, true], true, false]);
+    }
+    /* 같은 구멍이 다른 저장 로봇에도 있었다(2026-11-22 · 인스타 다섯 · 층2 사냥꾼 · 원문 링크 확인 · 두 학교 조사) — `git push origin HEAD:<브랜치>` 로 올리는 워크플로 전부를 본다.
+       HEAD 를 올리므로, 다시 얹다(rebase) 충돌로 멈춘 자리(HEAD = 저쪽 끝)에서도 그 push 는 「보낼 것 없음」으로 성공한다. 안전한 꼴은 셋:
+         ① 그 줄에서 그만둔다 — `git pull --rebase … || git rebase --abort || true`
+         ② 충돌한 pull 이 push 에 닿지 않는다 — `git pull --rebase … && git push origin HEAD:… && exit 0`(다음 바퀴의 pull 도 실패해 고리는 exit 1 로 끝난다)
+         ③ `if ! git pull --rebase …; then` 묶음 안(fi 까지)에서 그만둔다(rollback.yml — abort 뒤 break) */
+    const wfDir = new URL('../.github/workflows/', import.meta.url);
+    const rebaseSafe = (lines, i) => /rebase --abort/.test(lines[i]) || /git pull --rebase[^\n]*&&\s*git push origin "?HEAD:[^\n]*&&\s*exit 0/.test(lines[i])
+      || (/^\s*if ! git pull --rebase[^\n]*;\s*then\s*$/.test(lines[i]) && lines.slice(i + 1, Math.max(i + 1, lines.findIndex((l, k) => k > i && /^\s*fi\b/.test(l)))).some((l) => /git rebase --abort/.test(l)));
+    const looseRebase = (files) => Object.entries(files).sort(([a], [b]) => (a < b ? -1 : 1)).flatMap(([f, text]) => {
+      const lines = text.split('\n').map((l) => (/^\s*#/.test(l) ? '' : l));   // 주석 줄은 안 본다
+      if (!lines.some((l) => /git pull --rebase/.test(l)) || !lines.some((l) => /git push origin "?HEAD:/.test(l))) return [];
+      return lines.map((l, i) => (/git pull --rebase/.test(l) && !rebaseSafe(lines, i) ? `${f}:${i + 1}` : null)).filter(Boolean);
+    });
+    const workflows = Object.fromEntries(fs.readdirSync(wfDir).filter((f) => /\.ya?ml$/.test(f)).map((f) => [f, readText(new URL(f, wfDir))]));
+    const loop = (pull) => `      - run: |\n          for i in 1 2 3; do\n            git push origin "HEAD:$BASE" && break\n            ${pull}\n          done\n`;
+    eq('🔴 HEAD 를 올리는 저장 로봇 전부(`git push origin HEAD:<브랜치>`): 다시 얹기(git pull --rebase)가 충돌하면 그만두거나(rebase --abort) 그 push 에 닿지 않는다 — 어긴 자리(파일:줄)가 없다 · 표본: 그만두지 않는 줄은 잡고 · 안전한 꼴 셋과 HEAD 를 안 올리는 워크플로·주석 줄은 안 잡는다',
+      [looseRebase(workflows), Object.keys(workflows).length > 20,
+        looseRebase({ 'bad.yml': loop('git pull --rebase origin "$BASE"'), 'abort.yml': loop('git pull --rebase origin "$BASE" || git rebase --abort || true'),
+          'chain.yml': '          git pull --rebase --autostash origin main && git push origin HEAD:main && exit 0\n',
+          'block.yml': loop('if ! git pull --rebase origin "$BASE"; then\n              git rebase --abort || true\n              break\n            fi'),
+          'block-bad.yml': loop('if ! git pull --rebase origin "$BASE"; then\n              echo 충돌\n            fi'),
+          'plain.yml': '          git pull --rebase origin main\n          git push\n', 'note.yml': loop('# git pull --rebase 는 여기서 안 쓴다\n            git fetch origin') })],
+      [[], true, ['bad.yml:4', 'block-bad.yml:4']]);
     eq('  등록 목록이 깨져 있으면 두 로봇 모두 멈춘다(빈 목록으로 읽으면 결과·장부가 「목록에서 빠진 공고」로 전부 지워진다)',
       [crSrc, frSrc].map((x) => /const reg = strictJson\('\.\.\/data\/registered\.json'/.test(x) && /if \(!Array\.isArray\(reg\.items\)\) \{ console\.error\(/.test(x)), [true, true]);
 
