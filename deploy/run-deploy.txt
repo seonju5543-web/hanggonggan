@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: david/great-tesla-un1ov3
-메모: 2026-11-21 보관함·신청 내역에서 장학금과 대외활동 구분(갈래 칩 · 달력 장학금·대외활동 칩) — 선주
+branch: david/awesome-brown-9p5gvb
+메모: 2026-11-22 학생이 읽지 않는 글자 전수 정리 2차(영역별 에이전트 조사·검증 86곳)
