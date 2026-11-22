@@ -7,6 +7,8 @@
 #
 # 하는 일: 4번(유료 카드 읽기)이 쓴 카드를 원문과 대조해 틀린 줄을 고치고 빠진 내용을 채운 완성본으로 바꾼다(data/card-read.json) ·
 #   첨부의 내용 문서 / 신청 양식 구분을 다시 본다 · 앱이 보여 주는 PDF 사본을 파일째 보고 원본과 같은지 판정한다(collector/final-review.json).
+#   ok 가 아닌 사본은 그 자리에서 앱에서 내린다(data/forms-pdf · data/docs-pdf · data/form-pages 의 색인 줄 — collector/pdf-verdicts.mjs · 학생에게는 원본 파일만 보인다 ·
+#   파일은 여기서 안 지운다: 색인에서 빠진 파일은 새벽 변환 로봇이 지운다).
 # 언제: 유료 카드 읽기가 끝난 직후(카드를 바로 고친다) · 새벽 심층 수집(PDF 변환)이 끝난 직후(사본을 본다) · 22:47 KST(둘 다 놓쳤을 때의 대비)
 
 name: 유료 최종 검토
@@ -90,6 +92,10 @@ jobs:
           [ -f data/card-read.json ] && git add data/card-read.json   # 둘째 AI 가 고친 카드(2026-11-21)
           [ -f collector/final-review.json ] && git add collector/final-review.json   # 무엇을 고쳤나 · 첨부 구분(6번의 답) · PDF 사본 판정
           [ -f collector/final-review-ledger.json ] && git add collector/final-review-ledger.json
+          # ok 가 아닌 PDF 사본을 앱에서 내린 것(색인의 줄 · 「다시 만들지 말 것」 표시 — collector/pdf-verdicts.mjs · 2026-11-21 · 파일은 변환 로봇이 지운다)
+          [ -d data/forms-pdf ] && git add -A data/forms-pdf
+          [ -d data/docs-pdf ] && git add -A data/docs-pdf
+          [ -d data/form-pages ] && git add -A data/form-pages
           if ! git diff --cached --quiet; then
             git commit -m "유료 최종 검토: $(grep -o '검토 [0-9]*건' /tmp/final-review.txt | tail -1 || echo '결과 갱신')"
             pushed=0

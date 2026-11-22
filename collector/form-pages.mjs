@@ -8,6 +8,10 @@
       원문 글자·쪽 모양을 바꾸지 않는다(떼기만). 앱은 색인을 받아 질문 화면 머리에 「공고문 안 신청서 서식 (n~m쪽)」으로 보여 준다.
    🔴 서식 쪽 판정은 **쪽 글자의 표식**으로만(classifyPage · 순수 함수) — 「붙임 1. 신청서 1부」 같은 첨부 **목록 줄**은 서식이 아니다(표식만 든 짧은 줄만 센다).
       첫 쪽(공고 표지)은 더 엄격하다. 못 고르면 그 공고는 그대로 둔다(지어내지 않는다).
+   🔴 AI 가 갈래를 정한 파일(2026-11-21 · 4번 카드 읽기·6번 최종 검토 · collector/attach-role-ai.mjs)은 그 답이 먼저다 — 붙은 문서(mixed)는 AI 가 짚은 「서식이 시작되는 줄」이 든 쪽부터
+      끝까지를 떼고(aiFormRange · formStartPage — 줄 머리에서 찾고 그 쪽이 서식 쪽일 때만 · 그 앞쪽은 공고문 PDF 로봇 doc-pdf 가 읽는 글 사본으로 남긴다), 내용 문서·이 공고 문서가 아닌 파일에서는 떼지 않는다.
+      통째로 신청 양식이라 한 파일은 양식 PDF 로봇이 맡으면 안 떼고, 그 로봇이 못 보는 파일(자격 색인에만 있는 것)이면 전부를 서식 쪽으로 낸다(formPdfHandles).
+      AI 의 답이 없는 파일(옛 공고 · 층2 재단 사본)과 그 줄을 쪽에서 못 찾은 파일만 위의 쪽 글자 표식으로 고른다.
    🔴 양식 PDF 로봇과 **폴더·색인을 따로** 쓴다 — 그 로봇의 prune 이 제 색인에 없는 폴더를 지운다(data/forms-pdf 에 섞어 넣으면 다음 실행에 사라진다).
    🔴 마감 뒤 폴더를 지운다 · 같은 원본(크기 같음)은 다시 안 한다 · 예산(FORM_PAGES_BUDGET_SEC) 안에 끝낸다 · 넘어져도 색인은 파일마다 쓴다.
    🔴 FORM_PAGES_AS_LIB=1 이면 본편을 건너뛴다(관문이 순수 함수만 부른다). FORM_PAGES_ROOT 로 저장소를 바꿔 끼운다.
@@ -17,9 +21,11 @@ import path from 'node:path';
 import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { noticeDocFiles, loadNoticeDocIndex } from './attachment-text.mjs';
+import { noticeDocFiles, noticeFormRows, loadNoticeDocIndex } from './attachment-text.mjs';
 import { sameTitle } from './detail-url.mjs';
 import { sofficeToPdf } from './soffice.mjs';   // LibreOffice 변환 한 곳(전용 프로필 · 시한 · 변환기 말) — 신청서 PDF 로봇과 같이 쓴다
+import { loadAiRoles, aiRoleFor, toDecisionRole, aiSig, fileHash16 } from './attach-role-ai.mjs';   // AI 가 정한 첨부 갈래(4번 · 6번) — 붙은 문서(mixed)의 서식 쪽은 AI 가 짚은 줄부터 뗀다
+import { applyPdfVerdicts, loadPdfVerdicts } from './pdf-verdicts.mjs';               // 6번이 ok 가 아니라고 본 사본을 내린다(시작할 때 한 번 더)
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const BUDGET_SEC = Number(process.env.FORM_PAGES_BUDGET_SEC || 240);
@@ -112,6 +118,64 @@ export function pdfPageText(file, n) {
   const r = run('pdftotext', ['-layout', '-f', String(n), '-l', String(n), file, '-']);
   return r.ok ? r.out : '';
 }
+/* ── AI 가 짚은 서식 쪽 (2026-11-21 개발자 지시 — *"한 문서에 신청양식이랑 내용문서가 동시에 들어있는 경우 -> 분리해서 2개의 pdf 로"*) ─────────────────
+   4번·6번 AI 는 붙은 문서(mixed)마다 **서식이 시작되는 줄**(formStart)을 원문 글자 그대로 한 줄 낸다. 그 줄이 든 쪽부터 끝까지가 서식 쪽이다(이 로봇이 뗀다) ·
+   그 앞쪽이 읽는 글이다(공고문 PDF 로봇 doc-pdf 가 그 쪽까지만 남긴다 — 같은 함수 formStartPage 로 같은 쪽을 찾는다). */
+/** 서식이 시작되는 줄이 든 첫 쪽(1부터) — 못 찾았거나 찾은 쪽이 서식 쪽이 아니면 null.
+    🔴 빈칸을 전부 걷고 견준다 — 그 줄은 HWP·DOCX 에서 뽑은 글자이고 PDF 글자(pdftotext)는 표를 다르게 편다(글자 사이를 벌리고 줄을 다른 자리에서 꺾는다).
+    🔴 **줄 머리에서만** 찾는다(리뷰 2026-11-23) — 공고 본문은 제출 서류 목록에서 그 서식을 이름으로 부른다(「가. 장학금 신청서 1부([별지 제1호 서식])」).
+       쪽 글자 아무 데서나 찾으면 그 앞쪽에서 잘려 공고문 사본은 제출·일정 쪽을 잃고, 서식 쪽 사본에는 공고문 쪽이 든다.
+    찾는 차례: ① 그 줄로 **시작하는** 줄이 있는 첫 쪽(오른쪽에 붙은 「(앞쪽)」·「접수번호」 칸 글자는 넘긴다) ② 줄 머리부터 이어지는 줄들이 그 줄을 차례로 덮는 첫 쪽
+                 (머리글과 제목을 한 줄로 적은 답 — PDF 글자는 두 줄로 꺾는다 · 줄마다 끝에 남은 칸 글자는 넘긴다) ③ 그 줄의 앞 12자로 ②.
+    🔴 찾은 쪽이 쪽 글자 표식(classifyPage)으로도 서식 쪽일 때만 그 쪽이다 — 아니면 못 찾은 것으로 친다(서식 쪽 떼기는 쪽 글자 표식으로 고르는 예전 길 · 공고문 PDF 는 자르지 않는다).
+       두 로봇이 이 함수 하나를 부른다(같은 쪽에서 가른다).
+    4자 못 되는 줄로는 찾지 않는다(아무 쪽에나 걸린다). pageText·pages 는 관문이 가짜를 넘긴다(poppler 없이 잰다) ·
+    pages 를 안 주면 쪽 수를 읽고, 🔴 못 읽으면 던진다 — 「쪽을 못 읽음」을 「서식 쪽 없음」으로 적으면 공고문 PDF 가 그 답으로 끝났다고 보고 다시 자르지 않는다 */
+export function formStartPage(pdf, formStart, { pageText = pdfPageText, pages } = {}) {
+  const squeeze = (s) => String(s || '').normalize('NFC').replace(/\s+/g, '');
+  const line = squeeze(formStart);
+  if (line.length < 4) return null;
+  const count = pages ?? ((pc) => { if (!pc.ok) throw new Error(pc.why); return pc.pages; })(pdfPageCount(pdf));
+  const raw = [];
+  for (let p = 1; p <= count; p += 1) raw.push(String(pageText(pdf, p) || ''));
+  const lines = raw.map((t) => t.split(/\n|\f/).map(squeeze).filter(Boolean));
+  /* i 째 줄부터 이어지는 줄들이 want 를 앞에서부터 덮는가 — 줄마다 남은 want 의 앞부분과 같은 만큼 먹고(그 줄 끝의 나머지는 넘긴다) · 한 글자도 못 먹는 줄에서 멈춘다 */
+  const covers = (ls, i, want) => {
+    for (let j = i, rest = want; j < ls.length; j += 1) {
+      let k = 0;
+      while (k < rest.length && ls[j][k] === rest[k]) k += 1;
+      if (k === rest.length) return true;
+      if (!k) return false;
+      rest = rest.slice(k);
+    }
+    return false;
+  };
+  /* 그 줄이 걸리고 **서식 쪽이기도 한**(classifyPage) 첫 쪽 (2026-11-23) — 앞쪽 공고문의 붙임 목록·차례가 줄 머리에서 서식 이름으로 시작해도 그 쪽은 건너뛰고
+     뒤의 진짜 서식 쪽을 고른다(첫 번째로 걸린 쪽만 보고 포기하면 AI 의 답을 버리고 예전 길로 간다) */
+  const isForm = (at) => classifyPage(raw[at], at + 1) === 'form';
+  const first = (hit) => { const at = lines.findIndex((ls, idx) => ls.some((l, i) => hit(ls, l, i)) && isForm(idx)); return at >= 0 ? at + 1 : null; };
+  return first((ls, l) => l.startsWith(line)) || first((ls, l, i) => covers(ls, i, line)) || first((ls, l, i) => covers(ls, i, line.slice(0, 12)));
+}
+/** AI 의 답으로 서식 쪽 구간을 정한다 — [[시작 쪽, 끝 쪽]] | 'none'(이 파일에서는 떼지 않는다) | null(AI 의 답이 없거나 그 줄을 못 찾음 → 쪽 글자 표식으로 고르는 예전 길).
+    ai = 그 파일의 답({ role, formStart }) · pages = 쪽 수 · find(formStart) = 그 줄이 든 첫 쪽 | null · formPdfHas = 그 파일을 양식 PDF 로봇이 맡는가(formPdfHandles).
+    🔴 AI 가 답한 파일에서는 쪽 글자 표식이 쪽을 떼지 않는다: 내용 문서(content)에는 서식이 없고 · 이 공고 문서가 아닌 것(other)은 뗄 것이 없다.
+    🔴 통째로 신청 양식(form)은 양식 PDF 로봇이 맡는 파일이면 여기서 안 뗀다(같은 서식이 두 번 보인다) — 그 로봇이 못 보는 파일(자격 색인에만 있는 순수 서식 · 「붙임2.hwp」)이면
+       여기서 **전부**를 서식 쪽으로 낸다(2026-11-22). 안 내면 AI 가 신청 양식이라 한 파일이 앱 신청서 칸 어디에도 안 선다 */
+export function aiFormRange(ai, pages, find, formPdfHas = true) {
+  if (!ai || !ai.role) return null;
+  if (ai.role === 'form') return formPdfHas ? 'none' : [[1, pages]];
+  if (ai.role !== 'mixed') return 'none';
+  const p0 = find(ai.formStart);
+  return p0 ? [[p0, pages]] : null;
+}
+/** 그 원본을 양식 PDF 로봇(form-pdf)이 맡는가 — 그 공고의 신청서 쪽 색인 줄(forms-index · attachment-text noticeFormRows) 가운데 그 파일이 있거나(이름) 바이트가 같은 파일이 있다.
+    rows = 그 공고의 색인 줄 · name = 원본 이름(extracted/ 기준) · hash = 그 원본의 바이트 해시 · hashOf(file) = 색인 줄 파일의 해시 */
+export const formPdfHandles = (rows, name, hash, hashOf) => (rows || []).some((r) => r.file === name || (!!hash && hashOf(r.file) === hash));
+const AI_NONE = { content: 'AI: 서식 없는 내용 문서', form: 'AI: 통째로 신청 양식(양식 PDF 로봇 몫)', other: 'AI: 이 공고의 문서가 아님' };
+/** 지난 색인 줄이 지금 원본·지금 AI 답으로 만든 것인가 — 같으면 다시 하지 않는다. 「서식 쪽 없음」(none) 줄도 같은 셈이다:
+    🔴 최종 검토가 내린 사본(collector/pdf-verdicts.mjs)이 none 줄로 남아, 원본이 바뀌거나(srcBytes) AI 의 답이 바뀔 때까지 같은 쪽을 다시 떼지 않는다(다시 떼면 6번이 돈 내고 또 내린다) */
+export const sameSource = (h, name, srcBytes, ai = '') => !!h && h.src === name && (h.srcBytes || 0) === srcBytes && (h.ai || '') === ai;
+
 /** 쪽 구간들을 떼어 한 PDF 로 — pdfseparate 로 쪽을 낸 뒤 pdfunite 로 잇는다 */
 export function extractRanges(src, ranges, outPath) {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'form-pages-'));
@@ -166,6 +230,8 @@ export function buildReport({ today, targets, done, none, failed, dropped, skipp
 }
 
 export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC, log = console.log } = {}) {
+  /* 최종 검토(6번)가 ok 가 아니라고 본 사본을 내린다 — 색인이 옛 판으로 되돌려졌을 때를 위해 시작할 때 한 번 더(색인을 읽기 전에 · form-pdf 와 같은 줄) */
+  if (!dry) applyPdfVerdicts({ root, verdicts: loadPdfVerdicts(root), today });
   const reg = JSON.parse(fs.readFileSync(path.join(root, 'data', 'registered.json'), 'utf8')).items || [];
   let kosaf = [];
   try { kosaf = JSON.parse(fs.readFileSync(path.join(root, 'data', 'kosaf-open.json'), 'utf8')).items || []; } catch { /* 층2 없음 */ }
@@ -179,8 +245,11 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
   const extractedDir = path.join(root, 'collector', 'extracted');
   /* 공고문 고르기는 attachment-text noticeDocFiles 한 곳 — 자격 색인 + 신청서 쪽에서 속이 공고문인 것(내용 판정 · 2026-11-20) */
   const noticeIndex = loadNoticeDocIndex(extractedDir);
-  const filesFor = (it) => noticeDocFiles(it, { index: noticeIndex, sameTitle });
+  /* AI 가 정한 첨부 갈래(4번 · 6번 — 없으면 빈 표) — 이름이 신청서여도 붙은 문서(mixed)면 여기서 서식 쪽을 떼고, 통째로 신청 양식·이 공고 문서 아님은 안 본다(층2 재단 사본에는 답이 없다) */
+  const aiRoles = loadAiRoles(path.join(root, 'collector'));
+  const filesFor = (it) => noticeDocFiles(it, { index: noticeIndex, sameTitle, aiRoles: (id, file, abs) => toDecisionRole((aiRoleFor(aiRoles, id, file, abs) || {}).role) });
   const targets = pickPageTargets({ registered: reg, kosaf, eligIndex, today, extractedDir, kosafDir: path.join(root, 'data', 'kosaf-files'), filesFor });
+  const regById = new Map(reg.map((it) => [it && it.id, it]));
   const live = new Set(targets.map((t) => t.id));
   /* 🔴 대상이 하나도 없는데 색인에 공고가 있으면 지우지 않는다 — 색인(elig-docs.json)·사본 폴더를 못 읽은 실행(얕은 체크아웃 등)이 결과를 통째로 지우고 커밋한다(리뷰) */
   const skipPrune = !targets.length && Object.keys(index.items).length > 0;
@@ -199,13 +268,23 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
     const have = index.items[t.id] || [];
     const next = [];
     let any = false;
+    const formRows = noticeFormRows(regById.get(t.id), noticeIndex, sameTitle);   // 이 공고의 신청서 쪽 색인 줄 — 양식 PDF 로봇이 맡는 파일들(층2 재단 공고에는 없다)
     t.files.forEach((f, i) => {
       const srcBytes = fs.statSync(f.src).size;
+      /* 이 파일에 AI 가 정한 갈래 — 색인 줄에 그 답(ai)을 적어 두고, 답이 바뀌면(4번이 새로 읽음 · 6번이 고침) 그대로 쓰지 않고 다시 한다 */
+      const ai = aiRoleFor(aiRoles, t.id, f.name, f.src);
+      /* 통째로 신청 양식이라 한 파일 — 양식 PDF 로봇이 맡는 파일이면 여기서 안 떼고(handled), 자격 색인에만 있는 파일이면 여기서 전부를 서식 쪽으로 낸다.
+         그 갈림도 표시에 적는다(+whole) — 나중에 그 파일을 신청서 로봇이 받아 양식 PDF 로봇 몫이 되면 표시가 달라져 여기 것을 거둔다(거꾸로도) */
+      const handled = !!ai && ai.role === 'form' && formPdfHandles(formRows, f.name, fileHash16(f.src), (file) => fileHash16(path.join(extractedDir, file)));
+      const sig = aiSig(ai) + (ai && ai.role === 'form' && !handled ? '+whole' : '');
       /* 🔴 '서식 쪽 없음'(none) 항목은 file 이 없다 — path.join(undefined) 로 넘어진다(2026-10-24 첫 예약 실행 · 색인이 처음 생긴 뒤 두 번째 실행부터 매번). file 있는 항목만 본다 */
-      const prev = have.find((h) => h.src === f.name && h.file && !h.none && (h.srcBytes || 0) === srcBytes && fs.existsSync(path.join(outDir, h.file)));
+      const prev = have.find((h) => h.src === f.name && h.file && !h.none && sameSource(h, f.name, srcBytes, sig) && fs.existsSync(path.join(outDir, h.file)));
       if (prev) { next.push(prev); skipped += 1; any = true; return; }
-      const prevNone = have.find((h) => h.src === f.name && h.none && (h.srcBytes || 0) === srcBytes);
+      const prevNone = have.find((h) => h.none && sameSource(h, f.name, srcBytes, sig));
       if (prevNone) { next.push(prevNone); skipped += 1; return; }
+      /* AI 가 「이 파일에서 뗄 서식 쪽이 없다」고 한 것(내용 문서 · 양식 PDF 로봇이 맡는 신청 양식 · 이 공고 문서 아님) — 바꾸지도 떼지도 않고 그렇게 적는다 */
+      if (aiFormRange(ai, 0, () => null, handled) === 'none') { next.push({ src: f.name, srcBytes, none: true, at: today, why: AI_NONE[ai.role], ai: sig }); return; }
+      const mark = sig ? { ai: sig } : {};
       if (srcBytes > MAX_PDF_BYTES) { failed.push({ id: t.id, name: f.name, why: '너무 큼' }); return; }
       const conv = toPdf(f.src);
       if (!conv.ok) { failed.push({ id: t.id, name: f.name, why: conv.why }); return; }
@@ -213,16 +292,22 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
       try {
         const pc = pdfPageCount(conv.pdf);
         if (!pc.ok) { failed.push({ id: t.id, name: f.name, why: pc.why }); return; }
-        if (pc.pages > MAX_PAGES) { next.push({ src: f.name, srcBytes, none: true, at: today, why: `쪽 수 ${pc.pages}` }); return; }
-        const formPages = [];
-        for (let p = 1; p <= pc.pages; p += 1) if (classifyPage(pdfPageText(conv.pdf, p), p) === 'form') formPages.push(p);
-        if (!formPages.length) { next.push({ src: f.name, srcBytes, none: true, at: today }); return; }
-        const ranges = groupRanges(formPages);
-        const file = `${t.id}/${i + 1}-${safeName(f.name)}_p${formPages[0]}-${formPages[formPages.length - 1]}.pdf`;
+        if (pc.pages > MAX_PAGES) { next.push({ src: f.name, srcBytes, none: true, at: today, why: `쪽 수 ${pc.pages}`, ...mark }); return; }
+        /* 🔴 붙은 문서(AI: mixed)는 AI 가 짚은 「서식이 시작되는 줄」이 든 쪽부터 끝까지가 서식 쪽이다 — 쪽 글자 표식(classifyPage)으로 고르지 않는다.
+           양식 PDF 로봇이 못 보는 신청 양식(AI: form · 자격 색인에만 있는 파일)은 전부가 서식 쪽이다.
+           그 줄을 쪽에서 못 찾았거나 AI 의 답이 없는 파일(옛 공고 · 층2 재단 사본)만 예전처럼 쪽 글자 표식으로 고른다 */
+        let ranges = aiFormRange(ai, pc.pages, (line) => formStartPage(conv.pdf, line, { pages: pc.pages }), handled);
+        if (!Array.isArray(ranges)) {
+          const formPages = [];
+          for (let p = 1; p <= pc.pages; p += 1) if (classifyPage(pdfPageText(conv.pdf, p), p) === 'form') formPages.push(p);
+          if (!formPages.length) { next.push({ src: f.name, srcBytes, none: true, at: today, ...mark }); return; }
+          ranges = groupRanges(formPages);
+        }
+        const file = `${t.id}/${i + 1}-${safeName(f.name)}_p${ranges[0][0]}-${ranges[ranges.length - 1][1]}.pdf`;
         if (dry) { log(`[dry] ${t.id} · ${f.name} → ${rangeLabel(ranges)}쪽`); return; }
         const r = extractRanges(conv.pdf, ranges, path.join(outDir, file));
         if (!r.ok) { failed.push({ id: t.id, name: f.name, why: r.why }); return; }
-        next.push({ file, name: `공고문 안 신청서 서식 (${rangeLabel(ranges)}쪽)`, pages: r.pages, bytes: r.bytes, src: f.name, srcBytes, srcPages: rangeLabel(ranges), from: '공고문 서식 쪽 떼기', at: today });
+        next.push({ file, name: `공고문 안 신청서 서식 (${rangeLabel(ranges)}쪽)`, pages: r.pages, bytes: r.bytes, src: f.name, srcBytes, srcPages: rangeLabel(ranges), from: '공고문 서식 쪽 떼기', at: today, ...mark });
         done.push({ id: t.id, name: t.name, src: f.name, ranges: rangeLabel(ranges), pages: r.pages });
         any = true;
         flush();

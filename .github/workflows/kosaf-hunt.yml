@@ -123,7 +123,7 @@ jobs:
             pushed=0
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
-              git pull --rebase --autostash origin "${{ github.ref_name }}"
+              git pull --rebase --autostash origin "${{ github.ref_name }}" || git rebase --abort || true
             done
             if [ "$pushed" != "1" ]; then
               echo "::error::층2 글 사냥꾼 결과 push 실패 — 3회 재시도 모두 실패."

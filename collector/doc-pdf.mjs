@@ -12,6 +12,9 @@
                이 PDF 를 읽으므로 마감·자격 줄이 빠진 사본은 원본보다 나쁘다. 잴 수 없는 것(그림 문서·.doc·pdftotext 없음)은 사본을 두고 리포트에 센다.
    어디에 — data/docs-pdf/<공고 id>/<n>-<safeName(첨부 이름)>.pdf + data/docs-pdf/index.json
             { updatedAt, items: { <id>: [{ file, name, pages, bytes, fonts, kept, at }] }, tried: { "<id>|<첨부 이름>": { at, why } } }.
+            줄의 다른 칸: srcHash(받은 원본의 바이트 해시 — AI 의 답을 다시 받지 않고 찾는다) · ai·cut(붙은 문서라 읽는 글 쪽만 남긴 사본 — 아래 「붙은 문서」) ·
+            tried 의 review(최종 검토가 내린 사본 — 만드는 법이나 그 사본을 만든 AI 의 답이 바뀔 때까지 다시 만들지 않는다 · resting) ·
+            tried 의 form(AI 가 통째로 신청 양식이라 한 첨부 — 이 로봇은 안 바꾼다 · 신청서 칸의 사본이 맡는다 · 받은 원본의 srcHash 로 다음 실행이 받지 않고 알아본다).
             🔴 registered.json 은 건드리지 않는다. 폴더를 form-pdf(data/forms-pdf)와 따로 둔다 — 그쪽 정리(prune)는 색인에 없는 폴더를 지운다.
    언제 — deep-fetch.yml 의 보강 단계(continue-on-error · 시한 · 경보 짝).
 
@@ -33,10 +36,15 @@ import { resolveJsDownload, isHtmlPayload } from './attachment-link.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { attachmentText } from './attachment-text.mjs';
 import { SOFFICE_TIMEOUT_MS, sofficeToPdfRelaxed } from './soffice.mjs';   // 변환 한 곳의 시한·높이 고정 글상자를 풀어 다시 바꾸기(2026-11-20 soffice.mjs 로 모임)
+import { loadAiRoles, aiRoleByName, aiSig, fileHash16 } from './attach-role-ai.mjs';   // AI 가 정한 첨부 갈래(4번 · 6번) — 붙은 문서(mixed)는 읽는 글 쪽만 남긴다
+import { applyPdfVerdicts, loadPdfVerdicts } from './pdf-verdicts.mjs';              // 6번이 ok 가 아니라고 본 사본을 내린다(시작할 때 한 번 더)
 
 /* form-pdf.mjs 는 불러오는 순간 본편이 돈다 — 순수 함수만 쓰도록 표시를 먼저 세우고 동적으로 부른다(deepfetch 와 같은 길) */
 process.env.FORM_PDF_AS_LIB = '1';
 const FP = await import('./form-pdf.mjs');
+/* form-pages.mjs 도 같다 — 붙은 문서에서 「서식이 시작되는 쪽」 찾기(formStartPage)와 쪽 떼기(extractRanges)를 그 로봇의 것으로 쓴다(베끼면 두 로봇이 다른 쪽에서 자른다) */
+process.env.FORM_PAGES_AS_LIB = '1';
+const FPG = await import('./form-pages.mjs');
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const OFFICE_DOC = /\.(hwp|hwpx|doc|docx)$/i;
@@ -140,13 +148,27 @@ export function missingLines(origText, pdfText, max = 3) {
 }
 
 const dayDiff = (a, b) => Math.round((new Date(`${b}T00:00:00Z`) - new Date(`${a}T00:00:00Z`)) / 86400000);
-/** 실패 장부(tried)에서 아직 쉬는 중인가 */
+/** 실패 장부(tried)에서 아직 쉬는 중인가
+ *  🔴 최종 검토(6번)가 내린 사본의 표시(review: true · collector/pdf-verdicts.mjs)는 **날수와 상관없이** 쉰다 — 같은 법으로 다시 만들면 같은 사본이 나오고 6번이 돈 내고 다시 내린다.
+ *     만드는 법(MAKER)이 바뀌면 풀린다(표시에 적힌 판 번호가 지금 판과 다르다) */
 export function resting(tried, key, today, restDays = REST_DAYS) {
-  const at = tried && tried[key] && tried[key].at;
+  const t = tried && tried[key];
+  if (t && t.review) return (t.mk || 1) === MAKER;
+  const at = t && t.at;
   if (!at) return false;
   const d = dayDiff(at, today);
   return Number.isFinite(d) && d < restDays;
 }
+
+/* ── 붙은 문서 (2026-11-21 개발자 지시 — *"한 문서에 신청양식이랑 내용문서가 동시에 들어있는 경우 -> 분리해서 2개의 pdf 로"*) ─────────────────
+   AI 가 붙은 문서(mixed)라 한 첨부는 PDF 가 둘이 된다: 서식 쪽은 서식 쪽 떼기 로봇(form-pages)이 「서식이 시작되는 줄」이 든 쪽부터 끝까지를 떼고,
+   이 로봇은 그 앞쪽(읽는 글)만 남긴다. 🔴 글자 대조(KEEP_MIN)는 자르기 **전** 사본 전체로 한다 — 대조는 변환이 글자를 잃었는지를 재는 것이고, 자르는 것은 일부러 하는 일이다.
+   ponytail: 원래 PDF 로 올라온 붙은 문서는 여기서 자르지 않는다(이 로봇은 한글·워드만 본다) — 그 첨부는 원래 PDF 가 통째로 보이고 서식 쪽만 form-pages 가 따로 뗀다.
+             PDF 도 읽는 글 쪽만 보여야 하면 이 로봇이 PDF 첨부를 대상에 넣고 같은 cutRange 로 자르게 한다 */
+/** 사본의 모양을 바꾸는 AI 의 답 — 붙은 문서일 때만 값이 있다(그 밖의 갈래는 사본을 그대로 둔다 · 학교를 다시 두드리지 않는다) */
+const cutSig = (ai) => (ai && ai.role === 'mixed' ? aiSig(ai) : '');
+/** 읽는 글 쪽 구간 — 붙은 문서이고 서식이 2쪽 이후에 시작할 때만 [[1, 서식 시작 쪽 - 1]] · 첫 쪽부터 서식이거나 그 줄을 못 찾았으면(p0 없음) null(통째로 둔다) */
+export const cutRange = (ai, p0) => (ai && ai.role === 'mixed' && p0 > 1 ? [[1, p0 - 1]] : null);
 
 /* ── 글자 뽑기 (글자 대조의 두 쪽) ───────────────────────────────────────────── */
 /* 배포용 문서(한글의 「배포용 문서로 저장」 — 본문이 따로 잠겨 있다)에서 본문 뽑기(hwp-bodytext.py)가 읽는 것은 본문 자리에 놓인 안내 문구 한 줄뿐이다:
@@ -235,19 +257,33 @@ function convertChecked({ src, work, name, convert, relax, origText, pdfText, ma
   return { ok: true, ...best, orig, tries };
 }
 
-async function makeOne({ t, f, file, root, outDir, today, fetchImpl, convert, relax, origText, pdfText, mayRelax }) {
+async function makeOne({ t, f, file, root, outDir, today, fetchImpl, convert, relax, origText, pdfText, mayRelax, aiFor = () => null, startPage, cutPdf }) {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-pdf-'));   // 받은 원본·만든 PDF 는 여기에만 — 커밋하지 않는다
   try {
     const got = await obtainSrc({ t, f, root, work, fetchImpl });
     if (!got.src) return { ok: false, why: got.why };
+    /* 받은 원본의 바이트 해시 — AI 의 답은 **이 바이트**에 대한 것만 쓴다(이름을 모르는 답도 바이트로 찾는다 · aiRoleByName). 색인 줄에 적어 두어 다음 실행이 받지 않고도 같은 답을 찾는다 */
+    const srcHash = fileHash16(got.src);
+    const ai = aiFor(srcHash);
+    /* 🔴 받은 바이트에 AI 가 「통째로 신청 양식」이라 답했으면 바꾸지 않는다 — 받기 전에는 이름으로만 찾아서 놓친 답(자격 로봇이 받아 이름을 모르는 답) · 아래 runDocPdf 의 같은 줄 */
+    if (ai && ai.role === 'form') return { ok: false, form: true, srcHash, why: 'AI: 통째로 신청 양식(신청서 칸의 사본이 맡는다)' };
     const c = convertChecked({ src: got.src, work, name: f.name, convert, relax, origText, pdfText, mayRelax });
     if (!c.ok) return { ok: false, why: c.why };
     if (c.ratio != null && c.ratio < KEEP_MIN) return { ok: false, why: `글자 빠짐(${Math.floor(c.ratio * 100)}%)`, miss: missingLines(c.orig, c.text), later: !!c.later };
     const out = path.join(outDir, file);
     fs.mkdirSync(path.dirname(out), { recursive: true });
-    fs.copyFileSync(c.pdf, out);   // 임시 폴더와 저장소가 다른 디스크일 수 있어 옮기기(rename) 대신 복사
-    /* 판 번호(mk)는 이 판의 길을 끝까지 간 사본에만 — 예산이 모자라 다시 가지 못한 사본(later)은 안 적어 다음 실행이 다시 만든다 */
-    return { ok: true, entry: { file, name: f.name, pages: c.r.pages, bytes: c.r.bytes, fonts: FP.FONT_STAMP, kept: c.ratio == null ? null : Math.round(c.ratio * 1000) / 1000, ...(c.boxes ? { boxes: c.boxes } : {}), ...(c.later ? {} : { mk: MAKER }), at: today } };
+    /* 붙은 문서(AI: mixed) — 서식이 시작되는 쪽 앞까지만 남긴다(cutRange). 그 쪽을 못 찾았거나 쪽을 못 떼면 통째로 둔다(사본을 버리지 않는다).
+       자르기는 덤이다 — 쪽 찾기·쪽 떼기에서 무엇이 넘어져도(던져도) 글자 대조를 통과한 통째 사본은 싣는다(convertChecked 의 다시 가는 길과 같은 규칙) */
+    let cut = null;
+    let range = null;
+    let settled = false;   // AI 의 답대로 모양이 정해졌다 — 잘랐다 · 서식 쪽을 못 찾았다 · 첫 쪽부터 서식이다(자를 것이 없다)
+    try { range = cutRange(ai, cutSig(ai) ? startPage(c.pdf, ai.formStart) : null); cut = range ? cutPdf(c.pdf, range, out) : null; settled = !range || !!(cut && cut.ok); } catch { cut = null; }
+    if (!cut || !cut.ok) fs.copyFileSync(c.pdf, out);   // 임시 폴더와 저장소가 다른 디스크일 수 있어 옮기기(rename) 대신 복사
+    const made = cut && cut.ok ? { pages: cut.pages, bytes: cut.bytes, cut: `1~${range[0][1]}쪽` } : { pages: c.r.pages, bytes: c.r.bytes };
+    /* 판 번호(mk)는 이 판의 길을 끝까지 간 사본에만 — 예산이 모자라 다시 가지 못한 사본(later)은 안 적어 다음 실행이 다시 만든다.
+       🔴 AI 의 답(ai)도 그 답대로 모양이 정해진 사본에만(settled · 리뷰 2026-11-23) — 쪽 도구가 없거나 넘어져 못 자른 통째 사본에 적으면 「그 답으로 만들었다」가 되어 영영 다시 자르지 않는다 */
+    return { ok: true, entry: { file, name: f.name, ...made, fonts: FP.FONT_STAMP, kept: c.ratio == null ? null : Math.round(c.ratio * 1000) / 1000, ...(c.boxes ? { boxes: c.boxes } : {}), ...(c.later ? {} : { mk: MAKER }),
+      ...(cutSig(ai) && settled ? { ai: cutSig(ai) } : {}), ...(srcHash ? { srcHash } : {}), at: today } };
   } catch (e) {
     const why = [e && e.name, e && e.cause && (e.cause.code || e.cause.message), e && e.message].filter(Boolean).join(' · ').replace(/\s+/g, ' ').slice(0, 100);
     return { ok: false, why: `오류(${why || '알 수 없음'})` };
@@ -263,7 +299,7 @@ export function systemicFailure({ failed = [], done = [] } = {}) {
   return !done.length && (office.some((f) => /H2Orestart/.test(f.why || '')) || office.length >= 2);
 }
 
-export function buildDocReport({ today, targets, done, failed, skipped, rested, unchecked, dropped, left, budgetSec, index = { items: {} } }) {
+export function buildDocReport({ today, targets, done, failed, skipped, rested, unchecked, dropped, left, budgetSec, index = { items: {} }, asForm = [] }) {
   const L = [];
   const files = targets.reduce((n, t) => n + t.files.length, 0);
   L.push(`## 📄 공고문 → PDF 리포트 (${today})`, '');
@@ -278,6 +314,12 @@ export function buildDocReport({ today, targets, done, failed, skipped, rested, 
   /* 평소 길로는 글자가 빠져 높이 고정 글상자를 풀어 다시 바꾼 사본(soffice.mjs sofficeToPdfRelaxed) — 지금 앱에 나가는 것 전체에서 센다 */
   const loosened = Object.values(index.items || {}).flat().filter((e) => e && e.boxes).length;
   if (loosened) L.push(`그중 표가 높이 고정 틀에 갇혀 글자가 잘리던 것을 틀을 풀어 다시 바꾼 사본 ${loosened}개`, '');
+  /* 붙은 문서(AI: 공고문 + 신청 양식이 한 파일)라 읽는 글 쪽만 남긴 사본 · 최종 검토(6번)가 내려 쉬고 있는 사본 — 선조치후보고 */
+  const cutCopies = Object.values(index.items || {}).flat().filter((e) => e && e.cut).length;
+  if (cutCopies) L.push(`그중 한 파일에 공고문과 신청 양식이 함께 든 문서라 읽는 글 쪽만 남긴 사본 ${cutCopies}개(서식 쪽은 「공고문 뒷장 서식 쪽 떼기」가 따로 낸다)`, '');
+  const reviewed = Object.values(index.tried || {}).filter((x) => x && x.review).length;
+  if (reviewed) L.push(`최종 검토가 내린 사본 ${reviewed}개 — 다시 만들지 않는다(만드는 법이나 AI 가 짚은 자리가 바뀌면 다시 · 그때까지 앱에는 원본 파일만)`, '');
+  if (asForm.length) L.push(`AI 가 통째로 신청 양식이라 한 첨부 ${asForm.length}개 — 바꾸지 않았다(신청서 칸의 사본이 맡는다 · 같은 파일의 사본이 둘이 되지 않게)`, '');
   if (failed.length) {
     const by = new Map();
     for (const f of failed) { const k = f.why.replace(/\(\d+%\)$/, '(…%)').replace(/\(\d+KB\)$/, '(…KB)'); by.set(k, (by.get(k) || 0) + 1); }
@@ -306,7 +348,12 @@ function loadTargets({ root, today, isApplicationForm }) {
 }
 
 export async function runDocPdf({ root, today, dry = false, budgetSec = BUDGET_SEC, fetchImpl = fetch, convert = FP.convertOne, relax = sofficeToPdfRelaxed,
-  origText = defaultOrigText, pdfText = defaultPdfText, isApplicationForm = null, log = console.log } = {}) {
+  origText = defaultOrigText, pdfText = defaultPdfText, isApplicationForm = null, log = console.log,
+  aiRoles = null, startPage = (pdf, line) => FPG.formStartPage(pdf, line), cutPdf = FPG.extractRanges } = {}) {
+  /* 최종 검토(6번)가 ok 가 아니라고 본 사본을 내린다 — 색인이 옛 판으로 되돌려졌을 때를 위해 시작할 때 한 번 더(색인을 읽기 전에 · form-pdf 와 같은 줄) */
+  if (!dry) applyPdfVerdicts({ root, verdicts: loadPdfVerdicts(root), today });
+  /* AI 가 정한 첨부 갈래(4번 · 6번 — 없으면 빈 표) — 붙은 문서(mixed)만 사본의 모양이 달라진다(읽는 글 쪽만) */
+  const aiTable = aiRoles || loadAiRoles(path.join(root, 'collector'));
   const { targets, readJson } = loadTargets({ root, today, isApplicationForm });
   const outDir = path.join(root, 'data', 'docs-pdf');
   const indexPath = path.join(outDir, 'index.json');
@@ -317,7 +364,7 @@ export async function runDocPdf({ root, today, dry = false, budgetSec = BUDGET_S
   const live = new Set(targets.map((t) => t.id));
   const dropped = dry ? Object.keys(index.items).filter((id) => !live.has(id)) : FP.prune(index, live, outDir);
   if (!dry) for (const k of Object.keys(index.tried)) if (!live.has(k.slice(0, k.indexOf('|')))) delete index.tried[k];   // 대상에서 빠진 공고의 실패 장부도 지운다
-  const done = []; const failed = []; const left = []; const unchecked = [];
+  const done = []; const failed = []; const left = []; const unchecked = []; const asForm = [];
   let skipped = 0; let rested = 0;
   const t0 = Date.now();
   /* 🔴 남은 예산이 파일 하나의 최대 시간(받기 + 변환)보다 적으면 시작하지 않는다 — 단계 시한에 끊기지 않게(form-pdf 11-19 사고와 같은 셈) */
@@ -334,22 +381,37 @@ export async function runDocPdf({ root, today, dry = false, budgetSec = BUDGET_S
       const file = `${t.id}/${i + 1}-${FP.safeName(f.name)}.pdf`;
       const key = `${t.id}|${f.name}`;
       const exists = (h) => h.name === f.name && h.file === file && fs.existsSync(path.join(outDir, h.file));
-      /* 글자가 덜 남은 옛 사본(kept < 1)은 만드는 법이 바뀌면(MAKER) 한 번 다시 만든다 — 다 남은 사본·잴 수 없던 사본은 그대로 */
-      const same = have.find((h) => exists(h) && h.fonts === FP.FONT_STAMP && (h.kept == null || h.kept >= 1 || (h.mk || 1) === MAKER));
+      /* 이 첨부에 AI 가 정한 갈래 — 이름으로, 받아 둔 원본의 바이트 해시(색인 줄의 srcHash · 받은 직후에는 그 파일의 해시)가 있으면 그것으로 확인한다 */
+      const aiFor = (hash) => aiRoleByName(aiTable, t.id, f.name, hash || '');
+      /* 🔴 AI 가 통째로 신청 양식이라 한 첨부는 바꾸지 않는다(리뷰 2026-11-23) — 그 파일의 사본은 신청서 칸이 맡는다(양식 PDF 로봇 · 자격 색인에만 있으면 서식 쪽 떼기가 통째로).
+         여기서도 바꾸면 같은 파일의 사본이 둘이 되고 6번이 둘 다 돈 내고 본다. 받기 전에는 이름과 받아 둔 바이트(옛 줄 · 장부의 srcHash)로, 받은 뒤에는 그 바이트로(makeOne) 찾는다.
+         옛 사본은 싣지 않는다(공고 폴더 정리가 지운다) · AI 의 답이 바뀌면 바로 다시 본다(그 장부 줄(form)에는 판 번호가 없어 쉬지 않는다 — 아래 쉼은 같은 판의 실패만) */
+      const known = (have.find((h) => h.name === f.name && h.srcHash) || index.tried[key] || {}).srcHash || '';
+      if ((aiFor(known) || {}).role === 'form') { asForm.push({ id: t.id, name: f.name }); continue; }
+      /* 글자가 덜 남은 옛 사본(kept < 1)은 만드는 법이 바뀌면(MAKER) 한 번 다시 만든다 — 다 남은 사본·잴 수 없던 사본은 그대로.
+         붙은 문서라는 AI 의 답이 새로 생기거나 바뀌면(서식이 시작되는 줄) 다시 만든다 — 읽는 글 쪽만 남기는 자리가 달라진다(cutSig) */
+      const same = have.find((h) => exists(h) && h.fonts === FP.FONT_STAMP && (h.kept == null || h.kept >= 1 || (h.mk || 1) === MAKER) && (h.ai || '') === cutSig(aiFor(h.srcHash)));
       if (same) { next.push(same); skipped += 1; continue; }
       const stale = have.find(exists);   // 글꼴 도장만 다르거나 글자가 덜 남은 옛 사본 — 새로 못 만들면 그대로 둔다(줄이 사라지지 않게)
+      /* 🔴 최종 검토가 내린 사본의 표시(review)는 그 사본을 만든 AI 의 답(표시의 ai)이 그대로인 동안만 쉰다(리뷰 2026-11-23) — 6번이 갈라낸 자리가 틀렸다고 보고
+         서식이 시작되는 줄을 새로 냈으면(resplit) 서식 쪽 떼기는 새 줄로 다시 떼는데, 여기만 영영 쉬면 그 공고는 공고문 사본이 끝까지 없다(서식 쪽 떼기의 none 줄과 같은 셈 · sameSource) */
+      const mark = index.tried[key];
+      if (mark && mark.review && (mark.ai || '') !== cutSig(aiFor(mark.srcHash))) delete index.tried[key];
       /* 쉼도 같은 판에서 실패한 것만 — 만드는 법이 바뀌면 쉬던 실패를 바로 다시 해 본다 */
       if (resting(index.tried, key, today) && (index.tried[key].mk || 1) === MAKER) { rested += 1; if (stale) next.push(stale); continue; }
       if (dry) { log(`[dry] ${t.id} · ${f.name}`); continue; }
       if (overBudget()) { left.push({ id: t.id, name: f.name }); if (stale) next.push(stale); continue; }
       let r;
-      try { r = await makeOne({ t, f, file, root, outDir, today, fetchImpl, convert, relax, origText, pdfText, mayRelax }); }
+      try { r = await makeOne({ t, f, file, root, outDir, today, fetchImpl, convert, relax, origText, pdfText, mayRelax, aiFor, startPage, cutPdf }); }
       catch (e) { r = { ok: false, why: `오류(${String((e && e.message) || e).slice(0, 80)})` }; }   // makeOne 이 이유를 돌려주지만 한 겹 더 — 한 파일이 실행을 멈추지 않는다
       if (r.ok) {
         next.push(r.entry);
         delete index.tried[key];
         done.push({ id: t.id, name: f.name, boxes: r.entry.boxes || 0 });
         if (r.entry.kept == null) unchecked.push({ id: t.id, name: f.name });
+      } else if (r.form) {
+        index.tried[key] = { at: today, why: r.why, srcHash: r.srcHash, form: true };   // 받은 바이트로 안 답 — 다음 실행은 받지 않고 이 srcHash 로 알아본다(옛 사본은 싣지 않는다)
+        asForm.push({ id: t.id, name: f.name });
       } else {
         index.tried[key] = { at: today, why: r.why, ...(r.later ? {} : { mk: MAKER }) };   // 예산이 모자라 다시 가지 못한 실패는 쉬지 않는다(다음 실행이 바로 잇는다)
         failed.push({ id: t.id, name: f.name, why: r.why, miss: r.miss || [] });
@@ -371,14 +433,14 @@ export async function runDocPdf({ root, today, dry = false, budgetSec = BUDGET_S
     }
     flush();
   }
-  const report = buildDocReport({ today, targets, done, failed, skipped, rested, unchecked, dropped, left, budgetSec, index });
+  const report = buildDocReport({ today, targets, done, failed, skipped, rested, unchecked, dropped, left, budgetSec, index, asForm });
   if (!dry) {
     flush();
     fs.mkdirSync(path.join(root, 'collector'), { recursive: true });
     fs.writeFileSync(path.join(root, 'collector', 'doc-pdf-report.md'), report + '\n');
   }
   log(report);
-  return { targets, done, failed, skipped, rested, unchecked, dropped, left, index };
+  return { targets, done, failed, skipped, rested, unchecked, dropped, left, asForm, index };
 }
 
 /* ── 진단 모드 (--probe) ──────────────────────────────────────────────────────

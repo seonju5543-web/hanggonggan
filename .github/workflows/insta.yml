@@ -208,7 +208,7 @@ jobs:
           git diff --cached --quiet && { echo '바뀐 게 없습니다'; exit 0; }
           git commit -m "인스타: 카드 준비 $(echo "$OK" | wc -w | tr -d ' ')건 · 마감 지나 정리 ${EXPIRED:-0}건"
           for i in 1 2 3; do
-            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE" || git rebase --abort || true; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }   # 🔴 sleep 이 0 을 남겨 그냥 넘어가던 자리
           done
           echo 'base=ok' >> "$GITHUB_OUTPUT"   # 장부가 기본 브랜치에 들어갔다 — 아래 실패 알림이 이것으로 말을 고른다
@@ -501,7 +501,7 @@ jobs:
           git diff --cached --quiet && { echo 'seen.json 변화 없음'; exit 0; }
           git commit -m '인스타: 올린 공고 기록'
           for i in 1 2 3; do
-            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE" || git rebase --abort || true; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }   # 🔴 sleep 이 0 을 남겨 그냥 넘어가던 자리
           done
 
@@ -603,7 +603,7 @@ jobs:
           git add insta/seen.json
           git diff --cached --quiet || git commit -m "인스타: 건너뛰기 — $CODE"
           for i in 1 2 3; do
-            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE" || git rebase --abort || true; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }
           done
           # 남은 카드 수는 insta/ready-issues.mjs 한 곳(위 게시 작업과 같다) — 장부는 바로 위에서 고쳤다

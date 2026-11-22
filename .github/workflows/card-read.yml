@@ -110,7 +110,7 @@ jobs:
           [ -f collector/card-read-ledger.json ] && git add collector/card-read-ledger.json
           [ -f collector/card-read-review.json ] && git add collector/card-read-review.json
           [ -f collector/attach-role-paid.json ] && git add collector/attach-role-paid.json
-          [ -f collector/attach-role-ai.json ] && git add collector/attach-role-ai.json   # 4-1 첨부 구분(내용 문서 / 신청 양식 · 2026-11-21) — 6번이 다시 본다
+          [ -f collector/attach-role-ai.json ] && git add collector/attach-role-ai.json   # 4-1 첨부 구분(내용 문서 / 신청 양식 · 2026-11-21) — 6번이 다시 보고, 5번 변환 로봇이 이 답으로 가른다
           if ! git diff --cached --quiet; then
             git commit -m "유료 카드 읽기: $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/card-read.txt | tail -1 || echo '결과 갱신') · 첨부 판정 $(grep -o '물음 [0-9]*개(실음 [0-9]*)' /tmp/attach-role.txt | tail -1 || echo '없음')"
             pushed=0

@@ -46,13 +46,13 @@
 - **원문 바로잡기**(`source-link.js` ⑥ · 로봇 데이터에 고쳐 쓰면 사라진다): 사람 `data/link-fixes.json`(관리자 「원문 링크 손볼 것」 → `tools/admin-apply.mjs` `linkFix` · 늘 이긴다) ·
   로봇 `data/link-check.json` `fix`(후보 `collector/link-candidates.json` 을 학생처럼 열어 `acceptCandidate` 통과분만). 열쇠 `id:`·`u:` · 회차(`round`)는 층2만. 관문 같은 절 fixes·candidates·admin.
 
-## 🔴 유료 관문 (2026-11-20 지시 · 설계 `docs/designs/paid-gate-pipeline.md` · 앞선 설계 `docs/designs/paid-card-reading.md`)
+## 🔴 유료 관문 (2026-11-20 지시 · 설계 `docs/designs/paid-gate-pipeline.md`)
 
-- 흐름(11-21 · 🔴 **기계 검사 없음**): 수집 → 숨김 등록(`auto-register.mjs` 가 `paidGate` 를 단다) → 원문 받기(`rescue-bodies.mjs` 「원문 받기 로봇」) → 💰 4번 카드 쓰기 → 학생 화면 → 5번 PDF 변환 → 💰 6번 최종 검토.
-- 4번 = `collector/card-read.mjs`: AI 하나가 본문+첨부를 읽어 카드(`cardEntry`)와 첨부 구분(4-1 → `collector/attach-role-ai.json` · 읽는 곳 `collector/attach-role-ai.mjs`)을 낸다 · `registered.json` 은 안 고친다.
-- 6번 = `collector/final-review.mjs`: 둘째 AI 가 원문·카드·구분·PDF 사본(파일째)을 보고 **고친 완성본**을 낸다(`applyReview` — 카드를 통째로 바꾼다 · 구분은 6번 답이 이긴다) · 카드 읽기·새벽 변환 직후에 돈다(`final-review.yml`) · 못 고친 것만 관리자 「할 일」. 옛 두 읽기의 빠진 줄(`collector/card-read-review.json` · `explainLine`)은 그 공고가 닫힐 때까지 `cardLine`(`tools/admin-apply.mjs` → `data/card-read-fixes.json`).
+- 흐름(11-21 · 🔴 **기계 검사 없음**): 수집 → 숨김 등록(`auto-register.mjs` 의 `paidGate`) → 원문 받기(`rescue-bodies.mjs`) → 💰 4번 카드 쓰기 → 학생 화면 → 5번 PDF 변환 → 💰 6번 최종 검토.
+- 4번 = `collector/card-read.mjs`: AI 하나가 본문+첨부를 읽어 카드(`cardEntry`)와 첨부 구분(4-1 → `collector/attach-role-ai.json`)을 낸다 · `registered.json` 은 안 고친다.
+- 6번 = `collector/final-review.mjs`: 둘째 AI 가 원문·카드·구분·PDF 사본(파일째)을 보고 **고친 완성본**을 낸다(`applyReview` — 카드를 통째로 바꾼다 · 구분은 6번 답이 이긴다) · 카드 읽기·새벽 변환 직후에 돈다(`final-review.yml`) · 못 고친 것만 관리자 「할 일」. 옛 두 읽기의 빠진 줄(`explainLine`)은 그 공고가 닫힐 때까지 `cardLine`(→ `data/card-read-fixes.json`).
 - 보이는가 = `match-engine.js` `publishedList`·`paidGateOpen` 한 곳(앱·서비스워커·`what-shows`·인스타·검색 요약·접수 서버 · 푸시 서버는 사본) — 결과 파일을 못 받으면 숨김분은 안 보이고, 사흘 넘게 통과가 없으면 무료 값 + 경보(`card-read.yml`). 그 전 등록분은 숨기지도 다시 읽지도 않는다. 관문 「유료 관문」·「유료 최종 검토」·「유료 카드 읽기」 · `verify-card-read.js`.
-- **첨부가 신청서 칸인가 카드인가**(11-20)는 원본 **내용**으로 — `attachDecision`(attachment-text) 한 곳 · 모르면 이름 규칙 · 앱은 `attIsForm`(색인 `roles`). 글자 없는 스캔 PDF·그림만 `collector/attach-role-read.mjs` 가 파일째 모델 둘에게 묻고 같은 답만 `collector/attach-role-paid.json` 에(같은 스위치). 관문 「첨부를 내용으로 가르기」.
+- **첨부가 신청서 칸인가 카드인가** — `attachDecision`(attachment-text) 한 곳: AI 구분(4번·6번) → 원본 내용 → 이름 규칙 · 앱은 `attIsForm`(색인 `roles`). 붙은 문서는 서식 쪽을 떼고(`formStartPage`) 공고문 사본은 앞쪽만 · 6번이 잘못됐다 한 사본은 내린다(`collector/pdf-verdicts.mjs`). 스캔 PDF·그림은 `collector/attach-role-read.mjs`. 관문 「첨부를 내용으로 가르기」·「5번 연결」.
 
 ## 🔴 학적정보 테일러링 (2026-10-24 개발자 지시 넷 — 원문은 설계 문서 0절)
 
@@ -306,6 +306,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **🔴 모든 워크플로에 `timeout-minutes`** · 보강 단계는 `timeout-minutes` + `continue-on-error: true` · 실패 알림은 `if: failure() || cancelled()` ·
   학교마다 `withDeadline()` 절대 시한 · 전역 예산(`harvest-budget.mjs`) 안에 스스로 끝낸다(상한 올리기는 해법 아님) · 넘어져도 `saveAll()`.
 - 대기줄(concurrency)을 하나로 합치지 말 것(대기 실행이 취소된다) · 예약은 정각·UTC 자정을 피한다(관례는 홀수 분) · 새 공고 0건이면 이슈 대신 코멘트.
+- 🔴 저장 고리가 `push … HEAD:브랜치` 꼴이면 다시 얹기 충돌 때 `git rebase --abort` — 없으면 다음 push 가 「보낼 것 없음」으로 성공해 결과가 사라진다(관문 「유료 관문」 리뷰 절).
 - 문법 검사는 `node --check` — `import('./x.mjs')` 는 **실행된다**. 불러오는 순간 실행되는 파일(auto-register·schematize)은 가져다 쓰지 말 것.
 - **원문 링크는 그 공고 하나로** — 주소를 유추하지 말고 게시판 폼을 그대로 · 세션 없는 새 탭에서 열어 확인 · '못 읽음'과 '다른 글'을 구분 ·
   같은 학교를 하루에 여러 번 두드리지 말 것 · 못 찾으면 `#n-` 표식(앱이 '게시판 목록 ↗'). 사냥꾼이 못 찾는 이유는 대개 `boardTitle` 이 없어서.
