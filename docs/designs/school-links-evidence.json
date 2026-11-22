@@ -1,0 +1,532 @@
+{
+ "경희대학교": {
+  "home": "https://www.khu.ac.kr",
+  "portal": "https://info21.khu.ac.kr",
+  "eclass": "https://e-campus.khu.ac.kr",
+  "library": "https://lib.khu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"경희대학교\"",
+   "portal": "found on school homepage link list (\"인포21\"); repo data.js verifiedTitle \"경희대학교 인포21\" 2026-09-14",
+   "eclass": "curl 200, title \"경희대학교 e-Campus\"; also homepage link \"e-campus\"",
+   "library": "curl 200, title \"경희대학교 중앙도서관\"; homepage \"중앙도서관\""
+  }
+ },
+ "한국외국어대학교": {
+  "home": "https://www.hufs.ac.kr",
+  "portal": "https://wis.hufs.ac.kr/src08/jsp/index.jsp",
+  "eclass": "https://eclass.hufs.ac.kr",
+  "library": "https://lib.hufs.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"index\" -> /hufs/index.do (homepage of HUFS, links list confirms)",
+   "portal": "curl 200, title \"한국외국어대학교 종합정보시스템\"; homepage \"종합정보시스템\". Note: scholarship applications use HUFS Ability https://hufsability.hufs.ac.kr (title \"한국외대 HUFSAbility\")",
+   "eclass": "curl 200, title \"한국외국어 대학교 e-Class System\"; homepage \"e-Class(LMS/TNS)\"",
+   "library": "curl 200, title \"한국외국어대학교 서울캠퍼스도서관\"; homepage \"도서관 (서울)\""
+  }
+ },
+ "서울대학교": {
+  "home": "https://www.snu.ac.kr",
+  "portal": "https://my.snu.ac.kr",
+  "eclass": "https://myetl.snu.ac.kr",
+  "library": "https://lib.snu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"서울대학교\" (/index.html)",
+   "portal": "curl 200, title \"서울대학교 포털 로그인\"; on homepage link list",
+   "eclass": "redirects to SNU SSO (title \"로그인 - 서울대학교 2단계 인증\"); search index title \"SNU eTL - 서울대학교\"",
+   "library": "curl 200, title \"서울대학교 중앙도서관\""
+  }
+ },
+ "연세대학교": {
+  "home": "https://www.yonsei.ac.kr",
+  "portal": "https://portal.yonsei.ac.kr",
+  "eclass": "https://ys.learnus.org",
+  "library": "https://library.yonsei.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"연세대학교\" (/sc/index.do)",
+   "portal": "found on school homepage link list (\"portal.yonsei.ac.kr\") (Firecrawl scrape of homepage)",
+   "eclass": "curl 200, title \"LearnUs YONSEI\"",
+   "library": "found on school homepage link list (\"library.yonsei.ac.kr\") (direct fetch reset by server)"
+  }
+ },
+ "연세대학교 미래캠퍼스": {
+  "home": "https://mirae.yonsei.ac.kr",
+  "portal": "https://portal.yonsei.ac.kr",
+  "eclass": "https://ys.learnus.org",
+  "library": "https://wlib.yonsei.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"연세대학교 미래캠퍼스\" (Firecrawl, /wj/index.do)",
+   "portal": "same portal as Sinchon; linked on Mirae homepage",
+   "eclass": "LearnUs YONSEI (title confirmed); Mirae homepage links LearnUs (www.learnus.org/inform/)",
+   "library": "found on school homepage link list (\"wlib.yonsei.ac.kr\") on Mirae homepage (direct fetch TLS-blocked)"
+  }
+ },
+ "고려대학교": {
+  "home": "https://www.korea.ac.kr",
+  "portal": "https://portal.korea.ac.kr",
+  "eclass": "https://lms.korea.ac.kr",
+  "library": "https://library.korea.ac.kr",
+  "evidence": {
+   "home": "redirects to /sites/ko/index.do; homepage fetched and links list read",
+   "portal": "found on school homepage link list (\"KUPID / 학사 포털\")",
+   "eclass": "curl 200, title \"고려대학교 LMS\"",
+   "library": "curl 200, title \"고려대학교 도서관\""
+  }
+ },
+ "고려대학교 세종캠퍼스": {
+  "home": "https://sejong.korea.ac.kr",
+  "portal": "https://portal.korea.ac.kr",
+  "eclass": "https://lms.korea.ac.kr",
+  "library": "https://libs.korea.ac.kr",
+  "evidence": {
+   "home": "meta-refresh to /koreaSejong/index.do; Sejong homepage fetched and links read",
+   "portal": "found on school homepage link list (\"KUPID\") on Sejong homepage (same as Seoul)",
+   "eclass": "same KU LMS (title \"고려대학교 LMS\"); not linked on Sejong homepage itself",
+   "library": "curl 200, title \"고려대학교 세종학술정보원\""
+  }
+ },
+ "서강대학교": {
+  "home": "https://www.sogang.ac.kr",
+  "portal": "https://saint.sogang.ac.kr/irj/portal",
+  "eclass": "https://eclass.sogang.ac.kr",
+  "library": "https://library.sogang.ac.kr",
+  "evidence": {
+   "home": "Firecrawl scrape of /ko/home title \"서강대학교\" (direct curl TLS-blocked)",
+   "portal": "found on school homepage link list (\"SAINT\")",
+   "eclass": "Firecrawl scrape title \"서강대학교 Cyber Campus System\"",
+   "library": "Firecrawl scrape title \"서강대학교 로욜라도서관\""
+  }
+ },
+ "성균관대학교": {
+  "home": "https://www.skku.edu",
+  "eclass": "https://canvas.skku.edu",
+  "evidence": {
+   "home": "Firecrawl scrape title \"성균관대학교\" (/skku/index.do)",
+   "eclass": "Firecrawl: redirects to icampus.skku.edu login, title \"Sungkyunkwan University\""
+  }
+ },
+ "한양대학교": {
+  "home": "https://www.hanyang.ac.kr",
+  "portal": "https://portal.hanyang.ac.kr",
+  "eclass": "https://learning.hanyang.ac.kr",
+  "library": "https://library.hanyang.ac.kr",
+  "evidence": {
+   "home": "Firecrawl scrape title \"한양대 - 한양대학교\" (curl blocked by Cloudflare)",
+   "portal": "curl 200, title \"한양대학교 포털\"; on homepage link list",
+   "eclass": "redirects to 한양대학교 인증센터 (api.hanyang.ac.kr); search index title \"HY-ON - 한양대학교\" (HY-ON = official LMS name per ectl.hanyang.ac.kr)",
+   "library": "curl 200, title \"한양대학교 백남학술정보관\""
+  }
+ },
+ "중앙대학교": {
+  "home": "https://www.cau.ac.kr",
+  "portal": "https://mportal.cau.ac.kr",
+  "eclass": "https://eclass3.cau.ac.kr",
+  "library": "https://library.cau.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"중앙대학교\"",
+   "portal": "curl 200, title \"중앙대학교 포탈\"; homepage \"중앙대포탈\"",
+   "eclass": "found on school homepage link list (\"E-Class\"); /login -> canvas.cau.ac.kr title \"중앙대학교 로그인\"",
+   "library": "curl 200, title \"중앙대학교 서울캠퍼스 학술정보원\""
+  }
+ },
+ "서울시립대학교": {
+  "home": "https://www.uos.ac.kr",
+  "portal": "https://portal.uos.ac.kr",
+  "eclass": "https://uclass.uos.ac.kr",
+  "library": "https://library.uos.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"서울시립대학교\"",
+   "portal": "found on school homepage link list (\"portal.uos.ac.kr\") (Firecrawl scrape of homepage)",
+   "eclass": "curl 200, title \"사이트에 로그인 | 서울시립대학교 온라인강의실\"",
+   "library": "curl 200, title \"서울시립대학교 중앙도서관\""
+  }
+ },
+ "건국대학교": {
+  "home": "https://www.konkuk.ac.kr",
+  "portal": "https://kuis.konkuk.ac.kr",
+  "eclass": "https://ecampus.konkuk.ac.kr",
+  "library": "https://library.konkuk.ac.kr",
+  "evidence": {
+   "home": "Firecrawl scrape title \"건국대학교\" (/konkuk/index.do; curl loops on SSO)",
+   "portal": "curl 200, title \"건국대학교 학사정보시스템\"; on homepage link list",
+   "eclass": "curl 200, title \"건국대학교 eCampus\"; on homepage link list",
+   "library": "curl 200, title \"건국대학교 상허기념도서관\""
+  }
+ },
+ "동국대학교": {
+  "home": "https://www.dongguk.edu",
+  "portal": "https://nportal.dongguk.edu",
+  "eclass": "https://eclass.dongguk.edu",
+  "library": "https://lib.dongguk.edu",
+  "evidence": {
+   "home": "curl 200, title \"동국대학교 메인페이지\"",
+   "portal": "curl 200, title \"동국대학교-uDRIMS 2.0\"; homepage \"Portal\"",
+   "eclass": "curl 200, title \"동국대학교 이클래스\"",
+   "library": "curl 200, title \"동국대학교 중앙도서관\""
+  }
+ },
+ "동국대학교 WISE캠퍼스": {
+  "home": "https://web.dongguk.ac.kr",
+  "portal": "https://nportal.dongguk.ac.kr",
+  "eclass": "https://eclass.dongguk.ac.kr",
+  "library": "https://libk.dongguk.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"동국대학교 WISE캠퍼스 메인페이지\"",
+   "portal": "curl 200, title \"동국대학교-uDRIMS 2.0\"; WISE homepage \"PORTAL\"",
+   "eclass": "found on school homepage link list (\"E-CLASS\") on WISE homepage (direct fetch reset)",
+   "library": "curl 200, title \"동국대학교 WISE도서관\""
+  }
+ },
+ "홍익대학교": {
+  "home": "https://www.hongik.ac.kr",
+  "portal": "https://cn.hongik.ac.kr",
+  "library": "https://honors.hongik.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"홍익대학교\" (/kr/index.do)",
+   "portal": "found on school homepage link list (\"클래스넷\"); redirects to hongik.ac.kr login",
+   "library": "curl 200, title \"홍익대학교 중앙도서관\"; homepage \"중앙도서관\""
+  }
+ },
+ "숙명여자대학교": {
+  "home": "https://www.sookmyung.ac.kr",
+  "portal": "https://portal.sookmyung.ac.kr",
+  "eclass": "https://snowboard.sookmyung.ac.kr",
+  "library": "https://lib.sookmyung.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"숙명여자대학교\"",
+   "portal": "curl 200, title \"숙명여자대학교 포털시스템\"",
+   "eclass": "curl 200, title \"SnowBoard: 사이트에 로그인\"",
+   "library": "curl 200, title \"숙명여자대학교 중앙도서관\""
+  }
+ },
+ "광운대학교": {
+  "home": "https://www.kw.ac.kr",
+  "portal": "https://klas.kw.ac.kr",
+  "eclass": "https://klas.kw.ac.kr",
+  "library": "https://kupis.kw.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"광운대학교\" (/ko/)",
+   "portal": "curl 200, title \"광운대학교 로그인 페이지\"; homepage \"KLAS 종합정보서비스\"",
+   "eclass": "KLAS also hosts online lectures/e-Class (school manuals on kw.ac.kr: \"KLAS를 활용한 이러닝 콘텐츠 학습하기\")",
+   "library": "found on school homepage link list (\"중앙도서관\") (direct fetch TLS-blocked)"
+  }
+ },
+ "명지대학교": {
+  "home": "https://www.mju.ac.kr",
+  "portal": "https://msi.mju.ac.kr",
+  "eclass": "https://lms.mju.ac.kr",
+  "library": "https://lib.mju.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"명지대학교\"",
+   "portal": "curl 200, title \"명지대학교 종합정보시스템(91)\"; homepage also links portal.mju.ac.kr \"포털시스템\"",
+   "eclass": "curl 200, title \"명지대학교 e-Learning System\"",
+   "library": "curl 200, title \"명지대학교 도서관\""
+  }
+ },
+ "상명대학교": {
+  "home": "https://www.smu.ac.kr",
+  "portal": "https://smul.smu.ac.kr",
+  "eclass": "https://ecampus.smu.ac.kr",
+  "library": "https://lib.smu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"상명대학교\"",
+   "portal": "curl 200, title \"상명대학교 통합정보시스템\"; homepage \"통합정보시스템\" (also 샘물포털 portal.smu.ac.kr)",
+   "eclass": "curl 200, title \"상명대학교 e-Campus\"",
+   "library": "Firecrawl scrape title \"상명대학교 학술정보관\" (blocks overseas IP)"
+  }
+ },
+ "가천대학교": {
+  "home": "https://www.gachon.ac.kr",
+  "portal": "https://portal.gachon.ac.kr",
+  "eclass": "https://cyber.gachon.ac.kr",
+  "library": "https://lib.gachon.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"가천대학교\"",
+   "portal": "found on school homepage link list (\"포털\") (redirects to SSO)",
+   "eclass": "curl 200, title \"Cyber Campus\"; homepage \"사이버캠퍼스\"",
+   "library": "curl 200, title \"가천대학교 중앙도서관\""
+  }
+ },
+ "아주대학교": {
+  "home": "https://www.ajou.ac.kr",
+  "portal": "https://portal.ajou.ac.kr",
+  "eclass": "https://eclass2.ajou.ac.kr",
+  "library": "https://library.ajou.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"아주대학교\"",
+   "portal": "curl 200, title \"아주대학교 포탈\"; on homepage link list",
+   "eclass": "Blackboard Learn redirect page; search index title \"아주대학교 통합인증\" (c Ajou University)",
+   "library": "curl 200, title \"아주대학교 중앙도서관\""
+  }
+ },
+ "국민대학교": {
+  "home": "https://www.kookmin.ac.kr",
+  "portal": "https://portal.kookmin.ac.kr",
+  "eclass": "https://ecampus.kookmin.ac.kr",
+  "library": "https://lib.kookmin.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"국민대학교 대표 홈페이지\"",
+   "portal": "curl 200, title \"국민대학교 ON국민 포털 로그인\"; homepage \"포털\"",
+   "eclass": "curl 200, title \"국민대학교 가상대학(eCampus): 사이트에 로그인\"",
+   "library": "curl 200, title \"국민대학교 성곡도서관\""
+  }
+ },
+ "숭실대학교": {
+  "home": "https://ssu.ac.kr",
+  "portal": "https://saint.ssu.ac.kr/irj/portal",
+  "eclass": "https://lms.ssu.ac.kr",
+  "library": "https://oasis.ssu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"숭실대학교 - 숭실대학교에 오신 것을 환영합니다.\"",
+   "portal": "curl 200, title \"숭실대학교 유세인트(u-SAINT)\"",
+   "eclass": "curl 200, title \"숭실대학교 LMS\"; homepage link class.ssu.ac.kr redirects here",
+   "library": "curl 200, title \"숭실대학교 중앙도서관\""
+  }
+ },
+ "세종대학교": {
+  "home": "https://www.sejong.ac.kr",
+  "portal": "https://portal.sejong.ac.kr",
+  "eclass": "https://ecampus.sejong.ac.kr",
+  "library": "https://library.sejong.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"세종대학교\"",
+   "portal": "curl 200, title \"세종대학교 포털 SSO 이동\"; homepage \"세종포털\"",
+   "eclass": "curl 200, title \"세종대학교 집현캠퍼스\"",
+   "library": "curl 200, title \"세종대학교 학술정보원\""
+  }
+ },
+ "이화여자대학교": {
+  "home": "https://www.ewha.ac.kr",
+  "portal": "https://portal.ewha.ac.kr",
+  "eclass": "https://cyber.ewha.ac.kr",
+  "library": "https://lib.ewha.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"이화여자대학교\"",
+   "portal": "curl 200, title \"이화여자대학교-포탈\"; homepage \"이화포탈\"",
+   "eclass": "curl 200, title \":: Ewha CyberCampus ::\"",
+   "library": "curl 200, title \"이화여자대학교 도서관\""
+  }
+ },
+ "인하대학교": {
+  "home": "https://www.inha.ac.kr",
+  "portal": "https://portal.inha.ac.kr",
+  "eclass": "https://learn.inha.ac.kr",
+  "library": "https://lib.inha.ac.kr",
+  "evidence": {
+   "home": "meta-refresh to /kr/index.do; homepage fetched",
+   "portal": "curl 200, title \"인하포털시스템\"",
+   "eclass": "found on school homepage link list (\"I-Class\") (direct fetch failed)",
+   "library": "curl 200, title \"인하대학교 정석학술정보관\""
+  }
+ },
+ "부산대학교": {
+  "home": "https://www.pusan.ac.kr",
+  "portal": "https://onestop.pusan.ac.kr",
+  "eclass": "https://plato.pusan.ac.kr",
+  "library": "https://lib.pusan.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"부산대학교\" (/kor/Main.do)",
+   "portal": "curl 200, title \"부산대학교 - 학생지원시스템\"",
+   "eclass": "curl 200, title \"홈 | PLATO\"; homepage \"스마트교육플랫폼 PLATO\"",
+   "library": "curl 200, title \"부산대학교 도서관\""
+  }
+ },
+ "가톨릭대학교": {
+  "home": "https://www.catholic.ac.kr",
+  "portal": "https://uportal.catholic.ac.kr",
+  "eclass": "https://e-cyber.catholic.ac.kr",
+  "library": "https://library.catholic.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"가톨릭대학교\"",
+   "portal": "curl 200, title \"TRINITY\"; homepage \"트리니티\"",
+   "eclass": "found on school homepage link list (\"사이버캠퍼스\") (direct fetch TLS legacy error)",
+   "library": "curl 200, title \"가톨릭대학교 중앙도서관 - 연구와 학문의 요람, 이용자 중심의 도서관\""
+  }
+ },
+ "한국항공대학교": {
+  "home": "https://www.kau.ac.kr",
+  "portal": "https://nportal.kau.ac.kr",
+  "eclass": "https://lms.kau.ac.kr",
+  "library": "https://lib.kau.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"한국항공대학교\"",
+   "portal": "curl 200, title \"한국항공대학교·종합정보시스템\" (login.html); homepage \"종합정보시스템\"",
+   "eclass": "curl 200, title \"KAU LMS\"",
+   "library": "curl 200, title \"항공대학교 도서관\"; homepage \"학술정보관(도서관)\""
+  }
+ },
+ "경기대학교": {
+  "home": "https://www.kyonggi.ac.kr",
+  "portal": "https://kutis.kyonggi.ac.kr/webkutis/view/indexWeb.jsp",
+  "eclass": "https://lms.kyonggi.ac.kr",
+  "library": "https://library.kyonggi.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"경기대학교\" (/www/index.do)",
+   "portal": "curl 200, title \"KUTIS 경기대학교 종합정보시스템\"; linked from homepage",
+   "eclass": "curl 200, title \"경기대학교 LMS\"",
+   "library": "curl 200, title \"경기대학교 도서관\""
+  }
+ },
+ "서울과학기술대학교": {
+  "home": "https://www.seoultech.ac.kr",
+  "portal": "https://for-a.seoultech.ac.kr/index-s.html",
+  "eclass": "https://eclass.seoultech.ac.kr",
+  "library": "https://library.seoultech.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"서울과학기술대학교\"",
+   "portal": "curl 200, title \"서울과학기술대학교 통합정보시스템\"; homepage \"통합정보(SUIS)\" (also 학생포탈 stportal.seoultech.ac.kr)",
+   "eclass": "curl 200, title \"LMS\"; homepage \"eClass\"",
+   "library": "curl 200, title \"서울과학기술대학교 도서관\""
+  }
+ },
+ "계명대학교": {
+  "home": "https://www.kmu.ac.kr",
+  "portal": "https://portal.kmu.ac.kr",
+  "library": "https://library.kmu.ac.kr",
+  "evidence": {
+   "home": "Firecrawl scrape title \"계명대학교\" (curl TLS-blocked)",
+   "portal": "found on school homepage link list (\"portal.kmu.ac.kr\") (Firecrawl scrape of homepage; direct fetch TLS-blocked)",
+   "library": "curl 200, title \"계명대학교 동산도서관\""
+  }
+ },
+ "서울교육대학교": {
+  "home": "https://www.snue.ac.kr",
+  "portal": "https://portal.snue.ac.kr/portal/lo/login/loginPage.do",
+  "eclass": "https://lms.snue.ac.kr",
+  "library": "https://lib.snue.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"서울교육대학교\" (/snue/main.do)",
+   "portal": "curl 200, title \"서울교육대학교 | 포털\"; linked from homepage",
+   "eclass": "curl 200, title \"서울교육대학교 e-CLASS\"",
+   "library": "curl 200, title \"서울교육대학교 도서관\""
+  }
+ },
+ "한국방송통신대학교": {
+  "home": "https://www.knou.ac.kr",
+  "eclass": "https://ucampus.knou.ac.kr",
+  "library": "https://library.knou.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"한국방송통신대학교\"",
+   "eclass": "curl 200, title \"U-KNOU캠퍼스\"; homepage \"U-KNOU캠퍼스\" (also the 학사 system)",
+   "library": "curl 200, title \"한국방송통신대학교 중앙도서관\""
+  }
+ },
+ "경북대학교": {
+  "home": "https://www.knu.ac.kr",
+  "portal": "https://knuin.knu.ac.kr",
+  "eclass": "https://lms1.knu.ac.kr",
+  "library": "https://kudos.knu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"경북대학교\"",
+   "portal": "found on school homepage link list (\"통합정보시스템\") (root returned HTTP 500 at check time; also 통합포털 on.knu.ac.kr)",
+   "eclass": "curl 200, title \"경북대학교 학습관리시스템\"",
+   "library": "curl 200, title \"경북대학교 도서관\""
+  }
+ },
+ "영남대학교": {
+  "home": "https://www.yu.ac.kr",
+  "portal": "https://portal.yu.ac.kr",
+  "eclass": "https://nice.yu.ac.kr/sso/ssocheck.php?ru=learningx",
+  "library": "https://libs.yu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"영남대학교\" (/main/index.do)",
+   "portal": "found on school homepage link list (\"포털\") (direct fetch reset)",
+   "eclass": "found on school homepage link list (\"강의포털\") (LearningX; old e-Class lms.yu.ac.kr replaced 2024)",
+   "library": "found on school homepage link list (\"도서관\") (direct fetch failed)"
+  }
+ },
+ "전북대학교": {
+  "home": "https://www.jbnu.ac.kr",
+  "portal": "https://oasis.jbnu.ac.kr",
+  "eclass": "https://lms.jbnu.ac.kr",
+  "library": "https://dl.jbnu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"전북대학교\" (/web/index.do)",
+   "portal": "curl 200, title \"전북대학교 통합정보시스템 오아시스3.0\"",
+   "eclass": "curl 200, title \"사이트에 로그인 | JBNU LXP\"; homepage \"LMS\"",
+   "library": "curl 200, title \"전북대학교 도서관\""
+  }
+ },
+ "충남대학교": {
+  "home": "https://plus.cnu.ac.kr",
+  "portal": "https://portal.cnu.ac.kr",
+  "eclass": "https://e-learn.cnu.ac.kr",
+  "library": "https://library.cnu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"충남대학교\" (/html/kr/)",
+   "portal": "curl 200, title \"충남대학교 포털시스템\"",
+   "eclass": "found on school homepage link list (\"사이버캠퍼스\"); redirects to dcs-lcms.cnu.ac.kr title \"대전충남세종권역 대학원격교육지원센터\"",
+   "library": "found on school homepage link list (\"디지털도서관\") (direct fetch reset)"
+  }
+ },
+ "전남대학교": {
+  "home": "https://www.jnu.ac.kr",
+  "portal": "https://portal.jnu.ac.kr",
+  "eclass": "https://sel.jnu.ac.kr",
+  "library": "https://lib.jnu.ac.kr",
+  "evidence": {
+   "home": "Firecrawl scrape title \"전남대학교에 오신 것을 환영합니다.\" (curl reset)",
+   "portal": "Firecrawl: redirects to sso.jnu.ac.kr title \"전남대학교 통합로그인\"; on homepage link list",
+   "eclass": "Firecrawl: og:title \"전남대학교 e-Class\"; on homepage link list",
+   "library": "Firecrawl scrape title \"전남대학교 중앙도서관\""
+  }
+ },
+ "조선대학교": {
+  "home": "https://www.chosun.ac.kr",
+  "portal": "https://p.chosun.ac.kr",
+  "eclass": "https://clc.chosun.ac.kr",
+  "library": "https://library.chosun.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"조선대학교\" (JS redirect to www3.chosun.ac.kr/chosun/index.do)",
+   "portal": "Firecrawl: redirects to sso.chosun.ac.kr, title \"조선대학교 포털시스템\"",
+   "eclass": "curl 200, title \"조선대학교\" -> /ilos; search title \"조선대학교 LMS\"",
+   "library": "curl 200, title \"조선대학교 중앙도서관\""
+  }
+ },
+ "충북대학교": {
+  "home": "https://www.chungbuk.ac.kr",
+  "portal": "https://eis.cbnu.ac.kr",
+  "eclass": "https://lms.chungbuk.ac.kr",
+  "library": "https://cbnul.chungbuk.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"충북대학교\" (/www/index.do)",
+   "portal": "curl 200, title \"충북대학교 - 개신누리\"",
+   "eclass": "found on school homepage link list (\"E-CAMPUS / eCampus\") (direct fetch failed)",
+   "library": "curl 200, title \"충북대학교 도서관\""
+  }
+ },
+ "부경대학교": {
+  "home": "https://www.pknu.ac.kr",
+  "portal": "https://portal.pknu.ac.kr",
+  "eclass": "https://lms.pknu.ac.kr",
+  "library": "https://libweb.pknu.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"국립부경대학교\"",
+   "portal": "curl 200, title \"국립부경대학교 포털시스템\"; homepage \"부경포털\"",
+   "eclass": "curl 200, title \"국립부경대학교 Smart-LMS\"",
+   "library": "found on school homepage link list (\"도서관\") (direct fetch reset)"
+  }
+ },
+ "강원대학교": {
+  "home": "https://www.kangwon.ac.kr",
+  "portal": "https://kcloud.kangwon.ac.kr",
+  "eclass": "https://eruri.kangwon.ac.kr",
+  "library": "https://library.kangwon.ac.kr",
+  "evidence": {
+   "home": "curl 200, title \"강원대학교\"",
+   "portal": "curl 200, title \"K-Cloud - 로그인\"; linked from official intro.kangwon.ac.kr (title \"강원대학교 통합 인트로\") as integrated portal (춘천·삼척); 강릉·원주 side uses gwportal.kangwon.ac.kr",
+   "eclass": "curl 200, title \"사이트에 로그인 | 강원대학교LXP\"; homepage \"스마트캠퍼스(e-루리)\"",
+   "library": "curl 200, title \"강원대학교 도서관\""
+  }
+ },
+ "성신여자대학교": {
+  "home": "https://www.sungshin.ac.kr",
+  "portal": "https://portal.sungshin.ac.kr",
+  "eclass": "https://slms.sungshin.ac.kr",
+  "library": "https://lib.sungshin.ac.kr",
+  "evidence": {
+   "home": "meta-refresh to /sites/main_kor/index.do; homepage fetched",
+   "portal": "curl 200, title \":: 성신여자대학교 포탈시스템::\"",
+   "eclass": "curl 200, title \"성신여자대학교LMS\"; homepage \"교육시스템\"",
+   "library": "curl 200, title \"성신여자대학교 중앙도서관\""
+  }
+ }
+}

@@ -1866,7 +1866,7 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
   eq('  빈칸을 찾은 파일에만 단추 — 없으면 자리를 숨긴다(칸을 지어내지 않는다)', /if \(!e\) \{ slot\.hidden = true; continue; \}/.test(ff), true);
   eq('  학적정보 자동 채움은 프로필 칸에서만 · 없는 key 는 빈 글자', /case 'studentId': return c\.studentId \|\| '';/.test(ff) && /default: return '';/.test(ff), true);
   eq('  칸은 쪽 크기에 대한 % 로 놓인다 · 글자 크기는 --ffpt(쪽마다 계산)', /ffPct\(f\.x, pg\.w\)/.test(ff) && /setProperty\('--ffpt'/.test(ff) && /--ffpt: 1px;/.test(css) && /calc\(var\(--ffpt\) \* 9\.5\)/.test(css), true);
-  eq('  화면이 showScreen 목록·안쪽 화면 목록에 있고 아래 탭을 숨긴다', /'perms', 'formfill'\]\.forEach/.test(app) && /'perms', 'formfill'\];/.test(app) && /name === 'onboarding' \|\| name === 'formfill'/.test(app), true);
+  eq('  화면이 showScreen 목록·안쪽 화면 목록에 있고 아래 탭을 숨긴다', /'perms', 'formfill'(, 'postreq')?(, 'adinq')?\]\.forEach/.test(app) && /'perms', 'formfill'(, 'postreq')?(, 'adinq')?\];/.test(app) && /name === 'onboarding' \|\| name === 'formfill'/.test(app), true);
   eq('  index.html 에 화면 틀이 있고 formfill.js 를 app.js 뒤에 싣는다 · 서비스워커가 미리 담는다',
     [/id="screen-formfill"/.test(html), html.indexOf('src="app.js"') < html.indexOf('src="formfill.js"'), /'formfill\.js'/.test(sw)], [true, true, true]);
   eq('  인쇄 CSS 는 쪽 그림만 남기고 쪽마다 넘긴다 (결정 4) · 화면 글자에 「신청 완료」가 없다(주석은 뺀다)',
@@ -10832,6 +10832,10 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       [/btn-apply-all/.test(h2), /function (?:renderBulkPrep|applyAll|bulkStart|bulkTargets)\(/.test(appSource()), /btn-apply-all|\.bulk-row|\.bulk-reqs/.test(css)], [false, false, false]);
     eq('  .hero-tiles 가 세로 여백을 갖는다 (파일 끝 블록에서)',
       /\.hero-tiles \{[^}]*margin: var\(--sp-3\)/.test(tail), true);
+    /* 2026-11-22 개발자 지시 "탭은 한 줄로 표시되는데, 옆으로 넘길 수 있게" — 칸이 열둘이라도 한 줄 · 옆으로 구른다 · 칸이 줄어들지 않는다 */
+    eq('  그림 칸은 한 줄로 옆으로 넘긴다 (flex · 가로 스크롤 · 칸 폭 고정 · 줄바꿈 없음)',
+      /\.hero-tiles \{[^}]*display: flex;[^}]*overflow-x: auto;/.test(tail) && !/\.hero-tiles \{[^}]*flex-wrap: wrap/.test(tail)
+      && /\.hero-tiles > \.hero-tile \{ flex: 0 0 /.test(tail), true);
     eq('  그림 칸 위아래에 구분선이 없다 (2026-10-01 CTO 지시)',
       /\.hero-tiles \{[^}]*border/.test(tail), false);
   }
@@ -10991,9 +10995,34 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const tiles = appSrc2.slice(appSrc2.indexOf('const HERO_TILES = ['), appSrc2.indexOf('];', appSrc2.indexOf('const HERO_TILES = [')));
     const gos = [...tiles.matchAll(/go: '([^']+)'/g)].map((m) => m[1]);
     /* 2026-10-10 팀 업무 분장 4번(은서) — 대외활동·공모전 칸을 더해 여섯 칸 · 칸은 작게 */
-    eq('히어로 그림 칸은 여섯 — 마감 임박 · 교내 · 교외 · 대외활동 · 공모전 · 신청 내역', gos, ['deadline', '교내', '교외', '대외활동', '공모전', 'applications']);
+    /* 2026-11-21 개발자 지시 — 게시 요청 · 학교 홈 · 종정시 · e-class · 도서관 다섯 칸을 더했다(학교 바로가기 넷은 주소를 확인한 학교만 그린다 · school-links.js) */
+    /* 같은 날 「광고 문의」 칸을 더했다가 2026-11-22 개발자 지시 "게시요청과 광고문의를 하나로 합치고"로 「게시·광고」 한 칸 — 화면 안 위 칸 둘(post-request.js renderInquiry) */
+    eq('히어로 그림 칸은 열하나 — 마감 임박 · 교내 · 교외 · 대외활동 · 공모전 · 신청 내역 · 게시·광고 · 학교 홈 · 종정시 · e-class · 도서관', gos,
+      ['deadline', '교내', '교외', '대외활동', '공모전', 'applications', 'postreq', 'link:home', 'link:portal', 'link:eclass', 'link:library']);
     eq('  그림은 SVG 다 (이모지 아님 — 폰마다 그림이 달라지지 않게)',
-      (tiles.match(/svg: '<svg /g) || []).length, 6);
+      (tiles.match(/svg: '<svg /g) || []).length, 11);
+    {
+      const ix = readText(new URL('../index.html', import.meta.url));
+      const scr = ix.slice(ix.indexOf('<section id="screen-postreq"'), ix.indexOf('</section>', ix.indexOf('<section id="screen-postreq"')));
+      eq('  게시 요청 · 광고 문의는 한 화면이다 — 위 칸 둘([게시 요청] [광고 문의]) · 두 몸통이 한 화면 안 · 광고 문의 화면은 따로 없다',
+        [/data-inq="post"[^>]*>게시 요청</.test(scr), /data-inq="ad"[^>]*>광고 문의</.test(scr), /id="postreq-body"/.test(scr), /id="adinq-body"/.test(scr),
+          /id="screen-adinq"/.test(ix), /function openAdInquiry\(\) \{ inqTab = 'ad'; showScreen\('postreq'\); \}/.test(readText(new URL('../ad-inquiry.js', import.meta.url)))],
+        [true, true, true, true, false, true]);
+    }
+    /* 광고 문의는 메일 앱을 열 뿐 — 앱이 '보냈다'고 말하지 않는다(운영 원칙 1) · 받는 주소는 support-config.js 하나 */
+    {
+      const adq = readText(new URL('../ad-inquiry.js', import.meta.url));
+      const AQ = createRequire(import.meta.url)('../ad-inquiry.js');
+      const m = AQ.adinqMail({ org: '가나재단', name: '홍길동', contact: '02-000-0000', kind: '', period: '', body: '배너 문의' });
+      eq('  광고 문의: 메일 앱을 열고(mailto · SUPPORT_CONFIG.email) 화면 글자에 「보냈어요·전송 완료」가 없다 · 빈 칸은 메일에 줄째 안 담는다',
+        [/const url = adinqMailto\(d\);[\s\S]{0,1800}if \(url\.length > ADINQ_MAILTO_MAX\)[\s\S]{0,1800}location\.href = url;/.test(adq), /mailto:\$\{encodeURIComponent\(SUPPORT_CONFIG\.email\)\}/.test(adq),
+          /보냈어요|전송 완료|접수 완료|접수되었/.test(adq.replace(/\/\*[\s\S]*?\*\//g, '')), /광고 종류|희망 기간/.test(m.body), /가나재단/.test(m.subject),
+          AQ.adinqMissing({ org: '가나재단', name: '홍길동', contact: '02', body: 'x' }) !== ''],
+        [true, true, false, false, true, true]);
+    }
+    eq('  학교 바로가기 칸은 주소가 있는 학교만 그린다 (지어낸 주소로 보내지 않는다) · 새 탭으로 연다',
+      /HERO_TILES\.filter\(\(t\) => !t\.link \|\| \(typeof schoolLinkFor === 'function' && schoolLinkFor\(state\.profile, t\.link\)\)\)/.test(appSrc2)
+      && /go\.startsWith\('link:'\)[\s\S]{0,300}window\.open\(url, '_blank', 'noopener'\)/.test(appSrc2), true);
     eq('  대외활동·공모전 칸은 그 종류 칩을 켠 채 대외활동 화면을 연다',
       /go === '대외활동' \|\| go === '공모전'[\s\S]{0,400}activitiesFilter = go;[\s\S]{0,300}showScreen\('activities'\)/.test(appSrc2), true);
     eq('  활동 목록이 아직 안 왔으면 0 이 아니라 배지를 숨긴다 (모름 ≠ 없음)',
@@ -11008,6 +11037,31 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       && /const soon = applyable\.filter/.test(home), true);
     eq('  칸을 누르면 간다 (장식으로 두지 않는다)',
       /\$\('#hero-tiles'\)\.addEventListener\('click'/.test(appSrc2), true);
+
+    /* 🔴 학교 바로가기 주소는 확인한 것만 (2026-11-21) — 표의 주소마다 확인 기록(docs/designs/school-links-evidence.json 의 같은 주소 + 확인 방법)이 있어야 한다.
+       확인 없이 한 줄 더 넣으면 여기서 막힌다(UI-20 SCHOOL_PORTALS 의 verifiedTitle 과 같은 뜻 · 흔히 떠올리는 주소가 없는 주소였던 적이 있다). */
+    const SL = createRequire(import.meta.url)('../school-links.js');
+    const EV = JSON.parse(readText(new URL('../docs/designs/school-links-evidence.json', import.meta.url)));
+    const servedNow = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
+    eq('학교 바로가기 표의 학교는 앱이 보여 주는 학교(SERVED_SCHOOLS)뿐이다',
+      Object.keys(SL.SCHOOL_LINKS).filter((s) => !servedNow.includes(s)), []);
+    const noProof = [];
+    for (const [s, row] of Object.entries(SL.SCHOOL_LINKS)) {
+      for (const [k, url] of Object.entries(row)) {
+        if (k === 'campus') continue;   // 캠퍼스 제한 칸(주소 아님) — 아래에서 따로 잰다
+        const ev = EV[s] || {};
+        if (!SL.SCHOOL_LINK_KINDS.includes(k) || !/^https:\/\//.test(url) || ev[k] !== url || !String((ev.evidence || {})[k] || '').trim()) noProof.push(`${s}.${k}`);
+      }
+    }
+    eq('  🔴 표의 주소마다 확인 기록이 있다 (같은 주소 · 확인 방법 · https · 아는 칸 넷뿐)', noProof, []);
+    eq('  캠퍼스마다 다른 칸은 그 캠퍼스 학생에게만 — 외대 도서관은 서울캠퍼스만(글로벌·캠퍼스 모름은 안 뜬다) · 제한 칸 이름은 그 학교 캠퍼스 목록에 있다',
+      [SL.schoolLinkFor({ school: '한국외국어대학교', campus: '서울캠퍼스' }, 'library') !== '', SL.schoolLinkFor({ school: '한국외국어대학교', campus: '글로벌캠퍼스(용인)' }, 'library'),
+        SL.schoolLinkFor({ school: '한국외국어대학교', campus: '' }, 'library'), SL.schoolLinkFor({ school: '한국외국어대학교', campus: '글로벌캠퍼스(용인)' }, 'home') !== '',
+        (() => { const dj = readText(new URL('../data.js', import.meta.url)); const cbs = dj.slice(dj.indexOf('const CAMPUSES_BY_SCHOOL = {'), dj.indexOf('};', dj.indexOf('const CAMPUSES_BY_SCHOOL = {')));
+          return Object.entries(SL.SCHOOL_LINKS).filter(([, r]) => r.campus).every(([sc, r]) => Object.values(r.campus).every((c) => cbs.split('\n').some((ln) => ln.includes(`'${sc}':`) && ln.includes(`'${c}'`)))); })()],
+      [true, '', '', true, true]);
+    eq('  표에 없는 학교·칸은 빈 주소 — 그 칸은 홈에 안 뜬다',
+      [SL.schoolLinkFor({ school: '없는대학교' }, 'home'), SL.schoolLinkFor({ school: '경희대학교' }, 'cafe'), SL.schoolLinkFor(null, 'home')], ['', '', '']);
   }
 
   /* 🔴 장학금 상세 시트 — 마감일·중복 수혜 · 문의 · 원문 링크는 맨 아래 한 묶음 (2026-10-02 CTO 지시).

@@ -4840,12 +4840,23 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 /* `.hero-sub`(금액과 버튼 사이 빨간 한 줄) 규칙은 그 줄을 뺀 2026-10-03 에 같이 걷었다 —
    요소도 index.html 에서 뺐다(app.js renderHome 주석에 경위). */
 .hero-tiles {
-  display: grid;
-  /* 6칸 (2026-10-10 은서 — 대외활동·공모전 칸을 더하고 칸을 줄였다). 375px 에서 칸 하나 ≈ 52px */
-  grid-template-columns: repeat(6, 1fr);
   margin: var(--sp-3) 0 var(--sp-2);
   /* 위아래 구분선 없음 (2026-10-01 CTO 지시) — 칸 사이는 여백만으로 가른다 */
+  /* 🔴 한 줄 · 옆으로 넘긴다 (2026-11-22 개발자 지시 "탭은 한 줄로 표시되는데, 옆으로 넘길 수 있게").
+     칸이 열둘로 늘어 두 줄이 됐던 것을 한 줄로 — 칸 폭은 예전 여섯 칸 때와 비슷하게 두고(화면에 5.5칸) 반 칸을 걸쳐 보여 '더 있다'를 알린다.
+     ⚠️ 가로로 굴리면 세로도 잘린다 — 숫자 배지(위로 5px·오른쪽으로 7px 삐져나온다)가 안 잘리게 위·오른쪽에 여백을 둔다.
+     문서는 굴러가지 않는다(#app 만) — 이건 이 줄 안에서만 옆으로 구르는 것이라 그 규칙과 부딪히지 않는다. */
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;          /* 끝까지 밀어도 브라우저 '뒤로 가기' 손짓으로 넘어가지 않게 */
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: var(--space-6) var(--space-8) var(--space-2) 0;
 }
+.hero-tiles::-webkit-scrollbar { display: none; }
+.hero-tiles > .hero-tile { flex: 0 0 18%; scroll-snap-align: start; }
 .hero-tile {
   display: flex;
   flex-direction: column;
@@ -5484,3 +5495,44 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
 .prep-record { border-top: 1px solid var(--line); padding-top: var(--sp-2); margin-bottom: var(--sp-2); }
 .prep-record .btn { width: 100%; }
 .prep-record .dp-note { margin-top: var(--space-8); }
+
+/* ── 게시 요청 — 기관 담당자 화면 (2026-11-21 · post-request.js) ── */
+#postreq-body { padding: 0 var(--sp-4) var(--sp-4); }
+.pr-wide { width: 100%; margin-top: var(--sp-2); }
+.pr-who { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2); font-size: var(--t-sm); color: var(--text-sub); margin: var(--sp-2) 0; }
+.pr-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-1); background: var(--surface-2); border-radius: var(--radius-pill); padding: var(--space-4); margin-bottom: var(--sp-3); }
+.pr-tab { border: 0; background: none; font: inherit; font-size: var(--t-sm); font-weight: 700; color: var(--text-sub); padding: var(--space-8) 0; border-radius: var(--radius-pill); cursor: pointer; }
+.pr-tab.active { background: var(--surface); color: var(--text); }
+.pr-form textarea, .pr-cm-form textarea, .pr-form input, .pr-login input, #pr-staff input { width: 100%; box-sizing: border-box; font: inherit; font-size: var(--t-input); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: var(--space-12); background: var(--surface); color: var(--text); }
+.pr-form textarea, .pr-cm-form textarea { resize: vertical; }
+.pr-kind { cursor: pointer; }
+.pr-list { display: flex; flex-direction: column; }
+.pr-item { display: flex; flex-direction: column; gap: var(--space-4); text-align: left; background: none; border: 0; border-top: 1px solid var(--rule); padding: var(--sp-3) 0; font: inherit; color: var(--text); cursor: pointer; }
+.pr-item:first-child { border-top: 0; }
+.pr-item-t { font-weight: 700; font-size: var(--t-md); }
+.pr-item-o, .pr-when { font-size: var(--t-xs); color: var(--text-weak); }
+.pr-head { display: flex; align-items: center; gap: var(--sp-2); }
+.pr-pill { font-size: var(--t-2xs); font-weight: 700; padding: var(--space-2) var(--space-8); border-radius: var(--radius-pill); background: var(--surface-2); color: var(--text-sub); }
+.pr-pill.pr-blue { background: var(--primary-weak); color: var(--primary); }
+.pr-pill.pr-orange { background: var(--orange-weak); color: var(--orange); }
+.pr-pill.pr-green { background: var(--green-weak); color: var(--green); }
+.pr-pill.pr-red { background: var(--red-weak); color: var(--red); }
+.pr-title { font-size: var(--t-lg); font-weight: 700; margin: var(--sp-2) 0 var(--space-4); }
+.pr-link { display: block; font-size: var(--t-xs); color: var(--primary); word-break: break-all; margin-bottom: var(--sp-2); }
+.pr-row { padding: var(--sp-2) 0; border-top: 1px solid var(--rule); }
+.pr-row span { font-size: var(--t-xs); color: var(--text-weak); }
+.pr-row p { margin: var(--space-2) 0 0; white-space: pre-wrap; }
+.pr-danger { color: var(--red); margin-top: var(--sp-2); }
+.pr-cms { display: flex; flex-direction: column; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+.pr-cm { background: var(--surface-2); border-radius: var(--radius-sm); padding: var(--sp-2) var(--sp-3); }
+.pr-cm-admin { background: var(--primary-weak); }
+.pr-cm b { font-size: var(--t-xs); }
+.pr-cm span { font-size: var(--t-2xs); color: var(--text-weak); margin-left: var(--sp-1); }
+.pr-cm p { margin: var(--space-4) 0 0; white-space: pre-wrap; font-size: var(--t-sm); }
+
+/* 게시 요청 · 광고 문의 한 화면의 위 칸 둘 (2026-11-22 · post-request.js renderInquiry).
+   게시 요청 안에 또 [게시 요청하기 · 게시물 관리] 알약 칸이 있어 — 위 칸은 알약이 아니라 밑줄 탭으로 모양을 갈라 둘이 겹쳐 보이지 않게 */
+.inq-tabs { display: grid; grid-template-columns: 1fr 1fr; margin: 0 var(--sp-4) var(--sp-3); border-bottom: 1px solid var(--rule); }
+.inq-tab { border: 0; background: none; font: inherit; font-size: var(--t-md); font-weight: 700; color: var(--text-weak); padding: var(--space-12) 0 var(--space-8); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+.inq-tab.active { color: var(--text); border-bottom-color: var(--text); }
+#adinq-body { padding: 0 var(--sp-4) var(--sp-4); }

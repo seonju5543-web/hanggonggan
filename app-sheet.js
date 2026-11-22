@@ -765,6 +765,7 @@ const SWIPE_BACK_TO = {
   faq: 'settings',
   support: 'settings',
   perms: 'settings',
+  postreq: 'home',   // 게시 요청 · 광고 문의 한 화면(2026-11-21 · 11-22 합침 · post-request.js) — 홈 그림 칸에서 들어온다
 };
 
 function enableScreenSwipeBack(root) {
@@ -1124,6 +1125,9 @@ function closeSheet() {
      ② 앱이 숨을 때 방금 지운 `sheet:{kind:'form'}` 을 다시 적어 다음에 켤 때 학생이
      닫은 신청서가 도로 열린다. 🔴 장부의 `form`(쓴 글)은 여기서 안 지운다 — 시트를 내린 것과
      쓴 글을 버리는 것은 다른 일이다. 지우는 곳은 `formProgressClear()` 하나뿐이다. */
+  /* 🔴 내리기 **전에** 쓰던 답을 한 번 적는다 (2026-11-21 개발자 지시 "양식을 작성하다가 공고를 나간 경우에 작성 내용이 저장"). 치는 동안의 저장은 0.7초 디바운스라,
+     치자마자 시트를 내리면 마지막 글자들이 타이머와 함께 버려졌다. formProgressSave 는 질문 칸이 실제로 떠 있을 때만 모으므로 빈 답으로 덮지 않는다 */
+  if (formFill && typeof formProgressSave === 'function') formProgressSave(true);
   formFill = null;
   clearTimeout(formSaveTimer);
   /* 이어보기 — 시트를 닫았으니 '열려 있던 시트'도 지운다.

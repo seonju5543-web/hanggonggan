@@ -89,6 +89,9 @@ function openFormFill(sch, file) {
   const { rel, F } = e;
   ffCur = { sch, file, rel, F, from: (typeof currentScreen !== 'undefined' && currentScreen) || 'applications' };
   if (typeof trackUse === 'function') trackUse('form_open', sch.id);   // 이용 횟수(usage-report.js)
+  /* 지금 화면에 띄운 양식 — 4시간 안에 다시 켜면 **이 양식**으로 돌아온다(리뷰 2026-11-21: 친 것만 적으면 앞서 쓴 다른 양식이 열렸다).
+     히어로 「이어서 쓰기」는 실제로 쓴 양식(fill · ffFlush)만 본다 — 열어 보기만 한 양식까지 '쓰던 것'이라 하지 않는다 */
+  if (typeof resumeSave === 'function') resumeSave({ fillOpen: { schId: sch.id, file, at: Date.now() } });
   const saved = ffSaved(sch, rel);
   const pagesHtml = F.pages.map((pg) => {
     const fields = F.fields.filter((f) => f.page === pg.n);
@@ -143,8 +146,37 @@ function ffSet(fid, value, fromEl) {
   if (typeof trackUse === 'function') trackUse('form_edit', ffCur.sch.id);   // 한 페이지에 한 번만 센다
   for (const el of $$(`[data-fid="${fid}"]`)) if (el !== fromEl && 'value' in el && el.tagName === 'INPUT') el.value = value;
   clearTimeout(ffSet.t);
-  ffSet.t = setTimeout(() => saveState(), 250);
+  ffSet.t = setTimeout(ffFlush, 250);
   ffRefresh();
+}
+/* 쓰던 칸 값을 지금 적는다 — 치는 동안은 0.25초 디바운스라, 뒤로 가기·앱 숨김(app.js visibilitychange·pagehide) 때 남은 것을 여기서 털어 낸다 (2026-11-21 개발자 지시 "공고를 나간 경우에 작성 내용이 저장").
+   이어보기 장부(resume.js)에는 **어느 공고·파일인가**만 적는다 — 칸 값은 이미 state.formFills 에 있다(같은 글을 두 곳에 두지 않는다). 히어로 「이어서 쓰기」가 이 기록으로 이 양식을 다시 연다 */
+function ffFlush() {
+  if (!ffSet.t) return;
+  clearTimeout(ffSet.t);
+  ffSet.t = null;
+  saveState();
+  if (ffCur && typeof resumeSave === 'function') resumeSave({ fill: { schId: ffCur.sch.id, file: ffCur.file, at: Date.now() } });
+}
+/* 이어보기 장부의 { schId, file } → 그 양식을 다시 연다. 공고·빈칸 자리를 못 찾으면 false(조용히 홈에 남는다) */
+function resumeOpenFill(fill) {
+  if (!fill || !fill.schId) return false;
+  const sch = typeof fillTargetFor === 'function' ? fillTargetFor(fill.schId)
+    : (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === fill.schId);
+  if (!sch) return false;
+  loadFormFields(sch).then((fj) => {
+    if (!ffFileEntry(fj, fill.file)) {
+      /* 그 양식을 더는 열 수 없다(마감 뒤 사본이 지워졌다 등) — 말없이 멈추지 않고 알린 뒤 기록을 지운다(다음부터 「이어서 쓰기」에 안 뜬다) */
+      if (typeof resumeSave === 'function') resumeSave({ fill: null, fillOpen: null });
+      if (typeof closeSheet === 'function' && typeof currentScreen !== 'undefined' && currentScreen !== 'formfill') closeSheet();
+      if (typeof toast === 'function') toast('이 양식은 이제 열 수 없어요');
+      if (typeof renderHome === 'function' && typeof currentScreen !== 'undefined' && currentScreen === 'home') renderHome();
+      return;
+    }
+    openFormFill(sch, fill.file);
+    if (typeof toast === 'function') toast('쓰던 양식을 그대로 불러왔어요');
+  });
+  return true;
 }
 function ffUndo(fid) {
   if (!ffCur) return;
@@ -187,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = ev.target;
     if (el && el.matches && el.matches('.fillp-field, .fill-pin')) ffSet(el.dataset.fid, el.value, el);
   });
-  $('#btn-fill-back').addEventListener('click', () => { const from = (ffCur && ffCur.from) || 'applications'; ffCur = null; showScreen(from === 'formfill' ? 'applications' : from, { back: true }); });
+  $('#btn-fill-back').addEventListener('click', () => { ffFlush(); const from = (ffCur && ffCur.from) || 'applications'; ffCur = null; showScreen(from === 'formfill' ? 'applications' : from, { back: true }); });
   $('#btn-fill-print').addEventListener('click', () => window.print());
   $('#fill-handle').addEventListener('click', () => $('#fill-panel').classList.toggle('open'));
   if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => ffScale()).observe($('#fill-pages'));

@@ -31,10 +31,14 @@ const PROFILE = {
   await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
   const ctx = await browser.newContext({ viewport: { width: 390, height: 900 }, hasTouch: true });
-  const page = await ctx.newPage();
+  let page = await ctx.newPage();
   const errors = [];
-  page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-  page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
+  /* 오류 듣기는 탭마다 — ⑤ 에서 새 탭으로 다시 켤 때도 같은 것을 단다(빠지면 「콘솔 오류 없음」이 새 탭을 못 본다) */
+  const watch = (pg) => {
+    pg.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+    pg.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
+  };
+  watch(page);
   await page.addInitScript((p) => {
     localStorage.setItem('handaejang.v1', JSON.stringify({ profile: p, applications: [] }));
     localStorage.removeItem('handaejang.resume');
@@ -161,6 +165,44 @@ const PROFILE = {
   await page.click('#btn-fill-back');
   await page.waitForTimeout(400);
   eq('뒤로 가면 양식 화면이 닫히고 아래 탭이 돌아온다', await page.evaluate(() => [document.querySelector('#screen-formfill').hidden, document.querySelector('#bottom-nav').hidden]), [true, false]);
+
+  console.log('\n■ ⑤ 쓰다가 나가도 남고 「이어서 쓰기」로 그대로 돌아온다 (2026-11-21 개발자 지시)');
+  /* 🔴 치자마자(디바운스 0.25초 안) 뒤로 가도 남는가 — 고친 것을 되돌리면(ffFlush 를 뒤로 가기에서 빼면) 빨개진다 */
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.click(`.fill-slot[data-file$="${target.rel}"] .fill-open`).catch(() => {});
+  if (await page.$('#screen-formfill[hidden]')) await page.evaluate(([id, rel]) => { const sch = fillTargetFor(id); return loadFormFields(sch).then(() => openFormFill(sch, `${id}/${rel}`)); }, [target.id, target.rel]);
+  await page.waitForSelector('#screen-formfill:not([hidden])', { timeout: 4000 });
+  /* 치기와 나가기를 한 순간에 — 디바운스(0.25초) 안에 나간다. 따로 누르면 그 사이 타이머가 먼저 돌아 고친 것이 빠져도 초록이다(red-green 으로 확인) */
+  await page.evaluate((fid) => {
+    resumeSave({ fill: null, fillOpen: null });   // 앞 단계가 남긴 기록을 비운다 — 아래 「장부에 적힌다」가 이 나가기의 저장만 재게(리뷰 2026-11-21)
+    const el = document.querySelector(`#fill-pages .fillp-field[data-fid="${fid}"]`);
+    el.value = '이어쓸값';
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('#btn-fill-back').click();
+  }, fid);
+  const kept = await page.evaluate((fid) => ({
+    saved: Object.values(JSON.parse(localStorage.getItem('handaejang.v1')).formFills || {}).some((f) => f[fid] === '이어쓸값'),
+    fill: (JSON.parse(localStorage.getItem('handaejang.resume') || '{}').fill || {}).schId || null,
+  }), fid);
+  eq('치자마자 뒤로 가도 쓴 값이 기기 장부에 남는다', kept.saved, true);
+  eq('  이어보기 장부에 그 양식(공고)이 적힌다', kept.fill, target.id);
+  /* 다시 켜기 = 같은 브라우저의 새 탭(기기 저장소는 같다) — 첫 탭의 시작 준비(프로필 심기·장부 비우기)는 그 탭에만 걸려 있어 새 탭에서는 안 돈다 */
+  const page1 = page;
+  page = await ctx.newPage();
+  watch(page);
+  await page1.close();
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });
+  await dismissNotify(page);
+  await page.waitForTimeout(1500);
+  eq('다시 켜면 홈 히어로에 「이어서 쓰기」 줄이 있다', await page.evaluate(() => !document.querySelector('#hero-lines [data-k="draft"]').hidden), true);
+  await page.evaluate(() => openHeroLine('draft'));
+  await page.waitForSelector('#btn-hero-draft', { timeout: 4000 });
+  await page.click('#btn-hero-draft');
+  await page.waitForSelector('#screen-formfill:not([hidden])', { timeout: 6000 });
+  await page.waitForTimeout(500);
+  eq('  「이어서 쓰기」를 누르면 그 양식이 쓴 값 그대로 열린다', await page.$eval(`#fill-pages .fillp-field[data-fid="${fid}"]`, (e) => e.value), '이어쓸값');
+  await page.click('#btn-fill-back');
 
   eq('콘솔 오류 없음', errors, []);
   await browser.close();

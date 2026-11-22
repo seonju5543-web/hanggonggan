@@ -764,6 +764,25 @@
       <div id="support-body"></div>
     </section>
 
+    <!-- ============ 게시 요청 · 광고 문의 — 한 화면 (2026-11-22 개발자 지시 "게시요청과 광고문의를 하나로 합치고") ============
+         위 칸 둘: [게시 요청] = 기관 담당자 로그인·게시 요청하기·게시물 관리(post-request.js · 권한 supabase/migrations/0008_post_requests.sql)
+                   [광고 문의] = 적은 내용을 담아 메일 앱을 연다(ad-inquiry.js · 앱이 대신 보내지 않는다)
+         어느 칸을 보일지는 post-request.js renderInquiry 한 곳 -->
+    <section id="screen-postreq" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-postreq-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>게시 요청 · 광고 문의</h2>
+      </header>
+      <div class="inq-tabs" id="inq-tabs" role="tablist">
+        <button type="button" role="tab" class="inq-tab active" data-inq="post" aria-selected="true">게시 요청</button>
+        <button type="button" role="tab" class="inq-tab" data-inq="ad" aria-selected="false">광고 문의</button>
+      </div>
+      <div id="postreq-body"></div>
+      <div id="adinq-body" hidden></div>
+    </section>
+
     <!-- ============ 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ============ -->
     <section id="screen-perms" class="screen" hidden>
       <header class="sub-header sub-header-stick">
@@ -957,6 +976,7 @@
   <script src="app-applications.js"></script>   <!-- 신청 내역 화면 — app.js 보다 먼저 -->
   <script src="app-my.js"></script>   <!-- MY 화면(보관함·설정·자주 묻는 질문·고객센터·약관·휴지통) — app.js 보다 먼저 -->
   <script src="app-sheet.js"></script>   <!-- 상세 시트(공고 상세·자격 묻기·시트 되돌아가기) — app.js 보다 먼저 -->
+  <script src="school-links.js"></script>   <!-- 학교 바로가기(학교 홈·종합정보시스템·e-class·도서관) 주소 표 — 홈 그림 칸이 쓴다 -->
   <script src="app-live.js"></script>   <!-- 실시간 공고 구역(공고 파일 받기·학과·등록금·원문 링크·층2·학교 사진) — app.js 보다 먼저 -->
   <script src="app-events.js"></script>   <!-- 이벤트 연결(버튼·화면 전환·입력 묶기) — app.js 보다 먼저 -->
   <script src="app-prep.js"></script>   <!-- 신청 준비(일괄 준비·신청 준비 시트·제출처 안내) — app.js 보다 먼저 -->
@@ -966,6 +986,8 @@
   <script src="app.js"></script>
   <script src="formfill.js"></script>   <!-- 양식 채우기 — app.js 의 전역을 쓴다(뒤에 싣는다) -->
   <script src="pdf-view.js"></script>   <!-- PDF 보기 — 설치한 앱에서 앱 안 PDF 를 열면 뒤로 단추가 있는 판으로(엔진 pdfjs/ 는 처음 열 때 싣는다) -->
+  <script src="post-request.js"></script>   <!-- 게시 요청(기관 담당자 로그인·게시물 관리) — app.js·supabase-client.js 의 전역을 쓴다 -->
+  <script src="ad-inquiry.js"></script>   <!-- 광고 문의(메일 앱으로) — app.js·support-config.js 의 전역을 쓴다 -->
   <script src="essay-config.js"></script>
   <script src="essay-quality.js"></script>
   <!-- 제출 전 점검표 판정 — essay.js 가 전역으로 참조하므로 먼저 실어야 한다 -->
