@@ -21,12 +21,12 @@
   "tries": 2
  },
  "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/790?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=991": {
   "at": "2026-11-22",
@@ -183,6 +183,34 @@
   "at": "2026-11-21",
   "tries": 1,
   "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546101": {
+  "at": "2026-11-22",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인",
+   "[중증장애인거주시설 사랑울타리]산책 프로그램 자원봉사자 모집"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3515772": {
+  "at": "2026-11-22",
+  "tries": 1,
+  "lines": [
+   "아동·청소년",
+   "활동구분",
+   "오프라인",
+   "- 초등학생 기초학습 지도",
+   "- 프로그램 보조",
+   "[봉사장소 지도] 지도 건너뛰기",
+   "봉사활동 장소[1] 주소 : 충청남도 아산시 신창면 남성길 99(샘마을아파트) 상가동 3층",
+   "충청남도 아산시 신창면 남성길 99 샘마을 아파트 상가 3층",
+   "이전 봉사참여",
    "봉사자유형 : 성인"
   ],
   "excludes": [],
