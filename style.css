@@ -1976,6 +1976,13 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .acc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .acc-actions .btn { flex: 1; min-width: 120px; }
 .acc-actions .btn.danger { color: var(--red); border-color: rgba(224, 80, 62, 0.35); }
+/* 로그인한 판의 로그아웃 — 작은 빨간 글자 하나(테두리·바탕 없음 · 2026-11-21 개발자 지시). 보이는 글자는 작아도 누르는 넓이는 44px(위아래 여백은 음수로 거둬 판이 커지지 않게) · 누르면 글자색만 짙어진다 */
+.acc-out {
+  display: inline-flex; align-items: center; min-height: 44px; margin: calc(var(--sp-1) * -1) 0 calc(var(--sp-2) * -1); padding: 0;
+  font-size: var(--t-sm); font-weight: 650; color: var(--red);
+  background: none; border: 0; cursor: pointer; transition: opacity var(--dur) var(--ease);
+}
+.acc-out:hover, .acc-out:active { opacity: 0.72; }   /* 새 색을 들이지 않는다(팔레트 밖 색 톱니) — 같은 빨강을 옅게 */
 
 /* 동의 줄 — 온보딩 특별자격 아래, 가입 시트 안. 기존 .check-item 위에 얹는다 */
 .consent-item {

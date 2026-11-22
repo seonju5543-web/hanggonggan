@@ -18488,7 +18488,33 @@ console.log('■ 로그인 판 — 소셜 로그인도 로그인 상태로 보�
   eq('  번호가 빈 채 저장된 기기(이미 그 사고를 겪은 기기)도 다시 로그인하지 않고 로그인 상태로 보인다', stuck, { userId: 'u-9', email: 'b@x.kr' });
   eq('  토큰 꼴이 아니면 로그인 아님(넘어지지 않는다)', broken, null);
   eq('  로그아웃 없이 다른 계정으로 로그인하면 새 사람 — 앞사람 번호가 남지 않는다', switched, { userId: 'new', email: 'new@x.kr' });
-  eq('  MY 계정 카드는 authUser() 하나로 로그아웃/로그인을 가른다(다른 판정을 새로 만들지 않는다)', /const u = authUser\(\);\s*el\.innerHTML = u\s*\?[\s\S]{0,200}?id="btn-acc-out"/.test(readText(new URL('../app-account.js', import.meta.url))), true);
+  const accSrc = readText(new URL('../app-account.js', import.meta.url));
+  const cardFn = (accSrc.match(/^function renderAccountCard\(\) \{[\s\S]*?^\}/m) || [''])[0];
+  const signedInHtml = (cardFn.match(/el\.innerHTML = u[\s\S]*?\?\s*`([\s\S]*?)`\s*:/) || [, ''])[1];
+  eq('  MY 계정 카드는 authUser() 하나로 로그아웃/로그인을 가른다(다른 판정을 새로 만들지 않는다)', /const u = authUser\(\);\s*el\.innerHTML = u\b/.test(cardFn) && /id="btn-acc-out"/.test(signedInHtml), true);
+  /* 2026-11-21 개발자 지시 — 로그인한 판: 계정 · 그 아래 메일 · 그 아래 작은 빨간 글자 로그아웃(테두리 없음) · 탈퇴는 설정 화면 한 곳 */
+  eq('  로그인한 판 = 계정 → 메일 → 글자 버튼 「로그아웃」 차례 · 탈퇴 버튼 없음(설정 화면 #btn-withdraw 에만) · 테두리 버튼(btn) 아님',
+    [/<p class="acc-head">계정<\/p>\s*<p class="acc-mail">[^<]*<\/p>\s*<button type="button" class="acc-out" id="btn-acc-out">로그아웃<\/button>\s*$/.test(signedInHtml), /탈퇴|btn-acc-del/.test(signedInHtml) || /btn-acc-del/.test(cardFn), (signedInHtml.match(/<button[^>]*\bclass="([^"]*)"/) || [, ''])[1].split(/\s+/).includes('btn'),
+      /id="btn-withdraw"/.test(readText(new URL('../index.html', import.meta.url)))], [true, false, false, true]);
+  const css = readText(new URL('../style.css', import.meta.url));
+  const outRule = (css.match(/\n\.acc-out \{([^}]*)\}/) || [, ''])[1];
+  eq('  로그아웃 글자 버튼 모양 — 빨강 · 작은 글씨 · 바탕·테두리 없음 · 누르는 넓이 44px', [/color: var\(--red\)/.test(outRule), /font-size: var\(--t-sm\)/.test(outRule), /background: none/.test(outRule) && /border: 0/.test(outRule), /min-height: 44px/.test(outRule)], [true, true, true, true]);
+  /* 로그아웃은 서버 답을 기다리지 않는다 — 부르는 순간 이 기기 로그인이 지워지고(첫 await 앞) 카드는 바로 다시 그린다 */
+  {
+    const store2 = {};
+    let sent = null;
+    const c2 = { localStorage: { getItem: (k) => (k in store2 ? store2[k] : null), setItem: (k, v) => { store2[k] = String(v); }, removeItem: (k) => { delete store2[k]; } },
+      SUPABASE_CONFIG: { url: 'https://x.supabase.co', anonKey: 'k', timeoutMs: 8000 }, atob, TextDecoder, Uint8Array, console, setTimeout, clearTimeout, location: { hash: '', pathname: '/', search: '' }, navigator: {}, window: {},
+      fetch: (url, o) => { sent = { url: String(url), auth: o && o.headers && o.headers.Authorization }; return new Promise(() => {}); } };   // 서버는 영영 답하지 않는다
+    vm.createContext(c2);
+    vm.runInContext(readText(new URL('../supabase-client.js', import.meta.url)), c2, { filename: 'supabase-client.js' });
+    const tok = jwt({ sub: 'u-1', email: 'a@x.kr' });
+    c2.localStorage.setItem('handaejang.auth', JSON.stringify({ accessToken: tok, refreshToken: 'r', expiresAt: Date.now() + 3e6, userId: 'u-1', email: 'a@x.kr' }));
+    c2.authSignOut();   // 기다리지 않는다
+    eq('  로그아웃 — 서버가 답하지 않아도 부르는 순간 이 기기는 로그아웃(authUser null) · 서버에는 들고 있던 토큰으로 알린다',
+      [c2.authUser(), !!sent && /\/auth\/v1\/logout$/.test(sent.url), sent && sent.auth], [null, true, 'Bearer ' + tok]);
+    eq('  카드의 로그아웃 단추는 기다리지 않고 바로 다시 그린다(await 없음)', /btnOut\.addEventListener\('click', \(\) => \{\s*authSignOut\(\);[\s\S]{0,120}?renderMy\(\);/.test(cardFn), true);
+  }
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

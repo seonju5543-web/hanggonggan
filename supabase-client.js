@@ -409,10 +409,16 @@ async function authCaptureFromUrl() {
   return kind;
 }
 
+/* 🔴 **이 기기에서 먼저 지우고, 서버에는 그 뒤에 알린다** (2026-11-21 개발자 확인 요청 "로그아웃 누르면 바로 로그인 박스로 바뀌는지").
+   예전엔 서버 답(최대 8초 · 401 이면 갱신까지 한 번 더)을 기다린 **뒤에** 지워서, 느린 망에선 눌러도 몇 초간 아무 일도 없었다(실측: 서버 6초 → 6.5초 뒤에야 바뀜).
+   지우는 줄은 첫 await 앞이라 부르는 순간 끝난다 — 부른 쪽이 기다리지 않고 바로 다시 그려도 로그인 박스가 나온다.
+   서버 알림은 들고 있던 토큰으로 직접 보낸다(sbAuthed 는 이미 지운 저장분을 읽고, 실패하면 갱신을 시도하므로 쓰지 않는다) · 실패해도 이 기기는 로그아웃이다 */
 async function authSignOut() {
   const t = authLoad();
-  if (t) await sbAuthed('/auth/v1/logout', { method: 'POST' });
   authClear();
+  if (t && t.accessToken) {
+    try { await sbFetch('/auth/v1/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + t.accessToken } }); } catch { /* 이 기기는 이미 로그아웃 */ }
+  }
 }
 
 /* 탈퇴 — 방침에 "탈퇴하면 지웁니다"라고 적는 이상 실제로 지울 수 있어야 한다.
