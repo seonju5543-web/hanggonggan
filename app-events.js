@@ -194,7 +194,6 @@ function bindEvents() {
     const go = t.dataset.heroGo;
     if (go === 'applications') { showScreen('applications'); return; }
     if (go === 'postreq') { if (typeof openPostReq === 'function') openPostReq(); return; }
-    if (go === 'adinq') { if (typeof openAdInquiry === 'function') openAdInquiry(); return; }
     if (go.startsWith('link:')) {
       /* 학교 사이트는 새 탭으로 — 로그인은 학생이 그 사이트에서 직접 한다(운영 원칙 9 · 우리는 주소만 넘긴다) */
       const url = typeof schoolLinkFor === 'function' && schoolLinkFor(state.profile, go.slice(5));

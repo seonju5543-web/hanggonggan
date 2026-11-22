@@ -303,9 +303,26 @@ function prShowErr(msg) {
   const e = $('#pr-err');
   if (e) { e.textContent = pr.err; e.hidden = !pr.err; }
 }
+/* ── 한 화면 두 칸 (2026-11-22 개발자 지시 "게시요청과 광고문의를 하나로 합치고") ──
+   [게시 요청] = 이 파일 · [광고 문의] = ad-inquiry.js. 어느 칸인가는 inqTab 하나 — 그리는 함수는 각 파일 그대로다 */
+let inqTab = 'post';
+function renderInquiry() {
+  const ad = inqTab === 'ad';
+  for (const b of document.querySelectorAll('#inq-tabs .inq-tab')) {
+    const on = b.dataset.inq === inqTab;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', String(on));
+  }
+  const post = $('#postreq-body'), adb = $('#adinq-body');
+  if (post) post.hidden = ad;
+  if (adb) adb.hidden = !ad;
+  if (ad) { if (typeof renderAdInquiry === 'function') renderAdInquiry(); }
+  else renderPostReq();
+}
 function openPostReq() {
   pr.err = ''; pr.edit = false;
   if (staffSignedIn()) pr.staff = undefined;   // 들어올 때마다 서버에서 새로 받는다(운영자가 바꾼 상태·댓글)
+  inqTab = 'post';
   showScreen('postreq');
 }
 
@@ -315,6 +332,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!root) return;
   const back = $('#btn-postreq-back');
   if (back) back.addEventListener('click', () => showScreen('home', { back: true }));
+  const tabs = $('#inq-tabs');
+  if (tabs) tabs.addEventListener('click', (ev) => {
+    const t = ev.target.closest('.inq-tab');
+    if (!t || t.dataset.inq === inqTab) return;
+    inqTab = t.dataset.inq === 'ad' ? 'ad' : 'post';
+    renderInquiry();
+    appScrollTo(0);
+  });
   /* 가입 확인 링크로 돌아왔으면 담당자로 들어온 채 게시 요청 화면을 연다(첫 화면이 다 그려진 뒤) */
   if (staffCaptureFromUrl()) setTimeout(() => { prResetAccount(); openPostReq(); toast('담당자 가입을 확인했어요'); }, 1200);
 

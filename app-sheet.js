@@ -739,8 +739,7 @@ const SWIPE_BACK_TO = {
   faq: 'settings',
   support: 'settings',
   perms: 'settings',
-  postreq: 'home',   // 게시 요청(2026-11-21 · post-request.js) — 홈 그림 칸에서 들어온다
-  adinq: 'home',     // 광고 문의(2026-11-21 · ad-inquiry.js) — 홈 그림 칸에서 들어온다
+  postreq: 'home',   // 게시 요청 · 광고 문의 한 화면(2026-11-21 · 11-22 합침 · post-request.js) — 홈 그림 칸에서 들어온다
 };
 
 function enableScreenSwipeBack(root) {

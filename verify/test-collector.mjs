@@ -10952,11 +10952,19 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const gos = [...tiles.matchAll(/go: '([^']+)'/g)].map((m) => m[1]);
     /* 2026-10-10 팀 업무 분장 4번(은서) — 대외활동·공모전 칸을 더해 여섯 칸 · 칸은 작게 */
     /* 2026-11-21 개발자 지시 — 게시 요청 · 학교 홈 · 종정시 · e-class · 도서관 다섯 칸을 더했다(학교 바로가기 넷은 주소를 확인한 학교만 그린다 · school-links.js) */
-    /* 같은 날 「광고 문의」 칸을 더해 열둘(두 줄이 꽉 찬다 · ad-inquiry.js) */
-    eq('히어로 그림 칸은 열둘 — 마감 임박 · 교내 · 교외 · 대외활동 · 공모전 · 신청 내역 · 게시 요청 · 광고 문의 · 학교 홈 · 종정시 · e-class · 도서관', gos,
-      ['deadline', '교내', '교외', '대외활동', '공모전', 'applications', 'postreq', 'adinq', 'link:home', 'link:portal', 'link:eclass', 'link:library']);
+    /* 같은 날 「광고 문의」 칸을 더했다가 2026-11-22 개발자 지시 "게시요청과 광고문의를 하나로 합치고"로 「게시·광고」 한 칸 — 화면 안 위 칸 둘(post-request.js renderInquiry) */
+    eq('히어로 그림 칸은 열하나 — 마감 임박 · 교내 · 교외 · 대외활동 · 공모전 · 신청 내역 · 게시·광고 · 학교 홈 · 종정시 · e-class · 도서관', gos,
+      ['deadline', '교내', '교외', '대외활동', '공모전', 'applications', 'postreq', 'link:home', 'link:portal', 'link:eclass', 'link:library']);
     eq('  그림은 SVG 다 (이모지 아님 — 폰마다 그림이 달라지지 않게)',
-      (tiles.match(/svg: '<svg /g) || []).length, 12);
+      (tiles.match(/svg: '<svg /g) || []).length, 11);
+    {
+      const ix = readText(new URL('../index.html', import.meta.url));
+      const scr = ix.slice(ix.indexOf('<section id="screen-postreq"'), ix.indexOf('</section>', ix.indexOf('<section id="screen-postreq"')));
+      eq('  게시 요청 · 광고 문의는 한 화면이다 — 위 칸 둘([게시 요청] [광고 문의]) · 두 몸통이 한 화면 안 · 광고 문의 화면은 따로 없다',
+        [/data-inq="post"[^>]*>게시 요청</.test(scr), /data-inq="ad"[^>]*>광고 문의</.test(scr), /id="postreq-body"/.test(scr), /id="adinq-body"/.test(scr),
+          /id="screen-adinq"/.test(ix), /function openAdInquiry\(\) \{ inqTab = 'ad'; showScreen\('postreq'\); \}/.test(readText(new URL('../ad-inquiry.js', import.meta.url)))],
+        [true, true, true, true, false, true]);
+    }
     /* 광고 문의는 메일 앱을 열 뿐 — 앱이 '보냈다'고 말하지 않는다(운영 원칙 1) · 받는 주소는 support-config.js 하나 */
     {
       const adq = readText(new URL('../ad-inquiry.js', import.meta.url));

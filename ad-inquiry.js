@@ -1,5 +1,6 @@
 /* ============================================================
-   광고 문의 — 홈 그림 칸 「광고 문의」 → #screen-adinq (2026-11-21 개발자 지시 "광고 문의 탭도 함께 추가해줘")
+   광고 문의 — 홈 그림 칸 「게시·광고」 화면의 [광고 문의] 칸(#adinq-body) (2026-11-21 개발자 지시 "광고 문의 탭도 함께 추가해줘" ·
+   2026-11-22 "게시요청과 광고문의를 하나로 합치고" — 화면 틀·칸 바꾸기는 post-request.js renderInquiry)
    ------------------------------------------------------------
    누가 — 한대장에 광고·제휴를 하고 싶은 회사·기관.
    🔴 앱이 대신 보내지 않는다 — 적은 내용을 담아 **메일 앱을 연다**(mailto). 보내기는 문의하는 사람이 직접 누른다
@@ -85,14 +86,13 @@ function renderAdInquiry() {
     </div>`;
 }
 
-function openAdInquiry() { showScreen('adinq'); }
+/* 게시 요청과 한 화면이다(2026-11-22) — 광고 문의 칸을 켠 채로 연다 */
+function openAdInquiry() { inqTab = 'ad'; showScreen('postreq'); }
 
 /* 브라우저에서만 — 관문(test-collector)이 Node 에서 이 파일의 순수 함수(adinqMissing·adinqMail)를 불러 쓴다 */
 if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', () => {
   const root = $('#adinq-body');
   if (!root) return;
-  const back = $('#btn-adinq-back');
-  if (back) back.addEventListener('click', () => showScreen('home', { back: true }));
   const err = (m) => { const e = $('#adinq-err'); if (e) { e.textContent = m || ''; e.hidden = !m; } };
 
   /* 치는 대로 이 기기에 적어 둔다 — 쓰다 나가도(앱을 내려도) 남는다 */

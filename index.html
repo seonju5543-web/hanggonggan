@@ -764,28 +764,23 @@
       <div id="support-body"></div>
     </section>
 
-    <!-- ============ 게시 요청 — 기관 담당자 전용 (2026-11-21 개발자 지시 · post-request.js) ============
-         담당자 로그인은 학생 로그인과 따로다 · 「게시 요청하기」「게시물 관리」(요청 현황·정보 수정·댓글) · 권한은 supabase/migrations/0008_post_requests.sql -->
+    <!-- ============ 게시 요청 · 광고 문의 — 한 화면 (2026-11-22 개발자 지시 "게시요청과 광고문의를 하나로 합치고") ============
+         위 칸 둘: [게시 요청] = 기관 담당자 로그인·게시 요청하기·게시물 관리(post-request.js · 권한 supabase/migrations/0008_post_requests.sql)
+                   [광고 문의] = 적은 내용을 담아 메일 앱을 연다(ad-inquiry.js · 앱이 대신 보내지 않는다)
+         어느 칸을 보일지는 post-request.js renderInquiry 한 곳 -->
     <section id="screen-postreq" class="screen" hidden>
       <header class="sub-header sub-header-stick">
         <button class="sub-back" id="btn-postreq-back" aria-label="뒤로">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
         </button>
-        <h2>게시 요청</h2>
+        <h2>게시 요청 · 광고 문의</h2>
       </header>
+      <div class="inq-tabs" id="inq-tabs" role="tablist">
+        <button type="button" role="tab" class="inq-tab active" data-inq="post" aria-selected="true">게시 요청</button>
+        <button type="button" role="tab" class="inq-tab" data-inq="ad" aria-selected="false">광고 문의</button>
+      </div>
       <div id="postreq-body"></div>
-    </section>
-
-    <!-- ============ 광고 문의 (2026-11-21 개발자 지시 · ad-inquiry.js) ============
-         적은 내용을 담아 메일 앱을 연다(앱이 대신 보내지 않는다) · 받는 주소는 support-config.js 하나 -->
-    <section id="screen-adinq" class="screen" hidden>
-      <header class="sub-header sub-header-stick">
-        <button class="sub-back" id="btn-adinq-back" aria-label="뒤로">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
-        </button>
-        <h2>광고 문의</h2>
-      </header>
-      <div id="adinq-body"></div>
+      <div id="adinq-body" hidden></div>
     </section>
 
     <!-- ============ 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ============ -->
