@@ -7,7 +7,7 @@
 <!-- 2026-11-22 · 개발자 지시 "대학교 별로 학교 주변지도 기능 … 신입생을 위한 … 직접 만들어서 시안 제시해볼래?"
      시범 학교 = 서울과학기술대학교. 지도 위 장소·개수는 전부 실제 데이터(OpenStreetMap 11-22 · 서울 열린데이터광장)이고,
      못 구한 데이터는 점선 상자(연결 예정)로만 그렸다. 앱 부품 모양은 app-parts.css(앱 실효값 사본)를 그대로 쓴다.
-     지도 그리기는 vendor/leaflet.js(저장소 사본) — 바깥 스크립트를 불러오지 않는다. -->
+     지도 그리기는 vendor/leaflet.js(저장소 사본) — 바깥 스크립트를 불러오지 않는다. 검토 셋(디자인·사실·문구) 반영판. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="vendor/leaflet.css">
 <link rel="stylesheet" href="tokens.css">
@@ -26,15 +26,11 @@
       지도 위 장소 이름·개수는 <b>지어낸 것이 없습니다</b>: OpenStreetMap(11-22 받음)과 서울 열린데이터광장 파일에서 가져왔고,
       못 구한 데이터는 점선 상자로 자리만 그렸습니다. 지도는 끌어서 움직여 볼 수 있습니다.
     </p>
-    <div class="legend" aria-label="겹 색">
-      <span><i style="background:var(--m-campus)"></i>학교 안</span>
-      <span><i style="background:var(--m-study)"></i>카공</span>
-      <span><i style="background:var(--m-life)"></i>생활</span>
-      <span><i style="background:var(--m-safety)"></i>안전</span>
-      <span><i style="background:var(--m-transit)"></i>교통</span>
-      <span><i style="background:var(--m-benefit)"></i>혜택</span>
-      <span><i style="background:var(--m-docs)"></i>서류 떼는 곳</span>
-      <span><i class="lg-plan"></i>점선 상자 = 연결 예정(지금 데이터 없음)</span>
+    <div class="legend" aria-label="지도 읽는 법">
+      <span><i class="lg-pin" data-icon="library" data-size="13"></i>핀 — 고른 겹의 장소(그림으로 갈래)</span>
+      <span><i class="lg-sel"></i>테두리 — 지금 고른 곳</span>
+      <span><i class="lg-dot"></i>회색 점 — 그 밖의 곳</span>
+      <span><i class="lg-plan"></i>점선 상자 — 연결 예정(시안 메모 · 실제 앱엔 안 나옴)</span>
     </div>
   </header>
 
@@ -43,254 +39,218 @@
 
   <div class="phones">
 
-    <!-- ① 홈 — 새 구역 -->
+    <!-- ① 홈 — 「우리 학교 주변」 두 줄 -->
     <section class="phone" id="s1">
-      <div class="phone-cap"><span class="no">1</span><b>홈 — 「우리 학교 주변」 구역</b></div>
-      <p class="phone-cap why">홈을 조금 내리면 「우리 학교 소식」 띠 바로 아래에 새 구역이 있습니다. 하단 탭은 5칸이 꽉 차 있어 새 탭을 만들지 않았습니다.</p>
+      <div class="phone-cap"><span class="no">1</span><b>홈 — 「우리 학교 주변」</b></div>
+      <p class="phone-cap why">소식 띠 아래에 입구 두 줄만 둡니다. 장학금 목록을 덜 밀어내려고 지도는 작은 그림 하나로 줄였습니다. 하단 탭은 5칸이 꽉 차 새 탭을 만들지 않았습니다.</p>
       <div class="phone-screen">
-        <div class="app-scroll" id="screen-home" style="padding-top:18px">
+        <div class="app-scroll" style="padding-top:18px">
           <section class="home-news" aria-label="우리 학교 소식" style="margin-top:0"><div class="section-head home-news-head"><h3>우리 학교 소식</h3><button type="button" class="link-btn home-news-all">전체 보기</button></div><div class="news-strip"><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898049&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
   <span class="news-tile-photo"><img class="news-tile-img" src="../../../../assets/schools/n14kv35j-f13e3ada.webp" alt="" width="148" height="104" style="object-position:55% 62%"></span>
   <span class="news-tile-meta">11.20</span>
   <span class="news-tile-title">[마지막 기회] Microsoft AI-901 자격증 과정 특별 추가 모집</span>
+  <span class="news-tile-desc">전남대학교 인공지능혁신융합대학사업단에서 Microsoft 인공지능 국제인증자격증(AI-901) 교육과정 교육생을 아래와 같이 추가 모집 하오니 관심 있는 학생들의 많은 참여 바랍니다.</span>
 </a><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898047&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
   <span class="news-tile-photo"><img class="news-tile-img" src="../../../../data/news/img/c1f2de6ab074ef05.webp" alt="" width="148" height="104"></span>
   <span class="news-tile-meta">생활 · 11.20</span>
   <span class="news-tile-title">2026학년도 동계방학 생활관생 모집 안내 (신청</span>
+  <span class="news-tile-desc">2026학년도 동계방학 생활관생 모집을 안내하오니, 자세한 내용은 [생활관 홈페이지-공지사항] 을 참고하시기 바랍니다. ☞ 생활관 홈페이지 공지사항: https://tinyurl.com/4m8x4z37</span>
 </a><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898006&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
   <span class="news-tile-photo"><img class="news-tile-img" src="../../../../assets/schools/n14kv35j-f13e3ada.webp" alt="" width="148" height="104" style="object-position:55% 62%"></span>
   <span class="news-tile-meta">11.20</span>
   <span class="news-tile-title">[서울지방병무청] 각 군 현역병 모집일정('26년 12월) 안내</span>
+  <span class="news-tile-desc">병무청에서는 병역의무자의 전공, 자격·면허, 경력 등과 관련있는 군사특기에 지원하여 해당분야에서 복무할 수 있도록 하는 현역병 모집제도를 운영하고 있습니다.</span>
 </a></div></section>
 
-          <!-- 새 구역 -->
           <section class="home-near" aria-label="우리 학교 주변">
-            <div class="section-head"><h3>우리 학교 주변</h3><button type="button" class="link-btn">지도 열기</button></div>
-            <div class="near-map">
-              <div class="m-map" data-map='{"center":[37.6322,127.0779],"zoom":14.75,"static":true,"rings":[500],"layers":[],"pins":["w382499365","n6046633874","n368602672","pd-kiosk-103-w258026356"],"tint":{"civil_kiosk":"docs"}}'></div>
-            </div>
+            <div class="home-sec-head"><h3>우리 학교 주변</h3><span class="updated">11.22 갱신</span></div>
             <ul class="near-rows">
-              <li class="l-study"><span class="ni"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/><path d="M12 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/></svg></span><span class="nt">카공<small>정문 직선 500m 안</small></span><span class="nv">도서관 2 · 카페 15</span></li>
-              <li class="l-life"><span class="ni"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/><path d="M9.5 20v-5h5v5"/></svg></span><span class="nt">생활<small>정문 직선 500m 안</small></span><span class="nv">편의점 12 · 약국 5</span></li>
-              <li class="l-campus"><span class="ni"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H16"/></svg></span><span class="nt">신입생 첫 주 코스<small>학교 안 네 곳 + 공릉역</small></span><span class="nv">2 / 5 다녀옴</span></li>
+              <li><span class="thumb"><span class="m-map" data-map='{"center":[37.6312,127.0778],"zoom":14.25,"static":true,"gate":false,"layers":["study","campus"],"cats":{"study":["cafe"],"campus":["cafe"]},"maxDist":500,"pins":[]}'></span></span><span class="nt"><b>주변 지도</b><small>정문 반경 500m — 카페 15 · 편의점 12 · 약국 5</small></span><span class="go" data-go></span></li>
+              <li><span class="ni" data-icon="route"></span><span class="nt"><b>신입생 첫 주 코스</b><small>다섯 곳 중 2곳 다녀옴</small></span><span class="go" data-go></span></li>
             </ul>
-            <p class="near-src">OpenStreetMap · 11.22 기준</p>
           </section>
 
-          <div class="section-head" style="display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 8px"><h3 style="font-size:var(--t-xs);font-weight:700">나에게 맞는 장학금</h3><button class="link-btn" style="font-size:var(--t-sm);font-weight:550;color:var(--accent)">전체 보기</button></div>
-          <div class="card-list" style="margin:0 -20px">
+          <section class="home-after">
+            <div class="home-sec-head"><h3>나에게 맞는 장학금</h3><button class="link-btn">전체 보기</button></div>
+            <div class="card-list" style="margin:0 -20px">
 <div class="sch-card-wrap has-link">
-<button class="save-btn" aria-pressed="false" aria-label="공고 저장">
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h12a1 1 0 0 1 1 1v16.2a.8.8 0 0 1-1.25.66L12 17.3l-5.75 3.56A.8.8 0 0 1 5 20.2V4a1 1 0 0 1 1-1z"></path></svg>
-</button><a class="card-src-link" href="https://www.seoulfuture.or.kr/home/kor/M025378985/board.do?idx=cb00d1a0008a85e71a41b8741facbffe9c92b5676b1d6934d9efe41731e60154&amp;act=detail&amp;board_code=XL50YTz5" target="_blank" rel="noopener" title="원문 공고 ↗">원문 공고 ↗</a>
+<button class="save-btn" aria-pressed="false" aria-label="공고 저장"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h12a1 1 0 0 1 1 1v16.2a.8.8 0 0 1-1.25.66L12 17.3l-5.75 3.56A.8.8 0 0 1 5 20.2V4a1 1 0 0 1 1-1z"></path></svg></button><a class="card-src-link" href="#" title="원문 공고 ↗">원문 공고 ↗</a>
 <button class="sch-card">
   <div class="sch-top"><span class="badge badge-kind badge-out">장학 · 교외</span><span class="sch-fit fit-blue">적합도 95%</span></div>
-  <p class="sch-name">서울미래인재재단 서울선순환인재 장학금</p>
-  <div class="sch-foot"><span class="sch-amount unknown"></span><span class="sch-due urgent">D-1</span></div>
+  <p class="sch-name">(재)한국장학재단 국가근로장학금</p>
+  <div class="sch-foot"><span class="sch-amount unknown"></span><span class="sch-due">D-98</span></div>
 </button>
 </div>
-          </div>
+            </div>
+          </section>
         </div>
-        <nav class="bottom-nav" aria-label="하단 탭">
-          <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/></svg>대외활동</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</button>
-        </nav>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
       </div>
       <div class="phone-notes">
-        <p><span class="tag real">실데이터</span>소식 띠·장학 카드는 지금 앱이 과기대 학생에게 보여 주는 그대로입니다(교내 소식 파일·정식 등록 공고). 구역의 숫자는 정문(OSM 「정문」 노드)에서 직선 500m 안을 센 실제 개수입니다.</p>
-        <p><span class="tag rule">규칙</span>0건인 줄은 그리지 않습니다. 「신입생 첫 주 코스」 줄은 1학년 프로필에만 보입니다. 숫자는 OSM 이 그려 둔 만큼이라 실제보다 적을 수 있습니다 — 실서비스는 공공데이터·장소 검색으로 채웁니다.</p>
+        <p><span class="tag real">실데이터</span>소식 띠(사진·요약 두 줄)와 장학 카드는 지금 앱이 과기대 1학년에게 보여 주는 그대로입니다(교내 소식 파일 · 층2 「(재)한국장학재단 국가근로장학금」 적합도 95% — what-shows 로 확인). 「정문 반경 500m — 카페 15 · 편의점 12 · 약국 5」는 OSM 「정문」에서 직선 500m 안을 센 실제 개수입니다.</p>
+        <p><span class="tag rule">규칙</span>구역 사이 간격은 앱 홈과 같은 50px. 0곳인 갈래는 줄에 안 적습니다. 「신입생 첫 주 코스」 줄은 1학년 프로필에만 보입니다. 숫자는 OSM 이 그려 둔 만큼이라 실제보다 적을 수 있습니다 — 실서비스는 공공데이터로 채웁니다(아래 「데이터」 표).</p>
       </div>
     </section>
 
     <!-- ② 지도 — 학교 안 -->
     <section class="phone" id="s2">
       <div class="phone-cap"><span class="no">2</span><b>지도 — 학교 안</b></div>
-      <p class="phone-cap why">처음 열면 「학교 안」 겹. 캠퍼스 경계(점선)와 신입생이 먼저 찾는 곳만 핀으로, 나머지 건물은 점으로.</p>
-      <div class="phone-screen" style="--map-top:116px">
+      <p class="phone-cap why">처음 열면 「학교 안」 겹. 캠퍼스 경계(점선)와 신입생이 먼저 찾는 곳만 핀으로, 나머지 건물은 회색 점으로.</p>
+      <div class="phone-screen" style="--map-top:108px">
         <div class="ms-top">
-          <header class="sub-header"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>학교 주변</h2><button class="btn-ghost btn-sm">목록 보기</button></header>
+          <header class="sub-header"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>학교 주변</h2></header>
           <div class="ms-chips" role="tablist" aria-label="겹">
-            <button class="filter-chip active l-campus">학교 안</button><button class="filter-chip l-study">카공</button><button class="filter-chip l-life">생활</button><button class="filter-chip l-safety">안전</button><button class="filter-chip l-transit">교통</button><button class="filter-chip l-benefit">혜택</button>
+            <button class="filter-chip active">학교 안</button><button class="filter-chip">카공</button><button class="filter-chip">생활</button><button class="filter-chip">안전</button><button class="filter-chip">교통</button><button class="filter-chip">혜택</button>
           </div>
         </div>
         <div class="m-map" data-map='{"center":[37.63245,127.07905],"zoom":15.75,"offset":[0,118],"layers":["campus"],"cats":{"campus":["building","student_center","facility","dormitory","construction"]},"pins":["w381113087","w470633638","w382499348","w382499358","w382499365"],"labels":["w382499365","w382499358","w382499348","w381113087","w470633638"],"labelLeft":["w382499365"]}'></div>
         <span class="m-credit">© OpenStreetMap</span>
         <section class="ms-panel">
           <div class="sheet-handle"></div>
-          <div class="p-head"><h3>학교 안</h3><button class="link-btn">첫 주 코스 ›</button></div>
-          <p class="p-sum">이름 있는 곳 <b>27</b>곳 중 신입생이 먼저 찾는 곳</p>
+          <div class="p-head"><p class="p-sum">신입생이 먼저 찾는 곳</p><button class="link-btn">목록 보기 ›</button></div>
           <ul class="place-list">
-            <li class="l-campus"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/><path d="M12 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/></svg></span><span class="pt"><b>도서관/정보전산원</b><small>도서관 별관 · 신축 중앙도서관(공사 중) 옆</small></span><span class="pd">320m</span></li>
-            <li class="l-campus"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3"/><path d="M7 11v10"/><path d="M16.5 21V3c-2 1.2-3 3.6-3 6.5V13h3"/></svg></span><span class="pt"><b>제2학생회관</b><small>장학복지팀(201호) · 학생 제2 식당 · 보건진료소 · 은행</small></span><span class="pd">240m</span></li>
-            <li class="l-campus"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3"/><path d="M7 11v10"/><path d="M16.5 21V3c-2 1.2-3 3.6-3 6.5V13h3"/></svg></span><span class="pt"><b>제1학생회관</b><small>학생 제1식당 · CU · 카페232</small></span><span class="pd">450m</span></li>
+            <li><span class="pi" data-icon="library"></span><span class="pt"><b>도서관/정보전산원</b><small>도서관 별관 옆</small></span><span class="pd">320m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="student_center"></span><span class="pt"><b>제2학생회관</b><small>장학복지팀(201호) · 학생 제2 식당 · 보건진료소 · 은행</small></span><span class="pd">240m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="student_center"></span><span class="pt"><b>제1학생회관</b><small>학생 제1식당 · 생협 카페 · CU</small></span><span class="pd">450m</span><span class="go" data-go></span></li>
           </ul>
         </section>
-        <nav class="bottom-nav" aria-label="하단 탭">
-          <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/></svg>대외활동</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</button>
-        </nav>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
       </div>
       <div class="phone-notes">
-        <p><span class="tag real">실데이터</span>건물 이름·위치·캠퍼스 경계는 OSM(서울과학기술대학교 경계 way 380910936 · 「정문」 노드 5549312537). 「장학복지팀(201호)」은 과기대 장학 공고 원문 「학생처 장학복지팀(제2학생회관 201호)으로 서면 제출」에서 왔습니다. 거리는 정문에서의 <b>직선</b> 거리라 「m」로만 적고 걷는 시간은 적지 않았습니다.</p>
-        <p><span class="tag rule">규칙</span>겹 칩은 한 줄에 다 들어가게 작은 칩 여섯(옆으로 밀지 않는다 · 10-04 지시). 고르면 앱 칩처럼 테두리만 강조색. 「목록 보기」는 신청 내역의 「달력 보기」와 같은 자리·모양.</p>
+        <p><span class="tag real">실데이터</span>건물 이름·위치·캠퍼스 경계는 OSM(경계 way 380910936 · 「정문」 노드 5549312537). 각 줄의 시설 이름은 그 건물 안에 OSM 으로 그려진 곳입니다. 「장학복지팀(201호)」은 과기대 장학 공고 원문 「※ 부득이한 경우에만 학생처 장학복지팀(제2학생회관 201호)으로 서면 제출」에서 온 자리 표시입니다(기본 제출 길은 통합정보시스템 사본 첨부).</p>
+        <p><span class="tag rule">규칙</span>거리는 정문에서의 <b>직선</b> 거리라 「m」로만 적고 걷는 시간은 적지 않습니다. 겹 칩은 대외활동 분야 칩과 같은 작은 칩 — 한 줄에 다 들어가고(옆으로 밀지 않음), 고르면 테두리만 강조색. 줄을 누르면 그 곳의 판(④ 모양)이 열립니다.</p>
       </div>
     </section>
 
     <!-- ③ 카공 -->
     <section class="phone" id="s3">
       <div class="phone-cap"><span class="no">3</span><b>지도 — 카공</b></div>
-      <p class="phone-cap why">도서관·문고는 핀, 카페는 점. 정문 둘레에 직선 500m · 1km 원.</p>
-      <div class="phone-screen" style="--map-top:116px">
+      <p class="phone-cap why">도서관·문고는 핀, 카페는 회색 점. 정문 둘레에 반경 500m · 1km 원.</p>
+      <div class="phone-screen" style="--map-top:108px">
         <div class="ms-top">
-          <header class="sub-header"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>학교 주변</h2><button class="btn-ghost btn-sm">목록 보기</button></header>
+          <header class="sub-header"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>학교 주변</h2></header>
           <div class="ms-chips">
-            <button class="filter-chip l-campus">학교 안</button><button class="filter-chip active l-study">카공</button><button class="filter-chip l-life">생활</button><button class="filter-chip l-safety">안전</button><button class="filter-chip l-transit">교통</button><button class="filter-chip l-benefit">혜택</button>
+            <button class="filter-chip">학교 안</button><button class="filter-chip active">카공</button><button class="filter-chip">생활</button><button class="filter-chip">안전</button><button class="filter-chip">교통</button><button class="filter-chip">혜택</button>
           </div>
         </div>
-        <div class="m-map" data-map='{"center":[37.6290,127.0725],"zoom":14.25,"offset":[0,118],"layers":["study","campus"],"cats":{"study":["cafe"],"campus":["cafe"]},"tint":{"cafe":"study","library":"study"},"rings":[500,1000],"ringLabels":["직선 500m","1km"],"pins":["n368653401","n368652700","n368653320","n12642237593","w382499356","w382499365"],"labels":["w382499365","n368652700","n368653320","n12642237593","n368653401"],"labelLeft":["w382499365","n368653320"]}'></div>
+        <div class="m-map" data-map='{"center":[37.6296,127.0735],"zoom":14.25,"offset":[0,118],"layers":["study","campus"],"cats":{"study":["cafe"],"campus":["cafe"]},"maxDist":1000,"rings":[500,1000],"ringLabels":["반경 500m","1km"],"pins":["w1444392878","n368653401","n368653320","n368652700","w382499356","w382499365"],"labels":["w382499365","n368652700","n368653320","n368653401"],"labelLeft":["w382499365","n368653320"]}'></div>
         <span class="m-credit">© OpenStreetMap</span>
         <section class="ms-panel">
           <div class="sheet-handle"></div>
-          <div class="p-head"><h3>카공</h3><button class="link-btn">목록 보기 ›</button></div>
-          <p class="p-sum">정문 직선 1km 안 — 도서관·문고 <b>6</b> · 카페 <b>24</b></p>
+          <div class="p-head"><p class="p-sum">정문 반경 1km — 도서관·문고 <b>6</b> · 카페 <b>24</b></p><button class="link-btn">목록 보기 ›</button></div>
           <ul class="place-list">
-            <li class="l-study"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/><path d="M12 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/></svg></span><span class="pt"><b>도서관/정보전산원</b><small>학교 도서관 · 도서관 별관 옆</small></span><span class="pd">320m</span></li>
-            <li class="l-study"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/><path d="M12 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/></svg></span><span class="pt"><b>한내지혜의 숲</b><small>평일 09:00–18:00 · 토 09:00–17:00</small></span><span class="pd">1.0km</span></li>
+            <li><span class="pi" data-icon="library"></span><span class="pt"><b>도서관/정보전산원</b><small>학교 도서관 · 도서관 별관 옆</small></span><span class="pd">320m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="library"></span><span class="pt"><b>공릉3동문고</b><small>도서관</small></span><span class="pd">620m</span><span class="go" data-go></span></li>
           </ul>
-          <div class="plan-slot" style="margin-top:8px"><span class="plan-tag">연결 예정</span>스터디카페·독서실 — 소상공인 상가정보(업종)로 채울 자리. 지금 OSM 에는 0곳입니다.</div>
+          <div class="plan-slot"><b>스터디카페·독서실</b><span class="sk"><i></i><i></i></span><span class="plan-tag">연결 예정</span></div>
         </section>
-        <nav class="bottom-nav" aria-label="하단 탭">
-          <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/></svg>대외활동</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</button>
-        </nav>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
       </div>
       <div class="phone-notes">
-        <p><span class="tag real">실데이터</span>도서관·문고 6곳 · 카페 24곳(정문 1km 안 · OSM). 「한내지혜의 숲」 여는 시간은 OSM 에 적힌 값 그대로입니다. 여는 시간을 모르는 곳은 그 줄을 비우지 않고 아예 안 적습니다.</p>
-        <p><span class="tag plan">연결 예정</span>스터디카페·독서실·24시 카페 — OSM 에는 0곳(안 그려져 있을 뿐). 「콘센트·조용함」 같은 카공 평가는 리뷰 낱말로 짐작하지 않습니다(원칙 8-1) — 하려면 학생 제보를 「제보 n명」으로만.</p>
+        <p><span class="tag real">실데이터</span>정문 1km 안 도서관·문고 6곳(핀 6개 — 이름 없는 1곳 포함)과 카페 24곳(OSM). 1km 조금 밖(1,008m)인 「한내지혜의 숲」은 이 화면에 넣지 않았습니다. 여는 시간은 OSM 에 없어 줄에 적지 않았습니다 — 실서비스는 전국도서관표준데이터의 운영 시각 칸으로.</p>
+        <p><span class="tag plan">연결 예정</span>스터디카페·독서실 — OSM 에는 0곳(안 그려져 있을 뿐). 소상공인 상가정보의 업종 「독서실/스터디 카페」로 채웁니다. 「콘센트·조용함」 같은 카공 평가는 리뷰 낱말로 짐작하지 않습니다(원칙 8-1).</p>
       </div>
     </section>
 
-    <!-- ④ 장소 시트 — 혜택이 붙은 곳 -->
+    <!-- ④ 혜택 — 장소 판 -->
     <section class="phone" id="s4">
-      <div class="phone-cap"><span class="no">4</span><b>장소를 누르면 — 혜택이 붙은 곳</b></div>
-      <p class="phone-cap why">「혜택」 겹에는 지금 진행 중인 교내 혜택·행사가 붙은 곳만 핀으로 섭니다. 누르면 시트에 「혜택」 절. 길찾기는 지도 앱으로 넘깁니다.</p>
-      <div class="phone-screen" style="--map-top:116px">
+      <div class="phone-cap"><span class="no">4</span><b>지도 — 혜택(장소를 누르면)</b></div>
+      <p class="phone-cap why">「혜택」 겹에는 지금 진행 중인 교내 혜택·행사가 붙은 곳만 핀으로 섭니다. 누르면 그 곳의 판이 올라옵니다(지도는 그대로 · 아래로 쓸면 접힘).</p>
+      <div class="phone-screen" style="--map-top:108px">
         <div class="ms-top">
-          <header class="sub-header"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>학교 주변</h2><button class="btn-ghost btn-sm">목록 보기</button></header>
+          <header class="sub-header"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>학교 주변</h2></header>
           <div class="ms-chips">
-            <button class="filter-chip l-campus">학교 안</button><button class="filter-chip l-study">카공</button><button class="filter-chip l-life">생활</button><button class="filter-chip l-safety">안전</button><button class="filter-chip l-transit">교통</button><button class="filter-chip active l-benefit">혜택</button>
+            <button class="filter-chip">학교 안</button><button class="filter-chip">카공</button><button class="filter-chip">생활</button><button class="filter-chip">안전</button><button class="filter-chip">교통</button><button class="filter-chip active">혜택</button>
           </div>
         </div>
-        <div class="m-map" data-map='{"center":[37.63222,127.07798],"zoom":15.75,"offset":[0,232],"layers":[],"tint":{"w382499356":"benefit","w382499348":"benefit"},"pins":["w382499348","w382499356"],"labels":["w382499348"],"focus":"w382499356","gate":false}'></div>
+        <div class="m-map" data-map='{"center":[37.63215,127.07800],"zoom":15.75,"offset":[0,220],"layers":[],"pins":["w382499348","w382499356","w382499365"],"labels":["w382499348","w382499356"],"focus":"w382499365","labelLeft":["w382499365"],"gate":false}'></div>
         <span class="m-credit">© OpenStreetMap</span>
-        <div class="sheet show" style="bottom:0;max-height:none">
+        <section class="ms-panel sheet">
           <div class="sheet-handle"></div>
-          <div class="sheet-body" style="padding-bottom:22px">
-            <div class="sch-top sheet-top"><span class="place-chip l-campus">학교 안 · 도서관</span></div>
-            <h3 class="sheet-title">도서관 별관</h3>
-            <p class="place-where">도서관/정보전산원 옆 · 정문에서 직선 390m</p>
-            <section class="sheet-sec"><h4>혜택</h4>
-              <a class="benefit-row" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=897342&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
-                <img src="../../../../data/news/img/9c94d481caa41a63.webp" alt="" width="64" height="64">
-                <span><b>🎁 도서관 첫 대출자를 찾습니다~ 이벤트 안내 (50명에게 문화상품권 2만원권 추첨 증정, ~11/30)</b><small>교내 소식 · 11.02 · <em class="due-plain">D-8</em> · 원문 보기 ↗</small></span>
-              </a>
-            </section>
-            <section class="sheet-sec"><h4>출처</h4><div class="sheet-facts"><p class="doc-legend">장소 OpenStreetMap · 11.22 기준</p><p class="doc-legend">글 학교 공지 게시판(교내 소식)</p></div></section>
-            <button class="btn btn-primary btn-lg" style="margin-top:16px">카카오맵으로 길찾기</button>
-            <p class="alt-route"><a href="#">네이버 지도로 길찾기 ↗</a></p>
-          </div>
-        </div>
+          <div class="sch-top sheet-top" style="padding-right:0"><span class="badge badge-kind">도서관</span></div>
+          <h3 class="sheet-title">도서관/정보전산원</h3>
+          <p class="place-where">도서관 별관 옆 · 정문에서 320m</p>
+          <section class="sheet-sec"><h4>교내 소식</h4>
+            <a class="news-row" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=897342&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+              <img src="../../../../data/news/img/9c94d481caa41a63.webp" alt="" width="64" height="64">
+              <span><b>도서관 첫 대출자를 찾습니다~ 이벤트 안내 (50명에게 문화상품권 2만원권 추첨 증정, ~11/30)</b><small>11.02 · 원문 보기 ↗</small></span>
+            </a>
+          </section>
+          <button class="btn btn-primary btn-lg" style="margin-top:16px">카카오맵으로 길찾기 ↗</button>
+          <p class="alt-route"><a href="#">네이버 지도로 길찾기 ↗</a></p>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
       </div>
       <div class="phone-notes">
-        <p><span class="tag real">실데이터</span>건물은 OSM, 글 제목·날짜·사진은 앱 교내 소식 파일 그대로. 원문 포스터의 장소 글자 「중앙도서관 동양서자료실, 별관도서관 서양서자료실」로 「도서관 별관」에 이었습니다. 혜택 핀 둘째는 제2학생회관 — 원문 「장소: 제2학생회관 3층 305호」(학생상담센터 마음나눔 카페 11/27).</p>
-        <p><span class="tag rule">규칙</span>기간이 지난 혜택은 원문 날짜로 자동으로 내립니다 — 생협 「도서관 카페 핸드드립 할인」은 원문 기간이 10.26~10.30 이라 지금은 안 뜹니다. 글을 장소에 잇는 것은 <b>사람이 확인한 것만</b>(관리자 「할 일」). 여는 시간처럼 모르는 절은 그리지 않습니다(앱 시트와 같은 규칙).</p>
+        <p><span class="tag real">실데이터</span>글 제목·날짜·사진은 앱 교내 소식 파일 그대로(맨 앞 그림 글자만 걷음 — 활동 제목과 같은 규칙). 원문 포스터의 장소 「중앙도서관 동양서자료실, 별관도서관 서양서자료실」을 OSM 「도서관/정보전산원」(영문 이름 Central Library)과 「도서관 별관」 두 곳에 이었고, 셋째 핀 제2학생회관은 원문 「장소: 제2학생회관 3층 305호」(학생상담센터 마음나눔 카페 · 11/27)입니다.</p>
+        <p><span class="tag rule">규칙</span>기간이 지난 혜택은 원문 날짜로 내립니다 — 생협 「도서관 카페 핸드드립 할인」은 원문 기간이 10.26~10.30 이라 지금은 안 뜹니다. 글을 장소에 잇는 것은 <b>사람이 확인한 것만</b>(관리자 「할 일」). 절 이름은 홈 띠와 같은 말 「교내 소식」 · 여는 시간처럼 모르는 절은 그리지 않습니다. 길찾기는 앱 밖으로 나가므로 ↗.</p>
       </div>
     </section>
 
-    <!-- ⑤ 안전 — 밤길 -->
+    <!-- ⑤ 안전 -->
     <section class="phone" id="s5">
-      <div class="phone-cap"><span class="no">5</span><b>지도 — 안전(밤길)</b></div>
-      <p class="phone-cap why">안전 겹은 밤길 기준이라 지도가 어두워집니다. 점수·별점은 매기지 않고 있는 시설만 보여 줍니다.</p>
-      <div class="phone-screen" style="--map-top:116px">
+      <div class="phone-cap"><span class="no">5</span><b>지도 — 안전</b></div>
+      <p class="phone-cap why">점수·별점 없이 있는 시설만. 긴급 전화 둘은 늘 판 안에.</p>
+      <div class="phone-screen" style="--map-top:108px">
         <div class="ms-top">
-          <header class="sub-header"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>학교 주변</h2><button class="btn-ghost btn-sm">목록 보기</button></header>
+          <header class="sub-header"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>학교 주변</h2></header>
           <div class="ms-chips">
-            <button class="filter-chip l-campus">학교 안</button><button class="filter-chip l-study">카공</button><button class="filter-chip l-life">생활</button><button class="filter-chip active l-safety">안전</button><button class="filter-chip l-transit">교통</button><button class="filter-chip l-benefit">혜택</button>
+            <button class="filter-chip">학교 안</button><button class="filter-chip">카공</button><button class="filter-chip">생활</button><button class="filter-chip active">안전</button><button class="filter-chip">교통</button><button class="filter-chip">혜택</button>
           </div>
         </div>
-        <div class="m-map" data-map='{"base":"night","center":[37.6305,127.0762],"zoom":14.5,"offset":[0,128],"layers":[],"rings":[500,1000],"ringLabels":["직선 500m","1km"],"pins":["n6046633874","w576229279","pd-bell-w199637113","n368602233","n368602672"],"labels":["n368602672","n368602233","pd-bell-w199637113","n6046633874","w576229279"],"labelLeft":["n6046633874","pd-bell-w199637113"],"rename":{"pd-bell-w199637113":"공릉터널 비상벨","n6046633874":"공릉역"}}'></div>
-        <span class="m-credit on-night">© OpenStreetMap</span>
+        <div class="m-map" data-map='{"center":[37.6305,127.0762],"zoom":14.5,"offset":[0,128],"layers":[],"rings":[500,1000],"ringLabels":["반경 500m","1km"],"pins":["n6046633874","w576229279","pd-bell-w199637113","n368602233","n368602672"],"labels":["n368602672","n368602233","pd-bell-w199637113","n6046633874","w576229279"],"labelLeft":["n6046633874","pd-bell-w199637113"],"rename":{"pd-bell-w199637113":"공릉터널 비상벨","n6046633874":"공릉역"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
         <section class="ms-panel">
           <div class="sheet-handle"></div>
-          <div class="p-head"><h3>안전</h3><button class="link-btn">목록 보기 ›</button></div>
-          <p class="p-sum">정문 직선 1km 안 — 치안센터 <b>3</b> · 안전비상벨 <b>1</b></p>
+          <div class="p-head"><p class="p-sum">정문 반경 1km — 치안센터 <b>3</b> · 터널 보행로 비상벨 <b>1</b></p></div>
           <ul class="place-list">
-            <li class="l-safety"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v6c0 4.6-3.1 7.7-7.5 9-4.4-1.3-7.5-4.4-7.5-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="pt"><b>공릉치안센터</b><small>치안센터</small></span><span class="pd">430m</span></li>
-            <li class="l-safety"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span><span class="pt"><b>공릉터널 보행로 안전비상벨</b><small>경찰 연계 · 경고등·경보음·CCTV</small></span><span class="pd">730m</span></li>
+            <li><span class="pi" data-icon="police"></span><span class="pt"><b>공릉치안센터</b><small>치안센터</small></span><span class="pd">430m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="emergency_bell"></span><span class="pt"><b>공릉터널 보행로 안전비상벨</b><small>경찰 연계 · 경고등·경보음·CCTV</small></span><span class="pd">730m</span><span class="go" data-go></span></li>
           </ul>
           <div class="call-row"><a class="call-btn" href="tel:112">112 경찰</a><a class="call-btn" href="tel:119">119 소방·구급</a></div>
-          <div class="plan-slot" style="margin-top:10px"><span class="plan-tag">연결 예정</span>골목 CCTV · 안전비상벨 위치 — 행정안전부 표준데이터(전국CCTV · 전국안전비상벨위치)로 채울 자리.</div>
+          <div class="plan-slot"><b>안심귀갓길 · CCTV</b><span class="sk"><i></i><i></i></span><span class="plan-tag">연결 예정</span></div>
         </section>
-        <nav class="bottom-nav" aria-label="하단 탭">
-          <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/></svg>대외활동</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</button>
-        </nav>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
       </div>
       <div class="phone-notes">
-        <p><span class="tag real">실데이터</span>치안센터 4곳(OSM) · 공릉터널 비상벨(서울 열린데이터광장 OA-15253 · 2026.09.10 기준 · 경찰 연계 Y). 비상벨 파일엔 좌표가 없어 「공릉터널」 위치에 두었습니다(터널 안 어딘가).</p>
-        <p><span class="tag rule">규칙</span>「안전한 동네 ★4.5」 같은 점수는 만들지 않습니다 — 판정 못 하는 축의 점수는 틀린 안심입니다. 가로등은 OSM 에 1km 안 0개라 밝기 근거로 쓰지 않았습니다.</p>
-        <p><span class="tag plan">연결 예정</span>골목 CCTV·비상벨 — 원본 파일(file.localdata.go.kr)을 이 환경에서 받지 못했습니다. 로봇이 GitHub 에서 받게 합니다.</p>
+        <p><span class="tag real">실데이터</span>치안센터 1km 안 3곳(1.3km 안 4곳 · OSM). 비상벨은 서울 열린데이터광장 OA-15253(서울시 도로사업소 관리 터널·지하차도 49행 · 2026.09.10 기준 · 경찰 연계 Y)의 공릉터널 1곳이라 이름에 「터널 보행로」를 넣었습니다. 파일에 좌표가 없어 공릉터널 위치에 두었습니다(터널 안 어딘가). 치안센터 운영 시간은 자료에 없어 「밤에도 연다」고 적지 않았습니다.</p>
+        <p><span class="tag rule">규칙</span>「안전한 동네 ★4.5」 같은 점수는 만들지 않습니다 — 판정 못 하는 축의 점수는 틀린 안심입니다. 가로등은 OSM 에 1km 안 0개라 밝기 근거로 쓰지 않았습니다. 처음 시안의 어두운 밤 지도는 앱에 없는 면이라 뺐습니다(「정해 주실 것」 5).</p>
+        <p><span class="tag plan">연결 예정</span>안심귀갓길(서울시 OA-21695 경로 · OA-21696 안전시설물 · 2023.04 기준)은 좌표가 있는 선·점이라 지도에 그대로 그릴 수 있습니다(기준일 같이 표시). 골목 CCTV·비상벨 표준데이터는 원본 서버(file.localdata.go.kr)가 이 환경에서 끊겨 못 받았습니다 — GitHub 러너에서 받아지는지 먼저 확인합니다.</p>
       </div>
     </section>
 
     <!-- ⑥ 서류 떼는 곳 -->
     <section class="phone" id="s6">
       <div class="phone-cap"><span class="no">6</span><b>서류 떼는 곳 — 신청 준비에서</b></div>
-      <p class="phone-cap why">공고 시트 「접수 › 서류」에 관공서 서류가 있으면 「떼는 곳 ›」이 붙습니다. 누르면 이 화면.</p>
-      <div class="phone-screen" style="--map-top:150px">
-        <div class="ms-top" style="padding-bottom:12px">
-          <header class="sub-header" style="margin-bottom:6px"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>서류 떼는 곳</h2></header>
+      <p class="phone-cap why">공고 시트 「접수 › 서류」에 관공서 서류가 있으면 「떼는 곳 ›」이 붙습니다. 누르면 이 화면 — 온라인 길을 먼저, 발급기는 그다음.</p>
+      <div class="phone-screen" style="--map-top:148px">
+        <div class="ms-top" style="padding-bottom:10px">
+          <header class="sub-header" style="margin-bottom:4px"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>서류 떼는 곳</h2></header>
           <div class="doc-ctx">
-            <p class="doc-ctx-t"><span class="badge badge-kind badge-out">장학 · 교외</span><b>서울미래인재재단 서울선순환인재 장학금</b><span class="badge badge-dday urgent">D-1</span></p>
-            <p class="doc-ctx-q">서류 <span>자기소개서 · 2026년 2학기 대학교 재학증명서 · <mark>주민등록등본</mark> · <mark>가족관계증명서</mark></span></p>
+            <p class="doc-ctx-t"><b>(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내</b><span class="due">D-1</span></p>
+            <p class="doc-ctx-q">서류 장학금 지급신청서 · 기초생활수급자 또는 차상위계층 증명서 · 재학증명서 · 성적증명서 · 생활기록부 · <strong>주민등록초본</strong> · 통장사본</p>
           </div>
         </div>
-        <div class="m-map" data-map='{"center":[37.6268,127.0745],"zoom":14.5,"offset":[0,150],"layers":[],"tint":{"civil_kiosk":"docs","dong_office":"docs"},"pins":["pd-kiosk-506-n368899206","pd-kiosk-404-n368899080","pd-kiosk-405-w570198783","pd-kiosk-401-w579134079","pd-kiosk-103-w258026356","pd-kiosk-410-r5689751"],"labels":["pd-kiosk-410-r5689751","pd-kiosk-103-w258026356","pd-kiosk-405-w570198783","pd-kiosk-404-n368899080"],"labelLeft":["pd-kiosk-103-w258026356","pd-kiosk-404-n368899080","pd-kiosk-410-r5689751"],"rename":{"pd-kiosk-410-r5689751":"원자력병원","pd-kiosk-103-w258026356":"공릉1동주민센터","pd-kiosk-401-w579134079":"노원문화원","pd-kiosk-405-w570198783":"을지병원","pd-kiosk-404-n368899080":"공릉2동 주민센터","pd-kiosk-506-n368899206":"하계1동 주민센터"}}'></div>
+        <div class="m-map" data-map='{"center":[37.63065,127.0764],"zoom":14.5,"offset":[0,168],"layers":[],"pins":["pd-kiosk-405-w570198783","pd-kiosk-401-w579134079","pd-kiosk-103-w258026356","pd-kiosk-410-r5689751"],"labels":["pd-kiosk-410-r5689751","pd-kiosk-103-w258026356","pd-kiosk-405-w570198783","pd-kiosk-401-w579134079"],"labelLeft":["pd-kiosk-103-w258026356","pd-kiosk-410-r5689751","pd-kiosk-401-w579134079"],"rename":{"pd-kiosk-410-r5689751":"원자력병원","pd-kiosk-103-w258026356":"공릉1동주민센터","pd-kiosk-401-w579134079":"노원문화원","pd-kiosk-405-w570198783":"을지병원"}}'></div>
         <span class="m-credit">© OpenStreetMap</span>
         <section class="ms-panel">
           <div class="sheet-handle"></div>
-          <div class="p-head"><h3>무인민원발급기</h3><button class="link-btn">목록 보기 ›</button></div>
-          <p class="p-sum">정문 직선 1km 안 <b>4</b>곳 · 가까운 순</p>
-          <ul class="place-list">
-            <li class="l-docs"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><rect x="8.5" y="6" width="7" height="5" rx="1"/><path d="M9 15h6M9 18h3"/></svg></span><span class="pt"><b>원자력병원</b><small>24시간</small></span><span class="pd">560m</span></li>
-            <li class="l-docs"><span class="pi"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><rect x="8.5" y="6" width="7" height="5" rx="1"/><path d="M9 15h6M9 18h3"/></svg></span><span class="pt"><b>공릉1동주민센터</b><small>평일 09:00–18:00 · 주말·공휴일 쉼</small></span><span class="pd">620m</span></li>
+          <p class="p-group">주민등록초본 · 온라인 무료</p>
+          <ul class="place-list compact">
+            <li><span class="pi" data-icon="docs"></span><span class="pt"><b>정부24</b><small>인터넷 발급 · 본인</small></span><span class="pd">↗</span></li>
           </ul>
-          <div class="plan-slot" style="margin-top:8px"><span class="plan-tag">확인 중</span>온라인 발급 길(정부24 · 대법원 전자가족관계등록시스템) — 근거 문서 확인 뒤 이 자리에 「온라인으로 먼저」 줄 둘.</div>
-          <p class="p-src">서울 열린데이터광장 무인민원 발급기 설치 정보 · 위치는 같은 이름 시설 기준</p>
+          <p class="p-group">무인민원발급기 · 정문 반경 1km 안 4곳</p>
+          <ul class="place-list compact">
+            <li><span class="pi" data-icon="civil_kiosk"></span><span class="pt"><b>원자력병원</b><small>24시간</small></span><span class="pd">560m</span></li>
+            <li><span class="pi" data-icon="civil_kiosk"></span><span class="pt"><b>공릉1동주민센터</b><small>평일 09:00–18:00 · 주말·공휴일 쉼</small></span><span class="pd">620m</span></li>
+          </ul>
         </section>
-        <nav class="bottom-nav" aria-label="하단 탭">
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</button>
-          <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/></svg>대외활동</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</button>
-        </nav>
+        <nav class="bottom-nav" data-tab="explore" aria-label="하단 탭"></nav>
       </div>
       <div class="phone-notes">
-        <p><span class="tag real">실데이터</span>공고·서류 줄은 앱 시트(정식 등록 공고 · 마감 11.23)의 「서류」 원문 그대로 — 관공서 서류 두 개만 표시. 발급기 6곳과 운영 시간은 서울 열린데이터광장 OA-20336(779행) 그대로입니다. 그 파일엔 좌표가 없어 이름이 같은 OSM 시설 자리에 두었습니다.</p>
-        <p><span class="tag rule">규칙</span>「떼는 곳 ›」은 서류 줄에 관공서 서류 이름이 <b>원문 글자로</b> 있을 때만 붙습니다(짐작 금지). 운영 시간이 없는 기기는 시간 줄을 안 적습니다.</p>
+        <p><span class="tag real">실데이터</span>공고는 과기대 장학 게시판의 정식 등록 공고(마감 11.23 · 「서류」 줄 그대로 — 앱 시트와 같은 길로 읽음). 발급기 4곳과 운영 시간은 서울 열린데이터광장 OA-20336 그대로(좌표가 없어 이름이 같은 OSM 시설 자리에 둠).</p>
+        <p><span class="tag real">확인</span>정부24 안내 「주민등록표 등본(초본)」 — 신청방법 「인터넷, 방문, 무인발급기」 · 「인터넷으로 발급받을 때는 무료」(본인). 같은 근거로 가족관계증명서는 대법원 전자가족관계등록시스템에서 인터넷 무료(정부24 는 직접 발급하지 않음). 발급기 수수료(초본 200원 · 가족관계증명서 500원)는 조례로 면제되는 곳이 있어(노원구는 확인 안 함) 화면에 적지 않았습니다.</p>
+        <p><span class="tag rule">규칙</span>「떼는 곳 ›」은 서류 줄에 관공서 서류 이름이 <b>원문 글자로</b> 있을 때만, 그리고 <b>발급 길을 근거로 확인한 서류만</b> 굵게 잇습니다 — 「기초생활수급자 또는 차상위계층 증명서」는 발급 길을 아직 확인하지 않아 잇지 않았습니다.</p>
       </div>
     </section>
 
@@ -298,69 +258,57 @@
     <section class="phone" id="s7">
       <div class="phone-cap"><span class="no">7</span><b>신입생 첫 주 코스</b></div>
       <p class="phone-cap why">입학 첫 주에 한 번씩 가 볼 곳을 번호 핀으로. 다녀왔는지는 학생이 직접 체크합니다(원칙 8).</p>
-      <div class="phone-screen" style="--map-top:104px">
+      <div class="phone-screen" style="--map-top:100px">
         <div class="ms-top">
           <header class="sub-header" style="margin-bottom:2px"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>첫 주 코스</h2></header>
-          <p class="ms-sub" style="margin:0 0 4px 32px">학교 안 네 곳 + 공릉역 · 다녀온 곳 2</p>
+          <p class="ms-sub" style="margin:0 0 4px 32px">다섯 곳 중 2곳 다녀옴</p>
         </div>
-        <div class="m-map" data-map='{"center":[37.62993,127.07506],"zoom":15,"offset":[28,165],"gate":false,"layers":[],"route":["n6046633874","gate","n5547152189","w382499348","w382499365","w382499358"],"numbered":{"n5547152189":1,"w382499348":2,"w382499365":3,"w382499358":4,"n6046633874":5},"done":["n5547152189","w382499348"],"pins":["n6046633874","w382499358","w382499365","w382499348","n5547152189"],"labels":["n5547152189","w382499348","w382499365","w382499358","n6046633874"],"labelLeft":["w382499365","w382499358","n6046633874"],"rename":{"n5547152189":"정문앞 정류장","n6046633874":"공릉역"},"tint":{"n6046633874":"transit"}}'></div>
+        <div class="m-map" data-map='{"center":[37.62993,127.07506],"zoom":15,"offset":[28,165],"gate":false,"layers":[],"route":["n6046633874","gate","n5547152189","w382499348","w382499365","w382499358"],"numbered":{"n5547152189":1,"w382499348":2,"w382499365":3,"w382499358":4,"n6046633874":5},"done":["n5547152189","w382499348"],"pins":["n6046633874","w382499358","w382499365","w382499348","n5547152189"],"labels":["w382499348","w382499365","w382499358","n6046633874"],"labelLeft":["w382499365","w382499358","n6046633874"],"rename":{"n6046633874":"공릉역"}}'></div>
         <span class="m-credit">© OpenStreetMap</span>
         <section class="ms-panel">
           <div class="sheet-handle"></div>
-          <ul class="place-list compact" style="margin-top:0">
-            <li class="is-check done l-campus"><span class="pi" style="background:#fff;color:var(--lc);box-shadow:inset 0 0 0 2px var(--lc)"><b class="m-num">1</b></span><span class="pt"><b>정문앞 정류장</b><small>노원13 마을버스 · 정문 안쪽</small></span><span class="ck"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></li>
-            <li class="is-check done l-campus"><span class="pi" style="background:#fff;color:var(--lc);box-shadow:inset 0 0 0 2px var(--lc)"><b class="m-num">2</b></span><span class="pt"><b>제2학생회관</b><small>장학복지팀(201호) · 학생 제2 식당 · 보건진료소 · 은행</small></span><span class="ck"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></li>
-            <li class="is-check l-campus"><span class="pi"><b class="m-num">3</b></span><span class="pt"><b>도서관/정보전산원</b><small>도서관 별관 옆</small></span><span class="ck"></span></li>
-            <li class="is-check l-campus"><span class="pi"><b class="m-num">4</b></span><span class="pt"><b>제1학생회관</b><small>학생 제1식당 · CU · 카페232</small></span><span class="ck"></span></li>
-            <li class="is-check l-transit"><span class="pi"><b class="m-num">5</b></span><span class="pt"><b>공릉역</b><small>다른 이름 서울과학기술대역</small></span><span class="ck"></span></li>
+          <ul class="check-list">
+            <li class="checked"><span class="num">1</span><span class="pt"><b>서울과학기술대학교정문앞</b><small>노원13 정류장 · 정문 안쪽</small></span><span class="ck"></span></li>
+            <li class="checked"><span class="num">2</span><span class="pt"><b>제2학생회관</b><small>장학복지팀(201호) · 학생 제2 식당 · 보건진료소 · 은행</small></span><span class="ck"></span></li>
+            <li><span class="num">3</span><span class="pt"><b>도서관/정보전산원</b><small>도서관 별관 옆</small></span><span class="ck"></span></li>
+            <li><span class="num">4</span><span class="pt"><b>제1학생회관</b><small>학생 제1식당 · 생협 카페 · CU</small></span><span class="ck"></span></li>
+            <li><span class="num">5</span><span class="pt"><b>공릉역</b><small>다른 이름 서울과학기술대역</small></span><span class="ck"></span></li>
           </ul>
         </section>
-        <nav class="bottom-nav" aria-label="하단 탭">
-          <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/></svg>대외활동</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</button>
-        </nav>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
       </div>
       <div class="phone-notes">
-        <p><span class="tag real">실데이터</span>다섯 곳 이름·위치·묶음(「제2학생회관 근처에 식당·보건진료소·은행·우체국」)은 OSM 그대로, 공릉역의 다른 이름도 OSM(alt_name)입니다.</p>
-        <p><span class="tag rule">규칙</span>각 곳의 「왜 가야 하는지」 설명은 지어내지 않고, 그곳에 실제로 있는 시설 이름만 적습니다. 장학 서류를 내는 사무실은 원문에 적힌 곳만(과기대: 「제2학생회관 201호」 · 장학 공고 원문). 코스 고르기는 관리자 몫(학교마다 한 번).</p>
+        <p><span class="tag real">실데이터</span>다섯 곳 이름·위치는 OSM(1번은 정류장 이름 그대로 · 노선 표시 route_ref 「노원13」), 묶음은 그 건물 경계 안에 그려진 시설, 공릉역의 다른 이름도 OSM(alt_name)입니다. 지도의 1번 핀은 정문 바로 안이라 이름표를 생략했습니다.</p>
+        <p><span class="tag rule">규칙</span>「왜 가야 하는지」는 지어내지 않고 그곳에 실제로 있는 시설 이름만 적습니다. 장학복지팀 자리는 원문에 적힌 곳만(서면 제출은 「부득이한 경우」만 — 원문). 체크는 앱 체크 목록과 같은 모양(줄 전체를 누름 · 체크하면 강조색 원 · 글자는 진하게). 코스 고르기는 관리자 몫(학교마다 한 번).</p>
       </div>
     </section>
 
     <!-- ⑧ 자취 동네 -->
     <section class="phone" id="s8">
       <div class="phone-cap"><span class="no">8</span><b>자취 동네 고르기</b></div>
-      <p class="phone-cap why">정문과 맞닿은 행정동 세 곳을 경계선으로. 동마다 생활·안전 시설 수를 나란히 놓고, 월세 시세는 자리만.</p>
-      <div class="phone-screen" style="--map-top:104px">
+      <p class="phone-cap why">정문과 가까운 행정동 셋을 경계선으로. 동마다 학교 밖 생활·안전 시설 수를 같은 칸으로 나란히 놓고, 월세 시세는 자리만.</p>
+      <div class="phone-screen" style="--map-top:100px">
         <div class="ms-top">
           <header class="sub-header" style="margin-bottom:2px"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>자취 동네</h2></header>
-          <p class="ms-sub" style="margin:0 0 4px 32px">정문과 가까운 행정동 세 곳</p>
+          <p class="ms-sub" style="margin:0 0 4px 32px">정문과 가까운 행정동 셋</p>
         </div>
-        <div class="m-map" data-map='{"center":[37.6300,127.0745],"zoom":14,"offset":[0,170],"layers":[],"campus":true,"dongs":["공릉2동","공릉1동","하계1동","하계2동","월계3동","묵1동"],"dongFocus":["공릉2동","공릉1동","하계1동"],"dongLabels":true,"dongLabelAt":{"공릉2동":[37.6275,127.0800]},"pins":[]}'></div>
+        <div class="m-map" data-map='{"center":[37.6300,127.0745],"zoom":14,"offset":[0,175],"layers":[],"campus":true,"dongs":["공릉2동","공릉1동","하계1동","하계2동","월계3동","묵1동"],"dongFocus":["공릉2동","공릉1동","하계1동"],"dongLabels":true,"dongLabelAt":{"공릉2동":[37.6275,127.0800]},"pins":[]}'></div>
         <span class="m-credit">© OpenStreetMap</span>
         <section class="ms-panel">
           <div class="sheet-handle"></div>
+          <div class="p-head" style="margin-bottom:6px"><p class="p-sum">정문 반경 1.3km · 학교 밖 시설</p></div>
           <ul class="dong-list">
-            <li><div class="dl-h"><b>공릉2동</b><span>정문이 있는 동</span></div><p class="dl-v">편의점 <b>23</b> · 카페 <b>18</b> · 약국 <b>6</b> · 코인세탁 <b>1</b> · 치안센터 <b>1</b></p></li>
-            <li><div class="dl-h"><b>공릉1동</b><span>동 경계까지 직선 220m</span></div><p class="dl-v">편의점 <b>25</b> · 카페 <b>9</b> · 약국 <b>3</b> · 지하철역 <b>1</b></p></li>
-            <li><div class="dl-h"><b>하계1동</b><span>동 경계까지 직선 70m</span></div><p class="dl-v">편의점 <b>9</b> · 카페 <b>7</b> · 치안센터 <b>1</b> · 지하철역 <b>1</b></p></li>
+            <li><div class="dl-h"><b>공릉2동</b><span>정문이 있는 동</span></div><p class="dl-v">편의점 <b>21</b> · 카페 <b>15</b> · 약국 <b>6</b> · 코인세탁 <b>1</b> · 치안센터 <b>1</b> · 지하철역 <b>0</b></p></li>
+            <li><div class="dl-h"><b>하계1동</b><span>동 경계까지 70m · 캠퍼스 북쪽 일부</span></div><p class="dl-v">편의점 <b>6</b> · 카페 <b>2</b> · 약국 <b>0</b> · 코인세탁 <b>0</b> · 치안센터 <b>1</b> · 지하철역 <b>1</b></p></li>
+            <li><div class="dl-h"><b>공릉1동</b><span>동 경계까지 220m</span></div><p class="dl-v">편의점 <b>25</b> · 카페 <b>9</b> · 약국 <b>3</b> · 코인세탁 <b>0</b> · 치안센터 <b>0</b> · 지하철역 <b>1</b></p></li>
           </ul>
-          <div class="plan-slot"><span class="plan-tag">연결 예정</span>월세·전세 시세 — 국토교통부 전월세 실거래가(동 단위)로 채울 자리.</div>
-          <p class="p-src">정문 직선 1.3km 안에서 셈 · OpenStreetMap 11.22 기준</p>
+          <div class="plan-slot"><b>월세·전세 시세</b><span class="sk"><i></i><i></i></span><span class="plan-tag">연결 예정</span></div>
         </section>
-        <nav class="bottom-nav" aria-label="하단 탭">
-          <button class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/></svg>대외활동</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</button>
-          <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</button>
-        </nav>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
       </div>
       <div class="phone-notes">
-        <p><span class="tag real">실데이터</span>행정동 경계 8곳(OSM admin_level 8)과 동 안 시설 수(점이 다각형 안에 드는지로 셈). 정문·캠퍼스는 공릉2동 안에 있습니다.</p>
-        <p><span class="tag plan">연결 예정</span>월세·전세 — 실거래가 API 는 좌표가 아니라 법정동·지번 단위라 동 단위 중앙값으로만 보여 줍니다(확인 중). 「살기 좋은 동네」 순위는 매기지 않습니다.</p>
+        <p><span class="tag real">실데이터</span>행정동 경계(OSM admin_level 8)와 동 안 시설 수(점이 경계 안에 드는지로 셈 · <b>캠퍼스 안 시설은 뺌</b>). 정문은 공릉2동이고, 캠퍼스 북서쪽(도서관·제1학생회관·기숙사)은 하계1동에 걸칩니다. 장소를 정문 1.3km 원 안에서만 받아서 동마다 센 몫이 다릅니다(공릉2동은 동 넓이의 약 3분의 1만 원 안) — 화면 머리줄에 그 범위를 적었습니다.</p>
+        <p><span class="tag plan">연결 예정</span>월세·전세 — 국토교통부 연립다세대·오피스텔 전월세 실거래가는 좌표 없이 <b>법정동·지번</b>으로 옵니다. 지도의 행정동(공릉1동·2동)과 단위가 달라 시세는 법정동(공릉동·하계동) 묶음으로만 보여 줄 수 있습니다(지번을 행정동으로 바꿀 수 있는지는 확인 전). 「살기 좋은 동네」 순위는 매기지 않습니다.</p>
       </div>
     </section>
 
@@ -370,59 +318,75 @@
   <p class="sec-lead">시안에는 추천안으로 그렸습니다. 바꾸시면 그 화면만 다시 그립니다.</p>
   <div class="decisions">
     <div class="dec"><h3>1. 어디서 들어가나</h3>
-      <div class="opt"><span class="k">A</span><span><b>홈 「우리 학교 주변」 구역</b> — 소식 띠 아래, 모든 학생에게(①). 신입생은 「첫 주 코스」 줄이 하나 더.</span></div>
-      <div class="opt"><span class="k">B</span><span><b>신입생에게만</b> — 홈 히어로 넘김에 한 장(첫 학기 동안). 2학년부터는 MY 메뉴 한 줄.</span></div>
-      <p class="rec">추천 A <span>— 카공·생활은 학년과 상관없이 쓰이고, 하단 탭은 5칸이 꽉 차 새 탭은 안 만듭니다.</span></p>
+      <div class="opt"><span class="k">A</span><span><b>홈 「우리 학교 주변」 두 줄</b> — 소식 띠 아래, 모든 학생에게(①). 지도는 작은 그림 하나만이라 장학금 목록을 덜 밀어냄.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>신입생에게만</b> — 홈 히어로 넘김에 한 장(첫 학기 동안) + 2학년부터는 MY 메뉴 한 줄.</span></div>
+      <p class="rec">추천 A <span>— 카공·생활은 학년과 상관없이 쓰입니다. 하단 탭은 5칸이 꽉 차 새 탭은 안 만듭니다.</span></p>
     </div>
-    <div class="dec"><h3>2. 겹을 어떻게 켜나</h3>
-      <div class="opt"><span class="k">A</span><span><b>한 번에 하나</b> — 칩을 누르면 그 겹만(②~⑤).</span></div>
-      <div class="opt"><span class="k">B</span><span><b>여러 개 겹쳐</b> — 칩마다 켜고 끄기.</span></div>
-      <p class="rec">추천 A <span>— 처음 온 학생에게 핀 400여 개가 한꺼번에 뜨면 읽히지 않습니다. 겹치는 건 「목록 보기」로.</span></p>
+    <div class="dec"><h3>2. 겹을 어떻게 켜고, 핀은 무슨 색으로</h3>
+      <div class="opt"><span class="k">A</span><span><b>한 번에 한 겹 · 핀은 남색 한 색</b> — 갈래는 핀 그림으로(②~⑥).</span></div>
+      <div class="opt"><span class="k">B</span><span><b>여러 겹을 겹쳐 · 겹마다 색</b> — 앱에서 초록·빨강·보라는 이미 「선정·마감·공모전」 뜻이라 부딪힙니다.</span></div>
+      <p class="rec">추천 A <span>— 처음 온 학생에게 핀 수백 개가 한꺼번에 뜨면 읽히지 않습니다. 겹쳐 보기는 「목록 보기」로.</span></p>
     </div>
     <div class="dec"><h3>3. 바탕 지도</h3>
-      <div class="opt"><span class="k">A</span><span><b>브이월드(국토교통부) 바탕 그림 + 우리 파일의 지도 프로그램</b> — 이 시안과 같은 방식. 바깥 스크립트 0, 앱 보안 설정은 그림 주소 하나만 더함.</span></div>
-      <div class="opt"><span class="k">B</span><span><b>카카오맵</b> — 가게 정보가 풍부하지만 카카오 스크립트를 들여야 해 지도 화면만 별도 페이지로.</span></div>
-      <p class="rec">추천 A <span>— 이용 조건은 아래 「출처」 표의 확인 결과를 보고 정합니다. 길찾기는 어느 쪽이든 카카오맵·네이버 지도로 넘깁니다.</span></p>
+      <div class="opt"><span class="k">A</span><span><b>브이월드(국토교통부) + 우리 파일의 지도 프로그램</b> — 이 시안과 같은 방식에서 그림 주소만 브이월드로. 무료 · 출처 표시(공공누리 1유형) · <b>회색·야간 지도가 따로 있어</b> 앱 색에 맞추기 쉽고 바깥 스크립트 0. 열쇠 발급 필요.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>카카오맵</b> — 카카오 스크립트를 들여야 해(앱 보안 설정을 연다) 지도 화면만 별도 페이지로. 일 30만 회 무료(개발자 계정의 첫 앱만). 지도 색·야간 지도는 바꿀 수 없음.</span></div>
+      <p class="rec">추천 A <span>— 브이월드의 타일 주소 형식·사용량 한도는 브이월드 사이트가 이 환경에서 열리지 않아 아직 확인 못 했습니다. 길찾기는 어느 쪽이든 카카오맵·네이버 지도로 넘깁니다.</span></p>
     </div>
     <div class="dec"><h3>4. 혜택 글을 장소에 잇는 사람</h3>
       <div class="opt"><span class="k">A</span><span><b>관리자가 확인해 잇기</b> — 로봇은 후보만(관리자 「할 일」에 한 줄).</span></div>
-      <div class="opt"><span class="k">B</span><span><b>로봇이 이름으로 자동</b> — 같은 이름 카페가 여덟이라 엉뚱한 곳에 붙을 수 있음.</span></div>
-      <p class="rec">추천 A <span>— 과기대만 해도 「과기대 생협 카페」가 OSM 에 8곳입니다.</span></p>
+      <div class="opt"><span class="k">B</span><span><b>로봇이 이름으로 자동</b> — 같은 이름이 여럿이면 엉뚱한 곳에 붙을 수 있음.</span></div>
+      <p class="rec">추천 A <span>— 과기대만 해도 「과기대 생협 카페」가 OSM 에 6곳입니다.</span></p>
+    </div>
+    <div class="dec"><h3>5. 안전 겹을 어두운 지도로?</h3>
+      <div class="opt"><span class="k">A</span><span><b>밝은 지도 그대로</b>(⑤) — 밤 정보는 내용으로(운영 시간이 확인된 곳만 「밤에도」).</span></div>
+      <div class="opt"><span class="k">B</span><span><b>안전 겹만 어두운 지도</b> — 앱에 없는 어두운 면과 새 색이 생깁니다(브이월드 야간 지도로 가능).</span></div>
+      <p class="rec">추천 A <span>— 앱은 밝은 한 벌뿐입니다.</span></p>
+    </div>
+    <div class="dec"><h3>6. 술집·과팅 장소</h3>
+      <div class="opt"><span class="k">A</span><span><b>넣지 않음</b> — 이번 지시(카공·생활·안전·혜택)에 없습니다.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>넣되 나이 확인 뒤</b> — 옛 지도 설계(map-roadmap.md 4절)의 방식. 과팅은 과팅 탭 쪽 일.</span></div>
+      <p class="rec">추천 A</p>
     </div>
   </div>
 
   <h2 class="sec-title">데이터 — 어디서 무엇을</h2>
-  <p class="sec-lead">시안에 쓴 것과 실서비스에 쓸 것. 「받음」은 이번에 실제로 받아 본 것, 「못 받음」은 받으려다 실패한 것입니다.</p>
+  <p class="sec-lead">시안에 쓴 것과 실서비스에 쓸 것. 「받음」은 이번에 실제로 받아 본 것, 「못 받음」은 받으려다 실패한 것, 「확인」은 근거 문서를 읽은 것입니다.</p>
   <table class="src" id="src-table">
     <thead><tr><th>겹</th><th>데이터</th><th>이번 시안</th><th>실서비스</th></tr></thead>
     <tbody>
-      <tr><td><b>전부</b></td><td>OpenStreetMap 장소·건물·캠퍼스·행정동 경계 (ODbL · 출처 표시)</td><td><span class="ok">받음</span> — 정문 1.3km 안 428곳 · 경계 8곳 (api.openstreetmap.org 29회)</td><td>학교 안 건물·경계는 OSM 유지, 가게 수는 아래 공공데이터로</td></tr>
-      <tr><td><b>생활</b></td><td>서울시 무인민원 발급기 설치 정보 (서울 열린데이터광장 OA-20336)</td><td><span class="ok">받음</span> — CSV 779행, 반경 안 6곳 · 좌표 없음(이름으로 자리 맞춤)</td><td>그대로 + 지방 학교는 행정안전부 자료</td></tr>
-      <tr><td><b>안전</b></td><td>서울시 안전비상벨 설치위치 (OA-15253)</td><td><span class="ok">받음</span> — 49행(터널·지하차도), 노원구 2곳 · 좌표 없음</td><td>골목 비상벨은 아래 표준데이터로</td></tr>
-      <tr><td><b>안전</b></td><td>전국CCTV표준데이터 · 전국안전비상벨위치표준데이터 (공공데이터포털)</td><td><span class="no">못 받음</span> — 원본(file.localdata.go.kr)이 이 환경에서 연결 끊김 ×4</td><td>로봇(GitHub)이 받게 — 연결 예정</td></tr>
-      <tr><td><b>카공·생활</b></td><td>소상공인 상가(상권)정보 — 업종으로 스터디카페·코인세탁</td><td>안 씀</td><td>연결 예정 (확인 중)</td></tr>
-      <tr><td><b>자취</b></td><td>국토교통부 전월세 실거래가</td><td>안 씀</td><td>연결 예정 (확인 중)</td></tr>
-      <tr><td><b>혜택</b></td><td>앱 교내 소식(학교 공지 게시판)</td><td><span class="ok">씀</span> — 과기대 소식 파일의 실제 글</td><td>그대로 + 관리자가 장소에 잇기</td></tr>
-      <tr><td><b>서류</b></td><td>앱 정식 등록 공고의 「서류」 원문</td><td><span class="ok">씀</span> — 마감 전 실제 공고</td><td>그대로</td></tr>
+      <tr><td><b>전부</b></td><td>OpenStreetMap — 장소·건물·캠퍼스·행정동 경계 (ODbL · 출처 표시)</td><td><span class="ok">받음</span> — 정문 1.3km 안 421곳(음식점·패스트푸드·가로등은 개수만) · 경계 8곳 · api.openstreetmap.org 29회</td><td>학교 안 건물·경계는 OSM, 가게 수는 아래 공공데이터로</td></tr>
+      <tr><td><b>바탕 지도</b></td><td>국토교통부 브이월드 WMTS — 무료 · 공공누리 1유형(출처 표시) · 회색·미드나잇 지도 · 열쇠 필요</td><td>안 씀 — 사이트 연결이 안 돼 타일 주소·한도 확인 못 함</td><td>추천(결정 3)</td></tr>
+      <tr><td><b>바탕 지도</b></td><td>OpenStreetMap 공식 타일</td><td><span class="ok">씀</span>(시안에서만)</td><td>안 씀 — 정책이 Referer 를 요구하는데 앱은 Referer 를 끄는 설정(index.html)</td></tr>
+      <tr><td><b>서류</b></td><td>정부24(주민등록 등·초본) · 대법원 전자가족관계등록시스템(가족관계증명서)</td><td><span class="ok">확인</span> — 둘 다 인터넷 발급 무료 · 발급기로도 발급(정부24 안내의 신청방법)</td><td>⑥ 「온라인 무료」 줄</td></tr>
+      <tr><td><b>서류</b></td><td>서울시 무인민원 발급기 설치 정보 (서울 열린데이터광장 OA-20336 · 매일 갱신)</td><td><span class="ok">받음</span> — 779행, 반경 안 6곳(서울 열린데이터 7곳 중) · 좌표 없음(이름으로 자리 맞춤)</td><td>그대로 · 지방 학교는 따로 찾기</td></tr>
+      <tr><td><b>안전</b></td><td>서울시 안전비상벨 설치위치 (OA-15253)</td><td><span class="ok">받음</span> — 49행(터널·지하차도) · 좌표 없음</td><td>—</td></tr>
+      <tr><td><b>안전</b></td><td>전국CCTV표준데이터 · 전국안전비상벨위치표준데이터 (행정안전부 · 공공데이터포털)</td><td><span class="no">못 받음</span> — 원본 서버(file.localdata.go.kr) 연결 끊김 ×4. CCTV 는 위경도(WGS84) 명시, 비상벨은 좌표계 표기가 엇갈림</td><td>GitHub 러너에서 받아지는지 먼저 확인</td></tr>
+      <tr><td><b>안전</b></td><td>서울시 안심귀갓길 경로·안전시설물·서비스 (OA-21695 · 21696 · 21697 · 2023.04 기준)</td><td>안 씀 — 좌표 있음(선·점)</td><td>안전 겹에 경로 선 · 기준일 표시</td></tr>
+      <tr><td><b>안전</b></td><td>생활안전지도 치안안전시설 API (행정안전부 · 좌표 UTM-K · 열쇠 필요)</td><td>안 씀</td><td>치안센터·지구대 위치</td></tr>
+      <tr><td><b>카공</b></td><td>전국도서관표준데이터 (평일·토요일 운영 시각 · 위도·경도 · 연 1회)</td><td>안 씀</td><td>도서관 여는 시간</td></tr>
+      <tr><td><b>카공·생활</b></td><td>소상공인 상가(상권)정보 — 업종 「독서실/스터디 카페」 · 「셀프 빨래방」 · 위도·경도 · 분기 갱신</td><td>안 씀</td><td>스터디카페·코인세탁 개수</td></tr>
+      <tr><td><b>자취</b></td><td>국토교통부 연립다세대·오피스텔 전월세 실거래가 (좌표 없음 · 법정동·지번)</td><td>안 씀</td><td>법정동(공릉동·하계동) 단위 시세</td></tr>
+      <tr><td><b>보충</b></td><td>카카오 로컬 키워드·카테고리 장소 검색 (일 10만 건씩 무료)</td><td>안 씀</td><td>빈 곳 보충 — 결과를 저장해도 되는지는 카카오에 확인 필요</td></tr>
+      <tr><td><b>혜택</b></td><td>앱 교내 소식(학교 공지 게시판)</td><td><span class="ok">씀</span> — 과기대 소식 파일의 실제 글 · 원문을 열어 기간·장소 확인</td><td>그대로 + 관리자가 장소에 잇기</td></tr>
+      <tr><td><b>서류</b></td><td>앱 공고 시트의 「서류」 줄</td><td><span class="ok">씀</span> — 마감 전 실제 공고</td><td>그대로</td></tr>
     </tbody>
   </table>
 
   <h2 class="sec-title">지킨 원칙</h2>
   <ul class="plain">
-    <li><b>지어낸 값 없음(원칙 6)</b> — 이름·개수·시간은 받은 파일 그대로. 못 구한 것은 점선 상자. 숫자가 OSM 기준이라 실제보다 적을 수 있다는 것은 화면이 아니라 이 설명에 적었습니다(앱 내부 사정은 학생 화면에 안 적는다).</li>
+    <li><b>지어낸 값 없음(원칙 6)</b> — 이름·개수·시간은 받은 파일 그대로. 못 구한 것은 점선 상자. 숫자가 OSM 기준이라 실제보다 적을 수 있다는 것, 자리를 이름으로 맞춘 방법 같은 앱 내부 사정은 화면이 아니라 이 설명에 적었습니다.</li>
     <li><b>짐작 금지(원칙 8-1)</b> — 「카공하기 좋음」·「안전한 동네」·「왜 이곳에 가야 하는지」를 지어내지 않았습니다. 걷는 시간 대신 직선 거리.</li>
-    <li><b>틀린 안심 금지</b> — 안전은 점수 없이 시설만. 가로등처럼 근거가 빈약한 것은 쓰지 않았습니다.</li>
+    <li><b>틀린 안심 금지</b> — 안전은 점수 없이 시설만. 운영 시간을 모르는 치안센터를 「밤에도」로 묶지 않았고, 가로등처럼 근거가 빈약한 것은 쓰지 않았습니다.</li>
     <li><b>위치정보를 받지 않음</b> — 모든 거리는 학교 정문 기준. 학생의 현재 위치는 묻지 않습니다(받으면 위치정보 동의·고지가 따로 필요).</li>
     <li><b>진척은 학생이 기록(원칙 8)</b> — 첫 주 코스의 「다녀옴」은 학생이 직접 체크.</li>
-    <li><b>술집·과팅 장소는 넣지 않음</b> — 신입생 다수가 만 19세 미만 · 기존 지도 설계(map-roadmap.md)도 과팅 앱 몫으로 봄.</li>
-    <li><b>바깥 스크립트 없음</b> — 지도 프로그램(Leaflet 1.9.4 · BSD-2)을 저장소 사본으로. 앱 보안 설정(script-src 'self')을 그대로 둘 수 있습니다.</li>
-    <li><b>앱 화면 규칙 그대로</b> — 그림자는 떠 있는 것(아래 판·시트·내비)에만, 칩은 고르면 테두리만, 화면 제목 밑줄 없음, 구분선은 목록에만, Pretendard 작은 척도.</li>
+    <li><b>바깥 스크립트 없음</b> — 지도 프로그램(Leaflet 1.9.4 · BSD-2)을 저장소 사본으로. 앱 보안 설정(script-src 'self')을 그대로 둘 수 있고, 그림 주소 하나만 img-src 에 더합니다.</li>
+    <li><b>앱 화면 규칙 그대로</b> — 핀은 남색 한 색(갈래는 그림으로) · 고른 곳은 강조색 테두리 · 그림자는 토큰만(떠 있는 판과 핀) · 글자는 앱 척도(11.5~21px) · 칩은 고르면 테두리만 · 화면 제목 밑줄 없음 · 구분선은 목록에만 · 안쪽 화면 머리에 오른쪽 단추 없음.</li>
   </ul>
 
   <h2 class="sec-title">만드는 순서(제안)</h2>
   <ul class="plain">
-    <li><b>1.</b> 로봇 — 학교마다 <code>data/map/&lt;학교키&gt;.json</code>(학교별 파일 · 폰은 자기 학교 것만), 주 1회. OSM + 공공데이터 파일.</li>
-    <li><b>2.</b> 홈 구역(①) + 지도(②~⑤) + 장소 시트(④) — 한 학교로 먼저.</li>
+    <li><b>1.</b> 로봇 — 학교마다 <code>data/map/&lt;학교키&gt;.json</code>(학교별 파일 · 폰은 자기 학교 것만 · 열쇠는 공고 파일과 같은 규칙), 주 1회. OSM + 공공데이터 파일.</li>
+    <li><b>2.</b> 홈 입구(①) + 지도(②~⑤) + 장소 판(④) — 한 학교로 먼저.</li>
     <li><b>3.</b> 서류 떼는 곳(⑥) — 공고 시트 「서류」 줄과 연결.</li>
     <li><b>4.</b> 첫 주 코스(⑦) — 학교마다 관리자가 한 번 고름.</li>
     <li><b>5.</b> 자취 동네(⑧) — 실거래가 연결 뒤.</li>
@@ -432,7 +396,7 @@
   <p class="foot">
     지도 그림 © OpenStreetMap contributors(ODbL) — 시안에서만 OSM 공식 타일 서버를 씁니다(실서비스에서 쓰는 곳이 아님).
     공공데이터: 서울 열린데이터광장 OA-20336 · OA-15253. 앱 부품 모양은 2026-11-22 style.css 실효값 사본(app-parts.css · tokens.css) — 앱이 바뀌면 이 사본은 낡습니다.
-    지도 데이터 생성: data.js(정문 1.3km 안 · 11-22 받음).
+    지도 데이터: data.js(정문 1.3km 안 · 11-22 받음). 화면 그림: shots/.
   </p>
 </div>
 

@@ -154,8 +154,35 @@
     return map;
   }
 
+  // 하단 탭 — 앱 index.html 의 다섯 칸 그대로(아이콘 원문 · 이름 · 차례). data-tab 이 고른 칸
+  var NAV = [
+    ['home', '홈', '<path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>'],
+    ['explore', '장학금', '<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>'],
+    ['activities', '대외활동', '<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3"/><path d="M17 6h3v2a3 3 0 0 1-3 3"/>'],
+    ['applications', '신청내역', '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>'],
+    ['my', 'MY', '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>'],
+  ];
+  function fillUi() {
+    var navs = document.querySelectorAll('nav.bottom-nav[data-tab]');
+    for (var i = 0; i < navs.length; i++) {
+      var on = navs[i].getAttribute('data-tab');
+      navs[i].innerHTML = NAV.map(function (n) {
+        return '<button class="nav-item' + (n[0] === on ? ' active' : '') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + n[2] + '</svg>' + n[1] + '</button>';
+      }).join('');
+    }
+    // 목록 줄 앞 그림 — 지도 핀과 같은 그림(CAT_ICON 이름 또는 아이콘 이름)
+    var ics = document.querySelectorAll('[data-icon]');
+    for (var j = 0; j < ics.length; j++) {
+      var n = ics[j].getAttribute('data-icon');
+      ics[j].innerHTML = window.mapIcon(CAT_ICON[n] || n, Number(ics[j].getAttribute('data-size') || 16));
+    }
+    var gos = document.querySelectorAll('.go[data-go]');
+    for (var k = 0; k < gos.length; k++) gos[k].innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  }
+
   window.MapMock = { mount: mount, byId: byId };
   function boot() {
+    fillUi();
     var els = document.querySelectorAll('[data-map]');
     for (var i = 0; i < els.length; i++) {
       try { mount(els[i]); } catch (e) { console.error('지도 그리기 실패', e); }
