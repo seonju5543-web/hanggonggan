@@ -28,7 +28,7 @@ a { color: inherit; }
 .legend .lg-pin { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; box-shadow: var(--cutout), var(--knob); }
 .legend .lg-sel { width: 22px; height: 22px; border-radius: 50%; background: var(--primary); box-shadow: var(--cutout), 0 0 0 5px var(--accent-line); }
 .legend .lg-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-weak); box-shadow: 0 0 0 1.5px #fff; }
-.legend .lg-plan { width: 24px; height: 14px; border-radius: var(--radius-hair); border: 1.5px dashed var(--text-weak); }
+.legend .lg-plan { width: 24px; height: 16px; border-radius: 3px; background: #fff3bf; border: 1px solid #ecd67a; transform: rotate(-.6deg); }
 
 .sec-title { font-size: var(--t-xl); font-weight: 800; letter-spacing: var(--track-display); margin: 54px 0 6px; }
 .sec-lead { font-size: var(--t-sm); color: var(--text-sub); max-width: 880px; line-height: 1.7; }
@@ -128,13 +128,10 @@ a { color: inherit; }
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
-/* 연결 예정 자리 — 앞으로 생길 줄의 빈 모양만(회색 뼈대) + 줄 이름 + 꼬리표. 설명은 화면 밖 회색 글에 */
-.plan-slot { display: flex; align-items: center; gap: 10px; border: 1.5px dashed rgba(23, 25, 28, .26); border-radius: var(--radius-sm); padding: 9px 12px; margin-top: 8px; }
-.plan-slot b { flex: none; font-size: var(--t-sm); font-weight: 650; color: var(--text-sub); }
-.plan-slot .sk { flex: 1; display: grid; gap: 5px; }
-.plan-slot .sk i { display: block; height: 7px; border-radius: var(--radius-hair); background: var(--surface-2); }
-.plan-slot .sk i + i { width: 62%; }
-.plan-slot .plan-tag { flex: none; font-size: var(--t-2xs); font-weight: 700; color: var(--text-sub); box-shadow: inset 0 0 0 1px var(--text-weak); border-radius: var(--radius-xs); padding: 1px 7px; }
+/* 시안 메모 — 앱 화면이 아니다. 앱에 없는 색(메모지 노랑)으로 일부러 튀게 해서, 앱의 「불러오는 중」 뼈대나 칩으로 읽히지 않게 한다.
+   실제 앱에서는 데이터가 없으면 이 자리에 아무것도 없다. */
+.plan-slot { position: relative; margin-top: 8px; padding: 8px 11px 8px 12px; background: #fff3bf; border: 1px solid #ecd67a; border-radius: 4px; transform: rotate(-.6deg); font-size: var(--t-2xs); line-height: 1.5; color: #5c4a00; }
+.plan-slot .plan-tag { font-weight: 800; margin-right: 6px; }
 
 /* ① 홈 — 「우리 학교 주변」 구역(한 줄 입구 둘) */
 .home-sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
@@ -258,4 +255,32 @@ ul.plain b { color: var(--text); }
   .phones { grid-template-columns: 1fr; justify-items: center; }
   .decisions { grid-template-columns: 1fr; }
   table.src { display: block; overflow-x: auto; }
+}
+
+/* ⑥ 들어가는 곳 조각 — 공고 시트 「접수」 절의 「서류」 줄 끝에 「떼는 곳 ›」 (폰 밖 작은 그림) */
+.frag { width: 390px; margin: 0 0 12px; background: var(--surface); border-radius: var(--radius-sm); box-shadow: 0 0 0 1px var(--line); padding: 12px 18px; font-size: var(--t-sm); }
+.frag h4 { display: flex; align-items: center; gap: 8px; font-size: var(--t-sm); font-weight: 800; margin-bottom: 6px; }
+.frag h4::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.frag p { line-height: 1.6; color: var(--text); }
+.frag p b { font-weight: 700; margin-right: 6px; }
+.frag .to { color: var(--accent); font-weight: 600; white-space: nowrap; margin-left: 4px; }
+.frag-cap { font-size: var(--t-2xs); color: var(--text-sub); margin: -6px 0 12px; }
+
+/* ⑥ 서류 줄 — 이름표는 앱 시트처럼 굵게 따로 · 굵은 서류가 왜 굵은지 한 줄 */
+.doc-ctx-q .lbl { color: var(--text); font-weight: 700; margin-right: 4px; }
+.doc-ctx-h { font-size: var(--t-xs); color: var(--text-sub); margin-top: 2px; }
+
+/* 기술 메모(접힘) */
+details.tech { margin-top: 40px; max-width: 980px; font-size: var(--t-xs); color: var(--text-sub); background: var(--surface); border-radius: var(--radius-sm); box-shadow: 0 0 0 1px var(--line); padding: 12px 16px; }
+details.tech summary { cursor: pointer; font-weight: 700; color: var(--text); font-size: var(--t-sm); }
+details.tech ul { margin: 10px 0 0 18px; line-height: 1.75; }
+details.tech code { font-size: 12px; }
+
+/* 휴대폰으로 이 시안 페이지를 열 때 — 폰 그림을 화면 끝까지(옆 여백 없이) 붙여 가로로 넘치지 않게 */
+@media (max-width: 430px) {
+  .phones { margin-left: -16px; margin-right: -16px; gap: 40px 0; }
+  .phone { width: 100vw; overflow-x: hidden; }
+  .phone-screen { margin: 0 auto; border-radius: 0; box-shadow: 0 0 0 1px rgba(23, 25, 28, .10); }
+  .phone-cap, .phone-notes, .frag-cap { padding-left: 16px; padding-right: 16px; }
+  .frag { width: auto; margin: 0 16px 12px; }
 }
