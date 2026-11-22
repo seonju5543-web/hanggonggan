@@ -11,17 +11,26 @@
    한쪽만 담겼으면 칩을 안 그린다 · 고른 칩은 이 화면을 떠 있는 동안만(기기에 저장하지 않는다) · 위 숫자(sub)는 늘 전체 */
 let savedKind = 'all';
 const SAVED_KINDS = [['all', '전체'], ['sch', '장학금'], ['act', '대외활동']];
+/* 나눠 보기 한 곳 — 보관함(savedKind)·신청 내역 달력(calKind · 2026-11-21 개발자 「공고보관함과 신청내역에서 대외활동과 장학금이 구분되게」)이 같이 쓴다.
+   둘 다 있을 때만 칩을 그리고, 한쪽만 남으면 '전체'로 돌아간다(돌려주는 kind 를 받아 적는다). counts:false 면 숫자 없이(달력은 이 달 숫자가 따로 있다) */
+function kindFilter(items, cur, attr, { counts: showCounts = true } = {}) {
+  const nAct = items.filter((s) => isActivityId(s.id)).length;
+  const counts = { all: items.length, act: nAct, sch: items.length - nAct };
+  const both = counts.act > 0 && counts.sch > 0;
+  const kind = both ? cur : 'all';
+  const list = kind === 'all' ? items : items.filter((s) => (kind === 'act') === isActivityId(s.id));
+  const row = both ? `<div class="filter-row saved-kinds" role="group" aria-label="공고 종류">${SAVED_KINDS.map(([k, label]) =>
+    `<button type="button" class="filter-chip${k === kind ? ' active' : ''}" data-${attr}="${k}" aria-pressed="${k === kind}">${label}${showCounts ? ` ${counts[k]}` : ''}</button>`).join('')}</div>` : '';
+  return { kind, list, row };
+}
 function renderSaved() {
   const el = $('#my-saved');
   if (!el) return;
   const all = savedScholarships();
-  const nAct = all.filter((s) => isActivityId(s.id)).length;
-  const counts = { all: all.length, act: nAct, sch: all.length - nAct };
-  const both = counts.act > 0 && counts.sch > 0;
-  if (!both) savedKind = 'all';
-  const list = savedKind === 'all' ? all : all.filter((s) => (savedKind === 'act') === isActivityId(s.id));
-  const kindRow = both ? `<div class="filter-row saved-kinds" role="group" aria-label="공고 종류">${SAVED_KINDS.map(([k, label]) =>
-    `<button type="button" class="filter-chip${k === savedKind ? ' active' : ''}" data-saved-kind="${k}" aria-pressed="${k === savedKind}">${label} ${counts[k]}</button>`).join('')}</div>` : '';
+  const kf = kindFilter(all, savedKind, 'saved-kind');
+  savedKind = kf.kind;
+  const list = kf.list;
+  const kindRow = kf.row;
   { const sub = $('#my-sub-saved'); if (sub) { const n = all.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = all.length ? `${all.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
   if (!list.length) {
     el.innerHTML = (`
@@ -220,8 +229,8 @@ function renderApplications() {
          ${/* 합이 0 이면 금액 두 줄을 안 그린다(2026-11-15 · 예전 「금액 미확인」 — '0원'도 쓰지 않는다: 한 푼도 못 받는다로 읽힌다) */ ''}
          ${shownAmount ? `<p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${won(shownAmount)}</p>` : ''}
-         <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록${
-           shownAmount && unknownAmount ? ` · 금액을 못 읽은 ${unknownAmount}건 제외` : ''}</p>
+         ${/* 「제출·발표는 각 공식 채널에서 · 결과는 여기에 기록」은 2026-11-21 개발자 지시로 지웠다 — 금액에서 뺀 건수만 남긴다 */ ''}
+         ${shownAmount && unknownAmount ? `<p class="summary-note">금액을 못 읽은 ${unknownAmount}건 제외</p>` : ''}
        </div>`
     : '';
 
@@ -331,7 +340,7 @@ function learnedHtml(c) {
   const rows = LEARNED_COMMON.filter(([k]) => c[k]);
   if (!rows.length) return '';
   return `<div class="my-learned">
-    <p class="my-learned-head">신청서에서 가져온 정보 <span>${rows.length}개</span></p>
+    <p class="my-learned-head">신청서에서 가져온 정보</p>${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) — 건수 꼬리표 */ ''}
     <ul>${rows.map(([k, label]) => `<li><span>${esc(label)}</span><strong>${esc(k === 'rrn' ? maskRrn(c[k]) : c[k])}</strong>
       <button type="button" class="btn-link" data-forget="${k}">지우기</button></li>`).join('')}</ul>
   </div>`;
@@ -355,19 +364,9 @@ function forgetLearned(key) {
 function renderMy() {
   /* 판 번호는 APP_VERSION 한 곳에서 온다 — 프로필이 없어 일찍 돌아가더라도 적어 둔다 */
   const ver = $('#my-version');
-  /* 🔴 "· 전국 대학 지원" 이라고 적혀 있었다 (2026-09-13 수정). 학교는 전국에서 고를 수
-     있지만 **교내 공고가 있는 학교는 두 곳뿐**이라, 그 말은 학생이 확인할 수 없는 약속이다.
-     지금은 **데이터가 세어 말한다** — 숫자를 손으로 적지 않으므로 학교가 늘면 저절로 맞는다.
-     ⚠️ 층2(한국장학재단)는 전국 재단이라 학교와 무관하다 — 그래서 따로 센다. */
-  if (ver) {
-    const inSchools = new Set(registeredList
-      .map((s) => s.eligibility && s.eligibility.schoolOnly).filter(Boolean));
-    const kosafN = kosafList.length;
-    const parts = [`한대장 ${APP_VERSION}`];
-    if (inSchools.size) parts.push(`교내 공고 ${inSchools.size}개교`);
-    if (kosafN) parts.push(`한국장학재단 ${kosafN}곳`);
-    ver.textContent = parts.join(' · ');
-  }
+  /* 🔴 판 번호만 적는다. 「· 전국 대학 지원」(09-13 지움 — 확인할 수 없는 약속) → 「교내 공고 n개교 · 한국장학재단 n곳」(데이터가 센 숫자)도
+     2026-11-21 개발자 지시로 지웠다 — 학생이 읽지 않는 앱 자랑이다. 숫자 줄을 되살리지 말 것 */
+  if (ver) ver.textContent = `한대장 ${APP_VERSION}`;
 
   /* 계정(로그인) 절 — 프로필이 없어도 그린다(새 기기에서 로그인해 프로필을 받아 오는 길 · 2026-10-10 MY 로 옮김) */
   renderAccountCard();
@@ -397,9 +396,8 @@ function renderMy() {
     </div>
     ${/* 🔴 줄 셋을 뺐다 (2026-09-12 개발자 지시) — '특별자격: 해당 없음' · 공통 서류정보
          안내 · 프로필 사진 안내. 대부분의 학생에게 '해당 없음' 한 줄이고, 나머지 둘은
-         온보딩에서 이미 같은 말을 했다(index.html '모두 선택 사항이며 이 기기에만
-         저장됩니다'). ⚠️ 저장 위치 고지 자체가 사라진 것은 아니다 — 온보딩 그 줄과
-         약관 「③ 서버로 보내지 않는 정보」가 원본이다. */ ''}
+         온보딩에서 이미 같은 말을 했다. ⚠️ 저장 위치 고지는 약관 「③ 서버로 보내지 않는 정보」가 원본이다
+         (온보딩 6단계의 「이 기기에만 저장돼요」는 로그인하면 사실이 아니라 2026-11-21 에 지웠다 — syncSafeProfile 이 빼는 것은 주민번호·계좌번호뿐). */ ''}
     ${learnedHtml(c)}`;
   bindPhotoButtons();
   renderMyMenu(p, trackLabel);
@@ -515,14 +513,14 @@ const FAQ_ITEMS = [
   ['신청', '신청 준비를 끝내면 그다음은 어떻게 되나요?',
     '신청내역에 <strong>신청 준비 완료 → 공식 제출 → 심사 → 선정 발표</strong> 네 단계로 남습니다. 앱은 학교·재단 전산을 볼 수 없어서 <strong>제출과 결과는 학생이 직접 기록</strong>합니다("제출했어요", "선정·미선정" 버튼). 심사 단계만 제출 기록과 마감 경과로 앱이 표시해요.'],
   ['신청', '대장님(도우미)은 무엇을 답해 주나요?',
-    '앱이 <strong>이미 알고 있는 것</strong>만 답합니다 — 등록된 공고, 필요한 서류, 내 신청 현황, 공고 원문에서 뽑아 둔 문장이에요. 모르는 것은 지어내지 않고 "못 찾았다"고 말합니다. 그게 이 도우미를 만든 이유예요.'],
+    '앱이 <strong>이미 알고 있는 것</strong>만 답합니다 — 등록된 공고, 필요한 서류, 내 신청 현황, 공고 원문에서 뽑아 둔 문장이에요. 모르는 것은 지어내지 않고 "못 찾았다"고 말합니다.'], // 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내)
 
   ['공고·매칭', '우리 학교 공고가 안 보여요.',
     '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
   ['공고·매칭', '자격 요건이 안 적힌 공고가 있어요.',
-    '그 공고에서는 자격 요건을 <strong>공고 원문에서 직접 확인</strong>해 주세요. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요.'],
+    '그 공고에서는 자격 요건을 <strong>공고 원문에서 직접 확인</strong>해 주세요. 앱이 짐작해서 채우지 않습니다.'], // 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내)
   ['공고·매칭', '금액이 안 보이는 공고가 있어요.',
-    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우입니다. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>금액 줄을 비워</strong> 둡니다. 다만 홈의 합계는 이런 공고를 빼 버리면 실제보다 작아지므로, <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙입니다. 자세한 내역은 홈의 금액을 눌러 <strong>금액 상세</strong>에서 볼 수 있어요.'],
+    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우예요. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>금액 줄을 비워</strong> 둡니다. 홈의 합계에는 <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙여요. 홈의 금액을 누르면 <strong>금액 상세</strong>에서 내역을 볼 수 있어요.'], // 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내)
   ['공고·매칭', '저장(북마크)한 공고는 어디에 남나요?',
     '<strong>이 기기에만</strong> 남습니다. 로그인해도 저장 목록은 서버로 올라가지 않아서, 기기를 바꾸면 다시 저장하셔야 해요.'],
   ['공고·매칭', '달력에 왜 몇 개만 표시되나요?',
@@ -796,7 +794,7 @@ function renderSupport() {
 
   /* 문의처가 정해졌을 때만 메일 버튼을 낸다 — 없으면 정직하게 무엇이 되는지 적는다 */
   const 문의 = supportConfigured()
-    ? `<p class="sup-desc">답변은 적어 주신 메일 주소로 받으실 수 있어요.${SUPPORT_CONFIG.hours ? ` 응대 시간은 ${esc(SUPPORT_CONFIG.hours)}입니다.` : ''}</p>
+    ? `${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}${SUPPORT_CONFIG.hours ? `<p class="sup-desc">응대 시간은 ${esc(SUPPORT_CONFIG.hours)}입니다.</p>` : ''}
        <button type="button" class="btn btn-outline" id="btn-support-mail">문의 메일 쓰기</button>`
     : `<p class="sup-desc">한대장은 아직 시범 개발 중이라 <strong>따로 받아 볼 문의처를 두지 않았어요.</strong>
          정해지면 이 자리에 적고 그때부터 받습니다(이용약관 9번과 같은 내용이에요).</p>
@@ -813,7 +811,6 @@ function renderSupport() {
 
     <div class="my-card">
       <p class="wallet-title">바로 물어보기</p>
-      <p class="sup-desc">대장님은 앱이 <strong>이미 아는 것</strong>(등록된 공고·서류·내 신청 현황·공고 원문)을 찾아 줍니다. 모르면 지어내지 않고 못 찾았다고 말해요.</p>
       <button type="button" class="btn btn-outline" id="btn-support-chat">대장님에게 물어보기</button>
     </div>
 
@@ -824,8 +821,8 @@ function renderSupport() {
 
     <div class="my-card">
       <p class="wallet-title">진단 정보</p>
-      <p class="sup-desc">문제를 알려 주실 때 아래를 함께 보내 주시면 원인을 훨씬 빨리 찾을 수 있어요.
-        <strong>이름·학교·성적 같은 개인정보는 들어 있지 않습니다.</strong></p>
+      <p class="sup-desc">문의할 때 아래 정보를 함께 보내 주세요.${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) — 권유 꾸밈 */ ''}
+        <strong>이름·학교·성적 같은 개인정보는 들어 있지 않아요.</strong></p>
       <div class="sup-diag">${supportDiagnostics()
         .map(([k, v]) => `<div class="sup-diag-row"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}</div>
       <button type="button" class="btn btn-outline" id="btn-support-copy">진단 정보 복사</button>

@@ -171,12 +171,11 @@ function renderAccountCard() {
   el.hidden = false;
   const u = authUser();
   el.innerHTML = u
+    /* 로그인한 판 (2026-11-21 개발자 지시) — 계정 · 그 아래 메일 · 그 아래 작은 빨간 글자 「로그아웃」(테두리·바탕 없음).
+       🔴 탈퇴는 여기 두지 않는다 — 설정 화면(알림 · 설정)의 「탈퇴」 한 곳(#btn-withdraw · 약관이 '설정 화면에서 탈퇴'라고 적는다) */
     ? `<p class="acc-head">계정</p>
        <p class="acc-mail">${esc(u.email || '로그인됨')}</p>
-       <div class="acc-actions">
-         <button class="btn btn-outline" id="btn-acc-out">로그아웃</button>
-         <button class="btn btn-outline danger" id="btn-acc-del">탈퇴 (서버 정보 삭제)</button>
-       </div>`
+       <button type="button" class="acc-out" id="btn-acc-out">로그아웃</button>`
     : `<p class="acc-head">로그인</p>
        <p class="acc-note">다른 폰에서도 내 정보와 신청 내역을 그대로 볼 수 있어요.</p>
        <div class="acc-actions">
@@ -187,16 +186,10 @@ function renderAccountCard() {
   const btnIn = $('#btn-acc-in'); if (btnIn) btnIn.addEventListener('click', () => openAuthSheet('in'));
   const btnUp = $('#btn-acc-up'); if (btnUp) btnUp.addEventListener('click', () => openAuthSheet('up'));
   const btnOut = $('#btn-acc-out');
-  if (btnOut) btnOut.addEventListener('click', async () => {
-    await authSignOut();
+  /* 🔴 서버 답을 기다리지 않고 바로 다시 그린다 — authSignOut 은 부르는 순간 이 기기 로그인을 지운다(서버 알림은 뒤에서) */
+  if (btnOut) btnOut.addEventListener('click', () => {
+    authSignOut();
     toast('로그아웃 · 이 기기의 정보는 그대로 유지');
-    renderMy();
-  });
-  const btnDel = $('#btn-acc-del');
-  if (btnDel) btnDel.addEventListener('click', async () => {
-    if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
-    const r = await authDeleteData();
-    toast(r.ok ? '서버 정보 삭제 완료' : r.error);
     renderMy();
   });
 }
@@ -353,8 +346,9 @@ async function authSubmit() {
      팀원이 아닌 주소로는 거부하는데, 그 거부가 앱에는 성공으로 보인다. 그래서
      "보냈습니다"라고 단정하지 않고 안 왔을 때 무엇을 하면 되는지까지 적는다. */
   if (mode === 'reset') {
-    renderAuthSheet(null, '재설정 링크 요청 완료. 메일함(스팸함도)을 확인해 주세요.\n'
-      + '몇 분 안에 안 오면 아직 메일 발송이 준비되지 않은 것이니 관리자에게 알려 주세요.');
+    /* 2026-11-21 개발자 지시로 줄임(확인 안 한 원인 단정을 빼고 실제 연락 길로) */
+    renderAuthSheet(null, '재설정 링크를 요청했어요. 메일함(스팸함도)을 확인해 주세요.\n'
+      + '몇 분 안에 안 오면 설정의 고객센터로 알려 주세요.');
     return;
   }
   if (mode === 'newpw') {
@@ -374,7 +368,7 @@ async function authSubmit() {
   else setRememberedEmail(email);          // 가입한 사람은 그 주소를 기억해 둔다
 
   closeSheet();
-  toast('로그인 완료 · 기기를 바꿔도 이어짐');
+  toast('로그인 완료');   // 2026-11-21 개발자 지시로 줄임(학생이 읽지 않는 설명)
   /* 🔴 순서가 중요하다 — **먼저** 서버와 맞춘다. 새 기기에서는 이 줄에서 프로필이
      처음 생기므로, 화면 그리기를 앞에 두면 아직 프로필이 없는 상태로 그리게 된다. */
   await syncAfterLoad();

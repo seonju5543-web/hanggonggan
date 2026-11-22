@@ -9641,9 +9641,8 @@ console.log('\n■ 화면이 「전국 모든 대학」을 약속하지 않는�
   const strip = (t) => t.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
   eq('화면 문구에 「전국 모든 대학」이 없다', /전국\s*모든\s*대학/.test(strip(html) + strip(app)), false);
   eq('  MY 아래줄이 「전국 대학 지원」이라고 하지 않는다', /전국 대학 지원/.test(strip(app)), false);
-  /* 🔴 숫자를 손으로 적지 않는다 — 학교가 늘면 저절로 맞아야 한다(데이터가 세어 말한다) */
-  eq('  대신 데이터에서 센다 (교내 학교 수 · 층2 재단 수)',
-    /schoolOnly\)\.filter\(Boolean\)/.test(app) && /kosafList\.length/.test(app), true);
+  /* 2026-11-21 개발자 지시 — 데이터가 센 숫자(「교내 공고 n개교 · 한국장학재단 n곳」)도 학생이 읽지 않는 앱 자랑이라 지웠다. 판 번호만 */
+  eq('  MY 아래줄은 판 번호뿐 (숫자 자랑 없음 · 2026-11-21)', /ver\.textContent = `한대장 \$\{APP_VERSION\}`;/.test(app) && !/교내 공고 \$\{inSchools/.test(app), true);
 }
 
 /* ══ 시작 화면 — 승인받은 컷 A 그대로인가 (2026-09-18 · 노션 UI-3) ═══════════
@@ -10914,7 +10913,8 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const appN = appSource();
     const robotN = readText(new URL('../collector/collect-news-desc.mjs', import.meta.url));
     eq('  앱 — 요약이 있는 글만 요약 줄을 그린다 (홈 띠 · 전체 보기 카드)', [/\$\{n\.desc \? `<span class="news-tile-desc">/.test(appN), /\$\{o\.desc \? `<p class="sch-desc">/.test(appN), /desc: n\.desc \}\)/.test(appN)], [true, true, true]);
-    eq('  앱 — 「오늘 n」 은 부를 때마다 오늘을 읽는다 (todayStart · 날짜를 굳히지 않는다)', /function newsIsToday[\s\S]{0,300}todayStart\(\)/.test(appN), true);
+    /* 「오늘 n」 알약은 2026-11-21 개발자 지시로 없앴다('AI 티 · 학생이 안 읽는 글자') — 되살아나지 않는가 */
+    eq('  앱 — 우리 학교 소식 제목 옆 「오늘 n」 알약이 없다 (2026-11-21)', /news-today|오늘 \$\{todayN\}/.test(appN), false);
     eqWf('  워크플로 — 요약 단계는 보강(continue-on-error) · 장부를 저장하고 감사 실패 땐 되돌린다',
       [/collect-news-desc\.mjs/.test(wf), /name: 교내 소식 요약[\s\S]{0,120}continue-on-error: true/.test(wf),
         /git add collector\/news-desc\.json/.test(wf), /git checkout -- collector\/news-desc\.json/.test(wf)], [true, true, true, true]);
@@ -14323,6 +14323,62 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  지원 가능 알약(STATUS_META)은 활동 시트에 없다 — 구조화 조건이 없어 늘 가능이라 거짓 안심', /STATUS_META\[/.test((() => { const a = appX.indexOf('function openActivityDetail'); return appX.slice(a, appX.indexOf('\nfunction ', a + 10)); })()), false);
 }
 
+/* ══ 승인받은 화면 그대로인가 — 앱 안 알림 시안 C「흰 카드」 (2026-11-21 · docs/designs/mockups/toast-options.png) ══
+   개발자가 시안 5종(A 진한 판 · B 진한 판+아이콘 · C 흰 카드 · D 위쪽 배너 · E 알약) 중 "C로 진행하자".
+   흰 바탕 · 얇은 테두리 · 왼쪽 동그란 아이콘 · 굵은 머리 + 회색 설명 · 되돌리기는 오른쪽 놋쇠 글자.
+   🔴 검사만 고쳐 통과시키지 말 것 — 화면을 바꾸려면 개발자에게 다시 보여 주고 승인받은 뒤 여기도 같이(스킬 approved-design). */
+{
+  console.log('\n■ 승인받은 화면 그대로인가 — 앱 안 알림 시안 C (2026-11-21)');
+  const appT = appSource();
+  const cssT = readText(new URL('../style.css', import.meta.url));
+  const rule = (sel) => { const a = cssT.indexOf(`\n${sel} {`); return a < 0 ? '' : cssT.slice(a, cssT.indexOf('}', a)); };
+  const box = rule('.toast');
+  eq('알림 판은 흰 바탕(--surface) · 잉크 글자 · 얇은 테두리(--rule) · 떠 있는 그림자(--shadow-lift)',
+    [/background: var\(--surface\)/.test(box), /color: var\(--text\)/.test(box), /border: 1px solid var\(--rule\)/.test(box), /box-shadow: var\(--shadow-lift\)/.test(box)], [true, true, true, true]);
+  eq('  왼쪽 정렬 · 화면 양옆 16px · 하단 탭 위(safe-area 포함)',
+    [/text-align: left/.test(box), /width: calc\(100% - 32px\)/.test(box), /bottom: calc\(74px \+ env\(safe-area-inset-bottom\)\)/.test(box)], [true, true, true]);
+  eq('  설명 줄은 회색(--text-sub) · 되돌리기는 강조색(--accent)',
+    [/color: var\(--text-sub\)/.test(rule('.toast-sub')), /color: var\(--accent\)/.test(rule('#toast .toast-undo'))], [true, true]);
+  eq('  아이콘은 24px 원 · 됐다=연초록 체크 · 안 됐다=연붉은 느낌표 · 안내=회색',
+    [/width: 24px; height: 24px; border-radius: 50%/.test(rule('.toast-ico')), /background: var\(--green-weak\); color: var\(--green\)/.test(rule('.toast-ico')),
+     /background: var\(--red-weak\); color: var\(--red\)/.test(rule('.toast-ico[data-tone="warn"]')), /background: var\(--surface-2\); color: var\(--text-sub\)/.test(rule('.toast-ico[data-tone="info"]'))],
+    [true, true, true, true]);
+  /* 판은 손가락을 통과시키고 단추만 받는다 — 넓은 판이 2.6초 동안 도우미 버튼을 삼키지 않게 */
+  eq('  알림 판은 누름을 통과시키고 되돌리기 단추만 받는다',
+    [/pointer-events: none/.test(box), /pointer-events: auto/.test(rule('#toast .toast-undo'))], [true, true]);
+  /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
+  const cut = appT.slice(appT.indexOf('const TOAST_WARN'), appT.indexOf('const TOAST_ICONS'));
+  const partsAt = appT.indexOf('function toastParts(');
+  const partsSrc = appT.slice(partsAt, appT.indexOf('\n}\n', partsAt) + 2);
+  const T = new Function(`${cut}\n${partsSrc}\nreturn { toastTone, toastParts };`)();
+  eq('머리·설명은 첫 「 · 」·「 — 」에서 한 번만 가른다 · 앞이 길면 가르지 않는다',
+    [T.toastParts('지원문서 작성 완료 · 내용을 옮겨 제출하세요 · 끝').sub, T.toastParts('비밀번호 변경 완료').sub, T.toastParts('저장돼 있던 평점·태어난 해 값이 범위를 벗어나 비웠어요 — 내 정보에서 다시 적어 주세요').sub],
+    ['내용을 옮겨 제출하세요 · 끝', '', '']);
+  /* 🔴 실패 알림에 체크를 달면 '안 됐는데 됐다'가 된다 — 실패 낱말이 섞이면 완료 낱말보다 먼저 본다 */
+  eq('  안 된 일은 느낌표 · 된 일은 체크 · 나머지는 안내',
+    ['서류를 지우지 못했어요 · 서류 보관함에서 직접 지워 주세요', '복사 실패', '팝업이 차단됐습니다. 브라우저 설정을 확인해 주세요', '학교명 입력 필요',
+     '지원문서 작성 완료 · 내용을 옮겨 제출하세요', '저장을 해제했어요', '3건 삭제', '알림을 켰습니다. 새 공고와 마감을 알립니다',
+     '새 알림 2건', '알림은 MY 화면에서 언제든 켜기 가능'].map(T.toastTone),
+    ['warn', 'warn', 'warn', 'warn', 'done', 'done', 'done', 'done', 'info', 'info']);
+  /* 🔴 실제 실패 문구가 체크로 새지 않는다 — 서버 오류(authErrorText)·입력 막음(input-guard·GUARD_KIND_MSG)·초안 거절(essay.js).
+     '문제가 생겼어요'는 끝난 말꼴이라 한때 초록 체크였다: 서버 정보 삭제 실패가 '됐다'로 보였다(리뷰 2026-11-21) */
+  eq('  서버 오류·입력 막음·초안 거절은 체크가 아니다(느낌표)',
+    ['문제가 생겼어요 (Internal error)', '문제가 생겼어요. 잠시 후 다시 시도해 주세요', '인터넷 연결을 확인해 주세요', '이메일 또는 비밀번호가 맞지 않아요',
+     '로그인 상태가 아니에요', '학번은 숫자·영문만 적을 수 있어요', '생년월일은 2005.03.14 처럼 적어 주세요', '있을 수 없는 생년월일이에요 — 다시 확인해 주세요',
+     '민감정보가 섞여 있어 보내지 않았어요 — 그 부분은 직접 써 주세요', '로그인이 끝났어요. 다시 로그인해 주세요', '재료에 없는 사실: "수상"'].map(T.toastTone),
+    Array(11).fill('warn'));
+  const sbSrc = readText(new URL('../supabase-client.js', import.meta.url));
+  const aeAt = sbSrc.indexOf('function authErrorText(');
+  const authMsgs = [...sbSrc.slice(aeAt, sbSrc.indexOf('\n}\n', aeAt)).matchAll(/return [`']([^`']+)[`']/g)].map((m) => m[1].replace(/\$\{m\}/, 'x'));
+  eq('  authErrorText 가 내는 문구는 하나도 체크가 아니다(전수)', authMsgs.length >= 6 && authMsgs.filter((m) => T.toastTone(m) === 'done'), []);
+  const toastAt = appT.indexOf('function toast(msg');
+  const toastFn = appT.slice(toastAt, appT.indexOf('\nfunction ', toastAt + 10));
+  eq('  toast() 가 실제로 성격을 가려 그 아이콘을 단다(함수만 있고 안 쓰이는 일이 없다)',
+    [/const tone = toastTone\(msg\);/.test(toastFn), /dataset\.tone = tone/.test(toastFn), /TOAST_ICONS\[tone\]/.test(toastFn), /toastParts\(msg\)/.test(toastFn)], [true, true, true, true]);
+  eq('  알림 글은 textContent 로만 넣는다(그림만 고정 글자)',
+    [/h\.textContent = head;/.test(toastFn), /d\.textContent = sub;/.test(toastFn), /innerHTML = [^;]*\b(msg|head|sub)\b/.test(toastFn)], [true, true, false]);
+}
+
 /* ══ 승인받은 화면 그대로인가 — 목록 카드 시안 B · 상세 시트 한 벌 (2026-11-02 · docs/designs/mockups/card-consistency.html 「시안 B」 · sheet-consistency.html) ══
    개발자 결정(같은 날 "제안대로"): 마감 D-day 는 카드 아랫줄 오른쪽 그대로 · 적합도 알약은 윗줄 칩·주최 옆 그대로.
    🔴 검사만 고쳐 통과시키지 말 것 — 화면을 바꾸려면 개발자에게 다시 보여 주고 승인받은 뒤 여기도 같이 고친다(스킬 approved-design). */
@@ -14371,7 +14427,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   /* 2026-11-07 개발자 지시 "지원자격에 넣을 내용이 없는 경우에는 지원자격 칸 자체를 없애기" — 11-02 의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다. 되돌리면 빨갛다 */
   eq('  자격 0줄이고 물을 것도 없으면 「지원 자격」 칸 자체가 없다(「원문에서 확인」 자리표시 줄 없음 · 2026-11-07) · 제외 조건은 같은 목록 안 ✗(r-x)',
     [/const elig = \(rows \|\| ask\) \? `<div class="sheet-verdict">/.test(sec), /자격은 원문에서 확인해 주세요/.test(sec), /class="r-elig r-x">✗ /.test(fnOf('eligibilityRowsHtml')), /지원 제외 대상/.test(fnOf('eligibilityRowsHtml'))], [true, false, true, false]);
-  eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period, true\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /재단 선발 공고문·홈페이지가 정한 접수 방법/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, true]);
+  eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period, true\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /'재단 선발 공고문·홈페이지가 정한 접수 방법'/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, false]);   // 마지막: 아무것도 알려 주지 않는 층2 「방법」 줄은 2026-11-21 개발자 지시로 지웠다
   /* 2026-11-15 은서 지시 — 「더 보기」 뒤 줄 수(「(2줄)」)는 뺀다 · 시트 목록 앞 점도 뺀다(style.css #detail-sheet 블록) */
   eq('  「공고 안내」 는 다섯 줄 뒤 「더 보기」(줄 수 없이) · 층2 재단 칸(선발방법·선발인원·추천필요여부)도 같은 줄로', [/NS_SHOWN/.test(fnOf('noticeSummaryHtml')), /<summary>더 보기<\/summary>/.test(fnOf('noticeSummaryHtml')) && !/더 보기 \(/.test(fnOf('noticeSummaryHtml')), /\['선발방법', '선발인원', '추천필요여부'\]/.test(fnOf('kosafAsScholarships'))], [true, true, true]);
   eq('  「첨부」 — 층2는 꼬리표 「재단 선발 공고문」 · 「공고 원본 첨부 양식」 이름은 없다', [/<h4>첨부\$\{sch\.sourceKind === 'kosaf' \? ' <span class="channel-tag">재단 선발 공고문<\/span>' : ''\}<\/h4>/.test(sec), /공고 원본 첨부 양식|공고 원본 첨부</.test(appV)], [true, false]);
@@ -18351,6 +18407,29 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
     [/Mascot\.syncHome\(state\.profile && state\.profile\.school\)/.test(appSource()), /Mascot\.syncApps\(apps\.length > 0 && !calMode\)/.test(appSource())], [true, true]);
 }
 
+console.log('\n■ PDF 보기 — 설치한 앱에서 돌아올 길 (2026-11-21 개발자 제보 — 양식을 열면 뒤로 버튼이 없어 앱을 껐다 켜야 했다)');
+{
+  /* 설치한 앱(standalone)엔 뒤로 버튼이 없다 — 같은 집 PDF(data/…pdf)는 target=_blank 여도 앱 창이 그대로 PDF 로 넘어간다.
+     pdf-view.js 가 그 클릭만 가로채 뒤로 단추가 있는 판에 그린다(아이폰 iframe 은 첫 쪽만 보여 쓰지 않는다 · 엔진 pdfjs/).
+     브라우저에서 연 앱은 새 탭 그대로다(2026-11-20 결정 (가)). 아래 셋 중 하나만 빠져도 다시 갇힌다 */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  const pv = readText(new URL('../pdf-view.js', import.meta.url));
+  eq('  pdf-view.js 를 index.html 이 싣고 서비스워커가 담는다 · 엔진 두 파일이 저장소에 있다 · index.html 은 엔진을 직접 싣지 않는다(처음 열 때 싣는다)',
+    [/<script src="pdf-view\.js"><\/script>/.test(html), sw.includes("'pdf-view.js'"),
+      fs.existsSync(new URL('../pdfjs/pdf.min.mjs', import.meta.url)), fs.existsSync(new URL('../pdfjs/pdf.worker.min.mjs', import.meta.url)), /src="pdfjs\//.test(html)],
+    [true, true, true, true, false]);
+  eq('  엔진 주소가 실제 파일 이름과 같다 (틀리면 판이 「열지 못했어요」만 띄운다)',
+    [pv.includes("const PDFV_LIB = 'pdfjs/pdf.min.mjs'"), pv.includes("const PDFV_WORKER = 'pdfjs/pdf.worker.min.mjs'")], [true, true]);
+  eq('  가로채는 조건 = 설치한 앱 + 같은 집 .pdf — 브라우저는 새 탭 그대로 · 바깥 PDF 는 폰이 「완료」 있는 창으로 연다',
+    [/!pdfvStandalone\(\) \|\| !pdfvOwnPdf\(/.test(pv), /navigator\.standalone === true/.test(pv), /display-mode: standalone/.test(pv), /u\.origin === location\.origin && \/\\\.pdf\$\/i\.test\(u\.pathname\)/.test(pv)],
+    [true, true, true, true]);
+  eq('  판에 뒤로(닫기) 단추가 있고 닫기가 판을 감춘다', [/class="sub-back pdfv-close" aria-label="닫기"/.test(pv), /querySelector\('\.pdfv-close'\)\.addEventListener\('click', closePdfView\)/.test(pv), /el\.hidden = true/.test(pv)], [true, true, true]);
+  eq('  🔴 iframe·embed 로 PDF 를 넣지 않는다 (아이폰은 첫 쪽만 그림처럼 보인다 · 주석은 빼고 본다)', /<iframe|<embed|<object/.test(pv.replace(/\/\*[\s\S]*?\*\//g, '')), false);
+  eq('  PDF 줄(pdfRowHtml)은 지금도 같은 집 data/ 주소를 건다 — 바뀌면 이 관문의 전제를 다시 본다',
+    ['data/forms-pdf/', 'data/docs-pdf/', 'data/form-pages/'].filter((d) => !readText(new URL('../app-live.js', import.meta.url)).includes('`' + d)), []);
+}
+
 console.log('\n■ 대장님 말귀 — 오타·변형 알아듣기 · 공고 한 건의 칸 (2026-11-20 개발자 지시)');
 {
   /* 개발자 지시: "입력된 값을 1000-10000개 수준으로 늘려서 … 오타를 내거나 같은 의미에서 변형된 말을 해도 알아듣고 …
@@ -18397,6 +18476,61 @@ console.log('\n■ 대장님 말귀 — 오타·변형 알아듣기 · 공고 �
       /'chat-nlu\.js', 'chat-kb\.js', 'chat\.js'/.test(readText(new URL('../sw.js', import.meta.url)))],
     [true, true, true, true]);
   eq('  🔴 일반 질문(`서류 뭐 준비해?`)에는 본문에만 낱말이 든 공고 하나를 고르지 않는다 — 이름에서 찾은 것만(chatNameHit)', /if \(hit && chatNameHit\(hit, q\)\)/.test(chatSrc), true);
+}
+
+console.log('■ 로그인 판 — 소셜 로그인도 로그인 상태로 보인다 (2026-11-21 · 개발자 지적 "로그인이 되어도 로그인·회원가입이 뜬다")');
+{
+  /* 구글·애플 로그인은 토큰만 들고 돌아와 사용자 번호가 없다 — 서버에 다시 묻는 요청(authFetchUser)이 실패하면 번호가 빈 채 남아
+     authUser() 가 null → MY 계정 카드(renderAccountCard)가 로그인·회원가입을 그렸다. 토큰(JWT) 안의 sub·email 로 읽는다(supabase-client.js jwtClaims) */
+  const vm = createRequire(import.meta.url)('node:vm');
+  const store = {};
+  const ctx = { localStorage: { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } },
+    SUPABASE_CONFIG: { url: 'https://x.supabase.co', anonKey: 'k' }, atob, TextDecoder, Uint8Array, console, setTimeout, clearTimeout, location: { hash: '', pathname: '/', search: '' }, navigator: {}, window: {} };
+  vm.createContext(ctx);
+  vm.runInContext(readText(new URL('../supabase-client.js', import.meta.url)), ctx, { filename: 'supabase-client.js' });
+  const b64u = (o) => Buffer.from(JSON.stringify(o)).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const jwt = (p) => `${b64u({ alg: 'HS256' })}.${b64u(p)}.sig`;
+  const put = (o) => ctx.localStorage.setItem('handaejang.auth', JSON.stringify(o));
+  ctx.authStore({ access_token: jwt({ sub: 'u-123', email: '한글@x.kr' }), expires_in: 3600 });
+  const social = ctx.authUser();
+  put({ accessToken: jwt({ sub: 'u-9', email: 'b@x.kr' }), userId: '' });
+  const stuck = ctx.authUser();
+  put({ accessToken: 'not-a-jwt', userId: '' });
+  const broken = ctx.authUser();
+  put({ accessToken: jwt({ sub: 'old' }), userId: 'old', email: 'old@x.kr' });
+  ctx.authStore({ access_token: jwt({ sub: 'new', email: 'new@x.kr' }) });
+  const switched = ctx.authUser();
+  eq('소셜 로그인(사용자 정보 없이 토큰만) — 토큰 안의 번호·메일로 로그인 상태(한글 메일도)', social, { userId: 'u-123', email: '한글@x.kr' });
+  eq('  번호가 빈 채 저장된 기기(이미 그 사고를 겪은 기기)도 다시 로그인하지 않고 로그인 상태로 보인다', stuck, { userId: 'u-9', email: 'b@x.kr' });
+  eq('  토큰 꼴이 아니면 로그인 아님(넘어지지 않는다)', broken, null);
+  eq('  로그아웃 없이 다른 계정으로 로그인하면 새 사람 — 앞사람 번호가 남지 않는다', switched, { userId: 'new', email: 'new@x.kr' });
+  const accSrc = readText(new URL('../app-account.js', import.meta.url));
+  const cardFn = (accSrc.match(/^function renderAccountCard\(\) \{[\s\S]*?^\}/m) || [''])[0];
+  const signedInHtml = (cardFn.match(/el\.innerHTML = u[\s\S]*?\?\s*`([\s\S]*?)`\s*:/) || [, ''])[1];
+  eq('  MY 계정 카드는 authUser() 하나로 로그아웃/로그인을 가른다(다른 판정을 새로 만들지 않는다)', /const u = authUser\(\);\s*el\.innerHTML = u\b/.test(cardFn) && /id="btn-acc-out"/.test(signedInHtml), true);
+  /* 2026-11-21 개발자 지시 — 로그인한 판: 계정 · 그 아래 메일 · 그 아래 작은 빨간 글자 로그아웃(테두리 없음) · 탈퇴는 설정 화면 한 곳 */
+  eq('  로그인한 판 = 계정 → 메일 → 글자 버튼 「로그아웃」 차례 · 탈퇴 버튼 없음(설정 화면 #btn-withdraw 에만) · 테두리 버튼(btn) 아님',
+    [/<p class="acc-head">계정<\/p>\s*<p class="acc-mail">[^<]*<\/p>\s*<button type="button" class="acc-out" id="btn-acc-out">로그아웃<\/button>\s*$/.test(signedInHtml), /탈퇴|btn-acc-del/.test(signedInHtml) || /btn-acc-del/.test(cardFn), (signedInHtml.match(/<button[^>]*\bclass="([^"]*)"/) || [, ''])[1].split(/\s+/).includes('btn'),
+      /id="btn-withdraw"/.test(readText(new URL('../index.html', import.meta.url)))], [true, false, false, true]);
+  const css = readText(new URL('../style.css', import.meta.url));
+  const outRule = (css.match(/\n\.acc-out \{([^}]*)\}/) || [, ''])[1];
+  eq('  로그아웃 글자 버튼 모양 — 빨강 · 작은 글씨 · 바탕·테두리 없음 · 누르는 넓이 44px', [/color: var\(--red\)/.test(outRule), /font-size: var\(--t-sm\)/.test(outRule), /background: none/.test(outRule) && /border: 0/.test(outRule), /min-height: 44px/.test(outRule)], [true, true, true, true]);
+  /* 로그아웃은 서버 답을 기다리지 않는다 — 부르는 순간 이 기기 로그인이 지워지고(첫 await 앞) 카드는 바로 다시 그린다 */
+  {
+    const store2 = {};
+    let sent = null;
+    const c2 = { localStorage: { getItem: (k) => (k in store2 ? store2[k] : null), setItem: (k, v) => { store2[k] = String(v); }, removeItem: (k) => { delete store2[k]; } },
+      SUPABASE_CONFIG: { url: 'https://x.supabase.co', anonKey: 'k', timeoutMs: 8000 }, atob, TextDecoder, Uint8Array, console, setTimeout, clearTimeout, location: { hash: '', pathname: '/', search: '' }, navigator: {}, window: {},
+      fetch: (url, o) => { sent = { url: String(url), auth: o && o.headers && o.headers.Authorization }; return new Promise(() => {}); } };   // 서버는 영영 답하지 않는다
+    vm.createContext(c2);
+    vm.runInContext(readText(new URL('../supabase-client.js', import.meta.url)), c2, { filename: 'supabase-client.js' });
+    const tok = jwt({ sub: 'u-1', email: 'a@x.kr' });
+    c2.localStorage.setItem('handaejang.auth', JSON.stringify({ accessToken: tok, refreshToken: 'r', expiresAt: Date.now() + 3e6, userId: 'u-1', email: 'a@x.kr' }));
+    c2.authSignOut();   // 기다리지 않는다
+    eq('  로그아웃 — 서버가 답하지 않아도 부르는 순간 이 기기는 로그아웃(authUser null) · 서버에는 들고 있던 토큰으로 알린다',
+      [c2.authUser(), !!sent && /\/auth\/v1\/logout$/.test(sent.url), sent && sent.auth], [null, true, 'Bearer ' + tok]);
+    eq('  카드의 로그아웃 단추는 기다리지 않고 바로 다시 그린다(await 없음)', /btnOut\.addEventListener\('click', \(\) => \{\s*authSignOut\(\);[\s\S]{0,120}?renderMy\(\);/.test(cardFn), true);
+  }
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

@@ -1,6 +1,6 @@
 {
  "school": "중앙대학교",
- "updatedAt": "2026-11-21",
+ "updatedAt": "2026-11-22",
  "items": [
   {
    "title": "2026학년도 K-MOOC FAIR 안내",
@@ -364,28 +364,6 @@
    "src": "f4f8bc8f",
    "foundAt": "2026-10-23",
    "desc": "신청기간 및 자격기준 가 . 신청기간 : 2026. 11. 16.( 월 ) 10 시 ~ 11. 27.( 금 ) 18 시"
-  },
-  {
-   "title": "2026년 11월 각 군 현역병 모집계획",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30277&pageNo=1",
-   "postId": "30277",
-   "postedAt": "2026-10-22",
-   "school": "중앙대학교",
-   "campus": "",
-   "src": "f4f8bc8f",
-   "foundAt": "2026-10-22",
-   "thumb": "data/news/img/c78e5fafc32bdcd5.webp"
-  },
-  {
-   "title": "2026학년도 2학기 금융권 직무특화교육 프로그램:11/02(월)~",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30276&pageNo=1",
-   "postId": "30276",
-   "postedAt": "2026-10-22",
-   "school": "중앙대학교",
-   "campus": "",
-   "src": "f4f8bc8f",
-   "foundAt": "2026-10-22",
-   "thumb": "data/news/img/c3927af0599aa84c.webp"
   }
  ]
 }

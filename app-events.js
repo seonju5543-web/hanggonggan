@@ -336,6 +336,17 @@ function bindEvents() {
 
   /* 달력 — 달 이동과 날짜 펼치기 */
   document.addEventListener('click', (e) => {
+    const ck = e.target.closest('[data-cal-kind]');
+    if (ck) {
+      if (ck.dataset.calKind !== calKind) {
+        calKind = ck.dataset.calKind;
+        renderCalendar();
+        /* 다시 그리면 누른 칩이 새로 만들어져 초점이 문서 맨 위로 간다 — 화면 낭독기 사용자가 자리를 잃는다(리뷰 2026-11-21) */
+        const again = document.querySelector(`#apps-calendar [data-cal-kind="${calKind}"]`);
+        if (again) again.focus();
+      }
+      return;
+    }
     const mv = e.target.closest('[data-cal-move]');
     if (mv) {
       const ms = calMonthStart();
@@ -559,6 +570,8 @@ function bindEvents() {
     if (!b || b.dataset.savedKind === savedKind) return;
     savedKind = b.dataset.savedKind;
     renderSaved();
+    const again = $(`#my-saved [data-saved-kind="${savedKind}"]`);   // 누른 칩에 초점을 돌려준다(달력 칩과 같은 까닭 · 리뷰 2026-11-21)
+    if (again) again.focus();
   });
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));

@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-21",
+ "updatedAt": "2026-11-22",
  "items": {
   "auto-otice06doarticleno140764": [
    {
@@ -668,6 +668,52 @@
     "fonts": "ko-nanum-1",
     "at": "2026-11-21"
    }
+  ],
+  "auto-q1brddate20261105brdseq1": [
+   {
+    "file": "auto-q1brddate20261105brdseq1/1-자기소개서_기본형_1_.pdf",
+    "name": "자기소개서_기본형 (1).hwp",
+    "pages": 2,
+    "bytes": 64123,
+    "srcBytes": 12800,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-22"
+   },
+   {
+    "file": "auto-q1brddate20261105brdseq1/2-발전기금_장학생_신청서_2026년2학기_1_.pdf",
+    "name": "발전기금 장학생 신청서(2026년2학기) (1).hwp",
+    "pages": 2,
+    "bytes": 137640,
+    "srcBytes": 17408,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-22"
+   }
+  ],
+  "act-0qklvg8": [
+   {
+    "file": "act-0qklvg8/1-붙임_2._제21기_씨티-경희대_NGO_인턴십_프로그램_인턴_지원서.pdf",
+    "name": "붙임 2. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 지원서.hwp",
+    "pages": 3,
+    "bytes": 199425,
+    "srcBytes": 258048,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-22"
+   }
+  ],
+  "act-1s2546y": [
+   {
+    "file": "act-1s2546y/1-붙임2._월드프렌즈코리아_청년봉사단_프로그램_제안서.pdf",
+    "name": "붙임2. 월드프렌즈코리아 청년봉사단 프로그램 제안서.hwp",
+    "pages": 15,
+    "bytes": 718407,
+    "srcBytes": 424448,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-22"
+   }
   ]
  },
  "roles": {
@@ -691,6 +737,9 @@
   },
   "auto-amepagescholarshipnotice-0ywblu5": {
    "[붙임2] 27년도_제출서류양식.hwp": "form"
+  },
+  "act-1s2546y": {
+   "붙임2. 월드프렌즈코리아 청년봉사단 프로그램 제안서.hwp": "form"
   }
  }
 }
