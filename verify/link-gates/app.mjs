@@ -277,7 +277,8 @@ export default async function gate(eq, ctx) {
   for (const [k, list] of Object.entries(feeds)) {
     for (const n of list) {
       const h = F('noticeCardHtml')(n, {});
-      const meta = (h.match(/<p class="sch-provider">([^<]*수집[^<]*)<\/p>/) || [])[1] || '';
+      /* 카드 맨 아랫줄(첨부 n개 · 링크 이름) — 2026-11-21 「○○ 수집」 날짜를 지워 이 줄을 낱말로 못 찾는다 · 카드의 마지막 sch-provider 줄로 잡는다 */
+      const meta = ([...h.matchAll(/<p class="sch-provider">([^<]*)<\/p>/g)].pop() || [])[1] || '';
       shown.push([`카드(${k})`, n.url, meta, h, n]);
     }
   }

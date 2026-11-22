@@ -33,7 +33,7 @@ function schoolPortalNote(sch) {
        스타일 없는 글이 앞 문장에 붙어 나온다 — 만들면서 실제로 그렇게 했다가 잡았다.
        ⚠️ 블록 스타일(padding-left·border-left)이라 `<span>` 이 아니라 `<p>` 여야 먹는다. */
     const path = sch.applyPortalSource
-      ? `<p class="r-quote">공고 원문 그대로 — 「${esc(sch.applyPortalSource)}」</p>` : '';
+      ? `<p class="r-quote">「${esc(sch.applyPortalSource)}」</p>` : '';
     return `<p class="dp-note">${where}에서 신청합니다.</p>${path}`;
   }
   const p = schoolPortal(sch);
@@ -195,7 +195,7 @@ function applySectionHtml(sch, opts) {
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource
-    : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
+    /* 층2 재단의 「재단 선발 공고문·홈페이지가 정한 접수 방법」 줄은 2026-11-21 개발자 지시로 지웠다 — 아무것도 알려 주지 않는 문장(원문 링크가 아래에 있다) */
     : '';
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
   const row = (k, v, plain) => `<li><b class="ns-k">${k}</b>${plain ? esc(v) : nsBodyHtml(v)}</li>`;   // 기간 줄은 plain — 80자에서 잘린 기간 토막의 주소를 진짜 같은 링크로 만들지 않는다(리뷰 2026-11-17)
@@ -360,7 +360,7 @@ function eligibilityRowsHtml(sch, result) {
   if (reqStruct) {
     const must = [...reqStruct.common, ...reqStruct.grade];
     if (must.length) reasonRows += `<li class="r-head">공통 요건 <em>모두 해당해야 합니다</em></li>` + must.map((e) => reqRow(e)).join('');
-    reasonRows += `<li class="r-head">다음 ${reqStruct.either.length === 2 ? '둘' : reqStruct.either.length + '가지'} 중 하나 <em>하나만 해당하면 됩니다</em></li>`;
+    reasonRows += `<li class="r-head">다음 ${reqStruct.either.length === 2 ? '둘' : reqStruct.either.length + '가지'} 중 <em>하나만 해당하면 됩니다</em></li>`;
     reqStruct.either.forEach((b, i) => {
       /* 이름을 못 읽었으면 지어내지 않고 순서로만 가른다 (원칙 8-1) */
       /* 갈래 이름이 첫 줄과 같은 글자면(`취업지원형 : …` 가 이름이자 줄) 줄을 한 번만 — 같은 문장이 두 번 보였다(2026-10-15) */
@@ -517,20 +517,20 @@ function openDetail(id) {
           const pc = prepChecklist(app, sch);
           return `<h4>신청 준비 체크리스트 <span class="channel-tag">${pc.done}/${pc.total}</span></h4>
           <ul class="doc-list doc-badged prep-check">${pc.items.map((it) => `
-            <li>${it.done ? '<span class="doc-auto">✓</span>' : '<span class="doc-manual">□</span>'} ${esc(it.label)}${it.auto && it.done ? ' <span class="doc-legend">자동 확인</span>' : ''}${
+            <li>${it.done ? '<span class="doc-auto">✓</span>' : '<span class="doc-manual">□</span>'} ${esc(it.label)}${/* 「자동 확인」 꼬리표 — 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}${
               it.manual && !(it.auto && it.done) ? ` <button class="link-btn" data-prep-toggle="${it.key}">${it.done ? '되돌리기' : '확인했어요'}</button>` : ''}${
               it.key === 'write' && !it.done ? ' <span class="doc-legend">「서류 작성 이어서 하기」로</span>' : ''}</li>`).join('')}
           </ul>`;
         })()}
-        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '신청내역에 담김 · 준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}${ch.note ? ` <span class="doc-legend">${esc(ch.note)}</span>` : ''}</p>
+        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}${ch.note ? ` <span class="doc-legend">${esc(ch.note)}</span>` : ''}</p>
         ${step === 0 ? `
           <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">공식 제출 완료로 기록</button>
-          <p class="dp-note">최종 제출은 ${esc(ch.label)}에서 이루어집니다. 제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>` : ''}
+          <p class="dp-note">${esc(ch.label)}에서 제출을 마친 뒤 눌러 주세요.</p>` : ''}
         ${step === 1 ? `
-          <p class="progress-note">${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시됩니다` : ''}</p>
+          <p class="progress-note">${app.submittedAt} 제출${/* 「마감 뒤 자동으로 심사 단계」 설명 — 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">제출 기록 취소</button>` : ''}
         ${step === 2 ? `
-          <p class="progress-note">접수가 마감되어 심사가 진행 중입니다. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${esc(ch.label)}${/* '원문 공고'는 그 공고로 가는 주소(post)일 때만 — 재단 홈페이지·목록을 원문이라 부르지 않는다 (2026-10-03) */ ''}${sch.sourceUrl && sourceLink(sch, 'detail').cls === 'post' ? ' 또는 원문 공고' : ''}에서 할 수 있습니다.</p>
+          <p class="progress-note">발표는 ${esc(ch.label)}${/* '원문 공고'는 그 공고로 가는 주소(post)일 때만 — 재단 홈페이지·목록을 원문이라 부르지 않는다 (2026-10-03) */ ''}${sch.sourceUrl && sourceLink(sch, 'detail').cls === 'post' ? ' 또는 원문 공고' : ''}에서 확인하고, 결과를 아래에 기록해 주세요.</p>
           <div class="submit-actions" style="margin-bottom:12px">
             <button class="btn btn-outline" id="btn-result-won">선정됨</button>
             <button class="btn btn-outline" id="btn-result-lost">아쉽게 미선정</button>
@@ -538,7 +538,7 @@ function openDetail(id) {
         ${step === 3 ? `
           <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
             ? `${esc(app.resultAt)} 선정${(() => { const t = amountLine(sch).text.replace(/^금액 · /, ''); return t ? ` · ${esc(t)}` : ''; })()}`   /* 금액은 카드와 같은 amountLine — 모르면 「선정」까지만(예전 「선정 · 금액 원문 확인」 · 2026-11-16) */
-            : `${esc(app.resultAt)} 미선정으로 기록됨`}</p>
+            : `${esc(app.resultAt)} 미선정`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${app.docs && app.docs.length ? `
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
@@ -579,7 +579,7 @@ function openDetail(id) {
       ${applyCaution ? `<p class="dp-note dp-caution">${applyCaution === 'unknown'
         ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
         : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
-      ${lock.noApply ? `<p class="dp-note">원문: 「${esc(sch.noApply)}」</p>` : ''}
+      ${/* noApply 원문 줄(「접수」 절 방법 줄과 같은 문장) — 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
       ${/* 단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」 한 마디도 2026-10-29 개발자 지시로 뺐다(2026-10-15 "happy talk 전부 삭제" 뒤 남아 있던 마지막 줄).
            제출처는 신청 준비 화면(「최종 제출 방법」 절)이 말한다 */ ''}

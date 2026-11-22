@@ -68,7 +68,7 @@ function htmlTexts(src) {
    data.js 제출처 이름이 훑개 밖에서 살아남았다). 화면이 싣는 공용 파일·서비스워커(알림 문구)·약관 화면(앱 안에서 읽는다)까지.
    새로 화면 글자를 만드는 파일을 더하면 여기에도 — 관문이 index.html 의 <script src> 가 전부 여기 있는지 본다 */
 const SCREEN_FILES = ['app.js', 'app-account.js', 'app-activities.js', 'app-prep.js', 'app-events.js', 'app-mascot.js', 'app-live.js', 'app-sheet.js', 'app-my.js', 'app-applications.js', 'app-onboarding.js', 'index.html', 'match-engine.js', 'source-link.js', 'data.js', 'apply-channel.js', 'forms.js', 'form-plan.js',
-  'notify-rules.js', 'notify.js', 'parse-amount.js', 'parse-requirements.js', 'section-head.js', 'formfill.js', 'essay.js', 'essay-ask.js', 'essay-quality.js',
+  'notify-rules.js', 'notify.js', 'parse-amount.js', 'parse-requirements.js', 'section-head.js', 'formfill.js', 'pdf-view.js', 'essay.js', 'essay-ask.js', 'essay-quality.js',
   'essay-submit-check.js', 'chat.js', 'chat-kb.js', 'chat-nlu.js', 'resume.js', 'boot.js', 'sw.js', 'interactions.js', 'elig-ask.js', 'input-guard.js', 'major-track.js', 'about.js', 'supabase-client.js',
   'error-report.js', 'usage-report.js', 'post-request.js', 'ad-inquiry.js', 'school-links.js', 'terms.html'];
 

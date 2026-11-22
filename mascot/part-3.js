@@ -148,7 +148,7 @@
       g.add(tube([[0, 0, 0], [dx * 0.3, hgt * 0.6, 0], [dx + 0.12, hgt, 0]], r, blue)); g.add(sph(r, blue, dx + 0.12, hgt, 0));
       head.add(g); return g;
     });
-    return { root, squash, head, arms, eyes: eyeG, ears, look: 0.4, scale: 0.9 };
+    return { root, squash, head, arms, eyes: eyeG, ears, jacket: arms.jacket, look: 0.4, scale: 0.9 };
   } });
 
   // 가톨릭대 하양이 — 흰 뭉게 양털 머리의 어린양 · 갈색 돌돌 말린 뿔 · 분홍 볼 · 분홍 입 / 과잠: 가대 Blue(#0C2E86) · 흰 C

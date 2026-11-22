@@ -74,7 +74,7 @@ function renderApplyPrep(sch) {
     <div class="sheet-handle"></div>
     <div class="sheet-body" id="apply-prep">
       <h3 class="sheet-title">신청 준비</h3>
-      <p class="sheet-provider">${esc(sch.name)} · 준비할 것을 확인하고 담아 두세요</p>
+      <p class="sheet-provider">${esc(sch.name)}${/* 2026-11-21 개발자 지시로 줄임(학생이 읽지 않는 안내 — 맨 아래 「담기」 단추가 같은 말) */ ''}</p>
       ${(formAtts.length || (!kosaf && pageRows)) ? `
       <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
       ${listOf(formAtts, kosaf ? '' : pageRows)}` : ''}
@@ -153,7 +153,7 @@ function amountDetailRow(m, opt) {
       ${val || o.check ? `<p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p>` : ''}</div>
     ${o.note ? `<p class="ad-note">${esc(o.note)}</p>` : ''}
     ${merged ? `<details><summary>${esc(schoolOfNotice(m.mergedFrom[0]) || '다른 학교')} 외 ${merged}건</summary>
-      <div class="ad-list"><span>같은 재단이 여러 학교에서 접수하는 공고. 1건으로 합산.</span>
+      <div class="ad-list"><span>${/* 2026-11-21 개발자 지시로 해요체 한 줄로 줄임 */ ''}같은 공고라 금액은 한 번만 셌어요</span>
       ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(providerUnknown(x.provider) ? (x.name || '') : x.provider)}</span>`).join('')}</div></details>` : ''}
     ${/* 층2는 우리가 읽은 공고 원문이 아니라 재단이 한국장학재단에 적어 둔 칸이다 — '원문'이라 부르지 않는다 (2026-10-03) */ ''}
     ${raw || exRaw ? `<details><summary>${sch.sourceKind === 'kosaf' ? '재단이 적어 둔 글' : '원문 보기'}</summary>

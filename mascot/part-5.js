@@ -20,7 +20,7 @@
       if (sparkle) { g.add(sph(r * 0.36, w, r * 0.34, r * 0.38, r * 0.46)); g.add(sph(r * 0.18, w, -r * 0.3, -r * 0.36, r * 0.46)); }
       eyeList.push(onFace(g, t, s * phi, -r * 0.2));
     });
-    return { root, squash, head, arms, eyes: eyeList, ears: [], look: 0.4, scale: 0.9, e, onFace, eye, PY };
+    return { root, squash, head, arms, eyes: eyeList, ears: [], jacket: arms.jacket, look: 0.4, scale: 0.9, e, onFace, eye, PY };
   }
 
   // 전북대 표돌이 — 주황빛 아기 표범 · 갈색 반점 · 크림 주둥이 · 큰 흰 눈 / 과잠: 보라(#56296E) · 흰 J

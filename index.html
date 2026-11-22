@@ -113,12 +113,8 @@
       <div class="onboard-step" data-step="1" hidden>
         <div class="onboard-body">
           <h2>학적 정보를 알려주세요</h2>
-          <!-- 🔴 "전국 모든 대학 지원" 이었다 (2026-09-13 수정). 학교는 전국에서 고를 수 있는
-               것이 맞지만, **교내 공고가 있는 학교는 두 곳뿐**이다(등록 48건 = 한국외대 22 ·
-               경희대 12 · 학교 무관 14 · 층2 전국 재단 90곳 — 실측). '모든 대학 지원'은
-               그 학생이 교내 공고도 받는다는 말로 읽힌다. 확인 안 한 것을 단정하지 않는다(원칙 5).
-               ⚠️ 학교 목록을 줄일지 말지는 노션 A-6(개발자 판단 대기)다 — 여기서는 **말만** 고친다. -->
-          <p class="onboard-sub">학교는 전국에서 고를 수 있어요</p>
+          <!-- 부제 없음 — "전국 모든 대학 지원"(09-13 지움 · 확인할 수 없는 약속) → 「학교는 전국에서 고를 수 있어요」도
+               2026-11-21 개발자 지시로 지웠다(읽지 않는 설명 · 학교 칸이 바로 아래에 있다). -->
           <label class="field ac-wrap">
             <span class="field-label">학교</span>
             <input type="text" id="in-school" placeholder="학교명을 검색하세요 (예: 외대, 서울)" maxlength="30" autocomplete="off" />
@@ -174,7 +170,6 @@
       <div class="onboard-step" data-step="2" hidden>
         <div class="onboard-body">
           <h2>성적과 소득 정보를 알려주세요</h2>
-          <p class="onboard-sub">장학금 자격 판단의 핵심 기준</p>
           <label class="field">
             <span class="field-label">직전학기 평점 (4.5 만점 · 신입학은 공란 가능)</span>
             <input type="text" id="in-gpa" placeholder="예: 3.85" min="0" max="4.5" step="0.01" inputmode="decimal" data-guard="gpa" autocomplete="off" />
@@ -260,7 +255,7 @@
       <div class="onboard-step" data-step="3" hidden>
         <div class="onboard-body">
           <h2>해당하는 항목을 모두 선택하세요</h2>
-          <p class="onboard-sub">해당 없으면 바로 완료</p>
+          <!-- 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) -->
           <div class="check-list" id="in-flags">
             <label class="check-item"><input type="checkbox" value="basicLiving" /><span>기초생활수급자</span></label>
             <label class="check-item"><input type="checkbox" value="nearPoverty" /><span>차상위계층</span></label>
@@ -299,7 +294,7 @@
       <div class="onboard-step" data-step="4" hidden>
         <div class="onboard-body">
           <h2>지금 받고 있는<br />장학금이 있나요?</h2>
-          <p class="onboard-sub">다른 장학금과 함께 받을 수 없는 공고가 있습니다.<br />선택하면 지원할 수 없는 공고를 걸러냅니다.</p>
+          <!-- 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) -->
           <div class="check-list" id="in-scholarships">
             <label class="check-item"><input type="checkbox" value="kosaf" /><span>국가장학금<em>한국장학재단 I·II유형, 다자녀 등</em></span></label>
             <label class="check-item"><input type="checkbox" value="internal" /><span>교내 장학금<em>우리 학교에서 주는 성적·복지 장학금</em></span></label>
@@ -324,7 +319,7 @@
       <div class="onboard-step" data-step="5" hidden>
         <div class="onboard-body">
           <h2>해당하는 것이 있으면<br />눌러 주세요</h2>
-          <p class="onboard-sub">공고가 자주 묻는 조건이에요. 답하면 적합도가 더 정확해집니다.<br />모두 선택 사항이에요.</p>
+          <p class="onboard-sub">모두 선택 사항이에요</p>
           <div class="elig-ask-fields" id="in-traits"></div>
           <!-- 출신 고교 소재지 — `○○시 소재 고등학교 졸업자` 줄(공고 9곳 · 실측)을 판정한다. 시·도를 고르면 app.js 가 REGION_CITIES 로 시·군을 채운다 -->
           <label class="field">
@@ -352,7 +347,7 @@
       <div class="onboard-step" data-step="6" hidden>
         <div class="onboard-body">
           <h2>서류에 자동으로 채울<br />기본 정보를 알려주세요</h2>
-          <p class="onboard-sub">대부분의 장학금 신청서가 공통으로 요구하는 정보입니다.<br />모두 선택 사항이며 이 기기에만 저장됩니다.</p>
+          <!-- 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) -->
           <label class="field">
             <span class="field-label">학번 (선택)</span>
             <input type="text" id="in-sid" placeholder="예: 202512345" maxlength="12" inputmode="numeric" autocomplete="off" data-guard-kind="studentId" />
@@ -528,8 +523,7 @@
             교내 교외가 어디에 게시되느냐가 아니라 어떤 재단이 주최하는가가 기준이 되어야 돼."
            게시판 글은 제목뿐이라 **주최를 알 수 없다** — 그래서 '교내' 칸에 둘 수 없다.
            옮긴 자리는 홈이고, 표식(`#live-notices`)은 그대로 들고 갔다. -->
-      <!-- 링크 이름은 공고마다 다르다(source-link.js · 2026-10-03) — 재단 장학금(층2)의 링크는 원문이 아니라 재단 홈페이지다 -->
-      <p class="data-note">※ 정식 등록 공고는 실제 공고를 큐레이션한 것입니다. 접수 마감·지원 금액·세부 요건은 각 공고 맨 아래의 <strong>원문 공고 ↗</strong>(재단 장학금은 <strong>재단 홈페이지 ↗</strong>)와 한국장학재단에서 최종 확인하세요.</p>
+      <!-- 목록 맨 아래 「※ … 최종 확인하세요」 안내문은 2026-11-21 개발자 지시로 지웠다(학생이 읽지 않는 글 · 공고마다 상세에 원문 단추가 있다) -->
     </section>
 
     <!-- ============ 대외활동·공모전 (2026-09-25 · 노션 UI-34) ============
@@ -604,8 +598,7 @@
               실제 0건인 갈래(체험단·네이밍·슬로건)는 안 뜨고, 분야가 늘면 칩도 저절로 따라온다. -->
       <div class="filter-row" id="activities-field-filters"></div>
       <div id="activities-list" class="card-list"></div>
-      <!-- 단추 이름은 글마다 다르다(source-link.js · 2026-10-03) — 기관 첫 화면을 '원문'이라 부르지 않는다 -->
-      <p class="data-note">※ 학교 게시판에서 자동으로 모은 제목과 링크입니다. 참가 자격·마감·혜택은 각 글을 열어 맨 아래 단추로 주최 측 페이지에서 최종 확인하세요.</p>
+      <!-- 목록 맨 아래 「※ … 최종 확인하세요」 안내문은 2026-11-21 개발자 지시로 지웠다(학생이 읽지 않는 글 · 공고마다 상세에 원문 단추가 있다) -->
     </section>
 
     <!-- ============ 신청 내역 ============ -->
@@ -872,7 +865,7 @@
         <h2>양식 채우기</h2>
       </header>
       <p class="fill-head"><strong id="fill-title"></strong><span id="fill-file" class="fill-file"></span></p>
-      <p class="set-note">원본 그대로예요 — 학적정보에서 가져온 값은 틀리면 여기서 고치세요. 서명·날인 칸은 비워 두고 인쇄한 뒤 직접 써요.</p>
+      <p class="set-note">학적정보에서 가져온 값이 틀리면 여기서 고치세요. 서명·날인 칸은 비워 두고 인쇄한 뒤 직접 써요.</p>
       <div class="fill-wrap">
         <div id="fill-pages" class="fill-pages"></div>
         <aside id="fill-panel" class="fill-panel">
@@ -915,7 +908,7 @@
     <button class="chat-fab" id="btn-chat-fab" hidden aria-label="대장님 열기 — 장학금 도우미 (끌어서 위치 이동)">
       <svg class="mascot" viewBox="0 0 48 48" aria-hidden="true"><use href="#mascot"/></svg>
     </button>
-    <div class="chat-hint" id="chat-hint" hidden role="status">끌어서 이동 가능</div>
+    <div class="chat-hint" id="chat-hint" hidden role="status">끌어서 옮길 수 있어요</div>
     <div id="chat-backdrop" class="sheet-backdrop" hidden></div>
     <div id="chat-sheet" class="sheet chat-sheet" hidden role="dialog" aria-label="대장님 — 장학금 도우미" aria-modal="true">
       <div class="sheet-handle"></div>
@@ -925,7 +918,7 @@
         </span>
         <div class="chat-head-text">
           <p class="chat-title">대장님</p>
-          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답변</p>
+          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답해요</p>
         </div>
         <button class="icon-btn" id="btn-chat-close" aria-label="닫기">✕</button>
       </div>
@@ -946,7 +939,7 @@
     <div id="wallet-pop" class="wallet-pop" hidden role="dialog" aria-label="발급처 안내"></div>
 
     <!-- ============ 토스트 ============ -->
-    <div id="toast" class="toast" hidden></div>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   </div>
 
   <!-- 🔴 부팅 화면 — **다른 모든 스크립트보다 먼저** 실어야 한다. 뒤에 두면 그 사이가
@@ -997,8 +990,9 @@
   <script src="app-mascot.js"></script>   <!-- 3D 마스코트 연결(엔진은 늦게 싣는다) — app.js 가 그릴 때 부른다 -->
   <script src="app.js"></script>
   <script src="formfill.js"></script>   <!-- 양식 채우기 — app.js 의 전역을 쓴다(뒤에 싣는다) -->
-  <script src="post-request.js"></script>
-  <script src="ad-inquiry.js"></script>   <!-- 광고 문의(메일 앱으로) — app.js·support-config.js 의 전역을 쓴다 -->   <!-- 게시 요청(기관 담당자 로그인·게시물 관리) — app.js·supabase-client.js 의 전역을 쓴다 -->
+  <script src="pdf-view.js"></script>   <!-- PDF 보기 — 설치한 앱에서 앱 안 PDF 를 열면 뒤로 단추가 있는 판으로(엔진 pdfjs/ 는 처음 열 때 싣는다) -->
+  <script src="post-request.js"></script>   <!-- 게시 요청(기관 담당자 로그인·게시물 관리) — app.js·supabase-client.js 의 전역을 쓴다 -->
+  <script src="ad-inquiry.js"></script>   <!-- 광고 문의(메일 앱으로) — app.js·support-config.js 의 전역을 쓴다 -->
   <script src="essay-config.js"></script>
   <script src="essay-quality.js"></script>
   <!-- 제출 전 점검표 판정 — essay.js 가 전역으로 참조하므로 먼저 실어야 한다 -->

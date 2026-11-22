@@ -19,7 +19,7 @@
     });
     const head = new T.Group(), PY = o.PY; head.position.y = PY; squash.add(head);
     const onFace = (obj, t, phi, off) => { e.place(obj, t, phi, off); obj.position.y -= PY; head.add(obj); return obj; };
-    return { root, squash, head, arms, eyes: [], ears: [], look: 0.4, scale: o.scale || 0.9, e, onFace, top: e.yy(1) - PY };
+    return { root, squash, head, arms, eyes: [], ears: [], jacket: arms.jacket, look: 0.4, scale: o.scale || 0.9, e, onFace, top: e.yy(1) - PY };
   }
 
   // 한국항공대 마하 — 미색 큰 머리 송골매 · 깃 한 가닥 · 이마의 고글 · 노란 부리 (원작 파란 비행복 → 과잠)
