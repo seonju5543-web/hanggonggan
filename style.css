@@ -1706,12 +1706,10 @@ textarea:focus {
 .fq-keep input { width: 16px; height: 16px; accent-color: var(--primary); }
 
 /* 상한을 넘는 양식은 숨기지 않고 그렇다고 말한다 (개발자 지시 2026-08-18) */
-.fq-over { margin-bottom: 18px; font-weight: 600; }
 
 /* 신청서에서 배운 정보 (MY) — 앱이 무엇을 갖고 있는지 보이고 지울 수 있게 */
 .my-learned { margin-top: 14px; border-top: 1px solid rgba(18, 22, 31, 0.08); padding-top: 12px; }
 .my-learned-head { font-size: var(--t-sm); font-weight: 700; color: var(--text-sub); margin-bottom: 8px; }
-.my-learned-head > span { font-weight: 500; font-size: var(--t-xs); color: var(--text-weak); }
 .my-learned ul { list-style: none; display: grid; gap: 7px; }
 .my-learned li { display: flex; align-items: center; gap: 8px; font-size: var(--t-sm); }
 .my-learned li > span { color: var(--text-weak); min-width: 92px; }
@@ -3059,8 +3057,10 @@ body::after { opacity: 0.26; }
 /* 온보딩 — 칸 사이를 하나로 */
 .onboard-body h2 { margin-bottom: var(--sp-1); }
 .onboard-sub { margin: 0 0 var(--sp-4); }
-/* 부제 없이 제목 바로 밑에 칸이 오는 단계(1 학적 · 2 성적) — 제목과 첫 칸 사이도 절 사이만큼 (2026-11-21 부제를 지우며) */
-.onboard-body h2 + .field { margin-top: calc(var(--sp-4) - var(--sp-1)); }
+/* 부제 없이 제목 바로 밑에 내용이 오는 단계 — 제목과 첫 칸 사이도 절 사이만큼 (2026-11-21 부제를 지우며 · 어느 단계든 부제가 없으면 같은 여백) */
+.onboard-body h2 + :not(.onboard-sub) { margin-top: calc(var(--sp-4) - var(--sp-1)); }
+/* 부제를 지운 시트(우리 학교 소식 전체 보기 · 2026-11-21) — 제목과 목록 사이 여백은 목록이 갖는다(.sheet-provider 가 맡던 자리) */
+.sheet-title + .card-list, .sheet-title + .empty { margin-top: var(--sp-3); }
 .field { margin-bottom: var(--sp-3); }
 .field-label { margin-bottom: var(--sp-1); }
 .chip-group { gap: 7px; }

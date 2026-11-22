@@ -212,7 +212,7 @@ function renderActivities() {
   if (!list.length) {
     box.innerHTML = `<p class="empty">${q
       ? `'${esc(activitiesQuery.trim())}'와 맞는 글이 없어요`
-      : `아직 ${esc(p.school)} 게시판에서 모은 ${activitiesField === 'all' ? '' : esc(activitiesField) + ' '}${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요<br /><span class="empty-sub">게시판이 연결되면 새 글이 여기에 자동으로 떠요</span>`}</p>`;
+      : `아직 ${activitiesField === 'all' ? '' : esc(activitiesField) + ' '}${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내 — 게시판 수집·연결 설명) */ ''}`}</p>`;
     return;
   }
   box.innerHTML = list.map(activityCardHtml).join('');

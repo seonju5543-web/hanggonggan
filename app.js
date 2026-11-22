@@ -604,7 +604,8 @@ function effectiveStep(app, sch) {
 function recordSubmitted(sch) {
   const app = state.applications.find((a) => a.id === sch.id);
   if (!app) return;
-  if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
+  /* 확인 창 둘째 문단(진행 단계 설명)은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
+  if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?`)) return;
   app.submittedAt = nowStamp();
   saveState();
   if (typeof trackUse === 'function') trackUse('submitted', sch.id);
@@ -612,7 +613,8 @@ function recordSubmitted(sch) {
      일어났다**는 신호로만 쓴다(저장·새로고침·이 기록 셋). 화면이 바뀔 때마다 울리면
      알림처럼 느껴져서 학생이 폰 설정에서 앱 진동을 통째로 꺼 버린다. */
   if (typeof haptic === 'function') haptic(14);
-  toast('공식 제출 기록 완료 · 접수 마감 후 심사 단계로 자동 전환');
+  /* 뒤 절 「접수 마감 후 심사 단계로 자동 전환」은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
+  toast('공식 제출을 기록했어요');
   refreshProgressViews(sch.id);
 }
 
@@ -1115,7 +1117,7 @@ function bindPhotoButtons() {
     if (!file) return;
     if (file.size > 20 * 1024 * 1024) { toast('20MB 이하 사진만 올릴 수 있어요'); return; }
     const ok = await photoSet(file);
-    toast(ok ? '프로필 사진 저장 완료 · 이 기기에만 남아요' : '이 사진은 읽을 수 없어요 · JPG·PNG 로 다시 올려 주세요');
+    toast(ok ? '프로필 사진을 저장했어요 · 이 기기에만 남아요' : '이 사진은 읽을 수 없어요 · JPG·PNG 로 다시 올려 주세요');
     renderMy();
     if (!$('#screen-home').hidden) renderHome();
   });
@@ -1135,7 +1137,7 @@ function docWalletStatus(doc) {
   if (!s) return null;
   const rec = walletCache[s.slot];
   return rec
-    ? { ok: true, slot: s, text: `보관함에서 자동 첨부 · ${rec.name}` }
+    ? { ok: true, slot: s, text: `보관함에 있어요 · ${rec.name}` }
     : { ok: false, slot: s, text: `아직 안 올렸어요 · 발급처: ${s.issue}` };
 }
 
@@ -2155,8 +2157,9 @@ function certStatusListHtml(sch) {
     const name = esc(doc.replace(/\s*\(.*\)$/, ''));
     if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${esc(st.text)}</li>`;
     if (st) return `<li class="doc-miss">□ ${name} — ${esc(st.text)}</li>`;
-    if (/자동/.test(doc)) return `<li>△ ${name} — 학교·재단 연동 후 자동 첨부 (또는 보관함에 올려두세요)</li>`;
-    return `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
+    /* △ · □ 줄 꼬리 안내(「연동 후 자동 첨부」·「공식 제출 시 함께 준비하세요」)는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) — 원문 서류 이름만 보인다 */
+    if (/자동/.test(doc)) return `<li>△ ${esc(doc)}</li>`;
+    return `<li>□ ${esc(doc)}</li>`;
   }).join('');
   /* doc-check — 줄마다 ✓·□·△ 표식이 있어 목록 점은 뺀다(표식이 두 겹이던 자리 · 2026-10-15 · style.css) */
   /* 목록 밑 「보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.」는 2026-11-21 개발자 지시로 지웠다(학생이 읽지 않는 안내 · 서류함 상태는 각 줄이 말한다) */
@@ -2229,7 +2232,7 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">서류 작성</h3>
-        <p class="sheet-provider">${esc(sch.name)} · 고른 답으로 초안 문장을 엮습니다</p>
+        <p class="sheet-provider">${esc(sch.name)}${/* 「고른 답으로 초안 문장을 엮습니다」는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>
         ${docPrep.defs.map((def, di) => `
           <div class="dp-block">
             <h4>${esc(def.doc)}</h4>
@@ -2413,7 +2416,7 @@ function renderFormFill(restore) {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">작성 내용 확인</h3>
-        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있습니다 · ${tpl.unofficial ? esc(tpl.lead || '이 공고에 맞춘 지원문서') : '실제 공고 양식과 동일한 구조'}</p>
+        <p class="sheet-provider">칸을 눌러 직접 고칠 수 있어요${tpl.unofficial ? ' · ' + esc(tpl.lead || '이 공고에 맞춘 지원문서') : ''}${/* 「실제 공고 양식과 동일한 구조」는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>
         <div class="fd-wrap" id="ff-doc">${renderFormDoc(tpl, state.profile, formFill.ans, { editable: true })}</div>
         <button class="btn btn-primary btn-lg" id="btn-ff-confirm">이대로 신청 준비 완료</button>
         <div class="submit-actions" style="margin-top:8px">
@@ -2692,7 +2695,7 @@ function openNewsSheet() {
     <div class="sheet-handle"></div>
     <div class="sheet-body">
       <h3 class="sheet-title">우리 학교 소식</h3>
-      <p class="sheet-provider">${esc(p.school || '')} 공지 게시판</p>
+      ${/* 부제 「○○ 공지 게시판」은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}
       ${schoolNewsHtml()}
     </div>`;
   openSheetShell();
@@ -2707,7 +2710,7 @@ function buildSubmissionText(sch, app) {
 }
 
 function copyText(text, okMsg) {
-  const done = () => toast(okMsg || '복사 완료 · 공식 신청 페이지에 붙여넣기');
+  const done = () => toast(okMsg || '복사했어요 · 신청 페이지에 붙여 넣으세요');
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
   } else fallbackCopy(text, done);
@@ -2733,12 +2736,13 @@ async function shareApplication(sch, app) {
   try {
     if (files.length && navigator.canShare && navigator.canShare({ files })) {
       await navigator.share({ title: `${sch.name} 신청 서류`, text, files });
-      toast('서류와 함께 공유 완료 · 메일 앱에서 바로 접수 가능');
+      /* 뒤 절 「메일 앱에서 바로 접수 가능」은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
+      toast('서류와 함께 공유했어요');
       return;
     }
     if (navigator.share) {
       await navigator.share({ title: `${sch.name} 신청 서류`, text });
-      toast('내용 공유 완료 · 파일은 보관함에서 따로 첨부');
+      toast('내용을 공유했어요 · 파일은 보관함에서 따로 첨부해 주세요');
       return;
     }
   } catch (e) { /* 사용자가 공유를 취소한 경우 */ return; }

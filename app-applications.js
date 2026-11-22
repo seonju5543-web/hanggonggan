@@ -95,7 +95,7 @@ function nextAction(app, sch, step, d, closed) {
       : { text: `아직 제출 기록이 없어요${sch.deadline ? ' · 마감 ' + esc(d.label) : ''}`,   // 마감을 모르면 말하지 않는다(2026-11-15)
           btn: go('제출하러 가기') };
   }
-  if (step === 1) return { text: '제출 기록됨 · 접수가 마감되면 심사로 넘어가요', btn: '' };
+  if (step === 1) return { text: '결과가 나오면 아래에 기록해 주세요', btn: '' };   // 2026-11-21 개발자 지시로 줄임(학생이 읽지 않는 안내)
   if (step === 2) return { text: '결과가 나오면 아래에 기록해 주세요', btn: '' };
   return { text: app.result === 'won' ? '선정으로 기록됨' : '미선정으로 기록됨', btn: '' };
 }
@@ -137,8 +137,8 @@ function docChecklistHtml(sch) {
     const name = esc(doc.replace(/\s*\(.*\)$/, ''));
     if (st && st.ok) return `<li class="dc-ok">${name}</li>`;
     if (st) return `<li class="dc-miss">${name}<em>${esc(st.slot.issue)}</em></li>`;
-    /* 보관함에 칸이 없는 서류 — 있는지 없는지 앱이 알 수 없으므로 그렇게 말한다 */
-    return `<li class="dc-etc">${esc(doc)}<em>보관함에서 확인할 수 없는 서류</em></li>`;
+    /* 보관함에 칸이 없는 서류 — 앱이 있는지 모르므로 빈 네모만 둔다(「보관함에서 확인할 수 없는 서류」 글자는 2026-11-21 개발자 지시로 지움) */
+    return `<li class="dc-etc">${esc(doc)}</li>`;
   }).join('');
   /* 머리글은 **학생이 할 일의 개수**를 말한다 — 분수(0/2)는 읽는 데 한 박자 걸린다.
      🔴 세는 것은 `known` 이다 (2026-09-10 코드 리뷰). `all` 로 세면 위에서 일부러 갈라낸
@@ -146,8 +146,8 @@ function docChecklistHtml(sch) {
         (실측 4건 — reg-hi-jeju 3→2 · reg-hufs-myeonhak 2→1 · reg-hufs-alumni 3→2 ·
         reg-khu-intern 2→1). 줄은 갈랐는데 숫자만 안 갈랐던 것이다.
         못 읽은 몫은 바로 아래 `note` 줄이 이미 말한다. */
-  const head = `제출 서류 ${known.length}개`
-    + (missing.length ? '' : tracked.length ? ' · 보관함에서 자동 첨부' : '');
+  /* 2026-11-21 개발자 지시로 꼬리 「보관함에서 자동 첨부」를 지움(학생이 읽지 않는 안내 · ✓ 표시가 같은 말을 한다) */
+  const head = `제출 서류 ${known.length}개`;
   return `
     <details class="doc-check"${missing.length ? ' open' : ''}>
       <summary>${esc(head)}${missing.length ? ` <b>${missing.length}개 준비 안 됨</b>` : ''}</summary>
@@ -170,7 +170,7 @@ function appLogHtml(app, sch, step) {
   }
   const d = dday(sch.deadline);
   const row = (done, label, value) =>
-    `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b><span>${value}</span></li>`;
+    `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b>${value ? `<span>${value}</span>` : ''}</li>`;
   const closed = sch.deadline && d.days < 0;
   const next = nextAction(app, sch, step, d, closed);
   return `
@@ -182,7 +182,7 @@ function appLogHtml(app, sch, step) {
       ${docChecklistHtml(sch)}
       <ul class="app-log-list">
         ${sch.deadline ? row(!!closed, '접수 마감', esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label))) : ''}
-        ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
+        ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ '')}
         ${row(!!app.result, '선정 발표',
           app.result ? (app.result === 'won' ? '선정 · ' : '미선정 · ') + esc(app.resultAt || '')
             : `<button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
@@ -240,7 +240,7 @@ function deleteApps(ids) {
       saveState();
       renderApplications();
       renderHome();
-      toast('되살림');
+      toast('되살렸어요');
     },
   });
 }
@@ -493,7 +493,7 @@ function calDayHtml(iso) {
          층1과 한 목록에 쏟으면 학생이 그것도 앱이 추천한 것으로 읽는다. */ ''}
     ${layer2.length ? `<details class="cal-kosaf">
         <summary>한국장학재단 목록 ${layer2.length}건</summary>
-        <p class="cal-note">재단이 적어 둔 칸을 그대로 보여 줍니다 — 자격은 재단 홈페이지에서 확인하세요.</p>
+        <p class="cal-note">${/* 2026-11-21 개발자 지시로 줄임(학생이 읽지 않는 안내) */ ''}자격은 재단 홈페이지에서 확인하세요.</p>
         ${layer2.map((s) => calRowHtml(s, { badge: false })).join('')}
       </details>` : ''}
     ${/* 거른 때는 거른 쪽만 말한다 — 대외활동만 볼 때는 장학 목록을 안 붙이므로 「내 대외활동」(리뷰 2026-11-21) */ ''}

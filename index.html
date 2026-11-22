@@ -255,7 +255,7 @@
       <div class="onboard-step" data-step="3" hidden>
         <div class="onboard-body">
           <h2>해당하는 항목을 모두 선택하세요</h2>
-          <p class="onboard-sub">해당 없으면 바로 완료</p>
+          <!-- 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) -->
           <div class="check-list" id="in-flags">
             <label class="check-item"><input type="checkbox" value="basicLiving" /><span>기초생활수급자</span></label>
             <label class="check-item"><input type="checkbox" value="nearPoverty" /><span>차상위계층</span></label>
@@ -294,7 +294,7 @@
       <div class="onboard-step" data-step="4" hidden>
         <div class="onboard-body">
           <h2>지금 받고 있는<br />장학금이 있나요?</h2>
-          <p class="onboard-sub">함께 받을 수 없는 공고는 목록에서 빠져요</p>
+          <!-- 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) -->
           <div class="check-list" id="in-scholarships">
             <label class="check-item"><input type="checkbox" value="kosaf" /><span>국가장학금<em>한국장학재단 I·II유형, 다자녀 등</em></span></label>
             <label class="check-item"><input type="checkbox" value="internal" /><span>교내 장학금<em>우리 학교에서 주는 성적·복지 장학금</em></span></label>
@@ -347,7 +347,7 @@
       <div class="onboard-step" data-step="6" hidden>
         <div class="onboard-body">
           <h2>서류에 자동으로 채울<br />기본 정보를 알려주세요</h2>
-          <p class="onboard-sub">모두 선택 사항이며 이 기기에만 저장돼요</p>
+          <!-- 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) -->
           <label class="field">
             <span class="field-label">학번 (선택)</span>
             <input type="text" id="in-sid" placeholder="예: 202512345" maxlength="12" inputmode="numeric" autocomplete="off" data-guard-kind="studentId" />
@@ -841,7 +841,7 @@
         <h2>양식 채우기</h2>
       </header>
       <p class="fill-head"><strong id="fill-title"></strong><span id="fill-file" class="fill-file"></span></p>
-      <p class="set-note">원본 그대로예요 — 학적정보에서 가져온 값은 틀리면 여기서 고치세요. 서명·날인 칸은 비워 두고 인쇄한 뒤 직접 써요.</p>
+      <p class="set-note">학적정보에서 가져온 값이 틀리면 여기서 고치세요. 서명·날인 칸은 비워 두고 인쇄한 뒤 직접 써요.</p>
       <div class="fill-wrap">
         <div id="fill-pages" class="fill-pages"></div>
         <aside id="fill-panel" class="fill-panel">
@@ -884,7 +884,7 @@
     <button class="chat-fab" id="btn-chat-fab" hidden aria-label="대장님 열기 — 장학금 도우미 (끌어서 위치 이동)">
       <svg class="mascot" viewBox="0 0 48 48" aria-hidden="true"><use href="#mascot"/></svg>
     </button>
-    <div class="chat-hint" id="chat-hint" hidden role="status">끌어서 이동 가능</div>
+    <div class="chat-hint" id="chat-hint" hidden role="status">끌어서 옮길 수 있어요</div>
     <div id="chat-backdrop" class="sheet-backdrop" hidden></div>
     <div id="chat-sheet" class="sheet chat-sheet" hidden role="dialog" aria-label="대장님 — 장학금 도우미" aria-modal="true">
       <div class="sheet-handle"></div>
@@ -894,7 +894,7 @@
         </span>
         <div class="chat-head-text">
           <p class="chat-title">대장님</p>
-          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답변</p>
+          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답해요</p>
         </div>
         <button class="icon-btn" id="btn-chat-close" aria-label="닫기">✕</button>
       </div>

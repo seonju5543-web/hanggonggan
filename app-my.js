@@ -340,7 +340,7 @@ function learnedHtml(c) {
   const rows = LEARNED_COMMON.filter(([k]) => c[k]);
   if (!rows.length) return '';
   return `<div class="my-learned">
-    <p class="my-learned-head">신청서에서 가져온 정보 <span>${rows.length}개</span></p>
+    <p class="my-learned-head">신청서에서 가져온 정보</p>${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) — 건수 꼬리표 */ ''}
     <ul>${rows.map(([k, label]) => `<li><span>${esc(label)}</span><strong>${esc(k === 'rrn' ? maskRrn(c[k]) : c[k])}</strong>
       <button type="button" class="btn-link" data-forget="${k}">지우기</button></li>`).join('')}</ul>
   </div>`;
@@ -396,9 +396,8 @@ function renderMy() {
     </div>
     ${/* 🔴 줄 셋을 뺐다 (2026-09-12 개발자 지시) — '특별자격: 해당 없음' · 공통 서류정보
          안내 · 프로필 사진 안내. 대부분의 학생에게 '해당 없음' 한 줄이고, 나머지 둘은
-         온보딩에서 이미 같은 말을 했다(index.html '모두 선택 사항이며 이 기기에만
-         저장됩니다'). ⚠️ 저장 위치 고지 자체가 사라진 것은 아니다 — 온보딩 그 줄과
-         약관 「③ 서버로 보내지 않는 정보」가 원본이다. */ ''}
+         온보딩에서 이미 같은 말을 했다. ⚠️ 저장 위치 고지는 약관 「③ 서버로 보내지 않는 정보」가 원본이다
+         (온보딩 6단계의 「이 기기에만 저장돼요」는 로그인하면 사실이 아니라 2026-11-21 에 지웠다 — syncSafeProfile 이 빼는 것은 주민번호·계좌번호뿐). */ ''}
     ${learnedHtml(c)}`;
   bindPhotoButtons();
   renderMyMenu(p, trackLabel);
@@ -514,14 +513,14 @@ const FAQ_ITEMS = [
   ['신청', '신청 준비를 끝내면 그다음은 어떻게 되나요?',
     '신청내역에 <strong>신청 준비 완료 → 공식 제출 → 심사 → 선정 발표</strong> 네 단계로 남습니다. 앱은 학교·재단 전산을 볼 수 없어서 <strong>제출과 결과는 학생이 직접 기록</strong>합니다("제출했어요", "선정·미선정" 버튼). 심사 단계만 제출 기록과 마감 경과로 앱이 표시해요.'],
   ['신청', '대장님(도우미)은 무엇을 답해 주나요?',
-    '앱이 <strong>이미 알고 있는 것</strong>만 답합니다 — 등록된 공고, 필요한 서류, 내 신청 현황, 공고 원문에서 뽑아 둔 문장이에요. 모르는 것은 지어내지 않고 "못 찾았다"고 말합니다. 그게 이 도우미를 만든 이유예요.'],
+    '앱이 <strong>이미 알고 있는 것</strong>만 답합니다 — 등록된 공고, 필요한 서류, 내 신청 현황, 공고 원문에서 뽑아 둔 문장이에요. 모르는 것은 지어내지 않고 "못 찾았다"고 말합니다.'], // 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내)
 
   ['공고·매칭', '우리 학교 공고가 안 보여요.',
     '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
   ['공고·매칭', '자격 요건이 안 적힌 공고가 있어요.',
-    '그 공고에서는 자격 요건을 <strong>공고 원문에서 직접 확인</strong>해 주세요. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요.'],
+    '그 공고에서는 자격 요건을 <strong>공고 원문에서 직접 확인</strong>해 주세요. 앱이 짐작해서 채우지 않습니다.'], // 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내)
   ['공고·매칭', '금액이 안 보이는 공고가 있어요.',
-    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우입니다. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>금액 줄을 비워</strong> 둡니다. 다만 홈의 합계는 이런 공고를 빼 버리면 실제보다 작아지므로, <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙입니다. 자세한 내역은 홈의 금액을 눌러 <strong>금액 상세</strong>에서 볼 수 있어요.'],
+    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우예요. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>금액 줄을 비워</strong> 둡니다. 홈의 합계에는 <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙여요. 홈의 금액을 누르면 <strong>금액 상세</strong>에서 내역을 볼 수 있어요.'], // 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내)
   ['공고·매칭', '저장(북마크)한 공고는 어디에 남나요?',
     '<strong>이 기기에만</strong> 남습니다. 로그인해도 저장 목록은 서버로 올라가지 않아서, 기기를 바꾸면 다시 저장하셔야 해요.'],
   ['공고·매칭', '달력에 왜 몇 개만 표시되나요?',
@@ -795,7 +794,7 @@ function renderSupport() {
 
   /* 문의처가 정해졌을 때만 메일 버튼을 낸다 — 없으면 정직하게 무엇이 되는지 적는다 */
   const 문의 = supportConfigured()
-    ? `<p class="sup-desc">답변은 적어 주신 메일 주소로 받으실 수 있어요.${SUPPORT_CONFIG.hours ? ` 응대 시간은 ${esc(SUPPORT_CONFIG.hours)}입니다.` : ''}</p>
+    ? `${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}${SUPPORT_CONFIG.hours ? `<p class="sup-desc">응대 시간은 ${esc(SUPPORT_CONFIG.hours)}입니다.</p>` : ''}
        <button type="button" class="btn btn-outline" id="btn-support-mail">문의 메일 쓰기</button>`
     : `<p class="sup-desc">한대장은 아직 시범 개발 중이라 <strong>따로 받아 볼 문의처를 두지 않았어요.</strong>
          정해지면 이 자리에 적고 그때부터 받습니다(이용약관 9번과 같은 내용이에요).</p>
@@ -822,8 +821,8 @@ function renderSupport() {
 
     <div class="my-card">
       <p class="wallet-title">진단 정보</p>
-      <p class="sup-desc">문제를 알려 주실 때 아래를 함께 보내 주시면 원인을 훨씬 빨리 찾을 수 있어요.
-        <strong>이름·학교·성적 같은 개인정보는 들어 있지 않습니다.</strong></p>
+      <p class="sup-desc">문의할 때 아래 정보를 함께 보내 주세요.${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) — 권유 꾸밈 */ ''}
+        <strong>이름·학교·성적 같은 개인정보는 들어 있지 않아요.</strong></p>
       <div class="sup-diag">${supportDiagnostics()
         .map(([k, v]) => `<div class="sup-diag-row"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}</div>
       <button type="button" class="btn btn-outline" id="btn-support-copy">진단 정보 복사</button>

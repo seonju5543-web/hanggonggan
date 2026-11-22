@@ -255,7 +255,7 @@ function openNotifyInbox() {
       <h3 class="sheet-title" style="margin-top:0">알림함</h3>
       ${unread ? '<button class="wallet-btn" id="btn-nf-readall">모두 읽음</button>' : ''}
     </div>
-    <p class="sheet-provider">읽지 않은 알림 ${unread}건 · 최근 ${items.length}건 보관</p>
+    ${/* 「읽지 않은 알림 n건 · 최근 n건 보관」 줄은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}
     <div class="nf-list">${rows}</div>
     <button class="btn btn-outline" id="btn-nf-settings" style="margin-top:16px">알림 설정 열기</button>
   `);
@@ -301,7 +301,7 @@ function notifyConsentSheet() {
     <ul class="nf-type-list">${typeRows}</ul>
     <p class="sheet-note">${pushConfigured()
       ? '알림은 <strong>앱을 켜지 않아도</strong> 도착. 내용은 기기 안에서 생성 · 서버 저장은 폰 주소·학교만.'
-      : '발송 서버 미연결. 알림은 <strong>앱을 열 때</strong>·<strong>열어 둔 동안</strong>, 지원 기기는 백그라운드 확인 시점에 전달.'} MY에서 언제든 켜기·끄기.</p>
+      : '발송 서버 미연결. 알림은 <strong>앱을 열 때</strong>·<strong>열어 둔 동안</strong>, 지원 기기는 백그라운드 확인 시점에 전달.'} 끄기는 MY에서.${/* 「켜기·끄기」를 줄였다(2026-11-21) — 동의하는 자리에서 되돌릴 길(끄기)은 남긴다 */ ''}</p>
     ${sup.iosNeedsInstall ? '<p class="sheet-note">iPhone은 사파리 공유 → <strong>홈 화면에 추가</strong>로 앱을 설치하면 수신 가능.</p>' : ''}
     <button class="btn btn-primary btn-lg" id="btn-nf-allow" style="margin-top:16px">알림 받기</button>
     <button class="btn btn-outline" id="btn-nf-later" style="margin-top:8px">나중에 할게요</button>
@@ -327,13 +327,11 @@ function notifyConsentSheet() {
       // 🔴 등록이 안 되면 알림은 꺼짐으로 돌아가고 **아무 말도 하지 않는다**(2026-11-09 지시) — '켰습니다'라고 하면 거짓말이 된다
       const p = await nfRegisterAfterPress(seq);
       // 장부의 켜짐만 보면 안 된다 — 더 늦은 누름이 아직 서버를 기다리는 동안 잠깐 켜짐일 뿐일 수 있다
-      if (seq === nfPressSeq && notifyLedger.enabled && !nfRegisterFailed(p)) toast(p && p.ok
-        ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
-        : '알림을 켰습니다. 새 공고와 마감을 알립니다');
+      if (seq === nfPressSeq && notifyLedger.enabled && !nfRegisterFailed(p)) toast('알림을 켰어요'); // 2026-11-21 개발자 지시로 줄임(뒷말은 동의 시트가 방금 한 말)
     } else if (perm === 'denied') {
-      toast('브라우저에서 알림이 차단돼 있습니다. 앱 안 알림함으로 계속 알립니다');
+      toast('브라우저에서 알림이 막혀 있어요 · 앱 안 알림함으로 계속 알려요');
     } else {
-      toast('앱 안 알림함으로 알립니다. MY에서 언제든 켤 수 있습니다');
+      toast('앱 안 알림함으로 알려요 · MY에서 언제든 켤 수 있어요');
     }
     if (!$('#screen-my').hidden) renderMy();
     notifyRedrawSettings();
@@ -344,7 +342,7 @@ function notifyConsentSheet() {
     notifyLedger.enabled = false;
     await finish();
     closeNotifyPanel();
-    toast('알림은 MY 화면에서 언제든 켜기 가능');
+    toast('알림은 MY에서 언제든 켤 수 있어요');
     if (!$('#screen-my').hidden) renderMy();
     notifyRedrawSettings();
   });

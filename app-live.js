@@ -664,7 +664,7 @@ function liveNoticesHtml() {
   const mine = boardNoticesForMe();
   const head = liveNoticesHead();
   if (!mine.length) {
-    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
+    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요${/* 2026-11-21 개발자 지시로 둘째 줄 지움(학생이 읽지 않는 안내) */ ''}</p>`;
   }
   /* 🔴 (2026-10-10 팀 업무 분장 11번 · 은서 — 「우리학교 게시판 공고 · 재단 지자체 새 공고 인터페이스 개선」)
      ① 카드마다 같은 「○○대학교 게시판」 윗줄이 반복됐다 — 구역 제목이 이미 그 말을 한다. 윗줄에는 **언제 올라왔나**를 적는다.
@@ -757,7 +757,8 @@ function noticeCardHtml(n, opts) {
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
       ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) && hintShort(n.deadlineHint) ? `<p class="sch-provider">${esc(hintShort(n.deadlineHint))}</p>` : ''}
       ${/* 링크 이름은 sourceLink 한 곳(card) — 목록·홈페이지·로봇이 확인한 문제 주소는 '원문'이라 부르지 않는다 (2026-10-03) */ ''}
-      <p class="sch-provider">${[(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개` : '', o.dateTop || !n.foundAt ? '' : `${esc(shortDay(n.foundAt))} 수집`, link.label && !o.sheet ? esc(link.label) : ''].filter(Boolean).join(' · ')}</p>
+      ${/* 2026-11-21 개발자 지시로 「○○ 수집」 날짜를 지움(학생이 읽지 않는 안내) · 남는 글자가 없으면 빈 줄을 그리지 않는다 */ ''}
+      ${(() => { const tail = [(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개` : '', link.label && !o.sheet ? esc(link.label) : ''].filter(Boolean).join(' · '); return tail ? `<p class="sch-provider">${tail}</p>` : ''; })()}
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
