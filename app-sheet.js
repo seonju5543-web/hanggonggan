@@ -33,7 +33,7 @@ function schoolPortalNote(sch) {
        스타일 없는 글이 앞 문장에 붙어 나온다 — 만들면서 실제로 그렇게 했다가 잡았다.
        ⚠️ 블록 스타일(padding-left·border-left)이라 `<span>` 이 아니라 `<p>` 여야 먹는다. */
     const path = sch.applyPortalSource
-      ? `<p class="r-quote">공고 원문 그대로 — 「${esc(sch.applyPortalSource)}」</p>` : '';
+      ? `<p class="r-quote">「${esc(sch.applyPortalSource)}」</p>` : '';
     return `<p class="dp-note">${where}에서 신청합니다.</p>${path}`;
   }
   const p = schoolPortal(sch);
@@ -195,7 +195,7 @@ function applySectionHtml(sch, opts) {
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource
-    : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
+    /* 층2 재단의 「재단 선발 공고문·홈페이지가 정한 접수 방법」 줄은 2026-11-21 개발자 지시로 지웠다 — 아무것도 알려 주지 않는 문장(원문 링크가 아래에 있다) */
     : '';
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
   const row = (k, v, plain) => `<li><b class="ns-k">${k}</b>${plain ? esc(v) : nsBodyHtml(v)}</li>`;   // 기간 줄은 plain — 80자에서 잘린 기간 토막의 주소를 진짜 같은 링크로 만들지 않는다(리뷰 2026-11-17)
@@ -360,7 +360,7 @@ function eligibilityRowsHtml(sch, result) {
   if (reqStruct) {
     const must = [...reqStruct.common, ...reqStruct.grade];
     if (must.length) reasonRows += `<li class="r-head">공통 요건 <em>모두 해당해야 합니다</em></li>` + must.map((e) => reqRow(e)).join('');
-    reasonRows += `<li class="r-head">다음 ${reqStruct.either.length === 2 ? '둘' : reqStruct.either.length + '가지'} 중 하나 <em>하나만 해당하면 됩니다</em></li>`;
+    reasonRows += `<li class="r-head">다음 ${reqStruct.either.length === 2 ? '둘' : reqStruct.either.length + '가지'} 중 <em>하나만 해당하면 됩니다</em></li>`;
     reqStruct.either.forEach((b, i) => {
       /* 이름을 못 읽었으면 지어내지 않고 순서로만 가른다 (원칙 8-1) */
       /* 갈래 이름이 첫 줄과 같은 글자면(`취업지원형 : …` 가 이름이자 줄) 줄을 한 번만 — 같은 문장이 두 번 보였다(2026-10-15) */
@@ -510,15 +510,13 @@ function openDetail(id) {
         const step = effectiveStep(app, sch);
         const stepLabels = APP_STEPS.map((s, i) => (i === 3 && app.result === 'lost') ? '결과 확인' : s);
         const chLink = `${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}${ch.note ? ` <span class="doc-legend">${esc(ch.note)}</span>` : ''}`;
-        /* 다 쓴 문서 — 큰 단추 넷 대신 문서 한 줄 + 글자 단추(저장·인쇄·공유·다시 작성) */
+        /* 다 쓴 문서 — 문서 한 줄 + 「PDF 저장」 하나 (2026-11-22 개발자 지시 「작성한 양식 문서에 대해서는 pdf 저장 칸만 남겨줘」).
+           🔴 .doc 저장 · 공유 · 다시 작성을 **되살리지 말 것** — 저장 길은 PDF 하나다(인쇄 창에서 PDF 로 저장 · printFormDoc). */
         const docsHtml = `${app.formAns && formTplIdFor(sch, true) ? `
           <div class="prep-file">
             <span class="prep-file-name">작성한 양식 문서</span>
             <span class="prep-file-acts">
-              <button class="link-btn" id="btn-form-save">.doc 저장</button>
-              <button class="link-btn" id="btn-form-print">인쇄 · PDF</button>
-              <button class="link-btn" id="btn-form-share">공유</button>
-              <button class="link-btn" id="btn-form-edit">다시 작성</button>
+              <button class="link-btn" id="btn-form-print">PDF 저장</button>
             </span>
           </div>` : ''}${app.docs && app.docs.length ? `
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
@@ -536,10 +534,10 @@ function openDetail(id) {
           /* 제출을 적은 뒤 — 그 단계에서 할 일 한 가지와 쓴 문서만. 제출 방법·복사 단추는 이미 쓸 일이 없다 */
           return `${head}
         ${step === 1 ? `
-          <p class="progress-note">${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시됩니다` : ''}</p>
+          <p class="progress-note">${app.submittedAt} 제출${/* 「마감 뒤 자동으로 심사 단계」 설명 — 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">제출 기록 취소</button>` : ''}
         ${step === 2 ? `
-          <p class="progress-note">접수가 마감되어 심사가 진행 중입니다. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${esc(ch.label)}${/* '원문 공고'는 그 공고로 가는 주소(post)일 때만 — 재단 홈페이지·목록을 원문이라 부르지 않는다 (2026-10-03) */ ''}${sch.sourceUrl && sourceLink(sch, 'detail').cls === 'post' ? ' 또는 원문 공고' : ''}에서 할 수 있습니다.</p>
+          <p class="progress-note">발표는 ${esc(ch.label)}${/* '원문 공고'는 그 공고로 가는 주소(post)일 때만 — 재단 홈페이지·목록을 원문이라 부르지 않는다 (2026-10-03) */ ''}${sch.sourceUrl && sourceLink(sch, 'detail').cls === 'post' ? ' 또는 원문 공고' : ''}에서 확인하고, 결과를 아래에 기록해 주세요.</p>
           <div class="submit-actions" style="margin-bottom:12px">
             <button class="btn btn-outline" id="btn-result-won">선정됨</button>
             <button class="btn btn-outline" id="btn-result-lost">아쉽게 미선정</button>
@@ -547,7 +545,7 @@ function openDetail(id) {
         ${step === 3 ? `
           <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
             ? `${esc(app.resultAt)} 선정${(() => { const t = amountLine(sch).text.replace(/^금액 · /, ''); return t ? ` · ${esc(t)}` : ''; })()}`   /* 금액은 카드와 같은 amountLine — 모르면 「선정」까지만(예전 「선정 · 금액 원문 확인」 · 2026-11-16) */
-            : `${esc(app.resultAt)} 미선정으로 기록됨`}</p>
+            : `${esc(app.resultAt)} 미선정`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${docsHtml}`;
         }
@@ -566,8 +564,8 @@ function openDetail(id) {
         const items = pc.items.map((it) => {
           const toggle = it.manual && !(it.auto && it.done)
             ? `<button class="prep-toggle${it.done ? ' is-undo' : ''}" data-prep-toggle="${it.key}">${it.done ? '되돌리기' : '확인했어요'}</button>` : '';
-          const legend = it.auto && it.done ? '<span class="doc-legend">자동 확인</span>'
-            : it.key === 'write' && !it.done ? '<span class="doc-legend">「서류 작성 이어서 하기」로</span>' : '';
+          /* 「자동 확인」 꼬리표 — 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
+          const legend = it.key === 'write' && !it.done ? '<span class="doc-legend">「서류 작성 이어서 하기」로</span>' : '';
           const detail = detailOf(it.key);
           return `
             <li class="prep-item${it.done ? ' is-done' : ''}">
@@ -592,7 +590,7 @@ function openDetail(id) {
         </div>
         <div class="prep-record">
           <button class="btn btn-outline" id="btn-mark-submitted">공식 제출 완료로 기록</button>
-          <p class="dp-note">제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>
+          <p class="dp-note">제출을 마친 뒤 눌러 주세요.</p>
         </div>`;
       })() : ''}
 
@@ -610,7 +608,7 @@ function openDetail(id) {
       ${applyCaution ? `<p class="dp-note dp-caution">${applyCaution === 'unknown'
         ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
         : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
-      ${lock.noApply ? `<p class="dp-note">원문: 「${esc(sch.noApply)}」</p>` : ''}
+      ${/* noApply 원문 줄(「접수」 절 방법 줄과 같은 문장) — 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}${app && !app.pending ? ' hidden' : ''}>${btnLabel}</button>
       ${/* 🔴 담아 둔 공고(app && !app.pending)에선 이 단추를 **숨긴다** (2026-11-21) — 늘 잠긴 회색 단추로 「준비 중 1/4 — 아래 체크리스트」만 되풀이했다
            (체크리스트는 위에 있다). 할 일은 위 「제출 전 준비」·제출 단추가 말한다. 요소는 남긴다 — 검사·도구가 이 단추로 잠금을 읽는다 */ ''}
@@ -653,17 +651,11 @@ function openDetail(id) {
     const url = safeUrl(ch.url || effectiveLinkUrl(sch));   // 제출처 표가 없으면 원문 — 바로잡은 원문이 있으면 그 주소(source-link.js ⑥)
     if (url) window.open(url, '_blank', 'noopener');
   });
-  /* 다 쓴 문서는 그 공고에 원본 신청서가 나중에 생겼어도 열린다(formTplIdFor 의 written — 이미 쓴 글을 뺏지 않는다 · 6-1 리뷰 2026-11-22) */
+  /* 다 쓴 문서는 그 공고에 원본 신청서가 나중에 생겼어도 PDF 로 받을 수 있다(formTplIdFor 의 written — 이미 쓴 글을 뺏지 않는다 · 6-1 리뷰 2026-11-22).
+     단추는 「PDF 저장」 하나뿐이다(2026-11-22 개발자 지시 — .doc 저장·공유·다시 작성은 뺐다) */
   if (app && app.formAns && formTplIdFor(sch, true)) {
     const tpl = FORM_TEMPLATES[formTplIdFor(sch, true)];
-    $('#btn-form-save').addEventListener('click', () => downloadFormDoc(tpl, state.profile, app.formAns));
     $('#btn-form-print').addEventListener('click', () => printFormDoc(tpl, state.profile, app.formAns));
-    $('#btn-form-share').addEventListener('click', () => shareFormDoc(tpl, state.profile, app.formAns, sch));
-    $('#btn-form-edit').addEventListener('click', () => {
-      startFormFill(sch, { ans: app.formAns, quiet: true });   // 쓴 글이 있다(restore.ans) — 원본이 생긴 공고라도 그 문서를 연다
-      if (!formFill || formFill.schId !== sch.id) return;       // 문서를 못 열었으면(준비 시트로 갔다) 남의 formFill 을 건드리지 않는다
-      formFill.ans = app.formAns; formFill.stage = 'preview'; renderFormFill();
-    });
   }
   const copyBtn = $('#btn-copy-docs');
   if (copyBtn) copyBtn.addEventListener('click', () => copyText(buildSubmissionText(sch, app)));

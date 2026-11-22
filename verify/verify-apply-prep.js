@@ -348,17 +348,21 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
       let threw = '';
       try { openDetail(id); } catch (e) { threw = String(e && e.message); }
       await new Promise((r) => setTimeout(r, 500));
-      const has = ['#btn-form-save', '#btn-form-print', '#btn-form-edit'].map((q) => !!document.querySelector(q));
-      const b = document.querySelector('#btn-form-edit');
+      /* 2026-11-22 개발자 지시 — 작성한 양식 문서 줄엔 「PDF 저장」 하나만(.doc 저장·공유·다시 작성 뺌) */
+      const has = ['#btn-form-print', '#btn-form-save', '#btn-form-share', '#btn-form-edit'].map((q) => !!document.querySelector(q));
+      const b = document.querySelector('#btn-form-print');
+      const label = b && b.textContent.trim();
+      /* 진짜 인쇄 창은 띄우지 않고, 누르면 그 문서(쓴 답)로 printFormDoc 을 부르는지만 본다 */
+      const real = window.printFormDoc; let called = null;
+      window.printFormDoc = (tpl, p, ans) => { called = { tpl: tpl === FORM_TEMPLATES['prep:' + id], ans: ans === state.applications.find((a) => a.id === id).formAns }; };
       if (b) b.click();
-      await new Promise((r) => setTimeout(r, 400));
-      const edit = { stage: formFill && formFill.stage, tpl: formFill && formFill.tplId, sch: formFill && formFill.schId === id };
+      window.printFormDoc = real;
       state.applications = state.applications.filter((a) => a.id !== id);
       resumeSave({ form: null, sheet: null });
-      return { threw, has, edit };
+      return { threw, has, label, called };
     }, pick.P.id);
-    eq('  다 쓴 문서(작성한 양식 문서)는 원본이 생긴 뒤에도 저장·인쇄·다시 작성 단추가 있고, 「다시 작성」이 그 문서를 미리보기로 연다',
-      r3, { threw: '', has: [true, true, true], edit: { stage: 'preview', tpl: 'prep:' + pick.P.id, sch: true } });
+    eq('  다 쓴 문서(작성한 양식 문서)는 원본이 생긴 뒤에도 「PDF 저장」 하나로 받는다 — 누르면 그 문서·쓴 답으로 PDF(인쇄) · 다른 단추는 없다',
+      r3, { threw: '', has: [true, false, false, false], label: 'PDF 저장', called: { tpl: true, ans: true } });
     await page.keyboard.press('Escape');
     await closedAfter(600);
   }

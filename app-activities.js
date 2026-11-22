@@ -147,7 +147,7 @@ function activityGateShow(on) {
   $('#activities-gate').hidden = !on;
   $('#act-gate-bar').hidden = on;
   ['#screen-activities .search-box', '#activities-filters', '#activities-field-filters', '#activities-list',
-    '#screen-activities .data-note', '#screen-activities .sort-wrap'].forEach((sel) => { const el = $(sel); if (el) el.hidden = on; });
+    '#screen-activities .sort-wrap'].forEach((sel) => { const el = $(sel); if (el) el.hidden = on; });
   if (!on) {
     const p = state.profile || {};
     const n = (p.interestFields || []).length;
@@ -212,7 +212,7 @@ function renderActivities() {
   if (!list.length) {
     box.innerHTML = `<p class="empty">${q
       ? `'${esc(activitiesQuery.trim())}'와 맞는 글이 없어요`
-      : `아직 ${esc(p.school)} 게시판에서 모은 ${activitiesField === 'all' ? '' : esc(activitiesField) + ' '}${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요<br /><span class="empty-sub">게시판이 연결되면 새 글이 여기에 자동으로 떠요</span>`}</p>`;
+      : `아직 ${activitiesField === 'all' ? '' : esc(activitiesField) + ' '}${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내 — 게시판 수집·연결 설명) */ ''}`}</p>`;
     return;
   }
   box.innerHTML = list.map(activityCardHtml).join('');
@@ -273,7 +273,7 @@ function activityAsSch(n) {
     id: `act:${n.url}`, name: activityTitle(n), type: n.kind || '대외활동', eligibility: {},
     eligibilityLines: [...(n.eligibilityLines || []), ...titleTargetLines(n.title).filter((l) => !(n.eligibilityLines || []).some((x) => String(x).includes(l)))], eligibilityExcludes: n.eligibilityExcludes || [], eligibilityPriority: n.eligibilityPriority || [],
     excerpts: n.noticeLines || [], documents: [], deadline: n.deadline || null,
-    activity: true, amount: [n.kind || '대외활동', activityHostLine(n)].filter(Boolean).join(' · '),   // 학교 게시판 글자는 어디에도 안 그린다(2026-11-02 개발자 결정)   // 달력·보관함 줄의 둘째 줄(장학은 금액 자리) — 지어낸 값이 아니라 종류·주최
+    activity: true, amount: [n.kind || '대외활동', activityHostLine(n)].filter(Boolean).join(' · '),   // 학교 게시판 글자는 어디에도 안 그린다(2026-11-02 개발자 결정)   // 시트·금액 줄이 읽는 값 — 달력·보관함 줄은 이것을 안 쓴다(갈래는 칩 · 둘째 줄은 주최만 — calRowHtml · 2026-11-21) — 지어낸 값이 아니라 종류·주최
   };
 }
 /* 카드·정렬·시트가 **같은 값**을 쓴다 — getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor) */

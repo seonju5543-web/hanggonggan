@@ -25,7 +25,7 @@
 - ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 440 · 상한 15건 초과 43 · 같은 글 2
   - 자격 줄 있는 글 9/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
-  - 코드 칸 값(첫 세 행): gugunCd=3220000|4490000|3460000 · sidoCd=6110000|6440000|6270000
+  - 코드 칸 값(첫 세 행): gugunCd=3180000|3180000|3180000 · sidoCd=6110000|6110000|6110000
   - 대외활동 · [성인,대학생] 의왕시 11월 자원봉사 기본교육 (~2026-11-22) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546495
   - 대외활동 · 국립망향의동산 잡초제거 등 환경 정비(오후타임13시~17시)월,화,목,금 -대학생 등 (~2026-11-23) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542414
   - 대외활동 · 어울림축제 전시 및 공연 행사 지원(11.27.금):대학생, 청년만 (~2026-11-24) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546101

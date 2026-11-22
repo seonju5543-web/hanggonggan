@@ -77,7 +77,9 @@
   /* 과잠 — 달걀 몸 위에 입힌다. o: { t0, t1 밑단·깃 높이, color 몸판, sleeve 소매(기본 흰색), trim 줄 색(기본 흰색), letter, letterColor,
      hand 손 색, armK 팔 길이 배율, armS 팔 굵기 배율, gap 앞섶 벌어짐(0 이면 닫힘) }. 팔 둘(어깨가 축)을 돌려준다 */
   function eggJacket(e, o) {
-    const squash = e.squash, G = o.gap == null ? 0.3 : o.gap, t0 = o.t0, t1 = o.t1;
+    /* 과잠 몸판·줄·단추·글자는 한 묶음(jk)에 담는다 — 화났을 때 과잠을 벗어 던지는 연출(mascot/mood.js · 2026-11-21)이 이 묶음 하나를 움직인다. 모양은 예전과 같다 */
+    const jk = new T.Group(); e.squash.add(jk);
+    const squash = jk, G = o.gap == null ? 0.3 : o.gap, t0 = o.t0, t1 = o.t1;
     const body = mat(o.color, 0.85), trim = mat(o.trim == null ? 0xffffff : o.trim, 0.8), sleeve = mat(o.sleeve == null ? 0xffffff : o.sleeve, 0.8), hand = mat(o.hand, 0.75);
     body.side = T.DoubleSide;
     const arc = Math.PI * 2 - G * 2;
@@ -93,14 +95,16 @@
       const s = 0.36 * (o.letterS || k);
       squash.add(e.place(new T.Mesh(new T.PlaneGeometry(s, s), new T.MeshBasicMaterial({ map: letterTex(o.letter, o.letterColor), transparent: true, depthWrite: false })), lerp(t0, t1, 0.68), G + 0.52, 0.06));
     }
-    return [-1, 1].map((s) => {
+    const arms = [-1, 1].map((s) => {
       const g = new T.Group(); g.position.set(s * e.rr(t1 - 0.06), e.yy(t1 - 0.06), 0.04); g.scale.set(k, (o.armK || 1), k);
       g.add(sph(0.2, sleeve, 0, -0.42, 0, 1, 2.3, 1));
       const cuff = torus(0.14, 0.06, body); cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.84; g.add(cuff);
       const st = torus(0.19, 0.014, trim); st.rotation.x = Math.PI / 2; st.position.y = -0.84; g.add(st);
       g.add(sph(0.16, hand, 0, -1.0, 0, 1, 1, 0.75));
-      g.userData.side = s; squash.add(g); return g;
+      g.userData.side = s; e.squash.add(g); return g;
     });
+    arms.jacket = jk;
+    return arms;
   }
 
   // 한국외대 '부' — 하늘색 달걀 몸 · 머리 위 깃 둘 · 주황 세모 부리 · 남색 몸판/흰 소매 과잠(H). cute: 0 원작 얼굴 · 1 더 귀엽게(개발자 선택)
@@ -139,7 +143,7 @@
       g.add(new T.Mesh(new T.TubeGeometry(curve, 16, 0.06, 10), mat(SKY, 0.75))); g.add(sph(0.06, mat(SKY, 0.75), s * 0.26, 0.32, 0));
       head.add(g); return g;
     });
-    return { root, squash, head, arms, eyes, ears, look: 0.4, scale: 0.9 };
+    return { root, squash, head, arms, eyes, ears, jacket: arms.jacket, look: 0.4, scale: 0.9 };
   }
 
   /* 2등신 캐릭터 틀 — 둥근 머리 + 과잠 입은 작은 몸. o: { body 몸 색, belly 배 색, head 머리 색(기본 body), hand 손 색, feet 발 색,
@@ -157,7 +161,7 @@
     const on = (obj, x, y, off) => {
       obj.position.set(x, y, onZ(R, x, y) + (off || 0)); obj.rotation.y = Math.asin(clamp(x / R, -1, 1)) * 0.9; obj.rotation.x = -Math.asin(clamp(y / R, -1, 1)) * 0.9; head.add(obj); return obj;
     };
-    return { root, squash, head, arms, eyes: [], ears: [], R, on, e, scale: o.scale || 0.92 };
+    return { root, squash, head, arms, eyes: [], ears: [], R, on, e, jacket: arms && arms.jacket, scale: o.scale || 0.92 };
   }
   // 얼굴 부품 — ch.on 으로 머리 앞면에 붙인다
   function eyes(ch, o) {   // o: { x 0.27, y 0.05, r 0.105, style: 'sparkle'(기본)|'dot'|'oval', color }
@@ -309,6 +313,7 @@
     if ('IntersectionObserver' in window) new IntersectionObserver((es) => { S.visible = es[0].isIntersecting; }).observe(btn);
 
     function tap() {
+      if (opt.beforeTap && opt.beforeTap() === false) return;   // 연출(mascot/mood.js)이 이 누르기를 가져갔다 — 동전 없이
       if (S.tJump >= 0 && S.tJump < 0.5) return;       // 뛰는 중에는 한 번만
       S.tJump = 0; if (ch.cap) S.capT = 0;
       if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} }
@@ -340,11 +345,14 @@
 
     let last = performance.now();
     let skip = false;
+    const ctx = { S, scene, cam, coins, btn, shadow, get ch() { return ch; } };
     function frame(now) {
       requestAnimationFrame(frame);
-      if (S.tJump < 0 && !S.drag && appear >= 1 && (skip = !skip)) return;   // 쉬는 동안은 한 프레임 걸러 (전력)
+      if (S.tJump < 0 && !S.drag && appear >= 1 && !S.busy && (skip = !skip)) return;   // 쉬는 동안은 한 프레임 걸러 (전력) · 연출 중(S.busy)은 매 프레임
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      if (!S.visible || !ch) return;
+      /* paused(): 밖에서 '지금은 그리지 마' — 홈 히어로는 시트가 무대를 덮고 있을 때(app-mascot.js). 덮인 무대를 그리면 느린 폰(과 소프트웨어 렌더링 검사)에서
+         시트 애니메이션이 밀렸다(11-22 verify-sheet-back 실측) · 없으면 예전 그대로 */
+      if (!S.visible || !ch || (opt.paused && opt.paused())) return;
       S.time += dt;
       // 돌리기 — 놓으면 용수철로 제자리
       if (!S.drag || !moved) { S.yawV += (-S.yaw * 60 - S.yawV * 7) * dt; S.yaw += S.yawV * dt; }
@@ -398,11 +406,13 @@
         ch.tassel.rotation.z = clamp(S.tas, -1.1, 1.1) + Math.sin(S.time * 1.7) * 0.05;
       }
       coins.update(dt); if (stack) stack.update(dt);
+      /* 덧입히는 연출 — 위에서 정한 자세 위에 마지막으로 얹는다(mascot/mood.js · 2026-11-21). 없으면 예전 그대로 */
+      if (opt.after) opt.after(dt, ctx);
       renderer.render(scene, cam);
     }
     requestAnimationFrame(frame);
     /* 밖에서 상태를 맞출 때 — point({x,y}): 화면 좌표(-1~1 · x 왼쪽이 −, y 위가 +)의 그 자리를 가리킨다(null 이면 그만) · hop(): 동전 없이 한 번 뛴다 */
-    return { setChar, tap, size, point(p) { S.point = p || null; }, hop() { if (S.tJump < 0 || S.tJump > 0.5) S.tJump = 0.1; } };
+    return { setChar, tap, size, ctx, point(p) { S.point = p || null; }, hop() { if (S.tJump < 0 || S.tJump > 0.5) S.tJump = 0.1; } };
   }
 
 

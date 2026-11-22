@@ -1,7 +1,27 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-11-21",
+ "updatedAt": "2026-11-22",
  "items": [
+  {
+   "title": "[산업대학원(원주)]2027년도 전기 신입생 모집 안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11678&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-11-21",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-11-22",
+   "desc": "모집인원 원주캠퍼스는 2027년도부터 ‘산업대학원(원주)’으로 독립 운영됨에 따라 신입생선발계획 분리 시행 중 원서접수 일시 현장 접수(우편접수 포함) 전형방법 서류심사 및 구술면접 전형일시 합격자 발표일 농협…"
+  },
+  {
+   "title": "[사회융합대학원/원주캠퍼스]2027년도 전기 신입생 모집 안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11677&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-11-21",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-11-22",
+   "desc": "모집인원 원주캠퍼스는 2027년도부터 ‘사회융합대학원’으로 독립 운영됨에 따라 신입생선발계획 분리 시행 중 원서접수 일시 현장 접수(우편접수 포함) 전형방법 서류심사 및 구술면접 전형일시 합격자 발표일 농협…"
+  },
   {
    "title": "2026학년도 지역사회 오픈 마이크로디그리과정 운영 안내",
    "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11675&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
@@ -397,28 +417,6 @@
    "src": "784a7e0d",
    "foundAt": "2026-10-28",
    "desc": "현재 도서관 시스템 오류로 인하여 홈페이지/모바일앱 등 도서관 시스템 접속이 불가합니다. 복구 시 다시 안내 드리겠습니다. 이용에 불편을 드려 죄송합니다. 도서관 시스템 복구가 완료되어 현재 정상 이용 가능합니다."
-  },
-  {
-   "title": "[매주 수요일은 후원의 집 가는 날] 안내드립니다.",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11581&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-10-28",
-   "school": "강원대학교",
-   "campus": "",
-   "src": "784a7e0d",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/430ef0d84e19c7fb.webp",
-   "desc": "강원대학교 춘천캠퍼스에서는 [매주 수요일은 강원대학교 후원의 집 가는 날]로 지정하여 대학에 기부해 주시는 업체에 고마움을 전하고자 ‘후원의 집’의 이용을 독려하오니 구성원 여러분의 많은 참여와 홍보를 부탁드립니다."
-  },
-  {
-   "title": "[생활협동조합] 총장님과 함께하는 김장나눔행사 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11580&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-10-27",
-   "kind": "행사",
-   "school": "강원대학교",
-   "campus": "",
-   "src": "784a7e0d",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/fa4ace963a8c92e8.webp"
   }
  ]
 }

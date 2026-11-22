@@ -586,7 +586,7 @@ const APP_STEPS = ['신청 준비 완료', '공식 제출', '심사', '선정 �
 /* 🔴 앱 판 번호는 **여기 한 곳**이다 (2026-09-13 고객센터 신설).
    MY 아래 줄과 고객센터의 진단 정보가 같은 값을 써야 한다 — 두 곳에 적어 두면
    한쪽만 고쳐져 학생이 알려 준 판 번호가 실제와 달라진다. */
-const APP_VERSION = 'v0.3 (MVP)';
+const APP_VERSION = 'v0.3';
 
 /* 진척도 판정 — 앱이 학교·재단 시스템을 들여다볼 수 없으므로(정직 원칙)
    '공식 제출'과 '발표 결과'는 사용자가 직접 기록하고,
@@ -604,7 +604,8 @@ function effectiveStep(app, sch) {
 function recordSubmitted(sch) {
   const app = state.applications.find((a) => a.id === sch.id);
   if (!app) return;
-  if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
+  /* 확인 창 둘째 문단(진행 단계 설명)은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
+  if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?`)) return;
   app.submittedAt = nowStamp();
   saveState();
   if (typeof trackUse === 'function') trackUse('submitted', sch.id);
@@ -612,7 +613,8 @@ function recordSubmitted(sch) {
      일어났다**는 신호로만 쓴다(저장·새로고침·이 기록 셋). 화면이 바뀔 때마다 울리면
      알림처럼 느껴져서 학생이 폰 설정에서 앱 진동을 통째로 꺼 버린다. */
   if (typeof haptic === 'function') haptic(14);
-  toast('공식 제출 기록 완료 · 접수 마감 후 심사 단계로 자동 전환');
+  /* 뒤 절 「접수 마감 후 심사 단계로 자동 전환」은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
+  toast('공식 제출을 기록했어요');
   refreshProgressViews(sch.id);
 }
 
@@ -663,6 +665,34 @@ function refreshProgressViews(id) {
   if (wasOpen) { if (appSch(id)) openDetail(id); else closeSheet(); }   // 결과를 적어 사라진 줄의 시트는 닫는다
 }
 
+/* 알림 글을 머리·설명으로 가른다 — 첫 ` · ` 또는 ` — ` 에서 한 번만.
+   머리가 너무 길면(문장 하나짜리 경고 등) 가르지 않는다: 머리만 굵어져 오히려 무겁다. */
+function toastParts(msg) {
+  const t = String(msg == null ? '' : msg).trim();
+  const m = t.match(/^(.+?)\s+[·—]\s+(.+)$/s);
+  if (!m || m[1].length > 24) return { head: t, sub: '' };
+  return { head: m[1], sub: m[2] };
+}
+
+/* 알림의 성격 — 아이콘을 고른다(승인 시안 C · 2026-11-21).
+   안 된 일(실패·차단·막음)을 먼저 본다: '서류를 지우지 못했어요' 처럼 '지웠'·'완료'류 낱말이 섞여도 실패다.
+   🔴 서버 오류 문구(supabase-client.js authErrorText — '문제가 생겼어요 (…)')·입력 막음(input-guard)·초안 거절(essay.js)도
+      여기서 잡는다 — '생겼어요'는 끝난 말꼴이라 안 잡으면 **서버 정보 삭제 실패에 초록 체크**가 붙는다(리뷰 2026-11-21).
+   된 일은 끝난 말꼴(완료·했어요·했습니다…)로만 · 둘 다 아니면 안내(새 알림 n건 · 켜기 가능 등). */
+const TOAST_WARN = /실패|미지원|못\s?[가-힣]|차단|벗어나|사이만|이하 (파일|사진)|이미 다른|필요$|^먼저|골라 주세요|읽을 수 없|찾지 못|문제가 생겼|다시 시도|연결을 확인|로그인해 주세요|맞지 않아요|이상이어야|다시 확인해|먼저 눌러|보내지 않았|다시 눌러|적을 수 있어요|적을 수 없|적어 주세요|있을 수 없|재료에 없는|비어 있음|직접 쓰셔야|아니에요/;
+const TOAST_DONE = /완료|[했됐웠겼렸왔켰] ?(어요|습니다)|해제했|저장했|기록했|되살|불러왔|^로그아웃|\d+건 삭제/;
+function toastTone(msg) {
+  const t = String(msg == null ? '' : msg);
+  if (TOAST_WARN.test(t)) return 'warn';
+  if (TOAST_DONE.test(t)) return 'done';
+  return 'info';
+}
+const TOAST_ICONS = {
+  done: '<path d="M5 12.5l4.2 4.2L19 7"/>',
+  warn: '<path d="M12 6.5v7"/><path d="M12 17.6v.01"/>',
+  info: '<path d="M12 11v6.5"/><path d="M12 6.6v.01"/>',
+};
+
 function toast(msg, action) {
   const el = $('#toast');
   /* 🔴 사라지는 중에 새 알림이 뜨면 **옛 숨김 타이머가 새 알림을 지운다** — 2600ms 타이머만
@@ -670,7 +700,36 @@ function toast(msg, action) {
      (반쯤 뜬 채로 사라진다). 두 타이머를 한자리에서 끈다. */
   clearTimeout(toast._t);
   clearTimeout(toast._h);
-  el.textContent = msg;
+  /* 읽어 주는 영역(role=status)은 보이는 상태에서 글이 바뀌어야 화면 낭독기가 읽는다 — 먼저 펼친다
+     (아직 .show 전이라 투명하다 · 리뷰 2026-11-21) */
+  el.hidden = false;
+  /* 머리 한 줄 + 설명 한 줄 (2026-11-21 개발자 요청 — "조금 더 프로페셔널하고 깔끔하게").
+     부르는 쪽은 이미 `결과 · 할 일` / `결과 — 할 일` 꼴로 적고 있다. 긴 문장을 가운데 정렬로
+     네댓 줄 쌓으면 무엇이 끝났고 무엇을 하라는지가 섞였다 → 첫 구분자 앞을 굵게, 뒤를 흐리게.
+     부르는 자리(60여 곳)는 손대지 않는다 · 글자는 여전히 textContent 로만 넣는다(태그 해석 없음). */
+  const { head, sub } = toastParts(msg);
+  el.textContent = '';
+  const tone = toastTone(msg);
+  const ico = document.createElement('span');
+  ico.className = 'toast-ico';
+  ico.dataset.tone = tone;
+  ico.setAttribute('aria-hidden', 'true');
+  /* 고정된 그림 글자만 넣는다(알림 글은 아래에서 textContent 로) */
+  ico.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${TOAST_ICONS[tone]}</svg>`;
+  el.appendChild(ico);
+  const body = document.createElement('div');
+  body.className = 'toast-body';
+  const h = document.createElement('div');
+  h.className = 'toast-head';
+  h.textContent = head;
+  body.appendChild(h);
+  if (sub) {
+    const d = document.createElement('div');
+    d.className = 'toast-sub';
+    d.textContent = sub;
+    body.appendChild(d);
+  }
+  el.appendChild(body);
   /* 되돌리기처럼 **되살릴 수 있는 실수**는 단추를 함께 준다.
      터치 타깃 44px은 style.css의 .toast-undo가 지킨다. */
   if (action) {
@@ -685,7 +744,6 @@ function toast(msg, action) {
     });
     el.appendChild(b);
   }
-  el.hidden = false;
   /* 🔴 `display:none` 에서 **같은 태스크에** .show 를 붙이면 전환이 아예 안 걸린다 —
      토스트가 페이드 없이 튀어나오고 사라질 때만 부드러웠다(들어올 때/나갈 때가 거꾸로).
      ⚠️ **rAF 한 번으로는 안 된다** — 실측했다(2026-09-06, 헤드리스 크롬):
@@ -1059,7 +1117,7 @@ function bindPhotoButtons() {
     if (!file) return;
     if (file.size > 20 * 1024 * 1024) { toast('20MB 이하 사진만 올릴 수 있어요'); return; }
     const ok = await photoSet(file);
-    toast(ok ? '프로필 사진 저장 완료 · 이 기기에만 남아요' : '이 사진은 읽을 수 없어요 · JPG·PNG 로 다시 올려 주세요');
+    toast(ok ? '프로필 사진을 저장했어요 · 이 기기에만 남아요' : '이 사진은 읽을 수 없어요 · JPG·PNG 로 다시 올려 주세요');
     renderMy();
     if (!$('#screen-home').hidden) renderHome();
   });
@@ -1079,7 +1137,7 @@ function docWalletStatus(doc) {
   if (!s) return null;
   const rec = walletCache[s.slot];
   return rec
-    ? { ok: true, slot: s, text: `보관함에서 자동 첨부 · ${rec.name}` }
+    ? { ok: true, slot: s, text: `보관함에 있어요 · ${rec.name}` }
     : { ok: false, slot: s, text: `아직 안 올렸어요 · 발급처: ${s.issue}` };
 }
 
@@ -2100,13 +2158,13 @@ function certStatusListHtml(sch, opts) {
     const name = esc(doc.replace(/\s*\(.*\)$/, ''));
     if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${esc(st.text)}</li>`;
     if (st) return `<li class="doc-miss">□ ${name} — ${esc(st.text)}</li>`;
-    if (/자동/.test(doc)) return `<li>△ ${name} — 학교·재단 연동 후 자동 첨부 (또는 보관함에 올려두세요)</li>`;
-    /* 「제출 전 준비」 줄 밑(bare)에선 같은 꼬리말이 줄마다 되풀이돼 이름만 둔다 — 그 줄 이름이 이미 '챙겨라'다 (2026-11-21) */
-    return opts && opts.bare ? `<li>□ ${esc(doc)}</li>` : `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
+    /* △ · □ 줄 꼬리 안내(「연동 후 자동 첨부」·「공식 제출 시 함께 준비하세요」)는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) — 원문 서류 이름만 보인다 */
+    if (/자동/.test(doc)) return `<li>△ ${esc(doc)}</li>`;
+    return `<li>□ ${esc(doc)}</li>`;
   }).join('');
   /* doc-check — 줄마다 ✓·□·△ 표식이 있어 목록 점은 뺀다(표식이 두 겹이던 자리 · 2026-10-15 · style.css) */
-  const list = `<ul class="doc-list doc-check">${rows}</ul>
-    <p class="dp-note">보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.</p>`;
+  /* 목록 밑 「보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.」는 2026-11-21 개발자 지시로 지웠다(학생이 읽지 않는 안내 · 서류함 상태는 각 줄이 말한다) */
+  const list = `<ul class="doc-list doc-check">${rows}</ul>`;
   return opts && opts.bare ? list : `<h4>증명서류 체크리스트</h4>${list}`;
 }
 
@@ -2176,7 +2234,7 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">서류 작성</h3>
-        <p class="sheet-provider">${esc(sch.name)} · 고른 답으로 초안 문장을 엮습니다</p>
+        <p class="sheet-provider">${esc(sch.name)}${/* 「고른 답으로 초안 문장을 엮습니다」는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>
         ${docPrep.defs.map((def, di) => `
           <div class="dp-block">
             <h4>${esc(def.doc)}</h4>
@@ -2222,7 +2280,6 @@ function renderDocPrep() {
           </div>`).join('')}
         ${certStatusListHtml(sch)}
         <button class="btn btn-primary btn-lg" id="btn-dp-confirm">이대로 신청 준비 완료</button>
-        <p class="dp-note">완료하면 작성한 서류가 저장되고 최종 제출처가 표시됩니다.</p>
       </div>`;
 
     $$('.dp-text').forEach((ta) =>
@@ -2361,7 +2418,7 @@ function renderFormFill(restore) {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">작성 내용 확인</h3>
-        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있습니다 · ${tpl.unofficial ? esc(tpl.lead || '이 공고에 맞춘 지원문서') : '실제 공고 양식과 동일한 구조'}</p>
+        <p class="sheet-provider">칸을 눌러 직접 고칠 수 있어요${tpl.unofficial ? ' · ' + esc(tpl.lead || '이 공고에 맞춘 지원문서') : ''}${/* 「실제 공고 양식과 동일한 구조」는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>
         <div class="fd-wrap" id="ff-doc">${renderFormDoc(tpl, state.profile, formFill.ans, { editable: true })}</div>
         <button class="btn btn-primary btn-lg" id="btn-ff-confirm">이대로 신청 준비 완료</button>
         <div class="submit-actions" style="margin-top:8px">
@@ -2522,8 +2579,7 @@ function externalNoticesHtml() {
     ? `<button type="button" class="link-btn home-more" id="external-more" data-external-more
          aria-expanded="${shown >= mine.length ? 'true' : 'false'}">${shown >= mine.length ? '접기' : '더보기'}</button>`
     : '';
-  return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
-    <span class="section-note">${liveExternal.updatedAt ? esc(shortDay(liveExternal.updatedAt)) + ' 갱신' : ''}</span></div>`
+  return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3></div>`
     + `<div class="card-list" id="external-list">`
     + mine.slice(0, shown).map((n) => noticeCardHtml(n, { org: n.host, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
     + `</div>${more}<div style="margin-bottom:18px"></div>`;
@@ -2591,12 +2647,6 @@ function schoolNewsHtml() {
   }).join('')}</div>`;
 }
 
-/* 오늘 올라온 글인가 — 게시일(없으면 수집일)이 오늘. todayStart 는 부를 때마다 오늘을 읽는다(PWA 가 며칠 살아 있어도 맞다) */
-function newsIsToday(n) {
-  const d = String(n.postedAt || n.foundAt || '').slice(0, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
-  return new Date(d + 'T00:00:00').getTime() === todayStart().getTime();
-}
 /* 날짜 짧게 — 띠 카드 윗줄의 'MM.DD' (게시일, 없으면 수집일) */
 const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}.${m[2]}` : ''; };
 
@@ -2608,9 +2658,8 @@ const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/
 function homeNewsHtml() {
   const p = state.profile;
   if (!p) return '';
-  /* 오늘 올라온 글 수 — 「오늘 날짜 기준」(2026-10-10 업무 분장 8번). 머리줄 아래 설명 줄은 두지 않는다(10-03 개발자 지시) — 제목 옆 작은 알약 하나 */
-  const todayN = liveNews ? schoolNewsForMe().filter((n) => newsIsToday(n)).length : 0;
-  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식${todayN ? ` <span class="news-today">오늘 ${todayN}</span>` : ''}</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
+  /* 🔴 제목 옆 「오늘 n」 알약은 없앴다(2026-11-21 개발자 지시 — 'AI 티가 나고 학생이 읽지 않는 글자'). 날짜는 카드마다 적혀 있다. 되살리지 말 것 */
+  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
   if (!liveNews) return head(false) + `<div class="news-strip" aria-busy="true">${'<span class="news-tile is-skel"><span class="news-tile-photo"></span><span class="news-tile-meta">&nbsp;</span><span class="news-tile-title">&nbsp;</span></span>'.repeat(3)}</div>`;
   const mine = schoolNewsForMe();
   if (!mine.length) return '';
@@ -2648,7 +2697,7 @@ function openNewsSheet() {
     <div class="sheet-handle"></div>
     <div class="sheet-body">
       <h3 class="sheet-title">우리 학교 소식</h3>
-      <p class="sheet-provider">${esc(p.school || '')} 공지 게시판${liveNews && liveNews.updatedAt ? ` · ${esc(liveNews.updatedAt)} 갱신` : ''}</p>
+      ${/* 부제 「○○ 공지 게시판」은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}
       ${schoolNewsHtml()}
     </div>`;
   openSheetShell();
@@ -2663,7 +2712,7 @@ function buildSubmissionText(sch, app) {
 }
 
 function copyText(text, okMsg) {
-  const done = () => toast(okMsg || '복사 완료 · 공식 신청 페이지에 붙여넣기');
+  const done = () => toast(okMsg || '복사했어요 · 신청 페이지에 붙여 넣으세요');
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
   } else fallbackCopy(text, done);
@@ -2689,12 +2738,13 @@ async function shareApplication(sch, app) {
   try {
     if (files.length && navigator.canShare && navigator.canShare({ files })) {
       await navigator.share({ title: `${sch.name} 신청 서류`, text, files });
-      toast('서류와 함께 공유 완료 · 메일 앱에서 바로 접수 가능');
+      /* 뒤 절 「메일 앱에서 바로 접수 가능」은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
+      toast('서류와 함께 공유했어요');
       return;
     }
     if (navigator.share) {
       await navigator.share({ title: `${sch.name} 신청 서류`, text });
-      toast('내용 공유 완료 · 파일은 보관함에서 따로 첨부');
+      toast('내용을 공유했어요 · 파일은 보관함에서 따로 첨부해 주세요');
       return;
     }
   } catch (e) { /* 사용자가 공유를 취소한 경우 */ return; }

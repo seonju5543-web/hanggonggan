@@ -219,7 +219,7 @@ function linkLines(it, where) {
     out.push(`       누르면 → ${hrefIn(d) || '(링크 없음)'}`);
   } else if (where === 'card') {
     const h = linkFn('noticeCardHtml')(it, {});
-    out.push(`       카드 아랫줄 「${htmlText((h.match(/<p class="sch-provider">([^<]*수집[^<]*)<\/p>/) || [])[1] || '')}」 · 도우미 「${it.title || ''} ${linkFn('sourceLink')(it, 'chat').label}」`);
+    out.push(`       카드 아랫줄 「${htmlText(([...h.matchAll(/<p class="sch-provider">([^<]*)<\/p>/g)].pop() || [])[1] || '')}」 · 도우미 「${it.title || ''} ${linkFn('sourceLink')(it, 'chat').label}」`);
     out.push(`       누르면 → ${hrefIn(h) || '(링크 없음)'}`);
   } else if (where === 'activity') {
     /* 활동 시트 단추 — 이름은 source-link.js activityButton 자리(승인 시안 2026-11-02 · openActivityDetail 과 같은 규칙) */
