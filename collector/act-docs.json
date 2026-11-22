@@ -24,48 +24,48 @@
   "tries": 1
  },
  "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/790?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=991": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=980": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=978": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=971&page=2": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=970&page=2": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=959&page=3": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=957&page=3": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=954&page=3": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=944&page=3": {
-  "at": "2026-11-15",
-  "tries": 1
+  "at": "2026-11-22",
+  "tries": 2
  },
  "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11441": {
   "at": "2026-11-16",
