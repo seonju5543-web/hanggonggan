@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-22",
+ "updatedAt": "2026-11-23",
  "items": {
   "auto-otice06doarticleno140764": [
    {
@@ -577,18 +577,6 @@
     "at": "2026-11-20"
    }
   ],
-  "act-0hpsg5o": [
-   {
-    "file": "act-0hpsg5o/1-_양식_2026년_대학생_재능봉사_프로그램_계획서.pdf",
-    "name": "(양식)2026년 대학생 재능봉사 프로그램 계획서.hwp",
-    "pages": 3,
-    "bytes": 322459,
-    "srcBytes": 223744,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-20"
-   }
-  ],
   "auto-2570viewdocurrentpageno1": [
    {
     "file": "auto-2570viewdocurrentpageno1/1-_서식_글로벌여성리더장학금.pdf",
@@ -703,16 +691,28 @@
     "at": "2026-11-22"
    }
   ],
-  "act-1s2546y": [
+  "act-037wp91": [
    {
-    "file": "act-1s2546y/1-붙임2._월드프렌즈코리아_청년봉사단_프로그램_제안서.pdf",
-    "name": "붙임2. 월드프렌즈코리아 청년봉사단 프로그램 제안서.hwp",
-    "pages": 15,
-    "bytes": 718407,
-    "srcBytes": 424448,
+    "file": "act-037wp91/1-_붙임2_신청_양식.pdf",
+    "name": "[붙임2] 신청 양식.hwp",
+    "pages": 6,
+    "bytes": 308031,
+    "srcBytes": 98304,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
-    "at": "2026-11-22"
+    "at": "2026-11-23"
+   }
+  ],
+  "act-1fz2fcx": [
+   {
+    "file": "act-1fz2fcx/1-_붙임2_신청_양식.pdf",
+    "name": "[붙임2] 신청 양식.hwp",
+    "pages": 6,
+    "bytes": 308031,
+    "srcBytes": 98304,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-23"
    }
   ]
  },
@@ -738,8 +738,11 @@
   "auto-amepagescholarshipnotice-0ywblu5": {
    "[붙임2] 27년도_제출서류양식.hwp": "form"
   },
-  "act-1s2546y": {
-   "붙임2. 월드프렌즈코리아 청년봉사단 프로그램 제안서.hwp": "form"
+  "act-037wp91": {
+   "[붙임2] 신청 양식.hwp": "form"
+  },
+  "act-1fz2fcx": {
+   "[붙임2] 신청 양식.hwp": "form"
   }
  }
 }
