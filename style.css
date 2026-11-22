@@ -5334,7 +5334,9 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
   position: absolute; top: 0; bottom: 0; left: -20px; right: -20px; z-index: 0;   /* 20px = .screen 좌우 안여백 */
   background: radial-gradient(34% 22% at 76% 86%, var(--accent-soft), transparent 70%);
 }
-.hero > .mascot-wrap .mascot-stage { height: 100%; cursor: grab; }
+.hero > .mascot-wrap .mascot-stage { height: 100%; cursor: grab; touch-action: none; }   /* 반응 연출(mascot/mood.js · 시안 mood.html 그대로) — 아래로 끌면 찌그러지고 빙글 돌리면 어지럽다 · 이 자리에서는 손가락이 화면을 굴리지 않는다 */
+/* 던진 몽둥이·깨진 유리 — 휴대폰 화면 전체를 덮는 한 장(app-mascot.js fxLayer · 누르기를 막지 않는다 · 시트보다 위) */
+.mascot-fx { position: fixed; inset: 0; pointer-events: none; z-index: 300; }
 .hero-lines { position: relative; z-index: 1; width: 60%; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-4) 0; }
 .hero-ln {
   position: relative; display: block; max-width: 100%; align-self: flex-start; text-align: left;

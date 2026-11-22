@@ -21,7 +21,7 @@
      · 수령 가능액 → 네모난 비즈니스 선글라스 · 회장님 의자(높은 등받이 · 다이아몬드 단추 누빔 가죽 · 날개 · 둥글게 말린 팔걸이 · 놋쇠 못 · 크롬 다섯 갈래 바퀴 다리)가
                      옆에서 묵직하게 굴러 들어와 → 폴짝 뛰어 앉아 등을 깊이 기댄다 → 두 발은 좌판 앞에서 발목을 꼰다 → 팔걸이에 얹은 손이 옆으로 무심하게 툭 — 지폐가 위로
      · 마감 D-Day  → 「이럴 수는 없어」 — 몸수색 받는 자세: 두 손을 번쩍 들었다가 뒤통수 뒤로 접어 숨긴다(앞에서 손이 안 보인다) · 팔꿈치를 벌리고 어깨를 으쓱 ·
-                     발을 벌리고 번갈아 동동 · 땀(이마의 큰 땀방울이 흘러내리고 · 볼의 작은 땀 · 발을 구를 때마다 튀는 땀 · 턱에서 떨어지는 땀 · 이마의 파란 세로줄)
+                     발을 벌리고 번갈아 동동 · 식은땀(머리 옆 물방울이 흘러내린다 — 11-22 개발자 지시로 4판 모양 그대로)
      · 줄을 떠날 때(다른 줄 · 다른 손짓) — 한 프레임에 끊지 않고 0.25초에 푼다: 의자에선 앞으로 폴짝 내려오고 의자는 뒤로 물러났다가 왔던 쪽으로 · 몸수색은 팔을 내리며
 
    🔴 화남은 손짓에만 반응한다 — 학생의 데이터(마감 놓침·미신청)로 화내지 않는다(혼나는 느낌 금지 · 11-21 제안 그대로).
@@ -89,22 +89,6 @@
       g.strokeStyle = '#ffffff'; g.lineWidth = lw; g.stroke();
     });
   }
-  /* 땀방울 — 만화 그대로: 위가 뾰족한 물방울 · 짙은 파란 테 · 흰 반짝이(테가 없으면 하늘색 '부'·크림색 캐릭터 위에서 사라진다) */
-  function dropDraw(g, w, h) {
-    const cx = w / 2, cy = h * 0.66, r = w * 0.36;
-    const path = () => { g.beginPath(); g.moveTo(cx, h * 0.05); g.bezierCurveTo(cx + r * 0.42, h * 0.27, cx + r, cy - r * 0.62, cx + r, cy); g.arc(cx, cy, r, 0, Math.PI, false); g.bezierCurveTo(cx - r, cy - r * 0.62, cx - r * 0.42, h * 0.27, cx, h * 0.05); g.closePath(); };
-    const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#d8f2ff'); gr.addColorStop(1, '#62bdf2');
-    path(); g.fillStyle = gr; g.fill(); g.lineWidth = w * 0.075; g.strokeStyle = '#1f4f8f'; g.lineJoin = 'round'; g.stroke();
-    g.fillStyle = 'rgba(255,255,255,.95)'; g.beginPath(); g.ellipse(cx - r * 0.38, cy - r * 0.05, r * 0.17, r * 0.32, -0.35, 0, Math.PI * 2); g.fill();
-  }
-  /* 이마의 파란 세로줄(만화의 '아연실색' 표시) */
-  function linesDraw(g, w, h) {
-    g.lineCap = 'round';
-    [0.24, 0.5, 0.76].forEach((x, i) => {
-      const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(46,84,190,.95)'); gr.addColorStop(1, 'rgba(46,84,190,0)');
-      g.strokeStyle = gr; g.lineWidth = w * 0.075; g.beginPath(); g.moveTo(w * x, h * 0.06); g.lineTo(w * x, h * (i === 1 ? 0.96 : 0.82)); g.stroke();
-    });
-  }
   function spiralTex() {
     return texOf(128, 128, (g) => {
       g.fillStyle = '#ffffff'; g.beginPath(); g.arc(64, 64, 62, 0, Math.PI * 2); g.fill();
@@ -121,7 +105,7 @@
     });
   }
   const TEX = {};
-  const tex = (k) => TEX[k] || (TEX[k] = k === 'drop' ? texOf(96, 128, dropDraw) : k === 'lines' ? texOf(96, 128, linesDraw) : k === 'spiral' ? spiralTex() : billTex());
+  const tex = (k) => TEX[k] || (TEX[k] = k === 'spiral' ? spiralTex() : billTex());
 
   // 물체의 경계 상자를 기준(ref) 좌표로 — 캐릭터마다 얼굴 크기가 달라 부품 자리를 여기서 잰다
   const _m = new T.Matrix4(), _b = new T.Box3();
@@ -353,7 +337,7 @@
     return { held, pile, H, W };
   }
 
-  /* 캐릭터 하나에 부품을 붙인다 — 볼 · 선글라스 · 소용돌이 눈 · 땀(스프라이트) · 팔꿈치 · 과잠 반쪽 · 소품 · 몽둥이 (처음엔 숨김) */
+  /* 캐릭터 하나에 부품을 붙인다 — 볼 · 선글라스 · 소용돌이 눈 · 식은땀 · 팔꿈치 · 과잠 반쪽 · 소품 · 몽둥이 (처음엔 숨김) */
   function buildRig(ch) {
     const head = ch.head, hb = localBox(head, head);
     const top = hb.max.y, front = hb.max.z, hw = Math.max(0.3, (hb.max.x - hb.min.x) / 2);
@@ -402,29 +386,10 @@
       const m = new T.MeshBasicMaterial({ map: tex('spiral'), transparent: true });
       rig.swirls = [L, R].map((e) => { const p = new T.Mesh(new T.PlaneGeometry(er * 2.6, er * 2.6), m); p.position.set(e.c.x, e.c.y, e.z + 0.02); p.visible = false; head.add(p); return p; });
     }
-    /* 땀(11-21 개발자 지시 5차 "땀 효과를 더 강조") — 만화의 땀 표시를 겹으로(리서치: 이마의 아주 큰 땀방울 = 당황 · 볼의 작은 땀 = 불안(많을수록 더) ·
-       턱에서 떨어지는 땀 = 극도의 긴장 · 튀는 땀(플루드) = 애씀·스트레스 · 이마의 파란 세로줄 = 충격). 모두 스프라이트(늘 화면을 본다) ·
-       깊이 검사를 끄고 맨 위에 그린다(머리·팔에 가려지지 않게) · 머리 묶음에 붙여 머리와 같이 움직인다 */
+    /* 식은땀 — 머리 옆 물방울 하나가 흘러내린다(11-22 개발자 지시 "땀을 기존으로" — 4판 모양 그대로 · 5판의 만화식 땀 겹은 뺐다) */
     {
-      const sp = (k, w, h) => { const s = new T.Sprite(new T.SpriteMaterial({ map: tex(k), transparent: true, depthTest: false, depthWrite: false })); s.scale.set(w, h, 1); s.renderOrder = 26; s.visible = false; head.add(s); return s; };
-      const ds = Math.max(er * 1.3, hw * 0.2);   // 땀방울 기준 크기 — 눈 크기에 맞추되 머리에 비해 너무 작지 않게
-      const corner = 1;       // 큰 땀방울은 화면 오른쪽 이마 모서리(가리키는 쪽 반대 · 팔꿈치에 덜 가린다)
-      rig.sw = {
-        ds, corner,
-        big: sp('drop', ds * 1.9, ds * 2.5),
-        cheek: [[-1, 0], [1, 0], [1, 1]].map(([s, n]) => sp('drop', ds * (n ? 0.46 : 0.56), ds * (n ? 0.62 : 0.75))),
-        chin: sp('drop', ds * 0.62, ds * 0.83),
-        lines: sp('lines', span * 0.62, span * 0.5),
-        /* 자리(머리 기준) — 눈을 기준으로 잰다(머리 묶음 꼭대기로 재면 '부'처럼 얼굴만 머리 묶음인 캐릭터는 땀이 머리 위 허공에 떴다 · 11-21 시안 실측) */
-        bigTop: new T.Vector3(corner * (Math.abs(R.c.x) + er * 1.0), R.c.y + er * 1.55, ez),
-        bigBot: new T.Vector3(corner * (Math.abs(R.c.x) + er * 1.45), R.c.y - er * 1.0, ez),
-        cheekPos: [
-          new T.Vector3(cheekAt[0].c.x - er * 0.15, cheekAt[0].c.y + er * 0.1, ez),
-          new T.Vector3(cheekAt[cheekAt.length - 1].c.x + er * 0.2, cheekAt[cheekAt.length - 1].c.y + er * 0.15, ez),
-          new T.Vector3(cheekAt[cheekAt.length - 1].c.x + er * 0.65, cheekAt[cheekAt.length - 1].c.y - er * 0.5, ez)],
-        chinPos: new T.Vector3(mid.x + er * 0.2, Math.max(hb.min.y + er * 0.5, mid.y - span * 1.05), ez),
-        linesPos: new T.Vector3(mid.x - span * 0.12, mid.y + er * 1.7, ez),
-      };
+      const d = new T.Group(); d.add(sph(er * 0.55, mat(0x9fd8ff, 0.2), 0, 0, 0, 0.8, 1.1, 0.6)); const tip = new T.Mesh(new T.ConeGeometry(er * 0.42, er * 0.9, 12), mat(0x9fd8ff, 0.2)); tip.position.y = er * 0.75; d.add(tip);
+      d.position.set(hw * 0.82, top * 0.45, front * 0.55); d.visible = false; head.add(d); rig.sweat = d;
     }
 
     /* 팔꿈치 — 팔을 위팔(어깨 묶음)과 아래팔(팔꿈치 묶음)로 나눈다(11-21 개발자 지시 4차 "팔을 굽힌 다음 펴서 던진다").
@@ -733,7 +698,7 @@
     const M = { mode: 'idle', t: 0, line: null, dday: false, lastInput: performance.now(), idleMs: opt.idleMs || 20000, sh: 0, squish: 0, squishV: 0, pullY: null, suppress: false, petting: false, amT: 0, dueT: 0, prevT: 0, prevA: 0, prevD: 0 };
     let rig = null;
 
-    // 장면에 두는 것 — 기호 · 김 · 하트 · 지폐 · 휙 · 단추 튐 · 먼지 · 튀는 땀
+    // 장면에 두는 것 — 기호 · 김 · 하트 · 지폐 · 휙 · 단추 튐 · 먼지
     /* 말풍선은 없다(11-21 개발자 지시 3차 — "모든 말풍선은 삭제") — 몸짓·표정만으로 말한다 */
     const mark = canvasSprite(128, 128, angerMark, 0.42); scene.add(mark);
     const bang = canvasSprite(128, 128, glyph('!', '#e0412f', 118), 0.5); scene.add(bang);
@@ -748,8 +713,6 @@
     const steam = Array.from({ length: 12 }, () => { const p = sph(0.12, steamMat.clone()); p.visible = false; p.userData = { life: 9 }; scene.add(p); return p; });
     const dustMat = new T.MeshBasicMaterial({ color: 0xcfc6b6, transparent: true, opacity: 0.8, depthWrite: false });
     const dust = Array.from({ length: 6 }, () => { const p = sph(0.1, dustMat.clone()); p.visible = false; p.userData = { life: 9, v: new T.Vector3() }; scene.add(p); return p; });
-    // 튀는 땀(플루드) · 떨어지는 땀 — 땀방울 스프라이트(뾰족한 끝이 머리 쪽을 본다)
-    const flyers = Array.from({ length: 18 }, () => { const s = new T.Sprite(new T.SpriteMaterial({ map: tex('drop'), transparent: true, depthTest: false, depthWrite: false })); s.renderOrder = 26; s.visible = false; s.userData = { life: 9, max: 0.5, v: new T.Vector3(), s: 0.1, splash: false }; scene.add(s); return s; });
     const BILL_GEO = new T.PlaneGeometry(0.34, 0.17);
     const billMat = () => new T.MeshStandardMaterial({ map: tex('bill'), side: T.DoubleSide, roughness: 0.8 });
     const bills = Array.from({ length: 28 }, () => { const m = new T.Mesh(BILL_GEO, billMat()); m.visible = false; m.userData = { on: false, v: new T.Vector3(), w: new T.Vector3(), life: 0, ph: 0 }; scene.add(m); return m; });
@@ -765,11 +728,6 @@
     }
     function emitDust(at, k) {
       for (let n = 0; n < 3; n++) { const p = dust.find((q) => !q.visible); if (!p) return; p.position.copy(at); p.position.x += rand(-0.3, 0.3) * k; p.visible = true; p.userData.life = 0; p.userData.v.set(rand(-0.9, 0.9), rand(0.4, 0.9), rand(-0.2, 0.4)); p.scale.setScalar(0.08 * k); }
-    }
-    function emitFlyer(at, v, size, life, splash) {
-      const d = flyers.find((q) => !q.visible); if (!d) return;
-      d.position.copy(at); d.visible = true; Object.assign(d.userData, { life: 0, max: life, s: size, splash: !!splash }); d.userData.v.copy(v);
-      d.scale.set(size * 0.75, size, 1); d.material.opacity = 1;
     }
     function throwBills(i, n) {
       if (i < 0 || !rig.limbs[i]) return; rig.handWorld(i, W); const sd = rig.limbs[i].arm.userData.side;
@@ -1004,24 +962,13 @@
       if (blush > 0) rig.blushMat.color.setHex(blushColor); rig.blushMat.opacity = lerp(rig.blushMat.opacity, blush, 1 - Math.pow(0.001, dt));
       M.sh = lerp(M.sh, shades, 1 - Math.pow(0.0005, dt));
       rig.shades.visible = M.sh > 0.02; rig.shades.position.y = rig.mid.y + (1 - M.sh) * 0.7; rig.shades.scale.setScalar(Math.max(0.01, M.sh));
-      if (!sweat) { const w = rig.sw; w.big.visible = false; w.chin.visible = false; w.lines.visible = false; w.cheek.forEach((s) => { s.visible = false; }); }
+      if (!sweat) rig.sweat.visible = false;
       if (shades && M.mode === 'idle' && M.sh > 0.85) rig.eyes.forEach((e) => { if (e.obj) e.obj.visible = false; });   // 선글라스가 눈을 덮은 뒤에(눈 없는 얼굴이 잠깐 보였다)
 
-      // 김 · 먼지 · 하트 · 튀는 땀 · 지폐
+      // 김 · 먼지 · 하트 · 지폐
       steam.forEach((p) => { if (!p.visible) return; const d = p.userData; d.life += dt; p.position.addScaledVector(d.v, dt); p.scale.multiplyScalar(1 + dt * 1.6); p.material.opacity = Math.max(0, 0.85 - d.life * 1.3); if (d.life > 0.65) p.visible = false; });
       dust.forEach((p) => { if (!p.visible) return; const d = p.userData; d.life += dt; d.v.multiplyScalar(1 - dt * 3); p.position.addScaledVector(d.v, dt); p.scale.multiplyScalar(1 + dt * 2.2); p.material.opacity = Math.max(0, 0.75 - d.life * 1.4); if (d.life > 0.55) p.visible = false; });
       if (heart.visible) { heart.userData.t += dt; headTopWorld(W, 0.15 + heart.userData.t * 0.5); heart.position.copy(W); heart.material.opacity = Math.max(0, 1 - heart.userData.t / 1.2); heart.scale.setScalar(0.3 + Math.min(1, heart.userData.t * 4) * 0.15); }
-      if (FZ != null) flyers.forEach((d) => { if (d.userData.fz !== M.frame) d.visible = false; });   // 멈춘 사진엔 이번 프레임에 그린 것만
-      else flyers.forEach((d) => {
-        if (!d.visible) return; const u = d.userData; u.life += dt; u.v.y -= 9 * dt; d.position.addScaledVector(u.v, dt);
-        d.material.rotation = Math.atan2(u.v.x, -u.v.y);   // 뾰족한 끝이 날아온 쪽(머리)을 본다
-        d.material.opacity = Math.max(0, Math.min(1, (u.max - u.life) / 0.12));
-        if (u.splash && d.position.y < 0.03) {   // 바닥에 닿으면 톡 — 작은 방울 셋(크기를 먼저 잡아 둔다 — 같은 자리를 다시 쓰면 덮어써졌다)
-          const s0 = u.s; W2.copy(d.position).setY(0.04); d.visible = false; for (let n = 0; n < 3; n++) emitFlyer(W2, V.set(rand(-0.9, 0.9), rand(0.9, 1.5), 0), s0 * 0.4, 0.25, false);
-          return;
-        }
-        if (u.life > u.max) d.visible = false;
-      });
       if (FZ != null) bills.forEach((b) => { if (b.userData.on || b.userData.fz !== M.frame) b.visible = false; });   // 멈춘 사진엔 이번 프레임에 그린 것만
       else bills.forEach((b) => {
         const d = b.userData; if (!d.on) { b.visible = false; return; } d.life += dt;
@@ -1033,7 +980,7 @@
         if (d.life > 3.0) { d.on = false; b.visible = false; b.scale.setScalar(1); }
       });
       M.prevT = t; M.prevA = M.amT; M.prevD = M.dueT;
-      c.S.busy = M.mode !== 'idle' || bills.some((b) => b.userData.on) || M.sh > 0.02 || steam.some((p) => p.visible) || dust.some((p) => p.visible) || flyers.some((p) => p.visible) || heart.visible || (M.line === 'due' && M.dday && !!P) || (M.line === 'amount' && !!P) || M.chair > 0.02;
+      c.S.busy = M.mode !== 'idle' || bills.some((b) => b.userData.on) || M.sh > 0.02 || steam.some((p) => p.visible) || dust.some((p) => p.visible) || heart.visible || (M.line === 'due' && M.dday && !!P) || (M.line === 'amount' && !!P) || M.chair > 0.02;
     }
 
     /* ── 화남 — 과잠 벗기 → 몽둥이 줍기 → 던지기 → 허리에 손 → 다시 입기 ── */
@@ -1294,7 +1241,7 @@
       void dt;
     }
 
-    /* ── 「이럴 수는 없어」(마감 D-Day) — 몸수색 자세 + 발 동동 + 땀 ──
+    /* ── 「이럴 수는 없어」(마감 D-Day) — 몸수색 자세 + 발 동동 + 식은땀 ──
        d: 이 줄을 가리킨 뒤 흐른 시간 · 0~0.5 들어가기(깜짝 → 두 손 번쩍 → 뒤통수 뒤로 접기 → 발 벌려 디딤) · 그 뒤 1.5초 고리(발 넷 번갈아 쾅 · 0.375초 간격)
        리서치: 경찰은 '손 들어 → 머리 뒤로'를 차례로 시킨다 · 팔을 곧장 내린 자세에서 접힌 자세로 섞으면 손이 얼굴 앞을 지난다 — 화면과 나란히 위·바깥으로 들었다가 접는다
        발 구르기는 '천천히 들고 빨리 내리찍는다'(0.24초 들기 · 0.075초 쾅) · 찍는 순간만 2~4장 찌그러진다 */
@@ -1303,7 +1250,7 @@
       W = W == null ? 1 : W;
       const FR = friskPose(rig), HU = [2.79, 0, 0, -0.26], full = W >= 1;
       const up = (REDUCED ? 1 : ease(seg(d, 0.06, 0.2))) * W, fold = REDUCED ? 1 : ease(seg(d, 0.28, 0.44)), shrug = (REDUCED ? 1 : ease(seg(d, 0.06, 0.3))) * W;
-      const loop = d >= 0.5 && !REDUCED && full, run = d - 0.5, L = loop ? run % 1.5 : -1, pL = M.prevD >= 0.5 ? (M.prevD - 0.5) % 1.5 : -1;
+      const loop = d >= 0.5 && !REDUCED && full, run = d - 0.5, L = loop ? run % 1.5 : -1;
       // 발 높이 — 그 발이 다음에 찍힐 때까지 남은 시간으로(A 는 0 · 0.75 · B 는 0.375 · 1.125 에 쾅)
       const FH = 0.18;
       const footH = (impact) => { if (!loop) return 0; const dd = ((impact - L) % 0.75 + 0.75) % 0.75; if (dd < 0.075) { const u = 1 - dd / 0.075; return FH * (1 - u * u); } if (dd < 0.315) { const u = (0.315 - dd) / 0.24; return FH * (1 - (1 - u) * (1 - u)); } return 0; };
@@ -1344,56 +1291,10 @@
         E.set(0.26 * (h / FH), l.s * 0.44 * wide, 0); Q2.setFromEuler(E); l.o.quaternion.copy(Q2).multiply(l.q0);
         if (hitF > 0) { const f = hitF * (dA < 0.05 || dB < 0.05 ? 1 : 0); l.o.scale.set(l.s0.x * (1 + 0.2 * f), l.s0.y * (1 - 0.25 * f), l.s0.z * (1 + 0.2 * f)); }
       });
-      // 땀 — 겹으로(풀리는 동안에는 없다)
-      if (full) sweatLayers(ch, d, L, pL, k, run);
+      // 식은땀 — 머리 옆 물방울이 흘러내린다(약 1.1초마다 · 4판 그대로 · 이 줄의 시각으로 — 멈춘 사진에서도 같게) · 풀리는 동안에는 없다
+      if (full) { const u = REDUCED ? 0.5 : (d * 0.9) % 1; rig.sweat.visible = true; rig.sweat.position.y = rig.top * (0.55 - u * 0.4); rig.sweat.scale.setScalar(Math.sin(u * Math.PI) + 0.01); }
       void cx; void dt;
     }
-    function sweatLayers(ch, d, L, pL, k, run) {
-      const w = rig.sw, ds = w.ds, head = ch.head;
-      const pop = (u) => (u < 0.5 ? lerp(0, 1.25, u / 0.5) : lerp(1.25, 1, (u - 0.5) / 0.5));
-      // 이마의 파란 세로줄 · 볼의 작은 땀
-      const fadeIn = REDUCED ? 1 : seg(d, 0, 0.2);
-      w.lines.visible = true; w.lines.position.copy(w.linesPos); w.lines.material.opacity = 0.9 * fadeIn;
-      w.cheek.forEach((s, n) => { s.visible = d > 0.1 + n * 0.08 || REDUCED; s.position.copy(w.cheekPos[n]); s.material.opacity = 1; });
-      // 큰 땀방울 — 이마 모서리에서 볼까지 천천히 흘러내렸다가(1.2초) 떨어지고, 새로 하나가 톡 생긴다
-      const big = w.big; big.visible = true; big.material.opacity = 1;
-      if (REDUCED || L < 0) {
-        const u = REDUCED ? 1 : clamp(d / 0.12, 0, 1); big.position.copy(w.bigTop); big.scale.set(ds * 1.9 * pop(u), ds * 2.5 * pop(u), 1);
-      } else if (L < 1.2) {
-        const u = EASE.in(L / 1.2); big.position.lerpVectors(w.bigTop, w.bigBot, u); big.scale.set(ds * 1.9, ds * 2.5 * (1 + 0.15 * u), 1);
-      } else if (L < 1.38) {
-        const u = (L - 1.2) / 0.18; big.position.copy(w.bigBot); big.position.y -= 4.5 * (L - 1.2) * (L - 1.2) / Math.max(0.3, k); big.material.opacity = 1 - u; big.scale.set(ds * 1.9, ds * 2.9, 1);
-      } else { const u = (L - 1.38) / 0.12; big.position.copy(w.bigTop); big.scale.set(ds * 1.9 * pop(u), ds * 2.5 * pop(u), 1); }
-      // 턱에서 떨어지는 땀 — 0.6 · 1.35 에 떨어지고(0.75초마다), 그 사이에 다시 맺힌다 · 고리가 돌아와도 끊기지 않는 한 박자로(11-22 리뷰)
-      const chin = w.chin; chin.visible = !REDUCED && d > 0.2; chin.position.copy(w.chinPos);
-      const chinAge = L >= 0 ? ((L - 0.6) % 0.75 + 0.75) % 0.75 : -1;   // 마지막으로 떨어진 뒤 지난 시간
-      if (L >= 0) { const s0 = Math.min(chinAge / 0.75, run / 0.45); chin.scale.set(ds * 0.62 * s0 + 0.001, ds * 0.83 * s0 + 0.001, 1); chin.position.y -= ds * 0.4 * s0; }
-      else chin.scale.set(0.001, 0.001, 1);
-      const chinStart = (out) => { head.localToWorld(out.copy(w.chinPos)); out.y -= ds * 0.4 * k; return out; };
-      const burstAt = (n, bias, out) => { const sd = n === 2 ? -bias : bias, sx = n === 1 ? 0.75 : 1; return { sd, at: head.localToWorld(out.set(rig.mid.x + sd * (rig.span * 0.5 + rig.er * 1.6) * sx, rig.mid.y + rig.er * 1.9, rig.eyes[1].z - rig.er)) }; };
-      if (M.freeze != null) {
-        /* 멈춘 사진 — 튀는 땀·떨어지는 땀을 그 순간의 자리로 그린다(입자는 프레임마다 쌓이는 것이라 멈추면 하나도 안 보였다 · 11-22 리뷰) */
-        flyers.forEach((f) => { f.visible = false; }); let fi = 0;
-        const put = (at, v, a, size, life) => { const f = flyers[fi++]; if (!f || a < 0 || a > life) return; f.visible = true; f.position.copy(at).addScaledVector(v, a); f.position.y -= 4.5 * a * a; if (f.position.y < 0.03) { f.visible = false; return; } f.scale.set(size * 0.75, size, 1); f.material.opacity = Math.max(0, Math.min(1, (life - a) / 0.12)); f.material.rotation = Math.atan2(v.x, -(v.y - 9 * a)); f.userData.life = f.userData.max = 0; f.userData.fz = M.frame; };
-        if (L >= 0) {
-          [[0, -1], [0.375, 1]].forEach(([at, bias]) => { const age = ((L - at) % 0.75 + 0.75) % 0.75; if (run - age < 0.315 || age > 0.55) return; for (let n = 0; n < 3; n++) { const b = burstAt(n, bias, W2); put(b.at, V.set(b.sd * (1.2 + 0.4 * n), 2.0 + 0.3 * n, 0.15).clone(), age, ds * (0.85 + 0.15 * n) * k, 0.5); } });
-          if (run - chinAge >= 0.6 && chinAge < 1.2) put(chinStart(W2), V.set(0, -0.3, 0.05).clone(), chinAge, ds * 0.85 * k, 1.2);
-        }
-        return;
-      }
-      if (L >= 0 && pL >= 0 && (crossed(pL, L, 0.6) || crossed(pL, L, 1.35))) emitFlyer(chinStart(W), V.set(0, -0.3, 0.05), ds * 0.85 * k, 1.2, true);
-      // 튀는 땀 — 발을 찍을 때마다 머리 위 양옆에서 3방울
-      if (L >= 0 && pL >= 0) {
-        [[0, -1], [0.375, 1]].forEach(([at, bias]) => {
-          const prevD2 = ((pL - at) % 0.75 + 0.75) % 0.75, nowD = ((L - at) % 0.75 + 0.75) % 0.75;
-          if (nowD < prevD2 && run - nowD >= 0.315) for (let n = 0; n < 3; n++) {
-            const b = burstAt(n, bias, W);
-            emitFlyer(b.at, V.set(b.sd * rand(1.2, 2.0), rand(2.0, 2.6), rand(0, 0.3)), ds * rand(0.85, 1.15) * k, rand(0.45, 0.55), false);
-          }
-        });
-      }
-    }
-
     return {
       after,
       /* kit 의 누르기(동전) 앞에서 — 연출이 가져간 누르기는 동전을 내지 않는다 */
@@ -1419,9 +1320,11 @@
 
   /* ── 화면 전체 연출 — 던진 몽둥이가 날아와 화면(유리)이 깨진다 (11-21 개발자 지시) ──
      캐릭터 무대(히어로 칸)가 아니라 **휴대폰 화면 전체**에 덮는 한 장(container 위 캔버스)이다 — 장학금 공고·실시간 공고까지 덮는다.
-     앱에서는 container = 앱 전체 틀 · 시안에서는 휴대폰 틀. 누르기를 막지 않는다(pointer-events: none) · 2.3초 뒤 걷힌다.
+     시안에서는 container = 휴대폰 틀(흔들기도 그 틀) · 앱에서는 container = 화면 전체를 덮는 한 장(#mascot-fx) · 흔드는 것은 shakeEl(홈 화면 —
+     🔴 앱 틀(#app)을 흔들면 그 안의 고정 요소(아래 탭)가 스크롤 자리로 튄다). 누르기를 막지 않는다(pointer-events: none) · 2.3초 뒤 걷힌다.
      🔴 '동작 줄이기'를 켠 폰에서는 부르지 않는다(Mood 가 REDUCED 면 던지지 않는다) */
-  function ScreenHit(container) {
+  function ScreenHit(container, shakeEl) {
+    const shaker = shakeEl || container;
     const cv = document.createElement('canvas');
     cv.setAttribute('aria-hidden', 'true');
     Object.assign(cv.style, { position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', pointerEvents: 'none', zIndex: '60', display: 'none' });
@@ -1500,9 +1403,9 @@
             const d = e - FLY;
             if (d < 110) { g.fillStyle = `rgba(255,255,255,${0.55 * (1 - d / 110)})`; g.fillRect(0, 0, w, h); }   // 번쩍
             const shake = d < 340 ? (1 - d / 340) * 9 : 0;
-            container.style.transform = shake ? `translate(${rand(-shake, shake)}px, ${rand(-shake, shake)}px)` : '';
+            shaker.style.transform = shake ? `translate(${rand(-shake, shake)}px, ${rand(-shake, shake)}px)` : '';
             drawCrack(crack, ix, iy, Math.min(1, d / 160), d < 1500 ? 1 : Math.max(0, 1 - (d - 1500) / 450));
-            if (d >= 1950) { g.clearRect(0, 0, w, h); cv.style.display = 'none'; container.style.transform = ''; return; }
+            if (d >= 1950) { g.clearRect(0, 0, w, h); cv.style.display = 'none'; shaker.style.transform = ''; return; }
           }
           if (at == null) requestAnimationFrame(step);
         })(performance.now());

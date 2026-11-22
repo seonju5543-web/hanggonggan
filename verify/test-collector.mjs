@@ -18329,6 +18329,22 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
       [/hold\(\); setActive\(k\);/.test(am), /onTap\(\) \{ hold\(\); const k = nextKey\(\); if \(k\) setActive\(k, 'mascot'\)/.test(am), /const k = nextKey\(\); if \(k\) setActive\(k\);/.test(am)], [true, true, true]);
     eq('  무대는 히어로 전체에 깔고 캐릭터만 오른쪽(screenX) — 왼쪽으로 뻗은 팔이 잘리지 않게', /screenX: 0\.33/.test(am), true);
   }
+  /* 🔴 반응 연출 = 승인 시안 docs/designs/mockups/mascot-3d/mood.html 그대로 (2026-11-22 개발자 지시 "앱에 모두 배포" · 땀은 "기존으로" = 4판 물방울).
+     연결 여섯(싣기 · 무대에 얹기 · 줄 알리기 · 깨우기 · 화남·졸기 동안 줄 멈춤 · 화면 전체 유리)과 시안의 금지(눈썹·말풍선 없음)를 못 박는다 */
+  {
+    const mood = readText(new URL('../mascot/mood.js', import.meta.url)), css = readText(new URL('../style.css', import.meta.url));
+    eq('  반응 연출 — 엔진 다음에 mood.js 를 싣고 무대에 얹는다(after · beforeTap) · 연출이 가져간 누르기는 동전 없이',
+      [/'mascot\/part-6\.js', 'mascot\/mood\.js'\]/.test(am), /after: \(dt, c\) => \{ if \(hero\.mood\) hero\.mood\.after\(dt, c\); \}/.test(am), /beforeTap: \(\) => \(hero\.mood \? hero\.mood\.beforeTap\(\) : true\)/.test(am)], [true, true, true]);
+    eq('  가리키는 줄을 알린다(수령 가능액 → 회장님 의자 · 마감 D-Day → 이럴 수는 없어) · 줄을 누르면 깨운다 · 화내거나 조는 동안은 줄을 넘기지 않는다',
+      [/hero\.mood\.setLine\(k, \{ dday: isDday\(\) \}\)/.test(am), /hero\.mood\.poke\(\)/.test(am), /if \(hero\.mood && hero\.mood\.mode !== 'idle'\) return;/.test(am), /classList\.contains\('urgent'\)/.test(am)], [true, true, true, true]);
+    eq('  던진 몽둥이는 휴대폰 화면 전체에(고정된 한 장 · 누르기를 막지 않는다) · 흔드는 것은 홈 화면(앱 틀을 흔들면 아래 탭이 튄다)',
+      [/K\.ScreenHit\(fxLayer\(\), \$id\('screen-home'\)\)/.test(am), /\.mascot-fx \{ position: fixed; inset: 0; pointer-events: none;/.test(css)], [true, true]);
+    eq('  무대에서는 손가락이 화면을 굴리지 않는다(아래로 끌기·빙글 돌리기 — 시안 그대로)', /\.hero > \.mascot-wrap \.mascot-stage \{[^}]*touch-action: none;/.test(css), true);
+    eq('  시안의 금지 — 눈썹 없음(5차 "못생겼다") · 말풍선 없음(3차) · 땀은 머리 옆 물방울 하나(11-22 "땀을 기존으로")',
+      [/rig\.brows|browOn/.test(mood), /bubble|말풍선을 띄/.test(mood.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')), /rig\.sweat = d;/.test(mood), /sweatLayers|tex\('drop'\)/.test(mood)], [false, false, true, false]);
+    eq('  🔴 화남은 손짓에만 — 학생의 데이터(마감 놓침·미신청)로 화내지 않는다(start(\'angry\') 는 연타 손짓과 시안 단추뿐)',
+      (mood.match(/start\('angry'\)/g) || []).length, 1);
+  }
   eq('  학교별로 끄는 자리(MASCOT_OFF)가 있고 꺼 둔 학교는 대장님 · 금액 글자를 이 파일이 만들지 않는다',
     [/const MASCOT_OFF = \[/.test(am), /MASCOT_OFF\.indexOf\(school\) >= 0/.test(am), /만원|toLocaleString/.test(am)], [true, true, false]);
   eq('  화면이 그릴 때 부른다 — 홈(학교) · 신청 내역(요약이 보일 때만)',
