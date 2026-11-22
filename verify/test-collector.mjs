@@ -18390,7 +18390,7 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
   {
     const mood = readText(new URL('../mascot/mood.js', import.meta.url)), css = readText(new URL('../style.css', import.meta.url));
     eq('  반응 연출 — 엔진 다음에 mood.js 를 싣고 무대에 얹는다(after · beforeTap) · 연출이 가져간 누르기는 동전 없이',
-      [/'mascot\/part-6\.js', 'mascot\/mood\.js'\]/.test(am), /after: \(dt, c\) => \{ if \(hero\.mood\) hero\.mood\.after\(dt, c\); \}/.test(am), /beforeTap: \(\) => \(hero\.mood \? hero\.mood\.beforeTap\(\) : true\)/.test(am)], [true, true, true]);
+      [/'mascot\/part-6\.js', 'mascot\/mood\.js'\]/.test(am), /after: \(dt, c\) => \{\n\s+if \(!hero\.mood\) return;[\s\S]{0,700}?hero\.mood\.after\(dt, c\);\n\s+\},/.test(am), /beforeTap: \(\) => \(hero\.mood \? hero\.mood\.beforeTap\(\) : true\)/.test(am)], [true, true, true]);
     eq('  가리키는 줄을 알린다(수령 가능액 → 회장님 의자 · 마감 D-Day → 이럴 수는 없어) · 줄을 누르면 깨운다 · 화내거나 조는 동안은 줄을 넘기지 않는다',
       [/hero\.mood\.setLine\(k, \{ dday: isDday\(\) \}\)/.test(am), /hero\.mood\.poke\(\)/.test(am), /if \(hero\.mood && hero\.mood\.mode !== 'idle'\) return;/.test(am), /classList\.contains\('urgent'\)/.test(am)], [true, true, true, true]);
     eq('  던진 몽둥이는 휴대폰 화면 전체에(고정된 한 장 · 누르기를 막지 않는다) · 흔드는 것은 홈 화면(앱 틀을 흔들면 아래 탭이 튄다)',
