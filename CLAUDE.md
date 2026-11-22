@@ -171,7 +171,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `essay.js` `essay-quality.js` `essay-submit-check.js` | AI 초안(유일하게 AI가 문장을 쓰는 곳 — 금지선은 '사실을 만드는 것') · 품질 검사 · 제출 전 점검 |
 | `chat.js` | 도우미 — 앱이 아는 것만 답하고 못 찾으면 "못 찾았다". 프로필은 절대 안 보낸다 |
 | `interactions.js` | 손짓·움직임(당겨서 새로고침·뼈대) — 판정을 새로 만들지 않는다 |
-| `app-mascot.js` `mascot/` | 3D 마스코트(11-19) — 홈은 그 학교 캐릭터 · 신청 내역은 대장님. 홈 히어로는 11-20 승인 시안 「가리키는 마스코트」(안내 줄 넷 · 상태는 `setActive` 하나 · 줄을 누르면 그 목록 `openHeroLine`) · 🔴 숫자는 renderHome 이 쓴다(이 파일은 안 센다 · 못 그리는 폰은 줄만) · 엔진은 늦게 싣는다 · 학교가 빼 달라면 `MASCOT_OFF` · 허락 경위 `docs/designs/mascot-permissions.md` · 관문 「3D 마스코트」 |
+| `app-mascot.js` `mascot/` | 3D 마스코트(11-19) — 홈은 그 학교 캐릭터 · 신청 내역은 대장님. 홈 히어로는 11-20 승인 시안 「가리키는 마스코트」(안내 줄 넷 · 상태는 `setActive` 하나 · 줄을 누르면 그 목록 `openHeroLine`) · 🔴 숫자는 renderHome 이 쓴다(이 파일은 안 센다 · 못 그리는 폰은 줄만) · 엔진은 늦게 싣는다 · 반응 연출(화남·회장님 의자·D-Day·졸기 — 11-22 시안 `docs/designs/mockups/mascot-3d/mood.html` 그대로)은 `mascot/mood.js` · 학교가 빼 달라면 `MASCOT_OFF` · 허락 경위 `docs/designs/mascot-permissions.md` · 관문 「3D 마스코트」 |
 | `formfill.js` | 양식 채우기 — 쪽 그림 위 빈칸에 답 얹기(학적정보 먼저 · 서랍/사이드바 · 인쇄→PDF) · `verify-formfill.js` |
 | `apply-channel.js` | 접수 채널 · 포털 시스템(`findApplyPortal`) |
 | `supabase-client.js` `supabase-config.js` | 로그인 — 서버로 나가는 사본은 **`syncSafeProfile()` 한 곳**(주민번호·계좌 제거) |
@@ -255,7 +255,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **🔴 마감일은 이름표(`신청기간 :` 등) 뒤 날짜만** — 게시일·조회수·다른 공고 날짜가 섞여 있다. 못 믿으면 비운다. 관문 「마감일」.
 - **달력·저장은 '내 것'만 찍는다**(마감 파랑·발표 빨강 둘뿐) · `state.saved` 를 `applications` 와 합치지 말 것. `docs/designs/calendar-and-save.md`.
 - **2026-09-17 결정 셋**: 홈 순서 = 적합도 − 남은 날(`byHomeOrder` · 마감 모르면 가짜 14 금지) · 앱 내부 사정은 학생 화면에 안 적는다
-  (11-02: '모름'류 글자 없음 · 관문 「학생 화면에 '모름'류 글자가 없다」) · 못 읽은 금액 어림은 `renderHome` 한 곳.
+  (11-02: '모름'류 글자 없음 · 관문 「학생 화면에 '모름'류 글자가 없다」 · 11-21: 소식 「오늘 n」·갱신 날짜·목록 끝 ※ 안내·MY 숫자 줄도 지웠다 — 되살리지 말 것) · 못 읽은 금액 어림은 `renderHome` 한 곳.
 
 ### 층2(KOSAF) · 접수 채널 · 인스타
 

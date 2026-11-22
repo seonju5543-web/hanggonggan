@@ -796,13 +796,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-21",
-  "lastAt": "2026-11-21",
-  "tries": 1,
+  "lastAt": "2026-11-22",
+  "tries": 2,
   "status": "pending",
   "why": "게시판을 못 엶(응답 400)",
   "checks": {},
   "round": "2026-12-31",
-  "nextAt": "2026-11-22"
+  "nextAt": "2026-11-25"
  },
  "kosaf|2000438004|https://www.namwon.go.kr/board/post/view.do?boardUid=ff8080818ea1b850018ea1e3e9ad0081&menuUid=ff8080818e3beff0018e4075e410006e&postUid=9be51b0f9b7ccfee019be97eae942c8d": {
   "ds": "kosaf",
@@ -1503,15 +1503,15 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "2026학년도 창암장학생 지원 공고 안내",
   "firstAt": "2026-11-17",
-  "lastAt": "2026-11-21",
-  "tries": 5,
+  "lastAt": "2026-11-22",
+  "tries": 6,
   "status": "rejected",
   "why": "다른 공고의 링크와 같은 주소([학부·대학원-교외장학] 2026학년도 창암장학생 지원 공고 안내)",
   "checks": {
    "C": "fail"
   },
   "round": "2026-11-20",
-  "decidedAt": "2026-11-21"
+  "decidedAt": "2026-11-22"
  },
  "kosaf|2703692001|https://koreashe.org/notice/?uid=95478&mod=document&pageid=1": {
   "ds": "kosaf",

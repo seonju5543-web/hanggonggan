@@ -93,6 +93,15 @@ const BASE = {
         parts.wonSeen = /2026-12-10 선정/.test(parts.won);
         try { closeSheet(); } catch (e) { /* 안 열렸으면 닫을 것도 없다 */ }
       } catch (e) { parts.won = ''; }
+      /* 준비 중(0단계) 시트의 제출처 줄(prep-where) — 2026-11-21 부터 제출처는 담김 줄이 아니라 「제출 방법 확인」 줄 밑에 있다 */
+      state.applications = [{ id: s.id, appliedAt: '2026-11-01', pending: false, prep: {} }];
+      try {
+        openDetail(s.id);
+        const w0 = document.querySelector('#detail-sheet');
+        parts.where = w0 ? [...w0.querySelectorAll('.prep-where, .applied-at')].map((e) => e.innerText).join('\n') : '';
+        parts.whereSeen = /제출처/.test(parts.where);
+        try { closeSheet(); } catch (e) { /* 안 열렸으면 닫을 것도 없다 */ }
+      } catch (e) { parts.where = ''; }
       state.applications = keepApps;
       rows.push({ id: s.id, name: s.name, where, listed, parts });
     };
@@ -121,11 +130,11 @@ const BASE = {
     }
     setLinkChecks({ updatedAt: 't', bad: realChecks });
     state.profile = keep;
-    return { rows, reg: reg.length, kosaf: kos.length, nat: nat.length, trouble: troubleUrls.length, wonSeen: rows.filter((r) => r.parts.wonSeen).length };
+    return { rows, reg: reg.length, kosaf: kos.length, nat: nat.length, trouble: troubleUrls.length, wonSeen: rows.filter((r) => r.parts.wonSeen).length, whereSeen: rows.filter((r) => r.parts.whereSeen).length };
   }, { base: BASE });
   for (const r of out.rows) {
     r.hit = {}; r.sample = {};
-    for (const k of ['card', 'sheet', 'prep', 'cal', 'amount', 'essay', 'won', 'chat']) {
+    for (const k of ['card', 'sheet', 'prep', 'cal', 'amount', 'essay', 'won', 'where', 'chat']) {
       const h = unknownHits(r.parts[k]);
       if (Object.keys(h).length) { r.hit[k] = h; r.sample[k] = String(r.parts[k]).split('\n').filter((l) => Object.keys(unknownHits('\n' + l)).length).slice(0, 4); }
     }
@@ -150,8 +159,9 @@ const BASE = {
   if (arg('json')) fs.writeFileSync(arg('json'), JSON.stringify(out, null, 1));
   if (errors.length) console.log(errors.slice(0, 5).join('\n'));
   /* 헛돌지 않는다 — 선정 줄을 하나도 못 그렸으면(시트 모양이 바뀌었다) 이 자리는 재지 못한 것이다 */
+  if (!out.whereSeen) console.log('   ✕ 신청 내역 준비 중 시트의 「제출처」 줄을 한 건도 못 그렸다 — 시트 모양이 바뀌었는지 볼 것(무력해진 검사)');
   if (!out.wonSeen) console.log('   ✕ 신청 내역 「선정」 줄을 한 건도 못 그렸다 — 시트 모양이 바뀌었는지 볼 것(무력해진 검사)');
-  const ok = bad.length === 0 && !cutRows.length && !lost.length && !errors.length && out.reg > 0 && out.wonSeen > 0;
+  const ok = bad.length === 0 && !cutRows.length && !lost.length && !errors.length && out.reg > 0 && out.wonSeen > 0 && out.whereSeen > 0;
   console.log(ok ? `  ✓ 공고 ${out.rows.length}건 화면 어디에도 '모름'류 글자가 없다` : `  ✕ '모름'류 글자가 남은 공고 ${bad.length}건${cutRows.length ? ` · 원문을 잘라 보인 공고 ${cutRows.length}건` : ''}${errors.length ? ` · 페이지 오류 ${errors.length}` : ''}${out.reg ? '' : ' · 정식 등록을 하나도 못 읽었다(무력해진 검사)'}`);
   await browser.close();
   process.exit(ok ? 0 : 1);

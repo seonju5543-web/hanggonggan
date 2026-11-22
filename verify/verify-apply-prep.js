@@ -234,17 +234,21 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
           { mem: [{ pending: false }], disk: [{ pending: false }] });
         await closedAfter(500);
         await open(pick.A.id);
-        eq('  다시 열면 버튼이 「신청 준비 완료됨」 으로 잠긴다', await page.evaluate(() => {
+        /* 2026-11-21 개발자 지시(가독성) — 담아 둔 공고에선 늘 잠긴 회색 단추(「준비 중 1/4 — 아래 체크리스트」)를 숨기고,
+           준비 정도는 「제출 전 준비」 머리의 n/4 가 말한다. 잠금 자체(disabled)는 그대로다 */
+        eq('  다시 열면 신청 단추는 잠긴 채 숨고, 「제출 전 준비」 머리가 1/4 를 말한다', await page.evaluate(() => {
           const b = document.querySelector('#btn-apply-one');
-          return b && { label: b.textContent.trim(), disabled: b.disabled };
-        }), { label: '준비 중 1/4 — 아래 체크리스트', disabled: true });   /* 문서는 썼고(1/4) 서류·증명서·제출 방법 확인이 남았다 (2026-10-13 ③ 체크리스트) */
-        eq('  준비 체크리스트가 보이고, 「확인했어요」를 누르면 2/4 가 된다', await page.evaluate(async () => {
-          const li = document.querySelectorAll('#detail-sheet .prep-check li').length;
+          const h = document.querySelector('#detail-sheet .prep-head');
+          return b && { disabled: b.disabled, shown: !!b.offsetParent, head: h && h.textContent.replace(/\s+/g, '') };
+        }), { disabled: true, shown: false, head: '제출전준비1/4' });   /* 문서는 썼고(1/4) 서류·증명서·제출 방법 확인이 남았다 (2026-10-13 ③ 체크리스트) */
+        eq('  준비 네 줄이 보이고, 「확인했어요」를 누르면 2/4 가 되며 그 줄에 ✓ 가 선다', await page.evaluate(async () => {
+          const li = document.querySelectorAll('#detail-sheet .prep-check > li').length;
           const b = document.querySelector('#detail-sheet [data-prep-toggle="docs"]');
-          if (!b) return { li, btn: 'no-toggle' };
+          if (!b) return { li, head: 'no-toggle' };
           b.click(); await new Promise((r) => setTimeout(r, 300));
-          return { li, btn: document.querySelector('#btn-apply-one').textContent.trim() };
-        }), { li: 4, btn: '준비 중 2/4 — 아래 체크리스트' });
+          const first = document.querySelector('#detail-sheet .prep-check > li');
+          return { li, head: document.querySelector('#detail-sheet .prep-head').textContent.replace(/\s+/g, ''), done: first.classList.contains('is-done') };
+        }), { li: 4, head: '제출전준비2/4', done: true });
         await page.keyboard.press('Escape');
         await closedAfter(500);
       }
@@ -344,17 +348,21 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
       let threw = '';
       try { openDetail(id); } catch (e) { threw = String(e && e.message); }
       await new Promise((r) => setTimeout(r, 500));
-      const has = ['#btn-form-save', '#btn-form-print', '#btn-form-edit'].map((q) => !!document.querySelector(q));
-      const b = document.querySelector('#btn-form-edit');
+      /* 2026-11-22 개발자 지시 — 작성한 양식 문서 줄엔 「PDF 저장」 하나만(.doc 저장·공유·다시 작성 뺌) */
+      const has = ['#btn-form-print', '#btn-form-save', '#btn-form-share', '#btn-form-edit'].map((q) => !!document.querySelector(q));
+      const b = document.querySelector('#btn-form-print');
+      const label = b && b.textContent.trim();
+      /* 진짜 인쇄 창은 띄우지 않고, 누르면 그 문서(쓴 답)로 printFormDoc 을 부르는지만 본다 */
+      const real = window.printFormDoc; let called = null;
+      window.printFormDoc = (tpl, p, ans) => { called = { tpl: tpl === FORM_TEMPLATES['prep:' + id], ans: ans === state.applications.find((a) => a.id === id).formAns }; };
       if (b) b.click();
-      await new Promise((r) => setTimeout(r, 400));
-      const edit = { stage: formFill && formFill.stage, tpl: formFill && formFill.tplId, sch: formFill && formFill.schId === id };
+      window.printFormDoc = real;
       state.applications = state.applications.filter((a) => a.id !== id);
       resumeSave({ form: null, sheet: null });
-      return { threw, has, edit };
+      return { threw, has, label, called };
     }, pick.P.id);
-    eq('  다 쓴 문서(작성한 양식 문서)는 원본이 생긴 뒤에도 저장·인쇄·다시 작성 단추가 있고, 「다시 작성」이 그 문서를 미리보기로 연다',
-      r3, { threw: '', has: [true, true, true], edit: { stage: 'preview', tpl: 'prep:' + pick.P.id, sch: true } });
+    eq('  다 쓴 문서(작성한 양식 문서)는 원본이 생긴 뒤에도 「PDF 저장」 하나로 받는다 — 누르면 그 문서·쓴 답으로 PDF(인쇄) · 다른 단추는 없다',
+      r3, { threw: '', has: [true, false, false, false], label: 'PDF 저장', called: { tpl: true, ans: true } });
     await page.keyboard.press('Escape');
     await closedAfter(600);
   }

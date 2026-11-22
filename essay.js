@@ -117,7 +117,7 @@ function essayTipsHtml(warnings) {
       (why ? `<span class="essay-tip-why">${esc(why)}</span>` : '') + `</li>`;
   }).join('');
   return `<div class="essay-tips"><b>이렇게 하면 더 좋아집니다</b><ul>${items}</ul>` +
-    `<p class="essay-fine">고치면 이 안내는 사라집니다 — 규정이 아니라 제안입니다.</p></div>`;
+    `${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</div>`;
 }
 
 /* ── 판(version) 관리 — AI/옮기기가 글을 바꿀 때마다 이전 판을 기기 안에 남긴다(설계 ①·4) ──
@@ -265,7 +265,7 @@ function essayMaterialLevel(fieldId, target) {
 const ESSAY_GAUGE_TEXT = {
   low:  { word: '부족', msg: '재료가 아직 적어요 — 위에서 키워드를 고르고, 보기를 누르면 열리는 칸에 <b>한 줄만</b> 적어 보세요.' },
   some: { word: '조금 더', msg: '조금만 더 있으면 좋아요 — 직접 겪은 이야기 <b>한 줄</b>이 글을 살아 있게 만들어요.' },
-  full: { word: '충분', msg: '재료가 충분해요 — 좋은 초안이 나올 거예요.' },
+  full: { word: '충분', msg: '재료가 충분해요.' },
 };
 function essayGaugeHtml(m) {
   const t = ESSAY_GAUGE_TEXT[m.level] || ESSAY_GAUGE_TEXT.some;
@@ -361,7 +361,7 @@ function essaySubmitCheckHtml(result) {
   return `<div class="essay-submit-check" id="essay-submit-check">` +
     `<div class="esc-head"><b>제출 전 점검</b>${badge}</div>` +
     `<ul class="esc-list">${rows}</ul>` +
-    `<p class="essay-fine">✗ 는 그대로 내면 문제가 되는 것 · △ 는 더 좋게 만드는 제안입니다.</p></div>`;
+    `${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</div>`;
 }
 
 /* 점검표를 '양식 문서 만들기' 버튼 위에 그린다(있으면 갈아끼운다) */
@@ -598,10 +598,10 @@ function essayRulesBannerHtml(sch) {
     `<li class="${위험.test(l) ? 'essay-rule-danger' : ''}">${esc(l)}</li>`).join('');
   return `<div class="essay-rules-banner">` +
     `<b>이 공고가 정한 작성 규정 — 반드시 지켜야 합니다</b>` +
-    (r.blind ? `<p class="essay-rule-danger"><b>블라인드 심사</b>: 학교 이름을 쓰면 심사에서 제외됩니다. ` +
-      `초안에는 학교 이름을 넣지 않아요(전공은 괜찮아요).</p>` : '') +
+    (r.blind ? `<p class="essay-rule-danger"><b>블라인드 심사</b>: 학교 이름을 쓰면 심사에서 제외됩니다.` +
+      `${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>` : '') +
     (items ? `<ul>${items}</ul>` : '') +
-    `<p class="essay-fine">재단이 공고·첨부에 직접 적은 문구입니다.</p></div>`;
+    `${/* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</div>`;
 }
 
 async function essayBind(tpl, sch) {
@@ -676,7 +676,7 @@ async function essaySend(tpl, sch, btn) {
       essayRenderAids(f, sch);   /* 되돌리기·바뀐 곳·팁 다시 그리기 */
       moved++;
     }
-    if (moved) { essayRenderSubmitCheck(tpl, sch); toast(`${moved}칸에 옮겼어요 — 문장으로 다듬어 주세요`); }
+    if (moved) { essayRenderSubmitCheck(tpl, sch); toast(`${moved}칸에 옮겼어요`); }
     else if (empty) toast('먼저 위에서 키워드를 골라 주세요');
     return;
   }

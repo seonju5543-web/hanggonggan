@@ -273,11 +273,9 @@ function formQuestionsHtml(tpl) {
     html += `<details class="fq-auto"><summary>프로필에서 자동으로 채운 항목 ${plan.autoRows.length}개 · 확인하고 고치기</summary>` +
       plan.autoRows.map((r) => `<label class="fq-sub"><span>${esc(String(r.label).replace(/\n/g, ' '))}</span>` +
         `<input type="text" class="fq-auto-in" data-f="${esc(r.id)}" value="${esc(r.value)}" autocomplete="off" /></label>`).join('') +
-      `<p class="dp-note">여기서 고친 값은 이 신청서에만 적용됩니다. 계속 바꾸려면 MY → 내 정보에서 고치세요.</p></details>`;
+      `<p class="dp-note">MY → 내 정보에서 고쳐야 다른 신청서에도 들어가요.</p></details>`;
   }
-  if (plan.over.length) {
-    html += `<p class="dp-note fq-over">이 신청서는 원본 항목이 많습니다 — 질문 ${plan.counts.total}개입니다. 하나도 빠뜨리지 않도록 전부 보여 줍니다.</p>`;
-  }
+  /* 질문 수 상한을 넘었다는 안내(fq-over)는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
 
   plan.secs.forEach((sec) => {
     html += `<div class="dp-block"><h4>${esc(sec.heading || '')}</h4>`;
@@ -536,7 +534,7 @@ function downloadFormDoc(tpl, p, ans) {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  toast('문서 파일(.doc)로 저장했습니다 — 한글·워드에서 열기 가능');
+  toast('문서 파일(.doc)로 저장했어요');
 }
 
 function printFormDoc(tpl, p, ans) {
@@ -642,7 +640,7 @@ function prepEligOptions(sch) {
 }
 function prepSubmitNote(sch) {
   const kind = prepKindFor(sch);
-  const where = { free: '공고의 접수처', attached: '원본 양식을 채워 공고의 접수처', portal: '공고가 안내한 포털·온라인 입력', email: `메일 ${sch.applyEmail || ''}`.trim(), unknown: '공고가 정한 접수 방법', kosaf: '재단 선발 공고문·홈페이지가 정한 접수 방법' }[kind];
+  const where = { free: '공고의 접수처', attached: '원본 양식을 채워 공고의 접수처', portal: '공고가 안내한 포털·온라인 입력', email: `메일 ${sch.applyEmail || ''}`.trim(), unknown: '공고가 정한 접수 방법', kosaf: '재단이 정한 접수 방법' }[kind];
   const due = sch.deadline ? `마감 ${sch.deadline}` : '';   // 마감을 모르면 말하지 않는다(2026-11-15 · 예전 '마감은 원문 확인')
   return `${[where, due].filter(Boolean).join(' · ')} · 학교·재단에 실제로 접수되는 것은 아니며 제출은 학생이 직접 합니다.`;
 }
@@ -705,7 +703,7 @@ function buildPrepTemplate(sch) {
   if (elig.length) {
     sections.push({
       heading: '지원 자격 확인',
-      note: '공고 원문의 자격 줄 — 해당하는 것을 본인이 확인합니다',
+      /* 절 설명 줄은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내 — 아래 질문이 같은 말) */
       fields: [{ id: 'eligCheck', label: '해당 사항', type: 'checks', q: '공고의 지원 자격 중 해당하는 항목을 모두 고르세요 (본인 확인)', options: elig }],
     });
   }

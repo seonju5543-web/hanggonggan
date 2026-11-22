@@ -330,7 +330,7 @@ function chatAnswerApplyable() {
     text: `지금 지원할 수 있는 공고가 ${list.length}건 있어요. 바로 신청 ${now}건 · 선발 심사형 ${sel}건이에요.`,
     cards: list.slice(0, 4),
     actions: [{ act: 'explore', label: '장학금 탭에서 전체 보기' }],
-    note: list.length > 4 ? `적합도가 높은 4건만 보여 드렸어요. 나머지는 장학금 탭에서 볼 수 있어요.` : '',
+    /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
   };
 }
 
@@ -345,7 +345,7 @@ function chatAnswerDeadline() {
       text: '마감일이 확인된 공고가 지금은 없어요.',
       note: noDate
         /* 링크 이름은 공고마다 다르다(원문 공고·게시판 목록·재단 홈페이지 — source-link.js · 2026-10-03) — 한 이름으로 부르지 않는다 */
-        ? `지원할 수 있는 공고 ${noDate}건은 마감일이 공고 원문에만 적혀 있어서, 앱이 날짜를 말씀드릴 수 없어요. 각 공고를 열어 맨 아래 링크에서 확인해 주세요.`
+        ? `지원할 수 있는 공고 ${noDate}건의 마감일은 각 공고를 열어 맨 아래 링크에서 확인해 주세요.`
         : '',
     };
   }
@@ -355,7 +355,7 @@ function chatAnswerDeadline() {
     text: `가장 급한 건 '${soon.sch.name}'이고 ${d.label}이에요. 마감이 확인된 공고 ${withDate.length}건을 가까운 순서로 보여 드릴게요.`,
     cards: withDate.slice(0, 4),
     actions: [{ act: 'notify', label: '마감 알림 켜기' }],
-    note: noDate ? `이 밖에 ${noDate}건은 마감일이 원문에만 있어서 목록에서 뺐어요 — 날짜를 지어내지 않으려고요.` : '',
+    note: noDate ? `이 밖에 ${noDate}건은 공고를 열어 맨 아래 링크에서 마감일을 봐 주세요.` : '',
   };
 }
 
@@ -368,14 +368,14 @@ function chatAnswerAmount() {
   if (!known.length) {
     return {
       text: '금액을 숫자로 확인한 공고가 아직 없어요.',
-      note: `지원할 수 있는 공고 ${list.length}건은 금액이 공고 원문에만 적혀 있어요. 앱이 임의로 계산하면 실제와 달라질 수 있어서, 합계에 넣지 않고 있어요. 각 공고를 열어 맨 아래 링크에서 확인해 주세요.`,
+      note: `지원할 수 있는 공고 ${list.length}건의 금액은 각 공고를 열어 맨 아래 링크에서 확인해 주세요.`,
     };
   }
   return {
     text: `금액이 확인된 ${known.length}건을 더하면 최대 ${chatSafe(() => won(total), total + '원')}이에요.`,
     cards: known.sort((a, b) => (b.sch.amountValue || 0) - (a.sch.amountValue || 0)).slice(0, 4),
     actions: [{ act: 'explore', label: '장학금 탭에서 전체 보기' }],
-    note: unknown ? `나머지 ${unknown}건은 금액이 원문에만 있어서 합계에서 뺐어요.` : '',
+    note: unknown ? `나머지 ${unknown}건의 금액은 각 공고를 열어 맨 아래 링크에서 봐 주세요.` : '',
   };
 }
 
@@ -398,7 +398,7 @@ function chatAnswerDocuments(q) {
       list: rows,
       cards: [hit],
       actions: [{ act: 'detail:' + hit.sch.id, label: '신청 준비하기' }, { act: 'wallet', label: '서류 보관함 열기' }],
-      note: '보관함(MY 탭)에 올려 둔 서류는 다음 신청부터 자동으로 함께 준비돼요.',
+      /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
     };
   }
 
@@ -424,7 +424,7 @@ function chatAnswerDocuments(q) {
     text: '지금 지원 가능한 공고에서 자주 요구하는 서류예요.',
     list: rows,
     actions: [{ act: 'wallet', label: '서류 보관함 열기' }],
-    note: '보관함(MY 탭)에 한 번 올려 두면 다음 신청부터 자동으로 함께 준비돼요.',
+    /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
   };
 }
 
@@ -436,7 +436,7 @@ function chatAnswerHowTo(q) {
       text: `'${hit.sch.name}'의 접수 방법이에요. ${label}`,
       cards: [hit],
       actions: [{ act: 'detail:' + hit.sch.id, label: '신청 준비하기' }],
-      note: '공고를 눌러 열면 준비 단계와 제출처 바로가기가 나와요. 최종 제출은 학교·재단 시스템에서 이뤄지니, 원문 공고에서 한 번 더 확인해 주세요.',
+      note: '최종 제출은 학교·재단 시스템에서 해요. 원문 공고에서 한 번 더 확인해 주세요.',
     };
   }
   /* 🔴 갈래를 **손으로 적지 않는다** (2026-09-21 코드 리뷰에서 잡힘).
@@ -449,7 +449,7 @@ function chatAnswerHowTo(q) {
     return { text: '접수 방법은 공고마다 달라요. 공고 이름을 함께 물어봐 주세요.' };
   }
   return {
-    text: `접수 방법은 공고마다 달라요. 한대장은 ${kinds.length}가지로 나눠 안내해요.`,
+    text: '접수 방법은 공고마다 달라요.',
     list: kinds,
     note: '공고 이름을 함께 물어보시면 그 공고가 어디에 해당하는지 알려 드릴게요. (예: "○○장학금 어떻게 신청해?")',
   };
@@ -473,13 +473,13 @@ function chatAnswerMyApps() {
     text: `준비한 장학금이 ${rows.length}건 있어요.`,
     list: rows,
     actions: [{ act: 'applications', label: '신청내역 열기' }],
-    note: '공식 제출과 발표 결과는 앱이 학교 전산을 볼 수 없어서, 신청내역 탭에서 직접 기록해 주셔야 해요.',
+    note: '제출·발표 결과는 신청내역 탭에서 직접 기록해 주세요.',
   };
 }
 
 function chatAnswerHelp() {
   return {
-    text: '저는 이 앱이 갖고 있는 공고·서류·신청 현황만 보고 답해요. 모르면 모른다고 말씀드릴게요.',
+    text: '이렇게 물어보세요.',
     list: [
       '"○○장학금 지원 자격 알려줘" — 그 공고의 자격 요건(내 정보로 ✓·✕)',
       '"○○장학금 원문 링크" · "마감 언제야" · "서류" · "신청 방법" · "문의처" — 공고 한 건의 칸',
@@ -490,7 +490,7 @@ function chatAnswerHelp() {
       '"내 신청 현황" — 준비한 장학금의 진행 단계',
       '"서류함 어떻게 써?" · "알림 끄는 법" — 앱 사용법',
     ],
-    note: '금액과 마감일은 공고 원문에만 있는 경우가 많아요. 그럴 때는 지어내지 않고 원문 링크를 알려 드려요.',
+    /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
   };
 }
 
@@ -664,7 +664,8 @@ function chatFieldRegistered(m, field) {
     return {
       text: `'${name}'의 지원 자격이에요. ${say}`.trim(),
       list: all.slice(0, 14),
-      note: `${fromKosaf}✓·✕는 내 정보로 맞춰 본 결과이고, · 표시는 내 정보로 판단할 수 없는 요건이에요.${all.length > 14 ? ' 나머지는 공고 상세에서 볼 수 있어요.' : ''}`,
+      /* 2026-11-21 개발자 지시로 기호 설명 줄 지움(학생이 읽지 않는 안내) */
+      note: `${fromKosaf}${all.length > 14 ? '나머지는 공고 상세에서 볼 수 있어요.' : ''}`.trim(),
       ...card,
     };
   }
@@ -731,7 +732,7 @@ function chatFieldRegistered(m, field) {
       text: `'${name}'의 첨부 파일이에요.`,
       links: links.length ? links : undefined,
       list: links.length ? [] : atts.map((a) => a.name),
-      note: '신청서 양식이 있는 공고는 상세 화면에서 "원본 양식 그대로 보기"·"양식 채우기"도 쓸 수 있어요.',
+      /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
       actions: [{ act: 'detail:' + s.id, label: '공고 상세 열기' }],
       ...card,
     };
@@ -750,7 +751,7 @@ function chatFieldRegistered(m, field) {
     return {
       text: `'${name}'의 신청 방법이에요. ${bits.join(' ')}`.trim(),
       quotes: qs.length ? [{ name, lines: qs }] : [],
-      note: '최종 접수는 학교·재단의 공식 접수처에서 직접 해요. 앱은 신청 준비까지 도와드려요.',
+      note: '최종 접수는 학교·재단의 공식 접수처에서 직접 해요.',
       actions: [{ act: 'detail:' + s.id, label: '신청 준비하기' }],
       ...linkActs, ...card,
     };
@@ -835,7 +836,7 @@ function chatFieldNotice(n, field) {
   const links = link ? [link] : undefined;
   if (field === 'link') return link ? { text: `'${n.title}'의 링크예요.`, links } : { text: `${chatEun(n.title)} 연결할 주소가 없어요.` };
   return {
-    text: `${chatEun(n.title)} 학교 게시판에서 모은 글이라 제목과 링크만 갖고 있어요. ${CHAT_FIELD_WORD[field] || '자세한 내용'}${chatJosa(CHAT_FIELD_WORD[field] || '내용', '은', '는')} 글을 열어 봐 주세요.`,
+    text: `'${n.title}'의 ${CHAT_FIELD_WORD[field] || '자세한 내용'}${chatJosa(CHAT_FIELD_WORD[field] || '내용', '은', '는')} 글을 열어 봐 주세요.`,
     links,
   };
 }
@@ -896,7 +897,7 @@ const CHAT_DYN = {
   board: () => {
     const list = chatNotices().slice().sort((a, b) => String(b.date || b.foundAt || '').localeCompare(String(a.date || a.foundAt || ''))).slice(0, 6);
     if (!list.length) return { text: '우리 학교 게시판에서 모은 글이 지금은 없어요.', note: '홈의 소식 띠와 장학금 탭에서 다른 공고를 볼 수 있어요.' };
-    return { text: `우리 학교 게시판의 최근 장학 공고예요.`, notices: list, note: '게시판 공고는 제목과 링크만 확인한 것이라, 자격·금액은 글을 열어 봐 주세요.' };
+    return { text: `우리 학교 게시판의 최근 장학 공고예요.`, notices: list, note: '자격·금액은 글을 열어 봐 주세요.' };
   },
   activities: (q) => {
     const all = chatSafe(() => (typeof activitiesForMe === 'function' ? activitiesForMe() : []), []);
@@ -921,7 +922,7 @@ const CHAT_DYN = {
     if (p.year) rows.push(`학년: ${p.year}학년${p.status ? ` (${p.status})` : ''}`);
     if (p.gpa != null && p.gpa !== '') rows.push(`직전학기 평점: ${p.gpa}`);
     if (p.bracket != null && p.bracket !== '') rows.push(`학자금 지원구간: ${p.bracket}구간`);
-    return { text: '지금 입력된 내 정보예요. 이 정보로 적합도를 계산해요.', list: rows, actions: [{ act: 'myinfo', label: '내 정보 고치기' }] };
+    return { text: '지금 입력된 내 정보예요.', list: rows, actions: [{ act: 'myinfo', label: '내 정보 고치기' }] };
   },
   saved: () => {
     const ids = (chatSafe(() => state.saved, []) || []).map((x) => x.id);
@@ -937,7 +938,7 @@ const CHAT_DYN = {
     return {
       text: hit.length ? `${hit.map((s) => s.label).join('·')} 발급처예요.` : '자주 내는 서류의 발급처예요.',
       list: pick.map((s) => `${s.label} — ${s.issue}`),
-      note: '발급받은 파일을 MY → 서류함에 올려 두면 다음 신청부터 자동으로 함께 준비돼요.',
+      /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
       actions: [{ act: 'mydocs', label: '서류함 열기' }],
     };
   },
@@ -958,7 +959,7 @@ function chatKindList(kind) {
   return {
     text: `지금 신청할 수 있는 ${kind} 장학금이 ${list.length}건 있어요.`,
     cards: list.slice(0, 4),
-    note: list.length > 4 ? '적합도가 높은 4건만 보여 드렸어요. 장학금 탭 위의 교내·교외 칸으로 전부 볼 수 있어요.' : '',
+    note: list.length > 4 ? '장학금 탭 위의 교내·교외 칸으로 전부 볼 수 있어요.' : '',
     actions: [{ act: 'explore', label: '장학금 탭에서 전체 보기' }],
   };
 }
@@ -1020,7 +1021,7 @@ function chatRoute(q) {
       cards,
       notices,
       note: notices.length
-        ? '게시판 공고는 제목과 링크만 확인한 것이라, 자격·금액은 원문 글을 열어 봐 주세요.'
+        ? '자격·금액은 원문 글을 열어 봐 주세요.'
         : '공고 이름과 함께 "자격"·"마감"·"링크"·"서류"를 물으시면 그 칸만 뽑아 드려요.',
     };
   }
@@ -1107,7 +1108,7 @@ function chatAnswerFaq(q, opts) {
 function chatFaqReply([cat, question, answer]) {
   return {
     text: chatStripTags(answer),
-    note: `자주 묻는 질문 「${chatStripTags(question)}」의 답이에요 (${cat}). 다른 질문은 설정 → 고객센터에 있어요.`,
+    note: `자주 묻는 질문 「${chatStripTags(question)}」의 답이에요.`,
     actions: [{ act: 'faq', label: '자주 묻는 질문 열기' }],
   };
 }
@@ -1122,13 +1123,13 @@ function chatAnswerUnknown(q) {
     return {
       text: '딱 맞는 답을 못 찾았어요. 혹시 이 중 하나인가요?',
       asks: maybe.map((m) => m.sch.name),
-      note: '아니라면 "지금 뭐 신청할 수 있어?", "마감 임박", "서류" 처럼 물어보셔도 돼요. 지어내서 답하지는 않을게요.',
+      note: '아니라면 "지금 뭐 신청할 수 있어?", "마감 임박", "서류" 처럼 물어보셔도 돼요.',
     };
   }
   return {
-    text: '그 질문은 제가 아직 못 알아들었어요. 앱에 있는 정보에서 찾아봤지만 맞는 공고가 없었어요.',
+    text: '그 질문은 제가 아직 못 알아들었어요.',
     actions: [{ act: 'explore', label: '장학금 탭에서 직접 찾기' }],
-    note: '지어내서 답하지 않으려고 여기서 멈춰요. "지금 뭐 신청할 수 있어?", "마감 임박", "서류" 처럼 물어보시거나, 장학금 탭에서 전체 목록을 훑어보실 수 있어요.',
+    note: '"지금 뭐 신청할 수 있어?", "마감 임박", "서류" 처럼 물어보세요.',
   };
 }
 
@@ -1506,7 +1507,7 @@ function chatOpen(prefill) {
         /* 개발자가 이 문구를 그대로 쓰기로 정했다 (2026-08-17) — 이름을 말하는 인사가
            캐릭터에 맞는다고 판단. 바꾸지 말 것(검사가 이 문구를 지킨다). */
         text: '안녕하세요, 저는 대장님이에요! 이 앱에 있는 공고와 서류 정보로 답해 드려요. 무엇이 궁금하세요?',
-        note: '금액·마감이 공고 원문에만 있는 경우가 많아요. 그럴 때는 지어내지 않고 원문 링크로 안내해 드려요.',
+        /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */
       }),
     });
   }

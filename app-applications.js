@@ -49,7 +49,7 @@ function appCard(app, sch) {
          aria-label="${esc(sch.name)} 선택" />` : ''}
       <button class="sch-card" data-detail="${sch.id}" tabindex="-1">
         <div class="sch-top">
-          <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>${closedBadge}
+          ${kindChipHtml(sch)}${closedBadge}${/* 갈래 칩 — 카드·시트·보관함 줄과 같은 「장학 · 교내」 · 활동이면 공모전·대외활동(2026-11-21) */ ''}
         </div>
         <p class="sch-name">${esc(sch.name)}</p>
         <div class="app-step app-step-s${step}${app.result === 'lost' ? ' app-step-lost' : ''}${app.pending ? ' app-step-wait' : ''}${deadPrep ? ' app-step-closed' : ''}">
@@ -95,7 +95,7 @@ function nextAction(app, sch, step, d, closed) {
       : { text: `아직 제출 기록이 없어요${sch.deadline ? ' · 마감 ' + esc(d.label) : ''}`,   // 마감을 모르면 말하지 않는다(2026-11-15)
           btn: go('제출하러 가기') };
   }
-  if (step === 1) return { text: '제출 기록됨 · 접수가 마감되면 심사로 넘어가요', btn: '' };
+  if (step === 1) return { text: '결과가 나오면 아래에 기록해 주세요', btn: '' };   // 2026-11-21 개발자 지시로 줄임(학생이 읽지 않는 안내)
   if (step === 2) return { text: '결과가 나오면 아래에 기록해 주세요', btn: '' };
   return { text: app.result === 'won' ? '선정으로 기록됨' : '미선정으로 기록됨', btn: '' };
 }
@@ -137,8 +137,8 @@ function docChecklistHtml(sch) {
     const name = esc(doc.replace(/\s*\(.*\)$/, ''));
     if (st && st.ok) return `<li class="dc-ok">${name}</li>`;
     if (st) return `<li class="dc-miss">${name}<em>${esc(st.slot.issue)}</em></li>`;
-    /* 보관함에 칸이 없는 서류 — 있는지 없는지 앱이 알 수 없으므로 그렇게 말한다 */
-    return `<li class="dc-etc">${esc(doc)}<em>보관함에서 확인할 수 없는 서류</em></li>`;
+    /* 보관함에 칸이 없는 서류 — 앱이 있는지 모르므로 빈 네모만 둔다(「보관함에서 확인할 수 없는 서류」 글자는 2026-11-21 개발자 지시로 지움) */
+    return `<li class="dc-etc">${esc(doc)}</li>`;
   }).join('');
   /* 머리글은 **학생이 할 일의 개수**를 말한다 — 분수(0/2)는 읽는 데 한 박자 걸린다.
      🔴 세는 것은 `known` 이다 (2026-09-10 코드 리뷰). `all` 로 세면 위에서 일부러 갈라낸
@@ -146,8 +146,8 @@ function docChecklistHtml(sch) {
         (실측 4건 — reg-hi-jeju 3→2 · reg-hufs-myeonhak 2→1 · reg-hufs-alumni 3→2 ·
         reg-khu-intern 2→1). 줄은 갈랐는데 숫자만 안 갈랐던 것이다.
         못 읽은 몫은 바로 아래 `note` 줄이 이미 말한다. */
-  const head = `제출 서류 ${known.length}개`
-    + (missing.length ? '' : tracked.length ? ' · 보관함에서 자동 첨부' : '');
+  /* 2026-11-21 개발자 지시로 꼬리 「보관함에서 자동 첨부」를 지움(학생이 읽지 않는 안내 · ✓ 표시가 같은 말을 한다) */
+  const head = `제출 서류 ${known.length}개`;
   return `
     <details class="doc-check"${missing.length ? ' open' : ''}>
       <summary>${esc(head)}${missing.length ? ` <b>${missing.length}개 준비 안 됨</b>` : ''}</summary>
@@ -170,7 +170,7 @@ function appLogHtml(app, sch, step) {
   }
   const d = dday(sch.deadline);
   const row = (done, label, value) =>
-    `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b><span>${value}</span></li>`;
+    `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b>${value ? `<span>${value}</span>` : ''}</li>`;
   const closed = sch.deadline && d.days < 0;
   const next = nextAction(app, sch, step, d, closed);
   return `
@@ -182,7 +182,7 @@ function appLogHtml(app, sch, step) {
       ${docChecklistHtml(sch)}
       <ul class="app-log-list">
         ${sch.deadline ? row(!!closed, '접수 마감', esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label))) : ''}
-        ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
+        ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : /* 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ '')}
         ${row(!!app.result, '선정 발표',
           app.result ? (app.result === 'won' ? '선정 · ' : '미선정 · ') + esc(app.resultAt || '')
             : `<button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
@@ -240,7 +240,7 @@ function deleteApps(ids) {
       saveState();
       renderApplications();
       renderHome();
-      toast('되살림');
+      toast('되살렸어요');
     },
   });
 }
@@ -365,12 +365,22 @@ const CAL_DOW = ['일', '월', '화', '수', '목', '금', '토'];
 const CAL_KIND_ORDER = { wait: 0, mine: 1 };
 const CAL_DOTS_MAX = 3;
 
+/* 달력 장학금 · 대외활동 칩 (2026-11-21 개발자 「신청내역에서 대외활동과 장학금이 구분되게」) — 보관함과 같은 kindFilter ·
+   점·이 달 숫자·날짜 목록이 고른 쪽만 · 대외활동만 볼 때는 「이날 마감되는 공고」(장학)도 뺀다 · 고른 칩은 앱을 닫을 때까지(기기에 저장하지 않는다 — 보관함 칩과 같다) */
+let calKind = 'all';
+const CAL_KIND_NOUN = { all: '공고', sch: '장학금', act: '대외활동' };   // 「이 달에는 내 ○○이 없어요」 — 셋 다 받침이 있어 「이」
+function calMineKind(ctx) {
+  const kf = kindFilter(ctx.mine, calKind, 'cal-kind', { counts: false });
+  calKind = kf.kind;
+  return kf;
+}
 function renderCalendar() {
   const box = $('#apps-calendar');
   if (!box) return;
   const ms = calMonthStart();
   const ctx = calContext();
-  const marks = calMarks(ms, ctx.mine);
+  const kf = calMineKind(ctx);
+  const marks = calMarks(ms, kf.list);
   const today = isoOf(todayStart());
   const days = new Date(ms.getFullYear(), ms.getMonth() + 1, 0).getDate();
   const lead = new Date(ms.getFullYear(), ms.getMonth(), 1).getDay();
@@ -400,13 +410,14 @@ function renderCalendar() {
       </button>`;
   }
 
-  box.innerHTML = `
+  box.innerHTML = `${kf.row}
     <div class="cal-head">
       <button class="cal-nav" data-cal-move="-1" aria-label="이전 달">‹</button>
       <span class="cal-month">${ms.getFullYear()}년 ${ms.getMonth() + 1}월</span>
       <button class="cal-nav" data-cal-move="1" aria-label="다음 달">›</button>
     </div>
-    <p class="cal-sum">${mineCount ? `내 공고 ${mineCount}건${waitCount ? ` · 발표 ${waitCount}건` : ''}` : '이 달에는 내 공고가 없어요'}</p>
+    ${/* 칩으로 거른 때는 이름도 그쪽으로 — 「이 달에는 내 공고가 없어요」는 거른 다른 쪽이 있으면 틀린 말이 된다(리뷰 2026-11-21) */ ''}
+    <p class="cal-sum">${mineCount ? `내 ${CAL_KIND_NOUN[kf.kind]} ${mineCount}건${waitCount ? ` · 발표 ${waitCount}건` : ''}` : `이 달에는 내 ${CAL_KIND_NOUN[kf.kind]}이 없어요`}</p>
     <div class="cal-dow">${CAL_DOW.map((w) => `<span>${w}</span>`).join('')}</div>
     <div class="cal-grid">${cells}</div>
     ${/* 🔴 범례는 **두 종류**다 (2026-09-07 개발자 지시: "간단하고 명확히").
@@ -430,10 +441,15 @@ function calRowHtml(sch, { badge = true, save = false } = {}) {
     const result = evaluateFor(sch, state.profile);
     mark = fitBadgeHtml(fitScore(sch, result, state.profile), fitDetailFor(sch, state.profile));
   }
+  /* 갈래 칩 (2026-11-21 개발자 「공고보관함과 신청내역에서 대외활동과 장학금이 구분되게」) — 카드와 같은 kindChipHtml 한 곳 ·
+     활동은 피드 모양 원본(activityItem)으로 갈래를 읽는다(act: 줄은 늘 활동 칩 — 글에 kind 가 없어도 「장학」으로 안 읽히게) · 칩이 종류를 말하므로 활동 둘째 줄은 주최만(종류를 두 번 적지 않는다) */
+  const act = isActivityId(sch.id) ? (activityItem(sch.id.slice(4)) || null) : null;
+  const sub = isActivityId(sch.id) ? (act ? activityHostLine(act) : '')
+    : [amountLine(sch).text.replace(/^금액 · /, ''), knownValue(sch.headcount)].filter(Boolean).join(' · ');
   const row = `<button class="cal-row" data-detail="${esc(sch.id)}">
-      <span class="cal-row-top">${mark}${d ? `<span class="badge badge-dday ${d.cls}">${d.label}</span>` : ''}${sch.formId ? '<span class="badge badge-form">앱에서 작성</span>' : ''}</span>
+      <span class="cal-row-top">${kindChipHtml(act ? { ...act, activity: true } : sch)}${mark}${d ? `<span class="badge badge-dday ${d.cls}">${d.label}</span>` : ''}${sch.formId ? '<span class="badge badge-form">앱에서 작성</span>' : ''}</span>
       <span class="cal-row-name">${esc(sch.name)}</span>
-      ${(() => { const sub = [amountLine(sch).text.replace(/^금액 · /, ''), knownValue(sch.headcount)].filter(Boolean).join(' · '); return sub ? `<span class="cal-row-sub">${esc(sub)}</span>` : ''; })()}
+      ${sub ? `<span class="cal-row-sub">${esc(sub)}</span>` : ''}
     </button>`;
   /* 보관함에서는 **여기서 바로 해제**할 수 있어야 한다 — 담는 곳과 빼는 곳이 다르면
      학생이 뺄 방법을 못 찾는다. 카드와 같은 이유로 단추는 줄 **바깥**에 둔다. */
@@ -444,8 +460,8 @@ function calRowHtml(sch, { badge = true, save = false } = {}) {
 function calDayHtml(iso) {
   const [y, m, d] = iso.split('-').map(Number);
   const ctx = calContext();
-  const mineAll = ctx.mine;
-  const marks = (calMarks(new Date(y, m - 1, 1), ctx.mine)[iso] || []);
+  const mineAll = calMineKind(ctx).list;
+  const marks = (calMarks(new Date(y, m - 1, 1), mineAll)[iso] || []);
   const seen = new Set();
   const mineRows = marks.map((k) => {
     if (seen.has(k.id)) return '';
@@ -462,7 +478,7 @@ function calDayHtml(iso) {
     return `<p class="cal-why">${why}</p>` + calRowHtml(sch, { badge: false });
   }).join('');
 
-  const others = calOthersOn(iso, ctx);
+  const others = calKind === 'act' ? [] : calOthersOn(iso, ctx);   // 대외활동만 볼 때는 장학 공고 목록을 안 붙인다
   const layer1 = others.filter((s) => s.sourceKind !== 'kosaf');
   const layer2 = others.filter((s) => s.sourceKind === 'kosaf');
 
@@ -477,8 +493,9 @@ function calDayHtml(iso) {
          층1과 한 목록에 쏟으면 학생이 그것도 앱이 추천한 것으로 읽는다. */ ''}
     ${layer2.length ? `<details class="cal-kosaf">
         <summary>한국장학재단 목록 ${layer2.length}건</summary>
-        <p class="cal-note">재단이 적어 둔 칸을 그대로 보여 줍니다 — 자격은 재단 홈페이지에서 확인하세요.</p>
+        <p class="cal-note">${/* 2026-11-21 개발자 지시로 줄임(학생이 읽지 않는 안내) */ ''}자격은 재단 홈페이지에서 확인하세요.</p>
         ${layer2.map((s) => calRowHtml(s, { badge: false })).join('')}
       </details>` : ''}
-    ${!mineRows && !layer1.length && !layer2.length ? '<p class="empty">이날 마감되는 공고가 없어요</p>' : ''}`;
+    ${/* 거른 때는 거른 쪽만 말한다 — 대외활동만 볼 때는 장학 목록을 안 붙이므로 「내 대외활동」(리뷰 2026-11-21) */ ''}
+    ${!mineRows && !layer1.length && !layer2.length ? `<p class="empty">${calKind === 'act' ? '이날 마감되는 내 대외활동이 없어요' : calKind === 'sch' ? '이날 마감되는 장학금이 없어요' : '이날 마감되는 공고가 없어요'}</p>` : ''}`;
 }

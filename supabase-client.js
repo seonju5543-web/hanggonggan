@@ -62,9 +62,30 @@ function setRememberedEmail(email) {
   } catch { /* 저장 공간이 막혀 있어도 로그인은 되어야 한다 */ }
 }
 
+/* 🔴 토큰 안에 적힌 사용자 번호(sub)·메일을 읽는다 (2026-11-21 개발자 지적: "로그인이 되어도 아래 로그인 판이 뜨고 로그인·회원가입을 누르게 되어 있다").
+   소셜 로그인(구글·애플)은 **토큰만 들고** 돌아와 사용자 번호가 없다 — 예전엔 서버에 한 번 더 물어(authFetchUser) 채웠는데,
+   그 요청이 실패·시한 초과하면 「로그인 완료」 토스트가 뜨고 토큰도 저장된 채 번호만 비어 authUser() 가 null 이었다
+   → MY 계정 카드가 로그인·회원가입을 그렸다. 토큰(JWT)의 가운데 조각에 sub·email 이 들어 있으므로 인터넷 없이 읽는다.
+   ⚠️ 서명은 여기서 확인하지 않는다 — 토큰은 우리 서버가 준 것이고, 서버는 요청마다 토큰을 다시 검증한다. 화면에 누구인지 보이는 용도다.
+   못 읽으면(토큰 꼴이 아니면) 빈 객체 — 넘어지지 않는다 */
+function jwtClaims(token) {
+  try {
+    const part = String(token || '').split('.')[1];
+    if (!part) return {};
+    const bin = atob(part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '='));
+    const text = typeof TextDecoder !== 'undefined' ? new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))) : bin;
+    const o = JSON.parse(text);
+    return o && typeof o === 'object' ? o : {};
+  } catch { return {}; }
+}
+
 function authUser() {
   const t = authLoad();
-  return t && t.userId ? { userId: t.userId, email: t.email || '' } : null;
+  if (!t) return null;
+  /* 번호가 비어 있는 옛 저장분(위 사고로 이미 그렇게 남은 기기)도 토큰에서 읽어 바로 로그인 상태로 보인다 */
+  const claims = t.userId ? {} : jwtClaims(t.accessToken);
+  const userId = t.userId || claims.sub || '';
+  return userId ? { userId, email: t.email || claims.email || '' } : null;
 }
 function signedIn() { return !!(supabaseConfigured() && authUser()); }
 
@@ -76,8 +97,9 @@ function authStore(json) {
     refreshToken: json.refresh_token || '',
     /* expires_in 은 초 단위. 만료 1분 전에 미리 갱신한다. */
     expiresAt: Date.now() + Math.max(0, (json.expires_in || 3600) - 60) * 1000,
-    userId: (json.user && json.user.id) || (authLoad() || {}).userId || '',
-    email: (json.user && json.user.email) || (authLoad() || {}).email || '',
+    /* 🔴 토큰에 적힌 사람이 앞의 저장분보다 먼저다 — 로그아웃 없이 다른 계정으로 소셜 로그인하면 예전엔 **앞사람 번호**가 남았다(jwtClaims 머리말) */
+    userId: (json.user && json.user.id) || jwtClaims(json.access_token).sub || (authLoad() || {}).userId || '',
+    email: (json.user && json.user.email) || jwtClaims(json.access_token).email || (authLoad() || {}).email || '',
   };
   authSave(t);
   return t;
@@ -387,10 +409,16 @@ async function authCaptureFromUrl() {
   return kind;
 }
 
+/* 🔴 **이 기기에서 먼저 지우고, 서버에는 그 뒤에 알린다** (2026-11-21 개발자 확인 요청 "로그아웃 누르면 바로 로그인 박스로 바뀌는지").
+   예전엔 서버 답(최대 8초 · 401 이면 갱신까지 한 번 더)을 기다린 **뒤에** 지워서, 느린 망에선 눌러도 몇 초간 아무 일도 없었다(실측: 서버 6초 → 6.5초 뒤에야 바뀜).
+   지우는 줄은 첫 await 앞이라 부르는 순간 끝난다 — 부른 쪽이 기다리지 않고 바로 다시 그려도 로그인 박스가 나온다.
+   서버 알림은 들고 있던 토큰으로 직접 보낸다(sbAuthed 는 이미 지운 저장분을 읽고, 실패하면 갱신을 시도하므로 쓰지 않는다) · 실패해도 이 기기는 로그아웃이다 */
 async function authSignOut() {
   const t = authLoad();
-  if (t) await sbAuthed('/auth/v1/logout', { method: 'POST' });
   authClear();
+  if (t && t.accessToken) {
+    try { await sbFetch('/auth/v1/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + t.accessToken } }); } catch { /* 이 기기는 이미 로그아웃 */ }
+  }
 }
 
 /* 탈퇴 — 방침에 "탈퇴하면 지웁니다"라고 적는 이상 실제로 지울 수 있어야 한다.

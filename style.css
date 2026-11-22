@@ -1057,29 +1057,50 @@ textarea:focus {
 
 /* ---------------- 토스트 ---------------- */
 .toast {
-  /* 🔴 하단 탭(높이 약 62px) 바로 위에 낮게 띄운다 — 예전 100px 은 화면 한가운데
-     가까이 떠서 보던 목록을 가렸다. 내용만큼만 넓어지도록 inline-flex 를 쓴다
-     (block + max-width:90% 이라 짧은 글에도 상자가 넓게 남았다). */
+  /* 🔴 하단 탭 바로 위에 낮게 띄운다 — 예전 100px 은 화면 한가운데 가까이 떠서 보던 목록을 가렸다.
+     🔴 홈 표시줄이 있는 아이폰에서는 탭이 그만큼 높다(.bottom-nav 의 safe-area 여백) — 74px 만 두면
+        알림이 탭 아이콘 위에 겹쳤다(2026-11-21 개발자 스크린샷). 도우미 버튼과 같은 자리 셈을 쓴다.
+     🔴 **승인 시안 C「흰 카드」(2026-11-21 개발자 선택 · docs/designs/mockups/toast-options.png)** —
+     흰 바탕(앱 카드와 같은 재질) · 얇은 테두리 · 왼쪽 동그란 아이콘 · 굵은 머리 한 줄 + 회색 설명 ·
+     되돌리기 단추는 오른쪽 끝 강조색(--accent) 글자. 폭은 화면 양옆 16px 을 뺀 만큼(앱 폭 상한 안).
+     관문: test-collector 「승인받은 화면 그대로인가 — 앱 안 알림 시안 C」. 바꾸려면 다시 보여 주고 검사도 같이. */
   position: fixed;
-  bottom: 74px;
+  bottom: calc(74px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%) translateY(8px);
-  display: inline-flex;
+  width: calc(100% - 32px);
+  max-width: 448px;
+  display: flex;
   align-items: center;
-  background: rgba(16, 22, 38, 0.94);
-  color: #fff;
+  gap: var(--sp-2);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--rule);
   font-size: var(--t-sm);
-  font-weight: 600;
-  padding: 9px 16px;
+  line-height: 1.45;
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) 16px;
   border-radius: var(--radius-sm);
   z-index: 200;
   opacity: 0;
   transition: opacity 0.25s, transform 0.25s;
-  max-width: 90%;
-  text-align: center;
+  text-align: left;
   box-shadow: var(--shadow-lift);
+  /* 판이 넓어져 2.6초 동안 도우미 버튼·목록 아래쪽 탭을 삼켰다 — 판은 손가락을 통과시키고 단추만 받는다(리뷰 2026-11-21) */
+  pointer-events: none;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-body { flex: 1; min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.toast-head { font-weight: 700; letter-spacing: -0.01em; }
+.toast-sub { font-size: var(--t-xs); font-weight: 500; color: var(--text-sub); }
+/* 왼쪽 아이콘 — 알림의 성격대로(toastTone): 됐다 = 연초록 체크 · 안 됐다 = 연붉은 느낌표 · 안내 = 회색 i.
+   🔴 실패 알림에 체크를 달면 '안 됐는데 됐다'고 말하게 된다 — 그래서 셋으로 가른다. */
+.toast-ico {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; align-self: flex-start; margin-top: 1px;
+  background: var(--green-weak); color: var(--green);
+}
+.toast-ico[data-tone="warn"] { background: var(--red-weak); color: var(--red); }
+.toast-ico[data-tone="info"] { background: var(--surface-2); color: var(--text-sub); }
 
 /* ---------------- 데스크톱 프레임 ---------------- */
 @media (min-width: 520px) {
@@ -1217,6 +1238,8 @@ textarea:focus {
    ⚠️ 목록의 줄별 아이콘(.nf-ico)은 남긴다 — 그건 장식이 아니라 **어떤 알림인지**를 말한다. */
 .nf-consent-hero { padding-top: 4px; }
 .nf-type-list { list-style: none; display: grid; gap: 12px; margin: 4px 0 18px; }
+/* 제목 밑 권유 문장을 지운 뒤(2026-11-21) 제목과 목록 사이 — 덩어리 사이만큼 */
+.nf-consent-hero + .nf-type-list { margin-top: var(--sp-2); }
 .nf-type-list li {
   display: flex; gap: 11px; align-items: flex-start;
   font-size: var(--t-md);
@@ -1683,12 +1706,10 @@ textarea:focus {
 .fq-keep input { width: 16px; height: 16px; accent-color: var(--primary); }
 
 /* 상한을 넘는 양식은 숨기지 않고 그렇다고 말한다 (개발자 지시 2026-08-18) */
-.fq-over { margin-bottom: 18px; font-weight: 600; }
 
 /* 신청서에서 배운 정보 (MY) — 앱이 무엇을 갖고 있는지 보이고 지울 수 있게 */
 .my-learned { margin-top: 14px; border-top: 1px solid rgba(18, 22, 31, 0.08); padding-top: 12px; }
 .my-learned-head { font-size: var(--t-sm); font-weight: 700; color: var(--text-sub); margin-bottom: 8px; }
-.my-learned-head > span { font-weight: 500; font-size: var(--t-xs); color: var(--text-weak); }
 .my-learned ul { list-style: none; display: grid; gap: 7px; }
 .my-learned li { display: flex; align-items: center; gap: 8px; font-size: var(--t-sm); }
 .my-learned li > span { color: var(--text-weak); min-width: 92px; }
@@ -1929,8 +1950,10 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 #toast .toast-undo {
   /* 손가락 목표는 44px 이 권장이지만, 그 높이가 알림 상자를 통째로 키우고 있었다.
      36px + 좌우 여백으로 줄인다 — 알림은 몇 초만 떠 있고 바로 옆에 다른 버튼이 없다. */
-  margin-left: 10px; background: transparent; border: 0; cursor: pointer;
-  color: #7cc4ff; font-weight: 700; font-size: var(--t-sm);
+  /* 되돌리기 글자는 강조색(--accent — 파일 뒤쪽 :root 가 잉크 파랑으로 다시 정한다) — 예전 하늘색(#7cc4ff)은 팔레트에서 걷어낸 'AI 블루'였다 */
+  pointer-events: auto;
+  flex: none; margin: calc(var(--sp-1) * -1) 0; background: transparent; border: 0; cursor: pointer;
+  color: var(--accent); font-weight: 700; font-size: var(--t-sm);
   min-height: 36px; padding: 0 6px; white-space: nowrap;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1951,6 +1974,13 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .acc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .acc-actions .btn { flex: 1; min-width: 120px; }
 .acc-actions .btn.danger { color: var(--red); border-color: rgba(224, 80, 62, 0.35); }
+/* 로그인한 판의 로그아웃 — 작은 빨간 글자 하나(테두리·바탕 없음 · 2026-11-21 개발자 지시). 보이는 글자는 작아도 누르는 넓이는 44px(위아래 여백은 음수로 거둬 판이 커지지 않게) · 누르면 글자색만 짙어진다 */
+.acc-out {
+  display: inline-flex; align-items: center; min-height: 44px; margin: calc(var(--sp-1) * -1) 0 calc(var(--sp-2) * -1); padding: 0;
+  font-size: var(--t-sm); font-weight: 650; color: var(--red);
+  background: none; border: 0; cursor: pointer; transition: opacity var(--dur) var(--ease);
+}
+.acc-out:hover, .acc-out:active { opacity: 0.72; }   /* 새 색을 들이지 않는다(팔레트 밖 색 톱니) — 같은 빨강을 옅게 */
 
 /* 동의 줄 — 온보딩 특별자격 아래, 가입 시트 안. 기존 .check-item 위에 얹는다 */
 .consent-item {
@@ -3027,6 +3057,10 @@ body::after { opacity: 0.26; }
 /* 온보딩 — 칸 사이를 하나로 */
 .onboard-body h2 { margin-bottom: var(--sp-1); }
 .onboard-sub { margin: 0 0 var(--sp-4); }
+/* 부제 없이 제목 바로 밑에 내용이 오는 단계 — 제목과 첫 칸 사이도 절 사이만큼 (2026-11-21 부제를 지우며 · 어느 단계든 부제가 없으면 같은 여백) */
+.onboard-body h2 + :not(.onboard-sub) { margin-top: calc(var(--sp-4) - var(--sp-1)); }
+/* 부제를 지운 시트(우리 학교 소식 전체 보기 · 2026-11-21) — 제목과 목록 사이 여백은 목록이 갖는다(.sheet-provider 가 맡던 자리) */
+.sheet-title + .card-list, .sheet-title + .empty { margin-top: var(--sp-3); }
 .field { margin-bottom: var(--sp-3); }
 .field-label { margin-bottom: var(--sp-1); }
 .chip-group { gap: 7px; }
@@ -5174,20 +5208,12 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    큰 제목 「계정」과 위 여백이 프로필 표와 가른다. */
 #screen-my #my-account.my-card { border-top: 0; }
 
-/* 구역 머리줄 오른쪽의 누를 수 없는 글자(갱신 날짜) — 파랑은 '누를 수 있음'이라 쓰지 않는다 (2026-10-10) */
-.section-head .section-note { font-size: var(--t-xs); font-weight: 600; color: var(--text-weak); white-space: nowrap; }
-
 /* 교내 소식 요약 (2026-10-10 업무 분장 8번) — 원문 첫 문장 발췌. 두 줄에서 자른다 */
 .news-tile-desc, .sch-desc {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   font-size: var(--t-xs); line-height: 1.5; color: var(--text-sub); font-weight: 500;
 }
 .sch-desc { margin-top: var(--space-4); }
-.news-today {
-  display: inline-block; vertical-align: middle; margin-left: var(--space-4);
-  padding: 0 var(--sp-2); border-radius: var(--radius-pill);
-  background: var(--red-weak); color: var(--red); font-size: var(--t-2xs); font-weight: 800; line-height: 1.7;
-}
 
 /* ── MY 첫 화면 (2026-10-10 은서 「저번 C안처럼」 — 구조만 C안 · 색·글꼴은 지금 앱 토큰) ──
    머리줄(사진·이름·학교) → 흰 카드 한 장 안의 메뉴 줄 넷(누르면 안쪽 화면) → 로그인 카드. */
@@ -5334,7 +5360,12 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
   position: absolute; top: 0; bottom: 0; left: -20px; right: -20px; z-index: 0;   /* 20px = .screen 좌우 안여백 */
   background: radial-gradient(34% 22% at 76% 86%, var(--accent-soft), transparent 70%);
 }
-.hero > .mascot-wrap .mascot-stage { height: 100%; cursor: grab; }
+.hero > .mascot-wrap .mascot-stage { height: 100%; cursor: grab; position: relative; }
+/* 반응 연출(mascot/mood.js) — 캐릭터 둘레만 손가락이 화면을 굴리지 않는다(아래로 끌면 찌그러진다). 🔴 무대 전체(히어로 너비)를 막으면 홈 위쪽 3분의 1에서
+   화면이 안 굴렀다(11-22 리뷰) — 시안은 굴러가지 않는 쪽이라 몰랐다. 캐릭터는 무대 가로 66% 자리(screenX 0.33)에 선다 · 왼쪽 안내 줄이 위에 겹치면 줄이 먼저 받는다 */
+.mascot-hit { position: absolute; left: 46%; right: 8%; top: 6%; bottom: 2%; touch-action: none; }
+/* 던진 몽둥이·깨진 유리 — 휴대폰 화면 전체를 덮는 한 장(app-mascot.js fxLayer · 누르기를 막지 않는다 · 시트보다 위) */
+.mascot-fx { position: fixed; inset: 0; pointer-events: none; z-index: 300; }
 .hero-lines { position: relative; z-index: 1; width: 60%; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-4) 0; }
 .hero-ln {
   position: relative; display: block; max-width: 100%; align-self: flex-start; text-align: left;
@@ -5389,3 +5420,67 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
 .has-mascot > .apps-summary .summary-label { color: var(--text-sub); opacity: 1; }
 .has-mascot > .apps-summary .summary-amount { color: var(--text); }
 #mascot-apps .mascot-stage { height: 220px; }
+/* PDF 보기 (2026-11-21 · pdf-view.js) — 설치한 앱에서 앱 안 PDF 를 열 때만 뜬다. 맨 위 뒤로 단추가 돌아올 길이다(시트 위 · 부팅 화면 아래).
+   🔴 이 판 안쪽만 굴러간다(.pdfv-scroll) — 문서는 굴러가지 않는다 규칙 그대로 */
+.pdfv { position: fixed; inset: 0; z-index: 150; display: flex; flex-direction: column; background: var(--bg); }
+.pdfv[hidden] { display: none !important; }
+.pdfv-bar { flex: none; display: flex; align-items: center; gap: var(--space-8); padding: calc(env(safe-area-inset-top) + var(--space-8)) var(--space-16) var(--space-8); background: var(--surface); border-bottom: 1px solid var(--line); }
+.pdfv-bar .sub-back { margin-left: calc(var(--space-8) * -1); }
+.pdfv-title { flex: 1; min-width: 0; margin: 0; display: flex; flex-direction: column; }
+.pdfv-name { font-size: var(--t-md); font-weight: 700; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pdfv-pages { font-size: var(--t-xs); color: var(--text-sub); }
+.pdfv-share { flex: none; font-size: var(--t-sm); font-weight: 700; color: var(--accent); padding: var(--space-8); }
+.pdfv-scroll { flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: var(--space-12) var(--space-12) calc(env(safe-area-inset-bottom) + 72px); }
+.pdfv-doc { min-width: 100%; margin: 0 auto; }
+.pdfv-page { width: 100%; background: var(--surface); border: 1px solid var(--line); margin-bottom: var(--space-12); }
+.pdfv-page canvas { display: block; width: 100%; height: 100%; }
+.pdfv-msg { margin: var(--space-24) 0; text-align: center; font-size: var(--t-sm); color: var(--text-sub); }
+.pdfv-zoom { position: absolute; right: var(--space-16); bottom: calc(env(safe-area-inset-bottom) + var(--space-16)); display: flex; gap: var(--space-8); }
+.pdfv-zoom button { width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--surface); border: 1px solid var(--line); font-size: var(--t-lg); font-weight: 700; color: var(--text); }
+
+/* ── 신청 내역 진행 화면 — 한 흐름 (2026-11-21 개발자 지시 · app-sheet.js openDetail) ──
+   *"불필요한 버튼이나 내용들이 너무 많아서 가독성을 떨어뜨리고 전문성이 낮아보이게 해"*
+   단계 막대 → 「제출 전 준비」 네 줄(줄 밑에 그 내용) → 제출 단추 하나 → 제출 기록. 큰 단추는 둘뿐이고 나머지는 글자 단추다. */
+#detail-sheet .applied-at { margin: var(--space-12) 0 var(--sp-3); }
+.prep-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+.prep-head h4 { margin: 0; font-size: var(--t-md); font-weight: 800; color: var(--text); }
+.prep-head .channel-tag { margin-left: 0; font-variant-numeric: tabular-nums; }
+.prep-check { list-style: none; margin: 0 0 var(--sp-3); padding: 0; border-top: 1px solid var(--line); }
+.prep-item { border-bottom: 1px solid var(--line); padding: var(--space-12) 0; }
+.prep-row { display: flex; align-items: center; gap: var(--space-12); min-height: 28px; }
+.prep-mark {
+  flex: none; width: 22px; height: 22px; border-radius: var(--radius-pill);
+  border: 1.5px solid var(--rule); display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--t-2xs); font-weight: 800; color: var(--surface); line-height: 1;
+}
+.prep-item.is-done .prep-mark { background: var(--primary); border-color: var(--primary); }
+.prep-label { flex: 1; min-width: 0; font-size: var(--t-md); font-weight: 700; color: var(--text); }
+.prep-item.is-done .prep-label { color: var(--text-sub); font-weight: 600; }
+.prep-label .doc-legend { margin-left: var(--space-4); }
+.prep-toggle {
+  flex: none; font-size: var(--t-xs); font-weight: 700; color: var(--text);
+  border: 1px solid var(--rule); border-radius: var(--radius-pill); padding: var(--space-6) var(--space-12); background: var(--surface);
+}
+.prep-toggle.is-undo { border-color: transparent; color: var(--text-weak); font-weight: 600; padding-right: 0; }
+/* 줄 밑 내용 — 표식(22px) + 틈(12px) 만큼 들여서 줄 이름 아래에 선다 */
+.prep-detail { margin: var(--space-8) 0 0 34px; }
+.prep-detail .doc-list.doc-check li { padding: var(--space-4) 0; font-size: var(--t-sm); color: var(--text-sub); }
+.prep-detail .dp-note { text-align: left; margin-top: var(--space-6); }
+.prep-detail .guide-list { margin: var(--space-6) 0 0 var(--space-16); font-size: var(--t-sm); gap: var(--space-4); }
+.prep-where { margin: 0 0 var(--space-4); font-size: var(--t-sm); color: var(--text-sub); line-height: 1.55; }
+.prep-where a { color: var(--text); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.prep-where .channel-tag { margin-left: 0; }
+/* 다 쓴 문서 — 문서 한 줄 + 글자 단추 넷 */
+.prep-file { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-12); padding: var(--space-12) var(--space-16); background: var(--surface-2); border-radius: var(--radius-sm); margin-bottom: var(--space-8); }
+.prep-file-name { flex: 1 1 auto; font-size: var(--t-sm); font-weight: 700; color: var(--text); }
+.prep-file-acts { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-12); }
+.prep-file-acts .link-btn, .prep-sub-acts .link-btn { font-size: var(--t-xs); font-weight: 700; color: var(--text-sub); padding: var(--space-4) 0; }
+.prep-detail .dp-saved { margin-top: var(--space-4); }
+/* 제출하기 — 큰 단추 하나 + 그 밑 글자 단추 둘 */
+.prep-submit { margin-bottom: var(--sp-3); }
+.prep-submit .btn-lg { width: 100%; }
+.prep-sub-acts { display: flex; justify-content: center; gap: var(--space-24); margin-top: var(--space-8); }
+/* 다 냈으면 기록 — 맨 끝, 선 하나 위 */
+.prep-record { border-top: 1px solid var(--line); padding-top: var(--sp-2); margin-bottom: var(--sp-2); }
+.prep-record .btn { width: 100%; }
+.prep-record .dp-note { margin-top: var(--space-8); }
