@@ -1298,7 +1298,11 @@
     return {
       after,
       /* kit 의 누르기(동전) 앞에서 — 연출이 가져간 누르기는 동전을 내지 않는다 */
-      beforeTap() { if (M.suppress) { M.suppress = false; return false; } return M.mode === 'idle'; },
+      beforeTap() {
+        if (M.suppress) { M.suppress = false; return false; }
+        if (M.mode === 'sleep') { poke(); return false; }   // 키보드·화면 읽기 프로그램의 누르기(손가락이 없어 pointerdown 이 없다)도 깨운다(11-22 리뷰)
+        return M.mode === 'idle';
+      },
       /* 홈 히어로가 지금 가리키는 줄 — 'amount' 이면 선글라스+회장님 의자 · 'due' 이고 dday 면 「이럴 수는 없어」 */
       setLine(k, info) { M.line = k || null; M.dday = !!(info && info.dday); },
       /* 시안 단추용 — 손으로 하기 어려운 것(길게 누르기·끌어내리기·20초 기다리기)을 그 자리에서 보여 준다 */
@@ -1403,9 +1407,12 @@
             const d = e - FLY;
             if (d < 110) { g.fillStyle = `rgba(255,255,255,${0.55 * (1 - d / 110)})`; g.fillRect(0, 0, w, h); }   // 번쩍
             const shake = d < 340 ? (1 - d / 340) * 9 : 0;
-            shaker.style.transform = shake ? `translate(${rand(-shake, shake)}px, ${rand(-shake, shake)}px)` : '';
+            /* 🔴 transform 이 아니라 translate 칸으로 — 앱 화면(.screen)은 들어오는 애니메이션(fill both)이 transform 을 붙잡고 있어 transform 흔들기는 안 보였다(11-22 리뷰) ·
+               따로 흔드는 요소(shakeEl — 스크롤되는 틀 안)는 왼쪽으로만 흔든다(오른쪽으로 넘치면 틀이 잠깐 옆으로 굴렀다) */
+            const sx = rand(-shake, shake);
+            shaker.style.translate = shake ? `${shakeEl ? -Math.abs(sx) : sx}px ${rand(-shake, shake)}px` : '';
             drawCrack(crack, ix, iy, Math.min(1, d / 160), d < 1500 ? 1 : Math.max(0, 1 - (d - 1500) / 450));
-            if (d >= 1950) { g.clearRect(0, 0, w, h); cv.style.display = 'none'; shaker.style.transform = ''; return; }
+            if (d >= 1950) { g.clearRect(0, 0, w, h); cv.style.display = 'none'; shaker.style.translate = ''; return; }
           }
           if (at == null) requestAnimationFrame(step);
         })(performance.now());

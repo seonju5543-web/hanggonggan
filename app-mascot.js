@@ -136,7 +136,15 @@
       st.home = K.Stage(wrap.querySelector('.mascot-stage'), { screenX: 0.33, coins: 8, spread: 1.0, jump: 0.28, camY: 1.4, lookY: 1.22, dist: 8.0,
         onTap() { hold(); const k = nextKey(); if (k) setActive(k, 'mascot'); },
         /* 반응 연출(mascot/mood.js) — 무대가 정한 자세 위에 얹는다 · 연출이 가져간 누르기는 동전·다음 줄 없이 */
-        after: (dt, c) => { if (hero.mood) hero.mood.after(dt, c); }, beforeTap: () => (hero.mood ? hero.mood.beforeTap() : true),
+        after: (dt, c) => {
+          if (!hero.mood) return;
+          /* 무대를 못 그린 동안(다른 탭 · 화면 밖 · 시트 · 앱을 내림)은 '안 건드린 시간'으로 세지 않는다 — 돌아오자마자 졸고 줄이 멈춰 있었다(11-22 리뷰) */
+          const now = performance.now();
+          if (hero.lastAfter && now - hero.lastAfter > 1000 && hero.mood.mode === 'idle') hero.mood.poke();
+          hero.lastAfter = now;
+          hero.mood.after(dt, c);
+        },
+        beforeTap: () => (hero.mood ? hero.mood.beforeTap() : true),
         /* 상세 시트가 화면에 있는 동안(올라오고·내려가는 움직임 포함)은 그리지 않는다 — 멈췄다가 시트가 걷히면 그 자리에서 잇는다.
            덮인 의자 장면을 그리느라 시트가 내려가는 움직임이 밀렸다(11-22 verify-sheet-back 실측 — 밀기 한 번 635ms) */
         paused: sheetOnScreen });
@@ -147,6 +155,7 @@
         if (hero.active) hero.mood.setLine(hero.active, { dday: isDday() });
       }
       wrap.hidden = false; card.classList.add('has-mascot');
+      { const hit = document.createElement('span'); hit.className = 'mascot-hit'; hit.setAttribute('aria-hidden', 'true'); wrap.querySelector('.mascot-stage').appendChild(hit); }   // 캐릭터 둘레 — 여기서 시작한 손짓만 마스코트가 가져간다
     }
     const key = keyOf(st.school);
     if (key !== st.homeKey || !st.homeSet) {

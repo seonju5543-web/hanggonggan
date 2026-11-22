@@ -18397,7 +18397,11 @@ console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 
       [/K\.ScreenHit\(fxLayer\(\), \$id\('screen-home'\)\)/.test(am), /\.mascot-fx \{ position: fixed; inset: 0; pointer-events: none;/.test(css)], [true, true]);
     eq('  상세 시트가 화면에 있는 동안(움직임 포함)은 무대를 그리지 않는다 — 덮인 장면을 그리느라 시트 움직임이 밀렸다(verify-sheet-back)',
       [/paused: sheetOnScreen/.test(am), /function sheetOnScreen\(\) \{ const sh = \$id\('detail-sheet'\); return !!\(sh && !sh\.hidden\); \}/.test(am), /\(opt\.paused && opt\.paused\(\)\)\) return;/.test(readText(new URL('../mascot/kit.js', import.meta.url)))], [true, true, true]);
-    eq('  무대에서는 손가락이 화면을 굴리지 않는다(아래로 끌기·빙글 돌리기 — 시안 그대로)', /\.hero > \.mascot-wrap \.mascot-stage \{[^}]*touch-action: none;/.test(css), true);
+    eq('  캐릭터 둘레(.mascot-hit)에서만 손가락이 화면을 굴리지 않는다 · 무대 전체를 막으면 홈 위쪽이 안 굴렀다 · 거기서 시작한 끌기는 새로고침이 아니다',
+      [/\.mascot-hit \{[^}]*touch-action: none;/.test(css), /\.hero > \.mascot-wrap \.mascot-stage \{[^}]*touch-action: none/.test(css), /hit\.className = 'mascot-hit'/.test(am),
+        /closest\('[^']*\.mascot-hit'\)/.test(readText(new URL('../interactions.js', import.meta.url)))], [true, false, true, true]);
+    eq('  잠든 마스코트도 키보드로 누르면 깬다 · 홈을 떠나 있던 시간은 안 건드린 시간이 아니다 · 흔들기는 translate 칸(화면 애니메이션이 transform 을 붙잡는다)',
+      [/if \(M\.mode === 'sleep'\) \{ poke\(\); return false; \}/.test(mood), /now - hero\.lastAfter > 1000 && hero\.mood\.mode === 'idle'\) hero\.mood\.poke\(\)/.test(am), /shaker\.style\.translate = shake/.test(mood), /shaker\.style\.transform/.test(mood)], [true, true, true, false]);
     eq('  시안의 금지 — 눈썹 없음(5차 "못생겼다") · 말풍선 없음(3차) · 땀은 머리 옆 물방울 하나(11-22 "땀을 기존으로")',
       [/rig\.brows|browOn/.test(mood), /bubble|말풍선을 띄/.test(mood.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')), /rig\.sweat = d;/.test(mood), /sweatLayers|tex\('drop'\)/.test(mood)], [false, false, true, false]);
     eq('  🔴 화남은 손짓에만 — 학생의 데이터(마감 놓침·미신청)로 화내지 않는다(start(\'angry\') 는 연타 손짓과 시안 단추뿐)',

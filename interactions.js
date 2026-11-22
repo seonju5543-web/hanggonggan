@@ -185,7 +185,8 @@ function installPullToRefresh(opts) {
        (2026-09-09 코드 리뷰가 잡았다). 그 단추는 pointer 이벤트로 자기 위치를 옮기는데,
        document 의 touchmove 는 그대로 흘러와서 **마스코트를 아래로 끌면 화면 전체가
        같이 내려왔다**. 128px 넘게 끌면 원치 않은 새로고침과 진동까지 갔다(재현됨). */
-    if (t && t.closest && t.closest('input, textarea, select, .sheet, .ptr, .chat-fab, #btn-chat-fab')) return;
+    /* 홈 히어로 마스코트를 아래로 끌어 찌그러뜨리는 자리(.mascot-hit · 2026-11-22 반응 연출)도 같다 — 안 빼면 찌그러뜨릴 때마다 새로고침이 됐다(리뷰 실측) */
+    if (t && t.closest && t.closest('input, textarea, select, .sheet, .ptr, .chat-fab, #btn-chat-fab, .mascot-hit')) return;
     held = screenEl();
     if (!held) return;
     clearTimeout(releaseTimer);      // 앞 당김의 되돌리기 타이머가 이 화면을 놓지 못하게
