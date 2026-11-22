@@ -1971,16 +1971,18 @@ console.log('\n■ 신청 내역 진행 화면 — 한 흐름 (2026-11-21)');
   eq('🔴 순서가 「제출 전 준비」 → 제출 단추 → 「공식 제출 완료로 기록」이다 (기록 단추가 제출 방법보다 먼저 나오지 않는다)',
     [at('class="prep-check"') > 0, at('class="prep-check"') < at('${primary}'), at('${primary}') < at('id="btn-mark-submitted"'), at('class="prep-submit"') < at('class="prep-record"'), /id="btn-go-submit"/.test(step0.slice(step0.indexOf('const primary'), step0.lastIndexOf('return `${head}')))], [true, true, true, true, true]);
   eq('🔴 같은 내용을 따로 된 절로 되풀이하지 않는다 — 「증명서류 체크리스트」·「최종 제출 방법」 머리가 없고, 서류 목록·제출 방법은 준비 줄 밑에 붙는다',
-    [/증명서류 체크리스트|>최종 제출 방법/.test(block), /certStatusListHtml\(sch, \{ bare: true \}\)/.test(step0), /key === 'submit' \?[\s\S]*?ch\.guide\.map/.test(step0)], [false, true, true]);
+    /* 머리 「증명서류 체크리스트」는 certStatusListHtml 안에 있다 — 그래서 머리 있는 부름(bare 없는 certStatusListHtml(sch))이 없는지를 본다(리뷰 2026-11-22: 글자로만 찾으면 늘 false) */
+    [/certStatusListHtml\(sch\)/.test(block), />최종 제출 방법/.test(block), /certStatusListHtml\(sch, \{ bare: true \}\)/.test(step0), /key === 'submit' \?[\s\S]*?ch\.guide\.map/.test(step0)], [false, false, true, true]);
   eq('  제출처 이름은 한 번만(「제출 방법 확인」 줄 밑) — 담김 줄과 기록 단추 밑에서 다시 말하지 않는다',
-    [(step0.match(/\$\{chLink\}/g) || []).length, (step0.match(/esc\(ch\.label\)/g) || []).length, /class="applied-at">\$\{app\.appliedAt\} 신청내역에 담김<\/p>/.test(block)], [1, 0, true]);
+    [(step0.match(/\$\{chLink\}/g) || []).length, (step0.match(/esc\(ch\.label\)/g) || []).length, /class="applied-at">\$\{app\.appliedAt\} \$\{prepChecklist\(app, sch\)\.complete \|\| step > 0 \? '준비 완료' : '준비 중'\}<\/p>/.test(block), /신청내역에 담김/.test(block)], [1, 0, true, false]);
   eq('🔴 큰 단추는 제출 하나(메일 접수면 메일, 아니면 제출처 열기 — 둘 중 하나)와 기록 하나뿐 · 복사·공유·문서 저장은 글자 단추',
     [(step0.match(/class="btn /g) || []).length, /sch\.applyEmail\s*\?\s*`<button class="btn btn-primary btn-lg" id="btn-mail-apply">[\s\S]*?:\s*\(ch\.url \|\| sch\.sourceUrl\) \? `<button class="btn btn-primary btn-lg" id="btn-go-submit">/.test(step0),
       ['btn-copy-docs', 'btn-share-docs', 'btn-form-print'].filter((id) => !new RegExp(`class="link-btn" id="${id}"`).test(block))],
     [3, true, []]);
   /* 2026-11-22 개발자 지시 「작성한 양식 문서에 대해서는 pdf 저장 칸만 남겨줘」 — 문서 줄의 단추는 PDF 저장 하나 */
   eq('🔴 작성한 양식 문서 줄에는 「PDF 저장」 하나뿐이다 — .doc 저장·공유·다시 작성이 되살아나지 않는다 (2026-11-22)',
-    [(block.match(/<span class="prep-file-acts">([\s\S]*?)<\/span>/) || ['', ''])[1].match(/<button/g)?.length || 0, /id="btn-form-print">PDF 저장</.test(block), ['btn-form-save', 'btn-form-share', 'btn-form-edit'].filter((id) => od.includes(id))],
+    /* 문서 줄 전체(docsHtml 정의 — 「작성한 서류 보기」 펼침 앞까지)의 단추를 센다 — span 안만 세면 그 밖에 붙은 단추를 놓친다(리뷰 2026-11-22) */
+    [((block.slice(block.indexOf('const docsHtml'), block.indexOf('dp-saved', block.indexOf('const docsHtml')))).match(/<button/g) || []).length, /id="btn-form-print">PDF 저장</.test(block), ['btn-form-save', 'btn-form-share', 'btn-form-edit'].filter((id) => od.includes(id))],
     [1, true, []]);
   eq('🔴 담아 둔 공고(app && !app.pending)에선 늘 잠긴 신청 단추를 숨긴다(요소는 남는다 — 도구가 잠금을 읽는다)',
     /id="btn-apply-one" \$\{canApply \? '' : 'disabled'\}\$\{app && !app\.pending \? ' hidden' : ''\}/.test(od), true);

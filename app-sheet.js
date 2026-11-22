@@ -529,7 +529,7 @@ function openDetail(id) {
               <span class="ap-dot"></span><span class="ap-label">${s}</span>
             </div>`).join('')}
         </div>
-        <p class="applied-at">${app.appliedAt} 신청내역에 담김</p>`;
+        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '준비 중'}</p>`;   /* 「신청내역에 담김」은 2026-11-21 개발자 지시(학생이 읽지 않는 글자)로 기본 브랜치에서 지운 말 — 되살리지 않는다 · 제출처는 「제출 방법 확인」 줄 밑(prep-where) */
         if (step !== 0) {
           /* 제출을 적은 뒤 — 그 단계에서 할 일 한 가지와 쓴 문서만. 제출 방법·복사 단추는 이미 쓸 일이 없다 */
           return `${head}
@@ -631,7 +631,8 @@ function openDetail(id) {
   $$('#detail-sheet [data-prep-toggle]').forEach((b) => b.addEventListener('click', () => {
     const a = state.applications.find((x) => x.id === sch.id);
     if (!a) return;
-    a.prep = a.prep || {};
+    /* 체크리스트 전에 담은 옛 항목(prep 칸 없음)은 prepChecklist 가 셋 다 끝난 것으로 본다 — 그 상태에서 출발해야 「되돌리기」가 누른 줄만 되돌린다(리뷰 2026-11-22) */
+    if (a.prep === undefined) a.prep = { docs: true, certs: true, submit: true };
     const k = b.dataset.prepToggle;
     a.prep[k] = !a.prep[k];
     saveState();
