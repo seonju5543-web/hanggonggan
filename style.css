@@ -4806,12 +4806,23 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 /* `.hero-sub`(금액과 버튼 사이 빨간 한 줄) 규칙은 그 줄을 뺀 2026-10-03 에 같이 걷었다 —
    요소도 index.html 에서 뺐다(app.js renderHome 주석에 경위). */
 .hero-tiles {
-  display: grid;
-  /* 6칸 (2026-10-10 은서 — 대외활동·공모전 칸을 더하고 칸을 줄였다). 375px 에서 칸 하나 ≈ 52px */
-  grid-template-columns: repeat(6, 1fr);
   margin: var(--sp-3) 0 var(--sp-2);
   /* 위아래 구분선 없음 (2026-10-01 CTO 지시) — 칸 사이는 여백만으로 가른다 */
+  /* 🔴 한 줄 · 옆으로 넘긴다 (2026-11-22 개발자 지시 "탭은 한 줄로 표시되는데, 옆으로 넘길 수 있게").
+     칸이 열둘로 늘어 두 줄이 됐던 것을 한 줄로 — 칸 폭은 예전 여섯 칸 때와 비슷하게 두고(화면에 5.5칸) 반 칸을 걸쳐 보여 '더 있다'를 알린다.
+     ⚠️ 가로로 굴리면 세로도 잘린다 — 숫자 배지(위로 5px·오른쪽으로 7px 삐져나온다)가 안 잘리게 위·오른쪽에 여백을 둔다.
+     문서는 굴러가지 않는다(#app 만) — 이건 이 줄 안에서만 옆으로 구르는 것이라 그 규칙과 부딪히지 않는다. */
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;          /* 끝까지 밀어도 브라우저 '뒤로 가기' 손짓으로 넘어가지 않게 */
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 6px 8px 2px 0;
 }
+.hero-tiles::-webkit-scrollbar { display: none; }
+.hero-tiles > .hero-tile { flex: 0 0 18%; scroll-snap-align: start; }
 .hero-tile {
   display: flex;
   flex-direction: column;

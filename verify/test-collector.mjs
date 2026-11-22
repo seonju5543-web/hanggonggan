@@ -10789,6 +10789,10 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       [/btn-apply-all/.test(h2), /function (?:renderBulkPrep|applyAll|bulkStart|bulkTargets)\(/.test(appSource()), /btn-apply-all|\.bulk-row|\.bulk-reqs/.test(css)], [false, false, false]);
     eq('  .hero-tiles 가 세로 여백을 갖는다 (파일 끝 블록에서)',
       /\.hero-tiles \{[^}]*margin: var\(--sp-3\)/.test(tail), true);
+    /* 2026-11-22 개발자 지시 "탭은 한 줄로 표시되는데, 옆으로 넘길 수 있게" — 칸이 열둘이라도 한 줄 · 옆으로 구른다 · 칸이 줄어들지 않는다 */
+    eq('  그림 칸은 한 줄로 옆으로 넘긴다 (flex · 가로 스크롤 · 칸 폭 고정 · 줄바꿈 없음)',
+      /\.hero-tiles \{[^}]*display: flex;[^}]*overflow-x: auto;/.test(tail) && !/\.hero-tiles \{[^}]*flex-wrap: wrap/.test(tail)
+      && /\.hero-tiles > \.hero-tile \{ flex: 0 0 /.test(tail), true);
     eq('  그림 칸 위아래에 구분선이 없다 (2026-10-01 CTO 지시)',
       /\.hero-tiles \{[^}]*border/.test(tail), false);
   }
