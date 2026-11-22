@@ -3,6 +3,18 @@
  "updatedAt": "2026-11-22",
  "items": [
   {
+   "title": "사회과학대학 제42회 수선포럼 개최 안내: 2026.12.16.(수) 16:00~17:30",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142176&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-22",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-22",
+   "thumb": "data/news/img/2dd365561cbb7fc7.webp",
+   "desc": "일시: 2026년 12월 16일(수) 16:00~17:30 장소: 사회과학연구원 컨퍼런스룸(수선관 901호) 발표: 이선우 교수(소비자학과) 신청: QR 코드 이용 * 행사 이후 한 학기를 마무리하는 식사를 함께…"
+  },
+  {
    "title": "[마감] 성균관대학교 성균융합원행정실 자체계약직원 채용 (수원)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141997&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-20",
@@ -427,17 +439,6 @@
    "foundAt": "2026-11-12",
    "thumb": "data/news/img/73364ee328678ddd.webp",
    "desc": "- 진행일시: 11/21(토) 오전 10시 30분 ~ 오후 5시 - 진행장소: 복합문화공간111CM (수원시 장안구 수성로195)"
-  },
-  {
-   "title": "성균관대학교 배터리학과 행정직원 모집(~11/20(금)까지)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141813&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-12",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-12",
-   "desc": "성균관대학교 성균융합원 배터리학과에서 행정직원을 아래와 같이 채용 공고합니다."
   }
  ]
 }
