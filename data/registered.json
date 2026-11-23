@@ -25997,6 +25997,56 @@
     "raw": "2년 간 4개 학기 계속 지원, 중복 수혜 가능"
    },
    "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-enoticedoarticleno770566",
+   "name": "두레장학생 모집(학술정보관): 27. 2월부터",
+   "boardTitle": "두레장학생 모집(학술정보관): 27. 2월부터",
+   "type": "교외",
+   "kindEvidence": [
+    "접수 이메일 도메인 smu.ac.kr (학교)"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-23",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-23",
+   "period": "접수 기간 원문 확인",
+   "summary": "상명대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "상명대학교"
+   },
+   "documents": [
+    "이력서 및 자기소개서(자유양식) 1부"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-23 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-23",
+   "attachments": [],
+   "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770566&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "applyEmail": "kaisyan@smu.ac.kr",
+   "applyEmailSource": "나. 제출처: 이메일 kaisyan@smu.ac.kr 제출",
+   "applyEmailFrom": "공고 원문",
+   "documentsFrom": "공고 원문",
+   "prepDoc": true,
+   "prepDocBasis": "가. 제출서류: 이력서 및 자기소개서(자유양식) 1부",
+   "prepDocFrom": "로봇 공고 원문",
+   "eligibilityLines": [
+    "4. 지원자격: 본교 대학원 재학생(27. 2월 및 2027-1학기 기준)",
+    "※ MS Excel 가능자, PC 및 주변기기 설치 능숙자, 전화 응대 및 이용자 안내에 적극적으로 대응할 수 있고, 밝고 활발한 성격의 지원자 우대"
+   ],
+   "excerpts": [
+    "4. 지원자격: 본교 대학원 재학생(27. 2월 및 2027-1학기 기준)",
+    "나. 제출처: 이메일 kaisyan@smu.ac.kr 제출",
+    "10. 문의: 서울캠퍼스 학술정보관 2층 디지털정보실 담당자(02-2287-7142, kaisyan@smu.ac.kr)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
