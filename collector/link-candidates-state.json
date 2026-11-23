@@ -1471,15 +1471,15 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "2026학년도 창암장학생 지원 공고 안내",
   "firstAt": "2026-11-17",
-  "lastAt": "2026-11-23",
-  "tries": 7,
+  "lastAt": "2026-11-24",
+  "tries": 8,
   "status": "rejected",
   "why": "다른 공고의 링크와 같은 주소([학부·대학원-교외장학] 2026학년도 창암장학생 지원 공고 안내)",
   "checks": {
    "C": "fail"
   },
   "round": "2026-11-20",
-  "decidedAt": "2026-11-23"
+  "decidedAt": "2026-11-24"
  },
  "kosaf|2703692001|https://koreashe.org/notice/?uid=95478&mod=document&pageid=1": {
   "ds": "kosaf",
