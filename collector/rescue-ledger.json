@@ -551,15 +551,6 @@
   "tries": 0,
   "name": "2026년도 2학기 국가근로장학금 동계방학 집중근로(교외) 신청 안내"
  },
- "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897345&bnum=5233&cate=0&qidx=5233": {
-  "tries": 3,
-  "at": "2026-11-08",
-  "minBody": 100,
-  "name": "(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23(월)까지)",
-  "att": "2026-11-18",
-  "attSeen": 1,
-  "attGap": 0
- },
  "https://www.sogang.ac.kr/ko/detail/551577?bbsconfigfk=141&namepage=ScholarshipNotice": {
   "ok": "2026-11-08",
   "at": "2026-11-08",
@@ -636,20 +627,20 @@
   "attGap": 0
  },
  "https://www.gachon.ac.kr/bbs/kor/478/127125/artclView.do": {
-  "ok": "2026-11-17",
-  "at": "2026-11-17",
+  "ok": "2026-11-24",
+  "at": "2026-11-24",
   "tries": 0,
   "name": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
-  "att": "2026-11-18",
+  "att": "2026-11-24",
   "attSeen": 2,
   "attGap": 0
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521206": {
-  "ok": "2026-11-17",
-  "at": "2026-11-17",
+  "ok": "2026-11-24",
+  "at": "2026-11-24",
   "tries": 0,
   "name": "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)",
-  "att": "2026-11-18",
+  "att": "2026-11-24",
   "attSeen": 2,
   "attGap": 0
  },
@@ -958,6 +949,29 @@
  "https://www.sejong.ac.kr/kor/intro/notice7.do?articleno=896512": {
   "att": "2026-11-21",
   "attSeen": 1,
+  "attGap": 0
+ },
+ "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category=장학&keyword=장학&paged=1&slug=★-2026학년도-2학기-윤준성교수님장학금-장학생-모집-공": {
+  "att": "2026-11-24",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=432": {
+  "attTries": 1,
+  "attAt": "2026-11-24"
+ },
+ "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=431": {
+  "attTries": 1,
+  "attAt": "2026-11-24"
+ },
+ "https://www.sogang.ac.kr/ko/detail/551909?bbsconfigfk=141&namepage=ScholarshipNotice": {
+  "att": "2026-11-24",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.smu.ac.kr/kor/life/notice.do?articleno=770566": {
+  "att": "2026-11-24",
+  "attSeen": 0,
   "attGap": 0
  }
 }
