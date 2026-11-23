@@ -115,12 +115,19 @@
     if (cfg.zones) {
       var T = window.CAMPUS_TOWN || { zones: [] };
       T.zones.forEach(function (z) {
+        if (z.id === 'z-campus') return;   // 캠퍼스는 경계선으로 따로 그린다
         if (cfg.zones !== 'all' && cfg.zones.indexOf(z.id) < 0) return;
         var hl = (cfg.zoneFocus || []).indexOf(z.id) >= 0;
         L.circle([z.lat, z.lon], { radius: z.r || 250, className: 'm-zone' + (hl ? ' is-hl' : ''), weight: hl ? 2 : 1.2, interactive: false }).addTo(map);
-        if (cfg.zoneLabels !== false) {
-          L.marker([z.lat, z.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'm-dong-label-wrap', html: '<span class="m-dong-label' + (hl || !cfg.zoneFocus ? '' : ' dim') + '">' + esc(z.name) + '</span>', iconSize: [0, 0] }) }).addTo(map);
+        if (cfg.zoneLabels !== false && (!cfg.zoneLabelIds || cfg.zoneLabelIds.indexOf(z.id) >= 0)) {
+          L.marker([z.lat, z.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'm-dong-label-wrap', html: '<span class="m-dong-label' + (hl || !cfg.zoneFocus ? '' : ' dim') + '">' + esc(z.short || z.name) + '</span>', iconSize: [0, 0] }) }).addTo(map);
         }
+      });
+    }
+    if (cfg.bars) {   // 공개 지도의 주점 위치(이름·위치만)
+      ((window.CAMPUS_TOWN || {}).bars || []).forEach(function (b) {
+        if (cfg.maxDist && b.dist > cfg.maxDist) return;
+        L.marker([b.lat, b.lon], { icon: L.divIcon({ className: 'm-pin-wrap', html: '<span class="m-dot"></span>', iconSize: [10, 10], iconAnchor: [5, 5] }), interactive: false, keyboard: false }).addTo(map);
       });
     }
     // 리서치 장소를 점으로 — townCats: 갈래 목록 · townZone: 그 구역만
@@ -201,6 +208,32 @@
     for (var j = 0; j < ics.length; j++) {
       var n = ics[j].getAttribute('data-icon');
       ics[j].innerHTML = window.mapIcon(CAT_ICON[n] || n, Number(ics[j].getAttribute('data-size') || 16));
+    }
+    // 안쪽 화면 머리(뒤로 + 제목) — data-subhead="제목"
+    var heads = document.querySelectorAll('[data-subhead]');
+    for (var h = 0; h < heads.length; h++) {
+      heads[h].className = 'sub-header';
+      heads[h].innerHTML = '<button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>' + esc(heads[h].getAttribute('data-subhead')) + '</h2>';
+    }
+    // 지도 주제 칩 — data-chips="고른 주제"
+    var THEMES = ['학교 안', '카공', '밥집', '술집·과팅', '생활', '안전', '교통', '복지·혜택'];
+    var chipRows = document.querySelectorAll('[data-chips]');
+    for (var c = 0; c < chipRows.length; c++) {
+      var onChip = chipRows[c].getAttribute('data-chips');
+      chipRows[c].className = 'ms-chips';
+      chipRows[c].setAttribute('role', 'tablist');
+      chipRows[c].setAttribute('aria-label', '지도 주제');
+      chipRows[c].innerHTML = THEMES.map(function (t) { return '<button class="filter-chip' + (t === onChip ? ' active' : '') + '">' + t + '</button>'; }).join('');
+    }
+    // 리서치 자료에서 센 개수 — data-town-count="갈래" (핀 있는 곳 + 목록에만 있는 곳)
+    var T2 = window.CAMPUS_TOWN || { places: [], unplaced: [], zones: [] };
+    var cnts = document.querySelectorAll('[data-town-count]');
+    for (var q = 0; q < cnts.length; q++) {
+      var cat = cnts[q].getAttribute('data-town-count');
+      var all = T2.places.concat(T2.unplaced);
+      var n2 = cat === 'all' ? all.length : cat === 'zones' ? T2.zones.filter(function (z) { return z.id !== 'z-campus'; }).length
+        : all.filter(function (p) { return p.category === cat || p.also === cat; }).length;
+      cnts[q].textContent = String(n2);
     }
     var gos = document.querySelectorAll('.go[data-go]');
     for (var k = 0; k < gos.length; k++) gos[k].innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
