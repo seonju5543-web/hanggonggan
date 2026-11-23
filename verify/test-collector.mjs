@@ -10906,6 +10906,105 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       ND.newsDesc('<h3>2026학년도 2학기 학습법 특강 안내</h3><p>작성일 2026.10.02</p><p><img src="poster.jpg"></p><div>이전글 [학사] 2025학년도 겨울 계절학기 수강신청 일정 안내</div><div>다음글 [취업] 2025 하반기 공기업 채용설명회 참가 신청 안내</div>', '2026학년도 2학기 학습법 특강 안내'), '');
     eq('  🔴 서울대 꼴 — 「목록보기 다음글이 없습니다.」 뒤 남의 제목·주소 → 빈 값',
       ND.newsDesc('<h3>2026학년도 2학기 리포트 집중지도(1차) 참가자 발표</h3><p><img src="a.png"></p><a>목록보기</a><div>다음글이 없습니다.</div><div>2026년 우양재단「동행 장학」장학생 모집</div><div>서울특별시 관악구 관악로 1, 서울대학교 61동 201호(우편번호 08826)</div>', '2026학년도 2학기 리포트 집중지도(1차) 참가자 발표'), '');
+    /* 🔴 본문 밖 글자를 요약으로 싣지 않는다 2차 (2026-11-23 — 지도 시안 작업 중 서울과기대 「도서관 첫 대출자」 요약이 다른 글 제목으로 이어진 것을 발견 ·
+       요약이 보이는 821건의 글 화면을 다시 받아 전수: 실린 요약 중 본문 밖 글자가 든 것 50건 · 6개교). 원인은 두 갈래 —
+       ① 제목 자리를 잘못 고른다: 「이전글 …」·「… 다음글」 줄, 홀로 선 「이전글·다음글」 바로 아래 줄(비슷한 제목의 이웃 글), 제목과 닮은 첨부 파일 이름 줄
+       ② 본문 밖 글자를 못 알아본다: 그림 단추의 alt 뿐인 「이전·다음·목록」, 표 설명 <caption>, 「카카오톡으로 공유하기」, 「(다운로드 : 4284)」, 글 머리(<header>)째 지워진 제목.
+       이웃 글은 같은 학교 소식 파일에 없는 글이라 형제 제목(셋째 인자)으로는 못 막는다. 표본은 그 화면들의 꼴을 본떴다 — 실데이터를 읽지 않는다. */
+    const stT = '🎁 도서관 첫 대출자를 찾습니다~ 이벤트 안내 (50명에게 문화상품권 2만원권 추첨 증정, ~11/30)';
+    const stPage = ['<table class="tbl_view"><caption class="screen_hide">대학공지사항 게시글 확인</caption><tbody><tr>', '<th scope="row">제목</th>', `<td colspan="5">${stT}</td>`, '</tr><tr>',
+      '<th scope="row">작성자</th>', '<td>도서관</td>', '<th scope="row">조회수</th>', '<td>11069</td>', '<th scope="row">날짜</th>', '<td>2026-11-02</td>', '</tr><tr>',
+      '<th scope="row">첨부파일</th>', '<td colspan="5"><ul class="list_attach"></ul></td>', '</tr><tr>', '<td class="cont" colspan="6"><div>',
+      '<p><img alt="" src="poster.png" /></p>', '<p>&nbsp;</p>', '<p>※ 당첨자 발표 : 12월 중 도서관 홈페이지</p>', '<p>※ 문의 : 도서관&nbsp;970-9041</p>', '</div></td></tr></tbody></table>',
+      '<ul class="wrap_order"><li class="prev">', '<strong><img src="/common/images/board/th_prev.png" alt="이전" /></strong>',
+      '<p><a href="?do=commonview&bnum=4691&bidx=897360">[국제교류처] 2026학년도 하반기 무료 영어 클리닉(English Clinic) 참여자 모집(재학생/교직원, 그룹상담 가능)</a></p></li>',
+      '<li class="next">', '<strong><img src="/common/images/board/th_next.png" alt="다음" /></strong>',
+      '<p><a href="?do=commonview&bnum=4691&bidx=897321">[산학협력단] 2026년 하반기 산학협력단 연구자 워크숍 온라인 실시 안내</a></p></li></ul>',
+      '<div class="wrap_btn"><a href="?do=list&bnum=4691"><img src="/common/images/board/btn_list_ko.gif" alt="목록" /></a></div>'].join('\n');
+    eq('  🔴 서울과기대 꼴 — 「이전·다음·목록」이 그림 단추의 alt 뿐이고 아래 두 글이 소식 파일에 없어도 → 본문 두 줄까지만 (남의 제목이 붙었다)',
+      ND.newsDesc(stPage, stT, [stT]), '※ 당첨자 발표 : 12월 중 도서관 홈페이지 ※ 문의 : 도서관 970-9041');
+    const ssT = '봉사 해외선교봉사 (IMPACT 41기) 추가 모집';
+    const ssT2 = ssT.slice(3);   // 게시판 화면의 제목 — 소식 파일은 분류 낱말(「봉사 」)을 앞에 붙여 둔다
+    const ssBody = '교목실 학원선교팀에서 겨울방학 해외선교봉사(IMPACT 41기)에 함께할 학생을 아래와 같이 추가로 모집합니다.';
+    const ssHot = '<h5>HOT 공지사항</h5><ul class="best_post"><li><a href="/공지사항/?slug=a">★ 2026학년도 2학기 특별장학금(주거비, 교통비, 근면숭실, 공인어학시험) 신청 안내</a></li><li><a href="/공지사항/?slug=b">2026-2차 숭실대학교 신입직원 채용공고</a></li></ul>';
+    const ssPage = (prev, next) => [`<title>${ssT2} – 숭실대학교</title>`, `<h2>${ssT2}</h2>`, `<p>${ssBody}</p>`, '<a href="https://scatch.ssu.ac.kr/공지사항/?paged=1">목록</a>',
+      `<a href="/공지사항/?slug=p"><small><i class="ion"></i><br />이전글</small>${prev}</a>`, '<hr />', `<a href="/공지사항/?slug=n">${next} <small>다음글<br /><i class="ion"></i></small></a>`, ssHot].join('\n');
+    eq('  🔴 숭실 꼴 — 「목록」 아래 「이전글 <다시 올린 같은 제목>」·「<같은 제목> 다음글」 줄을 제목 자리로 고르지 않는다 (그 아래 「HOT 공지사항」 옆 칸이 요약이 됐다)',
+      [ND.newsDesc(ssPage(ssT2, '★ 2027학년도 1학기 주한미군상공회의소 미래의동반자재단 장학생 선발 공고 (~11/25 수 15시)'), ssT, [ssT]), ND.newsDesc(ssPage('2026-2차 숭실대학교 신입직원 채용공고', ssT2), ssT, [ssT])],
+      [ssBody, ssBody]);
+    const kgT = '[일반] 2026학년도 2학기 졸업시험 관련 안내';
+    const kgPage = ['<title>대학공지사항 | 경기대학교</title>', '<span class="cate">[일반]</span>', `<h4>${kgT.slice(5)}</h4>`, '<dl><dt>작성자</dt>', '<dd>일반대학원</dd>', '<dt>작성일</dt>', '<dd>2026년 11월 23일 11시 31분 01초</dd></dl>',
+      `<div class="view_cont"><p><img src="exam01.png" alt="${kgT.slice(5)}"></p></div>`, '<div class="attach"><span>졸업시험 관련 안내01.png</span> <a href="./download.do?no=1">다운로드</a></div>', '<a href="./list.do">목록</a>',
+      '<div class="move_item prev"><div class="move_title"><em>이전글</em></div>', '<div class="move_text"><a href="./selectBbsNttView.do?bbsNo=1073&nttNo=600110">관광전문대학원 학비감면 대상자 서류 제출 안내(입학 시 적용 대상자)</a></div>', '<div class="move_date">2021-05-26</div></div>',
+      '<div class="move_item next"><div class="move_title"><em>다음글</em></div>', '<div class="move_text"><a href="./selectBbsNttView.do?bbsNo=1073&nttNo=627332">2026학년도 2학기 생화학 과목 졸업시험 재시험 안내</a></div>', '<div class="move_date">2026-11-23</div></div>',
+      '<div class="custom"><p>HOME</p><p>대학소개</p><p>대학·조직</p><p>대학생활</p><p>맞춤정보</p><p>어떤 정보 를</p><p>찾고계시나요?</p><p>맞춤설정 저장하기</p><p>(언제든 변경 가능합니다)</p><p>맞춤설정 이란?</p><p>소속, 내용, 기간별로</p><p>나만의 맞춤 콘텐츠를 찾아보세요.</p></div>'].join('\n');
+    eq('  🔴 경기 꼴 — 그림뿐인 본문 뒤 홀로 선 「다음글」 바로 아래 비슷한 제목의 이웃 글(소식 파일에 없음)을 제목 자리로 고르지 않는다 → 빈 값 (그 아래 맞춤설정 상자가 요약이 됐다)',
+      ND.newsDesc(kgPage, kgT, [kgT]), '');
+    const cbT = '「충북대학교 교원임용규정」 및 「충북대학교 정년보장교원임용심사기준」 일부개정(안) (재)행정예고';
+    const cbBody = '「충북대학교 교원임용규정」 일부개정규정(안) 재행정예고와 「충북대학교 정년보장교원임용심사기준」 일부개정지침(안) 행정예고 에 의견이 있는 경우 2026. 11. 30.(월) 10:00까지 제출하여 주시기 바랍니다.';
+    const cbCaption = '<caption>대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공</caption>';
+    const cbPage = [`<h3 class="title">${cbT}</h3>`, `<div class="viewcontent"><p>${cbBody}</p><p>1. 주요내용</p></div>`, '<div class="attachedfile"><div class="attach_item">',
+      '<span class="text">충북대학교 교원임용규정 일부개정규정(안) 재행정예고.hwp</span>', '<a href="./downloadBbsFile.do?atchmnflNo=365280"><span>다운로드</span></a>', '</div><div class="attach_item">',
+      '<span class="text">충북대학교 정년보장교원임용 심사기준 일부개정지침(안) 행정예고.hwp</span>', '<a href="./downloadBbsFile.do?atchmnflNo=365281"><span>다운로드</span></a>', '</div></div>',
+      `<table class="p-table">${cbCaption}`, '<tbody><tr><th scope="row">부서</th>', '<td>교무과</td></tr></tbody></table>', '<a href="./list.do">목록</a>'].join('\n');
+    eq('  🔴 충북 꼴 — 제목과 닮은 첨부 파일 이름 줄을 제목 자리로 고르지 않는다 → 본문 첫 문장 (표 설명 글자가 요약이 됐다)', ND.newsDesc(cbPage, cbT, [cbT]), ND.clip(cbBody));
+    eq('  🔴 충북 꼴 — 짧은 본문 뒤 표 설명(<caption>)을 이어 붙이지 않는다 (화면에 안 보이는 접근성 글자)',
+      ND.newsDesc(`<h3>${cbT}</h3>\n<p>${shortBody}</p>\n<table>${cbCaption}\n<tr><th scope="row">부서</th>\n<td>교무과</td></tr></table>`, cbT), shortBody);
+    const snT = '2027학년도 관악학생생활관 대학원생 및 연구생 신청 선발 안내';
+    const snBody = '2027학년도 관악학생생활관 대학원생 및 연구생 입사 신청을 아래와 같이 받으니 기간 내에 신청하시기 바랍니다.';
+    const snPage = [`<html><head><title>${snT} - 일반공지 - 공지사항 - 서울대 소식 - 서울대학교</title></head><body>`, '<a href="#content">본문 영역 바로가기</a>',
+      '<div class="location"><h2>페이지 안내</h2><ol><li>서울대 소식</li><li>공지사항</li><li>일반공지</li></ol></div>',
+      `<article><header class="header"><h3 class="title">${snT}</h3><p class="date">2026. 11. 18.</p></header>`,
+      '<div class="content-wrap"><div class="share"><a href="#">카카오톡으로 공유하기</a>', '<a href="#">페이스북으로 공유하기</a>', '<a href="#">URL복사하기</a></div>',
+      `<div class="content"><p>${snBody}</p></div></div></article></body></html>`].join('\n');
+    eq('  🔴 서울대 꼴 — 글 머리(<header>) 안의 제목 칸은 지우지 않는다 · 「카카오톡으로 공유하기」「URL복사하기」는 본문이 아니다 (이동 경로·공유 단추가 요약이 됐다)',
+      ND.newsDesc(snPage, snT), snBody);
+    const ynT = '[인천대학교] 2026학년도 겨울 계절학기 학점교류 안내(2026.11.18.(수) 17:00)';
+    const ynBody = '2026학년도 겨울 계절학기 인천대학교 학점교류 신청을 아래와 같이 안내하오니 희망하는 학생은 기한 내에 신청하시기 바랍니다.';
+    const ynPage = [`<h3>${ynT}</h3>`, '<ul><li><span>작성자</span>', '<span>수업학적팀</span></li></ul>', '<div class="b-file-box"><ul><li><a class="b-file-dwn hwp" href="?mode=fileDownload&articleNo=232486860&attachNo=381443">',
+      '붙임1. [필독] 2026학년도 국내대학 학점교류 안내문(전출).hwp', '</a>', '<span>(다운로드 : 4284)</span></li></ul></div>', `<div class="b-content"><p>${ynBody}</p></div>`,
+      '<ul class="b-prev-next"><li><span>이전글</span></li>', '<li><a href="?mode=view&articleNo=232486000">[국민대학교] 2026학년도 겨울 계절학기 학점교류 안내(2026.11.13.(금) 17:00)</a></li>',
+      '<li><span>다음글</span></li>', '<li><a href="?mode=view&articleNo=232487000">2026학년도 2학기 강의평가 실시 안내</a></li></ul>'].join('\n');
+    eq('  🔴 영남 꼴 — 「(다운로드 : 4284)」 줄은 본문이 아니다 · 홀로 선 「이전글」 바로 아래 비슷한 제목의 이웃 글을 제목 자리로 고르지 않는다 → 본문 첫 문장',
+      ND.newsDesc(ynPage, ynT, [ynT]), ynBody);
+    /* 위 수정으로 제목 자리가 바로잡히자 드러난 것 셋 (같은 전수 — 사본 761건을 옛·새 규칙으로 견줘 하나씩 읽음) */
+    const abT = '충북대학교 AI부트캠프사업단 팀원급 직원 채용 공고';
+    const abBody = '충북대학교 부트캠프사업단에서는 본 사업의 팀원급 임용 후보자를 다음과 같이 공개 모집하오니 많은 응모 바랍니다.';
+    const abPage = [`<h3 class="title">${abT}</h3>`, `<div class="viewcontent"><p>${abBody}</p>`, '<p>1. 채용인원 및 분야</p>', '<p>가. 채용인원:1명</p>', '<p>2026년 11월 11일</p>',
+      '<p>충북대학교 AI부트캠프 사업단장</p></div>', '<div class="attach_item"><span class="text">충북대학교 AI부트캠프사업단 채용 공고 20261111.pdf</span></div>', '<a href="./list.do">목록</a>'].join('\n');
+    eq('  🔴 충북 꼴 — 본문 끝 맺음말(「충북대학교 AI부트캠프 사업단장」)이 제목과 두 글자씩 닮아도, 글자가 거의 같은 제목 칸이 있으면 그 칸이 제목 자리 → 본문 첫 문장 (맺음말부터 읽어 본문을 통째로 건너뛰었다)',
+      ND.newsDesc(abPage, abT, [abT]), abBody);
+    const ssT3 = '채용 2026-2차 숭실대학교 신입직원 채용공고';
+    const ssBody3 = '2026-2차 숭실대학교 신입직원을 아래와 같이 공개 채용하오니 많은 지원 바랍니다.';
+    const ssPage3 = [`<title>${ssT3.slice(3)} – 숭실대학교</title>`, `<h2>${ssT3.slice(3)}</h2>`, `<p>${ssBody3}</p>`, '<a href="https://scatch.ssu.ac.kr/공지사항/?paged=1">목록</a>',
+      '<h5>HOT 공지사항</h5><ul class="best_post"><li><a href="/공지사항/?slug=a">★ 2026학년도 2학기 특별장학금(주거비, 교통비, 근면숭실, 공인어학시험) 신청 안내</a></li>',
+      `<li><a href="/공지사항/?slug=self">${ssT3.slice(3)}</a></li>`, '<li><a href="/공지사항/?slug=c">■ 2026-2학기 비전채플 설문조사 참여 안내</a></li>',
+      '<li><a href="/공지사항/?slug=d">2026년 기본 훈련 3차(당해년도 / 이월) 및 후반기 작계 훈련 편성 계획</a></li></ul>'].join('\n');
+    eq('  🔴 숭실 꼴 — 옆 칸 「HOT 공지사항」에 이 글 자신이 올라 있어도 그 목록 속 제 제목 줄을 제목 자리로 고르지 않는다 (본문 뒤 「목록」에서 잠근다)',
+      ND.newsDesc(ssPage3, ssT3, [ssT3]), ssBody3);
+    eq('  위쪽 단추 줄의 「목록」(본문 전)에서는 잠그지 않는다 — 그 아래 제 제목 칸을 그대로 고른다',
+      ND.newsDesc([`<title>${ssT3.slice(3)} – 숭실대학교</title>`, '<a href="./list">목록</a>', `<h2>${ssT3.slice(3)}</h2>`, `<p>${ssBody3}</p>`].join('\n'), ssT3), ssBody3);
+    const hgT = '2026학년도 동계계절학기 학점교류 신청 안내 (강서대학교)';
+    const hgBody = '2026학년도 동계계절학기에 강서대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다.';
+    const hgPage = (cate, writer) => [`<p class="b-title-box"><span class="b-title">${hgT}</span></p>`, `<ul><li class="b-cate-box"><span>${cate}</span></li>`,
+      `<li class="b-writer-date-box"><span>${writer}</span>`, '<span>2026.11.18</span></li>', '<li class="b-hit-box"><span>조회수 848</span></li></ul>',
+      '<div class="b-sns-box"><a class="kakao" href="#">카카오 공유하기</a> <a class="url" href="#">URL 공유하기</a></div>', `<div class="b-content-box"><p>${hgBody}</p></div>`].join('\n');
+    eq('  🔴 홍익·전북 꼴 — 이름표 없이 선 작성 부서 줄(「학사지원팀」「세종캠퍼스」「앵커사업단(세종)」「국제처 국제협력과」)은 본문이 아니다',
+      [ND.newsDesc(hgPage('학사', '학사지원팀'), hgT), ND.newsDesc(hgPage('세종캠퍼스', '앵커사업단(세종)'), hgT), ND.newsDesc(hgPage('학사', '국제처 국제협력과'), hgT)],
+      [hgBody, hgBody, hgBody]);
+    eq('  🔴 경기·충북 꼴 — 그림 확대 단추 글자(<a>이미지 확대보기</a>)는 본문이 아니다',
+      ND.newsDesc(`<h4>${kgT.slice(5)}</h4>\n<div class="inner"><img src="exam.png" alt="${kgT.slice(5)} 이미지 1"> <span class="img_zoom"> <a href="exam.png" target="_blank">이미지 확대보기</a> </span></div>\n<p>${shortBody}</p>`, kgT), shortBody);
+    /* 글자가 거의 같은 줄을 먼저 쓰기 때문에, 그 줄이 **제목과 똑같은 첨부 이름**·**같은 제목으로 다시 올린 이웃 글**이면 오히려 그 줄을 고른다 — 아래 셋이 그 자리를 막는다 */
+    eq('  🔴 제목과 똑같은 첨부 이름(「<제목>.hwp」)이 본문 뒤에 있어도 그 줄을 제목 자리로 고르지 않는다 → 본문 첫 문장',
+      ND.newsDesc([`<h3>${kgT.slice(5)}</h3>`, `<p>${shortBody}</p>`, `<div class="attach"><span>${kgT.slice(5)}.hwp</span> <a href="./download.do?no=1">다운로드</a></div>`, '<a href="./list.do">목록</a>'].join('\n'), kgT), shortBody);
+    eq('  🔴 그림뿐인 본문 뒤 홀로 선 「다음글」 아래 **같은 제목으로 다시 올린** 이웃 글을 제목 자리로 고르지 않는다 → 빈 값 (본문 글이 없어 잠금이 안 걸리는 꼴)',
+      ND.newsDesc([`<h4>${kgT.slice(5)}</h4>`, '<div class="view_cont"><p><img src="exam01.png"></p></div>', '<div class="move_title"><em>이전글</em></div>',
+        '<div class="move_text"><a href="./view.do?nttNo=600110">관광전문대학원 학비감면 대상자 서류 제출 안내(입학 시 적용 대상자)</a></div>', '<div class="move_title"><em>다음글</em></div>',
+        `<div class="move_text"><a href="./view.do?nttNo=627332">${kgT.slice(5)}</a></div>`,
+        '<div class="custom"><p>맞춤설정 저장하기</p><p>(언제든 변경 가능합니다)</p><p>소속, 내용, 기간별로</p><p>나만의 맞춤 콘텐츠를 찾아보세요.</p></div>'].join('\n'), kgT, [kgT]), '');
+    eq('  🔴 그림뿐인 본문 뒤 「<같은 제목> 다음글」 줄을 제목 자리로 고르지 않는다 → 빈 값 (그 아래 「HOT 공지사항」이 요약이 된다)',
+      ND.newsDesc([`<h2>${ssT2}</h2>`, '<p><img src="poster.jpg"></p>', '<a href="/공지사항/?slug=p"><small><br />이전글</small>2026-2차 숭실대학교 신입직원 채용공고</a>', '<hr />',
+        `<a href="/공지사항/?slug=n">${ssT2} <small>다음글<br /></small></a>`, ssHot].join('\n'), ssT2, [ssT2]), '');
     const hySent = '2026 애스크톤 예선 결과를 아래와 같이 발표합니다. 본선 진출 팀은 10월 20일까지 발표 자료를 제출해 주시기 바랍니다.';
     eq('  🔴 한양 꼴 — 「작성자 IC-PBL교수학습센터」 처럼 이름표와 값이 한 줄이어도 줄째 뺀다 (한글 이름표가 실제로 걸린다)',
       ND.newsDesc(`<h2>[IC-PBL교수학습센터] 2026 애스크톤 예선 결과 발표</h2><div>작성자 IC-PBL교수학습센터</div><div>공지분류</div><div>일반</div><div><p>${hySent}</p></div><div>댓글달기 (0개)</div>`, '[IC-PBL교수학습센터] 2026 애스크톤 예선 결과 발표'), hySent);
