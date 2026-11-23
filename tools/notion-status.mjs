@@ -57,11 +57,11 @@ const LOG_LINES = 8;
    은서·세현의 일이 통째로 실린다(2026-09-06 에 없앤 '복붙'이 그대로 되살아난다).
    비워 두는 것이 맞다 — 아래 `push` 근거가 이선주의 줄을 채운다. */
 const PEOPLE = {
-  'seonju5543-web': { name: '이선주', page: '3d29505a-3ec3-81e0-a77e-df1a93912858',
+  'seonju5543-web': { name: '이선주', page: '3439505a-3ec3-8278-96b8-0174f85d9ef0',
                       emails: [] },
-  'Se-Hyeon-Jo':    { name: '세현',   page: '3d29505a-3ec3-81d5-8ad2-c11b875e594b',
+  'Se-Hyeon-Jo':    { name: '세현',   page: '3f09505a-3ec3-83f8-9de9-81643be982fa',
                       emails: ['josehyeon@josehyeon-ui-MacBookAir.local', 'josehyeon0926@gmail.com'] },
-  'didinin-wq':     { name: '은서',   page: '3d29505a-3ec3-81c1-b647-ef7cb39ca72d',
+  'didinin-wq':     { name: '은서',   page: 'e719505a-3ec3-82fb-a0aa-811384013b73',
                       emails: ['dhdp0105@gmail.com'] },
 };
 
