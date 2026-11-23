@@ -12980,7 +12980,6 @@
    "sourceKind": "auto",
    "eligibilityLines": [
     "* 신청요건: 4년제 대학생으로 학지금지원구간 2분위 이하인 학생이며 가족돌봄청년에 해당하는 자",
-    "장학복지팀 (02-3277-2274)",
     "[학부]2027년도 해동과학문화재단 장학생 선발 안내",
     "[학부] 2027년 STX장학재단 장학생 선발 안내"
    ],
@@ -20177,6 +20176,16 @@
      "school": "서울과학기술대학교",
      "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897345&qidx=5233&cate=0&allboard=true&nowpage=1",
      "id": "auto-345bnum5233cate0qidx5233"
+    },
+    {
+     "school": "가톨릭대학교",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277272&article.offset=0&articleLimit=10&srCategoryId=22",
+     "id": "notice:https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=277272&srcategoryid=22"
+    },
+    {
+     "school": "경기대학교",
+     "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626890&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+     "id": "notice:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsno=1073&key=7520&nttno=626890&searchkrwd=장학&sf.pnos=1073&sf.pnos=888"
     }
    ],
    "scopeFrom": "같은 사업이 홍익대학교 게시판에도 올라옴(자동) — 홍익대학교 게시판 https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159778&noCat=501",
@@ -25673,6 +25682,321 @@
    },
    "amountFrom": "공고 원문",
    "scopeFrom": "로봇 2026-11-23 · 원문 재판정으로 학교 한정 — 학교 추천 「추천대상자」 (전국으로 풀었던 근거: 본문 「재단 온라인 신청」)"
+  },
+  {
+   "id": "auto-rykeywordpaged1slug20262-0e9iyco",
+   "name": "장학 ★ 2026학년도 2학기 윤준성교수님장학금 장학생 모집 공고(~12/7 월 15시)",
+   "boardTitle": "장학 ★ 2026학년도 2학기 윤준성교수님장학금 장학생 모집 공고(~12/7 월 15시)",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「교내장학」",
+    "접수처 「제출처 … 숭실대학교」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-23",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-12-07",
+   "deadlineFrom": "공고 원문 · ★ 2026학년도 2학기 윤준성교수님장학금 장학생 모집 공고(~12/7 월 15시)",
+   "period": "접수 ~2026-12-07",
+   "summary": "숭실대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숭실대학교"
+   },
+   "documents": [
+    "장학생 지원서 1부",
+    "개인정보 수집·이용 및 제3자 제공 동의서 1부",
+    "한국장학재단 학자금 지원구간 통지서(2026학년도 2학기) 1부",
+    "성적증명서 1부"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-23 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-23",
+   "attachments": [
+    {
+     "name": "붙임1-장학금-지원서_양식학생지원팀.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbsycmpFPaeqQ9RvqaSzZXa9KcC0ID1jAqKakIbR1GjMmc78IRvZuAkyCZ9hpQgDp14M4OHrAuXp3O03fwh%2FyfgLLg%2F2nolOlReHVSI77I383sUwgUe%2FwLNSThbqjvZ9eja9Rs%2B6Xj1IX7sEXRro0hj8KODEW3lbATfrQRc%2FEGhWkP"
+    },
+    {
+     "name": "붙임2-개인정보-수집·이용-및-제3자-제공-동의서_숭실대학생지원팀_개정후.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs2SvTAA3DXCbUpxreUOvzBocJmcP02A7u2uVvD5eD0NDa%2FWeWbvi3wNQ%2FO%2B%2BwHei8j%2BNx7mIe6YJQKJfE1%2Fs5C49Aq%2FXyZng%2Bhc0L0DtBI%2BXomaJ0CgZK1DSLoWEfLLhkyq7%2FuuBrfFxP2dvvXoxm3DQjR673oPsg4Ngnt9zU0aFXRBSHn9CSbWxxexSWXp2eHOCgUw5vTOtzbxNuQI40%2BmGTOigAif7KJYNRzdMn9OAz0J8UCk0TxGsgxGyQ7Yd5dDxibFLBxS3g3iJAh1GZMNPuRR7t9sKIASH22mj1nvm"
+    }
+   ],
+   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EC%9C%A4%EC%A4%80%EC%84%B1%EA%B5%90%EC%88%98%EB%8B%98%EC%9E%A5%ED%95%99%EA%B8%88-%EC%9E%A5%ED%95%99%EC%83%9D-%EB%AA%A8%EC%A7%91-%EA%B3%B5&keyword=%EC%9E%A5%ED%95%99",
+   "sourceKind": "auto",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "가. 2026학년도 2학기 기준, 정규학기 2학기~8학기 이내 재학생 (건축학부 건축학전공은 2~9학기 이내)",
+    "나. 2026학년도 2학기 국가장학금을 신청하여 소득분위 신정이 완료된 학생",
+    "다. 가정형편이 어려워 학업을 지속할 수 없는 학생",
+    "라. 직전학기 기준 15학점 이상 취득한 학생(최종 직전학기는 12학점 이상 취득)",
+    "마. 직전학기 평점 평균 3.0 이상인 학생",
+    "바. 타 외부장학재단의 학업장려비성 장학금을 수혜하지 않은 자 우선 선발",
+    "※ 국가장학금, 교내장학금은 중복수혜 가능"
+   ],
+   "excerpts": [
+    "장학금액: 인당 2,000,000원 (한학기 지원)",
+    "가. 신청기간: 2026.12.07.( 월 ) 15:00 까지"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "장학금액: 인당 2,000,000원 (한학기 지원) 장학유형: 학업장려비 (수업료 초과 수혜 가능)"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "allowed",
+    "scope": "narrow",
+    "raw": "※ 국가장학금, 교내장학금은 중복수혜 가능"
+   },
+   "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-tegory1moddocumentuid432",
+   "name": "2027학년도 1학기 해외수학장학금 신청 안내(학부생 대상)(~26.12.8.(화) 18:00까지)",
+   "boardTitle": "2027학년도 1학기 해외수학장학금 신청 안내(학부생 대상)(~26.12.8.(화) 18:00까지)",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「교내장학」",
+    "접수처 「행정실 제출」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-23",
+   "provider": "주관 기관 원문 확인",
+   "amount": "384만원 ~ 750만원",
+   "amountValue": 7500000,
+   "deadline": "2026-12-08",
+   "deadlineFrom": "공고 원문 · 2027학년도 1학기 해외수학장학금 신청 안내(학부생 대상)(~26.12.8.(화) 18:00까지) – 서울대학교 학생처",
+   "period": "접수 ~2026-12-08",
+   "summary": "서울대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-23 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-23",
+   "attachments": [
+    {
+     "name": "★-2027학년도-1학기-해외수학장학생-신청안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=432&action=kboard_file_download&kboard-file-download-nonce=f4f0834b66&file=file1"
+    },
+    {
+     "name": "선발자-제출서류서약서-및-수혜-후기-보고서.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=432&action=kboard_file_download&kboard-file-download-nonce=f4f0834b66&file=file2"
+    }
+   ],
+   "sourceUrl": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=432",
+   "sourceKind": "auto",
+   "openDate": "2026-12-01",
+   "announceDate": "2026-12-23",
+   "eligibilityLines": [
+    "1. 선발대상 및 지원금액( 직전학기 평점 평균 2.4 이상 )",
+    "○ 선발대상: 2027학년도 1학기 국제처 및 대학 자체 교환학생 프로그램 선발 학생 중",
+    "- 2026학년도 2학기 학자금 지원구간 8구간 이내인 학부생",
+    "- 0~6구간: 전원 선발 / 7~8구간: 예산범위 내 선발",
+    "○ 지원금액 : 한 학기 기준 384만원 ~ 750만원 (수학지역, 기간, 학자금지원구간별 차등지급, 붙임 안내 참조)"
+   ],
+   "excerpts": [
+    "1. 선발대상 및 지원금액( 직전학기 평점 평균 2.4 이상 )",
+    "2. 신청기간 및 방법: 2026. 12. 1.(화) ~ 12. 8.(화) 18:00 / 마이스누에서 온라인 신청",
+    "5. 문의 및 서류제출처: 학생처 장학복지과(02-880-5078 /snu4u@snu.ac.kr)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "range",
+    "value": 7500000,
+    "ratio": 0,
+    "min": 3840000,
+    "max": 7500000,
+    "raw": "지원금액 : 한 학기 기준 384만원 ~ 750만원 (수학지역, 기간, 학자금지원구간별 차등지급, 붙임 안내 참조)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-tegory1moddocumentuid431",
+   "name": "2027학년도 1학기 교내장학금 신청 안내(~26.12.11.(금) 18:00까지)",
+   "boardTitle": "2027학년도 1학기 교내장학금 신청 안내(~26.12.11.(금) 18:00까지)",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-23",
+   "provider": "주관 기관 원문 확인",
+   "amount": "등록금 전액",
+   "amountValue": 0,
+   "deadline": "2026-12-11",
+   "deadlineFrom": "공고 원문 · 2027학년도 1학기 교내장학금 신청 안내(~26.12.11.(금) 18:00까지) – 서울대학교 학생처",
+   "period": "접수 ~2026-12-11",
+   "summary": "서울대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울대학교"
+   },
+   "documents": [
+    "가족관계증명서",
+    "소득증빙 서류",
+    "＊ 2026년 소득서류 미발급 사유를 장학신청사유 란에 작성",
+    "소득이 없을 시 해당 사실을 증명할 수 있는 서류 원본(은행잔고서류 등 비공식 서류 불가)",
+    "병적증명서 원본 (최초 1회)"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-23 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-23",
+   "attachments": [
+    {
+     "name": "1.-2027학년도-1학기-학부생-교내장학금-신청-안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=431&action=kboard_file_download&kboard-file-download-nonce=f4f0834b66&file=file1"
+    },
+    {
+     "name": "2.-2027학년도-1학기-대학원생-교내장학금-신청-안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=431&action=kboard_file_download&kboard-file-download-nonce=f4f0834b66&file=file2"
+    },
+    {
+     "name": "3-1.-2027학년도-1학기-장학선정신청서.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=431&action=kboard_file_download&kboard-file-download-nonce=f4f0834b66&file=file3"
+    },
+    {
+     "name": "3-2-2027학년도-1학기-장학선정신청서.doc",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=431&action=kboard_file_download&kboard-file-download-nonce=f4f0834b66&file=file4"
+    }
+   ],
+   "sourceUrl": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=431",
+   "sourceKind": "auto",
+   "openDate": "2026-11-23",
+   "documentsFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "1. 신청대상 : 2027학년도 1학기 교내장학금을 받고자 하는 등록대상자",
+    "1) 학부 재학생, 대학원 재학생 및 신입생, 학부 및 대학원 복학예정자 [맞춤형장학금]",
+    "2) 학부생 중 저소득유학생, UN참전용사 손자녀 [유학생장학금]",
+    "3) 학부생 중 국가유공, 북한이탈 신규 자격 생성자 [법정장학금]"
+   ],
+   "excerpts": [
+    "※ 2027-1학기 교내장학금 신청 기간이 종강 전에 마감됩니다."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "4. 선정 여부 및 장학금액 : 소속대학(학과.부)에서 결정 - (저소득)유학생장학금 및 법정장학금은 등록금 전액 면제 - 맞춤형 장학금은 2027학년도 1학기 등록금 고지서(마지막 페이지) 및 마이스누 장학선발현황에서 확인 가능 - 등록금 납부 후 장학생 선발시 학기 중 납부한 등록금 반환(1~2개월 내외 소요 예정)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-0k6yc5n",
+   "name": "[교외] 세아해암학술장학재단 장학생 선발 안내(12/9 마감, 이공계열, 생활비 300만원)",
+   "boardTitle": "[교외] 세아해암학술장학재단 장학생 선발 안내(12/9 마감, 이공계열, 생활비 300만원)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-23",
+   "provider": "주관 기관 원문 확인",
+   "amount": "300만원",
+   "amountValue": 3000000,
+   "deadline": "2026-12-09",
+   "deadlineFrom": "공고 원문 · [교외] 세아해암학술장학재단 장학생 선발 안내(12/9 마감, 이공계열, 생활비 300만원)",
+   "period": "접수 ~2026-12-09",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "자기소개서 1부",
+    "포토에세이 1부",
+    "과학탐구활동 실행 이력서 1부",
+    "재단 공식 프로그램 참석 확약서 1부",
+    "개인정보 제공 및 사용 동의서 1부"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-23 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-23",
+   "attachments": [
+    {
+     "name": "2-(서식) 자기소개서.docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119366"
+    },
+    {
+     "name": "3-(서식) 포토에세이.docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119367"
+    },
+    {
+     "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119368"
+    },
+    {
+     "name": "5-(서식) 공식 프로그램 참석 확약서.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119369"
+    },
+    {
+     "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119370"
+    }
+   ],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551909?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto",
+   "alsoPostedAt": [
+    {
+     "school": "성균관대학교",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142223&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.skku.edu/skku/campus/skk_comm/notice06.do?articleno=142223"
+    }
+   ],
+   "scopeFrom": "같은 사업이 성균관대학교 게시판에도 올라옴(자동) — 성균관대학교 게시판 https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142223&article.offset=0&articleLimit=10",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "3. 지원자격",
+    "1) 추천대상(모두 만족)",
+    "2027-1학기 기준 3학년 재학생 으로 기초과학 및 공학분야 전공자",
+    "명확한 과학자 비전 가진 우수 인재(취업 목표 수학 중인 학생 제외)",
+    "본 재단의 장학생 네트워크 활동에 적극 참여하여 자기발전을 키워갈 인재",
+    "2) 추천기준(모두 만족)",
+    "2026-2학기 기준 2027년 개편 한국장학재단 소득분위 ‘가~다’ 구간 해당자",
+    "2026-1학기까지의 전체 학업성적 평균 3.5/4.5 이상",
+    "2027-1학기 12학점 이상 수강 예정자"
+   ],
+   "excerpts": [
+    "4. 신청기한: 2026년 12월 9일(수)까지",
+    "8. 문의: 세아해암학술장학재단 카카오톡 플러스 친구 https://pf.kakao.com/_xhUPqC / 학생지원팀 02-705-8730"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "1. 장학금: 생활비 300만원 2년 간 4개 학기 계속 지원, 중복 수혜 가능 진학 시 아래의 재단 동문 장학생 자격 우선 선정 혜택 - 박사 장학생 : 학기 당 400만원 생활비 장학금(2년 4개 학기 계속지원) - 박사후연구원 : 연 1,000만원 연구활동비 지원(2년 계속지원) - 교수 및 연구원 : 연구프로젝트 연 5,000만원(3년 계속지원), "
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "allowed",
+    "scope": "external",
+    "raw": "2년 간 4개 학기 계속 지원, 중복 수혜 가능"
+   },
+   "exclusivityFrom": "공고 원문"
   }
  ]
 }

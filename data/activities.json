@@ -2,6 +2,43 @@
  "updatedAt": "2026-11-23",
  "items": [
   {
+   "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026-10-30 ~ 2026-11-23 23:59 주관기관명 경기대학교 대상 전체 창업업력 예비창업자 연락처 031-249-8702",
+   "deadline": "2026-11-23",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-30 ~ 2026-11-23 23:59"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026년 12월 2일(수) ~ 3일(목) 10:00~17:00"
+    },
+    {
+     "label": "혜택",
+     "text": "교육 참가비 무료 및 중식, 교재 제공"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
+   ],
+   "noticeLines": [
+    "모집기간 : 11월 2일(월)~11월 23일(월)"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-23",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-23",
+   "id": "act-0guquhh"
+  },
+  {
    "title": "[강동구 청년해냄센터] 2027년 정부 지원 사업 대비 성공 창업 스쿨 참가자 모집 공고",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179766",
    "kind": "대외활동",
@@ -234,15 +271,243 @@
    "excerptsAt": "2026-11-23"
   },
   {
-   "title": "[스포츠재활 연구실] 만성 발목 불안정성 대상 감각-인지 기반 발목 재활운동 연구 참여자 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142188&article.offset=0&articleLimit=10",
+   "title": "[서울특별시] 2027 시드니 글로벌 인재양성 프로그램 참가자 모집",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/272432/artclView.do",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-11-23",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026.11.23"
+    }
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "해외·교류",
+   "excerptsAt": "2026-11-23",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "id": "act-1qiftpa",
+   "eligibilityLines": [
+    "대상 : 인천-시드니",
+    "초등학생5학년~대학생"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "docsV": 7
+  },
+  {
+   "title": "[서울특별시] 서울 야간경제 활성화 해커톤",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/272428/artclView.do",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-12-07",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026.12.07"
+    }
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "IT·소프트웨어",
+   "excerptsAt": "2026-11-23",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "id": "act-15a4xen"
+  },
+  {
+   "title": "[인공지능혁신융합대학사업단] 2026 서울과학기술대학교 동계 인공지능 SCI 부트캠프 개최 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142229&article.offset=0&articleLimit=10",
    "kind": "대외활동",
    "attachments": [
     {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+     "name": "1. 2026 서울과학기술대학교 동계 인공지능 SCI 부트캠프 개최 계획(안).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=142229&attachNo=119377"
     }
    ],
+   "deadlineHint": "신청기간 : 2026. 12.10.(목)까지 3. 신청방법 : https://forms.gle/XNa2g4oCPmEAp1jFA 4. 운영기간:",
+   "deadline": "2026-12-10",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 12.10.(목)까지"
+    },
+    {
+     "label": "활동기간",
+     "text": "2027. 1. 4.(월) ~ 1. 29.(금)"
+    },
+    {
+     "label": "대상",
+     "text": "인공지능혁신융합대학사업 컨소시엄 대학 학부 재학생(원전공 재학생)"
+    }
+   ],
+   "eligibilityLines": [
+    "참가대상: 인공지능혁신융합대학사업 컨소시엄 대학 학부 재학생(원전공 재학생)"
+   ],
+   "noticeLines": [
+    "신청기간 : 2026. 12.10.(목)까지",
+    "신청방법 : https://forms.gle/XNa2g4oCPmEAp1jFA"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-23",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "id": "act-01tctjl"
+  },
+  {
+   "title": "「2026 인공지능혁신융합대학사업단 산학협력 학생 성과 공유회」 참여 학생 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142201&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "제출 기한: 2026년 12월 6일(일) 4) 선발 통보: 2026년 12월14일(월) 예정 문의 사항은 02-740-1630 (인공지능혁신융합",
+   "deadline": "2026-12-06",
+   "excerpts": [
+    {
+     "label": "일시",
+     "text": "2026년 12월 29일 14:00~18:00 (이후 만찬)"
+    }
+   ],
+   "eligibilityLines": [
+    "- 인공지능혁신융합대학사업단 주최 행사(해커톤, 경진대회, WE-MEET 등)에 참여한 경험이 있는 성균관대학교 학생 및 팀(성균관대 팀일 경우, 모두 참석하거나, 불참 동의서 필요)으로 신청",
+    "- 인공지능혁신융합대하사업단 참여학과 학생 또는 팀을 구성하여 자유주제로 본인 또는 팀이 개발한 솔루션(앱, 프로그램 등)으로 신청",
+    "- 인공지능혁신융합대하사업단 참여학과(컴퓨터교육과 수학교육과 한문교육과, 교육학과, 인공지능융합전공, 데이터사이언스융합전공, 컬처엔테크놀러지융합전공, 경영학과, 글로벌경영학과, 경제학과, 글로벌경제학과, 통계학과, 영어영문학과, 독어독문학과, 디자인학과, 연기예술학과, 영상학과, 의상학과)"
+   ],
+   "noticeLines": [
+    "제출 기한: 2026년 12월 6일(일)"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-23",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "id": "act-0551qvb"
+  },
+  {
+   "title": "AI 장편영화 제작 기술 워크숍 참여 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142249&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "일시",
+     "text": "2026년 12월 22일(화) 13:00 – 17:00"
+    },
+    {
+     "label": "대상",
+     "text": "AI 영상·영화 제작에 관심 있는 대학(원)생"
+    },
+    {
+     "label": "주최",
+     "text": "성균관대학교 예술대학, 트랜스미디어연구소"
+    }
+   ],
+   "eligibilityLines": [
+    "■ 대상: AI 영상·영화 제작에 관심 있는 대학(원)생"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-23",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "id": "act-107eeyj"
+  },
+  {
+   "title": "[뇌과학이미징연구단] 지각과 기억의 뇌 메커니즘 실험 참여자 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142242&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-12-06",
+   "eligibilityExcludes": [
+    "① 교정시력이 매우 나쁘거나 색맹 혹은 색약",
+    "② 신경정신과적 병력 및 폐쇄공포증을 가진 사람",
+    "③ 뇌과학이미징연구단 소속",
+    "④ 임신 가능성이 있는 사람"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-23",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "id": "act-0y9h73q"
+  },
+  {
+   "title": "[모집] 2026학년도 겨울계절학기 AI 부트캠프 수강생 모집 안내(~12/06까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142240&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "[2026-겨울계절학기] 몰입형 교과목 참가신청.png",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=142240&attachNo=119390"
+    }
+   ],
+   "deadlineHint": null,
+   "deadline": "2026-12-06",
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-23",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "id": "act-0xphzps"
+  },
+  {
+   "title": "[기후변화대응사업단] 2026년 두산에너빌리티 현장견학 프로그램 참가자 모집(~11/30)",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12648/view.do?currentPageNo=1",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "일시",
+     "text": "2026.11.30.(월) 15시까지 접수"
+    },
+    {
+     "label": "대상",
+     "text": "국민대 재학생 20명 내외"
+    },
+    {
+     "label": "혜택",
+     "text": "숙박 및 식비 지원, 플러스알파 시간부여, 공결처리서 발급 가능"
+    },
+    {
+     "label": "주최",
+     "text": "기후변화대응사업단"
+    }
+   ],
+   "eligibilityLines": [
+    "바. 참가대상 : 국민대 재학생 20명 내외",
+    "참가 자격(가, 나, 다, 라 중 1개 이상 해당자 지원 가능 *유의)"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-23",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "id": "act-03jspm7",
+   "deadline": "2026-11-30",
+   "deadlineFrom": "제목 · [기후변화대응사업단] 2026년 두산에너빌리티 현장견학 프로그램 참가자 모집(~11/30)"
+  },
+  {
+   "title": "[스포츠재활 연구실] 만성 발목 불안정성 대상 감각-인지 기반 발목 재활운동 연구 참여자 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142188&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [],
    "deadlineHint": null,
    "eligibilityLines": [
     "- 만 19세 이상 성인으로 최소 1회 이상 발목의 접질림으로 발목 외측 인대 부상 병력이 있는 경우",
@@ -611,8 +876,7 @@
    "seenAt": "2026-11-23",
    "excerptsAt": "2026-11-23",
    "eligibilityLines": [
-    "봉사자유형 : 성인",
-    "[중증장애인거주시설 사랑울타리]산책 프로그램 자원봉사자 모집"
+    "봉사자유형 : 성인"
    ],
    "eligibilityFrom": "브라우저 본문"
   },
@@ -1833,10 +2097,6 @@
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141708&article.offset=0&articleLimit=10",
    "kind": "대외활동",
    "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    },
     {
      "name": "(양식)2026년 대학생 재능봉사 프로그램 계획서.hwp",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=141708&attachNo=118934"
@@ -3961,7 +4221,8 @@
     "모집대상 : 20~29세 청소년활동에 관심 있는 후기청소년"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "documentsV": 1
   },
   {
    "title": "[마포진로직업체험지원센터] 2026 '대학생진로멘토단 DA:ON' 대학생 멘토 모집",
@@ -4118,12 +4379,13 @@
    "foundAt": "2026-11-16",
    "id": "act-1t6tf7v",
    "eligibilityLines": [
-    "공모대상 : 국내외 학부생·대학원생 개인 또는 4인 이하의팀",
+    "공모대상 : 국내외 학부생·대학원생 개인 또는 4인 이하의 팀",
     "선정발표 12월16일",
     "선정규모 총 10개 작품 선정 예정"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "documentsV": 1
   },
   {
    "title": "2026학년도 국민*창업경진대회 공고",
@@ -4544,7 +4806,8 @@
    "eligibilityFrom": "공고문 첨부(OCR)",
    "docsV": 7,
    "deadline": "2026-06-04",
-   "deadlineFrom": "원문 기간 · 2.신청 기간: 06.01(월) ~06.04(목)"
+   "deadlineFrom": "원문 기간 · 2.신청 기간: 06.01(월) ~06.04(목)",
+   "documentsV": 1
   },
   {
    "title": "[필독] 2026년 Airbus 101 공모전 참가팀 모집 연장 안내",
@@ -4962,7 +5225,14 @@
     "월1회 오프라인 모임 참석이 가능하신분(매월마지막 금요일16시)"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "noticeLines": [
+    "모집기간 : 8/3 (월)~8/18 (화) 오전 10시마감",
+    "모집기간 : 8/3 (월) ~8/18 (화) 오전10시 마감",
+    "모집기간 : 8/3(월) ~8/18 (화) 오전10시"
+   ],
+   "noticeFrom": "공고문 첨부(OCR)",
+   "documentsV": 1
   },
   {
    "title": "[모집] [시립마포청소년센터] 2026년 장애·비장애 청소년 통합활동 '라온:Round On' 참가자 모집",
@@ -5931,304 +6201,6 @@
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "docsV": 7
-  },
-  {
-   "title": "[한국어촌어항공단] 2026 청년 어촌 창업 아이디어 공모전",
-   "url": "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=896358&qidx=6302&cate=10&allboard=false&nowpage=1",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "[신청지원서]청년 어촌창업 아이디어 공모전.hwp",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=BD81FDFB02C947798BA52DC4AEF0F9C7_.hwp&ogrfname=%5B%EC%8B%A0%EC%B2%AD%EC%A7%80%EC%9B%90%EC%84%9C%5D%EC%B2%AD%EB%85%84+%EC%96%B4%EC%B4%8C%EC%B0%BD%EC%97%85+%EC%95%84%EC%9D%B4%EB%94%94%EC%96%B4+%EA%B3%B5%EB%AA%A8%EC%A0%84.hwp"
-    },
-    {
-     "name": "[신청지원서]청년 어촌창업 아이디어 공모전.hwp",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=C35E67DE5DB24163BAC9B585362920EF_.jpg&ogrfname=%5B%ED%8F%AC%EC%8A%A4%ED%84%B0%5D+%EC%B2%AD%EB%85%84+%EC%96%B4%EC%B4%8C+%EC%B0%BD%EC%97%85+%EC%95%84%EC%9D%B4%EB%94%94%EC%96%B4+%EA%B3%B5%EB%AA%A8%EC%A0%84.jpg"
-    }
-   ],
-   "deadlineHint": "접수기간: 2026.11.08 자정까지 접수방법: 포스터 내의 QR 코드 스캔 후 페이지 내의 파일 다운로드 후 작성 및 이메일 접수( co-v",
-   "deadline": "2026-11-08",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026.11.08 자정까지"
-    },
-    {
-     "label": "대상",
-     "text": "어촌창업을 희망하는 만 19세 이상 39세 이하인 자"
-    },
-    {
-     "label": "주최",
-     "text": "한국어촌어항공단"
-    }
-   ],
-   "eligibilityLines": [
-    "참가대상: 어촌창업을 희망하는 만 19세 이상 39세 이하인 자"
-   ],
-   "noticeLines": [
-    "접수기간: 2026.11.08 자정까지"
-   ],
-   "detailsV": 7,
-   "field": "기획·아이디어",
-   "excerptsAt": "2026-11-15",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-196xvhz",
-   "documentsV": 1
-  },
-  {
-   "title": "[ D4D x EDTH 해커톤] 🚀 KOREAN DEFENSE TECH HACKATHON | D4D x EDTH 참가자 모집",
-   "url": "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=895849&qidx=6302&cate=10&allboard=false&nowpage=1",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "해커톤 홍보물.pdf",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=597977C60FCD4D47AB4B72243C88AEE5_.pdf&ogrfname=%ED%95%B4%EC%BB%A4%ED%86%A4+%ED%99%8D%EB%B3%B4%EB%AC%BC.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "대상",
-     "text": "학생, 개발자, 디자이너, 기획자, 창업가, 연구자, 군인 및 제대군인 등"
-    }
-   ],
-   "eligibilityLines": [
-    "모집대상: 학생, 개발자, 디자이너, 기획자, 창업가, 연구자, 군인 및 제대군인 등",
-    "팀 구성: 팀당 최대 4인 / 개인 참가 가능 / 현장 팀 빌딩 지원",
-    "� 주요 해커톤 트랙",
-    "T1. UAS & CUAS : 무인항공체계(UAS) 및 대드론(CUAS)",
-    "T2. Build Your Own Device : 하드웨어·디바이스 직접 제작 및 구현",
-    "T3. OSINT : 공개정보를 활용한 국방·안보 인텔리전스",
-    "T4·T5 : 추후 공개 예정",
-    "Special Track : 개발 보드를 활용한 프로젝트 지원"
-   ],
-   "detailsV": 7,
-   "field": "IT·소프트웨어",
-   "excerptsAt": "2026-11-15",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-1flnnjr",
-   "documentsV": 1
-  },
-  {
-   "title": "[부산광역시상수도사업본부] 부산의 수돗물 홍보디자인 공모전 개최 안내",
-   "url": "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=895824&qidx=6302&cate=10&allboard=false&nowpage=1",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "1. 공모전 공고문.pdf",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=E779904796114C2DAF463DAD06CD2BF9_.pdf&ogrfname=1.+%EA%B3%B5%EB%AA%A8%EC%A0%84+%EA%B3%B5%EA%B3%A0%EB%AC%B8.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "디자인·미술",
-   "excerptsAt": "2026-11-15",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-0aag0ca",
-   "noticeLines": [
-    "0모집기간:2026.9.21.(월)09:00~ 10.30.(금) 18:00"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "3.응모자격:부산광역시 상수도사업본부에 관심이있는 전 국민 누구나",
-    "※팀 구성하여 참여 가능하나 팀대표 포함 4명 이내,1팀당 1건 접수 가능"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7,
-   "deadline": "2026-10-30",
-   "deadlineFrom": "공고 안내 · 0모집기간:2026.9.21.(월)09:00~ 10.30.(금) 18:00"
-  },
-  {
-   "title": "[노원구청] 노원맑음돌봄단 참여자 모집 안내",
-   "url": "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=894511&qidx=6302&cate=10&allboard=false&nowpage=1",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "excerptsAt": "2026-11-15",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-0u5gro4",
-   "noticeLines": [
-    "지원 기간: 8/11(화)~8/31(월) 까지"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "지원대상:우리 동네 환경을 직접 개선하고 싶은",
-    "주요 활동일정(모집 이후 변동 가능)",
-    "노원구 거주 및 활동 청년(19세~39세) 누구나",
-    "*주요 일정은 모두 오프라인으로 평일은 오후7-9시,",
-    "주말(9/20)은오후2-5시에 진행예정",
-    "지원 방법:하단의 구글품을 통해 지원"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7,
-   "deadline": "2026-08-31",
-   "deadlineFrom": "원문 기간 · 지원 기간: 8/11(화)~8/31(월) 까지"
-  },
-  {
-   "title": "[국민연금공단] 2026년 AI 활용 기초연금 홍보 콘텐츠 공모전 개최 안내",
-   "url": "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893582&qidx=6302&cate=10&allboard=false&nowpage=1",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "사본 - (붙임) 공모전 안내 포스터.jpg",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=C50B642999814B61960B2F39DD0740F3_.jpg&ogrfname=%EC%82%AC%EB%B3%B8+-+%28%EB%B6%99%EC%9E%84%29+%EA%B3%B5%EB%AA%A8%EC%A0%84+%EC%95%88%EB%82%B4+%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "광고·마케팅",
-   "excerptsAt": "2026-11-15",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-0e3ktnv",
-   "noticeLines": [
-    "-접수기간: 2026.8.5.(수)09:30~9.16.(수)18:00까지",
-    "-결과 발표: 2026년10월 중 예정"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "공모대상 : AI 영상/ AI 이미지"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7,
-   "deadline": "2026-09-16",
-   "deadlineFrom": "공고 안내 · -접수기간: 2026.8.5.(수)09:30~9.16.(수)18:00까지"
-  },
-  {
-   "title": "[재단법인 한국청년기업가정신재단] 2026 한난 온랩(On-Lab) 참가팀 모집 안내",
-   "url": "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893358&qidx=6302&cate=10&allboard=false&nowpage=1",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "붙임1. 2026 한난 온랩(On-Lab) 모집 공고문(연장).pdf",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=1282D4C1928A46A7B8CDB5E7EF1258B7_.pdf&ogrfname=%EB%B6%99%EC%9E%841.+2026+%ED%95%9C%EB%82%9C+%EC%98%A8%EB%9E%A9%28On-Lab%29+%EB%AA%A8%EC%A7%91+%EA%B3%B5%EA%B3%A0%EB%AC%B8%28%EC%97%B0%EC%9E%A5%29.pdf"
-    },
-    {
-     "name": "붙임2. 2026 한난 온랩(On-Lab) 참가 신청서.hwp",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=2886869B82E340BCAE784FCCE4A8A47C_.hwp&ogrfname=%EB%B6%99%EC%9E%842.+2026+%ED%95%9C%EB%82%9C+%EC%98%A8%EB%9E%A9%28On-Lab%29+%EC%B0%B8%EA%B0%80+%EC%8B%A0%EC%B2%AD%EC%84%9C.hwp"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "excerptsAt": "2026-11-15",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-119z6si",
-   "noticeLines": [
-    "모집기간:2026년 7월 1일(수) 10시~8월 3일(월) 17시까지"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "- 대상 : 육성팀(15팀 내외)",
-    "에너지 산업 기술 혁신 필요성에발맞춰AI 및 디지털 전환, 탄소중립",
-    "및에너지 전환 확대에 따른에너지·환경 분야 예비창업가를 지원하기",
-    "위한 [2026 한난 온랩(On-Lab)] 참가팀을모집하오니 많은 관심과",
-    "예비창업팀 점검 및BM전략 수립을 위한1:1클리닉",
-    "고객발굴및 검증, AX-GX 혁신, 시장진입 마케팅, IRDeck 및 피칭스킬등",
-    "희망하는분야 전문가와1:1집중멘토링",
-    "선배 창업가및 VC, 유관기관 네트워킹",
-    "참가대상 : 미래기술(AX, GX 등), 친환경, 에너지 등 분야 사업화에"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7,
-   "deadline": "2026-08-03",
-   "deadlineFrom": "공고 안내 · 모집기간:2026년 7월 1일(수) 10시~8월 3일(월) 17시까지"
-  },
-  {
-   "title": "[시립인터넷중독예방상담센터] 청소년 디지털 윤리의식 On&On 인스타툰/숏폼 공모전 신청 안내",
-   "url": "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893357&qidx=6302&cate=10&allboard=false&nowpage=1",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "1. [안내문] 2026 디지털 윤리의식 On&On 공모전 안내문(보라매아이윌센터).pdf",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=5D5B301D799B439AAF877422ACD8F727_.pdf&ogrfname=1.+%5B%EC%95%88%EB%82%B4%EB%AC%B8%5D+2026+%EB%94%94%EC%A7%80%ED%84%B8+%EC%9C%A4%EB%A6%AC%EC%9D%98%EC%8B%9D+On%26On+%EA%B3%B5%EB%AA%A8%EC%A0%84+%EC%95%88%EB%82%B4%EB%AC%B8%28%EB%B3%B4%EB%9D%BC%EB%A7%A4%EC%95%84%EC%9D%B4%EC%9C%8C%EC%84%BC%ED%84%B0%29.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "영상·사진",
-   "excerptsAt": "2026-11-15",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-07i9ty3",
-   "eligibilityLines": [
-    "공모대상 : |서울시 소재 만 9~24세 청소년 누구나"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
-  },
-  {
-   "title": "[행정안전부/한국지역정보개발원] 청년들이 만드는 첨단 공공서비스 AI 영상 공모전 개최 안내",
-   "url": "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893356&qidx=6302&cate=10&allboard=false&nowpage=1",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "영상·사진",
-   "excerptsAt": "2026-11-15",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-11-15",
-   "id": "act-0hbxqr0",
-   "eligibilityLines": [
-    "참가 자격 : ·대한민국 청년(1992.1.1~2007.12.31 출생자)",
-    "·개인 또는 팀으로 참가(팀당 최대 인원수 3명)",
-    "·①~⑤ 주제 중 선택하여 참여 가능"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
-  },
-  {
-   "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-23",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-30 ~ 2026-11-23"
-    },
-    {
-     "label": "대상",
-     "text": "혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "경기"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "경기대학교 창업지원단",
-   "api": "kstartup",
-   "apiId": "179673",
-   "id": "api-kstartup-179673",
-   "eligibilityLines": [
-    "혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
-   ],
-   "noticeLines": [
-    "경기대학교 창업지원단에서 2026 예비창업패키지 KGU 창업준비 아카데미 모집 계획을 공고하오니, 창업을 준비하시는 예비창업자 분들의 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/ij95oNbcrqMxXXX56"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-14",
-   "seenAt": "2026-11-23",
-   "excerptsAt": "2026-11-23"
   },
   {
    "title": "[경과원 X 나이스디앤비] 스타트업 공공시장 진출 실전 특강 - 공공입찰부터 기업·기술평가까지 한번에!",
