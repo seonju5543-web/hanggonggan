@@ -96,8 +96,8 @@
   "tries": 2
  },
  "https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=view&articleNo=150177&article.offset=0&articleLimit=10&srCategoryId=85": {
-  "at": "2026-11-16",
-  "tries": 1
+  "at": "2026-11-23",
+  "tries": 2
  },
  "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=888344&qidx=6302&cate=10&allboard=false&nowpage=2": {
   "at": "2026-11-23",
@@ -164,12 +164,12 @@
   "tries": 2
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171439&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
-  "at": "2026-11-16",
-  "tries": 1
+  "at": "2026-11-23",
+  "tries": 2
  },
  "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=897276&qidx=6302&cate=10&allboard=false&nowpage=1": {
-  "at": "2026-11-16",
-  "tries": 1
+  "at": "2026-11-23",
+  "tries": 2
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10890": {
   "at": "2026-11-17",

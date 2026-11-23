@@ -1,6 +1,44 @@
 {
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": [
+  {
+   "title": "[경과원 X 나이스디앤비] 스타트업 공공시장 진출 실전 특강 - 공공입찰부터 기업·기술평가까지 한번에!",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179793",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026-11-12 ~ 2026-11-24 15:00 주관기관명 (재)경기도경제과학진흥원 대상 전체 창업업력 예비창업자, 1년미만, 2",
+   "deadline": "2026-11-24",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-12 ~ 2026-11-24 15:00"
+    },
+    {
+     "label": "일시",
+     "text": "2026. 11. 25.(수) 14:00~16:00"
+    },
+    {
+     "label": "대상",
+     "text": "예비창업자, 창업기업 대표 및 임직원, 유관기관 관계자 등"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 예비창업자, 창업기업 대표 및 임직원, 대학(원)생, 유관기관 등",
+    "예비창업자, 창업기업 대표 및 임직원, 유관기관 관계자 등"
+   ],
+   "detailsV": 7,
+   "documents": [
+    "신청서(구글폼에서 작성)"
+   ],
+   "documentsV": 1,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-23",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-23",
+   "id": "act-0y712b4"
+  },
   {
    "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673",
@@ -5232,7 +5270,9 @@
     "모집기간 : 8/3(월) ~8/18 (화) 오전10시"
    ],
    "noticeFrom": "공고문 첨부(OCR)",
-   "documentsV": 1
+   "documentsV": 1,
+   "deadline": "2026-08-18",
+   "deadlineFrom": "원문 기간 · 모집기간 : 8/3 (월)~8/18 (화) 오전 10시마감"
   },
   {
    "title": "[모집] [시립마포청소년센터] 2026년 장애·비장애 청소년 통합활동 '라온:Round On' 참가자 모집",
@@ -5259,7 +5299,8 @@
    "eligibilityFrom": "공고문 첨부(OCR)",
    "docsV": 7,
    "deadline": "2026-04-06",
-   "deadlineFrom": "공고 안내 · 신청기간 : 2026년 4월 6일(월)까지"
+   "deadlineFrom": "공고 안내 · 신청기간 : 2026년 4월 6일(월)까지",
+   "documentsV": 1
   },
   {
    "title": "[2026 모두의 창업] 리부트(Reboot) 캠프 참여자 모집 안내",
@@ -6200,47 +6241,8 @@
     "*재학생,휴학생 모두 가능"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
-  },
-  {
-   "title": "[경과원 X 나이스디앤비] 스타트업 공공시장 진출 실전 특강 - 공공입찰부터 기업·기술평가까지 한번에!",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179793",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-24",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-12 ~ 2026-11-24"
-    },
-    {
-     "label": "대상",
-     "text": "예비창업자, 창업기업 대표 및 임직원, 대학(원)생, 유관기관 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "경기"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "경기도·경기도경제과학진흥원",
-   "api": "kstartup",
-   "apiId": "179793",
-   "id": "api-kstartup-179793",
-   "eligibilityLines": [
-    "예비창업자, 창업기업 대표 및 임직원, 대학(원)생, 유관기관 등"
-   ],
-   "noticeLines": [
-    "경기도와 경기도경제과학진흥원에서는 스타트업의 공공입찰 참여 및 기업·기술평가 대응 역량 강화를 위한 「스타트업 공공시장 진출 실전 특강 - 공공입찰부터 기업·기술평가까지 한번에!」 실무 특강을 개최하오니 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/8oUFZJUa4CukXS1N7"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-14",
-   "seenAt": "2026-11-23",
-   "excerptsAt": "2026-11-23"
+   "docsV": 7,
+   "documentsV": 1
   },
   {
    "title": "(주)데이톤 - 프로젝트 기반 UXUI 디자인 실전 캠프 과정 7기",
