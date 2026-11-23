@@ -14,7 +14,7 @@ description: PAUSED since 2026-10-30 (CLAUDE.md 「관리자 업무」 — do NO
 
 1. **숫자를 원천에서 센다** — 짐작·기억으로 적지 않는다(CLAUDE.md 원칙 5). 원천의 예:
    git(`git log`·`git diff --numstat` · 날짜는 한국 시각 `TZ=Asia/Seoul`) · GitHub Actions(커넥터 `mcp__github__actions_list`) ·
-   노션 백로그(커넥터 · data_source `60ac025f-edbd-4284-bb57-5e077bab1c3d`) · `data/` 파일 · 검사 출력(`verify/*`) · 그 작업의 기록 파일.
+   노션 백로그(커넥터 · data_source `5159505a-3ec3-83ce-aac7-070632b667b6`) · `data/` 파일 · 검사 출력(`verify/*`) · 그 작업의 기록 파일.
 2. **명세 JSON 을 세션 임시 폴더에 쓴다** — 꼴은 `tools/work-report/README.md`. 문서 번호 `HDJ-WR-YYYYMMDD-NN`(하루 마감본은 `-D`).
    구성: 표지(상태·관련 노션 행) → 한눈에 보기(숫자 칸) → 요약 → 경과(일정·커밋) → 한 일 → 검사·배포 상태 → 남은 일·결정 요청·기한 → 출처.
    숫자가 나오는 곳은 반드시 그림 블록(`bars`·`stacked`·`columns`·`timeline`·`meters`·`kpis`)으로. 표는 문장만.
