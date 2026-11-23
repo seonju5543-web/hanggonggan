@@ -17170,6 +17170,34 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   eq('  리뷰 — `졸업학년도` 는 연도라 학년 조건이 아니다 · 이중수혜 판정은 evaluate 와 같은 함수(holdsExternalScholarship)', [one('2027 졸업학년도 기준 등록자', 'year'), typeof MEx.holdsExternalScholarship === 'function' ? [MEx.holdsExternalScholarship({ scholarships: ['external'] }), MEx.holdsExternalScholarship({}), MEx.holdsExternalScholarship({ scholarships: ['kosaf'] })] : null], [null, [true, null, false]]);
   eq('    제외 줄 `타 민간재단 장학금 수혜자` 도 같은 종류(exclude) · 국가장학금·교내는 막지 않는다', [(condsEx6('타 민간재단 장학금 수혜자').find((c) => c.kind === 'scholarship') || {}).exclude, MEx.judgeCond(condsEx6('타 민간재단 장학금 수혜자').find((c) => c.kind === 'scholarship'), stu6({ scholarships: ['kosaf', 'internal'] }), {})], [true, 'pass']);
 
+  /* ── 이미 해 온 활동으로 정한 무리 (2026-11-23 · 층2 서울미래인재재단 「서울선순환인재 장학금」 — 지도 시안 작업 중 발견 · match-engine ACTIVITY_GROUP) ──
+     특정자격 칸 첫 줄 `2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토`(공고문 「① 필수 지원자격」 · 「①~② 항목 모두 충족하는 자」)가
+     요건 신호(REQ_SIGNAL)에 안 걸려 화면·분모에서 통째로 빠졌고, 남은 `서울 소재 대학교 재학 학부생 …` ✓ 와 제외 칸 통과로 서울 학생 누구에게나 「적합도 95%」였다
+     (틀린 안심 · 「누가」 칸 줄이 하나 살아 있어 11-13 규칙이 쉬었다). 줄만 살리면 75%(3/4 · 모름 1) — 그것도 서울런 멘토가 아닌 학생에게 높은 숫자다.
+     줄은 원문 꼴을 그대로 박는다(실데이터를 읽지 않는다) */
+  {
+    const mentorG = '2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토';
+    const seoulG = '서울 소재 대학교 재학 학부생 또는 서울 시민(의 자녀)으로서 비서울 소재 대학교 재학 학부생';
+    const exG = ['2026년 2학기 기준 휴학생/대학원생 등', '서울런 멘토 중 해당 기간(25년 11월 ~ 26년 10월) 내 활동 포기(영구 중단) 및 해촉된 멘토'];
+    const kG = (lines) => ({ id: 'kosaf-g', name: '서울미래인재재단 서울선순환인재 장학금', provider: '서울미래인재재단', sourceKind: 'kosaf', eligibility: { selective: true },
+      eligibilityLines: lines, kosafCoreLines: lines, kosafWhoLines: lines, eligibilityExcludes: exG });
+    const pG = (o) => ({ ...stu, school: '서울과학기술대학교', year: 1, region: '서울', parentRegion: '서울', ...o });
+    const keptG = (l) => MEx.requirementLines({ id: 'g', name: 'g' }, [l], { all: true }).length;
+    const fG = (s, p) => { const d = MEx.fitDetail(s, p); return [d.unread, d.fails.length]; };
+    eq('🔴 「…활동한 … 멘토」 꼴은 요건 줄이다 — 서울런 멘토 두 꼴(재단 칸 · 공고문 `‘25년 11월 ~ ’26년 10월까지`)·`… 활동한 학습 멘토`·`… 참여한 멘티` 는 화면에 남는다(전엔 0줄 — 공고의 필수 자격이 화면에서 사라졌다) · 반대 사례: 혜택 `현직 전문가 멘토`·`1:1 멘토 매칭` 은 그대로 안 남는다',
+      [keptG(mentorG), keptG('‘25년 11월 ~ ’26년 10월까지 8개월 이상 활동한 서울런 멘토'), keptG('2025년도에 6개월 이상 활동한 학습 멘토'), keptG('멘토링 프로그램에 참여한 멘티'), keptG('현직 전문가 멘토'), keptG('1:1 멘토 매칭')],
+      [1, 1, 1, 1, 0, 0]);
+    eq('🔴 「누가」 줄이 이미 해 온 활동으로 정한 무리(서울런 멘토 8개월)인데 판정을 못 하면 다른 줄이 ✓ 여도 적합도를 주지 않는다 — 서울 학생 자격 미확인(전엔 95%) · 반대 사례: 휴학생 ✕ 는 그대로 · 무리 줄이 없는 공고는 그대로(미확인 아님) · 택1 갈래 안의 무리 줄은 다른 갈래가 맞으면 쉰다 · 층1 공고도 같다',
+      [fG(kG([mentorG, seoulG]), pG({})), fG(kG([mentorG, seoulG]), pG({ status: '휴학' })), fG(kG([seoulG]), pG({})),
+        fG(kG(['아래 ①·② 중 하나에 해당하는 자', `① ${mentorG}`, `② ${seoulG}`]), pG({})), fG({ ...kG([mentorG, seoulG]), sourceKind: undefined }, pG({}))],
+      [[true, 0], [false, 2], [false, 0], [false, 0], [true, 0]]);
+    const both = '대학교 재학생 중 2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토';
+    eq('🔴 딸린 조건(재학)이 같은 줄에 붙어도 무리에 드는지는 모른다 — 재학생에게 그 줄은 ✓ 가 아니라 모름(전엔 재학 하나로 ✓) · 적합도 자격 미확인(✓ 를 주면 95% 그대로) · 반대 사례: 휴학생은 그 줄에서 ✕ 그대로',
+      [rmx(both, pG({})), fG(kG([both]), pG({})), rmx(both, pG({ status: '휴학' }))], [null, [true, 0], 'no']);
+    eq('  무리 꼴은 한 곳(parse-requirements ACTIVITY_GROUP)이다 — 요건 신호(REQ_SIGNAL)가 같은 꼴을 그대로 쓴다(두 벌로 적으면 화면엔 남는데 적합도는 쉬는 식으로 갈라진다)',
+      [PRx.ACTIVITY_GROUP instanceof RegExp, !!PRx.ACTIVITY_GROUP && MEx.REQ_SIGNAL.source.includes(PRx.ACTIVITY_GROUP.source)], [true, true]);
+  }
+
 }
 
 console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-31 · 5단계 — 숫자는 도구가 세고 질문 목록은 사람이 고친다)');
