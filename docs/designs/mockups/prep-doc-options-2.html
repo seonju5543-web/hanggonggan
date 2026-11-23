@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>앱 자체 제작 문서 — 등록 양식을 본뜬 시안</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root { --bg: #f6f4f0; --surface: #fffefc; --text: #191713; --text-sub: #57524a; --text-weak: #8b857b; --line: rgba(25,23,19,.09); --line-2: rgba(25,23,19,.18); --accent: #8a6a1f; --accent-soft: rgba(138,106,31,.10); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 40px 16px 72px; }
+h1 { font-size: 27px; margin: 0 0 8px; letter-spacing: -.02em; }
+.lede { color: var(--text-sub); margin: 0 0 32px; max-width: 66ch; font-size: 14.5px; }
+h2 { font-size: 21px; margin: 0; letter-spacing: -.02em; }
+.opt { background: var(--surface); border: 1px solid var(--line); border-radius: 27px; padding: 28px; margin-bottom: 28px; }
+.opt-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.opt-tag { font-size: 12.5px; font-weight: 800; color: var(--accent); background: var(--accent-soft); border-radius: 99px; padding: 3px 11px; }
+.opt-sub { color: var(--text-sub); font-size: 14.5px; margin: 0 0 22px; max-width: 72ch; }
+.opt-body { display: grid; grid-template-columns: 230px minmax(0, 1fr) 230px; gap: 28px; align-items: start; }
+.ref img { width: 100%; display: block; border: 1px solid var(--line-2); background: #fff; }
+.cap { font-size: 12.5px; color: var(--text-weak); margin: 8px 0 0; }
+.cap b { color: var(--text-sub); }
+.notes { font-size: 13.5px; color: var(--text-sub); }
+.notes dl { margin: 0; }
+.notes dt { font-weight: 700; color: var(--text); margin-top: 14px; }
+.notes dt:first-child { margin-top: 0; }
+.notes dd { margin: 2px 0 0; }
+.paper-wrap { overflow-x: auto; }
+.paper { background: #fff; color: #111; border: 1px solid var(--line-2); box-shadow: 0 10px 30px rgba(25,23,19,.07); min-width: 520px; aspect-ratio: 210 / 297; padding: 34px 38px; font-size: 11px; line-height: 1.5; display: flex; flex-direction: column; }
+.paper table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.tagline { font-size: 9.5px; color: #666; margin: 0; }
+.box { display: inline-block; width: 8px; height: 8px; border: 1px solid #333; margin-right: 5px; vertical-align: -1px; }
+.box.on { background: #111; box-shadow: inset 0 0 0 1.5px #fff; }
+
+/* ── 시안 1 — 라이나손보 CHUBB 신청서: 가는 회색 선 · ■ 절 띠 · 옅은 회색 이름표 · 넉넉한 행 ── */
+.p1 { padding: 30px 30px; }
+.p1-title { text-align: center; font-size: 16px; font-weight: 700; margin: 6px 0 2px; }
+.p1-sub { text-align: center; font-size: 10.5px; letter-spacing: .3em; margin: 0 0 14px; color: #333; }
+.p1 table { border: 1px solid #a9a9a9; }
+.p1 th, .p1 td { border: 1px solid #b9b9b9; padding: 8px 9px; text-align: left; vertical-align: middle; }
+.p1 th { background: #f2f2f2; font-weight: 500; text-align: center; width: 13%; letter-spacing: .3em; padding-left: calc(9px + .3em); white-space: nowrap; }
+.p1 th.wide { letter-spacing: 0; padding-left: 9px; }
+.p1 .bar td { background: #f2f2f2; font-weight: 700; padding: 6px 9px 6px 24px; position: relative; }
+.p1 .bar td::before { content: ''; position: absolute; left: 10px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; background: #111; }
+.p1 .hint { color: #9a9a9a; }
+.p1 .essay td { height: 78px; vertical-align: top; color: #222; }
+.p1 .grow { flex: 1; }
+
+/* ── 시안 2 — 한독제석재단 자기소개서: 굵은 바깥 틀 하나 · 옅은 청색 이름표 열 · 맺음말·귀중이 틀 안 ── */
+.p2 { padding: 40px 44px; }
+.p2-title { text-align: center; font-size: 19px; font-weight: 700; margin: 4px 0 16px; }
+.p2 table { border: 1.6px solid #111; flex: 1; }
+.p2 th, .p2 td { border: 1px solid #111; padding: 6px 9px; vertical-align: middle; }
+.p2 th { background: #dce3f1; font-weight: 700; text-align: center; width: 21%; font-size: 10.5px; }
+.p2 th small { display: block; font-weight: 500; font-size: 9px; }
+.p2 td.c { text-align: center; }
+.p2 .essay td { height: 62px; vertical-align: top; }
+.p2 .close td { text-align: center; padding: 14px 9px 16px; }
+.p2 .close .who { margin: 12px 0 10px; }
+.p2 .close b { font-size: 15px; }
+
+/* ── 시안 3 — 고려대 미래로장학금 신청서: 머리글(기관·부서) · 삼색 띠가 감싼 제목 판 · 색 절 띠 · 회색 유의사항 상자 ── */
+.p3 { padding: 28px 40px 34px; }
+.p3-head { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 8px; border-bottom: 3px solid #d9cfb9; }
+.p3-head b { font-size: 14px; letter-spacing: -.01em; }
+.p3-head span { font-size: 9px; letter-spacing: .5em; text-align: right; line-height: 1.8; color: #333; }
+.p3-band { display: flex; height: 9px; margin-top: 26px; }
+.p3-band i { display: block; }
+.p3-band i:nth-child(1) { flex: 2; background: #23201a; } .p3-band i:nth-child(2) { flex: 4; background: #8a6a1f; } .p3-band i:nth-child(3) { flex: 3; background: #a89f8f; }
+.p3-band.b { margin-top: 0; }
+.p3-band.b i:nth-child(1) { flex: 6; } .p3-band.b i:nth-child(2) { flex: 3; } .p3-band.b i:nth-child(3) { flex: 0; }
+.p3-title { background: #ececea; text-align: center; font-size: 19px; font-weight: 300; padding: 14px 0; margin: 0; letter-spacing: .02em; }
+.p3 table { border: 1.4px solid #111; margin-top: 16px; }
+.p3 th, .p3 td { border: 1px solid #333; padding: 4px 8px; text-align: center; vertical-align: middle; }
+.p3 th { font-weight: 500; width: 22%; }
+.p3 .bar td { background: #f3dfb6; font-weight: 700; text-align: left; padding: 3px 8px; }
+.p3 .essay td { height: 56px; text-align: left; vertical-align: top; }
+.p3 .l td, .p3 td.l { text-align: left; }
+.p3 .note td { background: #d9d9d9; text-align: left; padding: 8px 10px; flex: 1; }
+.p3 .note b { color: #8a1f1f; }
+.p3 .sign { text-align: center; margin: 14px 0 0; }
+
+.cmp { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 19px; overflow: hidden; font-size: 13.5px; }
+.cmp th, .cmp td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cmp thead th { font-size: 12.5px; color: var(--text-weak); }
+.cmp tr:last-child td, .cmp tr:last-child th { border-bottom: 0; }
+.cmp tbody th { font-weight: 700; white-space: nowrap; }
+.cmp-wrap { overflow-x: auto; }
+@media (max-width: 980px) { .opt-body { grid-template-columns: 1fr; } .ref { max-width: 230px; } .opt { padding: 20px 16px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>앱 자체 제작 문서 — 등록 양식을 본뜬 시안 셋</h1>
+  <p class="lede">앱에 PDF 사본으로 올라와 있는 신청서 59종의 첫 쪽을 전부 펼쳐 보고, 가장 정돈된 세 양식을 골라 디자인·배치·말투를 그대로 옮겼습니다. 기관 로고·이름은 옮기지 않았고, 안에 담는 칸은 지난 시안 A(인적 11칸 · 서술 3문항 · 자격 · 서류)와 같습니다. 예시 공고는 「배재장학재단 모범학생장학금(자립지원)」, 인적사항 값은 예시입니다.</p>
+
+  <!-- ══════════ 시안 1 ══════════ -->
+  <section class="opt" id="opt-1">
+    <div class="opt-head"><span class="opt-tag">시안 1</span><h2>가는 선 · 회색 절 띠 — 기업 재단형</h2></div>
+    <p class="opt-sub">본뜬 양식: 라이나손보 「CHUBB INNOVATION FUND 신청서」. 59종 가운데 선이 가장 가늘고 행이 넉넉해 요즘 문서처럼 보입니다. 서술 칸은 이름표 없이 「■ 질문 한 줄 → 넓은 빈 칸」.</p>
+    <div class="opt-body">
+      <div class="ref">
+        <img src="../../../data/forms-pdf/auto-krbbskr846174artclviewdo/1-CHUBB_Innovation_Fund_7기_신청서_학생용_-pages/1.webp" alt="본뜬 원본 양식 첫 쪽">
+        <p class="cap"><b>본뜬 원본</b> · 앱에 올라와 있는 사본</p>
+      </div>
+      <div class="paper-wrap"><div class="paper p1">
+        <p class="tagline">※ 앱 자체 제작 문서입니다</p>
+        <p class="p1-title">배재장학재단 모범학생장학금(자립지원) 지원문서</p>
+        <p class="p1-sub">&lt;학생용&gt;</p>
+        <table>
+          <colgroup><col style="width:13%"><col style="width:24%"><col style="width:13%"><col style="width:20%"><col style="width:13%"><col style="width:17%"></colgroup>
+          <tr class="bar"><td colspan="6">인적사항</td></tr>
+          <tr><th>이름</th><td>김한장</td><th class="wide">생년월일</th><td>2004. 3. 14.</td><th>학년</th><td>3학년 (6학기)</td></tr>
+          <tr><th>학교</th><td colspan="3">한국외국어대학교</td><th>학번</th><td>202100000</td></tr>
+          <tr><th>학과</th><td colspan="5">영어학과</td></tr>
+          <tr><th>주소</th><td colspan="5">서울특별시 강서구 ○○로 00</td></tr>
+          <tr><th class="wide">연락처</th><td colspan="2"><span class="hint">(휴대전화)</span> 010-0000-0000</td><td colspan="3"><span class="hint">(E-mail)</span> hj@example.com</td></tr>
+          <tr><th>성적</th><td colspan="2"><span class="hint">(직전학기 평점)</span> 3.9 / 4.5</td><td colspan="3"><span class="hint">(이수학점)</span> 14학점 &nbsp;·&nbsp; <span class="hint">(지원구간)</span> 6구간</td></tr>
+          <tr class="bar"><td colspan="6">장학금 신청 동기를 기술해 주세요</td></tr>
+          <tr class="essay"><td colspan="6">등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. 학기 중 근로로 생활비를 마련하고 있어 장학 지원이 학업을 이어가는 데 큰 힘이 됩니다.</td></tr>
+          <tr class="bar"><td colspan="6">교내·외 활동 내역을 기술해 주세요</td></tr>
+          <tr class="essay"><td colspan="6">전공 학회와 봉사 동아리에서 꾸준히 활동하며 협업과 책임감을 길렀습니다.</td></tr>
+          <tr class="bar"><td colspan="6">학업 및 진로 계획을 기술해 주세요</td></tr>
+          <tr class="essay"><td colspan="6">남은 학기 동안 전공 심화 과목을 집중 이수하고, 졸업 후에는 전공을 살려 사회에 기여하겠습니다.</td></tr>
+          <tr class="bar"><td colspan="6">지원 자격 · 제출 서류 확인</td></tr>
+          <tr><th class="wide">지원 자격</th><td colspan="5"><span class="box on"></span>산업체 또는 배재 대학 내 근로 학생 &nbsp; <span class="box"></span>등록금 납부금액이 100만원 이상인 학생<br><span class="box"></span>모·부자 가정의 자녀 또는 청소년 가장</td></tr>
+          <tr><th class="wide">제출 서류</th><td colspan="5"><span class="box"></span>성적증명서 &nbsp; <span class="box"></span>재학증명서 &nbsp; <span class="box"></span>주민등록등본 (주민번호 공개로 제출) &nbsp; <span class="box"></span>장학생 신청양식</td></tr>
+        </table>
+      </div></div>
+      <div class="notes"><dl>
+        <dt>옮긴 것</dt><dd>가는 회색 선 · ■ 붙은 회색 절 띠 · 자간 넓힌 두 글자 이름표 · 칸 안의 옅은 안내 글자 「(휴대전화)」 · 「~를 기술해 주세요」 말투.</dd>
+        <dt>안 옮긴 것</dt><dd>주황 바깥 테두리 · 로고 · 형광 강조.</dd>
+        <dt>어울리는 곳</dt><dd>화면에서도 가장 덜 답답함. 서술 문항이 주인공인 공고.</dd>
+        <dt>아쉬운 점</dt><dd>서명·기관명 자리가 없는 양식이라 맺음이 가볍다.</dd>
+      </dl></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 시안 2 ══════════ -->
+  <section class="opt" id="opt-2">
+    <div class="opt-head"><span class="opt-tag">시안 2</span><h2>한 틀 · 청색 이름표 열 — 전통 재단형</h2></div>
+    <p class="opt-sub">본뜬 양식: 한독제석재단 「자기소개서」. 문서 전체가 굵은 틀 하나에 들어가고, 왼쪽 이름표 열만 옅은 청색입니다. 맺음말·날짜·서명·「귀중」까지 틀 안에 있어 가장 격식 있어 보입니다.</p>
+    <div class="opt-body">
+      <div class="ref">
+        <img src="../../../data/forms-pdf/auto-skor478126688artclviewdo/1-2027_자기소개서_및_추천서_양식_장학금_지원자_-pages/1.webp" alt="본뜬 원본 양식 첫 쪽">
+        <p class="cap"><b>본뜬 원본</b> · 앱에 올라와 있는 사본</p>
+      </div>
+      <div class="paper-wrap"><div class="paper p2">
+        <p class="tagline">※ 앱 자체 제작 문서입니다</p>
+        <p class="p2-title">장학금 지원문서</p>
+        <table>
+          <colgroup><col style="width:21%"><col style="width:29%"><col style="width:21%"><col style="width:29%"></colgroup>
+          <tr><th>성 &nbsp; 명</th><td>김한장</td><th>생년월일</th><td>2004. 3. 14.</td></tr>
+          <tr><th>학 교 명</th><td>한국외국어대학교</td><th>소 &nbsp; 속</th><td>영어학과 3학년 (6학기)</td></tr>
+          <tr><th>학 &nbsp; 번</th><td>202100000</td><th>핸드폰번호</th><td>010-0000-0000</td></tr>
+          <tr><th>주 &nbsp; 소</th><td colspan="3">서울특별시 강서구 ○○로 00</td></tr>
+          <tr><th>E-mail 주소</th><td colspan="3">hj@example.com</td></tr>
+          <tr><th>성 &nbsp; 적</th><td class="c">취득학점 ( 14 ) 학점</td><td colspan="2">직전학기 평점 ( 3.9 ) / 4.5 &nbsp;·&nbsp; 지원구간 ( 6 )</td></tr>
+          <tr class="essay"><th>신청 동기</th><td colspan="3">등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. 학기 중 근로로 생활비를 마련하고 있어 장학 지원이 학업을 이어가는 데 큰 힘이 됩니다.</td></tr>
+          <tr class="essay"><th>교내·외 활동</th><td colspan="3">전공 학회와 봉사 동아리에서 꾸준히 활동하며 협업과 책임감을 길렀습니다.</td></tr>
+          <tr class="essay"><th>학업 및<br>진로 계획</th><td colspan="3">남은 학기 동안 전공 심화 과목을 집중 이수하고, 졸업 후에는 전공을 살려 사회에 기여하겠습니다.</td></tr>
+          <tr><th>지원 자격<small>(해당 항목 표시)</small></th><td colspan="3"><span class="box on"></span>산업체 또는 배재 대학 내 근로 학생<br><span class="box"></span>등록금 납부금액이 100만원 이상인 학생<br><span class="box"></span>모·부자 가정의 자녀 또는 청소년 가장</td></tr>
+          <tr><th>제출 서류</th><td colspan="3"><span class="box"></span>성적증명서 &nbsp; <span class="box"></span>재학증명서 &nbsp; <span class="box"></span>장학생 신청양식<br><span class="box"></span>주민등록등본 (주민번호 공개로 제출)</td></tr>
+          <tr class="close"><td colspan="4">위 내용은 사실과 다름이 없습니다.
+            <p class="who">2026년 &nbsp; 11월 &nbsp; 23일 &nbsp;&nbsp;&nbsp;&nbsp; 지원자 &nbsp; 김한장 &nbsp; (인)</p>
+            <b>배재장학재단</b></td></tr>
+        </table>
+      </div></div>
+      <div class="notes"><dl>
+        <dt>옮긴 것</dt><dd>굵은 바깥 틀 하나 · 청색 이름표 열 · 글자 사이 띄운 이름표(성 명) · 괄호 빈칸 「( ) 학점」 · 틀 안 맺음말과 큰 기관명.</dd>
+        <dt>안 옮긴 것</dt><dd>사진란(원문이 사진을 요구할 때만 넣는 규칙 그대로) · 「귀중」(낼 서류로 읽히지 않게).</dd>
+        <dt>어울리는 곳</dt><dd>지금 앱 문서와 뼈대가 같아 고칠 곳이 가장 적음. 인쇄했을 때 가장 서류다움.</dd>
+        <dt>아쉬운 점</dt><dd>폰 화면에서는 선이 많아 무겁다.</dd>
+      </dl></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 시안 3 ══════════ -->
+  <section class="opt" id="opt-3">
+    <div class="opt-head"><span class="opt-tag">시안 3</span><h2>머리글 · 띠 두른 제목 판 — 대학 본부형</h2></div>
+    <p class="opt-sub">본뜬 양식: 고려대학교 「미래로장학금(재심) 신청서」. 맨 위에 기관·부서 머리글, 삼색 띠가 위아래로 감싼 회색 제목 판, 색 절 띠, 맨 아래 회색 유의사항 상자. 59종 가운데 유일하게 「디자인된」 문서입니다. 색은 앱의 잉크·금색으로 바꿨습니다.</p>
+    <div class="opt-body">
+      <div class="ref">
+        <img src="../../../data/forms-pdf/auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds/1-미래로장학금_재심__신청서_양식_2026_2R_-pages/1.webp" alt="본뜬 원본 양식 첫 쪽">
+        <p class="cap"><b>본뜬 원본</b> · 앱에 올라와 있는 사본</p>
+      </div>
+      <div class="paper-wrap"><div class="paper p3">
+        <div class="p3-head"><b>한대장</b><span>앱 자체<br>제작 문서</span></div>
+        <div class="p3-band"><i></i><i></i><i></i></div>
+        <p class="p3-title">모범학생장학금(자립지원) 지원문서</p>
+        <div class="p3-band b"><i></i><i></i><i></i></div>
+        <table>
+          <colgroup><col style="width:22%"><col style="width:28%"><col style="width:22%"><col style="width:28%"></colgroup>
+          <tr class="bar"><td colspan="4">■ 신청자 인적사항</td></tr>
+          <tr><th>대학</th><td>한국외국어대학교</td><th>학과</th><td>영어학과</td></tr>
+          <tr><th>학번</th><td>202100000</td><th>이름</th><td>김한장</td></tr>
+          <tr><th>생년월일</th><td>2004. 3. 14.</td><th>학년(학기)</th><td>3학년 (6학기)</td></tr>
+          <tr><th>연락처</th><td>010-0000-0000</td><th>이메일</th><td>hj@example.com</td></tr>
+          <tr><th>주소</th><td colspan="3" class="l">서울특별시 강서구 ○○로 00</td></tr>
+          <tr><th>직전학기 성적</th><td>3.9 / 4.5 · 14학점</td><th>지원구간</th><td>6구간</td></tr>
+          <tr class="bar"><td colspan="4">■ 해당 유형</td></tr>
+          <tr><th>지원 자격</th><td colspan="3" class="l"><span class="box on"></span>산업체 또는 배재 대학 내 근로 학생<br><span class="box"></span>등록금 납부금액이 100만원 이상인 학생<br><span class="box"></span>모·부자 가정의 자녀 또는 청소년 가장</td></tr>
+          <tr class="bar"><td colspan="4">■ 종합기술(신청 동기)</td></tr>
+          <tr class="essay"><td colspan="4">등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. 학기 중 근로로 생활비를 마련하고 있어 장학 지원이 학업을 이어가는 데 큰 힘이 됩니다.</td></tr>
+          <tr class="bar"><td colspan="4">■ 종합기술(교내·외 활동 · 학업 및 진로 계획)</td></tr>
+          <tr class="essay"><td colspan="4">전공 학회와 봉사 동아리에서 꾸준히 활동하며 협업과 책임감을 길렀습니다. 남은 학기 동안 전공 심화 과목을 집중 이수하겠습니다.</td></tr>
+          <tr class="note"><td colspan="4">※ <b>제출 서류</b><br>&nbsp; 1. 성적증명서<br>&nbsp; 2. 재학증명서<br>&nbsp; 3. 주민등록등본 (주민번호 공개로 제출)<br>&nbsp; 4. 장학생 신청양식</td></tr>
+        </table>
+        <p class="sign">2026년 11월 23일 &nbsp;&nbsp; 지원자 김한장 (서명)</p>
+      </div></div>
+      <div class="notes"><dl>
+        <dt>옮긴 것</dt><dd>머리글(왼쪽 이름 · 오른쪽 자간 넓힌 두 줄) · 삼색 띠와 회색 제목 판 · 가는 굵기의 제목 글자 · 색 절 띠 「■」 · 가운데 맞춘 칸 · 번호 붙인 회색 유의사항 상자.</dd>
+        <dt>안 옮긴 것</dt><dd>학교 로고·교색(남색·진홍). 머리글 자리에 앱 이름을 넣어 「앱이 만든 문서」임을 디자인으로 드러냄.</dd>
+        <dt>어울리는 곳</dt><dd>가장 완성도 있어 보이고, 머리말 한 줄 없이도 누가 만든 문서인지 분명함.</dd>
+        <dt>아쉬운 점</dt><dd>색이 들어가 흑백 인쇄에서 띠가 회색으로 뭉개짐.</dd>
+      </dl></div>
+    </div>
+  </section>
+
+  <div class="cmp-wrap"><table class="cmp">
+    <thead><tr><th></th><th>1 기업 재단형</th><th>2 전통 재단형</th><th>3 대학 본부형</th></tr></thead>
+    <tbody>
+      <tr><th>선</th><td>가는 회색</td><td>검은 선 + 굵은 바깥 틀</td><td>검은 선 + 색 띠</td></tr>
+      <tr><th>이름표</th><td>옅은 회색 · 자간 넓힘</td><td>옅은 청색 열</td><td>색 없음 · 가운데 맞춤</td></tr>
+      <tr><th>서술 칸</th><td>질문 띠 아래 넓은 칸</td><td>왼쪽 이름표 + 오른쪽 칸</td><td>절 띠 아래 넓은 칸</td></tr>
+      <tr><th>말투</th><td>「~를 기술해 주세요」</td><td>「위 내용은 사실과 다름이 없습니다」</td><td>「■ 종합기술」 · 「※ 제출 서류」</td></tr>
+      <tr><th>지금 문서에서 고칠 양</th><td>중간</td><td>가장 적음</td><td>가장 많음 (머리글·띠)</td></tr>
+    </tbody>
+  </table></div>
+</div>
+</body>
+</html>
