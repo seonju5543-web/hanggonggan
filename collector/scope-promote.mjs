@@ -74,6 +74,7 @@ export function nationalEvidence(it, body) {
 const lines = [];
 let changed = 0;
 let reverted = 0;
+let absorbedN = 0;
 const items = reg.items;
 /* ⓪ 소급 — 원문 증거로 풀었던 것을 지금 규칙으로 다시 본다. 학교 창구 증거가 있으면 게시 학교 한정으로 되돌린다(머리말 ⓪) */
 for (const it of items) {
@@ -95,6 +96,7 @@ for (const m of mergeSamePrograms(items, TODAY, sameProgram, { reason: '다른 �
     ? `- 🌐 \`${m.keep.id}\` ${(m.keep.name || '').slice(0, 40)} ← \`${m.drop.id}\`(${m.dropSchool}) 와 같은 사업이라 합쳐 전국으로`
     : `- 🌐 \`${m.keep.id}\` ${(m.keep.name || '').slice(0, 40)} (이미 전국) ← \`${m.drop.id}\`(${m.dropSchool}) 같은 사업이라 흡수`);
   changed++;
+  if (!m.promoted) absorbedN++;
 }
 /* ①② 원문 증거 */
 for (const it of items) {
@@ -116,7 +118,7 @@ if (changed && WRITE) {
   reg.updatedAt = TODAY;
   fs.writeFileSync(REG, JSON.stringify(reg, null, 1) + '\n');
 }
-const head = `\n### 🌐 범위 승격 (학교 한정 → 전국) — ${changed - reverted}건${reverted ? ` · 🏫 학교 한정으로 되돌림 ${reverted}건` : ''}`;
+const head = `\n### 🌐 범위 승격 (학교 한정 → 전국) — ${changed - reverted - absorbedN}건${absorbedN ? ` · 이미 전국에 흡수 ${absorbedN}건` : ''}${reverted ? ` · 🏫 학교 한정으로 되돌림 ${reverted}건` : ''}`;
 const body = changed ? lines : ['- 이번 실행에서 원문 증거로 풀 수 있는 학교 한정 공고가 없었어요.'];
 if (WRITE && fs.existsSync(REPORT)) fs.appendFileSync(REPORT, ['', head, '원문(접수 이메일 도메인·"재단에 직접 제출"·다른 학교의 같은 사업)이 전국 사업이라고 말하는 것만 풀었어요. 학교 창구(장학팀·포털·우편 받는 곳·학교 추천·국가근로)로 내는 것은 그 학교 한정이 맞아 그대로 두고, 예전에 풀었던 것도 되돌립니다.', ...body].join('\n'));
-console.log(`scope-promote: ${changed - reverted} promoted, ${reverted} reverted` + (WRITE ? '' : ' (dry)'));
+console.log(`scope-promote: ${changed - reverted - absorbedN} promoted, ${absorbedN} absorbed, ${reverted} reverted` + (WRITE ? '' : ' (dry)'));

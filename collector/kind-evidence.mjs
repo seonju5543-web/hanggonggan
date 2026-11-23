@@ -49,7 +49,7 @@ export const SCHOOL_APPLY_RE = /(장학팀|학생지원팀|학생처|학생과|�
    받는 곳 표식 뒤의 같은 줄 — 표식만 있는 줄이면 다음 줄 — 을 읽는다. 「문의」 뒤는 받는 곳이 아니고, 받는 곳에 바깥 기관 낱말(ORG_RE)이 있으면 학교가 아니다
    (「제출처: ○○재단 사무국」 · 통영시 「우편물 제출처: 통영시 평생교육과」 는 그대로 재단·시 쪽 증거). */
 const SCHOOL_OFFICE = '장학팀|학생지원팀|학생지원과|학생처|학생과|학과\\s*사무실|행정실|교학팀|학사지원팀|장학복지팀|학생지원처|학생복지팀';
-const DEST_MARK_RE = /(?:우편|등기|방문)\s*(?:제출|접수)(?:처)?|(?:우편물\s*)?(?:제출|접수)\s*(?:처|장소|주소)|보내실\s*곳|받는\s*곳/;
+const DEST_MARK_RE = /(?:우편|등기|방문)\s*(?:제출|접수)(?:처(?!리))?|(?:우편물\s*)?(?:제출|접수)\s*(?:처(?!리)|장소|주소)|보내실\s*곳|받는\s*곳/;   // 「접수 처리 결과」 는 받는 곳이 아니다(리뷰)
 const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 export function schoolMailDest(body, school) {
   const office = new RegExp(`(${SCHOOL_OFFICE}${school ? `|${escapeRe(school)}` : ''})`);
@@ -71,11 +71,15 @@ export function schoolMailDest(body, school) {
    세종대 「② 학생지원과 추천대상자 확정 후 … ③ 추천대상자 한국장학재단 온라인 신청」 은 「재단 온라인 신청」 으로 전국에 풀려 44개교에 보였고,
    성균관대 성암육영회(「학교 추천자로 선발되었어도」)도 같았다. 맨 「추천서」(지도교수 추천서 · 재단 양식 추천서)는 학교 배정이 아니다(동진장학 실례).
    고등·중·초등학교 추천은 대학 창구가 아니다 · 「대학 추천 없이」 처럼 부정이면 아니다. */
-export const SCHOOL_RECOMMEND_RE = /(?:(?<!고등|중|초등)학교|대학(?:교)?|총장\s*님?)\s*(?:명의\s*|직인\s*)?추천(?!\s*(?:서\s*)?(?:없이|불필요|필요\s*없|아님|무관|하지\s*않|받지\s*않))|추천\s*대상자|(?:학교|대학)별\s*(?:배정|추천)/;
+export const SCHOOL_RECOMMEND_RE = /(?:(?<!고등|중|초등)학교|대학(?:교)?|총장\s*님?)\s*(?:명의\s*|직인\s*)?추천(?![^\n.。]{0,15}(?:없이|불필요|필요\s*(?:가\s*)?없|아님|무관|하지\s*않|받지\s*않))|추천\s*대상자|(?:학교|대학)별\s*(?:배정|추천)/;
 /* 국가근로 — 소속 대학이 뽑는다. 교외 근로기관은 그 대학과 협약한 곳이고(동양미래대 국가근로 운영 기준 「교외근로장학생 선발 기준은 근로기관과 협약을 통해」 ·
    한국장학재단 근로기관 안내자료 「장학생의 소속대학에 문의 … 대학 담당자와 협의 후 대체장학생 선발」) 그 학교 게시판의 모집 글은 그 학교 학생 몫이다.
    과기대 「국가근로장학생 교체 선발모집_(주)아이티희망나눔」 은 지원서를 회사 메일(naver.com)로 받아 '학교 밖 접수'로 전국에 풀렸다(2026-11-23). */
 export const WORK_STUDY_RE = /국가\s*근로/;
+/* 본문 속 **남의 글 제목** 줄 — 이전글·다음글·옆 목록이 본문에 딸려 온다(홍익 본문 끝 「[서울 학부생] 2026-2학기 학생 포상 추천 접수」 실례).
+   건국대 제목은 「[학교추천][교외]…」 꼴이라 그 줄이 학교 추천 증거로 읽혀 전국 사업이 ⓪ 에서 한 학교로 좁혀질 수 있었다(리뷰 2026-11-23).
+   학교 추천 낱말은 이 공고의 제목과 제 본문 줄에서만 읽는다 — 대괄호로 시작하는 줄 · 이름표(:) 없이 안내·공고·모집·선발로 끝나는 짧은 줄은 남의 제목으로 본다. */
+const looksLikeOtherTitle = (l) => /^\s*[\[【]/.test(l) || (l.length <= 90 && !/[:：]/.test(l) && /(안내|공고|모집|선발|접수)\s*(\([^)]*\))?\s*$/.test(l));
 
 /** 학교 창구로 받는다는 원문 증거 — 있으면 전국으로 풀지 않는다(scope-promote ①②) · 이미 푼 것은 되돌린다(같은 로봇 ⓪). 순수 함수.
  *  @param x { title, text, excerpts, school, applyPortal, applyEmail, domain } @returns 근거 한 줄 | null */
@@ -87,7 +91,8 @@ export function schoolWindowEvidence(x = {}) {
   if ((m = SCHOOL_APPLY_RE.exec(body))) return `접수처 「${m[0].trim()}」`;
   const mail = schoolMailDest(body, x.school);
   if (mail) return `받는 곳 「${mail}」`;
-  if ((m = SCHOOL_RECOMMEND_RE.exec(`${title}\n${body}`))) return `학교 추천 「${m[0].trim()}」`;
+  const ownLines = body.split('\n').filter((l) => !looksLikeOtherTitle(l)).join('\n');
+  if ((m = SCHOOL_RECOMMEND_RE.exec(`${title}\n${ownLines}`))) return `학교 추천 「${m[0].trim()}」`;
   if (x.applyPortal) return `포털 ${x.applyPortal}`;
   const ed = String(x.applyEmail || '').split('@')[1] || '';
   if (domainMatches(ed, x.domain)) return `접수 이메일 도메인 ${ed} (학교)`;

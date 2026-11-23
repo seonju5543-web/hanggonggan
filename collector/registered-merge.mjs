@@ -29,6 +29,9 @@ const robotScoped = (it, today) => !!(it && it.auto && it.type === '교외' && !
 
 /** 승격 후보 — 위 조건 + 학교 한정(schoolOnly) */
 export function promotableOn(it, today) {
+  /* 🔴 학교 창구 증거로 되돌린 것(scope-promote ⓪ · 「원문 재판정으로 학교 한정」)은 합치기로도 다시 넓히지 않는다 — 학교 추천·창구 접수분은
+     학교마다 따로다(리뷰 2026-11-23 · 안 그러면 같은 실행의 ③ 이나 다음 자동 등록이 다른 학교 같은 사업과 합쳐 44개교로 되돌린다). 사람이 본다 */
+  if (/원문 재판정으로 학교 한정/.test((it && it.scopeFrom) || '')) return false;
   return robotScoped(it, today) && !!((it.eligibility || {}).schoolOnly);
 }
 
