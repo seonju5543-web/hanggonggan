@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: david/great-tesla-un1ov3
-메모: 2026-11-23 노션 수리 — 「작업 현황」 로봇·백로그 주소를 옮겨진 새 「한대장」 사본으로(선주)
+branch: david/brave-rubin-pifh74
+메모: 2026-11-23 층2 서울선순환인재 장학금 — 서울런 멘토가 아닌 학생에게 적합도 95%(틀린 안심) 수리(선주)
