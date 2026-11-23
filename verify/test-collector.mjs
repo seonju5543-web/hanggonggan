@@ -1985,6 +1985,10 @@ console.log('\n■ 신청 내역 진행 화면 — 한 흐름 (2026-11-21)');
     /* 문서 줄 전체(docsHtml 정의 — 「작성한 서류 보기」 펼침 앞까지)의 단추를 센다 — span 안만 세면 그 밖에 붙은 단추를 놓친다(리뷰 2026-11-22) */
     [((block.slice(block.indexOf('const docsHtml'), block.indexOf('dp-saved', block.indexOf('const docsHtml')))).match(/<button/g) || []).length, /id="btn-form-print">PDF 저장</.test(block), /id="btn-form-edit">다시 작성</.test(block), ['btn-form-save', 'btn-form-share'].filter((id) => od.includes(id))],
     [2, true, true, []]);
+  /* 「다시 작성」으로 보기만 하고 닫아도 이어보기 장부(form)가 적힌다 — 다 쓴 신청(pending 없음)은 홈 「쓰던 신청서」가 아니다(리뷰 2026-11-23 · 실제 눌러 보는 건 verify-apply-prep) */
+  eq('🔴 다 쓴 신청은 「쓰던 신청서」로 불리지 않는다 — resumeDraft 가 pending 없이 담긴 공고의 양식 장부를 건너뛴다 · 되살린 화면은 조용히 연다',
+    [/const formDone = \(id\) => \(state\.applications \|\| \[\]\)\.some\(\(a\) => a\.id === id && !a\.pending\);/.test(take('resumeDraft')), /&& !formDone\(saved\.form\.schId\)/.test(take('resumeDraft')), /done \? \{ \.\.\.resumePlan\.form, quiet: true \} : resumePlan\.form/.test(app)],
+    [true, true, true]);
   /* 2026-11-23 개발자 지적 「확인했어요 버튼을 누르면 공고의 맨 마지막으로 이동돼」 — 다시 그릴 때 보던 자리를 넘기고, 누른 줄을 제자리로 맞춘다(실제 눌러 보는 건 verify-apply-prep) */
   const toggleSrc = od.slice(od.indexOf("[data-prep-toggle]').forEach"), od.indexOf("$('#btn-mark-submitted')"));
   eq('🔴 「확인했어요」로 다시 그려도 시트가 맨 위로 튀지 않는다 — 보던 자리(keepScroll)로 그리고 누른 줄을 제자리에 맞춘다',

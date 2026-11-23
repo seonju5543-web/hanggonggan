@@ -1644,7 +1644,10 @@ function resumeDraft() {
   const saved = typeof resumeLoad === 'function' ? resumeLoad() : null;
   const now = Date.now();
   const alive = (p) => typeof resumeProgressAlive === 'function' && resumeProgressAlive(p, now);
-  const form = saved && alive(saved.form) && findSch(saved.form.schId) ? { kind: 'form', sch: findSch(saved.form.schId), prog: saved.form } : null;
+  /* 🔴 이미 다 쓴 신청(신청내역에 pending 없이 담김)은 '쓰던 신청서'가 아니다 (리뷰 2026-11-23) — 신청 내역 「다시 작성」으로 열어 보기만 하고 닫아도
+     양식 화면이 이어보기 장부(form)를 적어, 홈 히어로가 끝난 신청을 「쓰던 신청서 1건」으로 불렀다 */
+  const formDone = (id) => (state.applications || []).some((a) => a.id === id && !a.pending);
+  const form = saved && alive(saved.form) && findSch(saved.form.schId) && !formDone(saved.form.schId) ? { kind: 'form', sch: findSch(saved.form.schId), prog: saved.form } : null;
   const fillSch = saved && alive(saved.fill) && (typeof fillTargetFor === 'function' ? fillTargetFor(saved.fill.schId) : findSch(saved.fill.schId));
   /* 🔴 그 양식(PDF 사본·서식 쪽)이 아직 실려 있을 때만 — 마감 뒤 로봇이 사본을 지우면 열 수 없는 줄이 7일 남고, 더 늦게 쓴 그것이 열리는 앱 신청서를 가린다(리뷰 2026-11-21) */
   const fillOpenable = fillSch && ((typeof formPdfsFor === 'function' && formPdfsFor(fillSch).length) || (typeof formPagesFor === 'function' && formPagesFor(fillSch).length));
@@ -3025,7 +3028,9 @@ else if (resumePlan.screen === 'onboarding') {
         const sch = findSch(resumePlan.form.schId);
         /* 🔴 마감·자격은 여기서 다시 보지 않는다 — 이미 쓴 글을 뺏지 않는다.
            마감된 공고는 시트 안의 판정이 제 손으로 말한다. */
-        if (sch) { openSheetShell(); startFormFill(sch, resumePlan.form); return; }
+        /* 다 쓴 신청을 「다시 작성」으로 보던 중이었다면 「쓰던 신청서를 그대로 불러왔어요」 알림은 맞지 않다 — 조용히 연다(리뷰 2026-11-23) */
+        const done = (state.applications || []).some((a) => a.id === resumePlan.form.schId && !a.pending);
+        if (sch) { openSheetShell(); startFormFill(sch, done ? { ...resumePlan.form, quiet: true } : resumePlan.form); return; }
       }
       /* 🔴 공고 상세는 저장해 둔 판정을 쓰지 않고 `openDetail` 이 처음부터 다시 판정한다 */
       if (resumePlan.sheet && findSch(resumePlan.sheet)) openDetail(resumePlan.sheet);

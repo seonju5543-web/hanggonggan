@@ -375,12 +375,16 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
       if (e) e.click();
       await new Promise((r) => setTimeout(r, 400));
       const edit = { stage: formFill && formFill.stage, tpl: formFill && formFill.tplId, sch: formFill && formFill.schId === id };
+      /* 보기만 하고 닫았다 — 다 쓴 신청이 홈에서 「쓰던 신청서」로 불리면 안 된다(리뷰 2026-11-23: 닫을 때 이어보기 장부가 적힌다) */
+      closeSheet(); await new Promise((r) => setTimeout(r, 300));
+      const d = resumeDraft();
+      const draftAfterLook = !!(d && d.sch && d.sch.id === id);
       state.applications = state.applications.filter((a) => a.id !== id);
       resumeSave({ form: null, sheet: null });
-      return { threw, has, label, called, edit };
+      return { threw, has, label, called, edit, draftAfterLook };
     }, pick.P.id);
     eq('  다 쓴 문서(작성한 양식 문서)는 원본이 생긴 뒤에도 「PDF 저장」(그 문서·쓴 답으로 인쇄)·「다시 작성」(그 문서를 미리보기로)이 있고 .doc 저장·공유는 없다',
-      r3, { threw: '', has: [true, true, false, false], label: ['PDF 저장', '다시 작성'], called: { tpl: true, ans: true }, edit: { stage: 'preview', tpl: 'prep:' + pick.P.id, sch: true } });
+      r3, { threw: '', has: [true, true, false, false], label: ['PDF 저장', '다시 작성'], called: { tpl: true, ans: true }, edit: { stage: 'preview', tpl: 'prep:' + pick.P.id, sch: true }, draftAfterLook: false });
     await page.keyboard.press('Escape');
     await closedAfter(600);
   }
