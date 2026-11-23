@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>앱 자체 제작 문서 — 개선 시안 셋</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* 시안 — 값은 style.css :root 실효값을 옮겨 적었다(앱 화면 부분) */
+:root {
+  --bg: #f6f4f0; --surface: #fffefc; --surface-2: #f1eee8;
+  --text: #191713; --text-sub: #57524a; --text-weak: #8b857b;
+  --line: rgba(25,23,19,.09); --line-2: rgba(25,23,19,.18);
+  --primary: #23201a; --accent: #8a6a1f; --accent-soft: rgba(138,106,31,.10); --accent-line: rgba(138,106,31,.26);
+  --paper: #fff; --ink: #111;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 40px 16px 72px; }
+h1 { font-size: 27px; margin: 0 0 8px; letter-spacing: -.02em; text-wrap: balance; }
+.lede { color: var(--text-sub); margin: 0 0 28px; max-width: 64ch; font-size: 14.5px; }
+h2 { font-size: 21px; margin: 0; letter-spacing: -.02em; }
+h3 { font-size: 12.5px; font-weight: 700; color: var(--text-weak); margin: 0 0 10px; letter-spacing: .02em; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* 조사 결과 */
+.find { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.find > div { background: var(--surface); border: 1px solid var(--line); border-radius: 19px; padding: 18px 20px; }
+.find b { display: block; font-size: 27px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.find span { font-size: 13.5px; color: var(--text-sub); }
+.bars { background: var(--surface); border: 1px solid var(--line); border-radius: 19px; padding: 20px; margin-bottom: 44px; }
+.bars-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 36px; }
+.bar { display: grid; grid-template-columns: 132px 1fr 40px; align-items: center; gap: 10px; font-size: 13.5px; }
+.bar i { display: block; height: 8px; border-radius: 99px; background: var(--surface-2); position: relative; overflow: hidden; }
+.bar i::after { content: ''; position: absolute; inset: 0 auto 0 0; width: var(--w); background: var(--primary); border-radius: 99px; }
+.bar.miss i::after { background: var(--accent); }
+.bar.miss em { color: var(--accent); font-weight: 700; }
+.bar em { font-style: normal; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-sub); }
+.legend { font-size: 12.5px; color: var(--text-weak); margin: 14px 0 0; }
+.legend u { text-decoration: none; display: inline-block; width: 10px; height: 10px; border-radius: 99px; margin-right: 5px; vertical-align: -1px; }
+
+/* 시안 한 벌 */
+.opt { background: var(--surface); border: 1px solid var(--line); border-radius: 27px; padding: 28px; margin-bottom: 28px; }
+.opt-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.opt-tag { font-size: 12.5px; font-weight: 800; color: var(--accent); background: var(--accent-soft); border-radius: 99px; padding: 3px 11px; }
+.opt-sub { color: var(--text-sub); font-size: 14.5px; margin: 0 0 22px; max-width: 70ch; }
+.opt-body { display: grid; grid-template-columns: 300px minmax(0, 1fr) 240px; gap: 28px; align-items: start; }
+.notes { font-size: 13.5px; color: var(--text-sub); }
+.notes dl { margin: 0; }
+.notes dt { font-weight: 700; color: var(--text); margin-top: 14px; }
+.notes dt:first-child { margin-top: 0; }
+.notes dd { margin: 2px 0 0; }
+
+/* 폰 화면 */
+.phone { background: var(--bg); border: 1px solid var(--line-2); border-radius: 30px; padding: 10px; }
+.sheet { background: var(--surface); border-radius: 22px; padding: 10px 16px 18px; font-size: 13.5px; }
+.sheet::before { content: ''; display: block; width: 38px; height: 4px; background: var(--line-2); border-radius: 99px; margin: 0 auto 14px; }
+.s-title { font-size: 18.5px; font-weight: 800; margin: 0; letter-spacing: -.02em; }
+.s-prov { font-size: 12.5px; color: var(--text-weak); margin: 2px 0 14px; }
+.s-h { font-size: 12.5px; font-weight: 700; color: var(--text-weak); margin: 16px 0 6px; }
+.auto { border: 1px solid var(--line); border-radius: 13px; padding: 10px 12px; font-size: 12.5px; color: var(--text-sub); display: flex; justify-content: space-between; gap: 8px; }
+.auto b { color: var(--text); font-weight: 700; }
+.q { font-weight: 700; margin: 0 0 6px; }
+.ta { border: 1px solid var(--line-2); border-radius: 13px; padding: 10px 12px; min-height: 58px; color: var(--text-weak); font-size: 12.5px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip { border: 1px solid var(--line-2); border-radius: 99px; padding: 5px 11px; font-size: 12.5px; background: var(--surface); }
+.chip.on { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn { display: block; text-align: center; background: var(--primary); color: #fff; border-radius: 13px; padding: 12px; font-weight: 700; margin-top: 16px; font-size: 14.5px; }
+.count { float: right; font-weight: 500; color: var(--text-weak); font-variant-numeric: tabular-nums; font-size: 11.5px; }
+.steps { display: flex; gap: 4px; margin: 0 0 14px; }
+.steps i { flex: 1; height: 3px; border-radius: 99px; background: var(--surface-2); }
+.steps i.on { background: var(--primary); }
+
+/* 종이 문서 */
+.paper-wrap { overflow-x: auto; }
+.paper { background: var(--paper); color: var(--ink); border: 1px solid var(--line-2); box-shadow: 0 10px 30px rgba(25,23,19,.07); padding: 30px 30px 26px; min-width: 430px; font-size: 11.5px; line-height: 1.5; }
+.paper + .paper { margin-top: 14px; }
+.p-tag { font-size: 10.5px; color: #555; margin: 0; }
+
+/* A — 재단 서식형 */
+.a-title { text-align: center; font-size: 19px; font-weight: 800; letter-spacing: .28em; margin: 12px 0 2px; padding-left: .28em; }
+.a-name { text-align: center; font-size: 11.5px; color: #444; margin: 0 0 14px; }
+.a-sec { font-weight: 800; font-size: 11.5px; margin: 14px 0 0; padding: 4px 8px; background: #111; color: #fff; display: inline-block; }
+table.a { width: 100%; border-collapse: collapse; table-layout: fixed; border-top: 1.5px solid #111; }
+table.a th, table.a td { border: 1px solid #555; padding: 5px 7px; text-align: left; vertical-align: top; }
+table.a th { background: #f2f2f0; font-weight: 600; width: 22%; white-space: nowrap; }
+table.a td { overflow-wrap: anywhere; }
+table.a td.long { height: 46px; color: #333; }
+.a-sign { text-align: center; margin-top: 16px; }
+.a-org { text-align: center; font-weight: 800; font-size: 14px; margin-top: 8px; letter-spacing: .1em; }
+.box { display: inline-block; width: 9px; height: 9px; border: 1px solid #222; margin-right: 5px; vertical-align: -1px; }
+.box.on { background: #111; box-shadow: inset 0 0 0 1.5px #fff; }
+
+/* B — 옮겨 적기 답안지 (폰 화면이 주인공) */
+.card { border: 1px solid var(--line); border-radius: 13px; padding: 11px 12px; margin-bottom: 8px; }
+.card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+.card-top b { font-size: 12.5px; }
+.copy { font-size: 11.5px; font-weight: 700; border: 1px solid var(--line-2); border-radius: 99px; padding: 3px 10px; color: var(--text); white-space: nowrap; }
+.copy.done { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+.card p { margin: 0; color: var(--text-sub); font-size: 12.5px; }
+.kv { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.kv .card { margin: 0; padding: 8px 10px; }
+.kv small { display: block; color: var(--text-weak); font-size: 11.5px; }
+.kv b { font-size: 12.5px; }
+.todo { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.todo li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.todo .mk { width: 16px; height: 16px; border-radius: 99px; border: 1.5px solid var(--line-2); flex: none; }
+.todo .done .mk { background: var(--primary); border-color: var(--primary); }
+.todo .done { color: var(--text-weak); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* C — 표지 + 서술 별지 */
+.c-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; border-bottom: 2px solid #111; padding-bottom: 12px; }
+.c-kicker { font-size: 10.5px; letter-spacing: .14em; color: #666; margin: 6px 0 4px; }
+.c-title { font-size: 19px; font-weight: 800; margin: 0; letter-spacing: -.02em; line-height: 1.3; }
+.c-due { text-align: right; white-space: nowrap; }
+.c-due b { display: block; font-size: 21px; font-variant-numeric: tabular-nums; }
+.c-due span { font-size: 10.5px; color: #555; }
+.c-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 12px; }
+.c-grid div { padding: 7px 0; border-bottom: 1px solid #ddd; }
+.c-grid small { display: block; font-size: 10px; color: #777; }
+.c-grid b { font-size: 12px; font-weight: 600; }
+.c-h { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; margin: 16px 0 6px; color: #111; }
+.c-list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 20px; }
+.c-list li { padding: 3px 0; break-inside: avoid; }
+.c-foot { margin-top: 16px; padding-top: 10px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; color: #555; font-size: 10.5px; }
+.c-essay h4 { font-size: 13px; margin: 14px 0 4px; }
+.c-essay p { margin: 0; color: #222; text-align: justify; }
+.c-essay .meta { font-size: 10.5px; color: #777; }
+
+.cmp { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 19px; overflow: hidden; font-size: 13.5px; }
+.cmp th, .cmp td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cmp thead th { font-size: 12.5px; color: var(--text-weak); }
+.cmp tr:last-child td, .cmp tr:last-child th { border-bottom: 0; }
+.cmp tbody th { font-weight: 700; white-space: nowrap; }
+.cmp-wrap { overflow-x: auto; }
+
+@media (max-width: 980px) {
+  .opt-body { grid-template-columns: 1fr; }
+  .phone { max-width: 320px; }
+  .find, .bars-grid, .two { grid-template-columns: 1fr; }
+  .opt { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>앱 자체 제작 문서 — 개선 시안 셋</h1>
+  <p class="lede">앱에 등록된 신청서 양식을 전부 열어 「재단·학교가 실제로 무엇을 묻는가」를 세고, 지금 앱이 만드는 지원문서와 비교한 뒤 방향 셋을 그렸습니다. 예시 공고는 지금 앱 문서가 뜨는 「배재장학재단 모범학생장학금(자립지원)」, 인적사항 값은 예시입니다.</p>
+
+  <div class="find">
+    <div><b>41건</b><span>마감 전 공고 63건 중 앱 자체 문서가 뜨는 공고 (재단 접수 37 · 접수 방법 미상 4)</span></div>
+    <div><b>0건</b><span>그중 「이 문서를 그대로 제출할 수 있는」 공고 — 전부 재단 서식에 옮겨 적는 용도</span></div>
+    <div><b>31건</b><span>공고와 상관없이 똑같은 기본 세 절(동기·학업/활동·계획)이 뜨는 공고</span></div>
+  </div>
+
+  <div class="bars">
+    <h3>등록 양식 73종이 묻는 칸 (칸을 읽을 수 있었던 양식 기준)</h3>
+    <div class="bars-grid">
+      <div class="bar"><span>성명</span><i style="--w:97%"></i><em>97%</em></div>
+      <div class="bar miss"><span>주소</span><i style="--w:64%"></i><em>64%</em></div>
+      <div class="bar"><span>연락처</span><i style="--w:84%"></i><em>84%</em></div>
+      <div class="bar miss"><span>생년월일</span><i style="--w:34%"></i><em>34%</em></div>
+      <div class="bar"><span>학과·전공</span><i style="--w:71%"></i><em>71%</em></div>
+      <div class="bar miss"><span>성적(평점·이수학점)</span><i style="--w:23%"></i><em>23%</em></div>
+      <div class="bar"><span>학년·학기</span><i style="--w:59%"></i><em>59%</em></div>
+      <div class="bar miss"><span>보호자·가족</span><i style="--w:22%"></i><em>22%</em></div>
+      <div class="bar"><span>학번</span><i style="--w:56%"></i><em>56%</em></div>
+      <div class="bar miss"><span>계좌</span><i style="--w:19%"></i><em>19%</em></div>
+      <div class="bar"><span>이메일</span><i style="--w:42%"></i><em>42%</em></div>
+      <div class="bar miss"><span>소득분위</span><i style="--w:10%"></i><em>10%</em></div>
+    </div>
+    <p class="legend"><u style="background:#23201a"></u>지금 앱 문서에 있는 칸 &nbsp;&nbsp; <u style="background:#8a6a1f"></u>양식은 묻는데 앱 문서에 없는 칸 &nbsp;·&nbsp; 서술 칸이 있는 양식은 40종, 평균 3문항 (가장 흔한 묶음: 신청 동기 · 교내외 활동 · 학업/진로 계획)</p>
+  </div>
+
+  <!-- ══════════ 시안 A ══════════ -->
+  <section class="opt" id="opt-a">
+    <div class="opt-head"><span class="opt-tag">시안 A</span><h2>재단 서식을 닮은 표준 지원서</h2></div>
+    <p class="opt-sub">실제 재단 양식이 묻는 칸을 그대로 갖춘 한 장. 칸 이름·순서가 재단 서식과 같아서 옮겨 적을 때 찾기 쉽습니다. 지금 문서의 뼈대를 유지하고 내용만 채우는 가장 작은 변화.</p>
+    <div class="opt-body">
+      <div class="phone"><div class="sheet">
+        <p class="s-title">지원문서 작성</p>
+        <p class="s-prov">배재장학재단 모범학생장학금(자립지원)</p>
+        <div class="auto"><span><b>내 정보 11칸</b>을 채웠어요</span><span>확인 ›</span></div>
+        <p class="s-h">자기소개서 1 / 3</p>
+        <p class="q">장학금 신청 동기 <span class="count">0 / 500자</span></p>
+        <div class="chips"><span class="chip on">등록금 부담</span><span class="chip">생활비 부담</span><span class="chip on">스스로 벌어 다님</span><span class="chip">가정 형편</span></div>
+        <div class="ta">키워드를 고르면 이 칸으로 옮겨져요 — 직접 써도 돼요</div>
+        <p class="s-h">자기소개서 2 / 3</p>
+        <p class="q">교내·외 활동 내역</p>
+        <div class="ta">동아리·봉사·근로·프로젝트</div>
+        <p class="s-h">자기소개서 3 / 3</p>
+        <p class="q">학업 및 진로 계획</p>
+        <div class="ta">&nbsp;</div>
+        <span class="btn">지원문서 만들기</span>
+      </div></div>
+
+      <div class="paper-wrap"><div class="paper">
+        <p class="p-tag">※ 앱 자체 제작 문서입니다</p>
+        <p class="a-title">장학금 지원서</p>
+        <p class="a-name">배재장학재단 모범학생장학금(자립지원)</p>
+        <span class="a-sec">1. 인적사항</span>
+        <table class="a">
+          <tr><th>성 명</th><td>김한장</td><th>생년월일</th><td>2004. 3. 14.</td></tr>
+          <tr><th>연락처</th><td>010-0000-0000</td><th>이메일</th><td>hj@example.com</td></tr>
+          <tr><th>주 소</th><td colspan="3">서울특별시 강서구 ○○로 00</td></tr>
+        </table>
+        <span class="a-sec">2. 학적 · 성적</span>
+        <table class="a">
+          <tr><th>학 교</th><td>한국외국어대학교</td><th>학 과</th><td>영어학과</td></tr>
+          <tr><th>학 번</th><td>202100000</td><th>학년(학기)</th><td>3학년 (6학기)</td></tr>
+          <tr><th>직전학기</th><td>평점 3.9 / 4.5 · 14학점</td><th>지원구간</th><td>6구간</td></tr>
+        </table>
+        <span class="a-sec">3. 자기소개서</span>
+        <table class="a">
+          <tr><th>① 신청 동기</th><td class="long">등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. …</td></tr>
+          <tr><th>② 교내·외 활동</th><td class="long">전공 학회와 봉사 동아리에서 꾸준히 활동하며 …</td></tr>
+          <tr><th>③ 학업·진로 계획</th><td class="long">남은 학기 동안 전공 심화 과목을 집중 이수하고 …</td></tr>
+        </table>
+        <span class="a-sec">4. 지원 자격 · 제출 서류 확인</span>
+        <table class="a">
+          <tr><th>지원 자격</th><td><span class="box on"></span>산업체 또는 배재 대학 내 근로 학생<br><span class="box"></span>등록금 납부금액이 100만원 이상인 학생<br><span class="box"></span>모·부자 가정의 자녀 또는 청소년 가장</td></tr>
+          <tr><th>제출 서류</th><td><span class="box"></span>성적증명서 &nbsp; <span class="box"></span>재학증명서 &nbsp; <span class="box"></span>주민등록등본 (주민번호 공개로 제출) &nbsp; <span class="box"></span>장학생 신청양식</td></tr>
+        </table>
+        <p class="a-sign">위 내용은 사실과 다름이 없습니다. &nbsp; 2026년 11월 23일 &nbsp; 지원자 김한장 (서명)</p>
+        <p class="a-org">배재장학재단</p>
+      </div></div>
+
+      <div class="notes"><dl>
+        <dt>내용</dt><dd>생년월일·주소·성적·지원구간 칸 추가(프로필에서 자동). 서술은 양식에서 가장 흔한 세 문항으로.</dd>
+        <dt>디자인</dt><dd>검은 절 머리띠 · 자격은 한 줄에 하나씩 · 서류는 체크 칸.</dd>
+        <dt>좋은 점</dt><dd>고칠 곳이 적고 인쇄했을 때 가장 「서류」답다.</dd>
+        <dt>아쉬운 점</dt><dd>여전히 「제출용처럼 보이는데 제출용이 아닌」 문서. 폰에서 표가 좁다.</dd>
+      </dl></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 시안 B ══════════ -->
+  <section class="opt" id="opt-b">
+    <div class="opt-head"><span class="opt-tag">시안 B</span><h2>옮겨 적기 답안지</h2></div>
+    <p class="opt-sub">앱 문서가 뜨는 41건이 모두 「재단 서식에 옮겨 적는」 용도라는 점에 맞춘 방향. 종이 흉내를 그만두고, 칸마다 「복사」가 달린 답안지를 화면에 둡니다. 재단 서식(PDF·포털)을 옆에 열고 한 칸씩 붙여 넣는 쓰임.</p>
+    <div class="opt-body">
+      <div class="phone"><div class="sheet">
+        <p class="s-title">내 답안지</p>
+        <p class="s-prov">배재장학재단 모범학생장학금(자립지원) · <span style="white-space:nowrap">마감 D-4</span></p>
+        <p class="s-h">인적사항 · 학적</p>
+        <div class="kv">
+          <div class="card"><small>성명</small><b>김한장</b></div>
+          <div class="card"><small>생년월일</small><b>2004. 3. 14.</b></div>
+          <div class="card"><small>학번</small><b>202100000</b></div>
+          <div class="card"><small>직전학기 평점</small><b>3.9 / 4.5</b></div>
+        </div>
+        <p class="s-h">서술 답</p>
+        <div class="card">
+          <div class="card-top"><b>신청 동기 <span class="count" style="float:none">· 412자</span></b><span class="copy done">복사됨</span></div>
+          <p>등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. 학기 중 근로로 생활비를 …</p>
+        </div>
+        <div class="card">
+          <div class="card-top"><b>교내·외 활동 <span class="count" style="float:none">· 286자</span></b><span class="copy">복사</span></div>
+          <p>전공 학회와 봉사 동아리에서 꾸준히 활동하며 …</p>
+        </div>
+        <div class="card">
+          <div class="card-top"><b>학업·진로 계획</b><span class="copy">쓰기</span></div>
+          <p style="color:var(--text-weak)">아직 안 썼어요</p>
+        </div>
+        <span class="btn">선발 공고문 열고 옮겨 적기</span>
+      </div></div>
+
+      <div class="two">
+        <div class="phone"><div class="sheet">
+          <p class="s-title">낼 것 챙기기</p>
+          <p class="s-prov">재단이 정한 접수 방법 · 마감 2026-11-27</p>
+          <ul class="todo">
+            <li class="done"><span class="mk"></span>답안지 3문항 중 2문항</li>
+            <li class="done"><span class="mk"></span>성적증명서</li>
+            <li><span class="mk"></span>재학증명서</li>
+            <li><span class="mk"></span>주민등록등본 (주민번호 공개로 제출)</li>
+            <li><span class="mk"></span>장학생 신청양식</li>
+          </ul>
+          <p class="s-h">지원 자격 — 해당하는 것</p>
+          <div class="chips"><span class="chip on">배재 대학 내 근로 학생</span><span class="chip">등록금 100만원 이상 납부</span><span class="chip">모·부자 가정의 자녀</span></div>
+          <span class="btn">신청내역에 담기</span>
+        </div></div>
+        <div class="paper-wrap"><div class="paper" style="min-width:0;padding:22px 20px">
+          <p class="p-tag">※ 앱 자체 제작 문서입니다 · 인쇄용 한 장</p>
+          <p style="font-size:14px;font-weight:800;margin:8px 0 10px">옮겨 적을 내용</p>
+          <table class="a">
+            <tr><th style="width:40%">성명</th><td>김한장</td></tr>
+            <tr><th>생년월일</th><td>2004. 3. 14.</td></tr>
+            <tr><th>학번</th><td>202100000</td></tr>
+            <tr><th>직전학기 평점</th><td>3.9 / 4.5</td></tr>
+            <tr><th>신청 동기</th><td class="long">등록금 부담을 덜고 …</td></tr>
+            <tr><th>교내·외 활동</th><td class="long">전공 학회와 …</td></tr>
+          </table>
+          <p style="color:#666;font-size:10.5px;margin:10px 0 0">서명·기관명 칸 없음 — 제출 서류가 아니라 메모</p>
+        </div></div>
+      </div>
+
+      <div class="notes"><dl>
+        <dt>내용</dt><dd>칸마다 복사 · 서술은 글자 수 표시 · 서류 준비와 답 작성을 한 목록으로.</dd>
+        <dt>디자인</dt><dd>앱 카드 한 벌 그대로. 인쇄본은 서명·기관명 없는 메모 한 장으로 낮춤.</dd>
+        <dt>좋은 점</dt><dd>실제 쓰임과 일치. 「제출 서류처럼 보이는」 오해가 사라져 정직한 신청 상태 원칙에 가장 잘 맞음. 포털 입력 공고에 특히 편함.</dd>
+        <dt>아쉬운 점</dt><dd>화면을 새로 만드는 일이 가장 큼. 자유 양식 공고(지금 0건)는 A식 문서가 따로 필요.</dd>
+      </dl></div>
+    </div>
+  </section>
+
+  <!-- ══════════ 시안 C ══════════ -->
+  <section class="opt" id="opt-c">
+    <div class="opt-head"><span class="opt-tag">시안 C</span><h2>한 장 요약 표지 + 서술 별지</h2></div>
+    <p class="opt-sub">표 양식을 버리고 두 쪽으로 나눕니다. 1쪽은 공고·지원자·낼 것을 한눈에 보는 표지, 2쪽은 표 없이 글로만 된 자기소개서. 서술문은 공고가 이름 붙여 요구한 서류(자기소개서·학업계획서) 단위로 쪽이 나뉩니다.</p>
+    <div class="opt-body">
+      <div class="phone"><div class="sheet">
+        <p class="s-title">지원문서 작성</p>
+        <p class="s-prov">배재장학재단 모범학생장학금(자립지원)</p>
+        <div class="steps"><i class="on"></i><i class="on"></i><i></i></div>
+        <p class="s-h">2단계 · 자기소개서</p>
+        <p class="q">어떤 이야기를 담을까요?</p>
+        <div class="chips"><span class="chip on">신청 동기</span><span class="chip on">교내·외 활동</span><span class="chip on">학업·진로 계획</span><span class="chip">성장 과정</span><span class="chip">장래 포부</span></div>
+        <p class="q" style="margin-top:12px">신청 동기 <span class="count">412 / 500자</span></p>
+        <div class="ta" style="color:var(--text-sub)">등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. 학기 중 근로로 …</div>
+        <p class="q" style="margin-top:12px">교내·외 활동</p>
+        <div class="ta">&nbsp;</div>
+        <span class="btn">다음 — 낼 것 확인</span>
+      </div></div>
+
+      <div class="paper-wrap">
+        <div class="paper">
+          <div class="c-top">
+            <div>
+              <p class="p-tag">※ 앱 자체 제작 문서입니다</p>
+              <p class="c-kicker">배재장학재단 · 지원 요약</p>
+              <p class="c-title">모범학생장학금(자립지원)</p>
+            </div>
+            <div class="c-due"><b>11. 27.</b><span>마감 · 재단이 정한 접수 방법</span></div>
+          </div>
+          <div class="c-grid">
+            <div><small>성명</small><b>김한장</b></div>
+            <div><small>학교 · 학과</small><b>한국외대 영어학과</b></div>
+            <div><small>학년(학기)</small><b>3학년 (6학기)</b></div>
+            <div><small>학번</small><b>202100000</b></div>
+            <div><small>직전학기 평점</small><b>3.9 / 4.5</b></div>
+            <div><small>연락처</small><b>010-0000-0000</b></div>
+          </div>
+          <p class="c-h">제출 서류</p>
+          <ul class="c-list">
+            <li><span class="box on"></span>성적증명서</li>
+            <li><span class="box"></span>재학증명서</li>
+            <li><span class="box"></span>주민등록등본 (주민번호 공개로 제출)</li>
+            <li><span class="box"></span>장학생 신청양식</li>
+          </ul>
+          <p class="c-h">지원 자격 — 본인 확인</p>
+          <ul class="c-list" style="columns:1">
+            <li><span class="box on"></span>산업체 또는 배재 대학 내 근로 학생</li>
+            <li><span class="box"></span>등록금 납부금액이 100만원 이상인 학생</li>
+            <li><span class="box"></span>모·부자 가정의 자녀 또는 청소년 가장</li>
+          </ul>
+          <div class="c-foot"><span>별지 — 자기소개서 1쪽</span><span>1 / 2</span></div>
+        </div>
+        <div class="paper c-essay">
+          <p class="p-tag">※ 앱 자체 제작 문서입니다</p>
+          <p class="c-title" style="margin-top:6px">자기소개서</p>
+          <p class="meta">김한장 · 한국외국어대학교 영어학과 3학년</p>
+          <h4>신청 동기</h4>
+          <p>등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. 학기 중 근로로 생활비를 마련하고 있어 장학 지원이 학업을 이어가는 데 큰 힘이 됩니다.</p>
+          <h4>교내·외 활동</h4>
+          <p>전공 학회와 봉사 동아리에서 꾸준히 활동하며 협업과 책임감을 길렀습니다.</p>
+          <h4>학업·진로 계획</h4>
+          <p>남은 학기 동안 전공 심화 과목을 집중 이수하고, 졸업 후에는 전공을 살려 사회에 기여하겠습니다.</p>
+          <div class="c-foot"><span>2026년 11월 23일 · 지원자 김한장 (서명)</span><span>2 / 2</span></div>
+        </div>
+      </div>
+
+      <div class="notes"><dl>
+        <dt>내용</dt><dd>3단계 작성(내 정보 → 서술 → 낼 것). 서술 문항을 학생이 고름(성장 과정·포부 포함 — 재단 양식에 있는 문항만).</dd>
+        <dt>디자인</dt><dd>표 테두리 대신 여백·가는 선. 마감일을 표지 오른쪽 위에 크게.</dd>
+        <dt>좋은 점</dt><dd>가장 보기 좋고, 자기소개서 쪽은 자유 양식 공고에 그대로 낼 수 있는 모양.</dd>
+        <dt>아쉬운 점</dt><dd>재단 서식(표)과 생김새가 달라 옮겨 적을 때 칸 대응이 A보다 덜 직관적.</dd>
+      </dl></div>
+    </div>
+  </section>
+
+  <h3 style="margin-top:36px">한눈에 비교</h3>
+  <div class="cmp-wrap"><table class="cmp">
+    <thead><tr><th></th><th>지금</th><th>A 표준 지원서</th><th>B 옮겨 적기 답안지</th><th>C 표지 + 별지</th></tr></thead>
+    <tbody>
+      <tr><th>인적·학적 칸</th><td class="num">7칸</td><td class="num">11칸</td><td>11칸 · 칸마다 복사</td><td>표지 6칸 + 나머지는 답안</td></tr>
+      <tr><th>서술 문항</th><td>고정 4칸</td><td>고정 3문항</td><td>3문항 · 글자 수</td><td>학생이 고름</td></tr>
+      <tr><th>제출 서류</th><td>이름 나열</td><td>체크 칸</td><td>준비 체크(앱 안)</td><td>체크 칸</td></tr>
+      <tr><th>결과물</th><td>표 문서 1장</td><td>표 문서 1장</td><td>화면 답안지 + 메모 1장</td><td>표지 + 서술 2쪽</td></tr>
+      <tr><th>고칠 범위</th><td>—</td><td>작음 (문서 틀)</td><td>큼 (새 화면)</td><td>중간 (문서 틀 + 작성 단계)</td></tr>
+    </tbody>
+  </table></div>
+</div>
+</body>
+</html>
