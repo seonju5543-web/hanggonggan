@@ -1798,6 +1798,16 @@ const UNASKED_ATTR = /(개발\s?도상국|영주\s?(?:권|자격)|특별\s?영�
    ⚠️ 푸는 조건은 **그 줄의 미확인 낱말이 전부 답한 처지로 덮일 때만**이다. `추천을 받`·
       `형제·자매 동시 재학` 처럼 물을 칸이 없는 낱말이 하나라도 남으면 빗장은 그대로다
       (`장애학생 중 … 수상 실적` 의 교훈 — 딸린 조건 하나가 맞았다고 ✓ 가 되면 안 된다). */
+/* 🔴 **이미 해 온 활동으로 정한 무리** (2026-11-23 · 층2 서울미래인재재단 「서울선순환인재 장학금」 — 선조치 후 보고).
+   특정자격 칸 `2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토`(공고문 「① 필수 지원자격」)는 「그 사업에서 그만큼 활동한 사람」만 받는다는 말이다 —
+   프로필 어느 칸으로도 모르고, 처지 질문(TRAIT_PAT)으로도 못 묻는다(사업 이름·기간이 공고마다 달라 예/아니요 한 칸에 담기지 않는다).
+   꼴: 활동·참여·참가·봉사·수료·이수 + 한·했던·해 온·하고 있는·중인 … 멘토·멘티·서포터즈·기자단·단원·활동가·수료생 으로 **줄이 끝난다**(끝이 그 무리 이름).
+   ⚠️ `회원` 은 넣지 않는다 — 단체 회원은 처지 질문(member:<단체>)이 있어, 넣으면 「예」라고 답해도 ✓ 가 영영 막힌다(2026-11-23 리뷰).
+   쓰는 곳 셋 — ① 화면 자격 줄(match-engine REQ_SIGNAL · 끝말 「멘토」를 사람으로 못 봐 이 줄이 화면·분모에서 통째로 빠졌다 → 서울 학생 누구에게나 95%)
+   ② 아래 ACHIEVE_PARTS(딸린 조건 — 서울 소재·재학 — 하나가 맞았다고 ✓ 를 주지 않는다) ③ match-engine fitDetail(판정 못 하면 적합도를 단정하지 않는다).
+   ⚠️ 넓히지 말 것 — 혜택 줄(`현직 전문가 멘토`·`1:1 멘토 매칭`)은 활동 낱말이 없고, 우대 줄(`… 멘토 우대`)은 끝이 무리 이름이 아니라 안 걸린다(관문 「못 읽던 자격 줄」 · 이미 해 온 활동으로 정한 무리).
+   실측(2026-11-23 · 정식 등록 360 · 층2 66 · 대외활동 200 전수): 새로 걸리는 줄은 서울선순환인재 한 줄뿐이다 */
+const ACTIVITY_GROUP = /(?:활동|참여|참가|봉사|수료|이수)\s?(?:한|했던|하였던|해\s?온|하고\s?있는|중인)\s?[^.]{0,30}?(?:멘토|멘티|서포터즈|기자단|단원|활동가|수료생)\s*[)）]?\s*$/;
 const ACHIEVE_PARTS = [
   [/입상|수상/, 'award'], [/학자금\s?대출/, 'loan'], [/자격증/, 'cert'],
   [/봉사\s?(실적|시간)/, 'volunteer'],
@@ -1813,6 +1823,8 @@ const ACHIEVE_PARTS = [
      ⚠️ `미취업`·`구직` 은 넣지 않는다 — 대학생은 대개 미취업이고, `① 재학생 또는 ② 졸업 후 미취업자` 처럼 갈래 줄에서 맞는 갈래까지 '모름'으로 만들었다(실측). */
   /* ⚠️ 맨 `학생` 은 넣지 않는다 — `징계 처분을 받은 학생은 제외` 는 학생이 아니라 징계자를 뺀다(관문 「징계」가 잡았다) */
   [/(예비\s?)?창업자|예술인|센터\s?회원|(?<![가-힣])(대학생|대학원생|재학생)\s?(은|는)?\s?제외/, null],
+  /* 이미 해 온 활동으로 정한 무리(`… 8개월 이상 활동한 서울런 멘토`) — 위 ACTIVITY_GROUP 한 곳 · 물을 칸이 없다(null) */
+  [ACTIVITY_GROUP, null],
 ];
 const ACHIEVE_ATTR = new RegExp(ACHIEVE_PARTS.map(([re]) => re.source).join('|'));
 /* 🔴 국가장학금 '신청'은 묻지만(TRAIT_PAT kosafApplied) 그 **뒤**는 모른다 — 심사 승인·수혜·국가근로장학금을 따로 신청했는지
@@ -2025,7 +2037,7 @@ function shortRegion(x) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { schoolKindAlt, parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG, yearBranchLabels, yearBranchDoubt, memberOrgOf};
+  module.exports = { schoolKindAlt, parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG, yearBranchLabels, yearBranchDoubt, memberOrgOf, ACTIVITY_GROUP};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────

@@ -2245,7 +2245,9 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
   const rmSrc = readText(new URL('collector/registered-merge.mjs', root));
   eq('  승격은 로봇 등록·교외·사람 미지정·마감 전 등록분만 (아니면 hold)', /const promotable = promotableOn\(twin, TODAY\)/.test(ar) && /it\.auto && it\.type === '교외' && !\/\^관리자\/\.test\(it\.scopeFrom/.test(rmSrc) && /openOn\(it, today\)/.test(rmSrc), true);
   const sp = readText(new URL('collector/scope-promote.mjs', root));
-  eq('  범위 승격 로봇도 전국 등록분이 흡수한다(isNationalAbsorber) · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만', /export function isNationalAbsorber\(it, school\)/.test(sp) && /absorbsOn\(it, school, TODAY\)/.test(sp) && /absorbed/.test(sp) && /domainMatches\(/.test(sp) && /schoolsAny\.some/.test(rmSrc) && /schoolsAny/.test(ar) && /split\('\|'\)\[0\] === n\.school/.test(ar), true);
+  /* 2026-11-23 — 짝짓기(흡수)는 registered-merge.mjs mergeSamePrograms, 학교 창구 판정(학교 이메일 포함)은 kind-evidence.mjs schoolWindowEvidence 로 옮겼다 — 표본은 아래 「범위 승격 — 학교 창구 …」 절 */
+  const keSrc = readText(new URL('collector/kind-evidence.mjs', root));
+  eq('  범위 승격 로봇도 전국 등록분이 흡수한다(isNationalAbsorber) · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만', /export function isNationalAbsorber\(it, school\)/.test(sp) && /absorbsOn\(it, school, TODAY\)/.test(sp) && /mergeSamePrograms\(items, TODAY, sameProgram/.test(sp) && /r\.absorbed/.test(rmSrc) && /schoolWindowEvidence\(\{/.test(sp) && /domainMatches\(ed, x\.domain\)/.test(keSrc) && /schoolsAny\.some/.test(rmSrc) && /schoolsAny/.test(ar) && /split\('\|'\)\[0\] === n\.school/.test(ar), true);
   /* 리뷰 3차 — 리포트 파일은 부르는 쪽이 준다(브라우저 수집은 browser-report.md 만 커밋한다) */
   for (const f of ['collector/scope-promote.mjs', 'collector/kind-classify.mjs', 'collector/portal-candidates.mjs']) {
     eq(`  ${f} 가 리포트 파일 이름을 인자로 받는다`, /process\.argv\.slice\(2\)\.find/.test(readText(new URL(f, root))), true);
@@ -2279,6 +2281,143 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
   eq('학교 씨앗은 근거(evidence)와 함께 적혀 있고 find-boards 가 읽는다', seeds.seeds.every((x) => x.home && x.evidence) && /school-board-seeds\.json/.test(readText(new URL('collector/find-boards.mjs', root))), true);
   eq('  씨앗은 schools.json 에 자동으로 넣지 않는다', /schoolsCfg\.schools[^\n]*boardUrl\s*=/.test(readText(new URL('collector/find-boards.mjs', root))), false);
   eq('정문 사진 도구가 서비스 학교 전부를 이름 규칙(noticeFileKey)으로 만든다', /ME\.SERVED_SCHOOLS/.test(readText(new URL('tools/fetch-gate-photos.mjs', root))) && /ME\.noticeFileKey\(name\)/.test(readText(new URL('tools/fetch-gate-photos.mjs', root))), true);
+}
+
+console.log('\n■ 범위 승격 — 학교 창구 · 겹친 괄호 · 국가근로 · 소급 (2026-11-23)');
+{
+  /* 왜 있나 — 2026-11-22 지도 시안 작업 중 검토에서 드러난 셋(원문을 열어 확인):
+     ① 홍익 「신용카드수수료장학금」 이 전국이 됐다 — 맨 「등기우편」 을 '재단에 직접 제출'로 셌는데, 받는 곳은 「* 우편제출 : … 홍익대학교 학생회관 2층 학생처 장학팀」.
+        같은 꼴: 외대 송화재단(「5. 제출처 및 문의처」 ↵ 학교 주소 · 장학팀) · 학교 추천 — 세종대 국가이공계(「추천대상자」 · 열린 채 44개교에 보였다) · 성균관대 성암육영회
+     ② 과기대 「국가근로장학생 교체 선발모집_(주)아이티희망나눔」 — 회사 메일(naver.com)이라 '학교 밖 접수'로 전국. 국가근로는 소속 대학이 뽑는다
+     ③ 통영시 저소득 대학생 장학금이 둘 — 과기대 제목의 겹친 괄호 `(~11/23(월)까지)` 를 사업 열쇠가 `…까지)` 로 남겨 연세대 전국 등록분과 갈라졌다
+     그리고 예전 규칙으로 풀린 것은 그대로 남는다(승격 로봇은 풀기만 했다) → 매 실행 지금 규칙으로 다시 본다(⓪ 소급 · revertTarget).
+     🔴 표본만 잰다(실데이터 단정 금지) — 본문은 실제 원문을 줄인 것. 끝에서 진짜 scope-promote.mjs 를 사본 저장소에서 돌린다(불러오는 순간 실행되는 파일). */
+  const root = new URL('../', import.meta.url);
+  const KE = await import(new URL('collector/kind-evidence.mjs', root));
+  const RM = await import(new URL('collector/registered-merge.mjs', root));
+  const ER = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+  const hongik = ['2026-2학기 신용카드수수료장학금 신청 안내',
+    '3. 장학금액 : 수업료 60% 이내 차등지급 (단, 수업료 범위 내에서 교내장학금 간 이중수혜 허용)',
+    '5. 접수방법 : 방문 또는 등기우편 제출',
+    '* 우편제출 : 04066 서울 마포구 와우산로 94(상수동) 홍익대학교 학생회관 2층 학생처 장학팀',
+    '6. 수혜자 선정 및 발표 : 소정의 절차에 의한 심사 후, 개별 통지'].join('\n');
+  const songhwa = ['4. 제출기한 : 2026. 10. 2( 금 ) ~ 2026. 10. 13( 화 ) 15:00', '5. 제출처 및 문의처',
+    '경기도 용인시 처인구 모현읍 외대로 81 한국외국어대학교 학생회관 108 호 학생지원 . 장학팀', '- 031-330-4034', '- 등기우편 접수 및 방문접수'].join('\n');
+  const tongyeong = ['5. 신청방법: 방문 또는 우편 신청', '2) 우편: 등기우편을 원칙으로 하며, 신청 마감일 소인 분까지 인정',
+    '※ 방문 및 우편물 제출처: 통영시 평생교육과 평생학습팀', '[경남 통영시 무전3길 29(무전동), 평생교육과(통영시립도서관 4층) 우편번호 53035]'].join('\n');
+  const geochang = '5) 접수처: 거창군 읍면행정복지센터 방문(가족 또는 학생) 또는 우편접수(등기우편 원칙)';
+  const seonwon = ['4. 접수방법 : 방문 및 우편 접수 (전화: 051-996-3636, 팩스: 051-463-8124)', '- 부산광역시 중구 충장대로9번길66(한국선원복지고용센터 복지지원팀)'].join('\n');
+  const eunpyeong = ['2. 신청방법: 등기우편, 방문접수', '3. 신청서식: www.epjh.or.kr 재단 홈페이지 참조'].join('\n');
+  const sejong = ['■ 신청방법', '① 학생지원과 성적증명서 제출 : 2026. 11. 25 일 ( 수 ) 오후 5 시까지 기한엄수',
+    '② 학생지원과 추천대상자 확정 후 , 개별 연락 : 2026. 11. 26 일 (목 ) 오후중 개별 연락예정',
+    '③ 추천대상자 한국장학재단 온라인 신청 : 2026. 11. 27 일 ( 금 ) 오후 6 시까지 기한엄수'].join('\n');
+  const k = (title, text, school = '홍익대학교') => KE.classifyKind({ title, school, text, tokens: [], domain: 'hongik.ac.kr', own: [] });
+  /* ① 받는 곳 */
+  eq('① 우편·방문으로 받는 곳이 학교 창구(학생처 장학팀)면 맨 「등기우편」 은 재단 쪽 증거가 아니다 — 홍익 신용카드수수료장학 (national 거짓)',
+    [k('[장학팀] 2026학년도 2학기 신용카드수수료장학금 신청 안내', hongik).national, !!KE.schoolMailDest(hongik, '홍익대학교')], [false, true]);
+  eq('  받는 곳 표식만 있는 줄이면 다음 줄을 읽는다 — 외대 송화재단 「5. 제출처 및 문의처」 ↵ 학교 주소 · 장학팀',
+    [!!KE.schoolMailDest(songhwa, '한국외국어대학교'), k('(글로벌)(교외) 2026-2학기 송화재단 장학생 모집 공고(~10/13)', songhwa, '한국외국어대학교').national], [true, false]);
+  eq('  받는 곳이 시·군·센터면 그대로 재단 쪽 증거다 — 통영시 평생교육과 · 거창군 읍면행정복지센터 · 선원복지고용센터 · 받는 곳 없는 은평구(재단 홈페이지)',
+    [tongyeong, geochang, seonwon, eunpyeong].map((t) => [KE.schoolMailDest(t, '연세대학교'), k('2026 표본 장학생 선발 안내', t, '연세대학교').national]),
+    [[null, true], [null, true], [null, true], [null, true]]);
+  eq('  「문의」 뒤는 받는 곳이 아니고 · 받는 곳에 바깥 기관 낱말이 있으면 학교 창구가 아니다',
+    [KE.schoolMailDest('제출처: 표본장학재단 사무국 (문의: 학생처 장학팀 02-000-0000)', '가대학교'), KE.schoolMailDest('접수처: 표본재단 장학팀', '가대학교'),
+      KE.schoolMailDest('제출처: 서울 표본로 12 행복빌딩 3층 (문의: 학생처 장학팀 02-000-0000)', '가대학교')], [null, null, null]);
+  /* ② 학교 창구 증거 한 곳 */
+  const win = (title, text, x = {}) => KE.schoolWindowEvidence({ title, text, school: '가대학교', domain: 'ga.ac.kr', ...x });
+  eq('② 학교 창구 증거(schoolWindowEvidence) — 받는 곳 · 학교 추천(세종대 「추천대상자」 · 성암 「학교 추천자로」) · 국가근로 · 「장학팀에 제출」 · 포털 · 학교 메일',
+    [win('표본 장학', hongik, { school: '홍익대학교' }), win('2026-2 국가이공계 일시지원 장학생 선발 안내', sejong), win('2026년 성암육영회 장학생 선발안내', '※ 학교 추천자로 선발되었어도 최종 장학생으로 선정되지 않을 수 있음'),
+      win('2026-2학기 국가근로장학생 교체 선발모집_(주)아이티희망나눔', '7. 지원서 제출처 : rakimi718@naver.com (지원서 및 근로가능시간표 이메일로 제출)'),
+      win('표본 장학', '신청서는 장학팀에 제출'), win('표본 장학', '', { applyPortal: 'KLAS' }), win('표본 장학', '', { applyEmail: 'jang@ga.ac.kr' })].map((r) => (r || '').split(' ')[0]),
+    ['받는', '학교', '학교', '제목', '접수처', '포털', '접수']);
+  eq('  아니다 — 지도교수 추천서 · 「대학 추천 없이」 · 고등학교 추천 · 국세청 근로장려 · 재단 메일 · 통영시 받는 곳',
+    [win('2026년도 동진장학연구재단 장학생 선발 안내', '서식3 지도교수 추천서.hwp\n* 신청방법: 이메일 접수(admin@djfoundation.or.kr)'),
+      win('표본재단 장학생', '※ 대학 추천 없이 개인이 재단 홈페이지에서 직접 신청'), win('표본재단 장학생', '고등학교 추천을 받은 신입생'),
+      win('2026 국세청 근로 · 자녀 장려 장학생 선발 안내', ''), win('표본 장학', '', { applyEmail: 'a@foundation.or.kr' }), win('2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내', tongyeong)],
+    [null, null, null, null, null, null]);
+  /* 리뷰 2026-11-23 — 본문에 딸려 온 남의 글 제목(건국대 「[학교추천][교외]…」 꼴)은 학교 추천 증거가 아니다 · 부정은 몇 낱말 뒤에 와도 부정 · 「접수 처리」 는 받는 곳이 아니다 */
+  eq('  아니다 — 본문 끝 남의 글 제목 「[학교추천][교외]…」 · 「학교 추천을 받을 필요 없이」 · 「접수 처리 결과는 학생처 장학팀에서 안내」',
+    [win('2026년도 표본재단 장학생 선발 안내', '신청: 재단 홈페이지에서 신청\n[학교추천][교외][등록금] 2026학년도 2학기 송화재단 장학생 추천 선발 안내\n2026 표본 장학생 추천 선발 안내'),
+      win('표본재단 장학생', '※ 학교 추천을 받을 필요 없이 개인이 신청'), KE.schoolMailDest('접수 처리 결과는 학생처 장학팀에서 안내', '가대학교')],
+    [null, null, null]);
+  eq('  이 공고 제목의 「[학교추천]」 은 그대로 학교 추천이다', !!win('[학교추천][교외][등록금] 2026학년도 2학기 송화재단 장학생 추천 선발 안내', ''), true);
+  eq('  세종대 국가이공계는 「재단 온라인 신청」 으로 national 이지만 학교 추천이라 풀지 않는다 (판정기 national 은 그대로 · 거부는 창구 증거가 한다)',
+    [k('2026-2 국가이공계 일시지원 장학생 선발 안내', sejong, '세종대학교').national, !!win('2026-2 국가이공계 일시지원 장학생 선발 안내', sejong)], [true, true]);
+  /* ③ 겹친 괄호 */
+  eq('③ 사업 열쇠가 겹친 괄호를 안쪽부터 벗긴다 — 과기대 「(홍보) …선발 안내(~11/23(월)까지)」 = 연세대 「2026년도 … 선발 안내」',
+    [ER.sameProgram('(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23(월)까지)', '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내'),
+      ER.programKey('(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23(월)까지)')], [true, '통영시저소득대학생장학금']);
+  eq('  닫히지 않은 꼬리(70자에서 잘린 이름)는 끝까지 뗀다 · 남기는 괄호(이름의 일부)를 감싼 바깥 괄호는 바깥 글자로 판정',
+    [ER.programKey('[교외][등록금] 2026학년도 2학기 표본재단 인재장학생 선발 안내(10. 1.(목) 09:00 ~ 10. 20.(화) 23:59') === ER.programKey('2026학년도 2학기 표본재단 인재장학생 선발 안내'),
+      ER.dropParens('우정장학(가계곤란) 신청(~9/17(수))', (i) => /\d|접수/.test(i))], [true, '우정장학(가계곤란) 신청']);
+  /* ④ 짝짓기 — 전국 등록분이 뒤에 있어도 */
+  const T = '2026-11-23';
+  const cand = (id, school, name, extra = {}) => ({ id, name, auto: true, type: '교외', eligibility: { selective: true, schoolOnly: school }, deadline: '2026-11-30', sourceUrl: `https://${id}.example.ac.kr/1`, ...extra });
+  const nat = (id, name, extra = {}) => ({ id, name, auto: true, type: '교외', eligibility: { selective: true }, deadline: '2026-11-30', sourceUrl: `https://${id}.example.ac.kr/1`, ...extra });
+  const X = '(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23(월)까지)';
+  const N = '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내';
+  const run = (items) => { const out = RM.mergeSamePrograms(items, T, ER.sameProgram); return [items.map((i) => i.id), out.map((o) => (o.promoted ? 'promoted' : 'absorbed')), (items[0].alsoPostedAt || []).map((a) => a.id)]; };
+  eq('④ 짝짓기(mergeSamePrograms) — 🔴 학교 한정이 앞·전국이 뒤여도 흡수한다(예전 고리는 건너뛰었다) · 전국이 앞이어도 · 둘 다 학교 한정이면 승격',
+    [run([cand('a', '서울과학기술대학교', X), nat('n', N)]), run([nat('n', N), cand('a', '서울과학기술대학교', X)]), run([cand('a', '가대학교', X), cand('b', '나대학교', N)])],
+    [[['n'], ['absorbed'], ['a']], [['n'], ['absorbed'], ['a']], [['a'], ['promoted'], ['b']]]);
+  eq('  합치지 않는다 — 같은 학교끼리 · 마감 지난 학교 한정 · 사람이 범위를 정한 전국 · 다른 사업',
+    [run([cand('a', '가대학교', X), cand('b', '가대학교', N)])[0], run([cand('a', '가대학교', X, { deadline: '2026-11-01' }), nat('n', N)])[0],
+      run([cand('a', '가대학교', X), nat('n', N, { scopeFrom: '관리자 2026-11-20' })])[0], run([cand('a', '가대학교', X), nat('n', '2026년도 거창군 지역출신 대학생 등록금 지원 신청 안내')])[0]],
+    [['a', 'b'], ['a', 'n'], ['a', 'n'], ['a', 'n']]);
+  eq('  🔴 ⓪ 이 학교 창구로 되돌린 것은 합치기로도 다시 넓히지 않는다(promotableOn 거짓 · 리뷰)',
+    [RM.promotableOn(cand('a', '가대학교', X, { scopeFrom: '로봇 2026-11-23 · 원문 재판정으로 학교 한정 — 학교 추천 「추천대상자」 (전국으로 풀었던 근거: x)' }), T),
+      run([cand('a', '가대학교', X, { scopeFrom: '로봇 2026-11-23 · 원문 재판정으로 학교 한정 — x' }), cand('b', '나대학교', N)])[0]], [false, ['a', 'b']]);
+  /* ⑤ 소급 대상 */
+  const ev = (extra = {}) => ({ auto: true, eligibility: { selective: true }, scopeFrom: '로봇 2026-11-13 · 원문 증거로 전국 — 본문 「등기우편」 (게시: 홍익대학교)', ...extra });
+  eq('⑤ 소급 대상(revertTarget) — 원문 증거로 푼 로봇 등록분의 게시 학교(·캠퍼스) · 흡수했거나 학교 한정이거나 사람이 정했거나 합쳐서 푼 것은 아니다',
+    [RM.revertTarget(ev()), RM.revertTarget(ev({ scopeFrom: '로봇 2026-11-08 · 원문 증거로 전국 — 접수 이메일 도메인 naver.com (학교 밖) (게시: 가대학교 · 서울캠퍼스)' })),
+      RM.revertTarget(ev({ alsoPostedAt: [{ school: '나대학교' }] })), RM.revertTarget(ev({ eligibility: { schoolOnly: '홍익대학교' } })), RM.revertTarget(ev({ scopeFrom: '관리자 2026-11-20' })),
+      RM.revertTarget(ev({ scopeFrom: '다른 학교 게시판에도 같은 사업(자동 승격) — 나대학교 게시판 https://x' })), RM.revertTarget(ev({ auto: false }))],
+    [{ school: '홍익대학교', campus: null }, { school: '가대학교', campus: '서울캠퍼스' }, null, null, null, null, null]);
+  /* ⑥ 진짜 승격 로봇 — 사본 저장소에서(불러오는 순간 실행되는 파일이라 import 하지 않는다) */
+  const { sandbox } = await import(new URL('./health-gates/bodies.mjs', import.meta.url));
+  const sb = sandbox(root, 'hdj-scope-promote-');
+  try {
+    sb.write('verify/entry-rules.cjs', readText(new URL('verify/entry-rules.cjs', root)));
+    sb.write('collector/schools.json', { schools: ['가대학교', '나대학교', '다대학교'].map((s, i) => ({ school: s, boardUrl: `https://${['ga', 'na', 'da'][i]}.example.ac.kr/bbs/list.do` })) });
+    const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+    const shift = (n) => new Date(Date.parse(today) + n * 86400000).toISOString().slice(0, 10);
+    const U = (h, n) => `https://${h}.example.ac.kr/bbs/view.do?seq=${n}`;
+    const it = (id, h, n, name, extra = {}) => ({ id, name, type: '교외', auto: true, deadline: shift(10), sourceUrl: U(h, n), eligibility: { selective: true }, ...extra });
+    const items = [
+      it('rev', 'ga', 1, '[장학팀] 2026학년도 2학기 표본수수료장학금 신청 안내', { scopeFrom: '로봇 2026-11-13 · 원문 증거로 전국 — 본문 「등기우편」 (게시: 가대학교)' }),
+      it('rev-closed', 'ga', 9, '(글로벌)(교외) 2026-2학기 표본재단 장학생 모집 공고', { deadline: shift(-20), scopeFrom: '로봇 2026-10-02 · 원문 증거로 전국 — 본문 「등기우편」 (게시: 가대학교)' }),
+      it('keepnat', 'na', 2, '2026년도 표본시 저소득 대학생 장학금 선발 안내', { scopeFrom: '로봇 2026-10-28 · 원문 증거로 전국 — 본문 「등기우편」 (게시: 나대학교)' }),
+      it('cand-mail', 'da', 3, '2026학년도 2학기 표본가계곤란장학금 신청 안내', { eligibility: { selective: true, schoolOnly: '다대학교' } }),
+      it('cand-work', 'da', 4, '2026-2학기 국가근로장학생 교체 선발모집_(주)표본나눔', { eligibility: { selective: true, schoolOnly: '다대학교' }, applyEmail: 'sample@naver.com', applyEmailSource: '7. 지원서 제출처 : sample@naver.com' }),
+      it('cand-rec', 'da', 10, '2026-2 표본이공계 일시지원 장학생 선발 안내', { eligibility: { selective: true, schoolOnly: '다대학교' } }),
+      it('cand-out', 'da', 5, '2026년도 표본군장학회 지역출신 대학생 등록금 지원 신청 안내', { eligibility: { selective: true, schoolOnly: '다대학교' } }),
+      it('twin-a', 'ga', 6, '(홍보) 표본구 저소득 대학생 장학금 지원대상자 선발 안내(~11/30(월)까지)', { eligibility: { selective: true, schoolOnly: '가대학교' } }),
+      it('twin-n', 'ra', 7, '2026년도 표본구 저소득 대학생 장학금 지원 대상자 선발 안내', { scopeFrom: '같은 사업이 나대학교 게시판에도 올라옴(자동) — 나대학교 게시판 https://na.example.ac.kr/x', alsoPostedAt: [{ school: '나대학교', url: U('na', 70), id: 'x' }] }),
+      it('human', 'ga', 8, '[장학팀] 2026학년도 2학기 표본사람장학금 신청 안내', { scopeFrom: '관리자 2026-11-20' }),
+    ];
+    sb.write('data/registered.json', { updatedAt: today, items });
+    const schoolMail = (s) => ['5. 접수방법 : 방문 또는 등기우편 제출', `* 우편제출 : 04066 서울 표본구 표본로 94 ${s} 학생회관 2층 학생처 장학팀`].join('\n');
+    sb.write('collector/extracted/notices-text.json', [
+      [U('ga', 1), schoolMail('가대학교')], [U('ga', 9), ['5. 제출처 및 문의처', '경기도 표본시 표본로 81 가대학교 학생회관 108 호 학생지원 . 장학팀', '- 등기우편 접수 및 방문접수'].join('\n')],
+      [U('na', 2), tongyeong.replace(/통영시/g, '표본시')], [U('da', 3), schoolMail('다대학교')], [U('da', 4), '7. 지원서 제출처 : sample@naver.com (지원서 및 근로가능시간표 이메일로 제출)'],
+      [U('da', 10), sejong], [U('da', 5), '5) 접수처: 표본군 읍면행정복지센터 방문(가족 또는 학생) 또는 우편접수(등기우편 원칙)'], [U('ga', 8), schoolMail('가대학교')],
+    ].map(([url, text]) => ({ url, title: '', school: '', text })));
+    const r = sb.run('collector/scope-promote.mjs', [], {}, 60000);
+    const reg = sb.json('data/registered.json') || { items: [] };
+    const at = (id) => reg.items.find((x) => x.id === id);
+    const sc = (id) => (at(id) ? ((at(id).eligibility || {}).schoolOnly || '전국') : '없음');
+    eq('⑥ [승격 로봇 실행] 끝까지 돈다', [r.status, r.status ? r.out.slice(-400) : ''], [0, '']);
+    eq('  [승격 로봇 실행] 🔴 ⓪ 소급 — 학교 창구로 받는데 전국으로 풀렸던 것은 게시 학교로 되돌린다(마감 지난 것도 · 좁히는 쪽) · 재단 쪽 받는 곳은 전국 그대로 · 사람이 정한 것은 그대로',
+      [sc('rev'), /^로봇 \S+ · 원문 재판정으로 학교 한정 — 받는 곳 「/.test((at('rev') || {}).scopeFrom || ''), sc('rev-closed'), sc('keepnat'), sc('human'), (at('human') || {}).scopeFrom],
+      ['가대학교', true, '가대학교', '전국', '전국', '관리자 2026-11-20']);
+    eq('  [승격 로봇 실행] 🔴 ①② 학교 창구(받는 곳 장학팀 · 국가근로 · 학교 추천)는 풀지 않는다 · 시·군 받는 곳은 풀고 게시 학교를 표식에 남긴다',
+      [sc('cand-mail'), sc('cand-work'), sc('cand-rec'), sc('cand-out'), /원문 증거로 전국 — 본문 「우편접수」 \(게시: 다대학교\)$/.test((at('cand-out') || {}).scopeFrom || '')],
+      ['다대학교', '다대학교', '다대학교', '전국', true]);
+    eq('  [승격 로봇 실행] 🔴 ③ 겹친 괄호 제목의 학교 한정 글이 뒤에 있는 전국 등록분에 흡수된다',
+      [sc('twin-a'), ((at('twin-n') || {}).alsoPostedAt || []).map((a) => a.id)], ['없음', ['x', 'twin-a']]);
+    eq('  [승격 로봇 실행] 로그에 되돌린 숫자', /scope-promote: \d+ promoted, 1 absorbed, 2 reverted/.test(r.out), true);
+  } finally { sb.done(); }
 }
 
 console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
@@ -13471,13 +13610,17 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
     /isDuplicatePair[^}]*\} = createRequire/.test(src) && /isDuplicatePair\(\{ name: bare\(title\)/.test(src), true);
   eq('  제 사본(titleSim)을 다시 들이지 않는다', /function titleSim/.test(src), false);
   {
-    const { isDuplicatePair } = createRequire(import.meta.url)('./entry-rules.cjs');
-    /* 🔴 꼬리표 떼는 규칙은 **로봇 소스에서 떼어 온다** — 여기에 베끼면 로봇만 바뀌어도 관문이 모른다 */
-    const mBare = src.match(/const bare = \(s\) => \(s \|\| ''\)\.replace\((\/.*?\/g), ''\);/);
+    const { isDuplicatePair, dropParens } = createRequire(import.meta.url)('./entry-rules.cjs');
+    /* 🔴 꼬리표 떼는 규칙은 **로봇 소스에서 떼어 온다** — 여기에 베끼면 로봇만 바뀌어도 관문이 모른다.
+       2026-11-23 부터 괄호 벗기기는 entry-rules.cjs dropParens 한 곳(겹친 괄호 `(~11/23(월)까지)` 를 안쪽부터) — 로봇은 「무엇을 떼나」(안쪽 글자 규칙)만 넘긴다 */
+    const mBare = src.match(/const bare = \(s\) => dropParens\(s, \(inner\) => (\/[^/\n]+\/)\.test\(inner\)\);/);
     eq('로봇에서 꼬리표 떼는 규칙을 찾았다', !!mBare, true);
     const TAG = mBare ? eval(mBare[1]) : /$^/;
-    const bare = (s) => (s || '').replace(TAG, '');
+    const bare = (s) => dropParens(s, (inner) => TAG.test(inner));
     const dup = (a, b) => isDuplicatePair({ name: bare(a), eligibility: {} }, { name: bare(b), eligibility: {} });
+    eq('  겹친 괄호 꼬리표도 통째로 뗀다 — 옛 규칙은 `(~11/23(월)` 만 떼고 `까지)` 를 남겼다 (과기대 통영시 · 2026-11-23)',
+      [bare('(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23(월)까지)'), bare('우정장학(학업장려금(2026))')],
+      ['(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내', '우정장학(학업장려금)']);
 
     /* 🔴 떼는 것은 **꼬리표뿐**이다 — 괄호 안이 이름의 일부면 남겨야 한다.
        통째로 떼자 경희대의 서로 다른 두 장학금이 한 장학금이 됐다(실측으로 하나가 사라졌다). */
@@ -17037,6 +17180,34 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [RL('학자금 지원구간 8구간 이하 (상세 붙임 참조)').length, RL('백분위 환산 성적: 85점').length, (RL('선발 시 재학 중이어야 함')[0] || {}).aside, (one('전공 30학점 이상 및 교양 15학점 이상 이수', 'credits') || {}).alts], [1, 1, false, undefined]);
   eq('  리뷰 — `졸업학년도` 는 연도라 학년 조건이 아니다 · 이중수혜 판정은 evaluate 와 같은 함수(holdsExternalScholarship)', [one('2027 졸업학년도 기준 등록자', 'year'), typeof MEx.holdsExternalScholarship === 'function' ? [MEx.holdsExternalScholarship({ scholarships: ['external'] }), MEx.holdsExternalScholarship({}), MEx.holdsExternalScholarship({ scholarships: ['kosaf'] })] : null], [null, [true, null, false]]);
   eq('    제외 줄 `타 민간재단 장학금 수혜자` 도 같은 종류(exclude) · 국가장학금·교내는 막지 않는다', [(condsEx6('타 민간재단 장학금 수혜자').find((c) => c.kind === 'scholarship') || {}).exclude, MEx.judgeCond(condsEx6('타 민간재단 장학금 수혜자').find((c) => c.kind === 'scholarship'), stu6({ scholarships: ['kosaf', 'internal'] }), {})], [true, 'pass']);
+
+  /* ── 이미 해 온 활동으로 정한 무리 (2026-11-23 · 층2 서울미래인재재단 「서울선순환인재 장학금」 — 지도 시안 작업 중 발견 · match-engine ACTIVITY_GROUP) ──
+     특정자격 칸 첫 줄 `2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토`(공고문 「① 필수 지원자격」 · 「①~② 항목 모두 충족하는 자」)가
+     요건 신호(REQ_SIGNAL)에 안 걸려 화면·분모에서 통째로 빠졌고, 남은 `서울 소재 대학교 재학 학부생 …` ✓ 와 제외 칸 통과로 서울 학생 누구에게나 「적합도 95%」였다
+     (틀린 안심 · 「누가」 칸 줄이 하나 살아 있어 11-13 규칙이 쉬었다). 줄만 살리면 75%(3/4 · 모름 1) — 그것도 서울런 멘토가 아닌 학생에게 높은 숫자다.
+     줄은 원문 꼴을 그대로 박는다(실데이터를 읽지 않는다) */
+  {
+    const mentorG = '2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토';
+    const seoulG = '서울 소재 대학교 재학 학부생 또는 서울 시민(의 자녀)으로서 비서울 소재 대학교 재학 학부생';
+    const exG = ['2026년 2학기 기준 휴학생/대학원생 등', '서울런 멘토 중 해당 기간(25년 11월 ~ 26년 10월) 내 활동 포기(영구 중단) 및 해촉된 멘토'];
+    const kG = (lines) => ({ id: 'kosaf-g', name: '서울미래인재재단 서울선순환인재 장학금', provider: '서울미래인재재단', sourceKind: 'kosaf', eligibility: { selective: true },
+      eligibilityLines: lines, kosafCoreLines: lines, kosafWhoLines: lines, eligibilityExcludes: exG });
+    const pG = (o) => ({ ...stu, school: '서울과학기술대학교', year: 1, region: '서울', parentRegion: '서울', ...o });
+    const keptG = (l) => MEx.requirementLines({ id: 'g', name: 'g' }, [l], { all: true }).length;
+    const fG = (s, p) => { const d = MEx.fitDetail(s, p); return [d.unread, d.fails.length]; };
+    eq('🔴 「…활동한 … 멘토」 꼴은 요건 줄이다 — 서울런 멘토 두 꼴(재단 칸 · 공고문 `‘25년 11월 ~ ’26년 10월까지`)·`… 활동한 학습 멘토`·`… 참여한 멘티` 는 화면에 남는다(전엔 0줄 — 공고의 필수 자격이 화면에서 사라졌다) · 반대 사례: 혜택 `현직 전문가 멘토`·`1:1 멘토 매칭` 은 그대로 안 남는다',
+      [keptG(mentorG), keptG('‘25년 11월 ~ ’26년 10월까지 8개월 이상 활동한 서울런 멘토'), keptG('2025년도에 6개월 이상 활동한 학습 멘토'), keptG('멘토링 프로그램에 참여한 멘티'), keptG('현직 전문가 멘토'), keptG('1:1 멘토 매칭')],
+      [1, 1, 1, 1, 0, 0]);
+    eq('🔴 「누가」 줄이 이미 해 온 활동으로 정한 무리(서울런 멘토 8개월)인데 판정을 못 하면 다른 줄이 ✓ 여도 적합도를 주지 않는다 — 서울 학생 자격 미확인(전엔 95%) · 반대 사례: 휴학생 ✕ 는 그대로 · 무리 줄이 없는 공고는 그대로(미확인 아님) · 택1 갈래 안의 무리 줄은 다른 갈래가 맞으면 쉰다 · 층1 공고도 같다',
+      [fG(kG([mentorG, seoulG]), pG({})), fG(kG([mentorG, seoulG]), pG({ status: '휴학' })), fG(kG([seoulG]), pG({})),
+        fG(kG(['아래 ①·② 중 하나에 해당하는 자', `① ${mentorG}`, `② ${seoulG}`]), pG({})), fG({ ...kG([mentorG, seoulG]), sourceKind: undefined }, pG({}))],
+      [[true, 0], [false, 2], [false, 0], [false, 0], [true, 0]]);
+    const both = '대학교 재학생 중 2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토';
+    eq('🔴 딸린 조건(재학)이 같은 줄에 붙어도 무리에 드는지는 모른다 — 재학생에게 그 줄은 ✓ 가 아니라 모름(전엔 재학 하나로 ✓) · 적합도 자격 미확인(✓ 를 주면 95% 그대로) · 반대 사례: 휴학생은 그 줄에서 ✕ 그대로',
+      [rmx(both, pG({})), fG(kG([both]), pG({})), rmx(both, pG({ status: '휴학' }))], [null, [true, 0], 'no']);
+    eq('  무리 꼴은 한 곳(parse-requirements ACTIVITY_GROUP)이다 — 요건 신호(REQ_SIGNAL)가 같은 꼴을 그대로 쓴다(두 벌로 적으면 화면엔 남는데 적합도는 쉬는 식으로 갈라진다)',
+      [PRx.ACTIVITY_GROUP instanceof RegExp, !!PRx.ACTIVITY_GROUP && MEx.REQ_SIGNAL.source.includes(PRx.ACTIVITY_GROUP.source)], [true, true]);
+  }
 
 }
 

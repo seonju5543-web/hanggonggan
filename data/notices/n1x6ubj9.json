@@ -3,14 +3,39 @@
  "updatedAt": "2026-11-23",
  "items": [
   {
-   "title": "[한국장학재단] 2027학년도 1학기 국가장학금 1차 신청 기간 안내 (11/24~1/7)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142179&article.offset=0&articleLimit=10",
+   "title": "2027년도 세아해암학술장학재단 제35기 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142223&article.offset=0&articleLimit=10",
    "attachments": [
     {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+     "name": "2-(서식) 자기소개서.docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119366"
+    },
+    {
+     "name": "3-(서식) 포토에세이.docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119367"
+    },
+    {
+     "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119368"
+    },
+    {
+     "name": "5-(서식) 공식 프로그램 참석 확약서.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119369"
+    },
+    {
+     "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142223&attachNo=119370"
     }
    ],
+   "deadlineHint": null,
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "[한국장학재단] 2027학년도 1학기 국가장학금 1차 신청 기간 안내 (11/24~1/7)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142179&article.offset=0&articleLimit=10",
+   "attachments": [],
    "deadlineHint": "신청기간: 2026.11.24.(화) 09:00 ~ 2027.1.7.(목) 18:00 - 재학생이 1차 신청기간에 신청하지 않을 경우, ‘신청기",
    "school": "성균관대학교",
    "campus": "",
@@ -20,10 +45,6 @@
    "title": "[재공지] [발전협력팀]2026학년도 수원지역동문회 장학생 선발 안내(~11/25)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142059&article.offset=0&articleLimit=10",
    "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    },
     {
      "name": "성균관대학교_수원장학회_장학금_신청서(2026).hwp",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142059&attachNo=119231"

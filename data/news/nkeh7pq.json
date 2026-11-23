@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-23",
  "items": [
   {
+   "title": "[교수학습개발센터]2026학년도 인하좋은강의 에세이 모집안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46218/artclView.do",
+   "postedAt": "2026-11-23",
+   "kind": "채용",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/0e5177cc55ac3474.webp"
+  },
+  {
+   "title": "[입학처] 2027학년도 수시모집 논술(논술우수자)전형 논술고사 운영에 따른 건물 출입 통제 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46215/artclView.do",
+   "postedAt": "2026-11-23",
+   "kind": "생활",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-11-23",
+   "desc": "2027 학년도 수시모집 논술 ( 논술우수자 ) 전형 논술고사 운영을 위해 아래와 같이 건물 출입을 통제하오니 , 구성원 여러분의 많은 협조를 부탁드립니다 ."
+  },
+  {
    "title": "실감 3면 콘텐츠 및 MR/VR 체험Day 안내 [11.26(목) 오전 10시 30분~11시 30분 / 오후 3시~4시]",
    "url": "https://www.inha.ac.kr/bbs/kr/8/46201/artclView.do",
    "postedAt": "2026-11-23",
@@ -412,28 +434,6 @@
    "src": "f4141706",
    "foundAt": "2026-10-30",
    "desc": "항공드론 사업단에서는 첨단분야혁신융합대학사업을 공동 운영하고 있는 한국항공대학교와 한서대학교의 동계 계절학기 학점교류생 모집 공고를 아래와 같이 안내드리오니, 학생분들의 많은 관심과 지원 바랍니다."
-  },
-  {
-   "title": "[IPP] 2027년도 상반기 일학습병행 학생 모집 (★직무별 조기 마감 가능★)",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45999/artclView.do",
-   "postedAt": "2026-10-30",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/14301a34f7552aab.webp",
-   "desc": "IPP듀얼공동훈련센터에서는 2027년도 상반기 일학습병행에 참여할 학생을 모집하고 있습니다."
-  },
-  {
-   "title": "교내 재학생(학부/대학원) 대상 Adobe Creative Cloud 공동 구매 안내(26년)",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45991/artclView.do",
-   "postedAt": "2026-10-30",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/181136571c569694.webp",
-   "desc": "정보통신처에서 교내 재학생 대상 학업 활동을 지원하기 위해 Adobe 관련 소프트웨어 공동 구매를 진행하고자 합니다."
   }
  ]
 }
