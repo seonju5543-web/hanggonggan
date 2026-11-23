@@ -1,8 +1,233 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-23",
- "count": 1913,
+ "count": 1925,
  "items": [
+  {
+   "title": "[공통][교외]2027학년도 강남장학회 장학생 선발 안내(~12/13)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/272373/artclView.do",
+   "attachments": [
+    {
+     "name": "2027학년도 강남장학회 모집 공고(19기).pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153627/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "[공통][국가근로] 2027년 1학기 1차 국가근로장학금 신청 안내(~1/7)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/272375/artclView.do",
+   "attachments": [
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법(모바일앱).pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153629/download.do"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법(홈페이지).pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153630/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 : 2026. 11 24.( 화 ) 9 시 ~ 2027. 1. 7.( 목 ) 18 시까지 * 주말 및 공휴일 포함 신청기간 내 24",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "[공통][국가근로] 2027년 1학기 1차 국가근로장학금 신청 안내(~1/7)"
+  },
+  {
+   "title": "2027년도 1학기 1차 국가근로장학금 신청 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2549&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261123094344538.pdf&path=/bbs/34&fn=2027%EB%85%84%201%ED%95%99%EA%B8%B0%201%EC%B0%A8%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%ED%95%99%EC%83%9D%EC%8B%A0%EC%B2%AD%20%EB%B0%A9%EB%B2%95%20(%EB%AA%A8%EB%B0%94%EC%9D%BC%EC%95%B1).pdf"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261123094349129.pdf&path=/bbs/34&fn=2027%EB%85%84%201%ED%95%99%EA%B8%B0%201%EC%B0%A8%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%ED%95%99%EC%83%9D%EC%8B%A0%EC%B2%AD%20%EB%B0%A9%EB%B2%95%20(%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80).pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 - 학생신청: '26. 11. 24.(화) 9시 ~ '27. 1. 7.(목) 18시 ※ 춘천캠퍼스는 2차신청기간 없으므로, 반드시 기간",
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "2026년 청로장학재단 제7기 장학생 선발 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2550&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "2026년 (재)청로장학재단 제7기 장학생 선발 안내.hwp",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261123102102120.hwp&path=/bbs/34&fn=2026%EB%85%84%20(%EC%9E%AC)%EC%B2%AD%EB%A1%9C%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C7%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4.hwp"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026.11.12(목)~12.3.(목) 4)발표일 : 2026.12.17. 제출서류 등 세부사항은 : 청로장학재단 홈페이지( ht",
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "bodyDeadline": "2026-12-03",
+   "bodyDeadlineText": "2)장학금 : 1인당 5,000,000원 3)접수기간 : 2026.11.12(목)~12.3.(목)"
+  },
+  {
+   "title": "[한국장학재단] 2027년 1학기 1차 국가근로장학 신청 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521280",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "2027학년도 1학기 국가장학금 1차 신청 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=171786&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
+   "attachments": [],
+   "deadlineHint": "신청 기간: 2026. 11. 24.(화) 9시 ~ 2027. 1. 7.(목) 18시 나. 서류 제출 및 가구원 동의 기간: 2026. 11.",
+   "school": "충북대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "2027학년도 1학기 국가장학금 1차 신청 일정을 아래와 같이 안내하오니, 모든 학생들은 신청하시기 바랍니다. 가. 신청 기간: 2026. 11. 24.(화) 9시 ~ 2027. 1. 7.(목) 18시"
+  },
+  {
+   "title": "2027학년도 1학기 국가장학금 1차 신청 및 &#039;신입생 전액 장학금&#039; 안내 [&#039;26. 11. 24.(화) - &#039;27. 1. 7.(목)]",
+   "url": "https://www.jbnu.ac.kr/web/Board/220144/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 11. 24.(화) 9시 ~ 2027. 1. 7.(목) 18시 - 서류제출 및 가구원 동의 : 2026. 11. 24.(",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "1. 신청기간 : 2026. 11. 24.(화) 9시 ~ 2027. 1. 7.(목) 18시 - 서류제출 및 가구원 동의 : 2026. 11. 24.(화) 9시 ~ 2027. 1. 14.(목) 18시 ※ 주말 및 공휴일 포함 24시간 신청 가능, 마지막날은 18시에 마감"
+  },
+  {
+   "title": "2027학년도 1학기 1차 국가근로장학금 학생 신청기간 안내(11. 24.(화) 09:00 ~ 27. 1. 7.(목) 18:00)",
+   "url": "https://www.jbnu.ac.kr/web/Board/220152/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": "신청기간 안내(11. 24.(화) 09:00 ~ 27. 1. 7.(목) 18:00) http://ju.ac.kr/b220152 2027학년도 1",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "※ 상세 신청방법은 [붙임] 학생신청 방법 참고 2. 신청기간: 2026. 11. 24.(화) 09:00 ~ 2027. 1. 7.(목) 18:00"
+  },
+  {
+   "title": "[장학안내] 2027학년도 1학기 1차 국가근로장학금 학생 신청 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71063&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2592620"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2592621"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 11. 24.(화) 09:00 ～ 2027. 1. 7.(금) 18:00 ※ 주말 및 공휴일 포함 신청기간 내 24시간 신청",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "※ 자세한 방법은 첨부파일 참고 2. 신청기간: 2026. 11. 24.(화) 09:00 ～ 2027. 1. 7.(금) 18:00"
+  },
+  {
+   "title": "[등록/장학] 2026학년도 2학기 국가장학금 지급 (예정)안내(2차)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53730&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "광운미디어",
+     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "[한국장학재단] 2027년 1학기 1차 국가근로장학금 학생 신청기간 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/237397/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "[한국장학재단] 2027학년도 1학기 국가장학금 1차 신청 기간 안내 (11/24~1/7)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142179&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.11.24.(화) 09:00 ~ 2027.1.7.(목) 18:00 - 재학생이 1차 신청기간에 신청하지 않을 경우, ‘신청기",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "※ 국가장학금(1유형) 탈락 시 문행장학금 탈락 ■ 신청기간: 2026.11.24.(화) 09:00 ~ 2027.1.7.(목) 18:00"
+  },
+  {
+   "title": "2027-1학기 국가근로장학금 1차 학생 신청 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232642536&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1. 2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232642536&attachNo=382054"
+    },
+    {
+     "name": "붙임1. 2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232642536&attachNo=382055"
+    },
+    {
+     "name": "붙임2. 2027년 1학기 1차 국가근로장학금 학생신청 포스터.jpg",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232642536&attachNo=382056"
+    },
+    {
+     "name": "붙임3. 국가근로장학금 알리미 홍보포스터.png",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232642536&attachNo=382057"
+    }
+   ],
+   "deadlineHint": "신청기간 및 방법 가. 신청기간: 2026.11.24.(화) 09:00 ~ 2027.01.07.(목) 18:00 ※ 주말 및 공휴일 포함 24시",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-11-23",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "1. 한국장학재단 국가근로장학금 신청기간 및 방법 가. 신청기간: 2026.11.24.(화) 09:00 ~ 2027.01.07.(목) 18:00"
+  },
   {
    "title": "★2027학년도 1학기 국가장학금 1차 신청 기간 안내★",
    "url": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&pageNo=2#n-%E2%98%852027%ED%95%99%EB%85%84%EB%8F%84%201%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88%201%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%20%EA%B8%B0%EA%B0%84%20%EC%95%88%EB%82%B4%E2%98%85",
@@ -32071,24 +32296,6 @@
    "school": "경희대학교",
    "campus": "",
    "foundAt": "2026-09-28"
-  },
-  {
-   "title": "[글로벌][교외] 2026년 효림장학재단 장학생 선발 안내 (~10/1)",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267611/artclView.do",
-   "attachments": [
-    {
-     "name": "개인정보수집이용동의서 (7).hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151093/download.do"
-    },
-    {
-     "name": "장학금+신청서(양식)(효림장학재단).hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151094/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간 : 2026. 9. 28.( 월 ) ~ 2026. 10. 1.( 목 ) 16:00 까지 &nbsp; 6. 신청방법 : 등기우편 접수 또",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-09-23"
   }
  ]
 }
