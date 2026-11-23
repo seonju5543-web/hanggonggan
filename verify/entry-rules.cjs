@@ -249,10 +249,27 @@ function isDuplicatePair(A, B) {
    그래서 대괄호 표식·연도·학기·회차·기수·게시판 붙박이 말(모집·안내·공고·선발·신청·접수·참여자·장학생)을 떼고 남는
    **알맹이**를 열쇠로 삼는다. 열쇠가 같으면 같은 사업이다. 🔴 열쇠가 8자 미만이면 판정하지 않는다 — `성적우수장학` 처럼
    여러 학교가 각자 운영하는 흔한 이름이 한 사업으로 묶이면 학교별 제도가 조용히 지워진다(그건 재게시가 아니다). */
-const PROGRAM_NOISE = /\[[^\]]*\]|\([^)]*\)|20\d{2}\s*(학년도|년도|년)?|\d\s*학기|(상|하)반기|제?\s*\d+\s*(회|기|차)|하반기|상반기|공통|서울|글로벌|국제/g;
+const PROGRAM_NOISE = /\[[^\]]*\]|20\d{2}\s*(학년도|년도|년)?|\d\s*학기|(상|하)반기|제?\s*\d+\s*(회|기|차)|하반기|상반기|공통|서울|글로벌|국제/g;
 const PROGRAM_TAIL = /(참여자|참가자|장학생|대상자|학생)?\s*(추가\s*)?(선발|모집|신청|접수|추천|지원)\s*(계획|안내|공고|공지)?(\s*(안내|공고|공지))?$/;
+/* ── 괄호는 안쪽부터 벗긴다 (2026-11-23 통영시 실측) ──────────────────────────────
+   `(~11/23(월)까지)` 처럼 겹친 괄호에 `\([^)]*\)` 하나를 쓰면 `(~11/23(월)` 만 떨어지고 `까지)` 가 남는다 —
+   과기대 「(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23(월)까지)」 의 열쇠가 `…선발안내까지)` 가 되어
+   연세대 전국 등록분(같은 사업)과 갈라졌고, 11-02 자동 등록이 흡수하지 못해 과기대 학생에게 같은 공고가 두 장 보였다.
+   닫히지 않은 꼬리(`(10. 1.(목) 09:00 ~` — 70자에서 잘린 이름)는 끝까지 뗀다.
+   `shouldDrop(안쪽 글자)` 가 거짓인 괄호는 남긴다 — 자동 등록의 이름 대조(bare)는 숫자·`접수` 든 꼬리표만 떼고
+   이름의 일부(`우정장학(가계곤란)`)는 남긴다. 남긴 괄호를 감싼 바깥 괄호는 바깥 글자 전체로 다시 판정한다. */
+const KEPT_OPEN = '\u0001';
+const KEPT_CLOSE = '\u0002';
+function dropParens(s, shouldDrop = () => true) {
+  let t = String(s || '');
+  for (let i = 0; i < 6 && /\([^()]*\)/.test(t); i++) {
+    t = t.replace(/\(([^()]*)\)/g, (all, inner) => (shouldDrop(inner) ? '' : `${KEPT_OPEN}${inner}${KEPT_CLOSE}`));
+  }
+  t = t.replace(/\(([^()]*)$/, (all, inner) => (shouldDrop(inner) ? '' : all));
+  return t.split(KEPT_OPEN).join('(').split(KEPT_CLOSE).join(')');
+}
 function programKey(title) {
-  let t = String(title || '').replace(PROGRAM_NOISE, ' ');
+  let t = dropParens(title).replace(/[()]/g, ' ').replace(PROGRAM_NOISE, ' ');
   t = t.replace(/\s+/g, ' ').trim();
   for (let i = 0; i < 3; i++) t = t.replace(PROGRAM_TAIL, '').trim();
   t = t.replace(/[\s·ㆍ~〜.,'"「」『』:：\-–—_/]/g, '').toLowerCase();
@@ -291,4 +308,4 @@ const FIX_PLAN = {
   },
 };
 
-module.exports = { checkEntry, isDuplicatePair, programKey, sameProgram, lastDateIn, registeredAfterDeadline, RULES, FIX_PLAN };
+module.exports = { checkEntry, isDuplicatePair, programKey, sameProgram, dropParens, lastDateIn, registeredAfterDeadline, RULES, FIX_PLAN };

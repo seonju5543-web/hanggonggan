@@ -33,10 +33,66 @@ export const OFF_MARK_RE = /\[\s*교외|교외\s*장학|외부\s*장학|외부\s
 /* 본문 — 학교가 준다는 말 */
 export const SCHOOL_BODY_RE = /본교\s*(장학|기금|예산)|우리\s*(대학|학교)\s*(장학|재학생)|교내\s*장학|(교비|발전기금|장학예산|학교\s*예산)[^\n]{0,15}(지원|지급|운영|재원|출연|마련)|(장학팀|장학복지팀|학생지원팀|학생처|학생지원처|학생과|학생복지팀)[^\n]{0,10}(주관|운영|선발|심사)/;
 /* 본문 — 학교 창구가 아니라 재단·공단에 직접 내라는 말 (전국 승격의 재료) */
-export const EXTERNAL_APPLY_RE = /(재단|공단|진흥원|장학회|복지회|협회)\s*(에|으로|측에|에서)\s*(직접\s*)?(제출|접수|신청|우편|이메일|메일)|(재단|공단|진흥원|장학회|협회)\s*(홈페이지|누리집|사이트|온라인|시스템)\s*(에서|을\s*통해|로)?\s*(신청|접수|지원)|우편\s*접수|등기\s*우편|온라인\s*신청\s*\(?(재단|공단)/;
+export const EXTERNAL_DIRECT_RE = /(재단|공단|진흥원|장학회|복지회|협회)\s*(에|으로|측에|에서)\s*(직접\s*)?(제출|접수|신청|우편|이메일|메일)|(재단|공단|진흥원|장학회|협회)\s*(홈페이지|누리집|사이트|온라인|시스템)\s*(에서|을\s*통해|로)?\s*(신청|접수|지원)|온라인\s*신청\s*\(?(재단|공단)/;
+/* 맨 「우편 접수」·「등기우편」 — 받는 곳이 학교 창구가 아닐 때만 재단 쪽 증거다(아래 schoolMailDest · 2026-11-23 홍익 신용카드수수료장학 실측). */
+export const MAIL_APPLY_RE = /우편\s*접수|등기\s*우편/;
+/* 옛 이름 — 둘을 합친 것(받는 곳을 보지 않는다 · 판정기는 위 둘을 따로 쓴다) */
+export const EXTERNAL_APPLY_RE = new RegExp(`${EXTERNAL_DIRECT_RE.source}|${MAIL_APPLY_RE.source}`);
 /* ⚠️ 위원회·사무국·본부는 넣지 않는다 — 학교 안 장학위원회·학생지원본부가 흔해 첫 시험에서 성균관대 벽송회장학금이 전국으로 풀렸다(2026-09-30). */
 /* 본문 — 학교 창구로 내라는 말 (교내 또는 학교 접수분) */
 export const SCHOOL_APPLY_RE = /(장학팀|학생지원팀|학생처|학생과|학과\s*사무실|행정실|교학팀|학사지원팀|장학복지팀)\s*(에|으로|방문|직접|을\s*통해)?\s*(제출|접수|방문|신청)|(포털|종합정보시스템|학사정보시스템|INFO21|HUFSAbility|SAINT|e-?Campus|유레카|KLAS|학생지원시스템)[^\n]{0,24}(신청|접수|등록|입력|제출)/i;
+
+/* ── 우편·방문으로 받는 곳이 학교 창구인가 (2026-11-23 · 홍익 신용카드수수료장학 · 외대 송화재단 실측) ──
+   「5. 접수방법 : 방문 또는 등기우편 제출」 ↵ 「* 우편제출 : 04066 서울 마포구 와우산로 94(상수동) 홍익대학교 학생회관 2층 학생처 장학팀」 —
+   맨 「등기우편」 을 '재단에 직접 제출'로 세어 학교 접수분이 44개교 전체에 풀렸다. SCHOOL_APPLY_RE 는 「장학팀에 제출」(창구 → 동사) 꼴만 읽어
+   「우편제출 : … 장학팀」(동사 → 주소 → 창구) 꼴을 못 봤다. 외대 송화재단은 「5. 제출처 및 문의처」 ↵ 「… 한국외국어대학교 학생회관 108 호 학생지원 . 장학팀」.
+   받는 곳 표식 뒤의 같은 줄 — 표식만 있는 줄이면 다음 줄 — 을 읽는다. 「문의」 뒤는 받는 곳이 아니고, 받는 곳에 바깥 기관 낱말(ORG_RE)이 있으면 학교가 아니다
+   (「제출처: ○○재단 사무국」 · 통영시 「우편물 제출처: 통영시 평생교육과」 는 그대로 재단·시 쪽 증거). */
+const SCHOOL_OFFICE = '장학팀|학생지원팀|학생지원과|학생처|학생과|학과\\s*사무실|행정실|교학팀|학사지원팀|장학복지팀|학생지원처|학생복지팀';
+const DEST_MARK_RE = /(?:우편|등기|방문)\s*(?:제출|접수)(?:처)?|(?:우편물\s*)?(?:제출|접수)\s*(?:처|장소|주소)|보내실\s*곳|받는\s*곳/;
+const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export function schoolMailDest(body, school) {
+  const office = new RegExp(`(${SCHOOL_OFFICE}${school ? `|${escapeRe(school)}` : ''})`);
+  const lines = String(body || '').split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const m = DEST_MARK_RE.exec(lines[i]);
+    if (!m) continue;
+    let rest = lines[i].slice(m.index + m[0].length).replace(/^\s*(?:및\s*문의처?)?\s*[:：]?\s*/, '');
+    if (!/[가-힣A-Za-z0-9]/.test(rest)) rest = lines[i + 1] || '';
+    rest = rest.split('문의')[0];
+    if (ORG_RE.test(rest)) continue;
+    const o = office.exec(rest);
+    if (o) return `${m[0].trim()} … ${o[0]}`;
+  }
+  return null;
+}
+
+/* 학교가 추천해 보내는 사업 — 학교 창구다(CLAUDE.md 「학교 범위」: 학교 창구·포털·**추천 배정**으로 받는 것만 그 학교 · 2026-11-23).
+   세종대 「② 학생지원과 추천대상자 확정 후 … ③ 추천대상자 한국장학재단 온라인 신청」 은 「재단 온라인 신청」 으로 전국에 풀려 44개교에 보였고,
+   성균관대 성암육영회(「학교 추천자로 선발되었어도」)도 같았다. 맨 「추천서」(지도교수 추천서 · 재단 양식 추천서)는 학교 배정이 아니다(동진장학 실례).
+   고등·중·초등학교 추천은 대학 창구가 아니다 · 「대학 추천 없이」 처럼 부정이면 아니다. */
+export const SCHOOL_RECOMMEND_RE = /(?:(?<!고등|중|초등)학교|대학(?:교)?|총장\s*님?)\s*(?:명의\s*|직인\s*)?추천(?!\s*(?:서\s*)?(?:없이|불필요|필요\s*없|아님|무관|하지\s*않|받지\s*않))|추천\s*대상자|(?:학교|대학)별\s*(?:배정|추천)/;
+/* 국가근로 — 소속 대학이 뽑는다. 교외 근로기관은 그 대학과 협약한 곳이고(동양미래대 국가근로 운영 기준 「교외근로장학생 선발 기준은 근로기관과 협약을 통해」 ·
+   한국장학재단 근로기관 안내자료 「장학생의 소속대학에 문의 … 대학 담당자와 협의 후 대체장학생 선발」) 그 학교 게시판의 모집 글은 그 학교 학생 몫이다.
+   과기대 「국가근로장학생 교체 선발모집_(주)아이티희망나눔」 은 지원서를 회사 메일(naver.com)로 받아 '학교 밖 접수'로 전국에 풀렸다(2026-11-23). */
+export const WORK_STUDY_RE = /국가\s*근로/;
+
+/** 학교 창구로 받는다는 원문 증거 — 있으면 전국으로 풀지 않는다(scope-promote ①②) · 이미 푼 것은 되돌린다(같은 로봇 ⓪). 순수 함수.
+ *  @param x { title, text, excerpts, school, applyPortal, applyEmail, domain } @returns 근거 한 줄 | null */
+export function schoolWindowEvidence(x = {}) {
+  const title = String(x.title || '');
+  const body = [x.text || '', ...(Array.isArray(x.excerpts) ? x.excerpts : [])].join('\n');
+  let m;
+  if ((m = WORK_STUDY_RE.exec(title))) return `제목 「${m[0]}」 — 소속 대학이 뽑는다`;
+  if ((m = SCHOOL_APPLY_RE.exec(body))) return `접수처 「${m[0].trim()}」`;
+  const mail = schoolMailDest(body, x.school);
+  if (mail) return `받는 곳 「${mail}」`;
+  if ((m = SCHOOL_RECOMMEND_RE.exec(`${title}\n${body}`))) return `학교 추천 「${m[0].trim()}」`;
+  if (x.applyPortal) return `포털 ${x.applyPortal}`;
+  const ed = String(x.applyEmail || '').split('@')[1] || '';
+  if (domainMatches(ed, x.domain)) return `접수 이메일 도메인 ${ed} (학교)`;
+  return null;
+}
 
 /* 이메일 도메인이 학교 도메인인가 — 같거나 그 하위(`.`)여야 한다. 맨 endsWith 는 `xkhu.ac.kr` 같은 남의 도메인도 통과시킨다(리뷰 3차). */
 export function domainMatches(emailDomain, schoolDom) {
@@ -89,8 +145,10 @@ export function classifyKind(x = {}) {
   const emailDomain = x.applyEmail ? String(x.applyEmail).split('@')[1]?.toLowerCase() : '';
   const emailIsSchool = domainMatches(emailDomain, x.domain);
   const emailIsOutside = !!(emailDomain && !emailIsSchool && !/\.ac\.kr$/.test(emailDomain));
-  const externalApply = EXTERNAL_APPLY_RE.exec(body);
-  const schoolApply = SCHOOL_APPLY_RE.exec(body) || (x.applyPortal ? { 0: `포털 ${x.applyPortal}` } : null);
+  /* 우편·방문으로 받는 곳이 학교 창구면 맨 「등기우편」 은 재단 쪽 증거가 아니라 학교 창구다(schoolMailDest · 2026-11-23 홍익) */
+  const mailToSchool = schoolMailDest(body, x.school);
+  const externalApply = EXTERNAL_DIRECT_RE.exec(body) || (mailToSchool ? null : MAIL_APPLY_RE.exec(body));
+  const schoolApply = SCHOOL_APPLY_RE.exec(body) || (mailToSchool ? { 0: mailToSchool } : null) || (x.applyPortal ? { 0: `포털 ${x.applyPortal}` } : null);
   const schoolBody = SCHOOL_BODY_RE.exec(body);
   const national = !!(externalApply || emailIsOutside);
 
