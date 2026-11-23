@@ -50,7 +50,7 @@ if [ -f "$gitdir/claude-work-touched" ] \
    && ! used_after 'notion-write' "$(cat "$gitdir/claude-work-touched" 2>/dev/null)"; then
   notice="📋 이번 작업을 노션 백로그에 아직 반영하지 않았습니다.
    해당 항목이 있으면 상태·상태 메모를, 새 일이면 행을 더하세요 —
-   data_source 60ac025f-edbd-4284-bb57-5e077bab1c3d (「개발 업무」 › 백로그).
+   data_source 5159505a-3ec3-83ce-aac7-070632b667b6 (「개발 업무」 › 백로그).
    지금 무엇을 하는 중인지는 「작업 현황」의 '지금 하는 일' 칸에 적습니다.
    (백로그와 무관한 작업이면 그냥 넘어가세요. 이건 알림이지 관문이 아닙니다.)"
   printf '%s\n' "$notice" >&2      # 아래 관문이 exit 2 로 끝나는 경우엔 이쪽으로 전달된다
