@@ -1889,40 +1889,6 @@
    "excerptsAt": "2026-11-23"
   },
   {
-   "title": "청년 체인지메이커 아카데미 운영",
-   "url": "https://jejuyouthdream.com/policy/detail/70",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-01-01 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "청년의 멘토가 되어 줄 각분야 유명인·명사 강연 지원"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "제주특별자치도 기획조정실 청년정책담당관",
-   "api": "youthPolicy",
-   "apiId": "20260421005400212793",
-   "id": "api-youthPolicy-20260421005400212793",
-   "noticeLines": [
-    "생애전환기 인생의 진로 설계 등으로 고민하는 청년에게 유명인 및 명사의 강연 참여 기회를 제공하여 안정적인 사회진입 지원",
-    "신청 방법 : QR코드 신청 예정",
-    "기타 : ※ 신청 및 사업기간 추후 공지"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-23",
-   "excerptsAt": "2026-11-23"
-  },
-  {
    "title": "대학생 봉사활동 활성화",
    "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236",
    "kind": "대외활동",
@@ -1955,6 +1921,41 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-12",
+   "seenAt": "2026-11-23",
+   "excerptsAt": "2026-11-23"
+  },
+  {
+   "title": "이전공공기관 취업아카데미 운영",
+   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-01-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "국가기술자격증 ‘컨벤션기획사 2급’ 필기·실기 취득 교육 - 컨벤션 기획, 운영 및 현장 연출, 해외연사 초청 영문서신 작성방법 등 -「2025년 제3회 지속가능한 마이스·관광 울산포럼」참석 등"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "울산광역시",
+   "api": "youthPolicy",
+   "apiId": "20260407005400212532",
+   "id": "api-youthPolicy-20260407005400212532",
+   "eligibilityLines": [
+    "지원대상 : MICE산업에 관심 있는 청년, 공기관 담당자, 시민 등 50명"
+   ],
+   "noticeLines": [
+    "MICE산업 전문 교육 기회제공을 통해 MICE 인재 양성과 울산 MICE산업의 인적 경쟁력 강화"
+   ],
+   "detailsV": 7,
+   "foundAt": "2026-11-23",
    "seenAt": "2026-11-23",
    "excerptsAt": "2026-11-23"
   },
