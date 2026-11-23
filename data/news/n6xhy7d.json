@@ -3,6 +3,25 @@
  "updatedAt": "2026-11-23",
  "items": [
   {
+   "title": "[일반] 교내 네트워크, 정보시스템 및 대표 홈페이지 일시 중단 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53732&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-23",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "[일반] [성평등가족부] 2026년 여성청소년 생리용품 바우처 지원 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53734&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-23",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/bfc89783e824063e.webp"
+  },
+  {
    "title": "[일반] [(재)군포시청소년재단] 군포시진로교육협력센터 '꿈이지 대학생 멘토단' 모집",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53729&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-11-23",
@@ -407,27 +426,6 @@
    "foundAt": "2026-11-09",
    "thumb": "data/news/img/d68966f6febe6476.webp",
    "desc": "1. 초빙분야 및 응모자격 2. 제출서류 (※ 모든 제출서류는 1개의 PDF로 작성하여 제출요망)"
-  },
-  {
-   "title": "[학사] 2027학년도 1학기 전과제도 시행 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53629&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-09",
-   "kind": "학사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-09",
-   "desc": "2027학년도 1학기 전과제도 시행과 관련하여 아래와 같이 안내하오니, 전과를 희망하는 학생은 일정 및 절차를 숙지하여 기한 내 신청하시기 바랍니다. 신청 기간 09:00 ~ 17:00 (추가 접수 불가) 신청 방법"
-  },
-  {
-   "title": "[국제학생] 외국인 유학생 시간제 취업 금지 분야 불법취업 적발시 처리기준 개정 알림",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53622&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-06",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-08",
-   "desc": "외국인 유학생의 시간제 취업 허가 위반자 처리 기준이 아래와 같이 개정 되었습니다. 개정된 내용을 정확히 인지하여 출국 조치 되는 일이 없도록 하시길 바랍니다. <주요 개정사항>"
   }
  ]
 }

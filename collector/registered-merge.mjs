@@ -29,6 +29,9 @@ const robotScoped = (it, today) => !!(it && it.auto && it.type === '교외' && !
 
 /** 승격 후보 — 위 조건 + 학교 한정(schoolOnly) */
 export function promotableOn(it, today) {
+  /* 🔴 학교 창구 증거로 되돌린 것(scope-promote ⓪ · 「원문 재판정으로 학교 한정」)은 합치기로도 다시 넓히지 않는다 — 학교 추천·창구 접수분은
+     학교마다 따로다(리뷰 2026-11-23 · 안 그러면 같은 실행의 ③ 이나 다음 자동 등록이 다른 학교 같은 사업과 합쳐 44개교로 되돌린다). 사람이 본다 */
+  if (/원문 재판정으로 학교 한정/.test((it && it.scopeFrom) || '')) return false;
   return robotScoped(it, today) && !!((it.eligibility || {}).schoolOnly);
 }
 
@@ -38,6 +41,46 @@ export function absorbsOn(it, school, today) {
   const e = (it && it.eligibility) || {};
   if (!robotScoped(it, today) || e.schoolOnly) return false;
   return !e.schoolsAny || !school || e.schoolsAny.some((x) => String(x).split('|')[0] === school);
+}
+
+/** 원문 증거로 전국으로 풀었던 로봇 등록분 — 지금 규칙으로 다시 볼 대상이면 돌려줄 학교 `{ school, campus }`, 아니면 null (2026-11-23 · 원칙 7 소급).
+ *  scope-promote ①② 가 남긴 표식 `로봇 YYYY-MM-DD · 원문 증거로 전국 — … (게시: 학교[ · 캠퍼스])` 이 있고 · 지금도 전국이고 · 다른 학교 글을 흡수하지 않은 것만
+ *  (흡수했으면 그 학교 학생 몫도 들어 있다 — 한 학교로 좁히면 그 학생들이 못 본다 · 사람이 본다).
+ *  🔴 사람이 범위를 정하면 표식이 '관리자 …' 로 바뀌므로 여기 걸리지 않는다. 좁히는 쪽이라 마감이 지나도 본다(넓히는 승격만 마감 전 · collect-14). */
+export function revertTarget(it) {
+  if (!it || !it.auto) return null;
+  const m = String(it.scopeFrom || '').match(/^로봇 \S+ · 원문 증거로 전국 — [\s\S]*\(게시: ([^()]+)\)\s*$/);
+  if (!m) return null;
+  const e = it.eligibility || {};
+  if (e.schoolOnly || (e.schoolsAny || []).length || (it.alsoPostedAt || []).length) return null;
+  const [school, campus] = m[1].split(' · ').map((s) => s.trim());
+  return school ? { school, campus: campus || null } : null;
+}
+
+/** 다른 학교의 같은 사업을 합친다 — 범위 승격 로봇(scope-promote ③)의 짝짓기 한 곳 (2026-11-23 이리 옮김 · 그 파일은 불러오는 순간 실행되어 관문이 표본으로 못 잰다).
+ *  남기는 쪽은 앞의 후보(둘 다 학교 한정 · 다른 학교 → 전국 승격) 또는 전국 등록분(흡수 · 범위 그대로).
+ *  🔴 전국 등록분이 배열 **뒤**에 있어도 짝을 짓는다 — 예전 고리는 앞쪽이 후보이고 뒤쪽이 전국이면 건너뛰어,
+ *     사업 열쇠를 고친 뒤 되살아난 짝(먼저 등록된 학교 한정 · 나중에 전국으로 풀린 등록분)이 영영 안 합쳐졌다.
+ *  items 를 제자리에서 고친다(지운 쪽을 뺀다). 반환: [{ keep, drop, dropSchool, promoted, absorbed }] */
+export function mergeSamePrograms(items, today, sameProgram, { reason = '다른 학교 게시판에도 같은 사업(자동 승격)' } = {}) {
+  const out = [];
+  const sch = (it) => (it.eligibility || {}).schoolOnly;
+  for (let i = 0; i < items.length; i++) {
+    for (let j = items.length - 1; j > i; j--) {
+      const a = items[i]; const b = items[j];
+      let keep = null; let drop = null; let at = -1;
+      if (promotableOn(b, today) && (promotableOn(a, today) ? sch(a) !== sch(b) : absorbsOn(a, sch(b), today))) { keep = a; drop = b; at = j; }
+      else if (promotableOn(a, today) && absorbsOn(b, sch(a), today)) { keep = b; drop = a; at = i; }
+      if (!keep || !sameProgram(keep, drop)) continue;
+      const dropSchool = sch(drop);
+      const r = mergeInto(keep, drop, { reason });
+      if (!r.promoted && !r.absorbed) continue;
+      out.push({ keep, drop, dropSchool, ...r });
+      items.splice(at, 1);
+      if (at === i) { i -= 1; break; }   // 앞쪽(a)을 지웠다 — 같은 자리에 온 다음 항목부터 다시 본다
+    }
+  }
+  return out;
 }
 
 export function mergeInto(keep, drop, { reason = '' } = {}) {

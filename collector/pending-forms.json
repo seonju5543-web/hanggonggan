@@ -1276,6 +1276,40 @@
    "fetched": true,
    "schematized": false,
    "lastTryAt": "2026-11-21"
+  },
+  {
+   "id": "auto-rykeywordpaged1slug20262-0e9iyco",
+   "name": "장학 ★ 2026학년도 2학기 윤준성교수님장학금 장학생 모집 공고(~12/7 월 15시)",
+   "target": "장학 ★ 2026학년도 2학기 윤준성교수님장학금 장학생",
+   "added": "2026-11-23",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-tegory1moddocumentuid432",
+   "name": "2027학년도 1학기 해외수학장학금 신청 안내(학부생 대상)(~26.12.8.(화) 18:00까지)",
+   "target": "2027학년도 1학기 해외수학장학금 신청 안내(학부생 ",
+   "added": "2026-11-23",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-tegory1moddocumentuid431",
+   "name": "2027학년도 1학기 교내장학금 신청 안내(~26.12.11.(금) 18:00까지)",
+   "target": "2027학년도 1학기 교내장학금 신청 안내(~26.12",
+   "added": "2026-11-23",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-0k6yc5n",
+   "name": "[교외] 세아해암학술장학재단 장학생 선발 안내(12/9 마감, 이공계열, 생활비 300만원)",
+   "target": "세아해암학술장학재단 장학생 선발 안내(12/9 마감, ",
+   "added": "2026-11-23",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-11-23"
   }
  ]
 }

@@ -19,7 +19,9 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion, schoolKindAlt, yearBranchLabels, yearBranchDoubt };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion, schoolKindAlt, yearBranchLabels, yearBranchDoubt,
+      /* 옛 캐시의 parse-requirements 와 섞여 실려도(서비스워커 3.5초 폴백) 엔진 전체가 죽지 않게 — 없으면 아무 줄에도 안 걸리는 꼴(2026-11-23 리뷰) */
+      ACTIVITY_GROUP: typeof ACTIVITY_GROUP !== 'undefined' ? ACTIVITY_GROUP : /(?!)/ };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -1152,6 +1154,7 @@ function fitDetail(sch, p) {
 
   const fails = [];
   let met = 0, unknown = 0, total = 0, metMain = 0;   // metMain — 제외 조항 통과를 뺀, 자격 줄에서 맞힌 수(아래 '모른다' 판정용)
+  let groupUnknown = false;          // 반드시 충족할 줄 가운데 '이미 해 온 활동으로 정한 무리'(parse-requirements ACTIVITY_GROUP)를 판정 못 했나 — 아래 '모른다' 판정용
   const groups = new Map();          // 선택지 묶음 → 그 안에서 하나라도 충족했나
   /* 🔴 줄이 아니라 **조건**을 센다 (2026-10-29 개발자 "적합도는 퍼센트로 — 나름의 세세한 기준이 있으면").
      한 줄에 조건이 여럿이면(`직전학기 12학점 이상 이수 및 평점 3.0 이상인 재학생` = 학점·성적·재학 셋) 그 수만큼 무게를 준다 —
@@ -1164,6 +1167,7 @@ function fitDetail(sch, p) {
     const d = {};
     const lv = lineVerdict(it.text, p, false, ctx, d);
     const verdict = lv === 'no' ? 'fail' : lv === 'ok' ? 'pass' : 'unknown';
+    if (verdict === 'unknown' && !(it.group > 0) && PR.ACTIVITY_GROUP.test(PR.untag(it.text))) groupUnknown = true;   // 택1 갈래 안의 줄은 다른 갈래가 맞으면 된다 — 세지 않는다
     if (it.group > 0) {
       const g = groups.get(it.group) || { any: false };
       if (verdict === 'pass') g.any = true;
@@ -1219,6 +1223,13 @@ function fitDetail(sch, p) {
      누가 받는지를 적은 칸을 하나도 못 읽었으면 그 공고의 대상을 모른다 — ✕ 는 위에서 이미 냈다 · 여기는 ✓ 를 '모름'으로 낮추기만 한다 */
   const who = (sch && sch.sourceKind === 'kosaf' && sch.kosafWhoLines) || [];
   if (who.length && !requirementLines(sch, who, { all: true }).length) return { pct: FIT_UNREAD, unread: true, met, total, unknown, fails: [] };
+  /* 🔴 **이미 해 온 활동으로 정한 무리를 판정 못 했으면 '모른다'** (2026-11-23 · 층2 서울미래인재재단 「서울선순환인재 장학금」 — 선조치 후 보고).
+     특정자격 칸이 `2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토`(공고문 「① 필수 지원자격」 · 「①~② 항목 모두 충족하는 자」)와
+     `서울 소재 대학교 재학 학부생 …` 둘인데, 앞 줄이 화면에서 빠져(REQ_SIGNAL) 뒷줄 ✓ 와 제외 칸 통과만으로 서울 학생 누구에게나 「적합도 95%」였다 —
+     「누가」 칸 줄이 하나 살아 있어 위 규칙이 쉬었다. 줄을 살려도 모름 1 이라 75% 다 — 그 무리가 아닌 학생(거의 모두)에게 높은 숫자는 틀린 안심이다.
+     무리에 드는지는 프로필로도 처지 질문으로도 모른다(parse-requirements ACTIVITY_GROUP · ACHIEVE_PARTS 가 딸린 조건의 ✓ 도 막는다).
+     ✕ 는 위에서 이미 냈다 · 여기는 ✓ 를 '모름'으로 낮추기만 한다 · 택1 갈래 안의 무리 줄(groupUnknown 이 안 센다)·여러 장학금 묶음(multi — 그 무리는 한 종의 대상일 수 있다)은 쉰다 · 층1·활동 공고도 같다 */
+  if (groupUnknown && !multi) return { pct: FIT_UNREAD, unread: true, met, total, unknown, fails: [] };
   /* 🔴 **하나도 판정하지 못했으면 '적합'이 아니라 '모른다'** (2026-09-21).
      예전에는 `fails` 가 비면 곧바로 적합이라, 요건을 **0개 판정**하고도 카드가 '적합'이라고
      말했다. 실측으로 걸린 것: 울산 남구 장학금(`남구에 주민등록`)과 전남 장학금
@@ -1514,6 +1525,9 @@ const REQ_SIGNAL = new RegExp([
      `사업자등록을 완료한 개인 또는 단체` · `(예비)창업자`. 🔴 줄 **끝**에서만 — 줄 가운데의 `전문가 멘토링` 같은 혜택 말은 아니다 */
   '(?:전문가|경험자|(?:예비\\s?)?창업자|개인\\s?(?:및|또는|·)\\s?(?:단체|기업|팀))\\s*[)）]?\\s*$',                    // …할 수 있는 학생 / …할 수 있는 분
   '(마친|가진|이수한|합격한|해당하는|갖춘)\\s?자',
+  /* 이미 해 온 활동으로 정한 무리 — `2025년 11월 ~ 2026년 10월까지 8개월 이상 활동한 서울런 멘토` (2026-11-23 · 층2 서울선순환인재 장학금의 「① 필수 지원자격」).
+     끝말 「멘토」를 사람으로 못 봐 이 줄이 화면·분모에서 통째로 빠지고, 남은 서울 소재 줄 ✓ 로 서울 학생 누구에게나 95% 였다. 꼴은 parse-requirements ACTIVITY_GROUP 한 곳(fitDetail 이 같은 것을 본다) */
+  PR.ACTIVITY_GROUP.source,
   '이상인?\\s?자|이하의?\\s?(해당\\s?)?학생',
   '결격\\s?사유|결격사유|합격자|재직|파견|추천\\s?(가능|대상)자?|이수(한|자)',
   /* `국가근로장학생 대상자 명단 에 있어야 함` (2026-11-12 · 시립대 경영경제도서관 국가근로 — 「2. 자격사항」 의 유일한 요건이 이 꼴이라 통째로 버려졌다).

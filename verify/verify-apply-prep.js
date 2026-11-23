@@ -249,6 +249,19 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
           const first = document.querySelector('#detail-sheet .prep-check > li');
           return { li, head: document.querySelector('#detail-sheet .prep-head').textContent.replace(/\s+/g, ''), done: first.classList.contains('is-done') };
         }), { li: 4, head: '제출전준비2/4', done: true });
+        /* 2026-11-23 개발자 지적 「확인했어요 버튼을 누르면 공고의 맨 마지막으로 이동돼」 — 누른 줄이 화면에서 제자리에 있어야 한다(옛 코드: 시트가 0 으로 튀어 줄이 화면 밖) */
+        eq('🔴 「확인했어요」를 눌러도 화면이 튀지 않는다 — 시트를 내려 둔 채 누른 줄이 같은 높이에 남는다(되돌리기도)', await page.evaluate(async () => {
+          const sh = document.querySelector('#detail-sheet');
+          const press = async (k) => {
+            const b = sh.querySelector(`[data-prep-toggle="${k}"]`);
+            b.scrollIntoView({ block: 'center' }); await new Promise((r) => setTimeout(r, 100));
+            const y0 = b.getBoundingClientRect().top; const top0 = sh.scrollTop;
+            b.click(); await new Promise((r) => setTimeout(r, 300));
+            const b2 = sh.querySelector(`[data-prep-toggle="${k}"]`);
+            return { scrolled: top0 > 50, still: !!b2 && Math.abs(b2.getBoundingClientRect().top - y0) < 3 };
+          };
+          return [await press('submit'), await press('submit')];
+        }), [{ scrolled: true, still: true }, { scrolled: true, still: true }]);
         await page.keyboard.press('Escape');
         await closedAfter(500);
       }
@@ -348,21 +361,30 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
       let threw = '';
       try { openDetail(id); } catch (e) { threw = String(e && e.message); }
       await new Promise((r) => setTimeout(r, 500));
-      /* 2026-11-22 개발자 지시 — 작성한 양식 문서 줄엔 「PDF 저장」 하나만(.doc 저장·공유·다시 작성 뺌) */
-      const has = ['#btn-form-print', '#btn-form-save', '#btn-form-share', '#btn-form-edit'].map((q) => !!document.querySelector(q));
+      /* 2026-11-22 「pdf 저장 칸만」 → 11-23 「다시 작성 기능까지」 — 문서 줄엔 「PDF 저장」·「다시 작성」(.doc 저장·공유 없음) */
+      const has = ['#btn-form-print', '#btn-form-edit', '#btn-form-save', '#btn-form-share'].map((q) => !!document.querySelector(q));
       const b = document.querySelector('#btn-form-print');
-      const label = b && b.textContent.trim();
+      const label = [b, document.querySelector('#btn-form-edit')].map((x) => x && x.textContent.trim());
       /* 진짜 인쇄 창은 띄우지 않고, 누르면 그 문서(쓴 답)로 printFormDoc 을 부르는지만 본다 */
       const real = window.printFormDoc; let called = null;
       window.printFormDoc = (tpl, p, ans) => { called = { tpl: tpl === FORM_TEMPLATES['prep:' + id], ans: ans === state.applications.find((a) => a.id === id).formAns }; };
       if (b) b.click();
       window.printFormDoc = real;
+      /* 「다시 작성」 — 그 문서를 미리보기로 연다(쓴 답 그대로) */
+      const e = document.querySelector('#btn-form-edit');
+      if (e) e.click();
+      await new Promise((r) => setTimeout(r, 400));
+      const edit = { stage: formFill && formFill.stage, tpl: formFill && formFill.tplId, sch: formFill && formFill.schId === id };
+      /* 보기만 하고 닫았다 — 다 쓴 신청이 홈에서 「쓰던 신청서」로 불리면 안 된다(리뷰 2026-11-23: 닫을 때 이어보기 장부가 적힌다) */
+      closeSheet(); await new Promise((r) => setTimeout(r, 300));
+      const d = resumeDraft();
+      const draftAfterLook = !!(d && d.sch && d.sch.id === id);
       state.applications = state.applications.filter((a) => a.id !== id);
       resumeSave({ form: null, sheet: null });
-      return { threw, has, label, called };
+      return { threw, has, label, called, edit, draftAfterLook };
     }, pick.P.id);
-    eq('  다 쓴 문서(작성한 양식 문서)는 원본이 생긴 뒤에도 「PDF 저장」 하나로 받는다 — 누르면 그 문서·쓴 답으로 PDF(인쇄) · 다른 단추는 없다',
-      r3, { threw: '', has: [true, false, false, false], label: 'PDF 저장', called: { tpl: true, ans: true } });
+    eq('  다 쓴 문서(작성한 양식 문서)는 원본이 생긴 뒤에도 「PDF 저장」(그 문서·쓴 답으로 인쇄)·「다시 작성」(그 문서를 미리보기로)이 있고 .doc 저장·공유는 없다',
+      r3, { threw: '', has: [true, true, false, false], label: ['PDF 저장', '다시 작성'], called: { tpl: true, ans: true }, edit: { stage: 'preview', tpl: 'prep:' + pick.P.id, sch: true }, draftAfterLook: false });
     await page.keyboard.press('Escape');
     await closedAfter(600);
   }

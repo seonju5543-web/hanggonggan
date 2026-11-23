@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { cleanTitle } from './clean-title.mjs';
 // 등록 규칙은 감사 도구와 같은 파일을 쓴다 (verify/entry-rules.cjs) — 규칙이 갈라지지 않게
-const { checkEntry, isDuplicatePair, sameProgram, registeredAfterDeadline, lastDateIn } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+const { checkEntry, isDuplicatePair, sameProgram, dropParens, registeredAfterDeadline, lastDateIn } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 /* 교내·교외 증거 판정 + 학교 이름표 + 합치기 — 규칙은 각자 한 곳 (2026-09-30 · 베끼지 않는다) */
 import { classifyKind, schoolDomain } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
@@ -188,8 +188,10 @@ function classify(n, regUrlSet, regItems, batchSeen, pastRounds, feed = []) {
      그래서 괄호 안에 **숫자나 `접수`가 있을 때만** 꼬리표로 본다 — 학기·연도·마감·접수처는 전부
      숫자나 그 낱말을 달고 오고, 이름의 일부(`학업장려금`·`가계곤란`·`Luke`)는 안 달고 온다.
      🔴 **양쪽에 똑같이 적용한다.** 옛 규칙은 등록명에만 썼는데, 그러면 공고 쪽 꼬리표가 그대로
-        남아 `고졸후학습자(희망사다리2유형) 장학금 신청(~9/17)` 이 같은 학교 등록분과 안 맞는다. */
-  const bare = (s) => (s || '').replace(/\([^)]*(\d|접수)[^)]*\)/g, '');
+        남아 `고졸후학습자(희망사다리2유형) 장학금 신청(~9/17)` 이 같은 학교 등록분과 안 맞는다.
+     🔴 겹친 괄호(`(~11/23(월)까지)`)는 안쪽부터 벗긴다 — 규칙은 entry-rules.cjs dropParens 한 곳(사업 열쇠 programKey 와 같다 · 2026-11-23 통영시).
+        옛 `\([^)]*(\d|접수)[^)]*\)` 는 `(~11/23(월)` 만 떼고 `까지)` 를 남겼다. */
+  const bare = (s) => dropParens(s, (inner) => /\d|접수/.test(inner));
   /* 🔴 등록 뒤 마감 경과로 뺀 등록분과 **같은 사업**이면 새로 등록하지 않는다 (2026-10-05 리뷰 · 장부 past-rounds.mjs).
      빼기 전에는 그 등록분이 짝(twin)이 되어 같은 사업 글이 '승격 불가(마감 경과) 컨펌 대기'로 걸렸다 — 빼고 나니 같은 실행에서 다른 학교 글이
      마감 없이 등록되고 셋째 학교 글이 그것을 전국으로 승격해, 지난 회차가 44개교 전체에 '마감' 카드로 남았다(세종대 K-원전 실례).
