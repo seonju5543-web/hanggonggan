@@ -3,6 +3,35 @@
  "updatedAt": "2026-11-23",
  "items": [
   {
+   "title": "2026년 12월 현역병 모집 계획",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512390",
+   "postedAt": "2026-11-23",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "[언어교육원] 2026학년도 겨울학기 대학원 학위청구 외국어시험 (한국어) 대체...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512378",
+   "postedAt": "2026-11-23",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "[언어교육원] 2026학년도 겨울학기 대학원 학위청구 외국어시험 (영어) 대체강...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512377",
+   "postedAt": "2026-11-23",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-23"
+  },
+  {
    "title": "[빛의위원회] 「빛의 혁명 2주년 기념행사」 안내",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512372",
    "postedAt": "2026-11-23",
@@ -389,37 +418,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-11-12",
    "desc": "2026학년도 겨울계절수업 울산과학기술원 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(국립경국대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512132",
-   "postedAt": "2026-11-12",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-12",
-   "desc": "2026학년도 겨울계절수업 국립경국대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[초록우산] 2026년 한국남부발전 모집...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512129",
-   "postedAt": "2026-11-11",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-11",
-   "thumb": "data/news/img/b627b75b5fea99e8.webp",
-   "desc": "초록우산 어린이재단에서 한국남부발전 「KOSPO 드림라이트 멘토링 2기」에 참여할 대학생 멘토를 다음과 같이 모집하오니, 학생 여러분의 많은 관심과 참여 바랍니다."
-  },
-  {
-   "title": "[공고] 효원문화회관 무단 점유 물품 처분에 관한 공시송달 공고",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512127",
-   "postedAt": "2026-11-11",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-11"
   }
  ]
 }
