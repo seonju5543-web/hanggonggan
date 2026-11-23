@@ -29,7 +29,7 @@
     police: 'police', cctv: 'cctv', emergency_bell: 'bell', emergency_phone: 'bell', fire_station: 'bell',
     station: 'subway', subway_entrance: 'subway', bus_stop: 'bus', bicycle_rental: 'bike',
     restaurant: 'food', fast_food: 'food', gate: 'gate', toilets: 'home',
-    '카공': 'study', '카페': 'cafe', '밥집': 'food', '술집': 'beer', '과팅': 'people', '생활': 'store', '복지·혜택': 'benefit', '놀거리': 'pin',
+    '카공': 'cafe', '카페': 'cafe', '밥집': 'food', '술집': 'beer', '과팅': 'people', '생활': 'store', '복지·혜택': 'benefit', '놀거리': 'pin',
   };
 
   var byIdCache = null;
@@ -120,7 +120,11 @@
         var hl = (cfg.zoneFocus || []).indexOf(z.id) >= 0;
         L.circle([z.lat, z.lon], { radius: z.r || 250, className: 'm-zone' + (hl ? ' is-hl' : ''), weight: hl ? 2 : 1.2, interactive: false }).addTo(map);
         if (cfg.zoneLabels !== false && (!cfg.zoneLabelIds || cfg.zoneLabelIds.indexOf(z.id) >= 0)) {
-          L.marker([z.lat, z.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'm-dong-label-wrap', html: '<span class="m-dong-label' + (hl || !cfg.zoneFocus ? '' : ' dim') + '">' + esc(z.short || z.name) + '</span>', iconSize: [0, 0] }) }).addTo(map);
+          // 이름표는 원 밖에 둔다 — 원의 화면 반지름(px)을 구해 그만큼 밀어낸다
+          var rpx = Math.round((z.r || 250) / (156543.03392 * Math.cos(z.lat * Math.PI / 180) / Math.pow(2, map.getZoom()))) + 5;
+          var side = (cfg.zoneLabelSide || {})[z.id] || 'above';
+          var tf = side === 'right' ? 'translate(' + rpx + 'px,-50%)' : side === 'left' ? 'translate(calc(-100% - ' + rpx + 'px),-50%)' : side === 'below' ? 'translate(-50%,' + rpx + 'px)' : 'translate(-50%,calc(-100% - ' + rpx + 'px))';
+          L.marker([z.lat, z.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'm-dong-label-wrap', html: '<span class="m-dong-label m-zone-label' + (hl || !cfg.zoneFocus ? '' : ' dim') + '" style="transform:' + tf + '">' + esc(z.short || z.name) + '</span>', iconSize: [0, 0] }) }).addTo(map);
         }
       });
     }
@@ -223,7 +227,7 @@
       chipRows[c].className = 'ms-chips';
       chipRows[c].setAttribute('role', 'tablist');
       chipRows[c].setAttribute('aria-label', '지도 주제');
-      chipRows[c].innerHTML = THEMES.map(function (t) { return '<button class="filter-chip' + (t === onChip ? ' active' : '') + '">' + t + '</button>'; }).join('');
+      chipRows[c].innerHTML = THEMES.map(function (t, i) { return (i === 4 ? '<i class="brk"></i>' : '') + '<button class="filter-chip' + (t === onChip ? ' active' : '') + '">' + t + '</button>'; }).join('');
     }
     // 리서치 자료에서 센 개수 — data-town-count="갈래" (핀 있는 곳 + 목록에만 있는 곳)
     var T2 = window.CAMPUS_TOWN || { places: [], unplaced: [], zones: [] };
@@ -232,7 +236,7 @@
       var cat = cnts[q].getAttribute('data-town-count');
       var all = T2.places.concat(T2.unplaced);
       var n2 = cat === 'all' ? all.length : cat === 'zones' ? T2.zones.filter(function (z) { return z.id !== 'z-campus'; }).length
-        : all.filter(function (p) { return p.category === cat || p.also === cat; }).length;
+        : all.filter(function (p) { return p.category === cat; }).length;   // 주 갈래만 센다
       cnts[q].textContent = String(n2);
     }
     var gos = document.querySelectorAll('.go[data-go]');
