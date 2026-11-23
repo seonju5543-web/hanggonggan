@@ -26,6 +26,13 @@ window.MAP_ICONS = {
   home: '<path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
   walk: '<circle cx="13" cy="4.5" r="1.8"/><path d="M10.5 21l2-6-2.5-2.5 1-4.5 3 2.5 3 1"/><path d="M8 11.5l2-3"/><path d="M14.5 15l1.5 6"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  beer: '<path d="M6 8h9v10a2.5 2.5 0 0 1-2.5 2.5h-4A2.5 2.5 0 0 1 6 18z"/><path d="M15 10.5h1.5a2.5 2.5 0 0 1 0 5H15"/><path d="M6 8c0-2 1.5-3.5 3.5-3.5 1 0 1.7.3 2.3.9.5-.5 1.2-.8 2-.8A2.4 2.4 0 0 1 15 8"/><path d="M9.5 11.5v5M12 11.5v5"/>',
+  people: '<circle cx="8.5" cy="8" r="3"/><path d="M2.5 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.6c3 .1 5.5 2 5.5 5.4"/>',
+  chat: '<path d="M4 5.5h16v11H10l-4.5 3.5v-3.5H4z"/><path d="M8 10h8M8 13h5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  thumb: '<path d="M7 11v9H4v-9z"/><path d="M7 11l4-7.5c1.7 0 2.5 1.2 2.5 2.6V9h4.6a2 2 0 0 1 2 2.4l-1.3 6.9a2 2 0 0 1-2 1.7H7"/>',
+  flag: '<path d="M6 21V4"/><path d="M6 4h11l-2.2 4L17 12H6"/>',
+  pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
   route: '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H16"/>',
 };
 window.mapIcon = function (name, size) {

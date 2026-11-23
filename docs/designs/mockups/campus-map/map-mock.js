@@ -29,11 +29,17 @@
     police: 'police', cctv: 'cctv', emergency_bell: 'bell', emergency_phone: 'bell', fire_station: 'bell',
     station: 'subway', subway_entrance: 'subway', bus_stop: 'bus', bicycle_rental: 'bike',
     restaurant: 'food', fast_food: 'food', gate: 'gate', toilets: 'home',
+    '카공': 'study', '카페': 'cafe', '밥집': 'food', '술집': 'beer', '과팅': 'people', '생활': 'store', '복지·혜택': 'benefit', '놀거리': 'pin',
   };
 
   var byIdCache = null;
   function byId(id) {
-    if (!byIdCache) { byIdCache = {}; D.pois.forEach(function (p) { byIdCache[p.id] = p; }); }
+    if (!byIdCache) {
+      byIdCache = {};
+      D.pois.forEach(function (p) { byIdCache[p.id] = p; });
+      // 대학가 리서치 자료(town.js · 재학생 커뮤니티에서 모은 곳) — id 는 t- 로 시작
+      ((window.CAMPUS_TOWN || {}).places || []).forEach(function (p) { byIdCache[p.id] = p; });
+    }
     return byIdCache[id] || null;
   }
   function esc(s) {
@@ -57,7 +63,7 @@
     var wantLabel = cfg.labels === 'all' || (cfg.labels || []).indexOf(p.id) >= 0 || sel;
     var name = (cfg.rename && cfg.rename[p.id]) || p.name;
     var left = (cfg.labelLeft || []).indexOf(p.id) >= 0;
-    var inner = num ? '<b class="m-num">' + num + '</b>' : window.mapIcon(CAT_ICON[p.cat] || 'campus', sel ? 17 : 14);
+    var inner = num ? '<b class="m-num">' + num + '</b>' : window.mapIcon(CAT_ICON[p.cat] || CAT_ICON[p.category] || 'campus', sel ? 17 : 14);
     var html = '<span class="m-pin ' + lc + (sel ? ' is-sel' : '') + (done ? ' is-done' : '') + '">' + inner + '</span>' +
       (wantLabel && name ? '<span class="m-label' + (sel ? ' is-sel' : '') + (left ? ' is-left' : '') + '">' + esc(name) + '</span>' : '');
     var s = sel ? 34 : 26;
@@ -104,6 +110,26 @@
           var c = (cfg.dongLabelAt && cfg.dongLabelAt[d.name]) || ringCentroid(d.rings[0]);
           L.marker(c, { interactive: false, keyboard: false, icon: L.divIcon({ className: 'm-dong-label-wrap', html: '<span class="m-dong-label' + (hl ? '' : ' dim') + '">' + esc(d.name) + '</span>', iconSize: [0, 0] }) }).addTo(map);
         }
+      });
+    }
+    if (cfg.zones) {
+      var T = window.CAMPUS_TOWN || { zones: [] };
+      T.zones.forEach(function (z) {
+        if (cfg.zones !== 'all' && cfg.zones.indexOf(z.id) < 0) return;
+        var hl = (cfg.zoneFocus || []).indexOf(z.id) >= 0;
+        L.circle([z.lat, z.lon], { radius: z.r || 250, className: 'm-zone' + (hl ? ' is-hl' : ''), weight: hl ? 2 : 1.2, interactive: false }).addTo(map);
+        if (cfg.zoneLabels !== false) {
+          L.marker([z.lat, z.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'm-dong-label-wrap', html: '<span class="m-dong-label' + (hl || !cfg.zoneFocus ? '' : ' dim') + '">' + esc(z.name) + '</span>', iconSize: [0, 0] }) }).addTo(map);
+        }
+      });
+    }
+    // 리서치 장소를 점으로 — townCats: 갈래 목록 · townZone: 그 구역만
+    if (cfg.townCats) {
+      var pinned0 = {}; (cfg.pins || []).forEach(function (id) { pinned0[id] = 1; });
+      ((window.CAMPUS_TOWN || {}).places || []).forEach(function (p) {
+        if (pinned0[p.id] || cfg.townCats.indexOf(p.category) < 0) return;
+        if (cfg.townZone && p.zone !== cfg.townZone) return;
+        L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'm-pin-wrap', html: '<span class="m-dot"></span>', iconSize: [10, 10], iconAnchor: [5, 5] }), interactive: false, keyboard: false }).addTo(map);
       });
     }
     if (cfg.campus !== false && D.campus && D.campus.length) {

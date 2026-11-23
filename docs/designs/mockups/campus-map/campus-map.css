@@ -284,3 +284,7 @@ details.tech code { font-size: 12px; }
   .phone-cap, .phone-notes, .frag-cap { padding-left: 16px; padding-right: 16px; }
   .frag { width: auto; margin: 0 16px 12px; }
 }
+
+/* 대학가 구역 — 학생들이 부르는 상권을 옅은 원으로(행정 경계가 아니다) */
+.m-zone { stroke: var(--primary); stroke-opacity: .4; stroke-dasharray: 3 5; fill: var(--primary); fill-opacity: .04; }
+.m-zone.is-hl { stroke-opacity: .85; stroke-dasharray: none; fill-opacity: .08; }
