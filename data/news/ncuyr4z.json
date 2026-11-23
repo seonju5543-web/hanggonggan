@@ -1,7 +1,52 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-11-22",
+ "updatedAt": "2026-11-23",
  "items": [
+  {
+   "title": "[해외파견] 2026-동계 JBNU English & AI 글로벌 챌린지 파견 프로그렘 선발 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220157/detailView.do",
+   "postedAt": "2026-11-23",
+   "postId": "220157",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-23",
+   "desc": "- 영어 의사소통 능력과 AI 이해 활용 역량을 높이고, 어학연수, 기업탐방이 결합된 프로그램"
+  },
+  {
+   "title": "[언어교육부] 12월 19일(토) 모의토익 실시 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220155/detailView.do",
+   "postedAt": "2026-11-23",
+   "postId": "220155",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-23",
+   "desc": "언어교육부 언어교육부에서 아래와 같이 모의토익을 실시하오니, 많은 관심 부탁드립니다."
+  },
+  {
+   "title": "[취업진로지원과]건지포럼 6차(12.02.(수) 16:00-17:30)//큰사람포인트 20점, 통합전공탐색 1시간 인정",
+   "url": "https://www.jbnu.ac.kr/web/Board/220151/detailView.do",
+   "postedAt": "2026-11-23",
+   "postId": "220151",
+   "kind": "행사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/6b20278d3f259dba.webp"
+  },
+  {
+   "title": "2026학년도 전기 졸업자격인증 신청 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220148/detailView.do",
+   "postedAt": "2026-11-23",
+   "postId": "220148",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-23",
+   "desc": "1. 신청대상자 : 졸업자격인증 요건을 충족한 학생 및 조기졸업희망자 , 수료자"
+  },
   {
    "title": "[해외파견] 2026-동계 JBNU English & AI 글로벌 챌린지 파견 프로그렘 선발 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/220105/detailView.do",
@@ -413,52 +458,6 @@
    "foundAt": "2026-11-10",
    "thumb": "data/news/img/eb54e1836d335932.webp",
    "desc": "학생취업진로처 학생지원과 < 2026 장애 이해 전문강사 초빙 교육 ( 법정의무교육 ) >"
-  },
-  {
-   "title": "[국제협력과] 2026 JBNU in Shanghai 프로그램 운영 취소 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/219621/detailView.do",
-   "postedAt": "2026-11-10",
-   "postId": "219621",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-10",
-   "desc": "국제처 국제협력과 전북대학교 국제협력과에서 서울대학교와 공동으로 추진하던 「2026 JBNU in Shanghai」 프로그램이 학교 사정으로 인해 부득이하게 취소되었음을 안내드립니다."
-  },
-  {
-   "title": "2026학년도 동계 J-ABLE 참여 학생 글로벌 역량 강화 프로그램(해외 대학 파견) 안내(전액 무료, 기간 연장)",
-   "url": "https://www.jbnu.ac.kr/web/Board/219612/detailView.do",
-   "postedAt": "2026-11-09",
-   "postId": "219612",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/8b31327a2a0be09c.webp",
-   "desc": "교육혁신본부 교육혁신부 문의 063-270-4236 혹은 ctl-wd@jbnu.ac.kr"
-  },
-  {
-   "title": "2026 순창코리아떡볶이페스타 행사 홍보 협조 요청",
-   "url": "https://www.jbnu.ac.kr/web/Board/219611/detailView.do",
-   "postedAt": "2026-11-09",
-   "postId": "219611",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/aa46bf6b49cf94d6.webp",
-   "desc": "사무국 총무과 1. 귀 기관의 무궁한 발전을 기원합니다. 2. (재)순창발효관광재단에서는 순창의 전통 장 문화의 정체성을 지키고 이를 토대로 새로운 활용방안 을 모색해 발전시키기 위해서 「2026…"
-  },
-  {
-   "title": "2026회계연도 제3회 전북대학교 재정위원회 소집 공고",
-   "url": "https://www.jbnu.ac.kr/web/Board/219603/detailView.do",
-   "postedAt": "2026-11-09",
-   "postId": "219603",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-09",
-   "desc": "전북대학교 재정 및 회계의 운영에 관한 규정 제 7 조에 따른 심의 ‧ 의결을 위하여 전북대학교 재정위원회 소집을 다음과 같이 공고함 일시 : 2026 년 11월 17 일 ( 화요일 ) 14시 장소 : 전북대학교…"
   }
  ]
 }

@@ -1,7 +1,50 @@
 {
  "school": "숭실대학교",
- "updatedAt": "2026-11-22",
+ "updatedAt": "2026-11-23",
  "items": [
+  {
+   "title": "비교과·행사 [모집]SSU 데이터톤 2026(~12/15)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EB%AA%A8%EC%A7%91ssu-%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%86%A4-202612-15&keyword",
+   "postedAt": "2026-11-23",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/eff57cdb199e05d7.webp",
+   "desc": "TDM Studio를 활용한 텍스트 데이터 분석 논문과 뉴스 속 데이터에서 나만의 질문을 찾고, 분석을 통해 답을 찾아보세요."
+  },
+  {
+   "title": "채용 2027년 숭실대학교 한국기독교박물관 학예팀 계약직(육아휴직 대체) 직원 모집",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2027%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%ED%95%9C%EA%B5%AD%EA%B8%B0%EB%8F%85%EA%B5%90%EB%B0%95%EB%AC%BC%EA%B4%80-%ED%95%99%EC%98%88%ED%8C%80-%EA%B3%84%EC%95%BD%EC%A7%81%EC%9C%A1&keyword",
+   "postedAt": "2026-11-23",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-23",
+   "desc": "본교 한국기독교박물관 학예팀에서 아래와 같이 육아휴직 대체 계약직 직원을 모집합니다. 모집 관련 자세한 사항은 아래의 모집공고를 참고하여 주시기 바랍니다."
+  },
+  {
+   "title": "채용 숭실대학교 교육대학원 교학팀 계약직 직원 모집",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B5%90%EC%9C%A1%EB%8C%80%ED%95%99%EC%9B%90-%EA%B5%90%ED%95%99%ED%8C%80-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EB%AA%A8%EC%A7%91-2&keyword",
+   "postedAt": "2026-11-23",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-23"
+  },
+  {
+   "title": "채용 2026년 숭실대학교 베어드학부대학 교양교육운영팀 계약직 직원 모집 (출산휴가 및 육아휴직 대체근무)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EB%B2%A0%EC%96%B4%EB%93%9C%ED%95%99%EB%B6%80%EB%8C%80%ED%95%99-%EA%B5%90%EC%96%91%EA%B5%90%EC%9C%A1%EC%9A%B4%EC%98%81%ED%8C%80-%EA%B3%84-4&keyword",
+   "postedAt": "2026-11-23",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-23",
+   "desc": "본교 숭실 베어드학부대학 교양교육행정팀에서 아래와 같이 계약직 직원을 모집합니다. 모집 관련 자세한 사항은 아래의 모집공고를 참고하여 주시기 바랍니다."
+  },
   {
    "title": "기타 2026-2학기 숭실대학교 실내체육관 대관 신청 안내(12월)",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026-2%ED%95%99%EA%B8%B0-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%8B%A4%EB%82%B4%EC%B2%B4%EC%9C%A1%EA%B4%80-%EB%8C%80%EA%B4%80-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B412%EC%9B%94&keyword",
@@ -375,49 +418,6 @@
    "src": "3b348584",
    "foundAt": "2026-11-03",
    "desc": "HOT 공지사항 2026학년도 겨울계절제 수업 일정 안내(수정) 2026학년도 2학기 학부 중간 강의평가 실시 안내[2026. 10. 6.(화) ~ 10. 19.(월)] 정부포상 추천대상교원(예정) 안내…"
-  },
-  {
-   "title": "학사 2027학년도 1학기 복학, 휴학, 유급 신청 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4&keyword",
-   "postedAt": "2026-11-02",
-   "kind": "학사",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/e6025fe17f41f07c.webp"
-  },
-  {
-   "title": "비교과·행사 [모집] AI & 프롬프트 리터러시(심화) (~11.16.)",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EB%AA%A8%EC%A7%91-ai-%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8-%EB%A6%AC%ED%84%B0%EB%9F%AC%EC%8B%9C%EC%8B%AC%ED%99%94-11-16&keyword",
-   "postedAt": "2026-11-02",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/af4ca387621d11b5.webp",
-   "desc": "주제: AI를 잘 쓰는 세 가지 리터러시 장소: 전산관 다솜홀 강연자: 박정훈 박사(한국과학기술정보연구원 책임 연구원, 중부대학교 문헌정보학과 겸임교수)"
-  },
-  {
-   "title": "외국인유학생 법무부 외국인 유학생 불법 취업 단속 강화 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EB%B2%95%EB%AC%B4%EB%B6%80-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EB%B6%88%EB%B2%95-%EC%B7%A8%EC%97%85-%EB%8B%A8%EC%86%8D-%EA%B0%95%ED%99%94-%EC%95%88%EB%82%B4&keyword",
-   "postedAt": "2026-11-02",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-11-02",
-   "desc": "법무부의 외국인 유학생 불법 취업 단속 강화와 관련하여 아래와 같이 안내하오니, 외국인 유학생 여러분께서는 관련 내용을 반드시 숙지하시고 불법 취업으로 인한 불이익이 발생하지 않도록 각별히 주의하여 주시기 바랍니다."
-  },
-  {
-   "title": "외국인유학생 [채용] 2026-2학기 국제처 국제팀 학부 외국인 유학생 담당 조교(교육연구조교) 모집",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026-2%ED%95%99%EA%B8%B0-%EA%B5%AD%EC%A0%9C%EC%B2%98-%EA%B5%AD%EC%A0%9C%ED%8C%80-%ED%95%99%EB%B6%80-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EB%8B%B4%EB%8B%B9-%EC%A1%B0%EA%B5%90-2&keyword",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-30",
-   "desc": "국제처 국제팀에서 2026-2학기 학부 외국인 유학생 담당 조교를 아래와 같이 모집하오니 많은 지원 바랍니다."
   }
  ]
 }

@@ -1,7 +1,28 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-22",
+ "updatedAt": "2026-11-23",
  "items": [
+  {
+   "title": "[대학생활] [전남광주통합특별시 북구] 고향사랑기부제 「기아타이거즈 레플리...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71064",
+   "postedAt": "2026-11-23",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/3cb09d307db31a6f.webp"
+  },
+  {
+   "title": "[대학생활] [빛의위원회] 빛의 혁명 2주년 기념행사 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71062",
+   "postedAt": "2026-11-23",
+   "kind": "행사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/568190416c7d48c8.webp"
+  },
   {
    "title": "[채용공고] 2026년 제3회 전남대학교 패키지 지원대학 사업 전문 및 사...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71061",
@@ -373,26 +394,6 @@
   {
    "title": "[취업정보] [식품안전정보원]2026년 제3차 기간제 직원 채용(~11.2...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71004",
-   "postedAt": "2026-11-16",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-16"
-  },
-  {
-   "title": "[학사안내] 2025학년도 동계 계절학기 타 대학교(명지대) 교류수학 신청...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71003",
-   "postedAt": "2026-11-16",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-16"
-  },
-  {
-   "title": "[채용공고] 2026년 제7회 전남대학교 국제협력과 기간제 계약직 직원 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71002",
    "postedAt": "2026-11-16",
    "kind": "채용",
    "school": "전남대학교",

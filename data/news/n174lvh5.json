@@ -1,7 +1,18 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-11-22",
+ "updatedAt": "2026-11-23",
  "items": [
+  {
+   "title": "AI전자정보융합대학 FESTIVAL 「AI:VERSE」 개최",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278077&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-23",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/d8b850d9aab2c5d5.webp",
+   "desc": "장소: 가톨릭대학교 김수환관 컨퍼런스룸 본 행사는 AI·데이터·소프트웨어·콘텐츠 분야의 학생 연구 및 프로젝트 성과를 공유하고, 학과 간 교류와 산학협력의 기회를 마련하기 위해 기획된 AI전자정보융합대학 출범 이후…"
+  },
   {
    "title": "제47회 가대문화상 및 제18회 한센병문화상 수상자 발표",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278040&article.offset=0&articleLimit=10",
@@ -421,16 +432,6 @@
    "foundAt": "2026-10-27",
    "thumb": "data/news/img/4a766de9395a8a6d.webp",
    "desc": "★11월 2일(월)~11월 30일(월) ★ 학생여러분의 많은 관심과 참여로 2학기 천원의 아침밥이 적극적으로 운영되고 있습니다."
-  },
-  {
-   "title": "[학생지원팀] 2026년도 하반기 강화군 대학생 등록금 지원사업 안내(10. 26.(월) ~ 11. 9.(월) 18:00)",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277125&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-27",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/3c88948b8136397c.webp"
   }
  ]
 }

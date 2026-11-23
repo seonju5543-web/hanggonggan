@@ -1,7 +1,40 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-22",
+ "updatedAt": "2026-11-23",
  "items": [
+  {
+   "title": "성균관대학교 소프트웨어융합대학장 비서 채용(~11/30(월) 15시)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142185&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-23",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-23",
+   "desc": "정보통신/소프트웨어/공과대학행정실 성균관대학교 소프트웨어융합대학장 비서 채용을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다."
+  },
+  {
+   "title": "반도체설계교육센터(IDEC) 수강생 모집(~11/25(수)까지 선착순 신청)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142182&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-23",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-23",
+   "desc": "반도체설계교육센터(IDEC)는 반도체 설계 전문인력 양성을 위해 전문 설계 교육 프로그램, EDA Tool 교육 및 기술 세미나 등을 운영하는 기관입니다."
+  },
+  {
+   "title": "[교수학습혁신센터] 2026학년도 겨울방학 “성균공부방 : Share via AI” 17기 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142181&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-23",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/d665d55c5e52247d.webp",
+   "desc": "두 개의 트랙 가운데 하나를 선택하여 팀 학습을 진행하고, 학습 내용을 바탕으로 팀원들과 AI 콘텐츠를 제작하여 공유하는 프로그램입니다."
+  },
   {
    "title": "사회과학대학 제42회 수선포럼 개최 안내: 2026.12.16.(수) 16:00~17:30",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142176&article.offset=0&articleLimit=10",
@@ -405,40 +438,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-11-12",
    "desc": "성균관대학교 자연과학대학 수학과사무실에서 행정업무를 담당할 행정조교를 다음과 같이 채용합니다."
-  },
-  {
-   "title": "[입학처] 2027학년도 수시모집 논술시험 교내 차량진입 및 건물출입 통제 안내 (2026. 11. 21.(토) ~ 22.(일),인문사회과학캠퍼스)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141870&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-12",
-   "kind": "생활",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-12",
-   "desc": "공정한 입시 진행을 위하여 학부모, 동반자 및 일반인(학부생 등 교내구성원 포함)의 캠퍼스 출입을 엄격히 제한합니다."
-  },
-  {
-   "title": "성균관대학교 소프트웨어융합대학 자체계약직원 채용(2026년 11월 19일 15시 까지 )",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141861&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-12",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-12",
-   "desc": "2. 근무지: 성균관대학교 자연과학캠퍼스 3. 담당업무: 소프트웨어학과 제반 업무"
-  },
-  {
-   "title": "2026년 제2회 수원청년 틈 페스티벌 행사 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141818&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-12",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-12",
-   "thumb": "data/news/img/73364ee328678ddd.webp",
-   "desc": "- 진행일시: 11/21(토) 오전 10시 30분 ~ 오후 5시 - 진행장소: 복합문화공간111CM (수원시 장안구 수성로195)"
   }
  ]
 }

@@ -1,7 +1,18 @@
 {
  "school": "연세대학교 미래캠퍼스",
- "updatedAt": "2026-11-22",
+ "updatedAt": "2026-11-23",
  "items": [
+  {
+   "title": "일반공지 2026학년도 교육수요 및 교육만족도 조사 안내 신촌/국제",
+   "url": "https://www.yonsei.ac.kr/bbs/wj/104/944703/artclView.do",
+   "postedAt": "2026-11-23",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "src": "83c7ba87",
+   "foundAt": "2026-11-23",
+   "thumb": "data/news/img/2ed476537410db0a.webp",
+   "desc": "안녕하세요. 연세대학교 미래캠퍼스(미래기획처 IR센터)에서는 교육 수요자의 기대와 요구사항 파악 등을 위해 2026학년도 교육수요 및 교육만족도 조사를 진행합니다."
+  },
   {
    "title": "2026학년도 겨울 계절제 1차 폐강 과목 안내(미래캠퍼스)",
    "url": "https://www.yonsei.ac.kr/bbs/wj/104/944694/artclView.do",

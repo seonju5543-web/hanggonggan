@@ -1,7 +1,16 @@
 {
  "school": "연세대학교",
- "updatedAt": "2026-11-22",
+ "updatedAt": "2026-11-23",
  "items": [
+  {
+   "title": "2027학년도 1학기 전공 신청 및 진입 확인 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944702/artclView.do",
+   "postedAt": "2026-11-23",
+   "school": "연세대학교",
+   "campus": "",
+   "src": "d66b0482",
+   "foundAt": "2026-11-23"
+  },
   {
    "title": "일반공지 2027학년도 1학기 학생설계전공 신청 안내 신촌/국제",
    "url": "https://www.yonsei.ac.kr/bbs/sc/58/944692/artclView.do",
@@ -122,16 +131,6 @@
    "src": "d66b0482",
    "foundAt": "2026-10-26",
    "desc": "1. 제도 목적 1) 다양한 학문 습득을 통한 전공간 융합 능력 함양 2) 복수전공 , 부전공 제도보다 낮은 이수요건으로 타 학문에 대한 접근 기회 제공"
-  },
-  {
-   "title": "일반공지 PHP 취약점 조치 안내 신촌/국제",
-   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944452/artclView.do",
-   "postedAt": "2026-10-23",
-   "school": "연세대학교",
-   "campus": "",
-   "src": "d66b0482",
-   "foundAt": "2026-10-23",
-   "desc": "1. 안내 개요 최근 웹서비스 개발 프로그래밍 언어인 PHP에서 초고위험(Critical) 취약점 이 발견되어 한국인터넷진흥원(KISA), 교육부 사이버안전센터 등 국내외 관련기관에서 즉시 보안 업데이트를 권고하고…"
   }
  ]
 }
