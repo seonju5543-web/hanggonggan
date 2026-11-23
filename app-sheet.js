@@ -449,7 +449,8 @@ function eligibilityRowsHtml(sch, result) {
   return reasonRows;
 }
 
-function openDetail(id) {
+/* opts.keepScroll — 같은 시트를 다시 그릴 때(준비 줄 「확인했어요」) 보던 자리를 지킨다. 없으면 맨 위부터(2026-08-29 규칙 그대로) */
+function openDetail(id, opts) {
   /* 대외활동 줄(달력·보관함)은 활동 시트로 — 같은 [data-detail] 길로 들어온다(2026-10-02) */
   if (isActivityId(id)) { openActivityDetail(id.slice(4)); return; }
   const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
@@ -510,13 +511,14 @@ function openDetail(id) {
         const step = effectiveStep(app, sch);
         const stepLabels = APP_STEPS.map((s, i) => (i === 3 && app.result === 'lost') ? '결과 확인' : s);
         const chLink = `${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}${ch.note ? ` <span class="doc-legend">${esc(ch.note)}</span>` : ''}`;
-        /* 다 쓴 문서 — 문서 한 줄 + 「PDF 저장」 하나 (2026-11-22 개발자 지시 「작성한 양식 문서에 대해서는 pdf 저장 칸만 남겨줘」).
-           🔴 .doc 저장 · 공유 · 다시 작성을 **되살리지 말 것** — 저장 길은 PDF 하나다(인쇄 창에서 PDF 로 저장 · printFormDoc). */
+        /* 다 쓴 문서 — 문서 한 줄 + 「PDF 저장」·「다시 작성」 (2026-11-22 개발자 지시 「pdf 저장 칸만 남겨줘」 → 11-23 「다시 작성 기능까지 추가해줘」).
+           🔴 .doc 저장 · 공유는 **되살리지 말 것** — 저장 길은 PDF 하나다(인쇄 창에서 PDF 로 저장 · printFormDoc). */
         const docsHtml = `${app.formAns && formTplIdFor(sch, true) ? `
           <div class="prep-file">
             <span class="prep-file-name">작성한 양식 문서</span>
             <span class="prep-file-acts">
               <button class="link-btn" id="btn-form-print">PDF 저장</button>
+              <button class="link-btn" id="btn-form-edit">다시 작성</button>
             </span>
           </div>` : ''}${app.docs && app.docs.length ? `
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
@@ -616,7 +618,7 @@ function openDetail(id) {
            제출처는 신청 준비 화면(「최종 제출 방법」 절)이 말한다 */ ''}
     </div>`;
 
-  openSheetShell();
+  openSheetShell(opts && opts.keepScroll);
   /* 이어보기 — 보던 공고를 적어 둔다. 🔴 **판정은 적지 않는다**: 다시 열 때 이 함수가
      처음부터 다시 돌아 `dday`·`evaluate` 로 새로 판정한다(자리를 비운 사이 마감될 수 있다). */
   if (typeof resumeSave === 'function') resumeSave({ sheet: { kind: 'detail', id: sch.id } });
@@ -636,7 +638,15 @@ function openDetail(id) {
     const k = b.dataset.prepToggle;
     a.prep[k] = !a.prep[k];
     saveState();
-    openDetail(sch.id);
+    /* 🔴 **누른 줄이 화면에서 제자리에 있어야 한다** (2026-11-23 개발자 지적 *"확인했어요 버튼을 누르면 공고의 맨 마지막으로 이동돼"*).
+       시트를 통째로 다시 그리면 openSheetShell 이 스크롤을 맨 위(0)로 돌려 누른 줄이 화면 밖으로 날아갔다.
+       보던 자리로 다시 그린 뒤, 그 줄의 화면 위치를 누르기 전과 같게 맞춘다(줄 안 내용 높이가 바뀌어도 그 줄은 안 움직인다). */
+    const sheetEl = $('#detail-sheet');
+    const rowOf = (el) => (el && el.closest('.prep-item')) || el;
+    const y0 = rowOf(b).getBoundingClientRect().top;
+    openDetail(sch.id, { keepScroll: sheetEl.scrollTop });
+    const again = rowOf(sheetEl.querySelector(`[data-prep-toggle="${k}"]`));
+    if (again) sheetEl.scrollTop += again.getBoundingClientRect().top - y0;
   }));
   const markBtn = $('#btn-mark-submitted');
   if (markBtn) markBtn.addEventListener('click', () => recordSubmitted(sch));
@@ -653,10 +663,15 @@ function openDetail(id) {
     if (url) window.open(url, '_blank', 'noopener');
   });
   /* 다 쓴 문서는 그 공고에 원본 신청서가 나중에 생겼어도 PDF 로 받을 수 있다(formTplIdFor 의 written — 이미 쓴 글을 뺏지 않는다 · 6-1 리뷰 2026-11-22).
-     단추는 「PDF 저장」 하나뿐이다(2026-11-22 개발자 지시 — .doc 저장·공유·다시 작성은 뺐다) */
+     단추는 「PDF 저장」·「다시 작성」 둘(2026-11-22 .doc 저장·공유를 뺐고 · 11-23 다시 작성을 되살렸다) */
   if (app && app.formAns && formTplIdFor(sch, true)) {
     const tpl = FORM_TEMPLATES[formTplIdFor(sch, true)];
     $('#btn-form-print').addEventListener('click', () => printFormDoc(tpl, state.profile, app.formAns));
+    $('#btn-form-edit').addEventListener('click', () => {
+      startFormFill(sch, { ans: app.formAns, quiet: true });   // 쓴 글이 있다(restore.ans) — 원본이 생긴 공고라도 그 문서를 연다
+      if (!formFill || formFill.schId !== sch.id) return;       // 문서를 못 열었으면(준비 시트로 갔다) 남의 formFill 을 건드리지 않는다
+      formFill.ans = app.formAns; formFill.stage = 'preview'; renderFormFill();
+    });
   }
   const copyBtn = $('#btn-copy-docs');
   if (copyBtn) copyBtn.addEventListener('click', () => copyText(buildSubmissionText(sch, app)));

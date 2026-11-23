@@ -1437,8 +1437,8 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
       [mk2({ id: 'n1', prepFormId: 'prep:n1' }), mk2({ id: 'n1', prepFormId: 'prep:n1' }, true)], [null, 'prep:n1']);
     /* 2026-11-22 개발자 지시로 단추는 「PDF 저장」(#btn-form-print) 하나 — .doc 저장·공유·다시 작성은 뺐다. 지키는 규칙(쓴 문서를 원본이 생긴 뒤에도 받는다)은 그대로다 */
     const sheetSrc = appSrc.slice(appSrc.indexOf("$('#btn-form-print')") - 900, appSrc.indexOf("$('#btn-form-print')") + 500);
-    eq('  다 쓴 문서(작성한 양식 문서 — PDF 저장)는 원본이 생긴 뒤에도 받는다 · 그리는 도중 문서를 다시 고르지 않는다(색인이 늦게 와도 화면이 멈추지 않는다)',
-      [/app\.formAns && formTplIdFor\(sch, true\)/.test(appSrc), /if \(app && app\.formAns && formTplIdFor\(sch, true\)\)/.test(sheetSrc), /\$\('#btn-form-print'\)\.addEventListener\('click', \(\) => printFormDoc\(tpl, state\.profile, app\.formAns\)\)/.test(sheetSrc),
+    eq('  다 쓴 문서(작성한 양식 문서 — PDF 저장 · 다시 작성)는 원본이 생긴 뒤에도 받고 다시 연다 · 그리는 도중 문서를 다시 고르지 않는다(색인이 늦게 와도 화면이 멈추지 않는다)',
+      [/app\.formAns && formTplIdFor\(sch, true\)/.test(appSrc), /if \(app && app\.formAns && formTplIdFor\(sch, true\)\)/.test(sheetSrc), /\$\('#btn-form-print'\)\.addEventListener\('click', \(\) => printFormDoc\(tpl, state\.profile, app\.formAns\)\)/.test(sheetSrc) && /startFormFill\(sch, \{ ans: app\.formAns, quiet: true \}\)/.test(sheetSrc),
         /const tpl = FORM_TEMPLATES\[formFill\.tplId\];/.test(take('renderFormFill')), /formTplIdFor/.test(take('renderFormFill'))], [true, true, true, true, false]);
   }
   eq('  준비 시트는 공고문에서 뗀 서식 쪽도 그린다(원본이 있는 공고가 이제 이 시트로 온다 — PDF 줄 → 서식 쪽 → 올린 원본)',
@@ -1980,10 +1980,16 @@ console.log('\n■ 신청 내역 진행 화면 — 한 흐름 (2026-11-21)');
       ['btn-copy-docs', 'btn-share-docs', 'btn-form-print'].filter((id) => !new RegExp(`class="link-btn" id="${id}"`).test(block))],
     [3, true, []]);
   /* 2026-11-22 개발자 지시 「작성한 양식 문서에 대해서는 pdf 저장 칸만 남겨줘」 — 문서 줄의 단추는 PDF 저장 하나 */
-  eq('🔴 작성한 양식 문서 줄에는 「PDF 저장」 하나뿐이다 — .doc 저장·공유·다시 작성이 되살아나지 않는다 (2026-11-22)',
+  /* 11-22 「pdf 저장 칸만 남겨줘」 → 11-23 「다시 작성 기능까지 추가해줘」 — 문서 줄 단추는 PDF 저장 · 다시 작성 둘 */
+  eq('🔴 작성한 양식 문서 줄에는 「PDF 저장」·「다시 작성」 둘뿐이다 — .doc 저장·공유가 되살아나지 않는다 (2026-11-22 · 11-23)',
     /* 문서 줄 전체(docsHtml 정의 — 「작성한 서류 보기」 펼침 앞까지)의 단추를 센다 — span 안만 세면 그 밖에 붙은 단추를 놓친다(리뷰 2026-11-22) */
-    [((block.slice(block.indexOf('const docsHtml'), block.indexOf('dp-saved', block.indexOf('const docsHtml')))).match(/<button/g) || []).length, /id="btn-form-print">PDF 저장</.test(block), ['btn-form-save', 'btn-form-share', 'btn-form-edit'].filter((id) => od.includes(id))],
-    [1, true, []]);
+    [((block.slice(block.indexOf('const docsHtml'), block.indexOf('dp-saved', block.indexOf('const docsHtml')))).match(/<button/g) || []).length, /id="btn-form-print">PDF 저장</.test(block), /id="btn-form-edit">다시 작성</.test(block), ['btn-form-save', 'btn-form-share'].filter((id) => od.includes(id))],
+    [2, true, true, []]);
+  /* 2026-11-23 개발자 지적 「확인했어요 버튼을 누르면 공고의 맨 마지막으로 이동돼」 — 다시 그릴 때 보던 자리를 넘기고, 누른 줄을 제자리로 맞춘다(실제 눌러 보는 건 verify-apply-prep) */
+  const toggleSrc = od.slice(od.indexOf("[data-prep-toggle]').forEach"), od.indexOf("$('#btn-mark-submitted')"));
+  eq('🔴 「확인했어요」로 다시 그려도 시트가 맨 위로 튀지 않는다 — 보던 자리(keepScroll)로 그리고 누른 줄을 제자리에 맞춘다',
+    [/openSheetShell\(opts && opts\.keepScroll\)/.test(od), /openDetail\(sch\.id, \{ keepScroll: sheetEl\.scrollTop \}\)/.test(toggleSrc), /sheetEl\.scrollTop \+= again\.getBoundingClientRect\(\)\.top - y0/.test(toggleSrc), /openDetail\(sch\.id\);/.test(toggleSrc)],
+    [true, true, true, false]);
   eq('🔴 담아 둔 공고(app && !app.pending)에선 늘 잠긴 신청 단추를 숨긴다(요소는 남는다 — 도구가 잠금을 읽는다)',
     /id="btn-apply-one" \$\{canApply \? '' : 'disabled'\}\$\{app && !app\.pending \? ' hidden' : ''\}/.test(od), true);
   eq('  준비 네 줄은 여전히 prepChecklist 한 곳 · 학생이 누르는 줄은 data-prep-toggle', [/pc\.items\.map/.test(step0), /data-prep-toggle="\$\{it\.key\}"/.test(step0)], [true, true]);
@@ -7536,8 +7542,9 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   }
   eq('  사본으로 연 시트에서는 신청을 시작·이어가지 않는다(양식 흐름이 넘어진다)', /const gone = !findSch\(id\);\s*const canApply = lock\.canApply && !gone;/.test(allApp), true);
   eq('  사본은 공고 목록을 다 받았을 때만 뜨고, 바뀌었을 때만 적는다', /function snapApplications\(resolve\) \{\s*if \(appsDataState\(\) !== 'ok'\) return false;/.test(allApp) && /if \(a\.snap && JSON\.stringify\(a\.snap\) === json\) continue;/.test(allApp), true);
+  /* 2026-11-23 — openDetail 에 둘째 인자(opts.keepScroll · 「확인했어요」 뒤 보던 자리)가 붙어 머리 모양만 넓힌다 · 하는 일(머리에서 사본으로 찾는다)은 그대로 */
   /* 창 200 → 600자 (2026-11-15) — 이용 횟수 세기(b8c227c5 · trackUse 두 줄)가 함수 머리에 들어와 appSch 가 200자 밖으로 밀렸다. 하는 일은 그대로(머리에서 사본으로 찾는다)라 창만 넓힌다 */
-  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{[\s\S]{0,600}?const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
+  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id(, opts)?\) \{[\s\S]{0,600}?const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
   eq('  내려간 공고에 결과를 적으면 줄이 사라지므로 실행 취소를 준다', /if \(!findSch\(sch\.id\)\) toast\([^\n]*\{ label: '실행 취소', run: \(\) => undoProgress\(sch\.id\) \}\)/.test(allApp), true);
   eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(appSource()), false);
   /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
