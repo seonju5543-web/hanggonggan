@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: david/elegant-cannon-2vtxj3
-메모: 2026-11-22 마스코트 반응 연출을 앱 홈에(연타 화남·회장님 의자·이럴 수는 없어·졸기 등 · 시안 mood.html 그대로 · 땀은 4판 물방울) — 개발자 지시 "앱에 모두 배포"
+branch: david/great-tesla-un1ov3
+메모: 2026-11-23 노션 수리 — 「작업 현황」 로봇·백로그 주소를 옮겨진 새 「한대장」 사본으로(선주)
