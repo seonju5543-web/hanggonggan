@@ -281,7 +281,7 @@ function mergeShortFields(plan, limits) {
    ('이 양식을 최적화하면 몇 개인가'가 개발자가 볼 숫자다) */
 const FORM_AUTO_KEYS_ALL = ['name', 'studentId', 'birth', 'major', 'school', 'email', 'phone',
   'year', 'gender', 'addr', 'emergency', 'guardianName', 'guardianRel', 'guardianPhone',
-  'bank', 'account', 'bracket', 'rrn', 'yearRemain', 'gpaLast', 'campus', 'region', 'status'];
+  'bank', 'account', 'bracket', 'rrn', 'yearRemain', 'gpaLast', 'gpa', 'campus', 'region', 'status'];
 
 function formBudgetReport(tpl) {
   const full = {};

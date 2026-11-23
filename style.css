@@ -1195,6 +1195,22 @@ textarea:focus {
 .fd-pledge { margin-top: 16px; font-size: var(--t-xs); text-align: center; color: #111; }
 .fd-sign { text-align: center; font-size: var(--t-xs); margin-top: 8px; color: #111; }
 .fd-org { text-align: center; font-weight: 700; margin-top: 10px; font-size: var(--t-md); color: #111; }
+/* 앱 지원문서 — 한 틀 문서 (2026-11-23 · 시안 docs/designs/mockups/prep-doc-options-2.html 「시안 2」 · 그리는 곳 forms.js renderPrepDoc) */
+.fd-name { text-align: center; font-size: var(--t-xs); color: #333; margin: -8px 0 14px; }
+.fd-frame { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #111; }
+.fd-frame th, .fd-frame td {
+  border: 1px solid #111; padding: 7px 7px; font-size: var(--t-xs); color: #111;
+  vertical-align: middle; text-align: left; word-break: keep-all; overflow-wrap: anywhere;
+}
+.fd-frame th { background: #dce3f1; font-weight: 700; text-align: center; }
+.fd-frame th small { display: block; font-weight: 400; font-size: var(--t-2xs); }
+.fd-frame td[contenteditable="true"]:focus { outline: 2px solid var(--primary); background: rgba(138,106,31,.06); }
+.fd-long td { height: 96px; vertical-align: top; }
+.fd-close td { text-align: center; padding: 16px 8px 18px; }
+.fd-close p { margin: 0; }
+.fd-close .fd-when { margin: 12px 0 10px; }
+.fd-close .fd-org { font-size: var(--t-lg); margin: 0; }
+.fd-foot { font-size: var(--t-2xs); color: #555; margin: 10px 0 0; }
 
 /* 추천 문구 · 작은 칩 */
 .fq-sugg { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2px; }

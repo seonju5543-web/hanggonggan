@@ -190,6 +190,7 @@ function formAutoVal(key) {
     case 'year': return p.year ? `${p.year}학년` : '';
     case 'yearRemain': return p.year ? `${p.year}학년 (잔여  학기)` : '';
     case 'gpaLast': return p.gpa != null ? `  /  / ${p.gpa} /4.5` : '';
+    case 'gpa': return p.gpa != null ? `${p.gpa} / 4.5` : (c.gpa || '');   // 앱 지원문서의 성적 칸(2026-11-23)
     default: return '';
   }
 }
@@ -405,6 +406,8 @@ function formKeepToProfile() {
 
 /* ---------- 문서 렌더링 (원본 양식과 동일 구조) ---------- */
 function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
+  /* 앱 지원문서는 틀이 다르다(한 틀 문서 · 2026-11-23) — 공고 원본 양식(아래)은 한 글자도 안 바뀐다(form-snapshot) */
+  if (tpl && tpl.layout === 'frame') return renderPrepDoc(tpl, p, ans, { editable });
   /* 🔴 info 칸의 값 사전을 따로 두지 않는다 — 예전엔 여기 6키, formAutoVal에 9키로
      갈라져 있어서 bracket·yearRemain·gpaLast가 info에서만 조용히 빈 칸이 됐다 */
   const autoVal = (k) => (k ? formAutoVal(k) : '');
@@ -501,6 +504,62 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
   return html;
 }
 
+/* ---------- 앱 지원문서 그리기 — 한 틀 문서 (2026-11-23 개발자 결정 · 시안 docs/designs/mockups/prep-doc-options-2.html 「시안 2」) ----------
+   등록 양식 가운데 한독제석재단 「자기소개서」의 짜임을 옮겼다 — 굵은 바깥 틀 하나 · 옅은 청색 이름표 열 · 맺음말·날짜·서명·기관명이 틀 안.
+   🔴 왼쪽 위 「※ 앱 자체 제작 문서입니다」 줄은 지웠다(같은 날 개발자 지시) — 「실제 접수가 아니다」는 틀 아래 제출 안내 줄이 말한다.
+   칸은 템플릿(buildPrepTemplate)이 공고에 맞춰 고른 것을 그대로 그린다 — 여기서 칸을 더하거나 빼지 않는다.
+   짧은 칸은 두 개씩 한 줄 · 긴 칸(wide)·서술·체크는 한 줄을 통째로. */
+function renderPrepDoc(tpl, p, ans, { editable = false } = {}) {
+  const ed = editable ? ' contenteditable="true"' : '';
+  const cell = (v) => esc(v || '').replace(/\n/g, '<br />');
+  const lab = (f) => esc(f.label).replace(/\n/g, '<br />') + (f.sub ? `<small>${esc(f.sub)}</small>` : '');
+  const valOf = (f) => {
+    const raw = ans ? ans[f.id] : undefined;
+    /* 옛 답(칸이 늘기 전에 담아 둔 신청)에는 새 칸의 답이 없다 — 프로필이 아는 값이면 그것으로 */
+    if (raw === undefined && f.auto) return formAutoVal(f.auto);
+    return typeof formAnswerFor === 'function' ? formAnswerFor(f, raw) : raw;
+  };
+  let rows = '';
+  let pend = [];
+  const flush = () => {
+    for (let i = 0; i < pend.length; i += 2) {
+      const a = pend[i]; const b = pend[i + 1];
+      rows += b
+        ? `<tr><th>${lab(a)}</th><td${ed}>${cell(valOf(a))}</td><th>${lab(b)}</th><td${ed}>${cell(valOf(b))}</td></tr>`
+        : `<tr><th>${lab(a)}</th><td colspan="3"${ed}>${cell(valOf(a))}</td></tr>`;
+    }
+    pend = [];
+  };
+  let foot = '';
+  (tpl.sections || []).forEach((sec) => {
+    (sec.fields || []).forEach((f) => {
+      if (f.type === 'text' && !f.wide) { pend.push(f); return; }
+      flush();
+      if (f.type === 'checks' || f.type === 'choice') {
+        const a = valOf(f) || { checks: [] };
+        const line = (f.options || []).map((o) => `${(a.checks || []).includes(o) ? '☑' : '□'} ${esc(o)}`).join('<br />');
+        rows += `<tr><th>${lab(f)}</th><td colspan="3"${ed}>${line}</td></tr>`;
+      } else {
+        rows += `<tr${f.type === 'textarea' ? ' class="fd-long"' : ''}><th>${lab(f)}</th><td colspan="3"${ed}>${cell(valOf(f))}</td></tr>`;
+      }
+    });
+    if (sec.docs && sec.docs.length) {
+      flush();
+      rows += `<tr><th>${esc(sec.docsLabel || '제출 서류')}</th><td colspan="3"${ed}>${sec.docs.map((d) => `□ ${esc(d)}`).join('<br />')}</td></tr>`;
+    } else if (!(sec.fields || []).length && sec.note) {
+      foot += `<p class="fd-foot">${esc(sec.note)}</p>`;
+    }
+  });
+  flush();
+  const now = new Date();
+  return `<div class="form-doc"><h2 class="fd-title">${esc(tpl.docTitle || tpl.title)}</h2>
+    ${tpl.docSub ? `<p class="fd-name">${esc(tpl.docSub)}</p>` : ''}
+    <table class="fd-frame"><colgroup><col style="width:21%"><col style="width:29%"><col style="width:21%"><col style="width:29%"></colgroup>${rows}
+    <tr class="fd-close"><td colspan="4">${tpl.pledge ? `<p>${esc(tpl.pledge)}</p>` : ''}
+      <p class="fd-when">${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일&nbsp;&nbsp;&nbsp;&nbsp;${esc(tpl.signLabel || '지원자')}&nbsp;&nbsp;${esc((p && p.name) || '')}&nbsp;&nbsp;(인)</p>
+      ${tpl.org ? `<p class="fd-org">${esc(tpl.org)}</p>` : ''}</td></tr></table>${foot}</div>`;
+}
+
 const FORM_DOC_CSS = `
   .form-doc { background:#fff; color:#111; font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; padding:8px 2px; }
   .fd-tag { font-size:12px; color:#444; }
@@ -518,6 +577,17 @@ const FORM_DOC_CSS = `
   .fd-pledge { margin-top:18px; font-size:12.5px; text-align:center; }
   .fd-sign { text-align:center; font-size:12.5px; margin-top:10px; }
   .fd-org { text-align:center; font-weight:700; margin-top:12px; font-size:14px; }
+  .fd-name { text-align:center; font-size:13px; color:#333; margin:-8px 0 16px; }
+  .fd-frame { width:100%; border-collapse:collapse; table-layout:fixed; border:2px solid #111; }
+  .fd-frame th, .fd-frame td { border:1px solid #111; padding:8px 9px; font-size:12.5px; vertical-align:middle; text-align:left; word-break:keep-all; overflow-wrap:anywhere; }
+  .fd-frame th { background:#dce3f1; font-weight:700; text-align:center; }
+  .fd-frame th small { display:block; font-weight:400; font-size:10.5px; }
+  .fd-long td { height:120px; vertical-align:top; }
+  .fd-close td { text-align:center; padding:18px 9px 20px; }
+  .fd-close p { margin:0; }
+  .fd-close .fd-when { margin:14px 0 12px; }
+  .fd-close .fd-org { font-size:17px; margin:0; }
+  .fd-foot { font-size:11px; color:#555; margin:10px 0 0; }
 `;
 
 /* ---------- 문서 내보내기 ---------- */
@@ -613,11 +683,9 @@ function prepKindFor(sch) {
   if (prepHasFormAttachment(sch)) return 'attached';
   return 'unknown';
 }
-/* 🔴 머리말은 「※ 앱 자체 제작 문서입니다」 **한 줄뿐**이다(2026-11-17 개발자 지시 — *"앱 자체 제작 문서입니다 만 띄우고 나머지는 모두 삭제"* ·
-   11-16 에는 이 말로 시작하고 뒤에 갈래별 제출 안내를 붙였었다). 갈래별로 다른 말(접수 방법·그대로 제출 가능 여부)은 둘째 줄(PREP_LEADS)과
-   제출 안내 절(prepSubmitNote)이 맡는다 — '그대로 제출 가능'은 여전히 free 만 말한다(원칙 8-2). 갈래 열쇠는 그대로 둔다(PREP_TAGS[kind] 로 찾는다). */
-const PREP_TAG = '※ 앱 자체 제작 문서입니다';
-const PREP_TAGS = { free: PREP_TAG, attached: PREP_TAG, portal: PREP_TAG, email: PREP_TAG, unknown: PREP_TAG, kosaf: PREP_TAG };
+/* 🔴 문서 왼쪽 위 머리말(「※ 앱 자체 제작 문서입니다」)은 없다 (2026-11-23 개발자 지시로 삭제 · 11-17 에는 그 한 줄만 남겼었다).
+   갈래별로 다른 말(접수 방법·그대로 제출 가능 여부)은 작성 화면 둘째 줄(PREP_LEADS)과 제출 안내 줄(prepSubmitNote)이 맡는다 —
+   '그대로 제출 가능'은 여전히 free 만 말한다(원칙 8-2). */
 /* 화면 머리줄용 짧은 말 — 긴 tag 는 문서 위에, 이것은 작성 화면 둘째 줄에 */
 const PREP_LEADS = {
   free: '자유 형식 제출 공고 — 이 문서를 그대로 제출할 수 있습니다',
@@ -645,21 +713,48 @@ function prepSubmitNote(sch) {
   return `${[where, due].filter(Boolean).join(' · ')} · 학교·재단에 실제로 접수되는 것은 아니며 제출은 학생이 직접 합니다.`;
 }
 
+/* ── 공고가 묻는 칸 고르기 (2026-11-23 개발자 결정 — *"각 칸에 들어갈 내용은 공고별로 상이하므로, 공고의 내용에 맞춰 칸의 필아웃 내용을 조정하는 구조"*) ──
+   늘 있는 칸(성명·학교·소속·학년·학번·연락처·이메일) 뒤에, **그 공고의 글이 말한 것만** 칸으로 더한다.
+   읽는 글 = 지원 자격 줄 · 제외 줄 · 제출 서류 이름 · 이중수혜 원문(prepNoticeText). 공고 이름·요약은 안 읽는다(장학회 이름의 「구민」 같은 낱말에 속는다).
+   🔴 공고에 없는 것을 묻지 않는다(원칙 8-1) — 규칙에 안 걸리면 칸이 없다. 값은 학생 본인 정보다(프로필이 알면 채우고 모르면 묻는다 · auto).
+   실제 양식이 묻는 비율(등록 양식 73종 실측): 주소 64% · 생년월일 34% · 성적 23% · 보호자 22% · 계좌 19% · 소득분위 10%. */
+const PREP_INFO_RULES = [
+  { id: 'i_birth', label: '생년월일', auto: 'birth', q: '생년월일', placeholder: '예: 2004.03.14', match: /주민등록|가족관계|만\s*\d+\s*세|연령|나이|출생|생년/ },
+  { id: 'i_gpa', label: '성 적', auto: 'gpa', q: '성적 (평점 평균)', placeholder: '예: 3.9 / 4.5', match: /성적|평점|학점|백분위|석차/ },
+  { id: 'i_bracket', label: '지원구간', auto: 'bracket', q: '학자금 지원구간(소득분위)', placeholder: '예: 6구간', match: /소득|분위|지원구간|기초생활|차상위|수급|저소득|가계|경제적|형편/ },
+  { id: 'i_bank', label: '은 행', auto: 'bank', q: '장학금을 받을 은행', match: /통장|계좌/ },
+  { id: 'i_account', label: '계좌번호', auto: 'account', q: '계좌번호 (본인 명의)', match: /통장|계좌/ },
+  { id: 'i_guardian', label: '보호자 성명', auto: 'guardianName', q: '보호자 성명', match: /보호자|부모|학부모|가족관계/ },
+  { id: 'i_guardianPhone', label: '보호자 연락처', auto: 'guardianPhone', q: '보호자 연락처', match: /보호자|부모|학부모|가족관계/ },
+  { id: 'i_addr', label: '주 소', auto: 'addr', wide: true, q: '주소', match: /거주|주소|주민등록|관내|도민|시민|구민|군민/ },
+  { id: 'i_others', label: '타 장학금\n수혜 내역', wide: true, q: '이번 학기에 받는(받을 예정인) 다른 장학금 — 없으면 「없음」', placeholder: '예: 국가장학금 Ⅰ유형 150만원', match: /이중\s*수혜|중복\s*(수혜|수급|지원)|타\s*장학|다른\s*장학|수혜\s*(내역|여부|사실|현황)/ },
+  { id: 'i_cert', label: '어학 · 자격증', wide: true, q: '어학 성적·자격증 (시험 이름 · 점수 · 취득일)', match: /토익|TOEIC|토플|TOEFL|TEPS|어학\s*(성적|점수|능력)|자격증/i },
+];
+function prepNoticeText(sch) {
+  return [].concat(sch.eligibilityLines || [], sch.eligibilityExcludes || [], prepRealDocs(sch),
+    (sch.exclusivity && sch.exclusivity.raw) || []).map((x) => String(x || '')).join('\n');
+}
+function prepInfoFields(sch) {
+  const text = prepNoticeText(sch);
+  const base = [
+    { id: 'i_name', label: '성 명', type: 'text', auto: 'name', q: '성명' },
+    { id: 'i_school', label: '학 교 명', type: 'text', auto: 'school', q: '학교' },
+    { id: 'i_major', label: '소 속', type: 'text', auto: 'major', q: '학과(전공)' },
+    { id: 'grade', label: '학년 (학기)', type: 'text', q: '학년(학기)', placeholder: '예: 3학년(6학기)' },
+    { id: 'i_sid', label: '학 번', type: 'text', auto: 'studentId', q: '학번' },
+    { id: 'i_phone', label: '연 락 처', type: 'text', auto: 'phone', q: '연락처 (휴대전화)' },
+    { id: 'i_email', label: 'E-mail', type: 'text', auto: 'email', q: '이메일' },
+  ];
+  const extra = PREP_INFO_RULES.filter((r) => r.match.test(text))
+    .map(({ match, ...f }) => ({ type: 'text', ...f }));   // match 는 고르는 데만 쓴다 — 템플릿에 정규식을 싣지 않는다(저장·비교되는 값)
+  return base.concat(extra);
+}
+
 function buildPrepTemplate(sch) {
   const kind = prepKindFor(sch);
   const writeDocs = prepWriteDocs(sch);
   const sections = [
-    {
-      heading: '신청 개요',
-      info: [
-        ['성 명', 'name', '학 교', 'school'],
-        ['학 과', 'major', '학 번', 'studentId'],
-        ['연락처', 'phone', '이메일', 'email']
-      ],
-      fields: [
-        { id: 'grade', label: '학년 (학기)', type: 'text', q: '학년(학기)', placeholder: '예: 3학년(6학기)' }
-      ]
-    },
+    { heading: '신청 개요', fields: prepInfoFields(sch) },
   ];
   if (writeDocs.length) {
     /* 공고가 이름 붙여 요구한 작성형 서류마다 절 하나 — 절 이름은 원문 서류 이름 그대로 */
@@ -689,6 +784,10 @@ function buildPrepTemplate(sch) {
           ] }
         ]
       },
+      ...(/봉사/.test(prepNoticeText(sch)) ? [{
+        heading: '봉사활동 내역',
+        fields: [{ id: 'volunteer', label: '봉사활동 내역', type: 'textarea', kind: 'story', q: '봉사활동 내역 (기관 · 기간 · 시간 · 내용)' }]
+      }] : []),
       {
         heading: '향후 계획',
         fields: [
@@ -704,18 +803,20 @@ function buildPrepTemplate(sch) {
     sections.push({
       heading: '지원 자격 확인',
       /* 절 설명 줄은 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내 — 아래 질문이 같은 말) */
-      fields: [{ id: 'eligCheck', label: '해당 사항', type: 'checks', q: '공고의 지원 자격 중 해당하는 항목을 모두 고르세요 (본인 확인)', options: elig }],
+      fields: [{ id: 'eligCheck', label: '지원 자격', sub: '(해당 항목 표시)', type: 'checks', multi: true /* 자격 줄은 여러 개 해당할 수 있다 — 두 줄뿐일 때 하나만 고르게 바뀌던 것을 막는다(form-plan formIsSingleChoice) */, q: '공고의 지원 자격 중 해당하는 항목을 모두 고르세요 (본인 확인)', options: elig }],
     });
   }
   const docs = prepRealDocs(sch);
   /* 서류를 못 읽었으면 절을 안 만든다 (2026-11-15 · 예전 「제출 서류는 원문 공고에서 확인하세요.」 — 개발자 결정 11-02) */
-  if (docs.length) sections.push({ heading: '제출 서류 확인', note: docs.join(' · '), fields: [] });
+  if (docs.length) sections.push({ heading: '제출 서류 확인', note: docs.join(' · '), docs, fields: [] });
   sections.push({ heading: '제출 안내', note: prepSubmitNote(sch), fields: [] });
   return {
     title: `${sch.name} — 지원문서`,
+    layout: 'frame',          // 한 틀 문서(renderPrepDoc)
+    docTitle: '지원문서',
+    docSub: sch.name || '',
     docName: `지원문서_${(sch.name || '').replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, 24) || '장학금'}`,
     org: sch.provider || '',
-    tag: PREP_TAGS[kind],
     lead: PREP_LEADS[kind],
     prepKind: kind,
     unofficial: true,

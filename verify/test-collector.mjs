@@ -1522,14 +1522,15 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   const heads = (t) => t.sections.map((s) => s.heading);
   const t0 = eng.buildPrepTemplate(base);
   /* 2026-11-15 개발자 결정 11-02 — 머리말은 참인 말만(「양식을 찾지 못했다 · 제출 전 원문에서 확인」 → 「정리한 문서이고 이 문서 자체를 내는 것은 아니다」) */
-  /* 2026-11-17 개발자 지시 — 머리말은 「※ 앱 자체 제작 문서입니다」 한 줄뿐(갈래별 제출 안내는 둘째 줄 lead 와 제출 안내 절이 맡는다) */
-  const ONLY_TAG = '※ 앱 자체 제작 문서입니다';
-  eq('🔴 서류를 모르는 공고 — 머리말은 「※ 앱 자체 제작 문서입니다」 한 줄뿐 · 둘째 줄도 그대로 제출 가능이라 말하지 않고 \'모름\'류 글자 없음',
-    [t0.prepKind, t0.tag, /그대로 제출/.test(t0.lead), /찾지 못했|원문에서 확인|원문 확인|확인 필요/.test(t0.tag + t0.lead), t0.unofficial], ['unknown', ONLY_TAG, false, false, true]);
-  eq('🔴 여섯 갈래 모두 머리말이 정확히 「※ 앱 자체 제작 문서입니다」 (2026-11-17 — 뒤 문장 전부 삭제)',
-    [eng.buildPrepTemplate({ ...base, prepDoc: true }), eng.buildPrepTemplate({ ...base, applyEmail: 'a@b.kr' }), eng.buildPrepTemplate({ ...base, applyPortal: 'x' }),
-      eng.buildPrepTemplate({ ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] }), eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf' }), t0].map((t) => t.tag),
-    [ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG]);
+  /* 2026-11-23 개발자 지시 — 문서 왼쪽 위 「※ 앱 자체 제작 문서입니다」 줄을 지웠다(11-17 에는 그 한 줄만 남겼었다). 갈래별 제출 안내는 둘째 줄 lead 와 제출 안내 절이 맡는다 */
+  const sixKinds = [eng.buildPrepTemplate({ ...base, prepDoc: true }), eng.buildPrepTemplate({ ...base, applyEmail: 'a@b.kr' }), eng.buildPrepTemplate({ ...base, applyPortal: 'x' }),
+    eng.buildPrepTemplate({ ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] }), eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf' }), t0];
+  eq('🔴 서류를 모르는 공고 — 둘째 줄이 그대로 제출 가능이라 말하지 않고 \'모름\'류 글자 없음 · 한 틀 문서(layout frame)',
+    [t0.prepKind, /그대로 제출/.test(t0.lead), /찾지 못했|원문에서 확인|원문 확인|확인 필요/.test(t0.lead), t0.unofficial, t0.layout], ['unknown', false, false, true, 'frame']);
+  eq('🔴 여섯 갈래 모두 머리말(tag)이 없고 그린 문서에 「앱 자체 제작 문서」 글자가 없다 (2026-11-23 지시로 삭제 — 되살리지 말 것)',
+    sixKinds.map((t) => [t.tag === undefined, /앱 자체 제작 문서|fd-tag|별첨/.test(eng.renderFormDoc(t, FORM_SAMPLE_PROFILE, {}))]).flat().every((v, k) => v === (k % 2 === 0)), true);
+  eq('  머리말을 지워도 여섯 갈래 모두 문서 아래 줄이 「실제로 접수되는 것은 아니」라고 말한다 (정직한 신청 상태 · 원칙 1)',
+    sixKinds.every((t) => /class="fd-foot">[^<]*실제로 접수되는 것은 아니/.test(eng.renderFormDoc(t, FORM_SAMPLE_PROFILE, {}))), true);
   eq('  자리표시 안내 줄은 제출 서류 절에 서류로 올라가지 않는다 — 서류를 못 읽었으면 절 자체가 없다(「원문 공고에서 확인하세요」 줄 없음)', t0.sections.some((s) => s.heading === '제출 서류 확인'), false);
   eq('  작성형 서류 이름이 없으면 기본 세 절(지원 동기·학업/활동·계획) — 자격 줄이 없으면 자격 절도 없다',
     heads(t0), ['신청 개요', '지원 동기 및 신청 사유', '학업 및 활동 요약', '향후 계획', '제출 안내']);
@@ -1562,6 +1563,8 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   const ec = t4.sections.find((s) => s.heading === '지원 자격 확인');
   eq('  자격 줄은 학생이 스스로 확인하는 체크(판정이 아니다) · 조각·너무 긴 줄·중복은 뺀다',
     ec && ec.fields[0].type === 'checks' && ec.fields[0].options, ['재학생 중 직전 학기 12학점 이상 이수', '평점 3.0 이상']);
+  eq('🔴 자격 줄이 둘뿐이어도 하나만 고르는 칸으로 바뀌지 않는다 (multi — 둘 다 해당할 수 있다 · 2026-11-23 실측: 두 줄 공고에서 체크가 문서에 안 실렸다)',
+    [ec.fields[0].multi, (await import('node:module')).createRequire(import.meta.url)('../form-plan.js').formIsSingleChoice(ec.fields[0])], [true, false]);
   eq('  제출 안내 절은 마감과 "실제 접수 아님"을 말한다',
     /2099-01-01/.test(t4.sections.at(-1).note) && /실제로 접수되는 것은 아니/.test(t4.sections.at(-1).note), true);
   eq('  마감을 모르면 지어내지 않고 말하지도 않는다 (예전 "마감은 원문 확인" · 2026-11-15)', (() => { const n = eng.buildPrepTemplate({ ...base, deadline: '' }).sections.at(-1).note; return [/마감/.test(n), /원문 확인/.test(n), /실제로 접수되는 것은 아니/.test(n)]; })(), [false, false, true]);
@@ -1569,9 +1572,29 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   const ans = {};
   t4.sections.forEach((s) => (s.fields || []).forEach((f) => { ans[f.id] = f.type === 'checks' ? { checks: [f.options[0]], text: '' } : '«답»'; }));
   const html = eng.renderFormDoc(t4, FORM_SAMPLE_PROFILE, ans);
-  eq('  문서에 공고 이름 · 머리말 · 자격 체크(☑) · 서약이 들어간다',
-    [/테스트장학 2026-2 — 지원문서/.test(html), /※ 앱 자체 제작 문서입니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
-    [true, true, true, true]);
+  eq('  문서에 제목 「지원문서」 · 공고 이름 · 자격 체크(☑) · 서약 · 기관명이 들어간다 (한 틀 문서)',
+    [/class="fd-title">지원문서</.test(html), /class="fd-name">테스트장학 2026-2</.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html), /class="fd-org">테스트재단</.test(html), /<table class="fd-frame">/.test(html)],
+    [true, true, true, true, true, true]);
+  /* ── 공고에 맞춰 칸을 고른다 (2026-11-23 개발자 결정 — "공고의 내용에 맞춰 칸의 필아웃 내용을 조정하는 구조") ── */
+  const infoIds = (t) => t.sections[0].fields.map((f) => f.id);
+  const BASE_IDS = ['i_name', 'i_school', 'i_major', 'grade', 'i_sid', 'i_phone', 'i_email'];
+  eq('🔴 공고가 아무것도 말하지 않으면 늘 있는 일곱 칸뿐이다 — 공고에 없는 것을 묻지 않는다(원칙 8-1)', infoIds(t0), BASE_IDS);
+  eq('  성적을 말한 공고(자격 줄 「평점 3.0 이상」)에는 성적 칸이 붙는다', infoIds(t4), [...BASE_IDS, 'i_gpa']);
+  const t5 = eng.buildPrepTemplate({ ...base, eligibilityLines: ['공고일 현재 강서구에 1년 이상 계속 거주'], eligibilityExcludes: ['타 장학금과 이중 수혜 불가'],
+    documents: ['주민등록초본 1부', '통장 사본 1부', '국가장학금 소득분위 확인서', '가족관계증명서'] });
+  eq('  거주·등본·통장·소득·가족관계·이중수혜를 말한 공고 — 그 칸들만 붙고(성적·어학 없음) 긴 칸은 한 줄 통째(wide)',
+    [infoIds(t5).slice(BASE_IDS.length), t5.sections[0].fields.filter((f) => f.wide).map((f) => f.id)],
+    [['i_birth', 'i_bracket', 'i_bank', 'i_account', 'i_guardian', 'i_guardianPhone', 'i_addr', 'i_others'], ['i_addr', 'i_others']]);
+  eq('🔴 공고 이름·요약의 낱말로는 칸을 붙이지 않는다 (장학회 이름 「구민한마음」에 속아 주소 칸이 붙으면 안 된다)',
+    infoIds(eng.buildPrepTemplate({ ...base, name: '구민한마음 성적우수 장학금', summary: '통장 사본 · 소득분위' })), BASE_IDS);
+  eq('  고른 칸은 전부 프로필에서 배우는 한 줄 칸이고(auto) 템플릿에 정규식이 실리지 않는다',
+    t5.sections[0].fields.filter((f) => f.id !== 'grade').every((f) => f.type === 'text' && !!f.auto === !['i_others', 'i_cert'].includes(f.id) && f.match === undefined), true);
+  eq('  봉사를 말한 공고에만 봉사활동 절이 붙는다 (작성형 서류 이름이 없을 때)',
+    [heads(eng.buildPrepTemplate({ ...base, eligibilityLines: ['최근 1년 봉사활동 20시간 이상인 자'] })).includes('봉사활동 내역'), heads(t0).includes('봉사활동 내역')], [true, false]);
+  const html5 = eng.renderFormDoc(t5, FORM_SAMPLE_PROFILE, {});
+  eq('  그린 문서 — 짧은 칸은 두 개씩 한 줄 · 긴 칸은 colspan 3 · 제출 서류는 줄마다 □ · 답이 없는 옛 신청은 프로필 값으로 채운다',
+    [/<th>성 명<\/th><td>[^<]+<\/td><th>학 교 명<\/th>/.test(html5), /<th>주 소<\/th><td colspan="3">/.test(html5), /□ 주민등록초본 1부<br \/>□ 통장 사본 1부/.test(html5),
+      html5.includes(`<th>성 명</th><td>${FORM_SAMPLE_PROFILE.name}</td>`)], [true, true, true, true]);
   /* 앱 연결 — 글자가 아니라 실제 모양을 본다 */
   const appSrc = appSource();
   const attach = appSrc.slice(appSrc.indexOf('function attachPrepTemplate('), appSrc.indexOf('/* 원본 신청서 —'));

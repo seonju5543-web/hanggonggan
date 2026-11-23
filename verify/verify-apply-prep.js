@@ -224,10 +224,13 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
       if (prev) {
         const doc = await page.evaluate(() => {
           const d = document.querySelector('#ff-doc');
-          return { title: d && d.querySelector('.fd-title') && d.querySelector('.fd-title').textContent, tag: d && d.querySelector('.fd-tag') && d.querySelector('.fd-tag').textContent,
+          return { title: d && d.querySelector('.fd-title') && d.querySelector('.fd-title').textContent, name: d && d.querySelector('.fd-name') && d.querySelector('.fd-name').textContent, tag: !!(d && d.querySelector('.fd-tag')), text: d ? d.textContent : '', frame: !!(d && d.querySelector('table.fd-frame')),
             boxedPh: [...(d ? d.querySelectorAll('td') : [])].map((t) => t.textContent).filter((t) => /^☐|^□/.test(t.trim()) && /원문 공고에서 확인/.test(t)).length };
         });
-        eq('  문서 제목이 그 공고 이름을 담고 머리말이 문서의 성격을 밝힌다', [!!doc.title && doc.title.includes('지원문서'), !!doc.tag && /^※/.test(doc.tag.trim())], [true, true]);
+        /* 2026-11-23 개발자 결정 — 한 틀 문서(시안 2) · 제목 「지원문서」 밑에 공고 이름 · 왼쪽 위 「※ 앱 자체 제작 문서입니다」 줄은 지웠다 */
+        eq('  문서는 한 틀(table.fd-frame)이고 제목 「지원문서」 밑에 그 공고 이름이 있다', [doc.frame, (doc.title || '').trim(), !!doc.name && doc.name.trim().length > 0], [true, '지원문서', true]);
+        eq('🔴 문서에 「앱 자체 제작 문서」 머리말이 없다 (2026-11-23 지시로 삭제 — 되살리지 말 것)', [doc.tag, /앱 자체 제작 문서/.test(doc.text)], [false, false]);
+        eq('  「실제 접수가 아니다」는 문서 아래 제출 안내 줄이 말한다 (머리말을 지워도 정직한 신청 상태는 남는다)', /실제로 접수되는 것은 아니/.test(doc.text), true);
         eq('  문서 안에도 안내 줄이 체크 항목으로 들어가지 않는다', doc.boxedPh, 0);
         await page.click('#btn-ff-confirm', { timeout: 4000 });
         eq('  확인을 누르면 신청내역에 pending:false 로 담긴다', await appsOf(pick.A.id),
