@@ -71,6 +71,35 @@
      "why": "학생이 작성해 제출하는 장학선정신청서 서식만 들어 있습니다."
     }
    ]
+  },
+  "auto-amepagescholarshipnotice-0k6yc5n": {
+   "at": "2026-11-24",
+   "docs": [
+    {
+     "file": "form-16foe5-1.docx",
+     "attach": "2-(서식) 자기소개서.docx",
+     "hash": "59f1bc6dd1f65189",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 직접 작성해 제출하는 자기소개서 서식만 들어 있습니다."
+    },
+    {
+     "file": "form-16foe5-2.docx",
+     "attach": "3-(서식) 포토에세이.docx",
+     "hash": "80fa70992986ef2f",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 사진과 설명을 채워 제출하는 포토에세이 서식만 들어 있습니다."
+    },
+    {
+     "file": "form-16foe5-3.docx",
+     "attach": "4-(서식) 과학탐구활동 실행 이력서.docx",
+     "hash": "68462b0a87832802",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 작성하는 과학탐구활동 실행 이력서 서식과 그 작성 가이드만 들어 있습니다."
+    }
+   ]
   }
  }
 }
