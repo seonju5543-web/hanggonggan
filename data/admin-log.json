@@ -755,6 +755,12 @@
    "by": "Claude 정기 세션",
    "action": "linkFix",
    "detail": "원문 주소 1건 — 넣음 다자녀가정 대학등록금 → https://www.gwgs.go.kr/prog/bbsArticle/BBSMSTR_000000000412/view.do?nttId=B000000076178Ek7xK9q (확인: 1)"
+  },
+  {
+   "at": "2026-11-24 13:23 KST",
+   "by": "Claude 정기 세션",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 대학원장학생 → https://eng.korea.ac.kr/square/scholarship_view.html?no=21 (확인: 1)"
   }
  ]
 }
