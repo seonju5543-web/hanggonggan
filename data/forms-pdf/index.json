@@ -591,16 +591,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-24"
-   },
-   {
-    "file": "auto-tegory1moddocumentuid431/2-3-2-2027학년도-1학기-장학선정신청서.pdf",
-    "name": "3-2-2027학년도-1학기-장학선정신청서.doc",
-    "pages": 1,
-    "bytes": 63595,
-    "srcBytes": 38400,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-24"
    }
   ],
   "auto-amepagescholarshipnotice-0k6yc5n": [
@@ -686,6 +676,14 @@
   },
   "auto-tegory1moddocumentuid432": {
    "선발자-제출서류서약서-및-수혜-후기-보고서.hwp": "form"
+  }
+ },
+ "rejected": {
+  "auto-tegory1moddocumentuid431|3-2-2027학년도-1학기-장학선정신청서.doc": {
+   "srcBytes": 38400,
+   "fonts": "ko-nanum-1",
+   "verdict": "broken",
+   "at": "2026-11-24"
   }
  }
 }
