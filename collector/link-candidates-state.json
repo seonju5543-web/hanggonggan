@@ -754,13 +754,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-24",
-  "lastAt": "2026-11-24",
-  "tries": 1,
+  "lastAt": "2026-11-25",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-11",
-  "nextAt": "2026-11-25"
+  "nextAt": "2026-11-28"
  },
  "kosaf|2000429013|https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=792": {
   "ds": "kosaf",
@@ -1533,13 +1533,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-24",
-  "lastAt": "2026-11-24",
-  "tries": 1,
+  "lastAt": "2026-11-25",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2027-01-08",
-  "nextAt": "2026-11-25"
+  "nextAt": "2026-11-28"
  },
  "kosaf|2704219001|board:https://www.ygef.or.kr/board/?board=recruitment&site=ygmirae&mn=213": {
   "ds": "kosaf",

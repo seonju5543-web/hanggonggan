@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-24T05:23:11.364Z",
+ "updatedAt": "2026-11-24T19:39:06.303Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -41,10 +41,6 @@
   "https://www.inha.ac.kr/bbs/kr/8/46024/artclView.do": {
    "v": "other",
    "at": "2026-11-12"
-  },
-  "https://www.jbnu.ac.kr/web/Board/219645/detailView.do": {
-   "v": "login",
-   "at": "2026-11-23"
   },
   "https://www.jinjae.kr/main/?gc=877EUFQ": {
    "v": "login",
