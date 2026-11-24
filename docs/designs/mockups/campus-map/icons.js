@@ -1,0 +1,41 @@
+// 지도 핀·칩 아이콘 — 앱 하단 내비 아이콘과 같은 문법(24 격자 · 선 1.8 · 둥근 끝 · fill none)
+window.MAP_ICONS = {
+  campus: '<path d="M3 10l9-6 9 6"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
+  gate: '<path d="M6 21V4"/><path d="M6 4h11l-2.2 4L17 12H6"/>',
+  cafe: '<path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8.5 3.5v2.5M12 3.5v2.5"/>',
+  library: '<path d="M3 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/><path d="M12 6.5c3-1.6 6-1.6 9 0v13c-3-1.6-6-1.6-9 0z"/>',
+  study: '<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
+  store: '<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/><path d="M9.5 20v-5h5v5"/>',
+  laundry: '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8.5 6.5h.01M11 6.5h.01"/>',
+  pharmacy: '<path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z"/>',
+  clinic: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/>',
+  docs: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/>',
+  kiosk: '<rect x="6" y="3" width="12" height="18" rx="2"/><rect x="8.5" y="6" width="7" height="5" rx="1"/><path d="M9 15h6M9 18h3"/>',
+  bank: '<path d="M3 9.5L12 4l9 5.5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20.5h18"/>',
+  post: '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/>',
+  police: '<path d="M12 3l7.5 3v6c0 4.6-3.1 7.7-7.5 9-4.4-1.3-7.5-4.4-7.5-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  cctv: '<path d="M3 8.5l11.5-4 2 5.2-11.5 4z"/><path d="M16.3 9.6l3.2 1.1"/><path d="M6.2 13.4V19"/><path d="M4 19h4.5"/>',
+  bell: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  bus: '<rect x="4.5" y="3.5" width="15" height="14" rx="2.5"/><path d="M4.5 11h15"/><path d="M8 20.5v-3M16 20.5v-3"/><path d="M8 14.5h.01M16 14.5h.01"/>',
+  subway: '<rect x="5" y="3" width="14" height="14.5" rx="3"/><path d="M5 10.5h14"/><path d="M9 14h.01M15 14h.01"/><path d="M8.5 21l2-3.5M15.5 21l-2-3.5"/>',
+  bike: '<circle cx="6.5" cy="16" r="3.5"/><circle cx="17.5" cy="16" r="3.5"/><path d="M6.5 16L10 8.5h5l2.5 7.5"/><path d="M9 8.5h-2"/>',
+  benefit: '<path d="M3.5 12V4.5H11l9.5 9.5-7 7z"/><path d="M7.7 8.3h.01"/>',
+  food: '<path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3"/><path d="M7 11v10"/><path d="M16.5 21V3c-2 1.2-3 3.6-3 6.5V13h3"/>',
+  health: '<path d="M12 20.5s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.8a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10-7.5 10z"/>',
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  home: '<path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  walk: '<circle cx="13" cy="4.5" r="1.8"/><path d="M10.5 21l2-6-2.5-2.5 1-4.5 3 2.5 3 1"/><path d="M8 11.5l2-3"/><path d="M14.5 15l1.5 6"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  beer: '<path d="M6 8h9v10a2.5 2.5 0 0 1-2.5 2.5h-4A2.5 2.5 0 0 1 6 18z"/><path d="M15 10.5h1.5a2.5 2.5 0 0 1 0 5H15"/><path d="M6 8c0-2 1.5-3.5 3.5-3.5 1 0 1.7.3 2.3.9.5-.5 1.2-.8 2-.8A2.4 2.4 0 0 1 15 8"/><path d="M9.5 11.5v5M12 11.5v5"/>',
+  people: '<circle cx="8.5" cy="8" r="3"/><path d="M2.5 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.6c3 .1 5.5 2 5.5 5.4"/>',
+  chat: '<path d="M4 5.5h16v11H10l-4.5 3.5v-3.5H4z"/><path d="M8 10h8M8 13h5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  thumb: '<path d="M7 11v9H4v-9z"/><path d="M7 11l4-7.5c1.7 0 2.5 1.2 2.5 2.6V9h4.6a2 2 0 0 1 2 2.4l-1.3 6.9a2 2 0 0 1-2 1.7H7"/>',
+  flag: '<path d="M6 21V4"/><path d="M6 4h11l-2.2 4L17 12H6"/>',
+  pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  route: '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H16"/>',
+};
+window.mapIcon = function (name, size) {
+  const s = size || 16;
+  return '<svg viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (window.MAP_ICONS[name] || '') + '</svg>';
+};

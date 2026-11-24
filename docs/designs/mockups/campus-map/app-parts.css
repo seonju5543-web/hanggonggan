@@ -1,0 +1,1212 @@
+/* 한대장 앱 부품의 실효 CSS 사본 — 2026-11-22 저장소의 style.css 를 390×844 폰에서 getComputedStyle 로 읽어 옮긴 값.
+   (하단 내비 · 화면 머리 · 목록 카드 · 칩 · 알약 · 시트 · 홈 띠 · 필터 칩 · 목록 줄·주석 줄)
+   🔴 앱의 값이 바뀌면 이 사본은 낡는다 — 시안 전용이다. 앱에 지도를 넣을 때는 style.css 원본을 쓴다. */
+/* 하단 내비(5탭) — #bottom-nav | index.html:815-836 · style.css:774 · :789 · :790 · :803 · :2357 · :2374 · :2425 · :2485 · :2487 · :2677 · :3475 · :4160 · :4327 */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* .bottom-nav — 실측 390×73.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgba(255, 254, 252, 0.82) · 안쪽 8 0 12 0 · box-shadow rgba(255, 255, 255, 0.7) 0px 1px 0px 0px inset, rgba(23, 25, 28, 0.09) 0px -1px 0px 0px */
+.bottom-nav {
+  position: fixed;  /* :774 */
+  bottom: 0;  /* :774 */
+  left: 50%;  /* :774 */
+  transform: translateX(-50%);  /* :774 */
+  width: 100%;  /* :774 */
+  max-width: 480px;  /* :774 */
+  display: flex;  /* :774 */
+  padding: 8px 0 max(12px, env(safe-area-inset-bottom));  /* :774 */
+  z-index: 50;  /* :774 */
+  background: rgba(255, 254, 252, 0.82);  /* :2425 */
+  backdrop-filter: blur(20px) saturate(1.6);  /* :2425 */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 -1px 0 var(--line);  /* :2425 */
+  border-top: 0;  /* :2425 */
+}
+
+/* .nav-item (안 고른 탭) — 실측 78×53.8 · 글자 11.5px 550 · 줄 17.825px · 자간 -0.161px · 색 rgb(136, 142, 151) · 안쪽 5 0 5 0 */
+.bottom-nav .nav-item {
+  flex: 1;  /* :790 */
+  display: flex;  /* :790 */
+  flex-direction: column;  /* :790 */
+  align-items: center;  /* :790 */
+  gap: 3px;  /* :790 */
+  font-size: var(--t-2xs);  /* :790 */
+  padding: 5px 0;  /* :790 */
+  font-weight: 550;  /* :2357 */
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform 0.14s var(--ease);  /* :2374 */
+  position: relative;  /* :2485 */
+  color: var(--text-weak);  /* :2485 */
+  letter-spacing: var(--track);  /* :3475 */
+}
+
+/* .nav-item.active — .nav-item 과 다른 것만 · ::after = 위 짧은 선 18×2 — 실측 78×53.8 · 글자 11.5px 550 · 줄 17.825px · 자간 -0.161px · 색 rgb(39, 80, 143) · 안쪽 5 0 5 0 */
+.bottom-nav .nav-item.active {
+  color: var(--accent);  /* :4160 */
+}
+.bottom-nav .nav-item.active::after {
+  content: '';  /* :2487 */
+  position: absolute;  /* :2487 */
+  background: var(--accent);  /* :2677 */
+  width: 18px;  /* :4327 */
+  height: 2px;  /* :4327 */
+  left: calc(50% - 9px);  /* :4327 */
+  margin-left: 0;  /* :4327 */
+  border-radius: var(--radius-pill);  /* :4327 */
+  top: 0;  /* :4327 */
+}
+
+/* .nav-item svg — 실측 23×23 · 글자 11.5px 550 · 줄 17.825px · 자간 -0.161px · 색 rgb(39, 80, 143) */
+.bottom-nav .nav-item svg {
+  width: 23px;  /* :803 */
+  height: 23px;  /* :803 */
+}
+
+/* 원문 — 숨김 */
+.bottom-nav[hidden] { display: none !important; }  /* :789 */
+/* 화면 머리 — 탭 화면 .page-header(제목 + 오른쪽 단추 하나) · 안쪽 화면 .sub-header(뒤로 + 제목) | index.html:488-505(장학금 찾기) · :613-621(신청 내역 + 「달력 보기」 토글) · :681-686(공고 보관함 sub-header) · style.css:604-605 · :1816-1817 · :1881 · :2144-2157 · :2866 · :3670 · :4203-4213 · :272-273 */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* .page-header — 실측 350×44 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.page-header {
+  margin-bottom: 18px;  /* :604 */
+  display: flex;  /* :1881 */
+  align-items: center;  /* :1881 */
+  justify-content: space-between;  /* :1881 */
+  gap: 10px;  /* :1881 */
+}
+
+/* .page-header h2 (화면 제목) — 실측 91.7×26 · 글자 21px 800 · 줄 26.04px · 자간 -0.63px · 색 rgb(23, 25, 28) */
+.page-header h2 {
+  line-height: 1.24;  /* :2346 */
+  text-wrap: balance;  /* :2346 */
+  font-size: var(--t-2xl);  /* :605 */
+  font-weight: 800;  /* :605 */
+  letter-spacing: var(--track-display);  /* :3450 */
+  font-family: var(--font-display);  /* :4138 */
+  word-break: keep-all;  /* :4186 */
+  overflow-wrap: break-word;  /* :4186 */
+}
+
+/* .sort-wrap — 실측 96.8×44 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.page-header .sort-wrap {
+  position: relative;  /* :2157 */
+}
+
+/* .sort-btn (정렬 단추) — 실측 96.8×44 · 글자 13.5px 600 · 줄 20.925px · 자간 -0.224px · 색 rgb(84, 90, 98) · 안쪽 0 13 0 13 · 모서리 13px · 선 top/right/bottom/left 1px rgba(23, 25, 28, 0.09) */
+.page-header .sort-btn {
+  display: flex;  /* :2144 */
+  align-items: center;  /* :2144 */
+  gap: 5px;  /* :2144 */
+  min-height: 44px;  /* :2144 */
+  font-size: var(--t-sm);  /* :2144 */
+  font-weight: 600;  /* :2144 */
+  color: var(--text-sub);  /* :2144 */
+  background: transparent;  /* :2144 */
+  cursor: pointer;  /* :2144 */
+  white-space: nowrap;  /* :2144 */
+  -webkit-user-select: none;  /* :2152 */
+  user-select: none;  /* :2152 */
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform 0.14s var(--ease);  /* :2374 */
+  border: 1px solid var(--line);  /* :2866 */
+  border-radius: var(--radius-sm);  /* :2866 */
+  padding: 0 13px;  /* :2866 */
+}
+
+/* .sort-btn svg — 실측 18×18 · 글자 13.5px 600 · 줄 20.925px · 자간 -0.224px · 색 rgb(84, 90, 98) */
+.page-header .sort-btn svg {
+  width: 18px;  /* :2153 */
+  height: 18px;  /* :2153 */
+  display: block;  /* :2153 */
+  flex-shrink: 0;  /* :2153 */
+}
+
+/* .apps-header-actions — 실측 71.2×33.4 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.page-header .apps-header-actions {
+  display: flex;  /* :3670 */
+  align-items: center;  /* :3670 */
+  gap: 8px;  /* :3670 */
+}
+
+/* #apps-view-toggle 「달력 보기」 (.btn-ghost.btn-sm) — 실측 71.2×33.4 · 글자 12.5px 400 · 줄 19.375px · 자간 -0.224px · 색 rgb(84, 90, 98) · 안쪽 6 12 6 12 · 모서리 9px · 선 top/right/bottom/left 1px rgba(23, 25, 28, 0.09) */
+.page-header .btn-ghost.btn-sm {
+  font-size: var(--t-xs);  /* :1816 */
+  padding: 6px 12px;  /* :1816 */
+  min-height: 32px;  /* :1816 */
+  border-radius: var(--radius-xs);  /* :1816 */
+  background: transparent;  /* :1817 */
+  border: 1px solid var(--line);  /* :1817 */
+  color: var(--text-sub);  /* :1817 */
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform 0.14s var(--ease);  /* :2374 */
+}
+
+/* .sub-header — 실측 350×40 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.sub-header {
+  display: flex;  /* :4203 */
+  align-items: center;  /* :4203 */
+  gap: var(--space-4);  /* :4203 */
+  margin-bottom: var(--space-20);  /* :4203 */
+}
+
+/* .sub-back (뒤로 · ::after = 닿는 넓이 44×44 덧판) — 실측 40×40 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 8 8 8 8 · 모서리 13px */
+.sub-header .sub-back {
+  position: relative;  /* :272 */
+  margin-left: calc(var(--space-8) * -1);  /* :4204 */
+  padding: var(--space-8);  /* :4204 */
+  color: var(--text);  /* :4204 */
+  border-radius: var(--radius-sm);  /* :4204 */
+  transition: background 0.15s;  /* :4204 */
+  -webkit-tap-highlight-color: transparent;  /* :4223 */
+}
+.sub-header .sub-back::after {
+  content: '';  /* :273 */
+  position: absolute;  /* :273 */
+  top: 50%;  /* :273 */
+  left: 50%;  /* :273 */
+  width: 44px;  /* :273 */
+  height: 44px;  /* :273 */
+  transform: translate(-50%, -50%);  /* :273 */
+}
+
+/* .sub-back svg — 실측 24×24 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.sub-header .sub-back svg {
+  width: 24px;  /* :4212 */
+  height: 24px;  /* :4212 */
+  display: block;  /* :4212 */
+}
+
+/* .sub-header h2 — 실측 91.1×27.3 · 글자 21px 800 · 줄 27.3px · 자간 -0.735px · 색 rgb(23, 25, 28) */
+.sub-header h2 {
+  text-wrap: balance;  /* :2346 */
+  font-size: var(--t-2xl);  /* :4213 */
+  font-weight: 800;  /* :4213 */
+  letter-spacing: -0.035em;  /* :4213 */
+  line-height: 1.3;  /* :4213 */
+}
+
+/* 상태 규칙 원문(줄 순) */
+.btn-ghost:hover { background: var(--surface); }  /* :1820 */
+.sort-btn:hover { background: rgba(18, 22, 31, 0.05); }  /* :2150 */
+.sort-btn:hover { background: var(--surface-2); border-color: var(--text-weak); }  /* :2867 */
+@media (hover: none) { .sort-btn:hover { background: transparent; border-color: var(--line); } }  /* :3493 */
+.sub-back:hover { background: rgba(18, 22, 31, 0.05); }  /* :4211 */
+.btn:active, .chip:active, .filter-chip:active, .icon-btn:active, .wallet-btn:active, .sort-btn:active, .link-btn:active, .btn-ghost:active { transform: scale(0.95); }  /* :4366 */
+/* 목록 카드 — .sch-card-wrap > .sch-card (장학·활동이 같이 쓰는 cardShellHtml 한 벌) | app.js:1538-1555(cardShellHtml) · :1489-1525(schCard) · :1561-1569(saveBtnHtml) · :463-471(kindChip) · :1469-1486(cardBadgeHtml → .sch-fit) · app-activities.js:312-316(cardSrcLinkHtml) · 실DOM = 홈 #home-deadline-list 첫 카드(서울과학기술대학교 프로필) */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* .card-list (카드 묶음 — 좌우 -20px 로 화면 끝까지) — 실측 390×354.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.card-list {
+  display: block;  /* :2530 */
+  gap: 0;  /* :2530 */
+  margin-inline: -20px;  /* :2530 */
+  border-top: 0;  /* :2975 */
+  border-bottom: 0;  /* :2975 */
+  margin-bottom: 4px;  /* :2979 */
+}
+
+/* .sch-card-wrap — 실측 390×118.3 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.sch-card-wrap {
+  position: relative;  /* :3510 */
+  animation: taste-in 0.24s var(--ease) 0.02s both;  /* :2436 */
+}
+
+/* .sch-card — 실측 390×118.3 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 17 20 17 20 · 선 bottom 1px rgba(23, 25, 28, 0.09) */
+.sch-card-wrap .sch-card {
+  position: relative;  /* :2536 */
+  display: block;  /* :2536 */
+  text-align: left;  /* :2536 */
+  background: transparent;  /* :2536 */
+  border: 0;  /* :2536 */
+  border-bottom: 1px solid var(--line);  /* :2536 */
+  border-radius: 0;  /* :2536 */
+  box-shadow: none;  /* :2536 */
+  transition: background var(--dur) var(--ease);  /* :2536 */
+  padding: 17px 20px;  /* :3040 */
+  width: 100%;  /* :3511 */
+}
+
+/* .sch-top (윗줄) — 실측 350×26.9 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 0 34 0 0 */
+.sch-card-wrap .sch-top {
+  display: flex;  /* :4006 */
+  align-items: baseline;  /* :4006 */
+  justify-content: space-between;  /* :4006 */
+  gap: 6px;  /* :4006 */
+  margin-bottom: 8px;  /* :4006 */
+  flex-wrap: nowrap;  /* :4006 */
+  padding-right: 34px;  /* :3513 */
+}
+
+/* 갈래 칩 「장학 · 교외」 — 실측 65.2×24.3 · 글자 11.5px 600 · 줄 17.25px · 자간 -0.161px · 색 rgb(84, 90, 98) · 안쪽 3.5 9 3.5 9 · 모서리 9px · box-shadow rgba(23, 25, 28, 0.09) 0px 0px 0px 1px inset */
+.sch-card-wrap .sch-top .badge.badge-kind.badge-out {
+  font-size: var(--t-2xs);  /* :534 */
+  border-radius: var(--radius-xs);  /* :534 */
+  font-weight: 600;  /* :2336 */
+  background: transparent;  /* :2469 */
+  color: var(--text-sub);  /* :2469 */
+  box-shadow: inset 0 0 0 1px var(--line);  /* :2469 */
+  margin: 0;  /* :2983 */
+  letter-spacing: var(--track);  /* :3475 */
+  line-height: 1.5;  /* :2984 */
+  padding: 3.5px 9px;  /* :2984 */
+  flex: 0 0 auto;  /* :4029 */
+}
+
+/* 판정 알약 「적합도 95%」 — 실측 83.8×26.9 · 글자 12.5px 800 · 줄 19.375px · 자간 normal · 색 rgb(39, 80, 143) · 바탕 rgba(39, 80, 143, 0.09) · 안쪽 2.75 8.75 2.75 8.75 · 모서리 999px · 선 top/right/bottom/left 1px rgba(39, 80, 143, 0.24) */
+.sch-card-wrap .sch-fit.fit-blue {
+  margin: 0;  /* :2983 */
+  flex: 0 0 auto;  /* :4075 */
+  font-size: var(--t-xs);  /* :4075 */
+  letter-spacing: 0;  /* :4075 */
+  white-space: nowrap;  /* :4075 */
+  font-variant-numeric: tabular-nums;  /* :4075 */
+  display: inline-flex;  /* :4456 */
+  align-items: center;  /* :4456 */
+  padding: 0.22em 0.7em;  /* :4456 */
+  border-radius: var(--radius-pill);  /* :4456 */
+  font-weight: 800;  /* :4456 */
+  border: 1px solid var(--line);  /* :4456 */
+  color: var(--accent);  /* :4467 */
+  background: var(--accent-soft);  /* :4467 */
+  border-color: var(--accent-line);  /* :4467 */
+}
+
+/* .sch-name (제목) — 실측 350×21 · 글자 14.5px 700 · 줄 21.025px · 자간 -0.2175px · 색 rgb(23, 25, 28) */
+.sch-card-wrap .sch-name {
+  text-wrap: pretty;  /* :2351 */
+  margin: 0;  /* :4035 */
+  font-size: var(--t-md);  /* :4035 */
+  line-height: 1.45;  /* :4035 */
+  font-weight: 700;  /* :4035 */
+  letter-spacing: -0.015em;  /* :4035 */
+  word-break: keep-all;  /* :4186 */
+  overflow-wrap: break-word;  /* :4186 */
+}
+
+/* .sch-foot (아랫줄) — 실측 350×19.4 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 0 28 0 0 */
+.sch-card-wrap .sch-foot {
+  display: flex;  /* :4043 */
+  align-items: baseline;  /* :4043 */
+  justify-content: space-between;  /* :4043 */
+  gap: var(--sp-1);  /* :4043 */
+  margin-top: var(--sp-1);  /* :4043 */
+  padding-right: calc(var(--space-24) + var(--space-4));  /* :3537 */
+  min-height: 18px;  /* :3537 */
+}
+
+/* .sch-amount — 지금은 빈 칸(금액 줄은 2026-11-15 에 뺐다 · app.js:1510-1511) — 실측 0×0 · 글자 13.5px 400 · 줄 20.925px · 자간 -0.224px · 색 rgb(136, 142, 151) */
+.sch-card-wrap .sch-amount {
+  text-wrap: pretty;  /* :2351 */
+  margin-top: 5px;  /* :3043 */
+  margin: 0;  /* :4051 */
+  font-size: var(--t-sm);  /* :4051 */
+  font-variant-numeric: tabular-nums;  /* :4051 */
+  min-width: 0;  /* :4089 */
+  overflow: hidden;  /* :4089 */
+  text-overflow: ellipsis;  /* :4089 */
+  white-space: nowrap;  /* :4089 */
+  font-weight: 400;  /* :4165 */
+  color: var(--text-weak);  /* :4060 */
+}
+
+/* .sch-due.urgent 「D-1」 — 7일 이내 빨강 · 그 밖은 --text-weak 회색 글자 — 실측 21.9×19.4 · 글자 12.5px 700 · 줄 19.375px · 자간 -0.224px · 색 rgb(143, 58, 46) */
+.sch-card-wrap .sch-due.urgent {
+  flex: 0 0 auto;  /* :4062 */
+  font-size: var(--t-xs);  /* :4062 */
+  white-space: nowrap;  /* :4062 */
+  font-variant-numeric: tabular-nums;  /* :4062 */
+  color: var(--red);  /* :4071 */
+  font-weight: 700;  /* :4071 */
+}
+
+/* .save-btn 북마크 — 카드 바깥(단추 안 단추 금지 · app.js:1557-1560) — 실측 40×40 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(136, 142, 151) · 모서리 9px */
+.sch-card-wrap .save-btn {
+  position: absolute;  /* :3543 */
+  top: 10px;  /* :3543 */
+  right: 8px;  /* :3543 */
+  z-index: 2;  /* :3543 */
+  width: 40px;  /* :3543 */
+  height: 40px;  /* :3543 */
+  display: flex;  /* :3543 */
+  align-items: center;  /* :3543 */
+  justify-content: center;  /* :3543 */
+  background: none;  /* :3543 */
+  border: 0;  /* :3543 */
+  padding: 0;  /* :3543 */
+  color: var(--text-weak);  /* :3543 */
+  cursor: pointer;  /* :3543 */
+  border-radius: var(--radius-xs);  /* :3543 */
+  transition: color 0.15s, transform 0.12s;  /* :3543 */
+}
+
+/* .save-btn svg — 실측 19×19 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(136, 142, 151) */
+.sch-card-wrap .save-btn svg {
+  width: 19px;  /* :3555 */
+  height: 19px;  /* :3555 */
+  fill: none;  /* :3555 */
+  stroke: currentColor;  /* :3555 */
+  stroke-width: 1.7;  /* :3555 */
+  stroke-linejoin: round;  /* :3555 */
+}
+
+.save-btn.on { color: var(--accent); }  /* :3558 */
+.save-btn.on svg { fill: currentColor; }  /* :3559 */
+/* .card-src-link 원문 아이콘 — 카드 바깥 · 글자는 0px(아이콘만) — 실측 18×18 · 글자 0px 400 · 줄 0px · 자간 -0.224px · 색 rgb(84, 90, 98) */
+.sch-card-wrap .card-src-link {
+  position: absolute;  /* :3517 */
+  right: var(--space-20);  /* :3517 */
+  bottom: var(--space-16);  /* :3517 */
+  z-index: 2;  /* :3517 */
+  display: block;  /* :3517 */
+  width: 18px;  /* :3517 */
+  height: 18px;  /* :3517 */
+  font-size: 0;  /* :3517 */
+  color: var(--text-sub);  /* :3517 */
+  text-decoration: none;  /* :3517 */
+}
+.sch-card-wrap .card-src-link::before {
+  content: '';  /* :3527 */
+  position: absolute;  /* :3527 */
+  inset: 0;  /* :3527 */
+  background: currentColor;  /* :3527 */
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6'/><path d='M20 4l-9 9'/><path d='M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5'/></svg>") center / contain no-repeat;  /* :3527 */
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6'/><path d='M20 4l-9 9'/><path d='M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5'/></svg>") center / contain no-repeat;  /* :3527 */
+}
+
+/* 이 카드에 안 나온 변형 — 원문 규칙 그대로 */
+.sch-due { flex: 0 0 auto; font-size: var(--t-xs); font-weight: 600; color: var(--text-weak); white-space: nowrap; font-variant-numeric: tabular-nums; }  /* :4062 */
+.sch-due.urgent { color: var(--red); font-weight: 700; }  /* :4071 */
+.badge-in { background: var(--primary-weak); color: var(--text-sub); }  /* :2468 */
+.badge-out { background: transparent; color: var(--text-sub); box-shadow: inset 0 0 0 1px var(--line); }  /* :2469 */
+.badge-kind { background: rgba(18, 22, 31, 0.05); color: var(--text-sub); font-weight: 600; }  /* :2336 */
+.badge-kind.badge-vol { background: var(--green-weak); color: var(--green); }  /* :3539 */
+.badge-kind.badge-contest { background: var(--purple-weak); color: var(--purple); }  /* :3540 */
+.badge-kind.badge-act { background: var(--primary-weak); color: var(--accent); }  /* :3541 */
+.sch-fit.fit-red, .sch-fit.fit-orange, .sch-fit.fit-yellow { color: var(--text); }  /* :4466 */
+.sch-fit.fit-green, .sch-fit.fit-blue { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }  /* :4467 */
+.sch-card:has(.badge-dday.closed) { opacity: 0.55; }  /* :2562 */
+.card-list > .sch-card:last-child, .card-list > *:last-child .sch-card { border-bottom: 0; }  /* :2976 */
+/* 상태 규칙 원문(줄 순 · 폰은 hover:none 이 참 — 실측 matchMedia) */
+.sch-card:hover { box-shadow: var(--shadow-lift); }  /* :530 */
+.sch-card:active { transform: scale(0.985); }  /* :531 */
+.sch-card:active { transform: scale(0.99); }  /* :2381 */
+.sch-card:hover { box-shadow: var(--shadow-lift); transform: translateY(-1px); }  /* :2382 */
+.sch-card:hover { background: var(--surface-2); transform: none; box-shadow: none; }  /* :2549 */
+.sch-card:active { background: var(--surface-2); transform: none; }  /* :2550 */
+.sch-card:hover, .sch-card:active { background: var(--surface-2); }  /* :2967 */
+@media (hover: none) { .sch-card:hover { transform: none; box-shadow: none; } }  /* :3484 */
+.save-btn:hover { color: var(--text-sub); }  /* :3556 */
+.save-btn:active { transform: scale(0.9); }  /* :3557 */
+/* 윗줄 칩(갈래 칩) — kindChip / kindChipHtml | app.js:457-471 · style.css:534-540(.badge) · :2336(.badge-kind) · :2468-2469(.badge-in/.badge-out) · :3539-3541(활동 갈래 색) · :2983-2984 · :4029 · :3453-3475(자간) */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* 「장학 · 교외」 (카드 윗줄) — 실측 65.2×24.3 · 글자 11.5px 600 · 줄 17.25px · 자간 -0.161px · 색 rgb(84, 90, 98) · 안쪽 3.5 9 3.5 9 · 모서리 9px · box-shadow rgba(23, 25, 28, 0.09) 0px 0px 0px 1px inset */
+.sch-top .badge.badge-kind.badge-out {
+  font-size: var(--t-2xs);  /* :534 */
+  border-radius: var(--radius-xs);  /* :534 */
+  font-weight: 600;  /* :2336 */
+  background: transparent;  /* :2469 */
+  color: var(--text-sub);  /* :2469 */
+  box-shadow: inset 0 0 0 1px var(--line);  /* :2469 */
+  margin: 0;  /* :2983 */
+  letter-spacing: var(--track);  /* :3475 */
+  line-height: 1.5;  /* :2984 */
+  padding: 3.5px 9px;  /* :2984 */
+  flex: 0 0 auto;  /* :4029 */
+}
+
+/* 원문 규칙 — 갈래별 바탕·글자색 */
+.badge { font-size: var(--t-2xs); font-weight: 700; padding: 3.5px 9px; border-radius: var(--radius-xs); letter-spacing: 0; }  /* :534 */
+.badge-kind { background: rgba(18, 22, 31, 0.05); color: var(--text-sub); font-weight: 600; }  /* :2336 */
+.badge-in { background: var(--primary-weak); color: var(--text-sub); }  /* :2468 */
+.badge-out { background: transparent; color: var(--text-sub); box-shadow: inset 0 0 0 1px var(--line); }  /* :2469 */
+.badge-kind.badge-vol { background: var(--green-weak); color: var(--green); }  /* :3539 */
+.badge-kind.badge-contest { background: var(--purple-weak); color: var(--purple); }  /* :3540 */
+.badge-kind.badge-act { background: var(--primary-weak); color: var(--accent); }  /* :3541 */
+.sch-top .badge, .sch-top .badge-fit { line-height: 1.5; padding: 3.5px 9px; }  /* :2984 */
+.sch-top > .badge { flex: 0 0 auto; }  /* :4029 */
+/* 알약 — 카드 판정 .sch-fit · 시트 적합도 .badge-fit · 마감 D-day 배지 · 홈 띠 「오늘 n」 | app.js:1419-1486(fitBadgeHtml·cardBadgeHtml) · app.js:2608-2610(news-today) · app-sheet.js:176-181(시트 D-day) · style.css:4456-4471 · :3073-3093 · :543-545 · :2470-2471 · :5186-5190 · :1798 */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* 카드 판정 알약 (60% 이상 = fit-green·fit-blue) — 실측 83.8×26.9 · 글자 12.5px 800 · 줄 19.375px · 자간 normal · 색 rgb(39, 80, 143) · 바탕 rgba(39, 80, 143, 0.09) · 안쪽 2.75 8.75 2.75 8.75 · 모서리 999px · 선 top/right/bottom/left 1px rgba(39, 80, 143, 0.24) */
+.sch-card-wrap .sch-fit.fit-blue {
+  margin: 0;  /* :2983 */
+  flex: 0 0 auto;  /* :4075 */
+  font-size: var(--t-xs);  /* :4075 */
+  letter-spacing: 0;  /* :4075 */
+  white-space: nowrap;  /* :4075 */
+  font-variant-numeric: tabular-nums;  /* :4075 */
+  display: inline-flex;  /* :4456 */
+  align-items: center;  /* :4456 */
+  padding: 0.22em 0.7em;  /* :4456 */
+  border-radius: var(--radius-pill);  /* :4456 */
+  font-weight: 800;  /* :4456 */
+  border: 1px solid var(--line);  /* :4456 */
+  color: var(--accent);  /* :4467 */
+  background: var(--accent-soft);  /* :4467 */
+  border-color: var(--accent-line);  /* :4467 */
+}
+
+/* 시트 적합도 알약 — 실측 227.6×26 · 글자 11.5px 700 · 줄 17.25px · 자간 -0.161px · 색 rgb(39, 80, 143) · 바탕 rgba(39, 80, 143, 0.2) · 안쪽 0 11 0 11 · 모서리 999px */
+.sheet .verdict-marks > .badge-fit {
+  font-variant-numeric: tabular-nums;  /* :2354 */
+  background: rgba(39, 80, 143, 0.20);  /* :2676 */
+  color: var(--accent);  /* :2676 */
+  display: inline-flex;  /* :3075 */
+  align-items: center;  /* :3075 */
+  min-height: 26px;  /* :3075 */
+  padding: 0 11px;  /* :3075 */
+  border-radius: var(--radius-pill);  /* :3075 */
+  font-size: var(--t-2xs);  /* :3075 */
+  font-weight: 700;  /* :3075 */
+  line-height: 1.5;  /* :3075 */
+  margin: 0;  /* :3075 */
+  letter-spacing: var(--track);  /* :3475 */
+}
+
+/* 시트 머리줄 D-day (7일 이내) — 실측 38.3×24.3 · 글자 11.5px 700 · 줄 17.25px · 자간 -0.161px · 색 rgb(143, 58, 46) · 바탕 rgb(245, 233, 230) · 안쪽 3.5 9 3.5 9 · 모서리 9px */
+.sheet .sheet-top .badge-dday.urgent {
+  font-size: var(--t-2xs);  /* :534 */
+  font-weight: 700;  /* :534 */
+  border-radius: var(--radius-xs);  /* :534 */
+  font-variant-numeric: tabular-nums;  /* :2354 */
+  margin: 0;  /* :2983 */
+  letter-spacing: var(--track);  /* :3475 */
+  margin-left: auto;  /* :914 */
+  background: var(--red-weak);  /* :2471 */
+  color: var(--red);  /* :2471 */
+  line-height: 1.5;  /* :2984 */
+  padding: 3.5px 9px;  /* :2984 */
+  flex: 0 0 auto;  /* :4029 */
+}
+
+/* 원문 규칙 — 이번 화면에 안 나온 변형 */
+.badge-fit-no { background: #fdecec; color: #b42318; }  /* :1798 */
+.sch-fit.fit-red, .sch-fit.fit-orange, .sch-fit.fit-yellow { color: var(--text); }  /* :4466 */
+.sch-fit.fit-green, .sch-fit.fit-blue { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }  /* :4467 */
+.news-today { display: inline-block; vertical-align: middle; margin-left: var(--space-4); padding: 0 var(--sp-2); border-radius: var(--radius-pill); background: var(--red-weak); color: var(--red); font-size: var(--t-2xs); font-weight: 800; line-height: 1.7; }  /* :5186 */
+.badge-dday { background: var(--primary-weak); color: var(--text-sub); }  /* :2470 */
+.badge-dday.urgent { background: var(--red-weak); color: var(--red); }  /* :2471 */
+.badge-dday.closed { background: rgba(18, 22, 31, 0.07); color: var(--text-weak); }  /* :545 */
+.verdict-marks .badge-fit em { font-size: inherit; font-weight: 500; opacity: 0.75; margin-left: 5px; }  /* :3088 */
+/* 시트(바텀시트) — #detail-sheet.sheet: 손잡이 · 머리줄 · 제목 · 금액 · 절(점 + 선) · 원문 링크 줄 · 주 버튼 | app-sheet.js:494-586(openDetail 마크업) · :176-181(sheetHeadHtml) · :213-244(sheetSectionsHtml) · :261-266(sourceLinkHtml) · :856-881(openSheetShell) · :663(enableSheetSwipe) · index.html:839 · :862 · style.css:807-848 · :1007-1034 · :2423 · :5285-5300 */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* .sheet-backdrop (열렸을 때 · .show) — 실측 390×844 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgba(10, 14, 24, 0.55) */
+.sheet-backdrop.show {
+  position: fixed;  /* :807 */
+  inset: 0;  /* :807 */
+  background: rgba(10, 14, 24, 0.55);  /* :807 */
+  backdrop-filter: blur(2px);  /* :807 */
+  z-index: 90;  /* :807 */
+  transition: opacity 0.25s;  /* :807 */
+  opacity: 1;  /* :816 */
+}
+
+/* .sheet (열렸을 때 · .show — 닫힐 때는 translate(-50%,100%)) — 실측 390×725.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgb(255, 255, 255) · 모서리 27px · box-shadow rgba(18, 26, 42, 0.2) 0px -14px 48px 0px */
+.sheet.show {
+  position: fixed;  /* :817 */
+  bottom: 0;  /* :817 */
+  left: 50%;  /* :817 */
+  width: 100%;  /* :817 */
+  max-width: 480px;  /* :817 */
+  max-height: 86dvh;  /* :817 */
+  background: var(--surface);  /* :817 */
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;  /* :817 */
+  z-index: 100;  /* :817 */
+  overflow-y: auto;  /* :817 */
+  overscroll-behavior: contain;  /* :817 */
+  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1);  /* :817 */
+  box-shadow: var(--shadow-sheet);  /* :2423 */
+  transform: translate(-50%, 0);  /* :836 */
+  transition-duration: 0.3s;  /* :836 */
+}
+
+/* .sheet-handle (손잡이) — 실측 44×5 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgba(18, 22, 31, 0.14) · 모서리 3px */
+.sheet .sheet-handle {
+  width: 44px;  /* :837 */
+  height: 5px;  /* :837 */
+  border-radius: var(--radius-hair);  /* :837 */
+  background: rgba(18, 22, 31, 0.14);  /* :837 */
+  margin: 11px auto 0;  /* :837 */
+  position: sticky;  /* :837 */
+  top: 11px;  /* :837 */
+  cursor: pointer;  /* :837 */
+}
+
+/* .sheet-body — 실측 390×1021.9 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 18 24 30 24 */
+.sheet .sheet-body {
+  padding: 18px 24px calc(30px + env(safe-area-inset-bottom));  /* :847 */
+}
+
+/* 머리줄 — 칩 · (주최) · D-day · 저장 — 실측 342×24.3 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 0 40 0 0 */
+.sheet .sch-top.sheet-top {
+  position: relative;  /* :3561 */
+  padding-right: 40px;  /* :3561 */
+  display: flex;  /* :4006 */
+  align-items: baseline;  /* :4006 */
+  justify-content: space-between;  /* :4006 */
+  gap: 6px;  /* :4006 */
+  margin-bottom: 8px;  /* :4006 */
+  flex-wrap: nowrap;  /* :4006 */
+}
+
+/* 머리줄 저장 단추 — 실측 40×40 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(136, 142, 151) · 모서리 9px */
+.sheet .sheet-top .save-btn {
+  margin: 0;  /* :2983 */
+  position: absolute;  /* :3543 */
+  z-index: 2;  /* :3543 */
+  width: 40px;  /* :3543 */
+  height: 40px;  /* :3543 */
+  display: flex;  /* :3543 */
+  align-items: center;  /* :3543 */
+  justify-content: center;  /* :3543 */
+  background: none;  /* :3543 */
+  border: 0;  /* :3543 */
+  padding: 0;  /* :3543 */
+  color: var(--text-weak);  /* :3543 */
+  cursor: pointer;  /* :3543 */
+  border-radius: var(--radius-xs);  /* :3543 */
+  transition: color 0.15s, transform 0.12s;  /* :3543 */
+  top: -8px;  /* :3562 */
+  right: -6px;  /* :3562 */
+}
+
+/* 원문 — 저장 단추 그림(카드와 같은 규칙) · 저장됨 */
+.save-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }  /* :3555 */
+.save-btn.on { color: var(--accent); }  /* :3558 */
+.save-btn.on svg { fill: currentColor; }  /* :3559 */
+/* .sheet-title — 실측 342×26 · 글자 21px 800 · 줄 26.04px · 자간 -0.63px · 색 rgb(23, 25, 28) */
+.sheet .sheet-title {
+  font-size: var(--t-2xl);  /* :848 */
+  font-weight: 800;  /* :848 */
+  line-height: 1.24;  /* :2346 */
+  text-wrap: balance;  /* :2346 */
+  margin-top: var(--sp-1);  /* :3058 */
+  letter-spacing: var(--track-display);  /* :3450 */
+  font-family: var(--font-display);  /* :4138 */
+  word-break: keep-all;  /* :4186 */
+  overflow-wrap: break-word;  /* :4186 */
+}
+
+/* .sheet-amount (읽은 금액만 · 강조색) — 실측 342×28.7 · 글자 18.5px 800 · 줄 28.675px · 자간 -0.224px · 색 rgb(39, 80, 143) */
+.sheet .sheet-amount {
+  text-wrap: pretty;  /* :2351 */
+  font-size: var(--t-xl);  /* :852 */
+  font-weight: 800;  /* :852 */
+  color: var(--accent);  /* :852 */
+  font-variant-numeric: tabular-nums;  /* :852 */
+  margin: var(--sp-1) 0 0;  /* :3062 */
+}
+
+/* .sheet-sec (절 묶음 — 위 선 하나) — 실측 342×165.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 14 0 0 0 · 선 top 1px rgba(23, 25, 28, 0.09) */
+.sheet .sheet-sec {
+  border-top: 1px solid var(--line);  /* :5289 */
+  margin-top: var(--sp-3);  /* :5289 */
+  padding-top: var(--sp-2);  /* :5289 */
+}
+
+/* 절 머리 — ::before 강조색 점 6px (원문 선택자도 이 두 갈래 · style.css:5293-5300) — 실측 66.4×22.5 · 글자 14.5px 800 · 줄 22.475px · 자간 -0.203px · 색 rgb(23, 25, 28) */
+.sheet .sheet-sec > h4, .sheet .sheet-sec > .sheet-verdict > h4 {
+  margin: 0;  /* :2332 */
+  letter-spacing: var(--track);  /* :3475 */
+  display: flex;  /* :5293 */
+  align-items: center;  /* :5293 */
+  gap: var(--sp-1);  /* :5293 */
+  font-size: var(--t-md);  /* :5293 */
+  font-weight: 800;  /* :5293 */
+  color: var(--text);  /* :5293 */
+}
+.sheet .sheet-sec > h4::before, .sheet .sheet-sec > .sheet-verdict > h4::before {
+  content: '';  /* :5298 */
+  flex: none;  /* :5298 */
+  width: 6px;  /* :5298 */
+  height: 6px;  /* :5298 */
+  border-radius: 50%;  /* :5298 */
+  background: var(--accent);  /* :5298 */
+}
+
+/* .sheet-verdict (「지원 자격」 머리 + 알약) — 실측 342×26 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.sheet .sheet-verdict {
+  display: flex;  /* :2328 */
+  align-items: baseline;  /* :2328 */
+  justify-content: space-between;  /* :2328 */
+  gap: 10px;  /* :2328 */
+  flex-wrap: wrap;  /* :2328 */
+  margin: 22px 0 4px;  /* :2328 */
+  margin-top: 0;  /* :5291 */
+}
+
+/* 원문 — 알약 칸(.verdict-marks) */
+.verdict-marks { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }  /* :2333 */
+.verdict-marks { align-items: center; gap: 6px; row-gap: 6px; }  /* :3072 */
+.verdict-marks > .badge, .verdict-marks > .badge-fit, .verdict-marks > .status-pill { display: inline-flex; align-items: center; min-height: 26px; padding: 0 11px; border-radius: var(--radius-pill); font-size: var(--t-2xs); font-weight: 700; line-height: 1.5; letter-spacing: 0; margin: 0; }  /* :3073 */
+.badge-fit em { font-style: normal; opacity: .75; font-size: .92em; margin-left: 4px; }  /* :1796 */
+.verdict-marks .badge-fit em { font-size: inherit; font-weight: 500; opacity: 0.75; margin-left: 5px; }  /* :3088 */
+/* .reason-list (지원 자격 줄 묶음) — 실측 342×120.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.sheet .reason-list {
+  list-style: none;  /* :869 */
+  display: grid;  /* :869 */
+  grid-template-columns: minmax(0, 1fr);  /* :869 */
+  gap: 0;  /* :919 */
+}
+
+/* 자격 줄 ✓ (r-ok · 초록) — ✗ 줄(r-x)은 아래 원문 규칙대로 회색 — 실측 342×47.5 · 글자 14.5px 400 · 줄 21.75px · 자간 -0.224px · 색 rgb(61, 107, 71) · 안쪽 2 0 2 0 */
+.sheet .reason-list li.r-ok {
+  text-wrap: pretty;  /* :2351 */
+  color: var(--green);  /* :923 */
+  font-size: var(--t-md);  /* :875 */
+  position: relative;  /* :875 */
+  padding-left: 2px;  /* :912 */
+  padding: var(--space-2) 0;  /* :918 */
+  line-height: 1.5;  /* :918 */
+}
+.sheet .reason-list li.r-ok::before {
+  content: '';  /* :881 */
+  position: absolute;  /* :881 */
+  left: 2px;  /* :881 */
+  top: 0.95em;  /* :881 */
+  width: 4px;  /* :881 */
+  height: 4px;  /* :881 */
+  border-radius: var(--radius-pill);  /* :881 */
+  background: var(--text-weak);  /* :881 */
+  display: none;  /* :917 */
+}
+
+.reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk, .reason-list .r-x { padding-left: 2px; }  /* :912 */
+.reason-list .r-x { color: var(--text-weak); }  /* :913 */
+/* .doc-list (절 안 목록) — 실측 342×99 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.sheet .doc-list {
+  list-style: none;  /* :869 */
+  display: grid;  /* :869 */
+  grid-template-columns: minmax(0, 1fr);  /* :869 */
+  gap: 0;  /* :919 */
+}
+
+/* 이름표 줄(기간 · 방법 · 서류 · 공고 안내) — 실측 342×25.8 · 글자 14.5px 400 · 줄 21.75px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 2 0 2 0 */
+.sheet .notice-summary li {
+  text-wrap: pretty;  /* :2351 */
+  font-size: var(--t-md);  /* :875 */
+  position: relative;  /* :875 */
+  padding: var(--space-2) 0;  /* :918 */
+  line-height: 1.5;  /* :918 */
+}
+.sheet .notice-summary li::before {
+  content: '';  /* :881 */
+  position: absolute;  /* :881 */
+  left: 2px;  /* :881 */
+  top: 0.95em;  /* :881 */
+  width: 4px;  /* :881 */
+  height: 4px;  /* :881 */
+  border-radius: var(--radius-pill);  /* :881 */
+  background: var(--text-weak);  /* :881 */
+  display: none;  /* :917 */
+}
+
+/* .ns-k 이름표 글자 — 실측 24.6×17 · 글자 14.5px 700 · 줄 21.75px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.sheet .ns-k {
+  font-weight: 700;  /* :1370 */
+  color: var(--text);  /* :1370 */
+  margin-right: var(--space-6);  /* :1370 */
+}
+
+/* 원문 — 절 머리 옆 꼬리표(「첨부 · 재단 선발 공고문」) · 첨부 줄(.att-*) CSS 는 지도와 무관해 뺐다 */
+.channel-tag { display: inline-block; font-size: var(--t-2xs); font-weight: 600; color: var(--text-sub); background: rgba(18, 22, 31, 0.05); border-radius: var(--radius-xs); padding: 2.5px 8px; margin-left: 6px; vertical-align: 1px; }  /* :558 */
+/* .sheet-facts (원문 절 안) — 실측 342×48 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.sheet .sheet-facts {
+  margin: var(--sp-3) 0;  /* :4952 */
+}
+
+/* 원문 링크 줄 — 실측 342×20 · 글자 12.5px 400 · 줄 20px · 자간 -0.224px · 색 rgb(136, 142, 151) */
+.sheet .doc-legend.sheet-source {
+  text-wrap: pretty;  /* :2351 */
+  font-size: var(--t-xs);  /* :1034 */
+  color: var(--text-weak);  /* :1034 */
+  margin-top: 8px;  /* :1034 */
+  line-height: 1.6;  /* :1034 */
+  margin-bottom: 0;  /* :4953 */
+}
+
+/* 「원문 공고 ↗」 링크 (이름은 source-link.js sourceLink 한 곳) — 실측 58.9×15 · 글자 12.5px 700 · 줄 20px · 자간 -0.224px · 색 rgb(30, 43, 66) */
+.sheet .sheet-source a {
+  color: var(--primary);  /* :1033 */
+  font-weight: 700;  /* :1033 */
+  text-decoration: none;  /* :1033 */
+}
+
+/* .doc-legend (작은 회색 안내 · 「문의 …」) — 실측 342×20 · 글자 12.5px 400 · 줄 20px · 자간 -0.224px · 색 rgb(136, 142, 151) */
+.sheet .doc-legend {
+  text-wrap: pretty;  /* :2351 */
+  font-size: var(--t-xs);  /* :1034 */
+  color: var(--text-weak);  /* :1034 */
+  margin-top: 8px;  /* :1034 */
+  line-height: 1.6;  /* :1034 */
+  margin-bottom: 0;  /* :4953 */
+}
+
+/* 주의 한 줄(빨강 면) — 판정이 못 미더울 때만 — 실측 342×44 · 글자 12.5px 450 · 줄 20px · 자간 -0.224px · 색 rgb(143, 58, 46) · 바탕 rgb(245, 233, 230) · 안쪽 12 12 12 12 · 모서리 13px */
+.sheet .dp-note.dp-caution {
+  font-size: var(--t-xs);  /* :1007 */
+  line-height: 1.6;  /* :1007 */
+  color: var(--orange);  /* :1024 */
+  background: var(--orange-weak);  /* :1024 */
+  text-align: left;  /* :1024 */
+  margin-top: 0;  /* :1024 */
+  margin-bottom: var(--space-12);  /* :1024 */
+  padding: var(--space-12);  /* :1024 */
+  border-radius: var(--radius-sm);  /* :1024 */
+  text-wrap: pretty;  /* :2351 */
+  font-weight: 450;  /* :2356 */
+}
+
+/* 주 버튼 — 화면(시트)당 하나 — 실측 342×60.3 · 글자 17px 700 · 줄 26.35px · 자간 -0.17px · 색 rgb(253, 251, 246) · 바탕 rgb(30, 43, 66) · 안쪽 17 17 17 17 · 모서리 13px · box-shadow rgba(35, 32, 26, 0.22) 0px 6px 18px 0px */
+.sheet .btn.btn-primary.btn-lg {
+  display: block;  /* :230 */
+  width: 100%;  /* :230 */
+  text-align: center;  /* :230 */
+  border-radius: var(--radius-sm);  /* :230 */
+  font-weight: 700;  /* :230 */
+  letter-spacing: -0.01em;  /* :230 */
+  padding: 17px;  /* :242 */
+  font-size: var(--t-lg);  /* :242 */
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform 0.14s var(--ease);  /* :2374 */
+  box-shadow: var(--shadow-btn);  /* :2396 */
+  background: var(--primary);  /* :2686 */
+  color: #fdfbf6;  /* :2686 */
+  margin-top: 12px;  /* :984 */
+}
+
+/* 상태 규칙 원문(줄 순) */
+.btn:active { transform: scale(0.98); }  /* :239 */
+.btn-primary:hover { background: var(--primary-dark); }  /* :248 */
+.btn:active, .chip:active, .filter-chip:active, .icon-btn:active, .my-menu-item:active, .wallet-btn:active { transform: scale(0.975); }  /* :2379 */
+.btn-primary:hover { background: var(--primary-dark); box-shadow: var(--shadow-btn-hover); }  /* :2397 */
+.btn-primary:hover { background: var(--primary-dark); }  /* :2687 */
+@media (hover: none) { .btn-primary:hover { background: var(--primary); } }  /* :3488 */
+.save-btn:hover { color: var(--text-sub); }  /* :3556 */
+.save-btn:active { transform: scale(0.9); }  /* :3557 */
+.btn:active, .chip:active, .filter-chip:active, .icon-btn:active, .wallet-btn:active, .sort-btn:active, .link-btn:active, .btn-ghost:active { transform: scale(0.95); }  /* :4366 */
+/* 홈 띠 — 「우리 학교 소식」 사진 카드 띠 (#home-news: 머리줄 + 옆으로 넘기는 카드 줄) | app.js:2600-2637(homeNewsHtml) · :2538(NEWS_STRIP_N = 4) · index.html:438-442 · style.css:5092-5150 · :5186-5190 */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* .home-news (띠 전체) — 실측 350×263.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.home-news {
+  display: flex;  /* :5092 */
+  flex-direction: column;  /* :5092 */
+  gap: var(--space-12);  /* :5092 */
+  margin-bottom: var(--sp-3);  /* :5092 */
+}
+
+/* 머리줄 — 실측 350×36.9 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 16 0 0 0 */
+.home-news .section-head.home-news-head {
+  padding-top: 16px;  /* :3036 */
+  margin-bottom: var(--sp-2);  /* :4324 */
+  display: flex;  /* :5093 */
+  justify-content: space-between;  /* :5093 */
+  align-items: baseline;  /* :5093 */
+  margin: 0;  /* :5093 */
+  border-top: 0;  /* :4881 */
+}
+
+/* 띠 제목 h3 — 실측 70.6×15.5 · 글자 12.5px 700 · 줄 15.5px · 자간 normal · 색 rgb(23, 25, 28) */
+.home-news .section-head h3 {
+  line-height: 1.24;  /* :2346 */
+  text-wrap: balance;  /* :2346 */
+  word-break: keep-all;  /* :4186 */
+  overflow-wrap: break-word;  /* :4186 */
+  font-family: var(--font-text);  /* :4312 */
+  font-size: var(--t-xs);  /* :4312 */
+  font-weight: 700;  /* :4312 */
+  letter-spacing: 0;  /* :4312 */
+  color: var(--text);  /* :5094 */
+}
+
+/* 「전체 보기」 링크 단추 — 실측 48.8×20.9 · 글자 13.5px 550 · 줄 20.925px · 자간 -0.224px · 색 rgb(39, 80, 143) */
+.home-news .link-btn.home-news-all {
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform 0.14s var(--ease);  /* :2374 */
+  color: var(--accent);  /* :5095 */
+  font-size: var(--t-sm);  /* :5095 */
+  font-weight: 550;  /* :5095 */
+}
+
+/* .news-strip (옆으로 넘김 · 오른쪽은 화면 끝까지) — 실측 390×214.9 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 0 20 4 20 */
+.home-news .news-strip {
+  display: flex;  /* :5096 */
+  gap: var(--space-12);  /* :5096 */
+  overflow-x: auto;  /* :5096 */
+  margin: 0 calc(-1 * var(--space-20));  /* :5096 */
+  padding: 0 var(--space-20) var(--space-4);  /* :5096 */
+  scroll-padding-inline: var(--space-20);  /* :5096 */
+  scroll-snap-type: x proximity;  /* :5096 */
+  scrollbar-width: none;  /* :5096 */
+}
+
+/* .news-tile (카드 한 장) — 실측 148×210.9 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.home-news .news-tile {
+  flex: none;  /* :5108 */
+  width: 148px;  /* :5108 */
+  display: flex;  /* :5108 */
+  flex-direction: column;  /* :5108 */
+  gap: var(--space-2);  /* :5108 */
+  color: var(--text);  /* :5108 */
+  text-decoration: none;  /* :5108 */
+  scroll-snap-align: start;  /* :5108 */
+}
+
+/* 사진 칸 — 실측 148×104 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgb(247, 246, 244) · 모서리 13px */
+.home-news .news-tile-photo {
+  display: block;  /* :5118 */
+  width: 148px;  /* :5118 */
+  height: 104px;  /* :5118 */
+  margin-bottom: var(--space-6);  /* :5118 */
+  border-radius: var(--radius-sm);  /* :5118 */
+  overflow: hidden;  /* :5118 */
+  background: var(--surface-2);  /* :5118 */
+}
+
+/* 사진 — 실측 148×104 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.home-news .news-tile-img {
+  display: block;  /* :5127 */
+  width: 100%;  /* :5127 */
+  height: 100%;  /* :5127 */
+  object-fit: cover;  /* :5127 */
+}
+
+/* 윗줄 「갈래 · MM.DD」 — 실측 148×19.4 · 글자 12.5px 600 · 줄 19.375px · 자간 -0.224px · 색 rgb(84, 90, 98) */
+.home-news .news-tile-meta {
+  font-size: var(--t-xs);  /* :5128 */
+  font-weight: 600;  /* :5128 */
+  color: var(--text-sub);  /* :5128 */
+  font-variant-numeric: tabular-nums;  /* :5128 */
+  min-height: 1.4em;  /* :5128 */
+}
+
+/* 제목 두 줄 — 실측 148×38 · 글자 13.5px 600 · 줄 19px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.home-news .news-tile-title {
+  font-size: var(--t-sm);  /* :5129 */
+  font-weight: 600;  /* :5129 */
+  line-height: 19px;  /* :5129 */
+  height: 38px;  /* :5129 */
+  overflow: hidden;  /* :5129 */
+  display: -webkit-box;  /* :5129 */
+  -webkit-line-clamp: 2;  /* :5129 */
+  -webkit-box-orient: vertical;  /* :5129 */
+  word-break: keep-all;  /* :5129 */
+  overflow-wrap: anywhere;  /* :5129 */
+}
+
+/* 요약 한 줄(있을 때만) — 실측 148×37.5 · 글자 12.5px 500 · 줄 18.75px · 자간 -0.224px · 색 rgb(84, 90, 98) */
+.home-news .news-tile-desc {
+  display: -webkit-box;  /* :5181 */
+  -webkit-line-clamp: 2;  /* :5181 */
+  -webkit-box-orient: vertical;  /* :5181 */
+  overflow: hidden;  /* :5181 */
+  font-size: var(--t-xs);  /* :5181 */
+  line-height: 1.5;  /* :5181 */
+  color: var(--text-sub);  /* :5181 */
+  font-weight: 500;  /* :5181 */
+}
+
+/* 상태 규칙 원문 — 누르면 회색 판 없이 제목 글자만 강조색(style.css:5141 주석 「누르면 회색 판이 아니라 글자색이 바뀐다 (개발자가 정한 화면 결정)」) */
+.link-btn:hover { color: var(--accent); }  /* :2384 */
+@media (hover: none) { .link-btn:hover { color: var(--accent); } }  /* :3490 */
+.btn:active, .chip:active, .filter-chip:active, .icon-btn:active, .wallet-btn:active, .sort-btn:active, .link-btn:active, .btn-ghost:active { transform: scale(0.95); }  /* :4366 */
+.news-tile:active .news-tile-title { color: var(--accent); }  /* :5142 */
+.news-tile:focus-visible { outline: none; }  /* :5143 */
+.news-tile:focus-visible .news-tile-photo { outline: 2px solid var(--accent); outline-offset: -2px; }  /* :5145 */
+/* 원문 — 받는 중 뼈대 · 제목 옆 「오늘 n」 */
+.news-tile.is-skel .news-tile-meta, .news-tile.is-skel .news-tile-title { background: var(--surface-2); border-radius: var(--radius-hair); color: transparent; }  /* :5147 */
+.news-tile.is-skel .news-tile-meta { width: 40%; }  /* :5149 */
+.news-today { display: inline-block; vertical-align: middle; margin-left: var(--space-4); padding: 0 var(--sp-2); border-radius: var(--radius-pill); background: var(--red-weak); color: var(--red); font-size: var(--t-2xs); font-weight: 800; line-height: 1.7; }  /* :5186 */
+/* 필터 칩 줄 — 장학금 찾기 #explore-filters(전체 · 교내 · 교외) · 대외활동 분야 칩(작은 칩 · 줄바꿈 · 「+n」 펼치기) | index.html:512-524 · :595-605 · app-activities.js:61-80(renderActivityFieldChips) · style.css:2379 · :4355-4360 · :4366 · 아래 실효값 줄 */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* .filter-row — 실측 390×45.5 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 0 20 4 20 */
+.filter-row {
+  display: flex;  /* :606 */
+  flex-wrap: nowrap;  /* :606 */
+  gap: 6px;  /* :606 */
+  margin-bottom: 16px;  /* :606 */
+  margin-left: calc(var(--space-20) * -1);  /* :606 */
+  margin-right: calc(var(--space-20) * -1);  /* :606 */
+  padding-left: var(--space-20);  /* :606 */
+  padding-right: var(--space-20);  /* :606 */
+  overflow-x: auto;  /* :606 */
+  padding-bottom: 4px;  /* :606 */
+  scrollbar-width: none;  /* :606 */
+}
+
+/* .filter-chip (안 고른 칩) — 실측 48.6×41.5 · 글자 14.5px 550 · 줄 22.475px · 자간 -0.224px · 색 rgb(84, 90, 98) · 바탕 rgb(255, 255, 255) · 안쪽 7.5 10 7.5 10 · 모서리 999px · 선 top/right/bottom/left 2px rgba(18, 22, 31, 0.1) */
+.filter-row .filter-chip {
+  flex: 0 0 auto;  /* :650 */
+  padding: 7.5px 10px;  /* :650 */
+  border-radius: var(--radius-pill);  /* :650 */
+  background: var(--surface);  /* :650 */
+  border: 2px solid rgba(18, 22, 31, 0.10);  /* :650 */
+  font-size: var(--t-md);  /* :650 */
+  color: var(--text-sub);  /* :650 */
+  white-space: nowrap;  /* :650 */
+  font-weight: 550;  /* :2357 */
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform 0.14s var(--ease);  /* :2374 */
+}
+
+/* .filter-chip.active — 안 고른 칩과 다른 것만 — 실측 48.6×41.5 · 글자 14.5px 550 · 줄 22.475px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgb(255, 255, 255) · 안쪽 7.5 10 7.5 10 · 모서리 999px · 선 top/right/bottom/left 2px rgb(39, 80, 143) */
+.filter-row .filter-chip.active {
+  background: var(--surface);  /* :4355 */
+  border-color: var(--accent);  /* :4355 */
+  color: var(--text);  /* :4355 */
+  box-shadow: none;  /* :4355 */
+}
+
+/* 둘째 줄(분야) — 작은 칩 줄 — 실측 390×82.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 8 20 8 20 */
+#activities-field-filters {
+  display: flex;  /* :606 */
+  gap: 6px;  /* :606 */
+  margin-left: calc(var(--space-20) * -1);  /* :606 */
+  margin-right: calc(var(--space-20) * -1);  /* :606 */
+  padding-left: var(--space-20);  /* :606 */
+  padding-right: var(--space-20);  /* :606 */
+  overflow-x: auto;  /* :606 */
+  scrollbar-width: none;  /* :606 */
+  padding-top: var(--space-8);  /* :4909 */
+  padding-bottom: var(--space-8);  /* :4909 */
+  margin-bottom: var(--space-8);  /* :4909 */
+  flex-wrap: wrap;  /* :4919 */
+  row-gap: var(--space-8);  /* :4919 */
+  overflow: visible;  /* :4919 */
+}
+
+/* 작은 칩 — 고른 상태(「분야 전체」)를 잰 값 · 안 고른 작은 칩은 선·글자색만 .filter-chip 기본(:650 · 잉크 10% 선 · --text-sub) — 실측 63.1×29.4 · 글자 12.5px 550 · 줄 19.375px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgb(255, 255, 255) · 안쪽 4 8 4 8 · 모서리 999px · 선 top/right/bottom/left 1px rgb(39, 80, 143) */
+#activities-field-filters .filter-chip {
+  flex: 0 0 auto;  /* :650 */
+  border-radius: var(--radius-pill);  /* :650 */
+  border: 2px solid rgba(18, 22, 31, 0.10);  /* :650 */
+  white-space: nowrap;  /* :650 */
+  font-weight: 550;  /* :2357 */
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform 0.14s var(--ease);  /* :2374 */
+  background: var(--surface);  /* :4355 */
+  border-color: var(--accent);  /* :4355 */
+  color: var(--text);  /* :4355 */
+  box-shadow: none;  /* :4355 */
+  padding: var(--space-4) var(--space-8);  /* :4896 */
+  font-size: var(--t-xs);  /* :4896 */
+  border-width: 1.5px;  /* :4896 */
+  position: relative;  /* :4939 */
+}
+#activities-field-filters .filter-chip::after {
+  content: "";  /* :4940 */
+  position: absolute;  /* :4940 */
+  left: 0;  /* :4940 */
+  right: 0;  /* :4940 */
+  top: 50%;  /* :4940 */
+  height: 44px;  /* :4940 */
+  transform: translateY(-50%);  /* :4940 */
+}
+
+/* 원문 — 고른 칩 · 「+n」 칩 */
+.chip.active, .filter-chip.active { background: var(--surface); border-color: var(--accent); color: var(--text); box-shadow: none; }  /* :4355 */
+#activities-field-filters .field-more { color: var(--accent); border-style: dashed; }  /* :4920 */
+/* 상태 규칙 원문(줄 순) */
+.btn:active, .chip:active, .filter-chip:active, .icon-btn:active, .my-menu-item:active, .wallet-btn:active { transform: scale(0.975); }  /* :2379 */
+.btn:active, .chip:active, .filter-chip:active, .icon-btn:active, .wallet-btn:active, .sort-btn:active, .link-btn:active, .btn-ghost:active { transform: scale(0.95); }  /* :4366 */
+/* 그 밖에 지도 화면에 쓸 것 — 검색 알약 · 빈 상태 · 정렬 팝오버(떠 있음) · 토스트(떠 있음) · 도우미 단추(떠 있음) · MY 메뉴 줄 · ※ 주석 줄 | index.html:507-511(검색) · app-my.js:28(빈 상태) · app.js:1864-1871(openSortMenu) · index.html:891-893(도우미 단추) · :925(토스트) · :645-650(MY 메뉴) · :532(data-note) */
+/* ── 실효값: 390×844 폰에서 브라우저가 이 요소에 실제로 적용한 선언만(겹쳐 진 선언은 뺐다) · 값은 style.css 원문 그대로 · 차례 = 캐스케이드 · 끝 주석 = 이긴 선언이 든 규칙의 첫 줄 · 선택자는 이 부품 뿌리로 범위를 좁혔다 ── */
+/* .search-box (검색 알약) — 실측 350×50.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgb(255, 255, 255) · 안쪽 0 14 0 14 · 모서리 13px · 선 top/right/bottom/left 1px rgba(18, 22, 31, 0.1) */
+.search-box {
+  display: flex;  /* :2251 */
+  align-items: center;  /* :2251 */
+  gap: 9px;  /* :2251 */
+  background: var(--surface);  /* :2251 */
+  border: 1.5px solid rgba(18, 22, 31, 0.10);  /* :2251 */
+  border-radius: var(--radius-sm);  /* :2251 */
+  padding: 0 14px;  /* :2251 */
+  min-height: 46px;  /* :2251 */
+  margin-bottom: 12px;  /* :2251 */
+  transition: border-color 0.15s, box-shadow 0.15s;  /* :2251 */
+}
+
+/* 돋보기 — 실측 18×18 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(136, 142, 151) */
+.search-box svg {
+  width: 18px;  /* :2265 */
+  height: 18px;  /* :2265 */
+  color: var(--text-weak);  /* :2265 */
+  flex: none;  /* :2265 */
+}
+
+/* 입력 — 16px(iOS 확대 방지 기능값) — 실측 293×48.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 12 0 12 0 · 모서리 13px */
+.search-box input {
+  border: 0;  /* :2266 */
+  background: none;  /* :2266 */
+  padding: 12px 0;  /* :2266 */
+  min-height: 44px;  /* :2266 */
+  font-size: var(--t-input);  /* :2266 */
+}
+
+/* .empty (빈 상태 문장 · 가운데) — 실측 350×109.9 · 글자 14.5px 400 · 줄 24.65px · 자간 -0.224px · 색 rgb(84, 90, 98) · 안쪽 30 20 30 20 */
+.empty {
+  text-align: center;  /* :593 */
+  font-size: var(--t-md);  /* :593 */
+  border: 0;  /* :2443 */
+  color: var(--text-sub);  /* :2443 */
+  line-height: 1.7;  /* :2443 */
+  text-wrap: pretty;  /* :2443 */
+  border-radius: 0;  /* :2669 */
+  background: transparent;  /* :2669 */
+  padding: 30px 20px;  /* :2669 */
+  word-break: keep-all;  /* :4186 */
+  overflow-wrap: break-word;  /* :4186 */
+  border-top: 0;  /* :2620 */
+}
+
+/* .empty-sub — 실측 350×21.3 · 글자 12.5px 500 · 줄 21.25px · 자간 -0.224px · 색 rgb(136, 142, 151) */
+.empty .empty-sub {
+  display: block;  /* :4101 */
+  margin-top: var(--space-4);  /* :4101 */
+  font-size: var(--t-xs);  /* :4101 */
+  color: var(--text-weak);  /* :4101 */
+  font-weight: 500;  /* :4101 */
+  word-break: keep-all;  /* :4186 */
+  overflow-wrap: break-word;  /* :4186 */
+}
+
+/* .sort-menu 떠 있는 팝오버 — --shadow-lift — 실측 160×146 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgb(255, 255, 255) · 안쪽 6 6 6 6 · 모서리 13px · box-shadow rgba(24, 35, 56, 0.07) 0px 2px 6px 0px, rgba(24, 35, 56, 0.14) 0px 18px 40px 0px · 선 top/right/bottom/left 1px rgba(23, 25, 28, 0.09) */
+.sort-menu {
+  position: absolute;  /* :2161 */
+  top: calc(100% + 4px);  /* :2161 */
+  right: 0;  /* :2161 */
+  z-index: 40;  /* :2161 */
+  display: flex;  /* :2161 */
+  flex-direction: column;  /* :2161 */
+  box-shadow: var(--shadow-lift);  /* :2161 */
+  background: var(--surface);  /* :2869 */
+  border: 1px solid var(--line);  /* :2869 */
+  border-radius: var(--radius-sm);  /* :2869 */
+  min-width: 160px;  /* :2869 */
+  padding: 6px;  /* :2869 */
+  transform-origin: top right;  /* :2869 */
+  animation: menu-in 0.16s var(--ease) both;  /* :2869 */
+}
+
+/* .sort-opt — 실측 146×44 · 글자 14.5px 700 · 줄 22.475px · 자간 -0.224px · 색 rgb(39, 80, 143) · 바탕 rgba(39, 80, 143, 0.09) · 안쪽 0 12 0 12 · 모서리 13px */
+.sort-menu .sort-opt {
+  display: block;  /* :2167 */
+  width: 100%;  /* :2167 */
+  text-align: left;  /* :2167 */
+  min-height: 44px;  /* :2167 */
+  padding: 0 12px;  /* :2167 */
+  border: 0;  /* :2167 */
+  border-radius: var(--radius-sm);  /* :2167 */
+  font-size: var(--t-md);  /* :2167 */
+  cursor: pointer;  /* :2167 */
+  white-space: nowrap;  /* :2167 */
+  background: var(--accent-soft);  /* :2882 */
+  color: var(--accent);  /* :2882 */
+  font-weight: 700;  /* :2882 */
+}
+
+/* .chat-fab 도우미(대장님) 단추 — 떠 있음 — 실측 56×56 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 모서리 50% · box-shadow rgba(16, 29, 61, 0.34) 0px 6px 18px 0px */
+.chat-fab {
+  position: fixed;  /* :1403 */
+  right: max(16px, calc(50% - 240px + 16px));  /* :1403 */
+  bottom: calc(74px + env(safe-area-inset-bottom));  /* :1403 */
+  width: 56px;  /* :1403 */
+  height: 56px;  /* :1403 */
+  border-radius: 50%;  /* :1403 */
+  background: linear-gradient(150deg, var(--navy-2), var(--navy-1));  /* :1403 */
+  box-shadow: 0 6px 18px rgba(16, 29, 61, 0.34);  /* :1403 */
+  display: flex;  /* :1403 */
+  align-items: center;  /* :1403 */
+  justify-content: center;  /* :1403 */
+  z-index: 55;  /* :1403 */
+  transition: transform 0.16s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.16s;  /* :1403 */
+  touch-action: none;  /* :1403 */
+  -webkit-user-select: none;  /* :1403 */
+  user-select: none;  /* :1403 */
+}
+
+/* .toast — 떠 있음 — 실측 80.8×38.9 · 글자 13.5px 600 · 줄 20.925px · 자간 -0.224px · 색 rgb(255, 255, 255) · 바탕 rgba(16, 22, 38, 0.94) · 안쪽 9 16 9 16 · 모서리 13px · box-shadow rgba(24, 35, 56, 0.07) 0px 2px 6px 0px, rgba(24, 35, 56, 0.14) 0px 18px 40px 0px */
+.toast {
+  position: fixed;  /* :1059 */
+  bottom: 74px;  /* :1059 */
+  left: 50%;  /* :1059 */
+  display: inline-flex;  /* :1059 */
+  align-items: center;  /* :1059 */
+  background: rgba(16, 22, 38, 0.94);  /* :1059 */
+  color: #fff;  /* :1059 */
+  font-size: var(--t-sm);  /* :1059 */
+  font-weight: 600;  /* :1059 */
+  padding: 9px 16px;  /* :1059 */
+  border-radius: var(--radius-sm);  /* :1059 */
+  z-index: 200;  /* :1059 */
+  transition: opacity 0.25s, transform 0.25s;  /* :1059 */
+  max-width: 90%;  /* :1059 */
+  text-align: center;  /* :1059 */
+  box-shadow: var(--shadow-lift);  /* :1059 */
+  opacity: 1;  /* :1082 */
+  transform: translateX(-50%) translateY(0);  /* :1082 */
+}
+
+/* .me-menu (MY 메뉴 묶음) — 실측 350×274.4 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 바탕 rgb(247, 246, 244) · 모서리 27px */
+.me-menu {
+  display: grid;  /* :5201 */
+  background: var(--surface-2);  /* :5201 */
+  border-radius: var(--radius-lg);  /* :5201 */
+  overflow: hidden;  /* :5201 */
+}
+
+/* .me-row — 실측 350×67.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) · 안쪽 12 16 12 20 */
+.me-menu .me-row {
+  display: flex;  /* :5202 */
+  align-items: center;  /* :5202 */
+  gap: var(--space-12);  /* :5202 */
+  width: 100%;  /* :5202 */
+  min-height: 58px;  /* :5202 */
+  padding: var(--space-12) var(--space-16) var(--space-12) var(--space-20);  /* :5202 */
+  background: none;  /* :5202 */
+  border: 0;  /* :5202 */
+  font: inherit;  /* :5202 */
+  color: var(--text);  /* :5202 */
+  text-align: left;  /* :5202 */
+  cursor: pointer;  /* :5202 */
+  -webkit-tap-highlight-color: transparent;  /* :5202 */
+  border-top: 0;  /* :5205 */
+}
+
+/* .me-txt (이름 + 설명 두 줄) — 실측 284×43.8 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.me-menu .me-txt {
+  flex: 1;  /* :5207 */
+  display: grid;  /* :5207 */
+  gap: var(--space-2);  /* :5207 */
+  min-width: 0;  /* :5207 */
+}
+
+/* 줄 이름 — 실측 284×22.5 · 글자 14.5px 700 · 줄 22.475px · 자간 -0.224px · 색 rgb(23, 25, 28) */
+.me-menu .me-txt b {
+  font-size: var(--t-md);  /* :5208 */
+  font-weight: 700;  /* :5208 */
+}
+
+/* 줄 설명 — 실측 284×19.4 · 글자 12.5px 400 · 줄 19.375px · 자간 -0.224px · 색 rgb(84, 90, 98) */
+.me-menu .me-txt small {
+  font-size: var(--t-xs);  /* :5209 */
+  color: var(--text-sub);  /* :5209 */
+  overflow: hidden;  /* :5209 */
+  text-overflow: ellipsis;  /* :5209 */
+  white-space: nowrap;  /* :5209 */
+}
+
+/* › 아이콘 — 실측 18×18 · 글자 16px 400 · 줄 24.8px · 자간 -0.224px · 색 rgb(136, 142, 151) */
+.me-menu .me-go {
+  width: 18px;  /* :5210 */
+  height: 18px;  /* :5210 */
+  flex: none;  /* :5210 */
+  color: var(--text-weak);  /* :5210 */
+}
+
+/* .data-note (목록 아래 ※ 한 줄) — 실측 334×63.8 · 글자 12.5px 400 · 줄 21.25px · 자간 -0.224px · 색 rgb(136, 142, 151) */
+.data-note {
+  text-wrap: pretty;  /* :2351 */
+  font-size: var(--t-xs);  /* :669 */
+  color: var(--text-weak);  /* :669 */
+  margin: 26px 8px 8px;  /* :669 */
+  line-height: 1.7;  /* :669 */
+  text-align: left;  /* :2668 */
+  margin-top: var(--sp-3);  /* :3055 */
+}
+
+/* 상태 규칙 원문 — MY 줄은 누르면 굵은 글자만 강조색 */
+.sort-opt:hover { background: rgba(18, 22, 31, .05); }  /* :2173 */
+.search-box:focus-within { border-color: var(--primary); box-shadow: var(--ring); }  /* :2261 */
+.search-box input:focus { border: 0; box-shadow: none; }  /* :2272 */
+.search-clear:active { background: rgba(18, 22, 31, 0.06); }  /* :2284 */
+.sort-opt:hover { background: var(--surface-2); }  /* :2881 */
+@media (hover: none) { .sort-opt:hover { background: transparent; } }  /* :3492 */
+.me-row:active .me-txt b { color: var(--accent); }  /* :5206 */

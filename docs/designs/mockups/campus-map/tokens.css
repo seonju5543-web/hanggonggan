@@ -1,0 +1,103 @@
+/* 한대장 :root 실효값 사본 (2026-11-22 · style.css 를 폰에서 읽은 값) — 시안 전용. 앱의 원본은 style.css */
+/* (원 설명) 한대장 style.css :root 실효값 — 2026-11-22 저장소 그대로를 390×844 폰(Chromium 153 · Pretendard 실림)에서 getComputedStyle 로 읽은 값.
+   style.css 에는 :root 블록이 11개 겹쳐 있어 마지막 선언이 이긴다 — 줄 끝 주석 = 이긴 선언의 줄.
+   ⚠️ DESIGN.md 상단 표나 승인 시안 HTML(card-consistency.html 등) 머리의 :root 값은 옛 값이 섞여 있다(예 --bg #f6f4f0 · --accent #8a6a1f) — 이 블록을 쓴다.
+   다크 모드 없음 — 밝은 한 벌(DESIGN.md:634 · :573). --cutout 은 원문 var(--bg) 가 풀린 값. */
+:root {
+  /* 바탕 · 면 · 글자 · 선 */
+  --bg: #fefdfc;  /* style.css:3182 */
+  --surface: #ffffff;  /* style.css:2947 */
+  --surface-2: #f7f6f4;  /* style.css:3183 */
+  --text: #17191c;  /* style.css:2950 */
+  --text-sub: #545a62;  /* style.css:2951 */
+  --text-weak: #888e97;  /* style.css:2952 */
+  --line: rgba(23, 25, 28, 0.09);  /* style.css:2953 */
+  --rule: rgba(23, 25, 28, 0.14);  /* style.css:2954 */
+  /* 동작(주 버튼·아바타 = 남색 잉크) · 강조(유일한 유채색 잉크블루) · 포커스 링 */
+  --primary: #1e2b42;  /* style.css:2801 */
+  --primary-dark: #131c2c;  /* style.css:2802 */
+  --primary-weak: rgba(23, 25, 28, 0.055);  /* style.css:2962 */
+  --accent: #27508f;  /* style.css:2516 */
+  --accent-soft: rgba(39, 80, 143, 0.09);  /* style.css:2517 */
+  --accent-line: rgba(39, 80, 143, 0.24);  /* style.css:2518 */
+  --ring: 0 0 0 2px #27508f;  /* style.css:4349 */
+  /* 뜻을 가진 색(빨강 = 마감 임박·검수 전 / 초록 = 선정·충족) · 활동 갈래 칩 보라 · 그림 안의 금색 · 남색 판 */
+  --gold: #b8912f;  /* style.css:37 */
+  --gold-soft: #d9b56a;  /* style.css:38 */
+  --green: #3d6b47;  /* style.css:41 */
+  --green-weak: #e9efe8;  /* style.css:41 */
+  --orange: #8f3a2e;  /* style.css:4277 */
+  --orange-weak: #f5e9e6;  /* style.css:4278 */
+  --purple: #6247d6;  /* style.css:43 */
+  --purple-weak: #f0ecfd;  /* style.css:43 */
+  --red: #8f3a2e;  /* style.css:44 */
+  --red-weak: #f5e9e6;  /* style.css:44 */
+  --navy-1: #182338;  /* style.css:2804 */
+  --navy-2: #2b3a55;  /* style.css:2805 */
+  /* 어두운 판 그라데이션(이 앱의 유일한 그라데이션 토큰 · 지금 홈 히어로는 흰 바탕이라 화면에서 거의 안 쓴다) */
+  --grad-navy: radial-gradient(120% 130% at 78% -18%, rgba(104, 148, 216, 0.30) 0%, rgba(104, 148, 216, 0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 60%), #182338;  /* style.css:2796 */
+  /* 모서리 — 고르는 것은 pill, 누르는 것은 13px(--radius-sm), 시트 윗모서리 27px */
+  --radius-hair: 3px;  /* style.css:55 */
+  --radius-xs: 9px;  /* style.css:56 */
+  --radius-sm: 13px;  /* style.css:57 */
+  --radius: 19px;  /* style.css:58 */
+  --radius-lg: 27px;  /* style.css:59 */
+  --radius-pill: 999px;  /* style.css:60 */
+  /* 그림자 — 닫힌 목록(새 값을 만들지 않는다 · ui-tone 관문) · 떠 있는 것에만 */
+  --shadow: 0 1px 2px rgba(24, 35, 56, 0.05), 0 8px 22px rgba(24, 35, 56, 0.07);  /* style.css:2957 */
+  --shadow-btn: 0 6px 18px rgba(35, 32, 26, 0.22);  /* style.css:73 */
+  --shadow-btn-hover: 0 8px 24px rgba(35, 32, 26, 0.28);  /* style.css:74 */
+  --shadow-btn-white: 0 10px 26px rgba(20, 16, 8, 0.32);  /* style.css:75 */
+  --shadow-chip: 0 4px 14px rgba(39, 80, 143, 0.26);  /* style.css:2958 */
+  --shadow-lift: 0 2px 6px rgba(24, 35, 56, 0.07), 0 18px 40px rgba(24, 35, 56, 0.14);  /* style.css:2959 */
+  --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);  /* style.css:2960 */
+  --cutout: 0 0 0 2px #fefdfc;  /* style.css:80 */
+  --knob: 0 1px 3px rgba(24, 35, 56, 0.26);  /* style.css:2961 */
+  /* 서체 — Pretendard 한 벌(제목도 같은 글꼴 · 굵기·자간으로만 구분) */
+  --font-text: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;  /* style.css:137 */
+  --font-display: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;  /* style.css:139 */
+  /* 글자 크기 9단(새 크기 금지) + 기능값(입력 16px · 시작 화면 32px) */
+  --t-2xs: 11.5px;  /* style.css:93 */
+  --t-xs: 12.5px;  /* style.css:94 */
+  --t-sm: 13.5px;  /* style.css:95 */
+  --t-md: 14.5px;  /* style.css:96 */
+  --t-lg: 17px;  /* style.css:97 */
+  --t-xl: 18.5px;  /* style.css:98 */
+  --t-2xl: 21px;  /* style.css:99 */
+  --t-3xl: 27px;  /* style.css:100 */
+  --t-hero: 38px;  /* style.css:101 */
+  --t-input: 16px;  /* style.css:106 */
+  --t-start: 32px;  /* style.css:4995 */
+  /* 자간 — 큰 글자만 좁힌다 · 한글에 양수 자간 금지 */
+  --track-display: -0.03em;  /* style.css:3430 */
+  --track-text: -0.01em;  /* style.css:111 */
+  --track-flat: 0;  /* style.css:112 */
+  --track: -0.014em;  /* style.css:3429 */
+  /* 여백 — 4px 격자 · 세로 리듬 넷(8 · 14 · 24 · 34) */
+  --space-2: 2px;  /* style.css:3000 */
+  --space-4: 4px;  /* style.css:3000 */
+  --space-6: 6px;  /* style.css:3000 */
+  --space-8: 8px;  /* style.css:3000 */
+  --space-12: 12px;  /* style.css:3001 */
+  --space-16: 16px;  /* style.css:3001 */
+  --space-20: 20px;  /* style.css:3001 */
+  --space-24: 24px;  /* style.css:3001 */
+  --space-32: 32px;  /* style.css:3002 */
+  --space-40: 40px;  /* style.css:3002 */
+  --sp-1: 8px;  /* style.css:3006 */
+  --sp-2: 14px;  /* style.css:3007 */
+  --sp-3: 24px;  /* style.css:3008 */
+  --sp-4: 34px;  /* style.css:3009 */
+  /* 움직임 — 곡선 하나 · 길이 둘 */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);  /* style.css:115 */
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.44, 1);  /* style.css:116 */
+  --dur: 0.22s;  /* style.css:117 */
+  --dur-slow: 0.42s;  /* style.css:118 */
+  /* 시작 화면(정문 투어링) 전용 */
+  --start-base: #0f1522;  /* style.css:4991 */
+  --start-ink: #fdfbf6;  /* style.css:4992 */
+  --start-band: 18, 26, 43;  /* style.css:4993 */
+  --start-dur: 2500ms;  /* style.css:4994 */
+  /* 그 밖 */
+  --ffpt: 1px;  /* style.css:107 */
+}

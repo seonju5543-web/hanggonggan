@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>학교 주변 지도 — 눌러 보는 시안</title>
+<!-- 2026-11-24 · 눌러 보는 시안(3판). 그림 시안 index.html 의 화면을 폰 한 대 안에서 이어 붙였다 — 화면 모양은 아래 <template>(index.html 에서 그대로 옮긴 생성본 · 손으로 고치지 말 것),
+     움직임은 play.js. 지도 그림은 오픈스트리트맵 서버에서 받는다(인터넷 필요). 앱 화면은 바뀌지 않았다. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app-parts.css">
+<link rel="stylesheet" href="campus-map.css">
+<link rel="stylesheet" href="play.css">
+</head>
+<body class="play">
+<div class="play-wrap">
+  <aside class="play-side">
+    <p class="kicker">한대장 · 눌러 보는 시안 · 3판</p>
+    <h1>학교 주변 지도</h1>
+    <p>오른쪽 폰 화면을 실제 앱처럼 눌러 보세요. 시범 학교는 <b>서울과학기술대학교</b>입니다.</p>
+    <ul>
+      <li>홈 「우리 학교 주변」 세 줄</li>
+      <li>주제 칩 여덟 개</li>
+      <li>핀 · 목록 줄 → 장소</li>
+      <li>의견 남기기 · 빠진 곳 제안하기</li>
+      <li>대학가 한눈에 → 구역</li>
+    </ul>
+    <p class="now">지금 화면: <b id="where"></b></p>
+    <div class="side-btns"><button type="button" data-reset>처음부터</button><a href="index.html">설명 붙은 그림 시안</a></div>
+  </aside>
+  <main id="app" class="phone-screen" aria-label="눌러 보는 시안"></main>
+</div>
+<template id="tpl-s1">
+        <div class="app-scroll" style="padding-top:18px">
+          <section class="home-news" aria-label="우리 학교 소식" style="margin-top:0"><div class="section-head home-news-head"><h3>우리 학교 소식</h3><button type="button" class="link-btn home-news-all">전체 보기</button></div><div class="news-strip"><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898049&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+  <span class="news-tile-photo"><img class="news-tile-img" src="img/school.webp" alt="" width="148" height="104" style="object-position:55% 62%"></span>
+  <span class="news-tile-meta">11.20</span>
+  <span class="news-tile-title">[마지막 기회] Microsoft AI-901 자격증 과정 특별 추가 모집</span>
+  <span class="news-tile-desc">전남대학교 인공지능혁신융합대학사업단에서 Microsoft 인공지능 국제인증자격증(AI-901) 교육과정 교육생을 아래와 같이 추가 모집 하오니 관심 있는 학생들의 많은 참여 바랍니다.</span>
+</a><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898047&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+  <span class="news-tile-photo"><img class="news-tile-img" src="img/news-dorm.webp" alt="" width="148" height="104"></span>
+  <span class="news-tile-meta">생활 · 11.20</span>
+  <span class="news-tile-title">2026학년도 동계방학 생활관생 모집 안내 (신청</span>
+  <span class="news-tile-desc">2026학년도 동계방학 생활관생 모집을 안내하오니, 자세한 내용은 [생활관 홈페이지-공지사항] 을 참고하시기 바랍니다. ☞ 생활관 홈페이지 공지사항: https://tinyurl.com/4m8x4z37</span>
+</a><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898006&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+  <span class="news-tile-photo"><img class="news-tile-img" src="img/school.webp" alt="" width="148" height="104" style="object-position:55% 62%"></span>
+  <span class="news-tile-meta">11.20</span>
+  <span class="news-tile-title">[서울지방병무청] 각 군 현역병 모집일정('26년 12월) 안내</span>
+  <span class="news-tile-desc">병무청에서는 병역의무자의 전공, 자격·면허, 경력 등과 관련있는 군사특기에 지원하여 해당분야에서 복무할 수 있도록 하는 현역병 모집제도를 운영하고 있습니다.</span>
+</a></div></section>
+
+          <section class="home-near" aria-label="우리 학교 주변">
+            <div class="home-sec-head"><h3>우리 학교 주변</h3><span class="updated">11.22 갱신</span></div>
+            <ul class="near-rows">
+              <li><span class="thumb"><span class="m-map" data-map='{"center":[37.6312,127.0778],"zoom":14.25,"static":true,"gate":false,"layers":["study","campus"],"cats":{"study":["cafe"],"campus":["cafe"]},"maxDist":500,"pins":[]}'></span></span><span class="nt"><b>주변 지도</b><small>카공 · 밥집 · 술집·과팅 · 생활 · 안전 · 복지·혜택</small></span><span class="go" data-go></span></li>
+              <li><span class="ni" data-icon="route"></span><span class="nt"><b>신입생 첫 주 코스</b><small>다섯 곳 중 2곳 다녀옴</small></span><span class="go" data-go></span></li>
+              <li><span class="ni" data-icon="pin"></span><span class="nt"><b>대학가 한눈에</b><small>철길 · 공릉역 · 노원역까지 구역 <span data-town-count="zones"></span>곳</small></span><span class="go" data-go></span></li>
+            </ul>
+          </section>
+
+          <section class="home-after">
+            <div class="home-sec-head"><h3>나에게 맞는 장학금</h3><button class="link-btn">전체 보기</button></div>
+            <div class="card-list" style="margin:0 -20px">
+<div class="sch-card-wrap has-link">
+<button class="save-btn" aria-pressed="false" aria-label="공고 저장"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h12a1 1 0 0 1 1 1v16.2a.8.8 0 0 1-1.25.66L12 17.3l-5.75 3.56A.8.8 0 0 1 5 20.2V4a1 1 0 0 1 1-1z"></path></svg></button><a class="card-src-link" href="#" title="원문 공고 ↗">원문 공고 ↗</a>
+<button class="sch-card">
+  <div class="sch-top"><span class="badge badge-kind badge-out">장학 · 교외</span><span class="sch-fit fit-blue">적합도 95%</span></div>
+  <p class="sch-name">(재)한국장학재단 국가근로장학금</p>
+  <div class="sch-foot"><span class="sch-amount unknown"></span><span class="sch-due">D-98</span></div>
+</button>
+</div>
+            </div>
+          </section>
+        </div>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s2" data-map-top="138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="학교 안"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.63245,127.07905],"zoom":15.75,"offset":[0,135],"layers":["campus"],"cats":{"campus":["building","student_center","facility","dormitory","construction"]},"pins":["w381113087","w470633638","w382499348","w382499358","w382499365"],"labels":["w382499365","w382499358","w382499348","w381113087","w470633638"],"labelLeft":["w382499365"]}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="p-head"><p class="p-sum">먼저 알아 둘 곳 · 거리는 정문에서</p><button class="link-btn">목록 보기 ›</button></div>
+          <ul class="place-list">
+            <li><span class="pi" data-icon="library"></span><span class="pt"><b>도서관/정보전산원</b><small>도서관 별관 옆</small></span><span class="pd">320m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="student_center"></span><span class="pt"><b>제2학생회관</b><small>장학복지팀 201호 · 학생 제2 식당 · 보건진료소</small></span><span class="pd">240m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="student_center"></span><span class="pt"><b>제1학생회관</b><small>학생 제1식당 · 생협 카페 · CU</small></span><span class="pd">450m</span><span class="go" data-go></span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s3" data-map-top="138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="카공"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.6332,127.0772],"zoom":15.5,"offset":[0,150],"layers":["study","campus"],"cats":{"study":["cafe"],"campus":["cafe"]},"maxDist":900,"pins":["t-p011","t-p009","t-p005"],"labels":["t-p005","t-p009","t-p011"],"labelLeft":["t-p005","t-p009"],"rename":{"t-p005":"별관도서관 와글와글","t-p009":"성림학사 글로벌 라운지"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="p-head"><p class="p-sum">학보·리뷰에 나온 카공 자리 <b data-town-count="카공"></b>곳</p><button class="link-btn">목록 보기 ›</button></div>
+          <ul class="place-list">
+            <li class="q2"><span class="pi" data-icon="카공"></span><span class="pt"><b>별관도서관 와글와글</b><small><i>학보</i> 「와글와글은 예약 없이 자유롭게 사용할 수 있어…」</small></span><span class="pd">400m</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pi" data-icon="카공"></span><span class="pt"><b>아너카페</b><small><i>학보</i> 「이미 많은 학생에게 알려진 아너카페에 공부하러 자주 방문했다」</small></span><span class="pd">철길 쪽</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pi" data-icon="카공"></span><span class="pt"><b>성림학사 글로벌 라운지</b><small><i>학보</i> 「카페 이용 여부와 관계없이 모든 재학생이 이용 가능하다」</small></span><span class="pd">590m</span><span class="go" data-go></span></li>
+            <li class="suggest"><span class="pi" data-icon="plus"></span><span class="pt"><b>빠진 곳 제안하기</b></span><span class="go" data-go></span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s4" data-map-top="138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="카공"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.63374,127.07655],"zoom":16.5,"offset":[0,300],"layers":[],"pins":["t-p005"],"focus":"t-p005","labelLeft":["t-p005"],"rename":{"t-p005":"별관도서관 와글와글"},"gate":false}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel sheet tall">
+          <div class="sheet-handle"></div>
+          <div class="sch-top sheet-top" style="padding-right:0"><span class="badge badge-kind">카공</span></div>
+          <h3 class="sheet-title">별관도서관 와글와글</h3>
+          <p class="place-where">도서관 별관 · 정문에서 400m</p>
+          <section class="sheet-sec"><h4>재학생 의견</h4>
+            <p class="empty-line">아직 의견이 없어요</p>
+            <button class="btn-ghost btn-wide">의견 남기기</button>
+          </section>
+          <section class="sheet-sec"><h4>학보·리뷰에서</h4>
+            <a class="quote-row" href="https://times.seoultech.ac.kr/reports/?idx=22267" target="_blank" rel="noopener">「와글와글은 예약 없이 자유롭게 사용할 수 있어…」<small><b>서울과기대신문 ↗</b> · 2026.03.09</small></a>
+          </section>
+          <section class="sheet-sec"><h4>교내 소식</h4>
+            <a class="news-row" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=897342&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+              <span><b>도서관 첫 대출자를 찾습니다~ 이벤트 안내 (50명에게 문화상품권 2만원권 추첨 증정, ~11/30)</b><small><b>원문 보기 ↗</b> · 11.02</small></span>
+              <img src="img/news-library.webp" alt="" width="72" height="72">
+            </a>
+          </section>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s5" data-map-top="138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="술집·과팅"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.6287,127.0768],"zoom":16,"offset":[0,150],"layers":[],"bars":true,"maxDist":700,"pins":[]}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="p-head"><p class="p-sum">학보·리뷰에 나온 술집 <b data-town-count="술집"></b>곳</p><button class="link-btn">목록 보기 ›</button></div>
+          <ul class="place-list">
+            <li class="q2"><span class="pi" data-icon="술집"></span><span class="pt"><b>여기,꼬치네</b><small><i>학보</i> 「손님들의 90% 이상이 과기대 학생들이고…」</small></span><span class="pd">철길 쪽</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pi" data-icon="술집"></span><span class="pt"><b>동학</b><small><i>리뷰</i> 「과기대 인근 퓨전민속주점.」</small></span><span class="pd">정문 앞</span><span class="go" data-go></span></li>
+          </ul>
+          <p class="p-group" style="margin-top:12px">과팅 장소</p>
+          <p class="empty-line">추천된 곳이 아직 없어요</p>
+          <ul class="place-list"><li class="suggest"><span class="pi" data-icon="plus"></span><span class="pt"><b>빠진 곳 제안하기</b></span><span class="go" data-go></span></li></ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s6" data-map-top="138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="안전"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.6305,127.0762],"zoom":14.5,"offset":[0,150],"layers":[],"rings":[500,1000],"ringLabels":["반경 500m","1km"],"pins":["n6046633874","w576229279","pd-bell-w199637113","n368602233","n368602672"],"labels":["n368602672","n368602233","pd-bell-w199637113","n6046633874","w576229279"],"labelLeft":["n6046633874","pd-bell-w199637113"],"rename":{"pd-bell-w199637113":"공릉터널 비상벨","n6046633874":"공릉역"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="call-row" style="margin-top:0"><a class="call-btn" href="tel:112">112 경찰</a><a class="call-btn" href="tel:119">119 소방·구급</a></div>
+          <p class="p-group" style="margin-top:12px">가까운 곳 · 거리는 정문에서</p>
+          <ul class="place-list compact">
+            <li><span class="pi" data-icon="emergency_bell"></span><span class="pt"><b>공릉터널 보행로 안전비상벨</b><small>경찰 연계 · 경고등·경보음·CCTV</small></span><span class="pd">730m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="police"></span><span class="pt"><b>공릉치안센터</b></span><span class="pd">430m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="police"></span><span class="pt"><b>하계1치안센터</b></span><span class="pd">520m</span><span class="go" data-go></span></li>
+          </ul>
+          <p class="plan-slot"><span class="plan-tag">시안 메모</span>여기에 안심귀갓길 길 선과 골목 CCTV·비상벨이 들어옵니다(공개 자료 연결 뒤).</p>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s7" data-map-top="168px">
+        <div class="ms-top" style="padding-bottom:10px">
+          <header class="sub-header" style="margin-bottom:4px"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>서류 떼는 곳</h2></header>
+          <div class="doc-ctx">
+            <p class="doc-ctx-t"><b>(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내</b><span class="due">D-1</span></p>
+            <p class="doc-ctx-q"><span class="lbl">서류</span>장학금 지급신청서 · 기초생활수급자 또는 차상위계층 증명서 · 재학증명서 · 성적증명서 · 생활기록부 · <strong>주민등록초본</strong> · 통장사본</p>
+            <p class="doc-ctx-h">굵은 서류는 아래에서 뗄 수 있어요</p>
+          </div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.63065,127.0764],"zoom":14.5,"offset":[0,175],"layers":[],"pins":["pd-kiosk-405-w570198783","pd-kiosk-401-w579134079","pd-kiosk-103-w258026356","pd-kiosk-410-r5689751"],"labels":["pd-kiosk-410-r5689751","pd-kiosk-103-w258026356","pd-kiosk-405-w570198783","pd-kiosk-401-w579134079"],"labelLeft":["pd-kiosk-103-w258026356","pd-kiosk-410-r5689751","pd-kiosk-401-w579134079"],"rename":{"pd-kiosk-410-r5689751":"원자력병원","pd-kiosk-103-w258026356":"공릉1동주민센터","pd-kiosk-401-w579134079":"노원문화원","pd-kiosk-405-w570198783":"을지병원"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <p class="p-group">주민등록초본 · 인터넷</p>
+          <ul class="place-list compact">
+            <li><span class="pi" data-icon="docs"></span><span class="pt"><b>정부24</b><small>본인 것은 인터넷 무료</small></span><span class="pd">↗</span></li>
+          </ul>
+          <p class="p-group">무인민원발급기 · 정문 반경 1km 안 4곳</p>
+          <ul class="place-list compact">
+            <li><span class="pi" data-icon="civil_kiosk"></span><span class="pt"><b>원자력병원</b><small>24시간</small></span><span class="pd">560m</span></li>
+            <li><span class="pi" data-icon="civil_kiosk"></span><span class="pt"><b>공릉1동주민센터</b><small>평일 09:00–18:00 · 주말·공휴일 휴무</small></span><span class="pd">620m</span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="explore" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s8" data-map-top="100px">
+        <div class="ms-top">
+          <header class="sub-header" style="margin-bottom:2px"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>첫 주 코스</h2></header>
+          <p class="ms-sub" style="margin:0 0 4px 32px">다섯 곳 중 2곳 다녀옴</p>
+        </div>
+        <div class="m-map" data-map='{"center":[37.62993,127.07506],"zoom":15,"offset":[28,165],"gate":false,"layers":[],"route":["n6046633874","n5547152189","w382499348","w382499365","w382499358"],"numbered":{"n6046633874":1,"n5547152189":2,"w382499348":3,"w382499365":4,"w382499358":5},"done":["n6046633874","n5547152189"],"pins":["w382499358","w382499365","w382499348","n5547152189","n6046633874"],"labels":["w382499348","w382499365","w382499358","n6046633874"],"labelLeft":["w382499365","w382499358","n6046633874"],"rename":{"n6046633874":"공릉역"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <ul class="check-list">
+            <li class="checked"><span class="num">1</span><span class="pt"><b>공릉역(서울과학기술대)</b><small>지하철역 · 정문에서 600m</small></span><span class="ck"></span></li>
+            <li class="checked"><span class="num">2</span><span class="pt"><b>서울과학기술대학교정문앞</b><small>노원03 정류장</small></span><span class="ck"></span></li>
+            <li><span class="num">3</span><span class="pt"><b>제2학생회관</b><small>장학복지팀 201호 · 학생 제2 식당 · 보건진료소</small></span><span class="ck"></span></li>
+            <li><span class="num">4</span><span class="pt"><b>도서관/정보전산원</b><small>도서관 별관 옆</small></span><span class="ck"></span></li>
+            <li><span class="num">5</span><span class="pt"><b>제1학생회관</b><small>학생 제1식당 · 생협 카페 · CU</small></span><span class="ck"></span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s9" data-map-top="100px">
+        <div class="ms-top">
+          <header data-subhead="대학가 한눈에" style="margin-bottom:2px"></header>
+          <p class="ms-sub" style="margin:0 0 4px 32px">구역 <span data-town-count="zones"></span>곳 · 가장 먼 곳 노원역 3.1km</p>
+        </div>
+        <div class="m-map" data-map='{"center":[37.6347,127.0722],"zoom":13,"offset":[0,144],"layers":[],"zones":"all","zoneFocus":["z-rail","z-hyeopdong","z-nowon"],"zoneLabelIds":["z-rail","z-gongneung","z-hyeopdong","z-hagye","z-taereung","z-hwarang","z-seokgye","z-nowon"],"zoneLabelSide":{"z-rail":"right","z-gongneung":"left","z-hyeopdong":"right","z-hagye":"left","z-taereung":"below","z-hwarang":"right","z-seokgye":"left","z-nowon":"right"},"gate":false,"pins":[]}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="p-head"><p class="p-sum">학생들이 부르는 구역</p><button class="link-btn">목록 보기 ›</button></div>
+          <ul class="place-list">
+            <li class="q2"><span class="pt"><b>철길</b><small><i>학보</i> 「경춘선숲길은 인근 자취생들에게 흔히 ‘철길’이라고 불리며…」</small></span><span class="pd">240m</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pt"><b>협동문 쪽</b><small><i>학보</i> 「하계역 및 인근 원룸 밀집 지역과 학교를 연결하는 주요 통학로다」</small></span><span class="pd">700m</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pt"><b>노원역</b><small><i>학보</i> 「더숲 아트시네마는 우리대학과 접근성이 좋은 7호선 노원역 인근에 위치해 있다」</small></span><span class="pd">3.1km</span><span class="go" data-go></span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </template>
+<template id="tpl-s10">
+        <div class="app-scroll form-screen">
+          <header data-subhead="장소 제안"></header>
+          <p class="verify-line"><span data-icon="check" data-size="14"></span>서울과학기술대학교 재학생으로 확인됐어요</p>
+          <label class="f-label">장소 이름</label>
+          <div class="f-input ph">가게·장소 이름</div>
+          <label class="f-label">주제</label>
+          <div class="pick-chips"><span class="chip">카공</span><span class="chip">밥집</span><span class="chip">카페</span><span class="chip">술집</span><span class="chip active">과팅</span><span class="chip">놀거리</span><span class="chip">생활</span><span class="chip">복지·혜택</span></div>
+          <label class="f-label">어디쯤</label>
+          <div class="pick-chips small"><span class="chip">정문 앞</span><span class="chip">철길</span><span class="chip">공릉역</span><span class="chip">도깨비시장</span><span class="chip">협동문</span><span class="chip">하계역</span><span class="chip">태릉입구</span><span class="chip">화랑대</span><span class="chip">석계역</span><span class="chip">노원역</span><span class="chip">학교 안</span></div>
+          <label class="f-label">한마디 (선택)</label>
+          <div class="f-input ph">왜 좋은지 한 줄</div>
+          <button class="btn btn-primary btn-lg" style="margin-top:20px">제안 보내기</button>
+          <p class="f-note">운영자가 확인한 뒤 지도에 실려요.</p>
+        </div>
+      </template>
+<template id="tpl-s11" data-map-top="138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="카공"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.63374,127.07655],"zoom":16.5,"offset":[0,300],"layers":[],"pins":["t-p005"],"focus":"t-p005","gate":false}'></div>
+        <div class="sheet-backdrop show"></div>
+        <section class="ms-panel sheet over">
+          <div class="sheet-handle"></div>
+          <h3 class="sheet-title" style="margin-top:4px">별관도서관 와글와글</h3>
+          <label class="f-label" style="margin-top:14px">어땠나요? (여러 개 고를 수 있어요)</label>
+          <div class="pick-chips multi"><span class="chip active">콘센트 많아요</span><span class="chip">조용해요</span><span class="chip active">대화해도 돼요</span><span class="chip">자리 넉넉해요</span><span class="chip">늦게까지 해요</span><span class="chip">오래 있어도 돼요</span></div>
+          <label class="f-label">한 줄 의견 (선택)</label>
+          <div class="f-input ph">다른 학생에게 알려 주고 싶은 것</div>
+          <button class="btn btn-primary btn-lg" style="margin-top:20px">의견 보내기</button>
+          <a class="sheet-link" href="#">틀린 정보 알리기 ›</a>
+        </section>
+      </template>
+<script src="vendor/leaflet.js"></script>
+<script src="icons.js"></script>
+<script src="data.js"></script>
+<script src="town.js"></script>
+<script src="map-mock.js"></script>
+<script src="play.js"></script>
+</body>
+</html>

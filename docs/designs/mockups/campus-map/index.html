@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>학교 주변 지도 시안</title>
+<!-- 2026-11-23 · 3판(검토 반영). 개발자 결정(전부 추천안 A · 술집·과팅 넣음 · 동네는 대학가 구역 · 재학생 제안·리뷰 · 최초 지도는 커뮤니티 리서치)을 반영.
+     시범 학교 = 서울과학기술대학교. 지도 위 장소는 공개 지도(OpenStreetMap)·서울시 공개 자료, 학생들의 말은 학보 등에서 글자 그대로(town.js).
+     못 구한 것은 노란 「시안 메모」 또는 빈 상태 그대로. 앱 부품 모양은 app-parts.css(앱 실효값 사본). 지도 프로그램은 vendor/leaflet.js(저장소 사본). -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app-parts.css">
+<link rel="stylesheet" href="campus-map.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc-head">
+    <p class="kicker">한대장 · 시안 3판 · 2026-11-23</p>
+    <h1>학교 주변 지도 — 재학생이 채우는 대학가 지도</h1>
+    <p class="lead">
+      시범 학교 <b>서울과학기술대학교</b>. 11-23 결정을 반영했습니다 — <b>술집·과팅 주제 추가</b>, 동네를 행정동 대신 <b>대학가 구역</b>으로, <b>재학생이 장소를 제안하고 의견을 남기는 화면</b>, 그리고 <b>리서치로 채운 최초 지도</b>.
+      먼저 말씀드릴 것 — <b>에브리타임은 로그인 뒤에만 글이 보여 읽지 못했습니다.</b> 그래서 화면에 실린 학생들의 말은 <b>대부분 학보 「서울과기대신문」 기사</b>의 구절입니다(재학생 기자가 쓴 글 · 요약 없이 글자 그대로 · 출처를 다시 열어 대조).
+      못 찾은 것(과팅 장소)은 비어 있다고 그대로 보여 주고, 그 자리는 재학생 제안으로 채웁니다. 무엇을 읽고 못 읽었는지는 아래 「리서치 결과」에 있습니다.
+    </p>
+    <p class="lead" style="margin-top:10px"><a href="play.html" style="font-weight:700;color:var(--accent)">눌러 보는 시안 열기 ›</a> — 같은 화면을 폰 한 대 안에서 실제 앱처럼 눌러 볼 수 있습니다.</p>
+    <div class="legend" aria-label="지도 읽는 법">
+      <span><i class="lg-pin" data-icon="library" data-size="13"></i>핀 — 위치를 확인한 곳(그림으로 종류)</span>
+      <span><i class="lg-sel"></i>테두리 — 지금 고른 곳</span>
+      <span><i class="lg-dot"></i>회색 점 — 같은 주제의 나머지 곳(이름·위치만)</span>
+      <span><i class="lg-plan"></i>노란 메모 — 시안 메모(실제 앱엔 없음)</span>
+    </div>
+  </header>
+
+  <h2 class="sec-title">화면 열한 장</h2>
+  <p class="sec-lead">①~② 들어가는 길과 학교 안 · ③~⑤ 리서치로 채운 주제(카공 · 장소 시트 · 술집·과팅) · ⑥~⑧ 안전 · 서류 · 첫 주 코스(2판 그대로) · ⑨ 대학가 구역 · ⑩~⑪ 재학생 제안과 의견. 「밥집」「생활」「교통」「복지·혜택」 지도는 ③과 모양이 같아 그림을 생략했습니다.</p>
+
+  <div class="phones">
+    <!-- ① 홈 — 「우리 학교 주변」 세 줄 -->
+    <section class="phone" id="s1">
+      <div class="phone-cap"><span class="no">1</span><b>홈 — 「우리 학교 주변」</b></div>
+      <p class="phone-cap why">소식 띠 아래에 입구 줄만 둡니다(지도는 작은 그림 하나). 장학금 목록을 덜 밀어내고, 하단 탭은 5칸이 꽉 차 새 탭을 만들지 않았습니다.</p>
+      <div class="phone-screen">
+        <div class="app-scroll" style="padding-top:18px">
+          <section class="home-news" aria-label="우리 학교 소식" style="margin-top:0"><div class="section-head home-news-head"><h3>우리 학교 소식</h3><button type="button" class="link-btn home-news-all">전체 보기</button></div><div class="news-strip"><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898049&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+  <span class="news-tile-photo"><img class="news-tile-img" src="../../../../assets/schools/n14kv35j-f13e3ada.webp" alt="" width="148" height="104" style="object-position:55% 62%"></span>
+  <span class="news-tile-meta">11.20</span>
+  <span class="news-tile-title">[마지막 기회] Microsoft AI-901 자격증 과정 특별 추가 모집</span>
+  <span class="news-tile-desc">전남대학교 인공지능혁신융합대학사업단에서 Microsoft 인공지능 국제인증자격증(AI-901) 교육과정 교육생을 아래와 같이 추가 모집 하오니 관심 있는 학생들의 많은 참여 바랍니다.</span>
+</a><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898047&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+  <span class="news-tile-photo"><img class="news-tile-img" src="../../../../data/news/img/c1f2de6ab074ef05.webp" alt="" width="148" height="104"></span>
+  <span class="news-tile-meta">생활 · 11.20</span>
+  <span class="news-tile-title">2026학년도 동계방학 생활관생 모집 안내 (신청</span>
+  <span class="news-tile-desc">2026학년도 동계방학 생활관생 모집을 안내하오니, 자세한 내용은 [생활관 홈페이지-공지사항] 을 참고하시기 바랍니다. ☞ 생활관 홈페이지 공지사항: https://tinyurl.com/4m8x4z37</span>
+</a><a class="news-tile" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=898006&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+  <span class="news-tile-photo"><img class="news-tile-img" src="../../../../assets/schools/n14kv35j-f13e3ada.webp" alt="" width="148" height="104" style="object-position:55% 62%"></span>
+  <span class="news-tile-meta">11.20</span>
+  <span class="news-tile-title">[서울지방병무청] 각 군 현역병 모집일정('26년 12월) 안내</span>
+  <span class="news-tile-desc">병무청에서는 병역의무자의 전공, 자격·면허, 경력 등과 관련있는 군사특기에 지원하여 해당분야에서 복무할 수 있도록 하는 현역병 모집제도를 운영하고 있습니다.</span>
+</a></div></section>
+
+          <section class="home-near" aria-label="우리 학교 주변">
+            <div class="home-sec-head"><h3>우리 학교 주변</h3><span class="updated">11.22 갱신</span></div>
+            <ul class="near-rows">
+              <li><span class="thumb"><span class="m-map" data-map='{"center":[37.6312,127.0778],"zoom":14.25,"static":true,"gate":false,"layers":["study","campus"],"cats":{"study":["cafe"],"campus":["cafe"]},"maxDist":500,"pins":[]}'></span></span><span class="nt"><b>주변 지도</b><small>카공 · 밥집 · 술집·과팅 · 생활 · 안전 · 복지·혜택</small></span><span class="go" data-go></span></li>
+              <li><span class="ni" data-icon="route"></span><span class="nt"><b>신입생 첫 주 코스</b><small>다섯 곳 중 2곳 다녀옴</small></span><span class="go" data-go></span></li>
+              <li><span class="ni" data-icon="pin"></span><span class="nt"><b>대학가 한눈에</b><small>철길 · 공릉역 · 노원역까지 구역 <span data-town-count="zones"></span>곳</small></span><span class="go" data-go></span></li>
+            </ul>
+          </section>
+
+          <section class="home-after">
+            <div class="home-sec-head"><h3>나에게 맞는 장학금</h3><button class="link-btn">전체 보기</button></div>
+            <div class="card-list" style="margin:0 -20px">
+<div class="sch-card-wrap has-link">
+<button class="save-btn" aria-pressed="false" aria-label="공고 저장"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h12a1 1 0 0 1 1 1v16.2a.8.8 0 0 1-1.25.66L12 17.3l-5.75 3.56A.8.8 0 0 1 5 20.2V4a1 1 0 0 1 1-1z"></path></svg></button><a class="card-src-link" href="#" title="원문 공고 ↗">원문 공고 ↗</a>
+<button class="sch-card">
+  <div class="sch-top"><span class="badge badge-kind badge-out">장학 · 교외</span><span class="sch-fit fit-blue">적합도 95%</span></div>
+  <p class="sch-name">(재)한국장학재단 국가근로장학금</p>
+  <div class="sch-foot"><span class="sch-amount unknown"></span><span class="sch-due">D-98</span></div>
+</button>
+</div>
+            </div>
+          </section>
+        </div>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">실데이터</span>소식 띠(사진·요약 두 줄)와 장학 카드는 지금 앱이 과기대 1학년에게 보여 주는 그대로입니다.</p>
+        <p><span class="tag rule">규칙</span>구역 사이 간격은 앱 홈과 같습니다. 「첫 주 코스」 줄은 1학년에게만(첫 학기 동안) 보입니다. 「주변 지도」를 누르면 ②가 열립니다.</p>
+      </div>
+    </section>
+
+
+    <!-- ② 지도 — 학교 안 -->
+    <section class="phone" id="s2">
+      <div class="phone-cap"><span class="no">2</span><b>지도 — 학교 안</b></div>
+      <p class="phone-cap why">처음 열면 「학교 안」. 학교 경계(점선)와 먼저 알아 둘 곳만 핀으로, 나머지 건물은 회색 점으로.</p>
+      <div class="phone-screen" style="--map-top:138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="학교 안"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.63245,127.07905],"zoom":15.75,"offset":[0,135],"layers":["campus"],"cats":{"campus":["building","student_center","facility","dormitory","construction"]},"pins":["w381113087","w470633638","w382499348","w382499358","w382499365"],"labels":["w382499365","w382499358","w382499348","w381113087","w470633638"],"labelLeft":["w382499365"]}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="p-head"><p class="p-sum">먼저 알아 둘 곳 · 거리는 정문에서</p><button class="link-btn">목록 보기 ›</button></div>
+          <ul class="place-list">
+            <li><span class="pi" data-icon="library"></span><span class="pt"><b>도서관/정보전산원</b><small>도서관 별관 옆</small></span><span class="pd">320m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="student_center"></span><span class="pt"><b>제2학생회관</b><small>장학복지팀 201호 · 학생 제2 식당 · 보건진료소</small></span><span class="pd">240m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="student_center"></span><span class="pt"><b>제1학생회관</b><small>학생 제1식당 · 생협 카페 · CU</small></span><span class="pd">450m</span><span class="go" data-go></span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">실데이터</span>건물 이름·위치·학교 경계는 오픈스트리트맵. 각 줄의 작은 글은 그 건물 안에 실제로 그려진 시설입니다. 「장학복지팀 201호」는 과기대 장학 공고 원문 「※ 부득이한 경우에만 학생처 장학복지팀(제2학생회관 201호)으로 서면 제출」에서 왔습니다(기본 제출은 학교 정보시스템에 사본 첨부).</p>
+        <p><span class="tag rule">규칙</span>거리는 정문에서 잰 직선 거리라 「m」로만 적고, 걷는 시간은 적지 않습니다. 주제 칩은 대외활동 분야 칩과 같은 작은 칩 — 여덟 개라 두 줄(네 개씩)로 끊고(옆으로 밀지 않음) 고르면 테두리만 강조색. 줄을 누르면 그곳 시트(④ 모양)가 올라옵니다. 「목록 보기 ›」는 지금 주제의 장소를 정문에서 가까운 순으로 지도 없이 보여 줍니다.</p>
+      </div>
+    </section>
+
+
+
+    <!-- ③ 카공 — 리서치로 채운 최초 지도 -->
+    <section class="phone" id="s3">
+      <div class="phone-cap"><span class="no">3</span><b>지도 — 카공 (리서치로 채운 최초 지도)</b></div>
+      <p class="phone-cap why">학보 기사와 리뷰에서 「공부하기 좋다」고 나온 곳을 그 글의 구절과 함께 싣습니다. 핀은 위치를 확인한 곳, 그 밖의 카페는 회색 점.</p>
+      <div class="phone-screen" style="--map-top:138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="카공"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.6332,127.0772],"zoom":15.5,"offset":[0,150],"layers":["study","campus"],"cats":{"study":["cafe"],"campus":["cafe"]},"maxDist":900,"pins":["t-p011","t-p009","t-p005"],"labels":["t-p005","t-p009","t-p011"],"labelLeft":["t-p005","t-p009"],"rename":{"t-p005":"별관도서관 와글와글","t-p009":"성림학사 글로벌 라운지"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="p-head"><p class="p-sum">학보·리뷰에 나온 카공 자리 <b data-town-count="카공"></b>곳</p><button class="link-btn">목록 보기 ›</button></div>
+          <ul class="place-list">
+            <li class="q2"><span class="pi" data-icon="카공"></span><span class="pt"><b>별관도서관 와글와글</b><small><i>학보</i> 「와글와글은 예약 없이 자유롭게 사용할 수 있어…」</small></span><span class="pd">400m</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pi" data-icon="카공"></span><span class="pt"><b>아너카페</b><small><i>학보</i> 「이미 많은 학생에게 알려진 아너카페에 공부하러 자주 방문했다」</small></span><span class="pd">철길 쪽</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pi" data-icon="카공"></span><span class="pt"><b>성림학사 글로벌 라운지</b><small><i>학보</i> 「카페 이용 여부와 관계없이 모든 재학생이 이용 가능하다」</small></span><span class="pd">590m</span><span class="go" data-go></span></li>
+            <li class="suggest"><span class="pi" data-icon="plus"></span><span class="pt"><b>빠진 곳 제안하기</b></span><span class="go" data-go></span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">리서치</span>세 곳 모두 학보 「서울과기대신문」 기사의 구절 그대로입니다(「아너카페」 구절은 기사 그림 속 글자라 눈으로 확인). 기사 링크는 장소를 눌러 뜨는 시트(④)에서 엽니다.</p>
+        <p><span class="tag rule">규칙</span>요약하거나 다듬지 않고 <b>원문 구절 + 출처</b>만 보여 줍니다(원칙 8-1) — 문장 중간에서 끊으면 「…」를 붙입니다. 위치를 확인하지 못한 가게(아너카페 — 공개 지도에 없음)는 핀 없이 목록에만 두고 구역 이름(「철길 쪽」)을 적습니다. 「중앙도서관 쉼터」도 학보에 나오지만 신축 공사 기사(2026.05)가 있어 지금 쓸 수 있는지 확인한 뒤 올립니다.</p>
+      </div>
+    </section>
+
+
+    <!-- ④ 장소 시트 — 재학생 의견 + 학보·리뷰 + 교내 소식 -->
+    <section class="phone" id="s4">
+      <div class="phone-cap"><span class="no">4</span><b>장소를 누르면 — 재학생 의견 · 학보·리뷰 · 교내 소식</b></div>
+      <p class="phone-cap why">절 차례는 늘 같습니다. ① 재학생 의견(처음엔 비어 있음) ② 리서치로 모은 학보·리뷰 구절 ③ 그곳에 붙은 교내 소식.</p>
+      <div class="phone-screen" style="--map-top:138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="카공"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.63374,127.07655],"zoom":16.5,"offset":[0,300],"layers":[],"pins":["t-p005"],"focus":"t-p005","labelLeft":["t-p005"],"rename":{"t-p005":"별관도서관 와글와글"},"gate":false}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel sheet tall">
+          <div class="sheet-handle"></div>
+          <div class="sch-top sheet-top" style="padding-right:0"><span class="badge badge-kind">카공</span></div>
+          <h3 class="sheet-title">별관도서관 와글와글</h3>
+          <p class="place-where">도서관 별관 · 정문에서 400m</p>
+          <section class="sheet-sec"><h4>재학생 의견</h4>
+            <p class="empty-line">아직 의견이 없어요</p>
+            <button class="btn-ghost btn-wide">의견 남기기</button>
+          </section>
+          <section class="sheet-sec"><h4>학보·리뷰에서</h4>
+            <a class="quote-row" href="https://times.seoultech.ac.kr/reports/?idx=22267" target="_blank" rel="noopener">「와글와글은 예약 없이 자유롭게 사용할 수 있어…」<small><b>서울과기대신문 ↗</b> · 2026.03.09</small></a>
+          </section>
+          <section class="sheet-sec"><h4>교내 소식</h4>
+            <a class="news-row" href="https://www.seoultech.ac.kr/service/info/notice/?do=commonview&amp;searchtext=&amp;searchtype=-1&amp;nowpage=1&amp;bnum=4691&amp;bidx=897342&amp;qidx=4691&amp;cate=10&amp;allboard=false&amp;nowpage=1" target="_blank" rel="noopener">
+              <span><b>도서관 첫 대출자를 찾습니다~ 이벤트 안내 (50명에게 문화상품권 2만원권 추첨 증정, ~11/30)</b><small><b>원문 보기 ↗</b> · 11.02</small></span>
+              <img src="../../../../data/news/img/9c94d481caa41a63.webp" alt="" width="72" height="72">
+            </a>
+          </section>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </div>
+      <div class="frag memo-frag" aria-label="의견이 쌓인 뒤의 모양">
+        <p class="plan-slot" style="margin:0 0 10px"><span class="plan-tag">시안 메모</span>의견이 쌓이면 「재학생 의견」 절이 이렇게 바뀝니다 — 아래 숫자와 줄은 <b>모양을 보이는 자리 표시</b>이고 실제 의견이 아닙니다.</p>
+        <h4>재학생 의견 <small class="cnt">12명</small></h4>
+        <div class="tag-counts"><span>콘센트 많아요 <b>9</b></span><span>대화해도 돼요 <b>7</b></span><span>자리 넉넉해요 <b>3</b></span></div>
+        <ul class="op-list"><li><span class="op-ph">(재학생이 쓴 한 줄 의견)</span><small>3일 전 · 신고</small></li><li><span class="op-ph">(재학생이 쓴 한 줄 의견)</span><small>2주 전 · 신고</small></li></ul>
+        <p class="frag-in">목록 줄에도 같은 숫자가 붙습니다 — <b>별관도서관 와글와글</b> · 콘센트 많아요 9 · 의견이 많은 곳이 위로.</p>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">리서치</span>인용은 학보 기사에 글자 그대로 있습니다(기사를 다시 열어 대조). 교내 소식은 앱 소식 파일의 실제 글이고, 도서관 행사라 건물(도서관 별관)에 이었습니다 — 포스터의 장소 글자는 관리자가 확인하고 잇습니다.</p>
+        <p><span class="tag rule">규칙</span>「재학생 의견」은 <b>처음엔 비어 있습니다</b> — 지어 넣지 않습니다. 같은 기사의 「공부하러 온 학생들이 자리가 없어 돌아가는 경우가 많았다」는 시험 기간 자리 맡기를 다룬 문장이라 앞뒤 없이 실으면 뜻이 달라져 뺐습니다. 길찾기 단추는 시트를 내리면 맨 아래에 있습니다(이 그림은 시트 윗부분).</p>
+      </div>
+    </section>
+
+
+    <!-- ⑤ 술집·과팅 -->
+    <section class="phone" id="s5">
+      <div class="phone-cap"><span class="no">5</span><b>지도 — 술집·과팅</b></div>
+      <p class="phone-cap why">리서치에서 술집은 이름이 나온 곳이 적고, 과팅 장소는 한 곳도 못 찾았습니다. 그래서 비어 있다고 그대로 말하고 재학생 제안으로 채웁니다.</p>
+      <div class="phone-screen" style="--map-top:138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="술집·과팅"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.6287,127.0768],"zoom":16,"offset":[0,150],"layers":[],"bars":true,"maxDist":700,"pins":[]}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="p-head"><p class="p-sum">학보·리뷰에 나온 술집 <b data-town-count="술집"></b>곳</p><button class="link-btn">목록 보기 ›</button></div>
+          <ul class="place-list">
+            <li class="q2"><span class="pi" data-icon="술집"></span><span class="pt"><b>여기,꼬치네</b><small><i>학보</i> 「손님들의 90% 이상이 과기대 학생들이고…」</small></span><span class="pd">철길 쪽</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pi" data-icon="술집"></span><span class="pt"><b>동학</b><small><i>리뷰</i> 「과기대 인근 퓨전민속주점.」</small></span><span class="pd">정문 앞</span><span class="go" data-go></span></li>
+          </ul>
+          <p class="p-group" style="margin-top:12px">과팅 장소</p>
+          <p class="empty-line">추천된 곳이 아직 없어요</p>
+          <ul class="place-list"><li class="suggest"><span class="pi" data-icon="plus"></span><span class="pt"><b>빠진 곳 제안하기</b></span><span class="go" data-go></span></li></ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">리서치</span>「여기,꼬치네」는 학보의 사장 인터뷰(2024.09)에서 사장이 한 말 그대로입니다. 「동학」은 리뷰 앱 뽈레의 글(글쓴이가 재학생인지는 모름). 셋째 「피맥 4도씨」(뽈레)는 「목록 보기」에 있습니다. 회색 점은 공개 지도에 있는 주점 위치(이름·위치만)입니다.</p>
+        <p><span class="tag rule">규칙</span>과팅·미팅 장소로 <b>이름이 적힌 가게는 리서치 어디에도 없었습니다</b> — 지어 넣지 않고 빈 채로 엽니다. 「동학」은 주소만 있고(뽈레) 「여기,꼬치네」는 출처에 주소가 없어 둘 다 핀이 없습니다(카카오 장소 검색 연결 뒤 핀으로).</p>
+      </div>
+    </section>
+
+    <!-- ⑤ 안전 -->
+    <section class="phone" id="s6">
+      <div class="phone-cap"><span class="no">6</span><b>지도 — 안전</b></div>
+      <p class="phone-cap why">긴급 전화 둘을 시트 맨 위에. 점수·별점 없이 있는 시설만, 운영 시간을 모르는 곳은 「밤에도」라고 하지 않습니다.</p>
+      <div class="phone-screen" style="--map-top:138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="안전"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.6305,127.0762],"zoom":14.5,"offset":[0,150],"layers":[],"rings":[500,1000],"ringLabels":["반경 500m","1km"],"pins":["n6046633874","w576229279","pd-bell-w199637113","n368602233","n368602672"],"labels":["n368602672","n368602233","pd-bell-w199637113","n6046633874","w576229279"],"labelLeft":["n6046633874","pd-bell-w199637113"],"rename":{"pd-bell-w199637113":"공릉터널 비상벨","n6046633874":"공릉역"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="call-row" style="margin-top:0"><a class="call-btn" href="tel:112">112 경찰</a><a class="call-btn" href="tel:119">119 소방·구급</a></div>
+          <p class="p-group" style="margin-top:12px">가까운 곳 · 거리는 정문에서</p>
+          <ul class="place-list compact">
+            <li><span class="pi" data-icon="emergency_bell"></span><span class="pt"><b>공릉터널 보행로 안전비상벨</b><small>경찰 연계 · 경고등·경보음·CCTV</small></span><span class="pd">730m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="police"></span><span class="pt"><b>공릉치안센터</b></span><span class="pd">430m</span><span class="go" data-go></span></li>
+            <li><span class="pi" data-icon="police"></span><span class="pt"><b>하계1치안센터</b></span><span class="pd">520m</span><span class="go" data-go></span></li>
+          </ul>
+          <p class="plan-slot"><span class="plan-tag">시안 메모</span>여기에 안심귀갓길 길 선과 골목 CCTV·비상벨이 들어옵니다(공개 자료 연결 뒤).</p>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">실데이터</span>치안센터 위치(공개 지도 · 정문 1km 안 3곳). 비상벨은 서울시 공개 자료(터널·지하차도 비상벨 49곳 · 2026.09.10 기준 · 경찰 연계)의 공릉터널 1곳이라 이름에 「터널 보행로」를 넣었습니다. 자료에 위치 좌표가 없어 공릉터널 자리에 두었습니다(터널 안 어딘가).</p>
+        <p><span class="tag rule">규칙</span>「안전한 동네 ★4.5」 같은 점수는 만들지 않습니다 — 판정 못 하는 것의 점수는 틀린 안심입니다. 치안센터는 밤·주말에 비는 곳이 많아 개수로 앞세우지 않고, 운영 시간이 확인된 곳만 시간을 적습니다. 어두운 밤 지도는 쓰지 않습니다(11-23 결정 · 밝은 지도 그대로).</p>
+        <p><span class="tag plan">연결 예정</span>서울시 안심귀갓길 자료(2023.04 기준)는 위치가 있는 길 선·시설이라 그대로 그릴 수 있습니다(기준일 같이 표시). 골목 CCTV·비상벨 전국 자료는 내려받는 서버가 이 작업 환경에서 끊겨 못 받았습니다 — 로봇 환경에서 받아지는지 먼저 확인합니다.</p>
+      </div>
+    </section>
+
+
+    <!-- ⑥ 서류 떼는 곳 -->
+    <section class="phone" id="s7">
+      <div class="phone-cap"><span class="no">7</span><b>서류 떼는 곳 — 공고 시트에서</b></div>
+      <p class="phone-cap why">공고 시트 「접수」 절의 「서류」 줄에 관공서 서류가 있으면 줄 끝에 「떼는 곳 ›」이 붙습니다(아래 조각). 누르면 이 화면 — 인터넷 길을 먼저, 발급기는 그다음.</p>
+      <div class="frag" aria-label="들어가는 곳 — 공고 시트 접수 절">
+        <h4>접수</h4>
+        <p><b>기간</b>~11.23</p>
+        <p><b>서류</b>장학금 지급신청서 · 기초생활수급자 또는 차상위계층 증명서 · 재학증명서 · 성적증명서 · 생활기록부 · 주민등록초본 · 통장사본<span class="to">떼는 곳 ›</span></p>
+      </div>
+      <p class="frag-cap">↑ 들어가는 곳: 지금 앱의 공고 시트 「접수」 절(서류 줄은 앱 그대로) + 새로 붙는 「떼는 곳 ›」</p>
+      <div class="phone-screen" style="--map-top:168px">
+        <div class="ms-top" style="padding-bottom:10px">
+          <header class="sub-header" style="margin-bottom:4px"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>서류 떼는 곳</h2></header>
+          <div class="doc-ctx">
+            <p class="doc-ctx-t"><b>(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내</b><span class="due">D-1</span></p>
+            <p class="doc-ctx-q"><span class="lbl">서류</span>장학금 지급신청서 · 기초생활수급자 또는 차상위계층 증명서 · 재학증명서 · 성적증명서 · 생활기록부 · <strong>주민등록초본</strong> · 통장사본</p>
+            <p class="doc-ctx-h">굵은 서류는 아래에서 뗄 수 있어요</p>
+          </div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.63065,127.0764],"zoom":14.5,"offset":[0,175],"layers":[],"pins":["pd-kiosk-405-w570198783","pd-kiosk-401-w579134079","pd-kiosk-103-w258026356","pd-kiosk-410-r5689751"],"labels":["pd-kiosk-410-r5689751","pd-kiosk-103-w258026356","pd-kiosk-405-w570198783","pd-kiosk-401-w579134079"],"labelLeft":["pd-kiosk-103-w258026356","pd-kiosk-410-r5689751","pd-kiosk-401-w579134079"],"rename":{"pd-kiosk-410-r5689751":"원자력병원","pd-kiosk-103-w258026356":"공릉1동주민센터","pd-kiosk-401-w579134079":"노원문화원","pd-kiosk-405-w570198783":"을지병원"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <p class="p-group">주민등록초본 · 인터넷</p>
+          <ul class="place-list compact">
+            <li><span class="pi" data-icon="docs"></span><span class="pt"><b>정부24</b><small>본인 것은 인터넷 무료</small></span><span class="pd">↗</span></li>
+          </ul>
+          <p class="p-group">무인민원발급기 · 정문 반경 1km 안 4곳</p>
+          <ul class="place-list compact">
+            <li><span class="pi" data-icon="civil_kiosk"></span><span class="pt"><b>원자력병원</b><small>24시간</small></span><span class="pd">560m</span></li>
+            <li><span class="pi" data-icon="civil_kiosk"></span><span class="pt"><b>공릉1동주민센터</b><small>평일 09:00–18:00 · 주말·공휴일 휴무</small></span><span class="pd">620m</span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="explore" aria-label="하단 탭"></nav>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">실데이터</span>공고는 과기대 장학 게시판의 정식 등록 공고(마감 11.23) — 「서류」 줄은 앱 시트와 같은 글자입니다. 발급기 4곳과 운영 시간은 서울시 공개 목록 그대로(위치 좌표가 없어 이름이 같은 시설 자리에 둠).</p>
+        <p><span class="tag real">확인</span>정부24 안내 「주민등록표 등본(초본)」: 신청 방법 「인터넷, 방문, 무인발급기」 · 「인터넷으로 발급받을 때는 무료」(본인). 가족관계증명서는 대법원 전자가족관계등록시스템에서 인터넷 무료(정부24 는 직접 발급하지 않음). 발급기 수수료(초본 200원 · 가족관계증명서 500원)는 지자체 조례로 면제되는 곳이 있어(노원구는 확인 안 함) 화면에 적지 않았습니다.</p>
+        <p><span class="tag rule">규칙</span>「떼는 곳 ›」은 서류 줄에 관공서 서류 이름이 <b>원문 글자로</b> 있을 때만 붙고, <b>떼는 길을 근거로 확인한 서류만</b> 굵게 잇습니다 — 「기초생활수급자 또는 차상위계층 증명서」는 떼는 길을 아직 확인하지 않아 잇지 않았습니다.</p>
+      </div>
+    </section>
+
+
+    <!-- ⑦ 신입생 첫 주 코스 -->
+    <section class="phone" id="s8">
+      <div class="phone-cap"><span class="no">8</span><b>신입생 첫 주 코스</b></div>
+      <p class="phone-cap why">입학 첫 주에 한 번씩 가 볼 곳을 번호 순서대로 — 지하철역에서 내려 정문을 지나 학교 안으로. 다녀왔는지는 학생이 직접 체크합니다(원칙 8).</p>
+      <div class="phone-screen" style="--map-top:100px">
+        <div class="ms-top">
+          <header class="sub-header" style="margin-bottom:2px"><button class="sub-back" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>첫 주 코스</h2></header>
+          <p class="ms-sub" style="margin:0 0 4px 32px">다섯 곳 중 2곳 다녀옴</p>
+        </div>
+        <div class="m-map" data-map='{"center":[37.62993,127.07506],"zoom":15,"offset":[28,165],"gate":false,"layers":[],"route":["n6046633874","n5547152189","w382499348","w382499365","w382499358"],"numbered":{"n6046633874":1,"n5547152189":2,"w382499348":3,"w382499365":4,"w382499358":5},"done":["n6046633874","n5547152189"],"pins":["w382499358","w382499365","w382499348","n5547152189","n6046633874"],"labels":["w382499348","w382499365","w382499358","n6046633874"],"labelLeft":["w382499365","w382499358","n6046633874"],"rename":{"n6046633874":"공릉역"}}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <ul class="check-list">
+            <li class="checked"><span class="num">1</span><span class="pt"><b>공릉역(서울과학기술대)</b><small>지하철역 · 정문에서 600m</small></span><span class="ck"></span></li>
+            <li class="checked"><span class="num">2</span><span class="pt"><b>서울과학기술대학교정문앞</b><small>노원03 정류장</small></span><span class="ck"></span></li>
+            <li><span class="num">3</span><span class="pt"><b>제2학생회관</b><small>장학복지팀 201호 · 학생 제2 식당 · 보건진료소</small></span><span class="ck"></span></li>
+            <li><span class="num">4</span><span class="pt"><b>도서관/정보전산원</b><small>도서관 별관 옆</small></span><span class="ck"></span></li>
+            <li><span class="num">5</span><span class="pt"><b>제1학생회관</b><small>학생 제1식당 · 생협 카페 · CU</small></span><span class="ck"></span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">실데이터</span>다섯 곳의 이름·위치는 공개 지도 그대로(2번은 정류장 이름 그대로 · 노선은 학보 2026.01 기사 「노원13이 폐선되고 노원03과의 통합 운영이 시작됐다」에 따라 「노원03」 — 통합은 2025.12.15 · 공개 지도에는 아직 옛 번호로 남아 있음), 작은 글은 그 건물 안에 그려진 시설, 공릉역의 다른 이름(서울과학기술대)도 공개 지도에 적힌 것입니다. 지도의 2번 핀은 정문 바로 곁이라 이름표를 생략했습니다.</p>
+        <p><span class="tag rule">규칙</span>「왜 가야 하는지」는 지어내지 않고 그곳에 실제로 있는 시설 이름만 적습니다. 장학복지팀 자리는 원문에 적힌 곳만(서면 제출은 「부득이한 경우」만 — 원문). 체크는 앱 체크 목록과 같은 모양(줄 전체를 누름 · 체크하면 강조색 원 · 글자는 진하게). 코스 고르기는 관리자 몫(학교마다 한 번).</p>
+      </div>
+    </section>
+
+
+
+    <!-- ⑨ 대학가 한눈에 -->
+    <section class="phone" id="s9">
+      <div class="phone-cap"><span class="no">9</span><b>대학가 한눈에 — 학생들이 부르는 구역</b></div>
+      <p class="phone-cap why">행정동 대신 학생들이 다니는 구역으로 묶었습니다. 바깥 끝을 어디로 볼지(지금은 노원역까지)는 시안의 가정이라 아래에서 여쭙니다.</p>
+      <div class="phone-screen" style="--map-top:100px">
+        <div class="ms-top">
+          <header data-subhead="대학가 한눈에" style="margin-bottom:2px"></header>
+          <p class="ms-sub" style="margin:0 0 4px 32px">구역 <span data-town-count="zones"></span>곳 · 가장 먼 곳 노원역 3.1km</p>
+        </div>
+        <div class="m-map" data-map='{"center":[37.6347,127.0722],"zoom":13,"offset":[0,144],"layers":[],"zones":"all","zoneFocus":["z-rail","z-hyeopdong","z-nowon"],"zoneLabelIds":["z-rail","z-gongneung","z-hyeopdong","z-hagye","z-taereung","z-hwarang","z-seokgye","z-nowon"],"zoneLabelSide":{"z-rail":"right","z-gongneung":"left","z-hyeopdong":"right","z-hagye":"left","z-taereung":"below","z-hwarang":"right","z-seokgye":"left","z-nowon":"right"},"gate":false,"pins":[]}'></div>
+        <span class="m-credit">© OpenStreetMap</span>
+        <section class="ms-panel">
+          <div class="sheet-handle"></div>
+          <div class="p-head"><p class="p-sum">학생들이 부르는 구역</p><button class="link-btn">목록 보기 ›</button></div>
+          <ul class="place-list">
+            <li class="q2"><span class="pt"><b>철길</b><small><i>학보</i> 「경춘선숲길은 인근 자취생들에게 흔히 ‘철길’이라고 불리며…」</small></span><span class="pd">240m</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pt"><b>협동문 쪽</b><small><i>학보</i> 「하계역 및 인근 원룸 밀집 지역과 학교를 연결하는 주요 통학로다」</small></span><span class="pd">700m</span><span class="go" data-go></span></li>
+            <li class="q2"><span class="pt"><b>노원역</b><small><i>학보</i> 「더숲 아트시네마는 우리대학과 접근성이 좋은 7호선 노원역 인근에 위치해 있다」</small></span><span class="pd">3.1km</span><span class="go" data-go></span></li>
+          </ul>
+        </section>
+        <nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag real">리서치</span>구역 이름은 학보와 학교 공식 안내의 글에서 나왔습니다 — 정문 앞 · 철길 · 공릉역 · 도깨비시장 · 협동문 · 하계역 · 태릉입구 · 화랑대 · 석계역 · 노원역. 원은 구역의 기준 지점(역 출구·시장 등 공개 지도의 실제 좌표) 둘레이고 경계선이 아닙니다. 「자취 동네」는 이 화면에 합쳤습니다 — 학보 문장으로는 「하계역 및 인근 원룸 밀집 지역」, 「철길 주변 카페에서 과제를 하다 근처 자취방으로 돌아간다」가 나옵니다.</p>
+        <p><span class="tag plan">가정</span>노원역을 대학가의 끝으로 본 근거는 학보의 영화관·청년센터 위치 문장 둘뿐이라 약합니다. 익명 게시판 글에만 나온 구역(원자력 삼거리 · 월계 트레이더스)은 싣지 않았습니다. 범위는 재학생 의견이 쌓이면 다시 맞춥니다(정해 주실 것 3).</p>
+      </div>
+    </section>
+
+
+    <!-- ⑩ 장소 제안 -->
+    <section class="phone" id="s10">
+      <div class="phone-cap"><span class="no">10</span><b>장소 제안 — 재학생이 지도를 채운다</b></div>
+      <p class="phone-cap why">모든 목록 끝의 「빠진 곳 제안하기」에서 들어옵니다. 재학생으로 확인된 계정만 보낼 수 있고, 운영자가 확인한 뒤 지도에 실립니다.</p>
+      <div class="phone-screen">
+        <div class="app-scroll form-screen">
+          <header data-subhead="장소 제안"></header>
+          <p class="verify-line"><span data-icon="check" data-size="14"></span>서울과학기술대학교 재학생으로 확인됐어요</p>
+          <label class="f-label">장소 이름</label>
+          <div class="f-input ph">가게·장소 이름</div>
+          <label class="f-label">주제</label>
+          <div class="pick-chips"><span class="chip">카공</span><span class="chip">밥집</span><span class="chip">카페</span><span class="chip">술집</span><span class="chip active">과팅</span><span class="chip">놀거리</span><span class="chip">생활</span><span class="chip">복지·혜택</span></div>
+          <label class="f-label">어디쯤</label>
+          <div class="pick-chips small"><span class="chip">정문 앞</span><span class="chip">철길</span><span class="chip">공릉역</span><span class="chip">도깨비시장</span><span class="chip">협동문</span><span class="chip">하계역</span><span class="chip">태릉입구</span><span class="chip">화랑대</span><span class="chip">석계역</span><span class="chip">노원역</span><span class="chip">학교 안</span></div>
+          <label class="f-label">한마디 (선택)</label>
+          <div class="f-input ph">왜 좋은지 한 줄</div>
+          <button class="btn btn-primary btn-lg" style="margin-top:20px">제안 보내기</button>
+          <p class="f-note">운영자가 확인한 뒤 지도에 실려요.</p>
+        </div>
+      </div>
+      <div class="frags2">
+        <div class="frag" aria-label="재학생 확인 전">
+          <p class="frag-t">확인 전에 누르면</p>
+          <h4 class="plain">재학생만 남길 수 있어요</h4>
+          <p class="frag-in">학교 메일로 한 번만 확인하면 돼요. 지도를 보는 것은 누구나 할 수 있어요.</p>
+          <div class="f-input ph" style="margin-top:10px">학교 메일 (@seoultech.ac.kr)</div>
+          <button class="btn-ghost btn-wide">확인 메일 받기</button>
+        </div>
+        <div class="frag" aria-label="제안을 보낸 뒤">
+          <p class="frag-t">보낸 뒤 — MY › 내가 보낸 제안</p>
+          <h4 class="plain">보냈어요. 확인되면 지도에 실려요</h4>
+          <ul class="sent-list"><li><b>(내가 제안한 장소)</b><span class="st">접수</span></li><li><b>(내가 제안한 장소)</b><span class="st on">지도에 실림</span></li><li><b>(내가 제안한 장소)</b><span class="st">실리지 않음</span></li></ul>
+        </div>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag rule">규칙</span>지금 앱의 「게시 요청」(요청 → 운영자 확인 → 상태 알약)과 같은 길입니다. 보낸 제안은 관리자 「할 일」에 뜨고, 확인되면 지도에 실리며 학생에게 알림이 갑니다. 지도에는 제안한 사람의 이름·학번을 붙이지 않습니다. 「한마디」는 그 장소의 첫 재학생 의견으로 실립니다. 「어디쯤」은 ⑨의 구역에서 고릅니다(학생 위치를 받지 않음).</p>
+        <p><span class="tag plan">정할 것</span>재학생 확인 방법(로그인 + 학교 메일 / 프로필의 학교만) · 제안이 실리는 때 — 아래 「새로 정해 주실 것」.</p>
+      </div>
+    </section>
+
+
+    <!-- ⑪ 의견 남기기 -->
+    <section class="phone" id="s11">
+      <div class="phone-cap"><span class="no">11</span><b>의견 남기기 — 리뷰가 지도에 반영된다</b></div>
+      <p class="phone-cap why">별점 대신 정해진 말을 고르고(여러 개), 한 줄은 선택. 「문 닫았어요」 같은 알림도 여기서 받습니다.</p>
+      <div class="phone-screen" style="--map-top:138px">
+        <div class="ms-top">
+          <header data-subhead="학교 주변"></header>
+          <div data-chips="카공"></div>
+        </div>
+        <div class="m-map" data-map='{"center":[37.63374,127.07655],"zoom":16.5,"offset":[0,300],"layers":[],"pins":["t-p005"],"focus":"t-p005","gate":false}'></div>
+        <div class="sheet-backdrop show"></div>
+        <section class="ms-panel sheet over">
+          <div class="sheet-handle"></div>
+          <h3 class="sheet-title" style="margin-top:4px">별관도서관 와글와글</h3>
+          <label class="f-label" style="margin-top:14px">어땠나요? (여러 개 고를 수 있어요)</label>
+          <div class="pick-chips multi"><span class="chip active">콘센트 많아요</span><span class="chip">조용해요</span><span class="chip active">대화해도 돼요</span><span class="chip">자리 넉넉해요</span><span class="chip">늦게까지 해요</span><span class="chip">오래 있어도 돼요</span></div>
+          <label class="f-label">한 줄 의견 (선택)</label>
+          <div class="f-input ph">다른 학생에게 알려 주고 싶은 것</div>
+          <button class="btn btn-primary btn-lg" style="margin-top:20px">의견 보내기</button>
+          <a class="sheet-link" href="#">틀린 정보 알리기 ›</a>
+        </section>
+      </div>
+      <div class="phone-notes">
+        <p><span class="tag rule">지도에 반영되는 방식</span>① 고른 말은 장소 시트와 목록 줄에 「콘센트 많아요 9」처럼 사람 수로 뜹니다(④ 아래 메모). ② 의견이 많은 곳이 목록 위로 올라옵니다. ③ 「틀린 정보 알리기」(문 닫았어요 · 위치가 달라요 · 이름이 달라요)가 세 명에게서 오면 지도에서 내리고 운영자가 확인합니다. ④ 한 줄 의견은 신고할 수 있고 운영자가 지울 수 있습니다. 의견에는 글쓴이 이름·학번을 붙이지 않습니다.</p>
+        <p><span class="tag rule">규칙</span>별점을 두지 않은 이유 — 가게에 대한 낮은 별점·비방은 분쟁 소지가 있고(옛 설계 4절), 정해진 좋은 말을 고르는 방식은 그 위험이 작습니다. 고르는 말은 주제마다 다릅니다(밥집: 혼밥 편해요 · 양 많아요 · 값이 착해요 …). 재학생 확인 전이면 ⑩ 아래의 「확인 전」 안내가 먼저 뜹니다.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <h2 class="sec-title">리서치 결과 — 무엇을 읽었고 무엇을 못 읽었나</h2>
+  <p class="sec-lead">지시하신 「에타 등 학생 커뮤니티」를 실제로 열어 본 결과입니다. 로그인하지 않았고, 돈이 드는 수집 도구도 쓰지 않았습니다.</p>
+  <table class="src">
+    <thead><tr><th>곳</th><th>결과</th><th>지도에 쓴 방식</th></tr></thead>
+    <tbody>
+      <tr><td><b>에브리타임</b></td><td><span class="no">못 읽음</span> — 과기대 에타 첫 화면에 「커뮤니티 이용을 위해 로그인이 필요합니다!」만 보임. 사이트 규칙도 첫 화면 말고는 자동 수집을 막음</td><td>안 씀 — 에타의 정보는 재학생이 「장소 제안」으로 직접 옮겨 주는 길(⑩)</td></tr>
+      <tr><td><b>학보 「서울과기대신문」</b>(영자신문 포함)</td><td><span class="ok">읽음</span> — 재학생 기자의 기사 70여 건. 가장 믿을 만한 재료</td><td>구절 그대로 인용 + 기사 링크. 화면 인용의 대부분</td></tr>
+      <tr><td><b>학교 공식 안내</b>(오시는 길 · 편의시설)</td><td><span class="ok">읽음</span></td><td>교통·교내 시설 확인</td></tr>
+      <tr><td><b>뽈레</b>(리뷰 앱)</td><td><span class="ok">읽음</span> — 글쓴이가 재학생인지는 모름</td><td>출처 이름을 달아 인용(「리뷰」)</td></tr>
+      <tr><td><b>디시인사이드 서울과기대 갤러리</b> · 다음 카페 공개 글 1건</td><td><span class="ok">읽음</span> — 글 252건(댓글은 못 읽음). 익명이라 글쓴이가 재학생인지 확인 못 함. <b>이 사이트의 규칙은 일반 수집은 허용하지만 Claude를 포함한 AI 수집기는 이름으로 막아 두었습니다.</b> 같은 규칙의 인스티즈·에펨코리아는 읽지 않았으므로 제 기준이 한결같지 않았습니다</td><td><b>시안에 쓰지 않음</b> — 인용도, 구역의 근거로도(정해 주실 것 5)</td></tr>
+      <tr><td><b>네이버 블로그·카페 · 인스타그램 · 페이스북 · 에펨코리아 · 인스티즈 · 레딧</b></td><td><span class="no">안 읽음</span> — 사이트 규칙이 자동 수집을 금지</td><td>안 씀</td></tr>
+      <tr><td><b>나무위키 · 오르비 · 더쿠</b></td><td><span class="no">막힘</span> — 접속이 거절됨</td><td>안 씀</td></tr>
+    </tbody>
+  </table>
+  <ul class="plain">
+    <li><b>모은 것</b> — 장소 118곳(가게 70 · 교내 시설 30 · 길·구역 등 18) · 인용 232개 · 구역 후보 12곳 · 학교 말(붕어방 · 붕짜 · 철길 · 1학 · 2학 …).</li>
+    <li><b>다시 대조</b> — 118곳 전부의 출처를 다시 대조해 인용이 글자 그대로 있는지 봤습니다(절반은 검증자 둘이 출처를 새로 받아서, 나머지 절반은 한 명이 받아 둔 원문으로). 지어낸 인용은 없었고 78곳이 통과했습니다. 2025년 이후 영업 근거를 못 찾았거나 닫은 곳 32곳(공릉 다이소 · 홈플러스 중계점 등), 위치·이름이 불분명한 8곳은 뺐습니다. 통과한 78곳 중에서도 익명 게시판 글만 있는 19곳과 조심할 2곳(공사 중인 기숙사 등)은 싣지 않아, 시안에 실린 것은 <b><span data-town-count="all"></span>곳</b>입니다.</li>
+    <li><b>못 채운 것</b> — 과팅 장소 0곳 · 술집은 이름이 나온 8곳 중 3곳만 통과 · 실린 가게 24곳 중 20곳은 공개 지도에 없어 핀을 못 세움(카카오 장소 검색 연결 필요) · 「지금 영업 중」을 확인할 공공 상가 자료는 이 작업 환경에서 못 받음.</li>
+    <li><b>알아 두실 것</b> — 학보가 소개한 동네 앱 「공릉동101」이 이미 지도·리뷰·쿠폰을 하고 있습니다. 한대장 지도는 장학 서류·학교 안·재학생 확인으로 달라집니다.</li>
+  </ul>
+
+  <h2 class="sec-title">정해진 것 (11-23)</h2>
+  <ul class="plain">
+    <li>홈의 「우리 학교 주변」 줄로 들어감 · 한 번에 한 주제 · 핀은 남색 한 색 · 바탕 지도는 브이월드 + 우리 저장소의 지도 프로그램 · 혜택 글 잇기는 관리자 확인 · 밝은 지도.</li>
+    <li><b>술집·과팅 장소를 넣음</b>(⑤) · 동네는 <b>대학가 구역</b>으로(⑨) · <b>재학생이 제안</b>(⑩)하고 <b>의견을 남김</b>(⑪) · 최초 지도는 <b>커뮤니티 리서치</b>(③~⑤·⑨).</li>
+  </ul>
+
+  <h2 class="sec-title">새로 정해 주실 것</h2>
+  <p class="sec-lead">새 화면을 그리면서 생긴 갈림길 여덟입니다. 시안은 모두 추천안(A)으로 그렸습니다.</p>
+  <div class="decisions">
+    <div class="dec"><h3>1. 재학생인지 어떻게 확인하나</h3>
+      <div class="opt"><span class="k">A</span><span><b>학교 메일로 확인</b> — 학교 메일로 온 확인 링크를 누른 계정만 제안·의견을 남김. 보는 것은 누구나.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>프로필의 학교만 믿기</b> — 바로 쓸 수 있지만 다른 학교 학생·가게 주인도 재학생인 척 쓸 수 있습니다.</span></div>
+      <p class="rec">추천 A <span>— 「재학생이 채운 지도」라는 말이 사실이 되려면 확인이 있어야 합니다. 백로그의 과팅 탭도 같은 확인을 씁니다.</span></p>
+    </div>
+    <div class="dec"><h3>2. 제안한 장소가 언제 지도에 실리나</h3>
+      <div class="opt"><span class="k">A</span><span><b>운영자가 확인한 뒤</b> — 관리자 「할 일」에 뜨고 확인하면 실림(지금 「게시 요청」과 같은 길).</span></div>
+      <div class="opt"><span class="k">B</span><span><b>바로 실림</b> — 신고가 쌓이면 내림. 빠르지만 광고·장난 글이 먼저 보입니다.</span></div>
+      <p class="rec">추천 A <span>— 처음엔 제안이 많지 않아 확인이 감당됩니다. 늘면 B로.</span></p>
+    </div>
+    <div class="dec"><h3>3. 대학가의 바깥 끝</h3>
+      <div class="opt"><span class="k">A</span><span><b>노원역까지(3.1km)</b>(⑨) — 지시하신 「학생들의 최대 이동범위」. 학보가 노원역의 영화관·청년센터를 「접근성이 좋은」 곳으로 소개합니다.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>걸어 다니는 범위만(석계역·태릉입구·하계역, 약 2km)</b> — 근거가 더 탄탄하지만 놀러 가는 곳이 빠집니다.</span></div>
+      <p class="rec">추천 A <span>— 다만 근거가 학보 문장 둘뿐이라, 열고 나서 재학생 제안이 들어오는 구역을 보고 다시 맞춥니다.</span></p>
+    </div>
+    <div class="dec"><h3>4. 에타를 못 읽은 자리를 무엇으로 채우나</h3>
+      <div class="opt"><span class="k">A</span><span><b>열기 전에 재학생 몇 명에게 받기</b> — 아는 재학생 서너 명이 ⑩ 화면으로 첫 장소(과팅·술집·밥집)를 제안. 에타에서 도는 정보를 학생 손으로 옮깁니다.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>빈 채로 열고 기다리기</b> — 손이 안 가지만 처음 온 학생에게 술집·과팅 지도가 거의 비어 보입니다.</span></div>
+      <p class="rec">추천 A <span>— 우리가 에타에 로그인해 긁는 길은 원칙(대신 로그인하지 않음)에 어긋나 선택지에 넣지 않았습니다.</span></p>
+    </div>
+    <div class="dec"><h3>5. 익명 게시판(디시) 글</h3>
+      <div class="opt"><span class="k">A</span><span><b>쓰지 않음</b>(지금 그림) — 그 사이트가 AI 수집기를 이름으로 막아 두었고 글쓴이가 재학생인지도 알 수 없습니다.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>구역의 근거로만</b> — 「원자력 삼거리」「월계 트레이더스」 두 구역이 더 생깁니다(화면에 글은 인용하지 않음).</span></div>
+      <div class="opt"><span class="k">C</span><span><b>출처를 달아 인용까지</b> — 19곳(밥집 8곳 등)이 더 실립니다.</span></div>
+      <p class="rec">추천 A <span>— 그 밥집들과 구역은 재학생 제안으로 다시 들어오게 합니다.</span></p>
+    </div>
+    <div class="dec"><h3>6. 술집·과팅을 누구에게 보이나</h3>
+      <div class="opt"><span class="k">A</span><span><b>프로필 생년이 성인인 학생에게만</b> — 그해에 만 19세가 되는 생년부터. 그보다 어린 조기 입학생에게는 주제 칩이 안 보입니다.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>모두에게</b> — 지도 앱들과 같습니다.</span></div>
+      <p class="rec">추천 A <span>— 프로필에 생년이 이미 있어 손이 거의 안 갑니다. 법이 무엇을 요구하는지는 아직 확인하지 않았습니다(옛 지도 설계 4절의 조심 원칙을 따른 것).</span></p>
+    </div>
+    <div class="dec"><h3>7. 지시에 없던 주제 — 밥집 · 카페 · 놀거리</h3>
+      <div class="opt"><span class="k">A</span><span><b>밥집은 주제 칩으로, 카페·놀거리는 제안 화면에서만</b>(지금 그림) — 리서치에서 학생들이 가장 많이 말한 것이 밥집이었습니다.</span></div>
+      <div class="opt"><span class="k">B</span><span><b>지시하신 주제만</b>(카공 · 생활 · 안전 · 복지·혜택 · 술집·과팅).</span></div>
+      <p class="rec">추천 A</p>
+    </div>
+    <div class="dec"><h3>8. 의견의 모양</h3>
+      <div class="opt"><span class="k">A</span><span><b>정해진 말 고르기 + 한 줄(선택) · 별점 없음</b>(⑪).</span></div>
+      <div class="opt"><span class="k">B</span><span><b>별점 + 자유 리뷰</b> — 익숙하지만 가게 비방 분쟁·별점 조작을 관리해야 합니다.</span></div>
+      <p class="rec">추천 A <span>— 가게를 깎아내리는 글이 생길 틈이 작고, 「콘센트 많아요 9」처럼 지도에 바로 숫자로 얹을 수 있습니다.</span></p>
+    </div>
+  </div>
+
+  <h2 class="sec-title">이렇게 그렸습니다 — 틀리면 말씀해 주세요</h2>
+  <ul class="plain">
+    <li>「틀린 정보 알리기」가 <b>세 명</b>에게서 오면 지도에서 내리고 운영자가 확인합니다(숫자는 가정).</li>
+    <li>의견·제안에는 <b>글쓴이 이름·학번을 붙이지 않습니다</b>(운영자만 누가 썼는지 압니다).</li>
+    <li>인용은 장소마다 <b>하나만</b> 먼저 보이고, 기사 링크로 원문을 엽니다.</li>
+    <li>위치를 확인하지 못한 가게는 핀 없이 <b>목록에만</b> 둡니다.</li>
+  </ul>
+
+  <h2 class="sec-title">개발자 몫으로 남는 일</h2>
+  <ul class="plain">
+    <li><b>카카오 개발자 앱 등록</b>(장소 검색 열쇠) — 가게 이름을 지도 위치로 바꾸는 데 필요합니다. 지금 리서치 가게 24곳 중 20곳이 핀 없이 목록에만 있습니다.</li>
+    <li><b>브이월드 사용 신청</b>(바탕 지도 그림) — 사용 조건·한도는 브이월드 사이트가 이 작업 환경에서 안 열려 아직 확인 못 했습니다.</li>
+    <li><b>학보사에 알리기</b> — 기사 구절을 출처·링크와 함께 짧게 인용하는 방식입니다. 정식으로 열기 전에 학보사에 알리고 허락을 받아 두는 편이 안전합니다.</li>
+    <li><b>약관</b> — 학생이 쓴 제안·의견의 책임·삭제 조항(옛 설계 4절).</li>
+    <li><b>다른 학교</b> — 같은 리서치를 나머지 학교에 하려면 학교마다 학보·커뮤니티가 달라 손이 많이 갑니다. 한 학교로 열어 재학생 제안이 실제로 쌓이는지 본 뒤 넓히는 것을 권합니다.</li>
+  </ul>
+
+  <h2 class="sec-title">지킨 원칙</h2>
+  <ul class="plain">
+    <li><b>지어낸 값·의견 없음(원칙 6)</b> — 학생들의 말은 출처 구절 그대로, 재학생 의견은 빈 채로 엽니다. 과팅 장소처럼 못 찾은 것은 비어 있다고 말합니다. 모양만 보이는 예시는 폰 그림 밖에 두고 「시안 메모」로 표시했습니다.</li>
+    <li><b>짐작 금지(원칙 8-1)</b> — 요약·평가를 만들지 않고 원문 구절 + 출처. 위치를 모르는 가게에 위치를 지어 붙이지 않았습니다.</li>
+    <li><b>로그인하지 않음(원칙 9)</b> — 로그인 벽은 넘지 않았습니다. 사이트가 자동 수집을 금지한 곳도 읽지 않았는데, <b>디시 한 곳은 예외로 읽었고</b> 그래서 그 글은 시안에서 모두 뺐습니다(위 표).</li>
+    <li><b>가게를 깎아내리는 말은 옮기지 않음</b> · 글쓴이의 이름·계정은 옮기지 않음.</li>
+    <li><b>학생 위치를 받지 않음</b> · <b>진척은 학생이 기록</b> · <b>외부 프로그램 없음</b> · <b>앱 화면 규칙 그대로</b>(2판과 같음).</li>
+  </ul>
+
+  <details class="tech">
+    <summary>기술 메모(개발용 · 펼치기)</summary>
+    <ul>
+      <li>리서치 자료: 3갈래(공식·학보 / 블로그·매체 / 커뮤니티) → merged(장소 118 · 구역 13 · 출처 129쪽) → 검증(verdict ok 만) → <code>town.js</code>(생성본 · 익명 게시판 글은 건수만 · 익명 글만이 근거인 구역 z-wonja·z-wolgye 제외). 구역 좌표는 OSM 의 역 출구·시장·정류장 등 실제 좌표.</li>
+      <li>OSM: 정문 2.76km 까지 빠짐없이(조각 83개) · 음식점·주점 이름까지. 학교 경계 way 380910936 · 정문 node 5549312537. 노원13 → 노원03(2025-12-15 통합 · 학보 idx=22224 · 2026-01) — OSM route_ref 는 옛 번호.</li>
+      <li>못 받은 것: 상가(상권)정보 15083033(data.go.kr TLS 단계에서 끊김 ×4) · 전국CCTV·비상벨 표준데이터(file.localdata.go.kr) · 브이월드 가이드(503).</li>
+      <li>사이트 규칙: everytime.kr robots <code>Disallow: / · Allow: /$</code> · 네이버·인스타·페이스북·레딧 <code>Disallow: /</code> · 디시 <code>User-agent: * Allow: /</code> + ClaudeBot·anthropic-ai·Claude-Web 등 이름 차단(인스티즈·에펨코리아도 같은 꼴).</li>
+      <li>재학생 확인·제안·의견은 Supabase(로그인 있음)에 표 셋(제안 · 의견 · 신고) + 자기 글만 고치는 규칙 — 「게시 요청」(0008_post_requests.sql)과 같은 틀. 학교 메일 도메인 목록 필요.</li>
+      <li>화면 이야기 확인: <code>node verify/what-shows.mjs &lt;id&gt; --school=서울과학기술대학교 --year=1</code> — 홈 카드(층2 국가근로 95%) · ⑦ 공고 auto-345bnum5233cate0qidx5233.</li>
+      <li>시안 파일: index.html · campus-map.css · map-mock.js · icons.js · data.js(공개 지도·서울시 자료) · town.js(리서치) · app-parts.css·tokens.css(앱 실효값 사본) · shots/.</li>
+    </ul>
+  </details>
+
+  <p class="foot">
+    지도 그림 © OpenStreetMap contributors(ODbL) — 시안에서만 오픈스트리트맵 지도 그림 서버를 씁니다. 인용: 서울과기대신문(times.seoultech.ac.kr) · 뽈레. 공공데이터: 서울 열린데이터광장. 화면 그림: shots/s1~s11.webp · 모아 보기 shots/overview.webp.
+  </p>
+</div>
+
+<script src="vendor/leaflet.js"></script>
+<script src="icons.js"></script>
+<script src="data.js"></script>
+<script src="town.js"></script>
+<script src="map-mock.js"></script>
+</body>
+</html>
