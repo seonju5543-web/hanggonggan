@@ -957,12 +957,12 @@
   "attGap": 0
  },
  "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=432": {
-  "attTries": 2,
-  "attAt": "2026-11-24"
+  "attTries": 3,
+  "attAt": "2026-11-25"
  },
  "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=431": {
-  "attTries": 2,
-  "attAt": "2026-11-24"
+  "attTries": 3,
+  "attAt": "2026-11-25"
  },
  "https://www.sogang.ac.kr/ko/detail/551909?bbsconfigfk=141&namepage=ScholarshipNotice": {
   "att": "2026-11-24",
@@ -972,6 +972,29 @@
  "https://www.smu.ac.kr/kor/life/notice.do?articleno=770566": {
   "att": "2026-11-24",
   "attSeen": 0,
+  "attGap": 0
+ },
+ "https://www.sogang.ac.kr/ko/detail/551923?bbsconfigfk=141&namepage=ScholarshipNotice": {
+  "tries": 1,
+  "at": "2026-11-25",
+  "minBody": 100,
+  "name": "[교외] 에몬스 장학생 선발 안내(1/8 마감, 생활비 500만원)",
+  "att": "2026-11-25",
+  "attSeen": 0,
+  "attGap": 0
+ },
+ "https://www.sogang.ac.kr/ko/detail/551919?bbsconfigfk=141&namepage=ScholarshipNotice": {
+  "tries": 1,
+  "at": "2026-11-25",
+  "minBody": 100,
+  "name": "[교외] 농림축산식품부 농어촌희망재단 청년창업농장학생 선발 안내(1/5 마감, 등록금 전액 및 학업장려금 2",
+  "att": "2026-11-25",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323654&menuno=200318": {
+  "att": "2026-11-25",
+  "attSeen": 3,
   "attGap": 0
  }
 }

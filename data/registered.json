@@ -26090,7 +26090,13 @@
    "noForm": "자동 등록(검수 전) 2026-11-24 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "paidGate": "2026-11-24",
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-1446x2041.jpg",
+     "url": "https://www.sogang.ac.kr/dataview/board/141/8ad112b9-7c8b-412b-9fba-e86edd0414fb.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551923?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto"
   },
@@ -26123,7 +26129,21 @@
    "noForm": "자동 등록(검수 전) 2026-11-24 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "paidGate": "2026-11-24",
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "[붙임]2. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551919_1.hwp?sg=[%EB%B6%99%EC%9E%84]2.%202027%EB%85%84%201%ED%95%99%EA%B8%B0%20%EB%86%8D%EB%A6%BC%EC%B6%95%EC%82%B0%EC%8B%9D%ED%92%88%EB%B6%80(%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EB%86%8D%EC%9E%A5%ED%95%99%EA%B8%88)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EA%B3%B5%EA%B3%A0.hwp"
+    },
+    {
+     "name": "[붙임]3. 2027년 1학기 청년창업농장학금 선발안내.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551919_2.pdf?sg=[%EB%B6%99%EC%9E%84]3.%202027%EB%85%84%201%ED%95%99%EA%B8%B0%20%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EB%86%8D%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%84%A0%EB%B0%9C%EC%95%88%EB%82%B4.pdf"
+    },
+    {
+     "name": "본문이미지-2475x3462.png",
+     "url": "https://www.sogang.ac.kr/dataview/board/141/07de5839-0846-4de4-9273-4c3707a18f29.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551919?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto"
   },
