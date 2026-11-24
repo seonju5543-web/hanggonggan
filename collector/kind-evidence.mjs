@@ -76,6 +76,9 @@ export const SCHOOL_RECOMMEND_RE = /(?:(?<!고등|중|초등)학교|대학(?:교
    한국장학재단 근로기관 안내자료 「장학생의 소속대학에 문의 … 대학 담당자와 협의 후 대체장학생 선발」) 그 학교 게시판의 모집 글은 그 학교 학생 몫이다.
    과기대 「국가근로장학생 교체 선발모집_(주)아이티희망나눔」 은 지원서를 회사 메일(naver.com)로 받아 '학교 밖 접수'로 전국에 풀렸다(2026-11-23). */
 export const WORK_STUDY_RE = /국가\s*근로/;
+/* 이 학교 학생만 받는다 — 「신청자격 : 우리대학 3·4 학년 학부 재학생」(시립대 언론인회 · 접수는 회장 메일 naver.com) · 「본교 재학생」 (2026-11-24).
+   메일이 학교 밖이어도 자격이 그 학교 학생으로 묶이면 전국 사업이 아니다. */
+export const OWN_STUDENTS_RE = /(?:우리\s*(?:대학교?|학교)|본교|당교)\s*(?:[가-힣A-Za-z0-9·]+\s*){0,3}?(?:재학생|학부생|학생|재학\s*중)|본교생/;
 /* 본문 속 **남의 글 제목** 줄 — 이전글·다음글·옆 목록이 본문에 딸려 온다(홍익 본문 끝 「[서울 학부생] 2026-2학기 학생 포상 추천 접수」 실례).
    건국대 제목은 「[학교추천][교외]…」 꼴이라 그 줄이 학교 추천 증거로 읽혀 전국 사업이 ⓪ 에서 한 학교로 좁혀질 수 있었다(리뷰 2026-11-23).
    학교 추천 낱말은 이 공고의 제목과 제 본문 줄에서만 읽는다 — 대괄호로 시작하는 줄 · 이름표(:) 없이 안내·공고·모집·선발로 끝나는 짧은 줄은 남의 제목으로 본다. */
@@ -93,6 +96,7 @@ export function schoolWindowEvidence(x = {}) {
   if (mail) return `받는 곳 「${mail}」`;
   const ownLines = body.split('\n').filter((l) => !looksLikeOtherTitle(l)).join('\n');
   if ((m = SCHOOL_RECOMMEND_RE.exec(`${title}\n${ownLines}`))) return `학교 추천 「${m[0].trim()}」`;
+  if ((m = OWN_STUDENTS_RE.exec(`${title}\n${ownLines}`))) return `이 학교 학생만 「${m[0].trim()}」`;
   if (x.applyPortal) return `포털 ${x.applyPortal}`;
   const ed = String(x.applyEmail || '').split('@')[1] || '';
   if (domainMatches(ed, x.domain)) return `접수 이메일 도메인 ${ed} (학교)`;
@@ -159,7 +163,14 @@ export function classifyKind(x = {}) {
 
   /* ① 표식·표 — 사람이 적어 둔 것이 가장 세다 */
   if (x.campusMark && x.campusMark.test(title)) { ev.push(`제목 표식 「${title.match(x.campusMark)[0]}」`); return { kind: '교내', confidence: 'high', evidence: ev, national: false }; }
-  if (OFF_MARK_RE.test(title)) { ev.push(`제목 표식 「${title.match(OFF_MARK_RE)[0]}」`); return { kind: '교외', confidence: 'high', evidence: ev, national }; }
+  /* 🔴 [교외] 표식이어도 전국 증거(학교 밖 접수 메일 · 재단 직접 제출)는 근거에 담는다 (2026-11-24) — 예전엔 여기서 바로 돌아가 근거가 표식 하나뿐이라
+     범위 승격(nationalEvidence 는 「학교 밖|본문」 근거만 쓴다)이 [교외] 제목 공고를 영영 풀지 못했다(청로장학재단 · 보림선원 실례) */
+  if (OFF_MARK_RE.test(title)) {
+    ev.push(`제목 표식 「${title.match(OFF_MARK_RE)[0]}」`);
+    if (emailIsOutside) ev.push(`접수 이메일 도메인 ${emailDomain} (학교 밖)`);
+    if (externalApply) ev.push(`본문 「${externalApply[0].trim()}」`);
+    return { kind: '교외', confidence: 'high', evidence: ev, national };
+  }
   const own = (x.own || []).find((p) => p && title.includes(p));
   if (own) { ev.push(`학교 제도 표 「${own}」`); return { kind: '교내', confidence: 'high', evidence: ev, national: false }; }
 

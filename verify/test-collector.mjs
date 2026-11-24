@@ -2340,6 +2340,17 @@ console.log('\n■ 범위 승격 — 학교 창구 · 겹친 괄호 · 국가근
     [win('2026년도 표본재단 장학생 선발 안내', '신청: 재단 홈페이지에서 신청\n[학교추천][교외][등록금] 2026학년도 2학기 송화재단 장학생 추천 선발 안내\n2026 표본 장학생 추천 선발 안내'),
       win('표본재단 장학생', '※ 학교 추천을 받을 필요 없이 개인이 신청'), KE.schoolMailDest('접수 처리 결과는 학생처 장학팀에서 안내', '가대학교')],
     [null, null, null]);
+  /* 2026-11-24 — [교외] 제목도 전국 근거를 담는다(예전엔 표식 하나로 돌아가 승격이 영영 안 됐다) · 자격이 「우리대학 … 재학생」 이면 메일이 학교 밖이어도 그 학교 것 */
+  {
+    const off = k('[학부-교외장학] 2026학년도 (재)청로장학재단 제7기 장학생 선발 안내', '8. 접수처 : 이메일 접수', '인하대학교');
+    const offMail = KE.classifyKind({ title: '[교외] 보림선원 서울선원 장학생 선발 안내', school: '서강대학교', applyEmail: 'borimseon@gmail.com', domain: 'sogang.ac.kr', tokens: [], own: [] });
+    eq('  [교외] 표식 공고도 학교 밖 접수 메일을 근거에 담는다 (청로장학재단·보림선원 · 범위 승격이 읽는 「학교 밖」 근거)',
+      [offMail.kind, offMail.evidence.some((e) => /학교 밖/.test(e)), offMail.national, off.kind], ['교외', true, true, '교외']);
+    eq('  이 학교 학생만 받는 공고 — 「우리대학 3·4 학년 학부 재학생」(시립대 언론인회) · 「본교 재학생」 · 「본교생」 · 아니다: 「대한민국 소재 학교에 재학 중인 학생」 · 「본교 장학금 규정」',
+      [win('[교외] 제9기 서울시립대 언론인회 장학생 선발', '마 . 신청자격 : 우리대학 3·4 학년 학부 재학생 ( 졸업예정자 가능 )', { applyEmail: 'chil8811@naver.com' }), win('표본 장학', '지원자격: 본교 재학생 중 성적 우수자'), win('표본 장학', '본교생에 한함'),
+        win('표본재단 장학', '4) 국내 학교 재학 : 대한민국 소재 학교에 재학 중인 학생'), win('표본재단 장학', '본교 장학금 지급 규정에 따른다')].map((r) => (r || '').split(' 「')[0]),
+      ['이 학교 학생만', '이 학교 학생만', '이 학교 학생만', '', '']);
+  }
   eq('  이 공고 제목의 「[학교추천]」 은 그대로 학교 추천이다', !!win('[학교추천][교외][등록금] 2026학년도 2학기 송화재단 장학생 추천 선발 안내', ''), true);
   eq('  세종대 국가이공계는 「재단 온라인 신청」 으로 national 이지만 학교 추천이라 풀지 않는다 (판정기 national 은 그대로 · 거부는 창구 증거가 한다)',
     [k('2026-2 국가이공계 일시지원 장학생 선발 안내', sejong, '세종대학교').national, !!win('2026-2 국가이공계 일시지원 장학생 선발 안내', sejong)], [true, true]);
@@ -2395,13 +2406,16 @@ console.log('\n■ 범위 승격 — 학교 창구 · 겹친 괄호 · 국가근
       it('twin-a', 'ga', 6, '(홍보) 표본구 저소득 대학생 장학금 지원대상자 선발 안내(~11/30(월)까지)', { eligibility: { selective: true, schoolOnly: '가대학교' } }),
       it('twin-n', 'ra', 7, '2026년도 표본구 저소득 대학생 장학금 지원 대상자 선발 안내', { scopeFrom: '같은 사업이 나대학교 게시판에도 올라옴(자동) — 나대학교 게시판 https://na.example.ac.kr/x', alsoPostedAt: [{ school: '나대학교', url: U('na', 70), id: 'x' }] }),
       it('human', 'ga', 8, '[장학팀] 2026학년도 2학기 표본사람장학금 신청 안내', { scopeFrom: '관리자 2026-11-20' }),
+      it('off-out', 'da', 11, '[학부-교외장학] 2026학년도 (재)표본장학재단 제7기 장학생 선발 안내', { eligibility: { selective: true, schoolOnly: '다대학교' }, applyEmail: 'apply@pyobon.org', applyEmailSource: '8. 접수처 : 이메일 접수 (apply@pyobon.org)' }),
+      it('off-own', 'da', 12, '[교외] 제9기 다대학교 언론인회 장학생 선발', { eligibility: { selective: true, schoolOnly: '다대학교' }, applyEmail: 'chief@naver.com', applyEmailSource: '* 제출처 이메일 주소 : chief@naver.com' }),
     ];
     sb.write('data/registered.json', { updatedAt: today, items });
     const schoolMail = (s) => ['5. 접수방법 : 방문 또는 등기우편 제출', `* 우편제출 : 04066 서울 표본구 표본로 94 ${s} 학생회관 2층 학생처 장학팀`].join('\n');
     sb.write('collector/extracted/notices-text.json', [
       [U('ga', 1), schoolMail('가대학교')], [U('ga', 9), ['5. 제출처 및 문의처', '경기도 표본시 표본로 81 가대학교 학생회관 108 호 학생지원 . 장학팀', '- 등기우편 접수 및 방문접수'].join('\n')],
       [U('na', 2), tongyeong.replace(/통영시/g, '표본시')], [U('da', 3), schoolMail('다대학교')], [U('da', 4), '7. 지원서 제출처 : sample@naver.com (지원서 및 근로가능시간표 이메일로 제출)'],
-      [U('da', 10), sejong], [U('da', 5), '5) 접수처: 표본군 읍면행정복지센터 방문(가족 또는 학생) 또는 우편접수(등기우편 원칙)'], [U('ga', 8), schoolMail('가대학교')],
+      [U('da', 10), sejong], [U('da', 11), '4) 국내 학교 재학 : 대한민국 소재 학교에 재학 중인 학생\n8. 접수처 : 이메일 접수 (apply@pyobon.org)'],
+      [U('da', 12), '마 . 신청자격 : 우리대학 3·4 학년 학부 재학생\n* 제출처 이메일 주소 : chief@naver.com'], [U('da', 5), '5) 접수처: 표본군 읍면행정복지센터 방문(가족 또는 학생) 또는 우편접수(등기우편 원칙)'], [U('ga', 8), schoolMail('가대학교')],
     ].map(([url, text]) => ({ url, title: '', school: '', text })));
     const r = sb.run('collector/scope-promote.mjs', [], {}, 60000);
     const reg = sb.json('data/registered.json') || { items: [] };
@@ -2414,6 +2428,8 @@ console.log('\n■ 범위 승격 — 학교 창구 · 겹친 괄호 · 국가근
     eq('  [승격 로봇 실행] 🔴 ①② 학교 창구(받는 곳 장학팀 · 국가근로 · 학교 추천)는 풀지 않는다 · 시·군 받는 곳은 풀고 게시 학교를 표식에 남긴다',
       [sc('cand-mail'), sc('cand-work'), sc('cand-rec'), sc('cand-out'), /원문 증거로 전국 — 본문 「우편접수」 \(게시: 다대학교\)$/.test((at('cand-out') || {}).scopeFrom || '')],
       ['다대학교', '다대학교', '다대학교', '전국', true]);
+    eq('  [승격 로봇 실행] 🔴 [교외] 제목도 학교 밖 메일이면 풀고 · 자격이 「우리대학 … 재학생」 이면 메일이 학교 밖이어도 그대로 (2026-11-24)',
+      [sc('off-out'), /접수 이메일 도메인 pyobon\.org \(학교 밖\) \(게시: 다대학교\)$/.test((at('off-out') || {}).scopeFrom || ''), sc('off-own')], ['전국', true, '다대학교']);
     eq('  [승격 로봇 실행] 🔴 ③ 겹친 괄호 제목의 학교 한정 글이 뒤에 있는 전국 등록분에 흡수된다',
       [sc('twin-a'), ((at('twin-n') || {}).alsoPostedAt || []).map((a) => a.id)], ['없음', ['x', 'twin-a']]);
     eq('  [승격 로봇 실행] 로그에 되돌린 숫자', /scope-promote: \d+ promoted, 1 absorbed, 2 reverted/.test(r.out), true);
