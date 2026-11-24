@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": {
   "auto-rykeywordpaged1slug20262-0e9iyco": {
    "at": "2026-11-23",
@@ -98,6 +98,19 @@
      "role": "form",
      "formStart": "",
      "why": "학생이 작성하는 과학탐구활동 실행 이력서 서식과 그 작성 가이드만 들어 있습니다."
+    }
+   ]
+  },
+  "auto-oardid323654menuno200318": {
+   "at": "2026-11-25",
+   "docs": [
+    {
+     "file": "elig-13cgcf-1.pdf",
+     "attach": null,
+     "hash": "e49da1b459d4abf8",
+     "role": "content",
+     "formStart": "",
+     "why": "Cheer-Up 장학 시행계획 공고문으로 자격·금액·신청기간·서류·유의사항을 담은 읽는 글이며 학생이 채우는 서식은 없다."
     }
    ]
   }
