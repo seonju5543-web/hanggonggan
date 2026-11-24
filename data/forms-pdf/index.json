@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": {
   "auto-otice06doarticleno140764": [
    {
@@ -69,38 +69,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-11"
-   }
-  ],
-  "auto-amepagescholarshipnotice-09j8czz": [
-   {
-    "file": "auto-amepagescholarshipnotice-09j8czz/1-관정국내장학생자기소개서양식.pdf",
-    "name": "관정국내장학생자기소개서양식.hwp",
-    "pages": 4,
-    "bytes": 83977,
-    "srcBytes": 33280,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-17"
-   },
-   {
-    "file": "auto-amepagescholarshipnotice-09j8czz/2-관정국내장학생지원서양식_학부.pdf",
-    "name": "관정국내장학생지원서양식 학부.hwp",
-    "pages": 2,
-    "bytes": 164544,
-    "srcBytes": 54272,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-17"
-   },
-   {
-    "file": "auto-amepagescholarshipnotice-09j8czz/3-국내_개인정보수집동의서공통.pdf",
-    "name": "국내 개인정보수집동의서공통.hwp",
-    "pages": 2,
-    "bytes": 103773,
-    "srcBytes": 60928,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-17"
    }
   ],
   "auto-amepagescholarshipnotice-0d1tyil": [
@@ -275,28 +243,6 @@
     "at": "2026-11-17"
    }
   ],
-  "auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle": [
-   {
-    "file": "auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle/1-붙임_2._장학생_지원서_및_자기소개서.pdf",
-    "name": "붙임_2._장학생_지원서_및_자기소개서.hwp",
-    "pages": 4,
-    "bytes": 152368,
-    "srcBytes": 57344,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   },
-   {
-    "file": "auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle/2-붙임_3._개인정보_수집_이용_및_제3자_제공_동의서.pdf",
-    "name": "붙임_3._개인정보_수집_이용_및_제3자_제공_동의서.docx",
-    "pages": 1,
-    "bytes": 148252,
-    "srcBytes": 12577,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
   "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds": [
    {
     "file": "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds/1-미래로장학금_재심__신청서_양식_2026_2R_.pdf",
@@ -343,72 +289,6 @@
     "at": "2026-11-18"
    }
   ],
-  "act-02ed6k3": [
-   {
-    "file": "act-02ed6k3/1-붙임_지원서_양식_.pdf",
-    "name": "붙임+지원서(양식).hwp",
-    "pages": 6,
-    "bytes": 303915,
-    "srcBytes": 132096,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
-  "act-01hrsly": [
-   {
-    "file": "act-01hrsly/1-별지_제1호_서식_참가신청서.pdf",
-    "name": "별지 제1호 서식_참가신청서.pdf",
-    "pages": 0,
-    "bytes": 51622,
-    "srcBytes": 51622,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   },
-   {
-    "file": "act-01hrsly/2-별지_제2호_서식_참가서약서.pdf",
-    "name": "별지 제2호 서식_참가서약서.pdf",
-    "pages": 0,
-    "bytes": 73040,
-    "srcBytes": 73040,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   },
-   {
-    "file": "act-01hrsly/3-별지_제3호_서식_개인정보_수집_이용_동의서.pdf",
-    "name": "별지 제3호 서식_개인정보 수집 이용 동의서.pdf",
-    "pages": 0,
-    "bytes": 62186,
-    "srcBytes": 62186,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
-  "act-0b5f7n7": [
-   {
-    "file": "act-0b5f7n7/1-_붙임2-1_서울대학교_융합과학기술대학원_2026학년도_동계_융합연구프로그램_지원서.pdf",
-    "name": "[붙임2-1] 서울대학교 융합과학기술대학원 2026학년도 동계 융합연구프로그램 지원서.hwp",
-    "pages": 2,
-    "bytes": 104192,
-    "srcBytes": 99328,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   },
-   {
-    "file": "act-0b5f7n7/2-_붙임2-2_서울대학교_융합과학기술대학원_2026학년도_동계_융합연구프로그램_지원서.pdf",
-    "name": "[붙임2-2] 서울대학교 융합과학기술대학원 2026학년도 동계 융합연구프로그램 지원서.docx",
-    "pages": 2,
-    "bytes": 104456,
-    "srcBytes": 23860,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
   "act-0qcoq7g": [
    {
     "file": "act-0qcoq7g/1-미래사회문제와_인문사회_융합세미나_수업계획서_.pdf",
@@ -440,18 +320,6 @@
     "pages": 2,
     "bytes": 100386,
     "srcBytes": 79872,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-19"
-   }
-  ],
-  "auto-krbbskr846174artclviewdo": [
-   {
-    "file": "auto-krbbskr846174artclviewdo/1-CHUBB_Innovation_Fund_7기_신청서_학생용_.pdf",
-    "name": "CHUBB Innovation Fund 7기_신청서 (학생용).docx",
-    "pages": 3,
-    "bytes": 146664,
-    "srcBytes": 48596,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-19"
@@ -679,40 +547,118 @@
     "at": "2026-11-22"
    }
   ],
-  "act-0qklvg8": [
+  "auto-rykeywordpaged1slug20262-0e9iyco": [
    {
-    "file": "act-0qklvg8/1-붙임_2._제21기_씨티-경희대_NGO_인턴십_프로그램_인턴_지원서.pdf",
-    "name": "붙임 2. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 지원서.hwp",
+    "file": "auto-rykeywordpaged1slug20262-0e9iyco/1-붙임1-장학금-지원서_양식학생지원팀.pdf",
+    "name": "붙임1-장학금-지원서_양식학생지원팀.hwp",
+    "pages": 4,
+    "bytes": 105681,
+    "srcBytes": 52224,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-24"
+   },
+   {
+    "file": "auto-rykeywordpaged1slug20262-0e9iyco/2-붙임2-개인정보-수집_이용-및-제3자-제공-동의서_숭실대학생지원팀_개정후.pdf",
+    "name": "붙임2-개인정보-수집·이용-및-제3자-제공-동의서_숭실대학생지원팀_개정후.hwp",
+    "pages": 2,
+    "bytes": 127113,
+    "srcBytes": 85504,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-24"
+   }
+  ],
+  "auto-tegory1moddocumentuid432": [
+   {
+    "file": "auto-tegory1moddocumentuid432/1-선발자-제출서류서약서-및-수혜-후기-보고서.pdf",
+    "name": "선발자-제출서류서약서-및-수혜-후기-보고서.hwp",
+    "pages": 4,
+    "bytes": 107422,
+    "srcBytes": 98816,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-24"
+   }
+  ],
+  "auto-tegory1moddocumentuid431": [
+   {
+    "file": "auto-tegory1moddocumentuid431/1-3-1.-2027학년도-1학기-장학선정신청서.pdf",
+    "name": "3-1.-2027학년도-1학기-장학선정신청서.hwp",
+    "pages": 1,
+    "bytes": 65490,
+    "srcBytes": 28160,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-24"
+   },
+   {
+    "file": "auto-tegory1moddocumentuid431/2-3-2-2027학년도-1학기-장학선정신청서.pdf",
+    "name": "3-2-2027학년도-1학기-장학선정신청서.doc",
+    "pages": 1,
+    "bytes": 63595,
+    "srcBytes": 38400,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-24"
+   }
+  ],
+  "auto-amepagescholarshipnotice-0k6yc5n": [
+   {
+    "file": "auto-amepagescholarshipnotice-0k6yc5n/1-2-_서식_자기소개서.pdf",
+    "name": "2-(서식) 자기소개서.docx",
+    "pages": 2,
+    "bytes": 52405,
+    "srcBytes": 28958,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-24"
+   },
+   {
+    "file": "auto-amepagescholarshipnotice-0k6yc5n/2-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf",
+    "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
+    "pages": 1,
+    "bytes": 94932,
+    "srcBytes": 94932,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-24"
+   }
+  ],
+  "act-090pxw4": [
+   {
+    "file": "act-090pxw4/1-2026_Pre_TeX-Corps_신청서_충북대.pdf",
+    "name": "2026 Pre TeX-Corps 신청서_충북대.hwp",
     "pages": 3,
-    "bytes": 199425,
-    "srcBytes": 258048,
+    "bytes": 233961,
+    "srcBytes": 65536,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
-    "at": "2026-11-22"
+    "at": "2026-11-24"
    }
   ],
-  "act-037wp91": [
+  "act-05qwozc": [
    {
-    "file": "act-037wp91/1-_붙임2_신청_양식.pdf",
-    "name": "[붙임2] 신청 양식.hwp",
-    "pages": 6,
-    "bytes": 308031,
-    "srcBytes": 98304,
+    "file": "act-05qwozc/1-_양식_봉사활동_인증제도_신청서_및_증빙서류_2026_.pdf",
+    "name": "(양식) 봉사활동 인증제도 신청서 및 증빙서류 (2026).hwp",
+    "pages": 7,
+    "bytes": 304978,
+    "srcBytes": 226816,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
-    "at": "2026-11-23"
+    "at": "2026-11-24"
    }
   ],
-  "act-1fz2fcx": [
+  "act-0empyzd": [
    {
-    "file": "act-1fz2fcx/1-_붙임2_신청_양식.pdf",
-    "name": "[붙임2] 신청 양식.hwp",
-    "pages": 6,
-    "bytes": 308031,
-    "srcBytes": 98304,
+    "file": "act-0empyzd/1-Attachment_2027학년도_자율전공학부_멘토_신청서_및_개인정보수집동의서.pdf",
+    "name": "Attachment 2027학년도 자율전공학부 멘토 신청서 및 개인정보수집동의서.hwp",
+    "pages": 2,
+    "bytes": 125363,
+    "srcBytes": 87552,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
-    "at": "2026-11-23"
+    "at": "2026-11-24"
    }
   ]
  },
@@ -738,11 +684,8 @@
   "auto-amepagescholarshipnotice-0ywblu5": {
    "[붙임2] 27년도_제출서류양식.hwp": "form"
   },
-  "act-037wp91": {
-   "[붙임2] 신청 양식.hwp": "form"
-  },
-  "act-1fz2fcx": {
-   "[붙임2] 신청 양식.hwp": "form"
+  "auto-tegory1moddocumentuid432": {
+   "선발자-제출서류서약서-및-수혜-후기-보고서.hwp": "form"
   }
  }
 }

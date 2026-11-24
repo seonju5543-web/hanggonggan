@@ -1,31 +1,21 @@
-## 🧾 신청서 쪽 그림 · 빈칸 자리 리포트 (2026-11-23)
+## 🧾 신청서 쪽 그림 · 빈칸 자리 리포트 (2026-11-24)
 
 원본 PDF 사본(data/forms-pdf)의 쪽 그림(WebP)과 이름표 옆 빈칸 자리(fields.json)를 만듭니다 — 앱의 「양식 채우기」가 그 위에 학생 답을 얹습니다. 🔴 칸을 지어내지 않습니다(못 찾은 파일은 빈 배열).
 
-파일 81개 — 이번에 만듦 2 · 그대로 79 · 실패 0 · 빈칸 합 151(프로필로 채울 수 있는 것 132) · 빈칸 0개 파일 61 · 표 머리글 아래 칸(학생이 적는 칸) 30 · 선 없는 쪽에서 머리글로 건너뛴 줄 0
-이름표별: 이름 12 · 학번 12 · 학과 12 · 연락처 2 · 이메일 2
+파일 76개 — 이번에 만듦 10 · 그대로 66 · 실패 0 · 빈칸 합 141(프로필로 채울 수 있는 것 126) · 빈칸 0개 파일 58 · 표 머리글 아래 칸(학생이 적는 칸) 8 · 선 없는 쪽에서 머리글로 건너뛴 줄 0
+이름표별: 연락처 10 · 이름 8 · 이메일 7 · 학번 4 · 학교 2 · 계좌번호 2 · 학과 1
 
 ### 빈칸을 하나도 못 찾은 파일 (학생은 원본을 받아 손으로 쓴다 · 관리자가 칸을 지정하는 길은 다음 조각)
 - auto-orykeywordpaged1slug2026-0ezoyxo · 2-2026년-숭실대-노동조합-직원-추천-장학생-선발관련-개인정보제공-동의서.pdf
-- auto-amepagescholarshipnotice-09j8czz · 1-관정국내장학생자기소개서양식.pdf
 - auto-amepagescholarshipnotice-0d1tyil · 2-첨부2-1._양식_삼성꿈장학재단_글로벌_희망장학_신청서_학부_.pdf
 - auto-ervicenoticedetail521206 · 2-개인정보_수집_및_이용_동의서_2026장학_.pdf
-- auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle · 1-붙임_2._장학생_지원서_및_자기소개서.pdf
-- auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle · 2-붙임_3._개인정보_수집_이용_및_제3자_제공_동의서.pdf
 - auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds · 1-미래로장학금_재심__신청서_양식_2026_2R_.pdf
 - auto-ent2431271834artclviewdo · 1-2026-2학기_외대비전HUFSDorm_장학금_신청서_및_추천서.pdf
 - auto-ent2431271834artclviewdo · 2-개인정보수집이용동의서.pdf
 - auto-ervicenoticedetail521215 · 1-신청서류_양식_.pdf
-- act-02ed6k3 · 1-붙임_지원서_양식_.pdf
-- act-01hrsly · 1-별지_제1호_서식_참가신청서.pdf
-- act-01hrsly · 2-별지_제2호_서식_참가서약서.pdf
-- act-01hrsly · 3-별지_제3호_서식_개인정보_수집_이용_동의서.pdf
-- act-0b5f7n7 · 1-_붙임2-1_서울대학교_융합과학기술대학원_2026학년도_동계_융합연구프로그램_지원서.pdf
-- act-0b5f7n7 · 2-_붙임2-2_서울대학교_융합과학기술대학원_2026학년도_동계_융합연구프로그램_지원서.pdf
 - act-0qcoq7g · 1-미래사회문제와_인문사회_융합세미나_수업계획서_.pdf
 - auto-0005009002000000seq31571 · 1-성과형_장학금_자격증_신청서_및_개인정보활용서.pdf
 - auto-amepagescholarshipnotice-1p6dyle · 1-개인정보_수집_및_활용_동의서.pdf
-- auto-krbbskr846174artclviewdo · 1-CHUBB_Innovation_Fund_7기_신청서_학생용_.pdf
 - act-1pk75lo · 1-26회_융합기초프로젝트_팀_신청서.pdf
 - act-1354f33 · 1-_붙임1_신청서_및_개인정보_수집활용_동의서_주제1_.pdf
 - act-0slj2js · 1-3._양식_예비언론인캠프_참가신청서_제29기_최종_.pdf
@@ -45,9 +35,16 @@
 - act-03xr7pr · 3-온라인_원서접수_및_수험표_다운로드_안내_연수시스템_.pdf
 - auto-q1brddate20261105brdseq1 · 1-자기소개서_기본형_1_.pdf
 - auto-q1brddate20261105brdseq1 · 2-발전기금_장학생_신청서_2026년2학기_1_.pdf
-- act-0qklvg8 · 1-붙임_2._제21기_씨티-경희대_NGO_인턴십_프로그램_인턴_지원서.pdf
-- act-037wp91 · 1-_붙임2_신청_양식.pdf
-- act-1fz2fcx · 1-_붙임2_신청_양식.pdf
+- auto-rykeywordpaged1slug20262-0e9iyco · 1-붙임1-장학금-지원서_양식학생지원팀.pdf
+- auto-rykeywordpaged1slug20262-0e9iyco · 2-붙임2-개인정보-수집_이용-및-제3자-제공-동의서_숭실대학생지원팀_개정후.pdf
+- auto-tegory1moddocumentuid432 · 1-선발자-제출서류서약서-및-수혜-후기-보고서.pdf
+- auto-tegory1moddocumentuid431 · 1-3-1.-2027학년도-1학기-장학선정신청서.pdf
+- auto-tegory1moddocumentuid431 · 2-3-2-2027학년도-1학기-장학선정신청서.pdf
+- auto-amepagescholarshipnotice-0k6yc5n · 1-2-_서식_자기소개서.pdf
+- auto-amepagescholarshipnotice-0k6yc5n · 2-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf
+- act-090pxw4 · 1-2026_Pre_TeX-Corps_신청서_충북대.pdf
+- act-05qwozc · 1-_양식_봉사활동_인증제도_신청서_및_증빙서류_2026_.pdf
+- act-0empyzd · 1-Attachment_2027학년도_자율전공학부_멘토_신청서_및_개인정보수집동의서.pdf
 - kosaf-2000429013 · 1-_공고문_2026년_전입장학금_지원_공고_p5-6.pdf
 - auto-ent2431269128artclviewdo · 1-elig-1qi88m-1_p5-8.pdf
 - kosaf-2000204008 · 1-다자녀가정_특별지원_대학등록금_지원신청서_p1-3.pdf
@@ -71,12 +68,12 @@
 ### 🎯 빈칸 정확도 (사람 채점 표본 · collector/form-fields-grades.json)
 아직 채점한 파일이 없습니다 — 아래 표본을 한 번 채점해 주세요(칸마다 맞음·놓침·틀림 · 파일 sha 를 열쇠로):
 - auto-orykeywordpaged1slug2026-0ezoyxo · 2-2026년-숭실대-노동조합-직원-추천-장학생-선발관련-개인정보제공-동의서.pdf — 지금 찾은 칸 0 · sha 7aa8ec1e325a
-- auto-amepagescholarshipnotice-09j8czz · 1-관정국내장학생자기소개서양식.pdf — 지금 찾은 칸 0 · sha 80d34f142d26
 - auto-amepagescholarshipnotice-0d1tyil · 2-첨부2-1._양식_삼성꿈장학재단_글로벌_희망장학_신청서_학부_.pdf — 지금 찾은 칸 0 · sha 756e79424f0d
 - auto-ervicenoticedetail521206 · 2-개인정보_수집_및_이용_동의서_2026장학_.pdf — 지금 찾은 칸 0 · sha c0927f4aecb2
+- auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds · 1-미래로장학금_재심__신청서_양식_2026_2R_.pdf — 지금 찾은 칸 0 · sha a355e4388c57
 - auto-amepagescholarshipnotice-0d1tyil · 1-_양식_삼성꿈장학재단_글로벌_희망장학_신청서_학부_.pdf — 지금 찾은 칸 14 · sha e0cc15da855f
 - auto-otice06doarticleno140764 · 1-장학금_신청서_사업참여확약서_개인정보제공활용동의서.pdf — 지금 찾은 칸 13 · sha cc58daaaf31e
 - act-0r96zru · 1-2._2026년_제주-유네스코_청년_연수_프로그램_신청서식.pdf — 지금 찾은 칸 12 · sha 4172d6c50b7c
+- auto-enoticedoarticleno770333 · 2-붙임.근로장학생_포기신청서.pdf — 지금 찾은 칸 4 · sha 1e3bccfc6394
 - auto-skor478126731artclviewdo · 1-사회봉사활동_자기소개서-이오순장학재단_2027-1_.pdf — 지금 찾은 칸 3 · sha e0cc28b7ceea
 - auto-ent2431270591artclviewdo · 1-2026학년도_2학기_HUFS_Dream_장학금_신청서_공고용_.pdf — 지금 찾은 칸 2 · sha ce935b7df344
-- auto-amepagescholarshipnotice-09j8czz · 3-국내_개인정보수집동의서공통.pdf — 지금 찾은 칸 2 · sha 67fe0ff4cb47

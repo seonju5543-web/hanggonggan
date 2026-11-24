@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": {
   "auto-o2432actionviewno9994682": [
    {
@@ -143,19 +143,6 @@
     "at": "2026-10-28"
    }
   ],
-  "auto-bbssc58944506artclviewdo": [
-   {
-    "file": "auto-bbssc58944506artclviewdo/1-elig-1g9py0-1_p3-5.pdf",
-    "name": "공고문 안 신청서 서식 (3, 5쪽)",
-    "pages": 2,
-    "bytes": 246073,
-    "src": "elig-1g9py0-1.hwp",
-    "srcBytes": 75776,
-    "srcPages": "3, 5",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-29"
-   }
-  ],
   "kosaf-2704219001": [
    {
     "file": "kosaf-2704219001/1-2026년_2학기_영광군_대학생등록금_지원사업_공고_안__p7-7.pdf",
@@ -219,32 +206,6 @@
     "at": "2026-11-04"
    }
   ],
-  "kosaf-2000356002": [
-   {
-    "file": "kosaf-2000356002/1-2026년_통영시_저소득_대학생_장학금_지원대상자_선발_공고_p3-5.pdf",
-    "name": "공고문 안 신청서 서식 (3, 5쪽)",
-    "pages": 2,
-    "bytes": 255987,
-    "src": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwpx",
-    "srcBytes": 77534,
-    "srcPages": "3, 5",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-04"
-   }
-  ],
-  "kosaf-2000356004": [
-   {
-    "file": "kosaf-2000356004/1-2026년도_통영시_지역대학생_장학금_지원대상자_선발_공고_p3-4.pdf",
-    "name": "공고문 안 신청서 서식 (3~4쪽)",
-    "pages": 2,
-    "bytes": 233036,
-    "src": "2026년도 통영시 지역대학생 장학금 지원대상자 선발 공고.hwpx",
-    "srcBytes": 68363,
-    "srcPages": "3~4",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-04"
-   }
-  ],
   "kosaf-2701180001": [
    {
     "file": "kosaf-2701180001/1-_공고_2026년장학회선발계획_공고_대학생__p3-8.pdf",
@@ -256,19 +217,6 @@
     "srcPages": "3, 6, 8",
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-11-04"
-   }
-  ],
-  "auto-345bnum5233cate0qidx5233": [
-   {
-    "file": "auto-345bnum5233cate0qidx5233/1-elig-1s2isd-1_p3-5.pdf",
-    "name": "공고문 안 신청서 서식 (3, 5쪽)",
-    "pages": 2,
-    "bytes": 255987,
-    "src": "elig-1s2isd-1.hwpx",
-    "srcBytes": 77534,
-    "srcPages": "3, 5",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-06"
    }
   ],
   "kosaf-0723001": [
@@ -293,14 +241,6 @@
     "srcBytes": 152754,
     "none": true,
     "at": "2026-11-07"
-   }
-  ],
-  "auto-amepagescholarshipnotice-09j8czz": [
-   {
-    "src": "elig-rm8ras-1.pdf",
-    "srcBytes": 458360,
-    "none": true,
-    "at": "2026-11-09"
    }
   ],
   "auto-bbssc58944606artclviewdo": [
@@ -343,22 +283,6 @@
     "srcBytes": 2764328,
     "none": true,
     "at": "2026-11-12"
-   }
-  ],
-  "kosaf-0774003": [
-   {
-    "src": "2026년도 우수 장애학생선수 체육장학금 지원계획 공고.pdf",
-    "srcBytes": 269236,
-    "none": true,
-    "at": "2026-11-14"
-   }
-  ],
-  "kosaf-2000483023": [
-   {
-    "src": "붙임 1. 2026년 서울선순환인재 장학금_선발 공고문.hwp",
-    "srcBytes": 129536,
-    "none": true,
-    "at": "2026-11-14"
    }
   ],
   "kosaf-2701277003": [
@@ -469,20 +393,6 @@
     "at": "2026-11-18"
    }
   ],
-  "auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle": [
-   {
-    "src": "elig-1tq99x-1.docx",
-    "srcBytes": 13123,
-    "none": true,
-    "at": "2026-11-18"
-   },
-   {
-    "src": "elig-1tq99x-2.docx",
-    "srcBytes": 24620,
-    "none": true,
-    "at": "2026-11-18"
-   }
-  ],
   "auto-amepagescholarshipnotice-1h5dt8m": [
    {
     "src": "elig-qvghpz-1.hwp",
@@ -522,14 +432,6 @@
     "srcBytes": 172908,
     "srcPages": "4~6",
     "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-20"
-   }
-  ],
-  "auto-enoticedoarticleno770332": [
-   {
-    "src": "elig-13mq64-1.pdf",
-    "srcBytes": 72895,
-    "none": true,
     "at": "2026-11-20"
    }
   ],
@@ -600,6 +502,34 @@
     "srcPages": "3, 5",
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-11-21"
+   }
+  ],
+  "auto-tegory1moddocumentuid432": [
+   {
+    "src": "elig-1irzyx-1.hwp",
+    "srcBytes": 72704,
+    "none": true,
+    "at": "2026-11-24",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   }
+  ],
+  "auto-tegory1moddocumentuid431": [
+   {
+    "src": "elig-v2aw2p-1.hwp",
+    "srcBytes": 75264,
+    "none": true,
+    "at": "2026-11-24",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   },
+   {
+    "src": "elig-v2aw2p-2.hwp",
+    "srcBytes": 70656,
+    "none": true,
+    "at": "2026-11-24",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
    }
   ]
  }
