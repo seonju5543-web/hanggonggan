@@ -82,6 +82,8 @@
   }
 
   function mount(el) {
+    var H = window.MapMock || {};   // 눌러 보는 시안(play.html)이 onPick·onZone 을 달아 둔다 — 없으면 예전처럼 눌리지 않는다
+    function pickable(m, id) { if (H.onPick && id) m.on('click', function () { H.onPick(id); }); return m; }
     var cfg = {};
     try { cfg = JSON.parse(el.getAttribute('data-map') || '{}'); } catch (e) { console.error('data-map', e); }
     var center;
@@ -118,13 +120,15 @@
         if (z.id === 'z-campus') return;   // 캠퍼스는 경계선으로 따로 그린다
         if (cfg.zones !== 'all' && cfg.zones.indexOf(z.id) < 0) return;
         var hl = (cfg.zoneFocus || []).indexOf(z.id) >= 0;
-        L.circle([z.lat, z.lon], { radius: z.r || 250, className: 'm-zone' + (hl ? ' is-hl' : ''), weight: hl ? 2 : 1.2, interactive: false }).addTo(map);
+        var zc = L.circle([z.lat, z.lon], { radius: z.r || 250, className: 'm-zone' + (hl ? ' is-hl' : ''), weight: hl ? 2 : 1.2, interactive: !!H.onZone }).addTo(map);
+        if (H.onZone) zc.on('click', (function (id) { return function () { H.onZone(id); }; })(z.id));
         if (cfg.zoneLabels !== false && (!cfg.zoneLabelIds || cfg.zoneLabelIds.indexOf(z.id) >= 0)) {
           // 이름표는 원 밖에 둔다 — 원의 화면 반지름(px)을 구해 그만큼 밀어낸다
           var rpx = Math.round((z.r || 250) / (156543.03392 * Math.cos(z.lat * Math.PI / 180) / Math.pow(2, map.getZoom()))) + 5;
           var side = (cfg.zoneLabelSide || {})[z.id] || 'above';
           var tf = side === 'right' ? 'translate(' + rpx + 'px,-50%)' : side === 'left' ? 'translate(calc(-100% - ' + rpx + 'px),-50%)' : side === 'below' ? 'translate(-50%,' + rpx + 'px)' : 'translate(-50%,calc(-100% - ' + rpx + 'px))';
-          L.marker([z.lat, z.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'm-dong-label-wrap', html: '<span class="m-dong-label m-zone-label' + (hl || !cfg.zoneFocus ? '' : ' dim') + '" style="transform:' + tf + '">' + esc(z.short || z.name) + '</span>', iconSize: [0, 0] }) }).addTo(map);
+          var zl = L.marker([z.lat, z.lon], { interactive: !!H.onZone, keyboard: false, icon: L.divIcon({ className: 'm-dong-label-wrap', html: '<span class="m-dong-label m-zone-label' + (hl || !cfg.zoneFocus ? '' : ' dim') + '" style="transform:' + tf + '">' + esc(z.short || z.name) + '</span>', iconSize: [0, 0] }) }).addTo(map);
+          if (H.onZone) zl.on('click', (function (id) { return function () { H.onZone(id); }; })(z.id));
         }
       });
     }
@@ -140,7 +144,7 @@
       ((window.CAMPUS_TOWN || {}).places || []).forEach(function (p) {
         if (pinned0[p.id] || cfg.townCats.indexOf(p.category) < 0) return;
         if (cfg.townZone && p.zone !== cfg.townZone) return;
-        L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'm-pin-wrap', html: '<span class="m-dot"></span>', iconSize: [10, 10], iconAnchor: [5, 5] }), interactive: false, keyboard: false }).addTo(map);
+        pickable(L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'm-pin-wrap', html: '<span class="m-dot"></span>', iconSize: [10, 10], iconAnchor: [5, 5] }), interactive: !!H.onPick, keyboard: false }), p.id).addTo(map);
       });
     }
     if (cfg.campus !== false && D.campus && D.campus.length) {
@@ -176,13 +180,13 @@
         if (!ok) return;
       }
       if (cfg.maxDist && p.dist > cfg.maxDist) return;
-      L.marker([p.lat, p.lon], { icon: pinIcon(p, cfg, 'dot'), interactive: false, keyboard: false }).addTo(map);
+      pickable(L.marker([p.lat, p.lon], { icon: pinIcon(p, cfg, 'dot'), interactive: !!H.onPick, keyboard: false }), p.id).addTo(map);
       drawn++;
     });
     (cfg.pins || []).forEach(function (id, i) {
       var p = byId(id);
       if (!p) { console.warn('핀 없음', id); return; }
-      L.marker([p.lat, p.lon], { icon: pinIcon(p, cfg, 'pin'), interactive: false, keyboard: false, zIndexOffset: cfg.focus === id ? 1000 : 200 + i }).addTo(map);
+      pickable(L.marker([p.lat, p.lon], { icon: pinIcon(p, cfg, 'pin'), interactive: !!H.onPick, keyboard: false, zIndexOffset: cfg.focus === id ? 1000 : 200 + i }), id).addTo(map);
     });
     if (cfg.gate !== false) {
       L.marker([D.gate.lat, D.gate.lon], { interactive: false, keyboard: false, zIndexOffset: 900, icon: L.divIcon({ className: 'm-pin-wrap', html: '<span class="m-gate">' + window.mapIcon('gate', 13) + '<i>정문</i></span>', iconSize: [0, 0] }) }).addTo(map);
@@ -243,7 +247,7 @@
     for (var k = 0; k < gos.length; k++) gos[k].innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
   }
 
-  window.MapMock = { mount: mount, byId: byId };
+  window.MapMock = { mount: mount, byId: byId, fillUi: fillUi, CAT_ICON: CAT_ICON, esc: esc };
   function boot() {
     fillUi();
     var els = document.querySelectorAll('[data-map]');
