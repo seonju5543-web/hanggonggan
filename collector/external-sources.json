@@ -778,7 +778,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-10",
+    "checkedAt": "2026-11-24",
     "why": "홈페이지 못 엶 (HTTP 403)",
     "best": null
    }
