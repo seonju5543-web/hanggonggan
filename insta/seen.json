@@ -5282,6 +5282,84 @@
    "dir": "insta/pub/2704383001",
    "at": "2026-11-20",
    "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2704173001",
+   "org": "강남장학회",
+   "name": "장학생",
+   "due": "2026-12-13",
+   "school": null,
+   "tplNo": 2,
+   "cards": 4,
+   "dir": "insta/pub/2704173001",
+   "at": "2026-11-24",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2500029003",
+   "org": "양천장학회",
+   "name": "학업지원 특별장학금",
+   "due": "2026-11-26",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2500029003",
+   "at": "2026-11-24",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2700542004",
+   "org": "(재)협성문화재단",
+   "name": "건설근로자 자녀 협성장학생",
+   "due": "2027-01-04",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2700542004",
+   "at": "2026-11-24",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2700542002",
+   "org": "(재)협성문화재단",
+   "name": "부산·울산·경남지역 고교 출신 협성장학생",
+   "due": "2027-01-04",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2700542002",
+   "at": "2026-11-24",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2704065001",
+   "org": "에몬스장학회",
+   "name": "에몬스 장학생",
+   "due": "2027-01-08",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2704065001",
+   "at": "2026-11-24",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000425003",
+   "org": "재단법인보은군민장학회",
+   "name": "학교장추천장학금",
+   "due": "2026-12-11",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000425003",
+   "at": "2026-11-24",
+   "dates": "absolute"
   }
  ]
 }

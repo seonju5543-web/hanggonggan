@@ -1,0 +1,15 @@
+{
+ "code": "2000425003",
+ "org": "재단법인보은군민장학회",
+ "name": "학교장추천장학금",
+ "due": "2026-12-11",
+ "school": null,
+ "tpl": "photo",
+ "tplNo": 1,
+ "seed": 1117108696,
+ "skin": "blue",
+ "font": null,
+ "cards": 5,
+ "at": "2026-11-24",
+ "dates": "absolute"
+}
