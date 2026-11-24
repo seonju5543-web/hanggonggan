@@ -1,7 +1,19 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": [
+  {
+   "title": "[교양교육원] 2026학년도 2학기 독서토론대회 결승전 개최 안내(12/4 기념...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512419",
+   "postedAt": "2026-11-24",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-25",
+   "thumb": "data/news/img/d822137a59b2c331.webp",
+   "desc": "결승전 관림이 가능하오니 학생 여러분들의 많은 관심과 참석바랍니다 . ★ 결승전 참관 시 간식 및 기념품 제공 ( 선착순 ) ★"
+  },
   {
    "title": "부산AX협의체 제2회 AX 확산 포럼 'Ready for QX'",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512416",
@@ -54,7 +66,8 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-11-24",
-   "thumb": "data/news/img/a7aa943aa94419ff.webp"
+   "thumb": "data/news/img/a7aa943aa94419ff.webp",
+   "desc": "안녕하십니까 . 성평등가족부 에서는 9~24 세 취약계층 ( 기초 ․ 차상위 ․ 한부모 ) 여성청소년 에게 생리 용품 구입비를 전자 바우처로 지원 하고 있습니다 . 올해부터는 언제 신청하든지 연간 지원금 전액…"
   },
   {
    "title": "2026년 12월 현역병 모집 계획",
@@ -63,7 +76,8 @@
    "school": "부산대학교",
    "campus": "",
    "src": "2d0d4013",
-   "foundAt": "2026-11-23"
+   "foundAt": "2026-11-23",
+   "desc": "육군.해군.해병.공군 모집병 모집 계획(2026년 12월)을 붙임과 같이 알려드립니다."
   },
   {
    "title": "[언어교육원] 2026학년도 겨울학기 대학원 학위청구 외국어시험 (한국어) 대체...",
@@ -409,18 +423,6 @@
    "foundAt": "2026-11-16",
    "thumb": "data/news/img/c2d2a742995fb0e8.webp",
    "desc": "※ 신청 전 아래 유의사항 을 확인해주시기 바랍니다. 최대한 희망 언어, 성별 등을 고려하여 매칭하기 위해 최선을 다하고 있습니다."
-  },
-  {
-   "title": "[SK AX] SK AX 현직자 AI 기술특강 및 SK 채용·SKALA 설명회 ...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512198",
-   "postedAt": "2026-11-16",
-   "kind": "행사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-16",
-   "thumb": "data/news/img/2646831fe8e8f6bb.webp",
-   "desc": "- 장소: IT관 306호 - 내용: SK AX 현직자가 전하는 AI 기술 활용 사례와 최신 기술 동향, 산업 현장의 실무 경험 및 문제 해결 과정 소개"
   }
  ]
 }

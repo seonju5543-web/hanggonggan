@@ -1,7 +1,29 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": [
+  {
+   "title": "사회과학/예술대학행정실 행정조교 모집[~11.30.(월) 16:00까지]",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142313&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-24",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-25",
+   "desc": "사회과학/예술대학행정실에서 행정업무를 담당할 행정조교를 다음과 같이 모집합니다."
+  },
+  {
+   "title": "IUC 10주년 기념 국제학술대회 (2026.12.11）",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142310&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-24",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-25",
+   "thumb": "data/news/img/2d01948a987f392f.webp",
+   "desc": "동아시아학술원 성균관대학교 동아시아학술원 국제한국학센터(IUC), 한국국제교류재단(KF), 성균관대학교 국어국문학과 BK21교육연구단이 공동 주최하는 IUC 10주년 기념 국제학술대회가 2026년 12월…"
+  },
   {
    "title": "경제대학 경제학과 행정조교 신규 채용 ~12.4.(금) 16시까지(합격자 결정 시 조기마감 가능)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=139855&article.offset=0&articleLimit=10",
@@ -44,7 +66,7 @@
    "src": "45ec8fd1",
    "foundAt": "2026-11-23",
    "thumb": "data/news/img/d665d55c5e52247d.webp",
-   "desc": "두 개의 트랙 가운데 하나를 선택하여 팀 학습을 진행하고, 학습 내용을 바탕으로 팀원들과 AI 콘텐츠를 제작하여 공유하는 프로그램입니다."
+   "desc": "안녕하세요. 교수학습혁신센터에서 2026학년도 겨울방학 “성균공부방 : Share via AI” 참가자를 모집합니다."
   },
   {
    "title": "사회과학대학 제42회 수선포럼 개최 안내: 2026.12.16.(수) 16:00~17:30",
@@ -416,28 +438,6 @@
    "foundAt": "2026-11-13",
    "thumb": "data/news/img/6b069539037f620a.webp",
    "desc": "학생지원팀 서울특별시에서는 건축설계그룹 BIG의 기획전시 「MATERIALISM(머티리얼리즘)」을 개최합니다. 이번 전시는 건축재료를 중심으로 설계 아이디어가 실제 공간으로 구현되는 과정을 소개합니다."
-  },
-  {
-   "title": "성균관대학교 전자전기공학부 자체계약직원 채용(~ 2026.11.20.(금) 14시 까지)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140837&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-13",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-13",
-   "desc": "정보통신/소프트웨어/공과대학행정실 성균관대학교 정보통신대학 전자전기공학부 사무실 행정인력을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다."
-  },
-  {
-   "title": "대학원혁신센터 촉탁직원 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141887&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-12",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-12",
-   "desc": "총괄지원팀 우리대학 대학원혁신센터에서 BK대학원혁신지원사업을 담당할 촉탁직원을 아래와 같이 채용합니다."
   }
  ]
 }

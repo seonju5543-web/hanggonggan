@@ -1,7 +1,18 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": [
+  {
+   "title": "[문정도서관] 기말고사 기간 중 일반열람실 및 미디어라운지 운영 안내",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160724&noCat=32",
+   "postedAt": "2026-11-24",
+   "kind": "학사",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-25",
+   "thumb": "data/news/img/91a1929f068e3c5d.webp"
+  },
   {
    "title": "2027학년도 수시모집 서울캠퍼스 면접고사 봉사학생 모집",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160697&noCat=514",
@@ -42,7 +53,7 @@
    "campus": "",
    "src": "9c41077f",
    "foundAt": "2026-11-20",
-   "desc": "세종캠퍼스 학생상담센터(세종) ★ 단 1분으로 알아보는 내 스트레스, 두뇌 컨디션, 집중도는??"
+   "desc": "★ 단 1분으로 알아보는 내 스트레스, 두뇌 컨디션, 집중도는?? 1. 옴니핏 스트레스 검사란?"
   },
   {
    "title": "학생설계전공 시행 안내",
@@ -52,7 +63,7 @@
    "campus": "",
    "src": "9c41077f",
    "foundAt": "2026-11-18",
-   "desc": "학사지원팀 1. 우리 대학은 학생 스스로 학문적 관심과 진로에 맞춰 두 개 이상의 학과(부)/전공의 교과목을 융합하여 교과과정을 설계하고 이수할 수 있는 학생설계전공(student-designed major)을…"
+   "desc": "1. 우리 대학은 학생 스스로 학문적 관심과 진로에 맞춰 두 개 이상의 학과(부)/전공의 교과목을 융합하여 교과과정을 설계하고 이수할 수 있는 학생설계전공(student-designed major)을 운영할…"
   },
   {
    "title": "2026학년도 동계계절학기 학점교류 신청 안내 (강서대학교)",
@@ -424,16 +435,6 @@
    "src": "9c41077f",
    "foundAt": "2026-10-28",
    "thumb": "data/news/img/155690bda9e326dc.webp"
-  },
-  {
-   "title": "[강화군] 2026년도 하반기 강화군 대학생 등록금 지원사업 안내",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159662&noCat=501",
-   "postedAt": "2026-10-27",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/3c88948b8136397c.webp"
   }
  ]
 }

@@ -1,7 +1,18 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": [
+  {
+   "title": "법인수익사업체 회사분할에 따른 구주권 제출 공고",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26767086",
+   "postedAt": "2026-11-24",
+   "postId": "26767086",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-25",
+   "desc": "주식회사 정진코퍼레이션은 2026 년 11 월 24 일 주주총회 결의로 의료사업부문을 제외한 기타사업부문을 인적분할하여 신설법인 주식회사 위즈덤컴퍼니를 설립하고 당사는 존속하기로 결의하였으며 , 분할 후 존속하는…"
+  },
   {
    "title": "[건강증진센터] 2026학년도 4분기 건강강좌 (병원임종과 존엄한 죽음) 개최 안내",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26767083",
@@ -90,8 +101,7 @@
    "campus": "",
    "src": "d521f12e",
    "foundAt": "2026-11-18",
-   "thumb": "data/news/img/9be46cd7b03e1697.webp",
-   "desc": "일시: 11월 24일(화) 11:30~15:30 장소: 학생회관 앞 내용: 점자카페, 점자행운카드만들기, 점자명함만들기 문의: 동국대학교 장애학생지원센터(02-2260-8806)"
+   "thumb": "data/news/img/9be46cd7b03e1697.webp"
   },
   {
    "title": "[교수학습혁신센터] 2026 XR활용 학습역량 강화 체험 프로그램 신청자 모집!",

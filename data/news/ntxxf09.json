@@ -1,7 +1,26 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 2027학년도 학부제 전공배정 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627372&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-24",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[입학에서 취업까지] 부전공 추가 신청 및 취소 기간 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627370&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-24",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-24"
+  },
   {
    "title": "[수강에서 성적까지] [수학과] 2026학년도 동계 계절수업 폐강과목 및 정정안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627368&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -41,7 +60,8 @@
    "school": "경기대학교",
    "campus": "",
    "src": "bf927d3e",
-   "foundAt": "2026-11-24"
+   "foundAt": "2026-11-24",
+   "desc": "2027년 제42대 원우회장 선출 결과, 양태원 후보가 당선되었습니다. 학교가 요구한 58개 학과 운영위 중 34명의 참석으로 찬반투표가 진행되었습니다."
   },
   {
    "title": "[일반] 2026학년도 2학기 생화학 과목 졸업시험 재시험 안내",
@@ -50,7 +70,8 @@
    "school": "경기대학교",
    "campus": "",
    "src": "bf927d3e",
-   "foundAt": "2026-11-24"
+   "foundAt": "2026-11-24",
+   "desc": "O 생화학 졸업시험 재시험 - 본 시험과 동일한 문제(1문항; 최대 2문항) 및 다른 문제(2 문항; 최소 1문항) 혼합형 출제 예정"
   },
   {
    "title": "[일반] 2027학년도 학부제 전공배정 안내",
@@ -385,28 +406,6 @@
    "title": "[일반] 제42대 경기대학교 일반대학원 원우회장 후보자 약력 및 소견서",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627127&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
    "postedAt": "2026-11-10",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-10"
-  },
-  {
-   "title": "[일반] [유아교육]현대모비스의왕연구소직장어린이집 2027년 보육교직원 채용 공고 및 보육실습 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627124&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-10",
-   "kind": "채용",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-10",
-   "thumb": "data/news/img/90c60bb4377d7f29.webp",
-   "desc": "자세한 내용은 다음과 같습니다. 1. 보육교직원 채용 공고 안내 - 모집 부문: 출산 및 육아휴직 대체교사, 보조 및 연장전담교사, 연장전담교사"
-  },
-  {
-   "title": "[수강에서 성적까지] 2026학년도 동계 계절수업[계절학기] 일정 및 개설예정과목 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627121&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-10",
-   "kind": "학사",
    "school": "경기대학교",
    "campus": "",
    "src": "bf927d3e",

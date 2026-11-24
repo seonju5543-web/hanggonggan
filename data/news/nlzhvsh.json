@@ -1,7 +1,19 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": [
+  {
+   "title": "2026년 제3차 강원 미래산업 AX혁신 포럼 개최",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11689&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-11-24",
+   "kind": "행사",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-11-25",
+   "thumb": "data/news/img/13283013092d9353.webp",
+   "desc": "많은 관심 바랍니다. 1.주제: AX시대, 강원 AI 생태계와 지역특화산업의 미래"
+  },
   {
    "title": "[도서관] 연구성과 분석을 위한 SciVal 설명회 안내(교직원)",
    "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11687&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
@@ -407,16 +419,6 @@
    "foundAt": "2026-11-02",
    "thumb": "data/news/img/53eaf7d49d3a6d1e.webp",
    "desc": "강원대학교 음악학과 강우성 교수님과 함께하는「음악이 흐르는 화요도서관」에 여러분을 초대합니다."
-  },
-  {
-   "title": "<필전 2026 조선백일장> 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11598&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-11-02",
-   "school": "강원대학교",
-   "campus": "",
-   "src": "784a7e0d",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/a41c6c0234acad24.webp"
   }
  ]
 }

@@ -1,7 +1,77 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": [
+  {
+   "title": "[채용공고] 2026년 제7회 국제협력과 기간제 계약직 직원 공개채용시험 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71108",
+   "postedAt": "2026-11-24",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[취업정보] [금화저축은행]2027 신입사원 채용공고(~12.7.(월)까지)",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71107",
+   "postedAt": "2026-11-24",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-24",
+   "thumb": "data/news/img/d38e0a0833d13fa0.webp"
+  },
+  {
+   "title": "[취업정보] [엘티정밀]재경팀 채용(~11.29.(일)까지)",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71106",
+   "postedAt": "2026-11-24",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[취업정보] [OK금융그룹]2026년 OK금융그룹 채용형 인턴 공개모집(~...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71105",
+   "postedAt": "2026-11-24",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[취업정보] [연세대학교]정규직원(8급, 시설기술) 채용 공고(~12.1....",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71104",
+   "postedAt": "2026-11-24",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[채용공고] 2026학년도 제4회 전남대학교 국립대학육성사업 전문/사무 인...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71103",
+   "postedAt": "2026-11-24",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[취업정보] [부산광역시기장군도시관리공단] 행정/기계/시설관리/청소년지도사...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71102",
+   "postedAt": "2026-11-24",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-24"
+  },
   {
    "title": "[취업정보] [한국산업기술진흥원] 2026년 하반기 육아휴직 대체인력 공개...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71095",
@@ -317,77 +387,6 @@
   {
    "title": "[취업정보] [한국미쓰비시전기오토메이션]상시 인재풀 채용(~채용시까지)",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71044",
-   "postedAt": "2026-11-18",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-18"
-  },
-  {
-   "title": "[취업정보] [HL디앤아이한라]2026 하반기 신입사원 채용(~11.24....",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71043",
-   "postedAt": "2026-11-18",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-18"
-  },
-  {
-   "title": "[취업정보] [(주)중앙백신연구소]정규직 신입채용★학교 추천채용(~12.2...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71042",
-   "postedAt": "2026-11-18",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-18",
-   "thumb": "data/news/img/4e284a09d3955923.webp"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 2차 폐강 교과목 공고",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71041",
-   "postedAt": "2026-11-18",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-18"
-  },
-  {
-   "title": "[대학생활] 2026학년도 심층집단상담 '겨울바다 곁에서, 나를 만나는 힐...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71038",
-   "postedAt": "2026-11-18",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-18",
-   "thumb": "data/news/img/1dc683124f88a8da.webp"
-  },
-  {
-   "title": "[취업정보] [기후환경에너지환경부, 한국환경산업협회]2026 환경산업 채용...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71037",
-   "postedAt": "2026-11-18",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-18"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(동신대) 교류수학 신청...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71036",
-   "postedAt": "2026-11-18",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-18"
-  },
-  {
-   "title": "[채용공고] 전남대학교 중성미자 정밀 연구센터 연구원 채용 공고 (석사급)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71035",
    "postedAt": "2026-11-18",
    "kind": "채용",
    "school": "전남대학교",
