@@ -13957,6 +13957,17 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
   /* 상단 메뉴의 '포털' 글자로 되살아나지 않는가 (apply-channel.js 첫머리의 오탐 ②) */
   eq('메뉴 글자만으로는 포털이 아니다',
     kind({ excerpts: ['학사행정 포털 장학 로그인 사이트맵'] }), 'unknown');
+  /* 🔴 앱이 포털 접수라고 읽는 방법 줄은 데이터 검사도 근거로 친다 (2026-11-25) — 두 낱말 목록이 갈라지면 아래 실데이터 검사가 멀쩡한 공고를 「근거 없는 포털 단정」으로 세고,
+     데이터 관문이 그 실행의 새 자동 등록을 통째로 되돌린다(이화여대 「유레카 시스템 … 학사행정 …」 한 건 때문에 그 실행의 새 등록이 네 번 · 11-17~23 · 그중 둘은 마감이 지났다).
+     표본은 앱의 목록(apply-channel WEAK)에 있는 이름마다 한 줄 — 이름이 늘면 여기 표본도 늘린다 */
+  const portalLines = ['5. 신청방법 : 유레카 시스템 신청 ( 유레카통합행정 > 학사행정 > 장학 > 장학금신청 )', '신청방법 : 통합정보시스템 장학 메뉴에서 신청', '신청방법 : 학생지원시스템에서 신청',
+    '신청방법 : 학교 포털 로그인 후 장학 신청', '신청방법 : 인포21 장학신청 메뉴로 신청', '신청방법 : 종합정보시스템(포털)에서 온라인 신청', '신청 방법 : HUFS Ability 에서 신청', '신청방법 : INFO21 장학신청 메뉴로 신청'];
+  eq('🔴 앱이 포털 접수라고 읽는 방법 줄은 데이터 검사도 근거로 친다 — 낱말 목록이 둘로 갈라지지 않았다(hasPortalName 이 앱의 정규식을 그대로 본다)',
+    portalLines.map((l) => [kind({ excerpts: [l] }), built.hasPortalName(l)]), portalLines.map(() => ['portal', true]));
+  eq('  이름이 없는 줄은 여전히 근거가 아니다(검사의 이빨은 그대로)', ['신청방법 : 방문 접수', '장학금 신청서 1부', '문의 : 장학팀'].map((l) => built.hasPortalName(l)), [false, false, false]);
+  eq('🔴 부서 이름 「학사행정실·학사행정팀」은 학교 시스템이 아니다 — 방문 제출을 포털 접수라고 부르지 않는다',
+    ['접수처 : 소속 단과대학 학사행정실 방문 제출', '제출처 : 학사행정팀'].map((l) => kind({ excerpts: [l] })), ['unknown', 'unknown']);
+
   /* 앞선 갈래는 그대로여야 한다 */
   eq('이메일 접수는 그대로', kind({ applyEmail: 'a@hufs.ac.kr' }), 'email');
   eq('양식 연결분은 그대로', kind({ formId: 'x' }), 'form');
@@ -13979,7 +13990,8 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
     if (hasPortalName(t)) return false;
     return !(it.applyPortalSource && hasPortalName(it.applyPortalSource));
   });
-  eq('등록 데이터에 근거 없는 포털 단정이 없다', baseless.length, 0);
+  /* 어느 공고인지 값에 싣는다(2026-11-25 리뷰) — 건수만 찍혀서 한 건이 네 번 되돌려지는 동안 로그에서 범인을 못 찾았다 */
+  eq('등록 데이터에 근거 없는 포털 단정이 없다', baseless.map((it) => it.id), []);
 }
 
 /* ── 🔴 노션 「작업 현황」이 낡은 것을 오늘 일이라고 말하지 않는다 (2026-09-22 신설) ──

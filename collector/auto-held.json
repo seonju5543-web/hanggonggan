@@ -2,39 +2,9 @@
  "_comment": "데이터 관문에 걸려 되돌린 자동 등록 공고 — 두 번 걸리면 마지막으로 걸린 날부터 3일 자동 등록에서 쉰다(collector/auto-held.mjs). 로봇이 쓴다 · 손으로 고치지 말 것.",
  "items": [
   {
-   "id": "auto-pnoticedoarticleno367997",
-   "reverts": 4,
-   "lastAt": "2026-11-23"
-  },
-  {
-   "id": "auto-pnoticedoarticleno367994",
-   "reverts": 4,
-   "lastAt": "2026-11-23"
-  },
-  {
-   "id": "auto-pnoticedoarticleno367991",
-   "reverts": 4,
-   "lastAt": "2026-11-23"
-  },
-  {
    "id": "auto-krbbskr846166artclviewdo",
    "reverts": 2,
    "lastAt": "2026-11-17"
-  },
-  {
-   "id": "auto-874bnum5233cate0qidx5233",
-   "reverts": 4,
-   "lastAt": "2026-11-23"
-  },
-  {
-   "id": "auto-archgbn0searchordersort0-1gbjq10",
-   "reverts": 4,
-   "lastAt": "2026-11-23"
-  },
-  {
-   "id": "auto-ervicenoticedetail521219",
-   "reverts": 4,
-   "lastAt": "2026-11-23"
   }
  ]
 }
