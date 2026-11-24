@@ -3,33 +3,45 @@
  "updatedAt": "2026-11-24",
  "items": [
   {
+   "title": "[등록/장학] 2027년도 1학기 국가근로장학금(사업) 학생 신청기간 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53740&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "Attachment 2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35673&ano=53740"
+    },
+    {
+     "name": "Attachment 2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35674&ano=53740"
+    }
+   ],
+   "deadlineHint": "신청기간 안내 2027 년도 1 학기 국가근로장학금 ( 사업 ) 학생 신청기간을 아래와 같이 안내하오니 희망하는 학생은 기한 내 신청하시기 바랍",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[외부] [국립국제교육원] 2027 중국정부초정 장학생 어학연수과정 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53745&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "Attachment 2027년 한국 중국어과 대학생 중국 연수 지원자 DB 양식.xlsx",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35680&ano=53745"
+    },
+    {
+     "name": "Attachment 2027년 중국정부초청 장학생 어학연수과정 선발 요강.hwpx",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35681&ano=53745"
+    }
+   ],
+   "deadlineHint": "신청 기간 : 2026.11.25.( 수 ) ~ 12.24.( 목 ) 15:00 , 기한엄수 라 . 신청 방법 1) < 붙임 1> 지원자 db",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-24"
+  },
+  {
    "title": "[등록/장학] 2027학년도 1학기 성적우수 및 프론티어장학금 신청 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53733&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
-    {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    },
     {
      "name": "Attachment (첨부) 프론티어 장학금 신청서_자기활동소개서(지도교수확인필수)_2027학년도 1학기.hwp",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35666&ano=53733"
