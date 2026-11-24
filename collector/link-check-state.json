@@ -1,18 +1,4 @@
 {
- "http://www.baeksan.or.kr/SBoard/sboard.asp?boardid=notice&mode=view&seq=46": {
-  "lastAt": "2026-11-20",
-  "lastV": "unread",
-  "why": "다른 글로 보이나 기대 제목이 앱 이름뿐(판정 보류)"
- },
- "http://www.changam.or.kr/?act=board&bbs_code=notice&bbs_mode=view&bbs_seq=21": {
-  "lastAt": "2026-11-20",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-20",
-  "n": 0,
-  "confirmed": false
- },
  "http://www.ghjanghak.kr/html/sub/04_01.jsp?amode=view&idx=64": {
   "lastAt": "2026-11-15",
   "lastV": "unread",
@@ -294,15 +280,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3547234": {
-  "lastAt": "2026-11-23",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded.",
-  "v": "post",
-  "at": "2026-11-21",
-  "n": 0,
-  "confirmed": false
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3548182": {
   "lastAt": "2026-11-24",
   "lastV": "post",
@@ -328,15 +305,6 @@
   "why": "열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at https://1365.go.kr/vol",
   "v": "post",
   "at": "2026-11-22",
-  "n": 0,
-  "confirmed": false
- },
- "https://ansanfys.or.kr/sub02/sub01.php?type=view&uid=1071": {
-  "lastAt": "2026-11-20",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-20",
   "n": 0,
   "confirmed": false
  },
@@ -1183,15 +1151,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://eminwon.hongcheon.go.kr/emwp/gov/mogaha/ntis/web/ofr/action/OfrAction.do?method=selectOfrNotAncmt&methodnm=selectOfrNotAncmtRegst&jndinm=OfrNotAncmtEJB&context=NTIS&not_ancmt_mgt_no=56076&homepage_pbs_yn=Y&subCheck=Y": {
-  "lastAt": "2026-11-20",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-20",
-  "n": 0,
-  "confirmed": false
- },
  "https://form.naver.com/response/2RU8EfZleUt": {
   "lastAt": "2026-11-09",
   "lastV": "unread",
@@ -1208,15 +1167,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-23",
-  "n": 0,
-  "confirmed": false
- },
- "https://geomdansf.clickn.co.kr/boards/33/view": {
-  "lastAt": "2026-11-20",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-20",
   "n": 0,
   "confirmed": false
  },
@@ -1466,15 +1416,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-24",
-  "n": 0,
-  "confirmed": false
- },
- "https://janghak.gangseo.seoul.kr/sc050101/325152?srchCtgry=&srchStdg=&curPage=&srchKey=&srchText=&srchBeginDt=&srchEndDt=": {
-  "lastAt": "2026-11-13",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-13",
   "n": 0,
   "confirmed": false
  },
@@ -5758,15 +5699,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://spowell.kspo.or.kr/bbs/welfare/1339?mSn=7395": {
-  "lastAt": "2026-11-21",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-21",
-  "n": 0,
-  "confirmed": false
- },
  "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=316": {
   "lastAt": "2026-11-13",
   "lastV": "unread",
@@ -8692,15 +8624,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-24",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.cheongju.go.kr/munui/selectBbsNttView.do?key=2426&bbsNo=511&nttNo=273950&searchCtgry=&searchCnd=all&searchKrwd=&pageIndex=1&integrDeptCode=000100200": {
-  "lastAt": "2026-11-20",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-20",
   "n": 0,
   "confirmed": false
  },
@@ -11736,11 +11659,6 @@
   "at": "2026-11-15",
   "n": 0,
   "confirmed": false
- },
- "https://www.ikw.ac.kr/board/detail.tc?mn=2589&mngNo=94&pageSeq=1929&boardNo=335595": {
-  "lastAt": "2026-11-21",
-  "lastV": "unread",
-  "why": "본문이 안 그려짐(0자 — 판정 불가)"
  },
  "https://www.inha.ac.kr/bbs/kr/8/45286/artclView.do": {
   "lastAt": "2026-11-02",
@@ -16121,11 +16039,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=1&btin.bbs_cde=1&btin.doc_no=1338708&btin.appl_no=000000&menu_idx=67": {
-  "lastAt": "2026-11-20",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded."
- },
  "https://www.konkuk.ac.kr/bbs/konkuk/234/1210682/artclView.do": {
   "lastAt": "2026-11-10",
   "lastV": "post",
@@ -18093,15 +18006,6 @@
   "firstAt": "2026-11-21",
   "confirmed": true
  },
- "https://www.kref.or.jp/news/2026scholarshipkorea/": {
-  "lastAt": "2026-11-20",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-20",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52884&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "lastAt": "2026-11-16",
   "lastV": "post",
@@ -19967,15 +19871,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice": {
-  "lastAt": "2026-11-19",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-19",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.pcu.ac.kr/kor/article/scholarship/1926154031": {
   "lastAt": "2026-11-20",
   "lastV": "post",
@@ -20945,15 +20840,6 @@
   "lastAt": "2026-11-20",
   "lastV": "unread",
   "why": "HTTP 403"
- },
- "https://www.seoulfuture.or.kr/home/kor/M025378985/board.do?idx=cb00d1a0008a85e71a41b8741facbffe9c92b5676b1d6934d9efe41731e60154&act=detail&board_code=XL50YTz5": {
-  "lastAt": "2026-11-19",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-19",
-  "n": 0,
-  "confirmed": false
  },
  "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=897276&qidx=6302&cate=10&allboard=false&nowpage=1": {
   "lastAt": "2026-11-16",
@@ -24265,18 +24151,6 @@
   "lastAt": "2026-11-21",
   "lastV": "unread",
   "why": "글 표지도 제목도 없음(판정 불가)"
- },
- "https://www.tongyeong.go.kr/00852/00853/00858.web?amode=view&not_ancmt_mgt_no=51736": {
-  "lastAt": "2026-11-20",
-  "lastV": "unread",
-  "why": "본문이 안 그려짐(31자 — 판정 불가)",
-  "final": "https://www.tongyeong.go.kr/tracer/info.jsp"
- },
- "https://www.tongyeong.go.kr/00852/00853/00858.web?amode=view&not_ancmt_mgt_no=51792": {
-  "lastAt": "2026-11-20",
-  "lastV": "unread",
-  "why": "본문이 안 그려짐(31자 — 판정 불가)",
-  "final": "https://www.tongyeong.go.kr/tracer/info.jsp"
  },
  "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147": {
   "lastAt": "2026-11-24",
