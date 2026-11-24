@@ -1,7 +1,68 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": [
+  {
+   "title": "[일반] [현장실습] 2026학년도 동계방학 단기 현장실습 참가자 사전신고 및 최종제출서류 안내 (최종합격자 대상)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53743&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-24",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-24",
+   "desc": "2026 학년도 동계방학 단기 현장실습 참여자 사전신고 및 최종제출서류 안내 ( 최종합격자 대상 )"
+  },
+  {
+   "title": "[일반] 광운대학교 교직원 사칭 구매·계약 사기 피해 예방 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53741&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-24",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-24",
+   "desc": "최근 대학 교직원 또는 계약 담당자를 사칭하여 물품 대리구매, 대금 대납 및 입찰보증금 입금 등을 유도하는 사기 사례가 발생하고 있습니다."
+  },
+  {
+   "title": "[학사] 2026학년도 2학기 기말고사 일정 및 시행지침 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53739&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-24",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-24",
+   "desc": "2026 학년도 2 학기 기말고사 시행과 관련하여 다음과 같이 안내합니다 ."
+  },
+  {
+   "title": "[봉사] [도봉동청소년문화의집] 2026년 도봉구 청소년디지털홍보단 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53746&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-24",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-24",
+   "thumb": "data/news/img/f52d6dbee4957cab.webp"
+  },
+  {
+   "title": "[외부] [노원구] 전월세 안심계약 도움 서비스 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53744&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-24",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-24",
+   "thumb": "data/news/img/5e1fdbbb0faf9b5e.webp"
+  },
+  {
+   "title": "[학사] 2026학년도 동계 계절수업 폐강 교과목 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53742&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-24",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-24"
+  },
   {
    "title": "[일반] 교내 네트워크, 정보시스템 및 대표 홈페이지 일시 중단 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53732&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -360,72 +421,6 @@
    "src": "b09cb042",
    "foundAt": "2026-11-10",
    "desc": "2026학년도 2학기 다전공 수요조사 참여 안내 설문 참여 혜택 참여 시 ‘광운AI메이트’에서 사용 가능한 생성형 AI 크레딧 제공 우리 대학에서는 학생들의 다전공에 대한 인식과 수요를 파악하고, 향후 다전공 제도…"
-  },
-  {
-   "title": "[시설] 2026학년도 동절기 난방 운영을 아래와 같이 안내 하오니 참고 하시기 바랍니다",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53640&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-10",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-10",
-   "thumb": "data/news/img/9095dc7095c9d380.webp"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(상담복지정책대학원 교학팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53639&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-09",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-09",
-   "desc": "모집인원 1. 지원 자격 및 우대사항 담당업무 상담복지정책대학원 교학팀 행정업무 등 지원 자격"
-  },
-  {
-   "title": "[학사] 2026학년도 동계 계절수업(브릿지학기제) 수강신청 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53634&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-09",
-   "kind": "학사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/a9ba5d3866a66537.webp"
-  },
-  {
-   "title": "[국제학생] [글로벌전략팀] 2027 롯데그룹 외국인 유학생 채용연계형 Winter Internship (~11/17)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53633&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-09",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-09",
-   "desc": "롯데그룹에서 외국인 유학생 여러분을 위한 특별한 채용 기회를 준비했습니다. 다양한 계열사와 직무가 참여하는 그룹 차원의 대규모 채용 연계형 인턴십으로, 유통·식품·화학·IT·기계 등 폭넓은 산업 분야에서 여러분의…"
-  },
-  {
-   "title": "[일반] [학생상담실] \"다시 시작하고 싶은데, 어디서부터 해야 할지 모르겠다면\" =>\"다시 나의 페이스로\" 대학생활 적응 집단상담 RE:BALANCE",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53632&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-09",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/a20f9655e0f86932.webp",
-   "desc": "지금의 대학생활을 다시 정비하고 싶은 학생들과 함께, 일상에서 활용할 수 있는 대처방법과 작은 변화를 찾아가는 시간 -신청기간: 11월 19일 목요일까지 -일시: 11월 21일 토요일 오후 1시-6시 신청링크 :…"
-  },
-  {
-   "title": "[일반] [초빙공고]2026학년도 2학기 산학협력단 산학협력중점교수 초빙 공고",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53630&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-09",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/d68966f6febe6476.webp",
-   "desc": "1. 초빙분야 및 응모자격 2. 제출서류 (※ 모든 제출서류는 1개의 PDF로 작성하여 제출요망)"
   }
  ]
 }

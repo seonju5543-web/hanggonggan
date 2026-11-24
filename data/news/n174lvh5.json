@@ -1,7 +1,17 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": [
+  {
+   "title": "[학사행정팀] 2027학년도 1학기 복수전공/부전공 변경 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278111&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-24",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-24"
+  },
   {
    "title": "AI전자정보융합대학 FESTIVAL 「AI:VERSE」 개최",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278077&article.offset=0&articleLimit=10",
@@ -21,7 +31,7 @@
    "campus": "",
    "src": "5d85d287",
    "foundAt": "2026-11-20",
-   "desc": "최우수: 시 「소록」 김서연 (자유전공·26) 우수: 시 「맨손의 온도」 유하영 (국제학부·24)"
+   "desc": "수상하신 모든 분들께 진심으로 축하드립니다. ■ 제47회 가대문화상 수상작 당선작: 「절취선」 고민지 (심리·23) 가작: 「잎 끝」 이찬영 (컴퓨터정보공학·23) 당선작: 「김 할머니의 순대 완판날」 김수연…"
   },
   {
    "title": "보안 업데이트에 따른 대표 홈페이지 접속 일시 중단 안내",
@@ -421,17 +431,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-27",
    "thumb": "data/news/img/326a06369497a6b5.webp"
-  },
-  {
-   "title": "[학생지원팀] 천원의 아침밥 11월 메뉴 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277146&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-27",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/4a766de9395a8a6d.webp",
-   "desc": "★11월 2일(월)~11월 30일(월) ★ 학생여러분의 많은 관심과 참여로 2학기 천원의 아침밥이 적극적으로 운영되고 있습니다."
   }
  ]
 }

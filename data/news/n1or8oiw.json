@@ -1,7 +1,31 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": [
+  {
+   "title": "[건강증진센터] 2026학년도 4분기 건강강좌 (병원임종과 존엄한 죽음) 개최 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26767083",
+   "postedAt": "2026-11-24",
+   "postId": "26767083",
+   "kind": "행사",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-24",
+   "thumb": "data/news/img/e00812131a579a28.webp",
+   "desc": "건강증진센터에서는 정기적으로 다양한 주제의 건강강좌를 개최하고 있으며 12월에는 병원임종과 존엄한 죽음 에 관한 내용을 다루고자 합니다. 교직원 및 학생 여러분의 많은 관심과 참여를 부탁드립니다."
+  },
+  {
+   "title": "[장애학생지원센터] 11월 24일(화) 혜화관 3층 점자체험 부스 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26767081",
+   "postedAt": "2026-11-24",
+   "postId": "26767081",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-24",
+   "thumb": "data/news/img/b2b082c024182d2e.webp"
+  },
   {
    "title": "[공지] 맛있는 점심과 함께하는 'AI 캠퍼스 프리뷰 클래스'에 초대합니다!",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26767057",
@@ -23,7 +47,7 @@
    "campus": "",
    "src": "d521f12e",
    "foundAt": "2026-11-20",
-   "desc": "※ 작업 진행 상황에 따라 종료 시간이 변경될 수 있습니다. 2. 작업 내용 : 교내 방화벽 OS 패치 작업"
+   "desc": "보다 안정적인 정보서비스 및 네트워크 서비스 제공을 위해 교내 방화벽 OS 패치 작업이 아래와 같이 예정되어 있습니다."
   },
   {
    "title": "[동국대학교 인권센터] 2026학년도 인권실태조사 참여 안내 (2026.11.17~11.24)",

@@ -1,7 +1,50 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": [
+  {
+   "title": "브랜드 단과대학 구성 및 운영 방안 설명회 안내[~11.25.(수) 10시]",
+   "url": "https://www.jbnu.ac.kr/web/Board/220227/detailView.do",
+   "postedAt": "2026-11-24",
+   "postId": "220227",
+   "kind": "행사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-24",
+   "thumb": "data/news/img/d33f4e84e84f2972.webp",
+   "desc": "지능형산업융합대학(브랜드 단과대학)의 구성과 운영 방안을 공유하고 구성원 여러분의 의견을 듣고자 설명회를 개최합니다. 학생, 교직원 누구나 참석하실 수 있으니 많은 관심 바랍니다."
+  },
+  {
+   "title": "2026학년도 2학기 학사지도교수 상담 일정 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220214/detailView.do",
+   "postedAt": "2026-11-24",
+   "postId": "220214",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[RED/BLUE필수] 직무자격증 과정 추가모집(6시그마GB 6명)-오늘 13시까지",
+   "url": "https://www.jbnu.ac.kr/web/Board/220204/detailView.do",
+   "postedAt": "2026-11-24",
+   "postId": "220204",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[해외파견] 2026-동계 JBNU English & AI 글로벌 챌린지 파견 프로그렘 선발 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220199/detailView.do",
+   "postedAt": "2026-11-24",
+   "postId": "220199",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-24"
+  },
   {
    "title": "[함께해 주세요] 제20대 총장선거 학생 투표 참여 결의 선언 연서명",
    "url": "https://www.jbnu.ac.kr/web/Board/220192/detailView.do",
@@ -11,7 +54,8 @@
    "campus": "",
    "src": "e41d3fac",
    "foundAt": "2026-11-23",
-   "desc": "총학생회 \"애국 전대의 선택\" 11월 30일(월) 오후 6시, 전북대학교 학생타운에서 학생총회가 열립니다."
+   "desc": "총학생회 \"애국 전대의 선택\" 11월 30일(월) 오후 6시, 전북대학교 학생타운에서 학생총회가 열립니다.",
+   "thumb": "data/news/img/84ca679b35731f9a.webp"
   },
   {
    "title": "제20대 전북대학교 총장선거 학생 결의문",
@@ -408,52 +452,6 @@
    "src": "e41d3fac",
    "foundAt": "2026-11-11",
    "desc": "학생취업진로처 취업진로지원과 추가모집 과정: 비즈니스엑셀(15명), 통계적공정관리(10명) 추가모집 기간: ~11/12 18시까지"
-  },
-  {
-   "title": "2027년「행복한 교육」명예기자 모집 협조 요청",
-   "url": "https://www.jbnu.ac.kr/web/Board/219709/detailView.do",
-   "postedAt": "2026-11-11",
-   "postId": "219709",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-11",
-   "thumb": "data/news/img/f4c31999df6591fa.webp"
-  },
-  {
-   "title": "(끌어올림)[취업진로지원과]건지포럼 5차(11.20.(금) 16:00-17:30)//큰사람포인트 20점, 통합전공탐색 1시간 인정",
-   "url": "https://www.jbnu.ac.kr/web/Board/219692/detailView.do",
-   "postedAt": "2026-11-11",
-   "postId": "219692",
-   "kind": "행사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-11"
-  },
-  {
-   "title": "[글로컬대학사업] 전북대학교 방위산업 맞춤형 인재양성 및 채용연계 협력 프로그램 기업 사전 면접 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/219690/detailView.do",
-   "postedAt": "2026-11-11",
-   "postId": "219690",
-   "kind": "채용",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-11",
-   "desc": "참여를 희망하는 학생은 아래 접수 방법과 첨부파일을 확인하여 기한 내 지원하시기 바랍니다."
-  },
-  {
-   "title": "[전북국제개발협력센터] 제4회 전북 개발협력 포럼 개최 (11/16) - 참여자 선착순 포럼 기념품 지급! / 큰사람 포인트 10점 지급!",
-   "url": "https://www.jbnu.ac.kr/web/Board/219645/detailView.do",
-   "postedAt": "2026-11-10",
-   "postId": "219645",
-   "kind": "행사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-10",
-   "desc": "전북국제개발협력센터 안녕하세요, 전북국제개발협력센터입니다. 전북특별자치도에서 주관하는 「제4회 전북 개발협력 포럼」 이 오는 11월 16일 (월) 전북대학교에서 개최됩니다."
   }
  ]
 }

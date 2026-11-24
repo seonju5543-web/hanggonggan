@@ -1,7 +1,18 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": [
+  {
+   "title": "외국인 유학생 및 연구인력을 위한 KoLab 서비스 안내 / KoLab Services for International Students and Researchers",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=727109",
+   "postedAt": "2026-11-24",
+   "kind": "채용",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-24",
+   "desc": "국제교류부 □ 외국인 유학생 및 연구인력을 위한 KoLab 서비스 안내 안녕하세요, 국립부경대학교 국제교류부입니다."
+  },
   {
    "title": "### 공기업 NCS 6차(기초) 참가 신청 안내 ###",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=727090",
@@ -412,16 +423,6 @@
    "src": "53a197d6",
    "foundAt": "2026-11-03",
    "desc": "★ 근로기관의 상세정보 확인 후 신청 바라며 학생 개인 사정에 따른 일방적 근로 포기시 근로 제한 될 수 있음 ★ 현재 국가 및 교내근로장학생은 방학집중근로 선발시 근로를 포기해야 함 (집중근로 선발시 현재…"
-  },
-  {
-   "title": "★2026-2학기 재(복)학생 등록금 분할납부(4차) 안내★",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726818",
-   "postedAt": "2026-11-02",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/bcd400a8b82e115f.webp"
   }
  ]
 }

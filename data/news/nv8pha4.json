@@ -1,7 +1,17 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": [
+  {
+   "title": "2027학년도 수시모집 서울캠퍼스 면접고사 봉사학생 모집",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160697&noCat=514",
+   "postedAt": "2026-11-24",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-24",
+   "desc": "학생활동 대학입학담당자 기간은 2026.12.5(토)~2026.12.6(일) 입니다. 아침, 점심식사 제공 및 봉사시간 부여되오니 많은 참여 바랍니다. 양일간 참여도 가능합니다!"
+  },
   {
    "title": "2026학년도 동계계절학기 학점교류 신청 안내 (서울과학기술대학교)",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160671&noCat=500",
@@ -22,7 +32,7 @@
    "src": "9c41077f",
    "foundAt": "2026-11-23",
    "thumb": "data/news/img/4e77efa69400a8f5.webp",
-   "desc": "세종캠퍼스 취업진로지원센터 ▶ 신청방법 - 아래 URL을 눌러 구글캘린더 직접 예약 ★ 전체계열 : https://calendar.app.google/BGM4RWsH4XjAnpPd9 ★ 공학계열:…"
+   "desc": "▶ 신청방법 - 아래 URL을 눌러 구글캘린더 직접 예약 ★ 전체계열 : https://calendar.app.google/BGM4RWsH4XjAnpPd9 ★ 공학계열:…"
   },
   {
    "title": "[대학혁신지원사업/학생상담센터(세종)]⭐생체신호 측정하여 스트레스 지수 파악⭐ 옴니핏 스트레스 검사 실시 안내",
@@ -424,16 +434,6 @@
    "src": "9c41077f",
    "foundAt": "2026-10-27",
    "thumb": "data/news/img/3c88948b8136397c.webp"
-  },
-  {
-   "title": "[사회봉사 2시간] 26-2 재학생 지능정보서비스(인터넷·스마트폰) 과의존 예방교육",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159659&noCat=514",
-   "postedAt": "2026-10-27",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-27",
-   "desc": "학생활동 학생지원팀 본교 재학생 대상으로 지능정보서비스(인터넷·스마트폰) 과의존 예방교육을 실시하오니 기한 내 교육을 이수하여 주시기 바랍니다."
   }
  ]
 }

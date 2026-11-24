@@ -1,7 +1,74 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-11-23",
+ "updatedAt": "2026-11-24",
  "items": [
+  {
+   "title": "🎁[추첨/설문조사]대학일자리플러스센터 뉴스레터 설문조사🎁",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31903&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-24",
+   "postId": "31903",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-24",
+   "thumb": "data/news/img/47142aedbdc4a99b.webp",
+   "desc": "향후 대학일자리플러스센터 뉴스레터 개선을 위해 여러분의 의견을 조사하고 있습니다. 수집된 결과는 대학일자리플러스센터 뉴스레터 개선을 위한 기초 자료로 활용될 예정입니다."
+  },
+  {
+   "title": "[전공설계융합지원센터] 2026학년도 2학기 2차 전체학생대상 전공설계상담 프로그램 운영 안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31899&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-24",
+   "postId": "31899",
+   "kind": "생활",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-24",
+   "thumb": "data/news/img/aa8c86e340469b59.webp",
+   "desc": "교육혁신원 안녕하세요, 전공설계융합지원센터입니다. 2026학년도 2학기 2차 상담이 시작되었습니다~! 서울시립대학교에서 운영하는 소단위교육과정 및 다전공제도와 더불어 학업설계, 전공설계 앞으로 졸업 후 전공활용,…"
+  },
+  {
+   "title": "[제71호] 학생처 대학일자리플러스센터 뉴스레터",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31902&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-24",
+   "postId": "31902",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-24",
+   "desc": "<자세히보기는 블로그를 참고해주세요> #뉴스레터"
+  },
+  {
+   "title": "[제70호] 학생처 대학일자리플러스센터 뉴스레터",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31901&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-24",
+   "postId": "31901",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[의사소통교실] 2026학년도 2학기 <대학글쓰기> 교과목 감독자 추가 모집 재안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31900&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-24",
+   "postId": "31900",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-24"
+  },
+  {
+   "title": "[생활관] 2026학년도 기숙사 동계특별개관 사용승인 공고 (신규 신청자)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31898&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-24",
+   "postId": "31898",
+   "kind": "생활",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-24"
+  },
   {
    "title": "📢이공계 취준생 주목! 한번에 끝내는 이공계 서류 면접 완성 패키지 프로그램 신청 안내(만34세 이하)",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31100&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -400,77 +467,6 @@
    "src": "80d7d3bc",
    "foundAt": "2026-11-13",
    "desc": "시립대생만을 위한 연말 특별 혜택! 10초 자가진단으로 내 취업 고민 상태를 점검하고, 투썸 1만원권까지 받아가세요."
-  },
-  {
-   "title": "✨제1회 청년미래콘서트 ✨",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31841&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-13",
-   "postId": "31841",
-   "kind": "행사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-13",
-   "thumb": "data/news/img/3aa9f76d81bd8726.webp"
-  },
-  {
-   "title": "[고시반] 2026년 세무사 합격자와의 만남 신청 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31840&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-13",
-   "postId": "31840",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-13",
-   "desc": "우리 학교 2026년 세무사 합격자들의 생생한 수험후기, 시험 준비에 대한 고민에 대한 조언과 합격자의 노하우가 듣고 싶은 우리학교 학생(졸업생)이라면 누구나 참석 할 수 있습니다."
-  },
-  {
-   "title": "취업준비콘서트 일자리톡톡_유한양행",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31839&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-13",
-   "postId": "31839",
-   "kind": "행사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-13",
-   "desc": "인재개발실 (장소) 서울고용복지플러스센터 1층 청년ON라운지 (대상) 유한양행 및 약품영업에 관심있는 청년(19~34세 청년) (강사) 유한양행 인사팀 현직자 (내용) 기업이념, 조직문화, 인재상 및 채용트렌드,…"
-  },
-  {
-   "title": "[의사소통교실] 2026학년도 2학기 <대학글쓰기> 교과목 감독자 모집 안내(기간연장)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31820&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-12",
-   "postId": "31820",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-12",
-   "desc": "근무일시 모집대상 ○ 서울시립대학교 대학원생 및 졸업생 ( ※ 학부생 및 교직원 지원불가 ) 모집인원 시험감독"
-  },
-  {
-   "title": "교내 드라마 촬영 안내(11/15,일)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31838&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-12",
-   "postId": "31838",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-12",
-   "thumb": "data/news/img/bb57184758f28c45.webp",
-   "desc": "대외협력과 교내에서 광고 촬영이 다음과 같이 진행될 예정이오니, 교내 구성원 여러분의 협조를 부탁드립니다. 11월 15일(일) [ 드라마 \"너의 그라운드\" 촬영] #드라마촬영"
-  },
-  {
-   "title": "[도서관] 2027학년도 대학수학능력시험 시행일(11/19) 자료실 개관 시간 변경 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31836&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-12",
-   "postId": "31836",
-   "kind": "생활",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-12",
-   "thumb": "data/news/img/b10ad1826e1d6055.webp",
-   "desc": "수능 날 도서관은 - 중앙도서관 (1F 정기간행물실, 2F 자료열람실, 4F #UOS)"
   }
  ]
 }
