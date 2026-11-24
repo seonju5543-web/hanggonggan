@@ -24090,12 +24090,11 @@
    "id": "auto-oarticleno160317nocat501",
    "name": "[장학팀] 2026학년도 2학기 신용카드수수료장학금 신청 안내",
    "boardTitle": "[장학팀] 2026학년도 2학기 신용카드수수료장학금 신청 안내",
-   "type": "교외",
+   "type": "교내",
    "kindEvidence": [
-    "본문 「등기우편」"
+    "관리자(이선주)가 교외 → 교내 로 정함"
    ],
-   "kindConfidence": "mid",
-   "kindFrom": "로봇(원문) 2026-11-13",
+   "kindFrom": "관리자 2026-11-24",
    "provider": "주관 기관 원문 확인",
    "amount": "등록금 60% 이내",
    "amountValue": 0,

@@ -761,6 +761,12 @@
    "by": "Claude 정기 세션",
    "action": "linkFix",
    "detail": "원문 주소 1건 — 넣음 대학원장학생 → https://eng.korea.ac.kr/square/scholarship_view.html?no=21 (확인: 1)"
+  },
+  {
+   "at": "2026-11-24 14:49 KST",
+   "by": "이선주",
+   "action": "edit",
+   "detail": "auto-oarticleno160317nocat501 — type"
   }
  ]
 }
