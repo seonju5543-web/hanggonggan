@@ -1101,6 +1101,38 @@
      "2026년 하반기 (재)강서구장학회 장학생 선발 결과 알림"
     ]
    }
+  },
+  {
+   "host": "재단법인보은군민장학회",
+   "home": "http://www.boeun.go.kr/",
+   "boardUrl": "https://www.boeun.go.kr/janghak/selectBbsNttList.do?bbsNo=243&key=1036",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-11-24",
+    "signals": 10,
+    "menu": "층2 글 사냥꾼 · 공고 3건 이상 · 보은군민장학회 › 장학생 선발 공고",
+    "sample": [
+     "2026년 학교장 추천(예체능 및 기능)장학생 선발 알림",
+     "2026년 하반기 관외 중·고등학교 성적 장학생 선발 공고",
+     "2026년 하반기 중·고등학교 복지 장학생 선발 공고"
+    ]
+   }
+  },
+  {
+   "host": "에몬스장학회",
+   "home": "https://www.emons.co.kr/introduce/introduce07.php",
+   "boardUrl": "https://www.emons.co.kr/company/notice/notice_list.php",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-11-24",
+    "signals": 10,
+    "menu": "층2 글 사냥꾼 · 공고 3건 이상 · 장학회 공지",
+    "sample": [
+     "'2026 에몬스 장학생 (18기)' 장학금 및 장학증서 수여식",
+     "'2026 에몬스 장학생 (18기)' 최종 선발자 발표",
+     "'2025 에몬스 장학생 (17기)' 장학금 및 장학증서 수여식"
+    ]
+   }
   }
  ],
  "_parked": "쓰지 않게 된 곳은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙). 되돌리려면 항목을 위 sources 로 옮기면 된다.",

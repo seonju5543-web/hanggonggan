@@ -1012,10 +1012,50 @@
    "lines": 0,
    "targets": 1,
    "why": "게시판도 글도 못 찾음"
+  },
+  "busanjin.go.kr": {
+   "checkedAt": "2026-11-24",
+   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "targets": 2
+  },
+  "hscf.co.kr": {
+   "checkedAt": "2026-11-24",
+   "pages": 2,
+   "found": 0,
+   "lines": 0,
+   "targets": 2,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "boeun.go.kr": {
+   "checkedAt": "2026-11-24",
+   "pages": 10,
+   "found": 0,
+   "lines": 1,
+   "targets": 1,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "emons.co.kr": {
+   "checkedAt": "2026-11-24",
+   "pages": 5,
+   "found": 0,
+   "lines": 1,
+   "targets": 1,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "wongangnam.com": {
+   "checkedAt": "2026-11-24",
+   "why": "홈페이지 못 엶 (TypeError: DEPTH_ZERO_SELF_SIGNED_CERT → 브라우저도 실패(page.goto: net::ERR_CERT_AUTHO)",
+   "targets": 1
   }
  },
  "searched": {
+  "2000425003": "2026-11-24",
   "2000438004": "2026-11-24",
-  "2700004003": "2026-11-24"
+  "2700542002": "2026-11-24",
+  "2700542004": "2026-11-24",
+  "2704065001": "2026-11-24",
+  "2704173001": "2026-11-24",
+  "2704387001": "2026-11-24",
+  "2704387002": "2026-11-24"
  }
 }
