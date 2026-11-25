@@ -17531,6 +17531,76 @@ module.exports = class Anthropic {
       FR.reviewHash('고정 원문', { eligibility: ['a'], hash: 'h' }, [{ file: 'f', hash: 'x', role: 'form', formStart: '' }], [{ kind: 'form', file: 'p.pdf', bytes: 10 }]), '69b219afe7021c30');
   }
 
+  /* ── 대외활동 유료 관문 ① 원문 글자 저장 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-2) ──
+     활동 글은 본문·첨부 원본을 저장소에 두지 않는다(공고문 원본만 공고당 650KB — 하루 10~15건이면 한 달에 수십 MB). 뽑은 **글자만** 글마다 작은 파일로 둔다.
+     🔴 한 번 쓴 본문은 다시 받아 덮지 않는다 — 본문은 받을 때마다 조회수·옆 목록이 달라져 원문 해시가 바뀌고, 같은 글을 돈 내고 다시 읽게 된다 */
+  console.log('\n■ 대외활동 유료 관문 ① 원문 글자 저장 — 글자만 · 한 번 쓴 본문은 덮지 않는다 · 모드마다 제 파일');
+  {
+    const AT = await import(new URL('../collector/act-text.mjs', import.meta.url));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-text-'));
+    try {
+      const doc = (hash, text, over = {}) => ({ name: `${hash}.hwp`, hash, from: 'attach', ocr: false, text, ...over });
+      const rawOf = (id, mode) => readText(AT.storeFile(dir, id, mode));
+      const w1 = AT.writeStore(dir, 'act-a', 'plain', { url: 'https://x.kr/1', body: '처음 본문 글자', bodyFrom: 'plain', docs: [doc('h1', '공고문 글자')] }, '2026-11-26');
+      const w2 = AT.writeStore(dir, 'act-a', 'plain', { url: 'https://x.kr/1', body: '다시 받은 본문(조회수 13)', bodyFrom: 'plain', docs: [doc('h1', '달라진 글자'), doc('h2', '새 첨부 글자'), doc('h3', '   ')] }, '2026-11-27');
+      const s = AT.readStore(dir, 'act-a');
+      eq('① 🔴 한 번 쓴 본문은 다시 받아 덮지 않는다 · 첨부는 지문이 새것만 더한다(같은 지문의 글자도 처음 것 그대로) · 글자 없는 줄은 안 싣는다',
+        [w1, w2, s.body, s.docs.map((d) => [d.hash, d.text])], [true, true, '처음 본문 글자', [['h1', '공고문 글자'], ['h2', '새 첨부 글자']]]);
+      eq('  바뀐 것이 없으면 다시 쓰지 않는다(빈 커밋이 생기지 않는다) · 파일은 로봇 형식(한 칸 들여쓰기 + 끝 개행)',
+        [AT.writeStore(dir, 'act-a', 'plain', { url: 'https://x.kr/1', body: '또 다른 본문', docs: [doc('h1', 'x')] }, '2026-11-28'), sameFormat(rawOf('act-a', 'plain')), JSON.parse(rawOf('act-a', 'plain')).at], [false, true, '2026-11-27']);
+      AT.writeStore(dir, 'act-b', 'plain', { url: 'https://x.kr/2', body: '', docs: [] }, '2026-11-26');
+      const emptyFirst = AT.readStore(dir, 'act-b');
+      const due = (id, mode, day) => AT.textDue(dir, id, mode, day);
+      const dueBefore = [due('act-b', 'plain', '2026-11-26'), due('act-b', 'plain', '2026-11-27'), due('act-b', 'browser', '2026-11-26'), due('act-a', 'plain', '2026-11-28'), due('act-a', 'browser', '2026-11-28'), due('act-new', 'plain', '2026-11-26'), due('act-new', 'browser', '2026-11-26')];
+      AT.writeStore(dir, 'act-b', 'browser', { url: 'https://x.kr/2', body: '브라우저로 그린 본문', bodyFrom: 'browser', docs: [doc('h9', '그림에서 읽은 글자', { from: 'img', ocr: true, name: '' })] }, '2026-11-26');
+      const sb2 = AT.readStore(dir, 'act-b');
+      eq('② 본문이 비어도 기록은 남긴다(무료 받기를 해 봤다) · 브라우저 모드는 제 파일(<id>.browser.json)에만 쓴다 · 읽을 때 무료 받기 본문이 비었으면 브라우저 본문',
+        [emptyFirst && emptyFirst.body, /act-b\.browser\.json$/.test(AT.storeFile(dir, 'act-b', 'browser')), fs.existsSync(AT.storeFile(dir, 'act-b', 'browser')), JSON.parse(rawOf('act-b', 'plain')).body, sb2.body, sb2.bodyFrom, sb2.docs.map((d) => d.hash)],
+        ['', true, true, '', '브라우저로 그린 본문', 'browser', ['h9']]);
+      eq('  받을 차례(textDue) — 무료 받기: 기록이 없거나 본문이 빈 채 날이 바뀌었을 때(같은 날 다시 두드리지 않는다) · 본문이 있으면 다시 안 받는다 / 브라우저: 무료 받기 본문이 빈 글만 · 이미 받았으면 안 받는다',
+        [...dueBefore, due('act-b', 'browser', '2026-11-27')], [false, true, true, false, false, true, false, false]);
+      AT.writeStore(dir, 'act-a', 'browser', { url: 'https://x.kr/1', body: '브라우저 본문', bodyFrom: 'browser', docs: [doc('h1', '같은 지문'), doc('h4', '브라우저만 본 첨부')] }, '2026-11-27');
+      const s3 = AT.readStore(dir, 'act-a');
+      eq('  두 기록이 다 있으면 — 본문은 무료 받기 것 · 첨부는 지문으로 한 번씩(무료 받기 것이 먼저 · 차례가 늘 같다) · 기록이 없는 글은 null',
+        [s3.body, s3.bodyFrom, s3.docs.map((d) => d.hash), AT.readStore(dir, 'act-none')], ['처음 본문 글자', 'plain', ['h1', 'h2', 'h4'], null]);
+      const T = '2026-11-26';
+      eq('③ 글자를 받을 글(wantsText) — 표시가 달린 글만 사흘 동안 · 올린 글(paidOpen)·관리자 숨김·id 없는 글은 아니다 · 시험 워크플로가 지정한 id 는 표시가 없어도',
+        [{ id: 'a', paidGate: T }, { id: 'a', paidGate: '2026-11-23' }, { id: 'a', paidGate: '2026-11-22' }, { id: 'a' }, { id: 'a', paidGate: T, paidOpen: '관리자 2026-11-26' }, { id: 'a', paidGate: T, hidden: true }, { paidGate: T }, { id: 'z' }]
+          .map((n) => AT.wantsText(n, T, new Set(['z']))), [true, true, false, false, false, false, false, true]);
+      const gone = AT.pruneStore(dir, new Set(['act-a']), 'plain');
+      eq('④ 목록에서 빠진 글의 기록은 제 모드 것만 지운다', [gone, fs.existsSync(AT.storeFile(dir, 'act-b', 'plain')), fs.existsSync(AT.storeFile(dir, 'act-b', 'browser')), fs.existsSync(AT.storeFile(dir, 'act-a', 'plain'))], [1, false, true, true]);
+      const big = 'ㄱ'.repeat(900000);
+      AT.writeStore(dir, 'act-big', 'plain', { url: 'u', body: '본문', docs: [doc('b1', big, { name: '큰 요강.pdf' }), doc('b2', '작은 글자'), doc('b3', big.slice(0, 500000), { name: '중간.pdf' })] }, T);
+      eq('⑤ 한 글의 기록은 2MB 를 넘지 않는다 — 큰 첨부부터 빼고 무엇을 뺐는지 적는다',
+        [fs.statSync(AT.storeFile(dir, 'act-big', 'plain')).size <= AT.MAX_STORE_BYTES, AT.readStore(dir, 'act-big').docs.map((d) => d.hash), JSON.parse(rawOf('act-big', 'plain')).dropped], [true, ['b2', 'b3'], ['큰 요강.pdf']]);
+      eq('  🔴 id 에 경로 글자가 섞였거나 비었으면 쓰지 않는다(폴더 밖에 파일을 만들지 않는다)',
+        [AT.writeStore(dir, '../evil', 'plain', { body: 'x', docs: [] }, T), AT.writeStore(dir, '', 'plain', { body: 'x', docs: [] }, T), fs.readdirSync(path.dirname(dir)).includes('evil.json')], [false, false, false]);
+
+      /* 받은 파일(act-files) → 기록 한 건 — 첨부 로봇(activity-docs)의 두 모드가 같은 함수를 쓴다 */
+      process.env.ACTIVITY_DOCS_AS_LIB = '1';
+      const AD = await import('../collector/activity-docs.mjs');
+      const texts = { 'k-P.txt': '농촌 아이디어 공모전 안내\n접수 기간 11.20 ~ 12.07', 'k-B.txt': '브라우저가 그린 농촌 아이디어 공모전 본문', 'k-0.hwp': '공모전 요강 글자', 'k-1i.png': '농촌 아이디어 공모전 포스터 글자', 'k-2i.png': '다른 행사 홍보물',
+        'k-L0.txt': '농촌 아이디어 공모전 대회 요강\n참가 자격 대학생', 'k-L1.txt': '재단 소개 페이지', 'k-3.pdf': '' };
+      const io = { key: 'k', readText: (p) => texts[path.basename(p)] ?? '', isOcr: (p) => /\.(png|pdf)$/.test(p), hashOf: (p) => `H-${path.basename(p)}` };
+      const post = { url: 'https://x.kr/9', title: '제10회 농촌 아이디어 공모전' };
+      const rec = AD.storeFromFiles(post, ['k-0.hwp', 'k-1i.png', 'k-2i.png', 'k-L0.txt', 'k-L1.txt', 'k-3.pdf'], { 'k-0.hwp': '요강.hwp', 'k-3.pdf': '스캔.pdf' }, { ...io, mode: 'plain' });
+      eq('⑥ 받은 파일 → 기록 — 본문은 페이지 글자 · 첨부는 이름·지문과 함께 · 페이지에서 주운 그림과 요강 페이지는 그 글의 것만(제목 낱말) · 글자를 못 뽑은 파일은 안 싣는다',
+        [rec.body.split('\n')[0], rec.bodyFrom, rec.docs.map((d) => [d.name, d.from, d.ocr, d.hash.slice(0, 2)])], ['농촌 아이디어 공모전 안내', 'plain', [['요강.hwp', 'attach', false, 'H-'], ['', 'img', true, 'H-'], ['', 'guide', false, 'T-']]]);
+      const recB = AD.storeFromFiles(post, ['k-B.txt', 'k-0.hwp'], { 'k-0.hwp': '요강.hwp' }, { ...io, mode: 'browser' });
+      const shell = AD.storeFromFiles(post, [], {}, { ...io, key: 'k2', readText: () => '로그인 메뉴 사이트맵 개인정보처리방침', mode: 'plain' });
+      const generic = AD.storeFromFiles({ url: 'u', title: '참가자 모집 안내' }, [], {}, { ...io, key: 'k3', readText: () => '서포터즈를 모집합니다 활동 기간 3개월', mode: 'plain' });
+      eq('  브라우저 모드의 본문은 브라우저가 그린 글자 · 본문에 글 제목의 낱말이 없으면 그 글의 페이지가 아니다(빈 본문 — 브라우저가 이어받는다) · 제목이 흔한 말뿐이면 가릴 수 없어 본문을 받는다',
+        [recB.body, recB.bodyFrom, recB.docs.map((d) => d.name), shell.body, shell.docs, generic.body], ['브라우저가 그린 농촌 아이디어 공모전 본문', 'browser', ['요강.hwp'], '', [], '서포터즈를 모집합니다 활동 기간 3개월']);
+      const adSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+      eq('⑦ 첨부 로봇 — 글자를 받을 글을 지금 대상보다 먼저 돈다 · 🔴 활동 목록 파일을 쓰는 곳은 무료 모드 한 곳뿐(브라우저 모드는 안 쓴다) · 끝에 제 모드 기록만 가지치기 · 시험 워크플로의 id 목록(ACT_TEXT_IDS)',
+        [/const order = \[\.\.\.acts\.items\.filter\(isTextTarget\), \.\.\.acts\.items\.filter\(\(n\) => !isTextTarget\(n\)\)\];/.test(adSrc), (adSrc.match(/writeFileSync\(ACTS/g) || []).length, /if \(changed && !BROWSER\) fs\.writeFileSync\(ACTS/.test(adSrc),
+          /pruneStore\(STORE_DIR, [^)]*, BROWSER \? 'browser' : 'plain'\)/.test(adSrc), /process\.env\.ACT_TEXT_IDS/.test(adSrc)], [true, 1, true, true, true]);
+      eq('  두 워크플로가 글자 기록 폴더를 저장한다(로봇이 고친 파일은 전부 git add 에)',
+        [/\[ -d collector\/act-text \] && git add -A collector\/act-text/.test(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url))),
+          /\[ -d collector\/act-text \] && git add -A collector\/act-text/.test(readText(new URL('../.github/workflows/rescue-bodies.yml', import.meta.url)))], [true, true]);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  }
+
   /* ── 유료 카드 읽기 (4번 · 2026-11-15 개발자 지시 · 11-21 개정) — AI 하나가 공고를 통째로 읽어 카드 칸을 쓰고 첨부를 가른다. 로봇은 꼴만 다듬어 그대로 싣는다 ── */
   console.log('\n■ 유료 카드 읽기 — AI 하나가 쓴 카드를 그대로 싣는다 · 첨부 구분 · 스위치 (2026-11-15 · 11-21 기계 검사 없음)');
   {

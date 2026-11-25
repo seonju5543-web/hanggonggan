@@ -37,6 +37,7 @@ import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails, eligLineOk, ACT_DETAILS_V, ACT_DOCS_V, activityDocuments, putActivityDocuments } from './activity-excerpts.mjs';
 import { ACT_SIGNAL } from './activity-vocab.mjs';
+import { writeStore, wantsText, textDue, pruneStore } from './act-text.mjs';   // 유료 관문 — 원문 글자 기록(글자만 · 2026-11-25)
 import { detailByRule } from './activity-detail-rules.mjs';   // 온통청년처럼 글·포스터가 JSON 에 있는 게시판 — 수집 로봇과 같은 함수(2026-10-28)
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
 
@@ -47,7 +48,13 @@ const MANIFEST = path.join(DIR, 'manifest.json');                // 이번 실�
 const BROWSER = process.argv.includes('--browser');
 const PLAIN_LEDGER = fileURLToPath(new URL('act-docs.json', HERE));       // 수집 로봇(무료 모드)의 장부 — { 주소: { at, tries } }
 const BROWSER_LEDGER = fileURLToPath(new URL('act-browser.json', HERE));  // 원문 받기 로봇(브라우저 모드)의 장부 + 결과
-const LEDGER = BROWSER ? BROWSER_LEDGER : PLAIN_LEDGER;                   // 커밋 — 모드마다 제 장부만 쓴다(두 로봇이 같은 파일을 안 쓴다)
+const LEDGER = BROWSER ? BROWSER_LEDGER : PLAIN_LEDGER;
+/* 유료 관문(2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-2) — 숨김 표시가 달린 글은 자격 줄이 있든 없든 본문·첨부의 **글자**를 받아 기록한다(AI 가 읽을 원문).
+   기록은 모드마다 제 파일(act-text/<id>.json · <id>.browser.json) — 두 워크플로가 같은 파일을 쓰지 않는다. 받은 원본은 지금처럼 커밋하지 않는다 */
+const STORE_DIR = fileURLToPath(new URL('act-text/', HERE));
+const NAMES = path.join(DIR, 'names.json');                      // 이번 실행이 받은 파일 → 첨부 이름 { 파일: 이름 } (페이지에서 주운 그림은 이름이 없다)
+const TEXT_IDS = new Set(String(process.env.ACT_TEXT_IDS || '').split(',').map((s) => s.trim()).filter(Boolean));   // 「유료 시험」 워크플로가 지정한 글 — 표시가 없어도 받는다
+const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);                   // 커밋 — 모드마다 제 장부만 쓴다(두 로봇이 같은 파일을 안 쓴다)
 const log = (m) => console.log(`[activity-docs] ${m}`);
 
 const POSTS_PER_RUN = Number(process.env.ACT_DOCS_POSTS || 15);   // 한 실행에 받는 글
@@ -219,7 +226,7 @@ async function browserHtml(url) {
 }
 
 /** 글 하나의 파일을 받는다 → act-files 안의 파일 이름들 */
-async function fetchPost(n, until, common = new Set(), owners = new Map()) {
+async function fetchPost(n, until, common = new Set(), owners = new Map(), names = {}) {
   const got = [];
   const key = keyOf(n.url);
   /* 규칙이 있는 게시판(온통청년)은 JSON 에서 본문 + 포스터 대체 글(`-R.txt`)과 포스터 그림을 받는다 — 평문 HTML 은 메뉴뿐이라 후보가 0개였다(2026-10-28) */
@@ -242,6 +249,8 @@ async function fetchPost(n, until, common = new Set(), owners = new Map()) {
   if (!html) return null;
   /* 브라우저로 그린 본문은 `-B.txt` 로 — 일반 받기로는 글자 0 이던 자바스크립트 페이지의 본문이다 */
   if (BROWSER) { fs.writeFileSync(path.join(DIR, `${key}-B.txt`), htmlToLines(html)); got.push(`${key}-B.txt`); }
+  /* 무료 모드의 페이지 글자는 `-P.txt` 로 남긴다(원문 글자 기록의 본문 · storeFromFiles) — 🔴 받은 파일 목록(got)에는 넣지 않는다: 넣으면 자격 고르기(eligFromFiles)가 본문을 「요강 페이지」로 한 번 더 읽는다 */
+  else fs.writeFileSync(path.join(DIR, `${key}-P.txt`), htmlToLines(html));
   /* 파일 이름 끝의 `i` = 페이지에서 주운 그림(그 글의 것인지 제목 낱말로 확인해야 한다) · 없으면 글에 붙은 첨부 */
   const save = async (list, referer) => {
     for (const f of list) {
@@ -256,6 +265,7 @@ async function fetchPost(n, until, common = new Set(), owners = new Map()) {
         const name = `${key}-${got.length}${f.from === 'img' ? 'i' : ''}.${d.ext}`;
         fs.writeFileSync(path.join(DIR, name), d.buf);
         got.push(name);
+        if (f.name) names[name] = f.name;   // 글에 붙은 첨부의 이름 — 원문 글자 기록·AI 의 첨부 구분이 이 이름으로 첨부와 만난다
       } catch { /* 이 파일만 건너뛴다 */ }
     }
   };
@@ -358,16 +368,27 @@ async function fetchPhase(acts) {
   const common = new Set(ledger._common || []);   // 공통 그림 서명 — 장부에 남겨 다음 실행도 안 받는다
   const owners = new Map();
   let posts = 0, files = 0;
-  for (const n of acts.items) {
+  /* 유료 관문 — 원문 글자를 받을 글(숨김 표시가 달린 글 · 시험 워크플로가 지정한 글)을 지금 대상(자격 줄이 없는 글)보다 **먼저** 돈다: 그 글은 글자가 와야 학생 화면에 오른다.
+     받을 차례는 act-text textDue — 무료 모드는 기록이 없거나 본문이 빈 채 날이 바뀐 글 · 브라우저 모드는 무료 모드의 본문이 빈 글만 */
+  const kst = kstToday(), mode = BROWSER ? 'browser' : 'plain';
+  const isTextTarget = (n) => wantsText(n, kst, TEXT_IDS) && textDue(STORE_DIR, n.id, mode, kst);
+  const order = [...acts.items.filter(isTextTarget), ...acts.items.filter((n) => !isTextTarget(n))];
+  const names = readJson(NAMES, {});
+  for (const n of order) {
     if (posts >= POSTS_PER_RUN || Date.now() > until) break;
-    if (!(needsElig(n) || (!BROWSER && staleDocs(n))) || !dueFree(ledger[n.url], today)) continue;
-    if (BROWSER && !plainTried[n.url]) continue;           // 무료 모드가 먼저 — 그래도 못 읽은 글만 브라우저로
-    if (BROWSER && ledger[n.url] && ledger[n.url].lines) continue;   // 이미 찾아 장부에 적었다 — 수집 로봇이 합치기 전까지 다시 열지 않는다
+    const forText = isTextTarget(n);
+    const forElig = needsElig(n) || (!BROWSER && staleDocs(n));
+    if (!forText) {
+      if (!forElig || !dueFree(ledger[n.url], today)) continue;
+      if (BROWSER && !plainTried[n.url]) continue;           // 무료 모드가 먼저 — 그래도 못 읽은 글만 브라우저로
+      if (BROWSER && ledger[n.url] && ledger[n.url].lines) continue;   // 이미 찾아 장부에 적었다 — 수집 로봇이 합치기 전까지 다시 열지 않는다
+    }
     posts += 1;
-    const got = await fetchPost(n, until, common, owners);
+    const got = await fetchPost(n, until, common, owners, names);
     if (got === null) continue;                              // 글을 못 받았다 — 장부에 안 적는다(잠깐 끊긴 것을 굳히지 않게)
     manifest[n.url] = got;
-    ledger[n.url] = { ...(ledger[n.url] || {}), at: today, tries: ((ledger[n.url] || {}).tries || 0) + 1 };
+    /* 자격 장부(무료 기회 두 번)는 자격을 읽으려던 글만 센다 — 글자만 받으러 간 글(자격은 이미 있다)의 기회를 깎지 않는다 */
+    if (forElig) ledger[n.url] = { ...(ledger[n.url] || {}), at: today, tries: ((ledger[n.url] || {}).tries || 0) + 1 };
     if (BROWSER) fs.writeFileSync(LEDGER, JSON.stringify({ ...ledger, _common: [...common].slice(-200) }, null, 1) + '\n');   // 글마다 저장 — 시간 초과로 끊겨도 해 본 것은 남는다
     files += got.length;
   }
@@ -378,6 +399,7 @@ async function fetchPhase(acts) {
   for (const [h, u] of owners) if (common.has(h) && manifest[u]) manifest[u] = manifest[u].filter((f) => !f.startsWith(`${keyOf(u)}-`) || fileHash(path.join(DIR, f)) !== h);
   ledger._common = [...common].slice(-200);
   fs.writeFileSync(MANIFEST, JSON.stringify(manifest, null, 1));
+  fs.writeFileSync(NAMES, JSON.stringify(names, null, 1));
   fs.writeFileSync(LEDGER, JSON.stringify(ledger, null, 1) + '\n');
   log(`받기 — 글 ${posts}건 · 파일 ${files}개`);
 }
@@ -391,6 +413,36 @@ export const titleWords = (title) => [...new Set(String(title || '').replace(/�
 /** OCR 로 읽은 그림이 이 글의 것인가 — 글 제목 낱말이 하나라도 그림 글자에 있어야 한다.
     🔴 사이트 옆 홍보물(「제주도 내 공공임대주택에 입주한 가구」)이 「청년 체인지메이커 아카데미」의 자격으로 붙을 뻔했다(2026-10-03 실측) */
 export const ownsImageText = (text, title) => { const t = String(text || '').replace(/\s/g, ''); return titleWords(title).some((w) => t.includes(w)); };
+
+/** 받은 파일(act-files) → 원문 글자 기록 한 건 { body, bodyFrom, docs } — 두 모드가 같은 함수(2026-11-25 · act-text.mjs writeStore 에 넘긴다).
+    · 본문: 브라우저 모드는 브라우저가 그린 글자(-B.txt) · 무료 모드는 페이지 글자(-P.txt · 규칙 게시판은 -R.txt).
+      글 제목의 낱말이 한 번도 없으면 그 글의 페이지가 아니다(포털 첫 화면·메뉴 껍데기) → 빈 본문(브라우저가 이어받는다). 제목이 흔한 말뿐이면 가릴 수 없어 받는다.
+    · 첨부: 글자를 뽑은 파일만 · 이름은 받을 때 적어 둔 것(names) · 지문은 원본 바이트 · 페이지에서 주운 그림(OCR)과 따라간 요강 페이지는 그 글의 것만(자격 고르기와 같은 거름 ownsImageText) */
+const sha16 = (s) => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 16);
+export function storeFromFiles(n, files, names = {}, { key = keyOf(n.url), dir = DIR, readText = (p) => (/\.txt$/.test(p) ? fs.readFileSync(p, 'utf8') : attachmentText(p)), isOcr = isOcrSource, hashOf = fileHash, mode = BROWSER ? 'browser' : 'plain' } = {}) {
+  const read = (f) => { try { return String(readText(path.join(dir, f)) || ''); } catch { return ''; } };
+  const owns = (text) => !titleWords(n.title).length || ownsImageText(text, n.title);
+  const list = files || [];
+  const bodyFile = mode === 'browser' ? `${key}-B.txt` : (list.includes(`${key}-R.txt`) ? `${key}-R.txt` : `${key}-P.txt`);
+  const rawBody = read(bodyFile);
+  const body = rawBody.trim() && owns(rawBody) ? rawBody : '';
+  const bodyFrom = body ? (mode === 'browser' ? 'browser' : bodyFile.endsWith('-R.txt') ? 'rule' : 'plain') : '';
+  const docs = [];
+  for (const f of list) {
+    if (/-[BRP]\.txt$/.test(f)) continue;                        // 본문 글자는 위에서
+    const p = path.join(dir, f);
+    const guide = /-L\d*\.txt$/.test(f);
+    const text = read(f);
+    if (!text.trim()) continue;
+    const ocr = !guide && !!isOcr(p);
+    const fromImg = /\di\.\w+$/.test(f);
+    if ((guide || (fromImg && ocr)) && !owns(text)) continue;    // 남의 글 막기
+    const hash = guide ? `T-${sha16(text)}` : hashOf(p);
+    if (!hash) continue;
+    docs.push({ name: guide ? '' : String(names[f] || ''), hash, from: guide ? 'guide' : fromImg ? 'img' : 'attach', ocr, text });
+  }
+  return { body, bodyFrom, docs };
+}
 
 /* 읽는 순서 — 요강 페이지 글자 → 원문 글자(HWP·HWPX·DOCX) → OCR(PDF·그림). 사람이 쓴 글자가 기계가 읽은 글자보다 먼저다 */
 const RANK = (f) => (/-B\.txt$/.test(f) ? 0 : /\.txt$/.test(f) ? 1 : /\.(hwpx?|docx)$/i.test(f) ? 2 : 3);   // 브라우저 본문 → 요강 페이지 → HWP·DOCX → OCR
@@ -451,6 +503,19 @@ function applyPhase(acts) {
       if (!BROWSER) fs.writeFileSync(PLAIN_LEDGER, JSON.stringify(led, null, 1) + '\n');
     }
     fs.writeFileSync(PADDLE_STATUS, JSON.stringify({ ...status, applied: true }, null, 1));
+  }
+  /* 유료 관문 — 이번 실행이 받은 글 가운데 글자를 받을 글의 기록을 쓴다(act-text.mjs · 글자만). 받은 파일이 없어도(본문뿐·빈 본문) 쓴다 — 「무료 받기를 해 봤다」는 표시라 브라우저가 이어받는다.
+     🔴 활동 목록 파일(ACTS)과는 상관없다 — 이 기록은 모드마다 제 파일이고, 유료 로봇(card-read --activities)이 읽기만 한다 */
+  {
+    const kst = kstToday(), mode = BROWSER ? 'browser' : 'plain', names = readJson(NAMES, {});
+    let stored = 0;
+    for (const n of acts.items) {
+      if (!(n.url in manifest) || !wantsText(n, kst, TEXT_IDS)) continue;
+      if (writeStore(STORE_DIR, n.id, mode, { url: n.url, ...storeFromFiles(n, manifest[n.url] || [], names) }, kst)) stored += 1;
+    }
+    const liveIds = new Set(acts.items.map((n) => n.id).filter(Boolean));
+    const pruned = pruneStore(STORE_DIR, liveIds, BROWSER ? 'browser' : 'plain');
+    if (stored || pruned) log(`원문 글자 기록 — 쓴 글 ${stored}건 · 목록에서 빠져 지운 글 ${pruned}건`);
   }
   if (BROWSER) fs.writeFileSync(BROWSER_LEDGER, JSON.stringify(bled, null, 1) + '\n');
   else got += mergeBrowserResults(acts);
