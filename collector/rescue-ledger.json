@@ -975,7 +975,7 @@
   "attGap": 0
  },
  "https://www.sogang.ac.kr/ko/detail/551923?bbsconfigfk=141&namepage=ScholarshipNotice": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-11-25",
   "minBody": 100,
   "name": "[교외] 에몬스 장학생 선발 안내(1/8 마감, 생활비 500만원)",
@@ -984,7 +984,7 @@
   "attGap": 0
  },
  "https://www.sogang.ac.kr/ko/detail/551919?bbsconfigfk=141&namepage=ScholarshipNotice": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-11-25",
   "minBody": 100,
   "name": "[교외] 농림축산식품부 농어촌희망재단 청년창업농장학생 선발 안내(1/5 마감, 등록금 전액 및 학업장려금 2",
