@@ -14686,8 +14686,28 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     eq('  띄어 쓴 맨 요일 + 시각(`(~12/7 월 15시)`)도 기간이다 (2026-11-25 실화면 · 숭실대) · 뗀 조각은 원문 글자 그대로 · `10월 15일 프로그램` 은 그대로',
       [T('윤준성교수님장학금 장학생 모집 공고(~12/7 월 15시)'), TD('윤준성교수님장학금 장학생 모집 공고(~12/7 월 15시)').dates, T('관정재단 장학생 선발 공고(~11/24 화 15시)'), T('청춘두두두(10월 15일 프로그램)')],
       ['윤준성교수님장학금 장학생 모집 공고', ['~12/7 월 15시'], '관정재단 장학생 선발 공고', '청춘두두두(10월 15일 프로그램)']);
+    /* 게시판 분류 머리말 (2026-11-25 개발자 결정 · 화면 점검 — 숭실대 「장학 ★ …」 · 전수: 경희 「공통」 · 연세 「일반공지」 · 숭실 「장학」) */
+    const SBH = new Function(`${grab('const TD_DAY =', '/* notStale(오래된 공고 숨김)')}; return stripBoardHead;`)();
+    eq('  게시판 분류 머리말을 뗀다 — 숭실 「장학」(+강조 별표) · 경희 「공통」 · 연세 「일반공지」 · 앞뒤 별표',
+      [SBH('장학 ★ 2026학년도 2학기 윤준성교수님장학금 장학생 모집 공고', 'https://scatch.ssu.ac.kr/공지사항/?slug=x'), SBH('장학 한국고등교육재단 인재림 제7기 장학생 선발 안내', 'https://scatch.ssu.ac.kr/a'),
+        SBH('공통 제36기 미레에셋 해외교환 장학생 선발', 'https://news.khu.ac.kr/a'), SBH('일반공지 2026년도 2학기 노수석 추모사업회 장학금 선발 안내', 'https://www.yonsei.ac.kr/a'),
+        SBH('장학 ★★★ 2027학년도 1학기 한국장학재단 국가장학금 1차 신청 안내 ★★★', 'https://scatch.ssu.ac.kr/a'), SBH('공통 2026년도 익산사랑 장학생 선발 안내', '')],
+      ['2026학년도 2학기 윤준성교수님장학금 장학생 모집 공고', '한국고등교육재단 인재림 제7기 장학생 선발 안내', '제36기 미레에셋 해외교환 장학생 선발', '2026년도 2학기 노수석 추모사업회 장학금 선발 안내',
+        '2027학년도 1학기 한국장학재단 국가장학금 1차 신청 안내', '2026년도 익산사랑 장학생 선발 안내']);
+    eq('  🔴 별표는 앞뒤를 같이 떼고, 떼고도 별이 남는 제목(가운데 별)은 그대로 둔다 — 한쪽만 깎지 않는다(리뷰 · 실제 제목)',
+      [SBH('★필독★ 2027학년도 1학기 국가장학금 1차 신청 안내', 'https://www.seoultech.ac.kr/a'), SBH('☆★KU SEJONG 장학 포탈 OPEN 안내☆★', ''), SBH('[재학생 필수] ★ 2027-1학기 등록금 납부 안내 ★', ''), SBH('★ 2027-1학기 등록금 납부 안내 ★', '')],
+      ['★필독★ 2027학년도 1학기 국가장학금 1차 신청 안내', '☆★KU SEJONG 장학 포탈 OPEN 안내☆★', '[재학생 필수] ★ 2027-1학기 등록금 납부 안내 ★', '2027-1학기 등록금 납부 안내']);
+    eq('  🔴 대조군: 다른 게시판의 「장학 …」 제목(주소 끝만 닮은 것 포함)·캠퍼스 머리말(서울·국제)·붙여 쓴 낱말은 그대로 · 남는 글자가 4자 미만이면 그대로',
+      [SBH('장학 담당자 변경 안내', 'https://www.hufs.ac.kr/a'), SBH('장학 담당자 변경 안내', 'https://fakessu.ac.kr/a'), SBH('장학 담당자 변경 안내', 'https://ssu.ac.kr.example.com/a'),
+        SBH('서울 2026학년도 2학기 교외 주거비 지원장학', 'https://news.khu.ac.kr/a'), SBH('공통교양 장학생 선발 안내', 'https://news.khu.ac.kr/a'), SBH('공통 안내', 'https://news.khu.ac.kr/a')],
+      ['장학 담당자 변경 안내', '장학 담당자 변경 안내', '장학 담당자 변경 안내', '서울 2026학년도 2학기 교외 주거비 지원장학', '공통교양 장학생 선발 안내', '공통 안내']);
+    eq('  정식 등록 카드(cardTitle·cardTitleParts)와 게시판 카드(noticeCardHtml·시트)·홈 소식 띠가 그 한 곳을 부른다 · 대괄호 표식 뒤 별표도 뗀다',
+      [/return cleanCardTitle\(stripBoardHead\(sch\.name, sch\.sourceUrl\)\)/.test(appX), /const raw = stripBoardHead\(String\(sch\.name \|\| ''\)\.trim\(\)\.replace\([^\n]*, sch\.sourceUrl\);/.test(appX),
+        (appX.match(/splitTitleDates\(stripBoardHead\(unent\(n\.title\), n\.url\)\)/g) || []).length, /news-tile-title">\$\{esc\(stripBoardHead\(unent\(n\.title\), n\.url\)\)\}/.test(appX),
+        new Function(`${grab('const TD_DAY =', '/* notStale(오래된 공고 숨김)')}; ${appX.match(/function cleanCardTitle\(name\) \{[\s\S]*?\n\}\n/)[0]}; return cleanCardTitle;`)()('[국가/신청] ★2026 국가우수장학금(이공계) 일시지원')],
+      [true, true, 2, true, '2026 국가우수장학금(이공계) 일시지원']);
     eq('  뗀 마감은 버리지 않고 돌려준다(D-day 없는 카드의 회색 줄) · 세 갈래 카드가 이 함수를 부른다',
-      [TD('장학생 선발 안내(~8/3)').dates, /splitTitleDates\(t\)\.title/.test(appX.slice(appX.indexOf('function cleanCardTitle'))), /t = splitTitleDates\(t\)\.title;/.test(appX.slice(appX.indexOf('function activityTitle'))), /const tSplit = splitTitleDates\(unent\(n\.title\)\)/.test(appX)],
+      [TD('장학생 선발 안내(~8/3)').dates, /splitTitleDates\(t\)\.title/.test(appX.slice(appX.indexOf('function cleanCardTitle'))), /t = splitTitleDates\(t\)\.title;/.test(appX.slice(appX.indexOf('function activityTitle'))), /const tSplit = splitTitleDates\(stripBoardHead\(unent\(n\.title\), n\.url\)\)/.test(appX)],
       [['~8/3'], true, true, true]);
     eq('  제목 — 정책브리핑 `기간 : …` 꼬리 · 꼬리 날짜 · 이모티콘 · `[일반]` 분류표 · `(~10/22)` · `마감` 머리를 뗀다 · 주최 대괄호는 남긴다',
       ['[감사원] 2026년 국민제안 감사 아이디어 공모 기간 : 2026.10.01 ~ 2026.10.31', '[공고] 2026년 청춘두두두 10월 프로그램 참가자 모집 공고 2026.09 . 28', '📢 「2026 보성 두드림 스테이」 추가 모집 🌿',
@@ -17793,6 +17813,46 @@ module.exports = class Anthropic {
         [0, true, true, true, true, true, true]);
       eq('  유료 SDK 는 끝까지 한 번도 불리지 않았다', sb.exists('sdk-called.txt'), false);
     } finally { sb.done(); }
+    /* ⑤ 대학원생만 받는 숨김 등록분 (2026-11-25 개발자 결정 · 화면 점검 — 상명대 「두레장학생 모집(학술정보관)」: 제목에 '대학원'이 없어 자동 등록을 지나갔고 카드를 읽고서야 드러났다).
+       학생 화면에 올리지 않고 사람에게 넘긴다(gateHeld 'grad-only') · 이미 올라간 것도 내린다(소급) · 관리자가 직접 등록한 공고(paidRead)·학부를 함께 받는 공고는 그대로 */
+    {
+      const PRg = createRequire(import.meta.url)('../parse-requirements.js');
+      const G = (e) => CR.gradOnlyCard(e, PRg);
+      eq('⑤ 대학원생 전용 판정 — 자격 줄이 대학원생을 대상으로 말하고 학부를 말하는 줄이 없을 때만 · 학부와 나란히 받는 공고 · 대학원이 안내 줄에만 나오는 공고 · 제목이 학부생 대상인 공고 · 자격 줄이 빈 카드는 아니다',
+        [G({ title: '두레장학생 모집(학술정보관)', eligibility: ['본교 대학원 재학생(27. 2월 및 2027-1학기 기준)'] }), G({ eligibility: ['학부 및 대학원 재학생'] }),
+          G({ eligibility: ['2027학년도 1학기 교내장학금을 받고자 하는 등록대상자'], apply: ['대학원 신입생은 장학선정신청서를 작성해 학과(부) 사무실로 제출합니다'] }),
+          G({ title: '해외수학장학금 신청 안내(학부생 대상)', eligibility: ['대학원 재학생'] }), G({ eligibility: [] }), G(null)],
+        [true, false, false, false, false, false]);
+      eq('  🔴 대조군(리뷰): 반대말(「대학원 재학생은 지원 불가」) · 학부·대학원을 줄을 나눠 함께 받는 공고는 대학원생 전용이 아니다 — 앱의 학위 판정(parseDegree)과 같은 잣대',
+        [G({ eligibility: ['본교 재학생 중 직전학기 평점 3.0 이상인 자', '대학원 재학생은 지원 불가'] }), G({ eligibility: ['재학생은 직전학기 12학점 이상 이수', '대학원 재학생은 직전학기 6학점 이상 이수'] }),
+          G({ eligibility: ['2~4학년 재학생', '석사과정 1~2학기 재학생'] }), G({ eligibility: ['본교 대학원 석사과정 재학생', '직전학기 평점 3.5 이상'] })],
+        [false, false, false, true]);
+      const gradCard = { ...good, eligibility: [L('본교 대학원 재학생', '가. 직전학기 평점평균 3.0 이상인 자로,')] };
+      const reg5 = [mk('q-grad', 1, { paidGate: plus(-1) }), mk('q-man', 2, { paidRead: plus(-1) }), mk('q-ok', 4, { paidGate: plus(-1) }), mk('q-was', 5, { paidGate: plus(-2) })];
+      const sb5 = paidBox('hdj-paid-grad-');
+      try {
+        sb5.write('data/registered.json', { items: reg5 });
+        sb5.write('collector/extracted/notices-text.json', [1, 2, 4, 5].map((n, i) => ({ title: reg5[i].name, school: '시험대학교', url: reg5[i].sourceUrl, text: body(n) })));
+        sb5.write('fake.json', { 'q-grad': gradCard, 'q-man': gradCard, 'q-ok': good, 'q-was': good });
+        const r5 = sb5.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb5.abs('fake.json') }, 30000), d5 = sb5.json('data/card-read.json') || {}, l5 = sb5.json('collector/card-read-ledger.json') || {};
+        eq('  🔴 진짜 로봇 — 대학원생 전용 숨김분(q-grad)은 결과에 싣지 않고 사람에게 넘긴다(grad-only · 관리자용 파일에도) · 직접 등록분(q-man)과 학부 공고(q-ok·q-was)는 실린다',
+          [r5.status, Object.keys(d5.items || {}).sort(), d5.gateHeld, !!(l5['q-grad'] || {}).gradOnly, (l5['q-grad'] || {}).done, (sb5.json('collector/card-read-review.json') || {}).gateHeld],
+          [0, ['q-man', 'q-ok', 'q-was'], { 'q-grad': 'grad-only' }, true, true, { 'q-grad': 'grad-only' }]);
+        if (r5.status !== 0) console.log(r5.out.slice(-600));
+        /* 소급 — 이미 올라가 있던 카드가 대학원생 전용으로 고쳐졌다(6번이 고친 경우와 같은 꼴) · 유료 스위치가 꺼진 실행에서도 내린다 */
+        sb5.write('data/card-read.json', { ...d5, items: { ...d5.items, 'q-was': { ...d5.items['q-was'], eligibility: ['본교 대학원 재학생'] } } });
+        const r6 = sb5.run('collector/card-read.mjs', ['--write'], NOENV, 30000), d6 = sb5.json('data/card-read.json') || {};
+        eq('  🔴 소급 — 이미 올라간 공고의 카드가 대학원생 전용이면 내리고 사람에게 넘긴다(스위치가 꺼진 실행에서도 · 돈 0) · 앱은 넘긴 숨김분을 안 보인다(paidGateOpen)',
+          [r6.status, Object.keys(d6.items || {}).sort(), d6.gateHeld, ME.paidGateOpen(reg5[3], d6, plus(30)), ME.paidGateOpen(reg5[2], d6, plus(0))],
+          [0, ['q-man', 'q-ok'], { 'q-grad': 'grad-only', 'q-was': 'grad-only' }, false, true]);
+        const r7 = sb5.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb5.abs('fake.json') }, 30000);
+        const rc7 = sb5.run('collector/card-read.mjs', ['--recheck', '--write'], NOENV, 30000), d7 = sb5.json('data/card-read.json') || {};
+        eq('  🔴 내린 공고를 다시 사지 않는다(다음 실행의 대상이 아니다 — 같은 원문) · --recheck 도 되살리지 않는다(표시가 그대로)',
+          [r7.status, /✓ q-grad|✓ q-was/.test(r7.out), rc7.status, Object.keys(d7.items || {}).sort(), d7.gateHeld],
+          [0, false, 0, ['q-man', 'q-ok'], { 'q-grad': 'grad-only', 'q-was': 'grad-only' }]);
+      } finally { sb5.done(); }
+      eq('  관리자 화면이 그 까닭을 사람 말로 적는다(GATE_WHY grad-only)', /'grad-only': '[^']*대학원생만 받는 공고/.test(readText(new URL('../_admin/admin.js', import.meta.url))), true);
+    }
 
     /* ④-2 관리자 cardLine 을 진짜 자식 프로세스로 — 살리기·고쳐서 싣기·버리기 · 막는 것들 (옛 두 읽기의 잡힌 줄을 사람이 정한다 · 리뷰 11-20: 시험이 없었다) */
     {

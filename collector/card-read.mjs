@@ -142,6 +142,18 @@ export function cardEntry(item, out, wonIn) {
   const filled = LIST_FIELDS.some((k) => entry[k].length) || !!entry.deadline;
   return o.unreadable === true || !filled ? null : entry;
 }
+/* 대학원생만 받는 공고인가 (2026-11-25 개발자 결정 · 화면 점검 — 상명대 「두레장학생 모집(학술정보관)」: 제목에 '대학원'이 없어 자동 등록을 지나갔고 카드를 읽고서야 드러났다).
+   이 앱의 학생은 정의상 학부생이고(온보딩) 정식 등록은 대학원 공고를 뺀다(운영 원칙 2) — 그런 숨김 등록분은 학생 화면에 올리지 않고 사람에게 넘긴다(gateHeld 'grad-only').
+   판정은 앱과 같은 함수(parse-requirements parseDegree·mentionsUndergrad — 묶음째 인자로 받는다)로: 자격 줄 가운데 **대학원생을 대상으로 말하는 줄**이 있고, 학부를 말하는 자격 줄이 하나도 없을 때만.
+   🔴 틀려도 '안 올림'이지 '틀린 미달'이 아니다 — 관리자 「할 일」에 뜬다. 학부·대학원을 나란히 받는 공고(「학부 및 대학원 재학생」)·대학원 기준이 표의 한 칸인 공고는 걸리지 않는다 */
+export function gradOnlyCard(entry, PR) {
+  const lines = (entry && Array.isArray(entry.eligibility)) ? entry.eligibility : [];
+  /* 앱이 미달을 내는 그 판정(parseDegree — 「대학원생은 지원 불가」 같은 반대말·대상이 아닌 줄은 걸러 준다)으로 본다(리뷰 2026-11-25) */
+  const isGrad = (l) => { const d = PR.parseDegree(PR.untag(l), false); return !!d && d.want === 'grad'; };
+  /* 대학원 말이 없는 줄이 재학생·학년을 말하면 학부생도 받는 공고다(「2~4학년 재학생」 + 「석사과정 1~2학기 재학생」 두 줄) */
+  const otherStudents = (l) => !/대학원|석사|박사/.test(l) && /재학|학년/.test(l);
+  return lines.some(isGrad) && !lines.some((l) => PR.mentionsUndergrad(l) || otherStudents(l)) && !/학부/.test(String((entry && entry.title) || ''));
+}
 /* 4-1 — AI 가 낸 첨부 갈래를 받아 둔 원본 파일에 잇는다(꼬리표 → 파일). 모르는 꼬리표·갈래는 버린다 · 같은 파일은 한 번 */
 export function rolesOf(parts, out) {
   const byTag = new Map((parts || []).filter((x) => x && x.tag).map((x) => [x.tag, x]));
@@ -226,6 +238,7 @@ export function pickTargets(items, partsOf, ledger, { today, giveUpAfter = 3, on
   return out.sort((x, y) => (key(x) < key(y) ? -1 : key(x) > key(y) ? 1 : 0));
 }
 /* 사람에게 넘길 숨김분 — 앱은 여기 적힌 공고를 사흘이 지나도 무료 값으로 올리지 않는다(match-engine paidGateOpen · 관리자 「할 일」 컨펌 대기).
+   grad-only: 카드를 읽어 보니 대학원생만 받는 공고다(gradOnlyCard) ·
    no-source: 등록 뒤 사흘이 지나도 읽을 원문(한글 40자)이 없다 · unreadable: AI 가 읽었는데 실을 것이 없었다(읽을 내용 없음 — 메뉴뿐·오류 화면).
    🔴 유료가 그냥 멈춘 것(스위치·잔액·실패)은 적지 않는다 — 그 공고는 사흘 뒤 무료 값으로 올라가야 한다(비상망) */
 const daysSince = (from, today) => Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${String(from).slice(0, 10)}T00:00:00Z`)) / 86400000);
@@ -234,6 +247,7 @@ export function gateHeldOf(items, partsOf, ledger, paid, today, waitDays = 3) {
   for (const it of items) {
     if (!it.paidGate || paid[it.id] || closedNow(it, null, today)) continue;
     const led = ledger[it.id];
+    if (led && led.gradOnly) { out[it.id] = 'grad-only'; continue; }
     if (led && led.done) { out[it.id] = 'unreadable'; continue; }
     if (daysSince(it.paidGate, today) > waitDays && sourceText(partsOf(it)).replace(/[^가-힣]/g, '').length < 40) out[it.id] = 'no-source';
   }
@@ -384,7 +398,21 @@ if (process.argv[1] && ranDirectly()) {
   const { wonIn } = require('../parse-amount.js');
   /* 임시 파일에 쓰고 이름을 바꾼다(쓰다 죽어도 반쪽 파일이 안 남는다) · 결과 파일을 장부보다 먼저(장부만 '읽음'이고 결과가 없는 상태가 안 생긴다) */
   const writeAtomic = (rel, obj) => { const p = P(rel), tmp = `${p}.tmp`; fs.writeFileSync(tmp, `${JSON.stringify(obj, null, 1)}\n`); fs.renameSync(tmp, p); };
+  /* 대학원생 전용 숨김분은 결과에서 내린다(소급 — 이미 올라간 것도 · 6번이 고친 카드도 같은 잣대) — 장부에 표시가 남아 gateHeldOf 가 사람에게 넘긴다 */
+  const PRq = require('../parse-requirements.js');
+  const sweepGrad = () => {
+    let n = 0;
+    for (const it of reg.items) {
+      const e = data.items[it.id];
+      if (!e || !it.paidGate || !gradOnlyCard(e, PRq)) continue;
+      delete data.items[it.id];
+      ledger[it.id] = { ...(ledger[it.id] || { name: String(it.name).slice(0, 60) }), gradOnly: TODAY };   // done 은 건드리지 않는다 — 원문이 바뀌어 다시 읽어야 하는 공고의 재시도를 막지 않는다(리뷰)
+      n += 1;
+    }
+    return n;
+  };
   const save = () => {
+    sweepGrad();
     data.updatedAt = TODAY; data.gateHeld = gateHeldOf(reg.items, partsOf, ledger, data.items, TODAY);
     writeAtomic('../data/card-read.json', data); writeAtomic('card-read-ledger.json', ledger);
     writeAtomic('card-read-review.json', { updatedAt: TODAY, ...reviewOf(ledger, data.gateHeld) });
@@ -401,13 +429,14 @@ if (process.argv[1] && ranDirectly()) {
   for (const id of Object.keys(data.items)) { const it = live.get(id); if (!it || (!kept(it) && closedNow(it, data.items[id], TODAY))) { delete data.items[id]; pruned += 1; } }
   for (const id of Object.keys(ledger)) { const it = live.get(id); if (!it || (!kept(it) && !data.items[id] && closedNow(it, null, TODAY))) delete ledger[id]; }
   for (const id of Object.keys(roles.items)) if (!live.get(id)) delete roles.items[id];
+  pruned += sweepGrad();   // 대학원생 전용으로 드러난 숨김분(소급) — 내린 것이 있으면 스위치가 꺼진 날에도 저장한다
 
   /* 한 건의 응답을 결과·장부·첨부 갈래에 적는다 — 읽기와 다시 만들기(--recheck)가 같은 길 */
   const put = (it, parts, hash, out) => {
     const led = ledger[it.id] = { ...(ledger[it.id] || {}), name: String(it.name).slice(0, 60), hash };
     const entry = cardEntry(it, out, wonIn);
     led.done = true; led.at = TODAY; led.mode = 'ai'; led.raw = out;
-    delete led.error; delete led.held; delete led.dropped;
+    delete led.error; delete led.held; delete led.dropped; delete led.gradOnly;
     if (entry) delete led.unreadable; else led.unreadable = true;
     /* 🔴 한 번 학생 화면에 올린 공고는 다시 숨기지 않는다 — 다시 읽기가 빈 결과를 내도 있던 결과를 남긴다(지우면 그 공고가 화면에서 사라진다) */
     if (entry) data.items[it.id] = { ...entry, hash, readAt: TODAY }; else if (!(kept(it) && data.items[it.id])) delete data.items[it.id];
@@ -421,6 +450,7 @@ if (process.argv[1] && ranDirectly()) {
     for (const it of reg.items) {
       const led = ledger[it.id];
       if (!led || led.mode !== 'ai' || !led.raw) continue;   // 옛 두 읽기 장부는 다시 만들 수 없다(그 결과는 결과 파일에 있는 그대로다)
+      if (led.gradOnly) continue;   // 대학원생 전용으로 내린 공고는 「잃은 결과」가 아니다 — 되살리면 6번이 고치기 전의 카드로 돌아가고 표시도 지워진다(리뷰 2026-11-25)
       if (data.items[it.id]) continue;   // 🔴 결과가 있는 공고는 건드리지 않는다(2026-11-22) — 6번 최종 검토가 고친 카드일 수 있다(다시 만들면 4번의 답으로 되돌아간다). 잃은 것만 되살린다
       const parts = partsOf(it);
       if (sourceHash(sourceText(parts)) !== led.hash) continue;   // 원문이 바뀌었다 — 다음 유료 실행이 다시 읽는다

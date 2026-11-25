@@ -717,7 +717,7 @@ const SCHOOL_PHOTO_RE = /^assets\/schools\/[a-z0-9]+-[0-9a-f]{8}\.webp$/;
 const PHOTO_FOCUS_RE = /^\d{1,3}% \d{1,3}%$/;
 function noticeCardHtml(n, opts) {
   const o = opts || {};
-  const tSplit = splitTitleDates(unent(n.title));   // 카드 제목의 날짜·기간 — 공용 규칙(2026-10-05)
+  const tSplit = splitTitleDates(stripBoardHead(unent(n.title), n.url));   // 카드 제목의 날짜·기간 — 공용 규칙(2026-10-05)
   const thumb = o.thumb && NEWS_THUMB_RE.test(o.thumb) ? o.thumb : '';
   const link = sourceLink(n, 'card');
   /* 안전하지 않은 주소면 href 를 아예 안 단다 — `href=""` 는 앱 자신을 다시 연다(첨부와 같은 사고 · 2026-10-03)
@@ -791,7 +791,7 @@ function openBoardDetail(url) {
   if (!n) return;
   if (typeof trackUse === 'function') trackUse('detail', url);
   { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = url; }
-  const tSplit = splitTitleDates(unent(n.title));
+  const tSplit = splitTitleDates(stripBoardHead(unent(n.title), n.url));
   const full = n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintShort(n.deadlineHint, Infinity) : '';   // 카드와 같은 기간 한 줄(다음 항목 앞에서 끊는다) · 카드의 44자 상한은 풀어 마감 날짜까지 보인다
   /* 다음 한글 항목(「나. 신청방법 …」) 앞에서도 끊는다 — 끊고도 날짜가 남을 때만(「신청 기간 및 방법 가. 신청 기간: …」 은 앞토막에 날짜가 없어 통째로 둔다 · 실데이터 853줄 비교 2026-11-20) */
   const cut = full.split(/\s(?=[가나다라마바사아자차카타파하]\s?\.\s*[가-힣])/)[0];

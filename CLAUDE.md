@@ -248,7 +248,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **🔴 교내/교외·주관 기관은 게시판이 아니라 '주는 곳'** — 제목 판정은 `noticeKind` 한 곳(셋째 인자 학습 표) · 원문 뒤 소급은 `kind-classify`(`classifyKind`). 교내는 제목 표식 또는 **`OWN_PROGRAMS`**(원문을 읽고 확인한 학교 자체 제도 ·
   근거는 `docs/designs/on-campus-programs.md` 에 인용과 함께). 등록 단계에서만 쓰고 앱 게시판 카드엔 안 쓴다. 낱말로 '교외'를 찾지 말 것 · `교내외` 는 교내 아님.
   소급은 `entry-rules.cjs checkEntry`(경고 — 오류로 두면 자동 등록이 멈춘다 · 판정 함수는 `opts.noticeKind` 로 받는다). ⚠️ 감사는 **id**로 출력한다 — 이름으로 grep 하면 못 찾는다.
-- **카드 제목은 기관명을 담는다**(`cardTitle` = `cleanCardTitle` — 게시판 대괄호·날짜만 뗀다 `splitTitleDates`) · 기관명은 윗줄에서 뺀다. 관문 「카드 제목」.
+- **카드 제목은 기관명을 담는다**(`cardTitle` = `cleanCardTitle` — 게시판 대괄호·분류 머리말(`stripBoardHead`)·날짜만 뗀다 `splitTitleDates`) · 기관명은 윗줄에서 뺀다. 관문 「카드 제목」.
 - **🔴 금액: 합산은 더하기가 아니라 고르기**(같은 장학금 한 번 · 배타 그룹 최대 하나) · 표 등록금은 1년치 → `tuitionFor` 에서 학기 환산 ·
   이중수혜 범위는 원문 한정어로(`external`/`narrow` — `all` 로 바꾸지 말 것) · 칸 이름은 `amountSpec` · 머리글은 콜론 앞 이름표로 · `유의사항` 절은 금액이 아니다.
   못 읽은 금액은 **홈 합계에서만** 중앙값으로 어림(`amountValue` 엔 안 적는다 — 감사가 막는다). 관문 금액 절.

@@ -406,7 +406,7 @@ function ddayWords(d) {
    ⚠️ 상세 시트 제목도 이 함수를 쓴다(2026-10-06 사장님 지시 · 개선안 E). 원문과 대조할 글자는
       '공고 원문 안내' 발췌와 원문 링크가 그대로 준다. */
 function cardTitle(sch) {
-  return cleanCardTitle(String(sch.name || '').trim());
+  return cleanCardTitle(stripBoardHead(sch.name, sch.sourceUrl));   // 게시판 분류 머리말(공통·일반공지·장학 ★)부터 뗀다(2026-11-25)
 }
 
 /* 카드 맨 윗줄의 `교외 · 기관명`. 🔴 **제목이 이미 기관명을 담고 있으면 기관명을 뺀다** —
@@ -496,7 +496,7 @@ function splitTitleWho(title) {
 }
 /* 정식 등록 공고 — 게시판 머리말이 대괄호와 같은 낱말이면(「공통 [공통] 2026…」) 그 머리말도 뗀다(지우기만) */
 function cardTitleParts(sch) {
-  const raw = String(sch.name || '').trim().replace(/^\s*(\S{2,8})\s+(?=[[【]\s*\1\s*[\]】])/, '').replace(/^공통\s+(?=\d)/, '');   // 「공통 2026-2학기 …」 — 게시판 분류(공통/학부/대학원) 머리말 · 해 앞에 선 것만(실측 경희대)
+  const raw = stripBoardHead(String(sch.name || '').trim().replace(/^\s*(\S{2,8})\s+(?=[[【]\s*\1\s*[\]】])/, ''), sch.sourceUrl);   // 게시판 분류 머리말(공통·일반공지·장학 ★) — stripBoardHead 한 곳(2026-11-25 · 전엔 해 앞의 「공통」만 뗐다)
   /* 🔴 장학 제목의 괄호는 떼지 않는다 — 장학 카드엔 「대상 · …」 줄이 없어 뗀 글자가 갈 자리가 없다(지우기가 된다 · 리뷰 2026-11-02). 끝 마침표만 */
   return { title: cleanCardTitle(raw).replace(/\.\s*$/, '').trim(), who: [] };
 }
@@ -524,6 +524,7 @@ function cleanCardTitle(name) {
   /* 🔴 앞 표식은 **대괄호만** 뗀다 — 소괄호를 넣으면 '(재)무안군승달장학회'의 법인 표기와
      '(서울캠퍼스)' 같은 구분자가 사라진다(실측으로 확인하고 좁혔다). */
   t = t.replace(/^(?:[[【]\s*[^\]】]{1,12}\s*[\]】]\s*)+/, '').trim();
+  t = trimStars(t);   // 대괄호 표식 뒤의 강조 별표(`[국가/신청] ★2026 …` · 2026-11-25)
   t = splitTitleDates(t).title;   // 날짜·기간은 한 곳에서(2026-10-05)
   t = t.replace(/[\s·\-–—:,]+$/, '').trim();
   return t.length >= 4 ? t : before;
@@ -577,6 +578,27 @@ function splitTitleDates(title) {
   t = t.replace(/\s+(20\d{2}\s?\.\s?\d{1,2}(?:\s?\.\s?\d{1,2})?\.?|20\d{2}-\d{1,2}-\d{1,2})\s*$/, ' ');   // 꼬리 게시일 — 마감이 아니라 dates 에 안 넣는다
   t = t.replace(/\s{2,}/g, ' ').replace(/[\s·\-–—:,]+$/, '').trim();
   return t.replace(/\s/g, '').length >= 4 ? { title: t, dates } : { title: before, dates: [] };
+}
+
+/* ── 게시판 분류 머리말 (2026-11-25 개발자 결정 · 화면 점검 — 숭실대 「장학 ★ 2026학년도 …」) ──
+   몇 학교 게시판은 **분류 칸**(공통·일반공지·장학)이 제목 앞에 붙어 수집된다(전수 2026-11-25: 경희 「공통」 · 연세 「일반공지」 · 숭실 「장학」).
+   그 게시판 안에서만 뜻이 있는 표식이라 카드 제목에서 뗀다 — 정식 등록(cardTitle·cardTitleParts)과 게시판 카드(noticeCardHtml)가 이 한 곳을 부른다.
+   🔴 「장학」 은 제목의 첫 낱말일 수 있다(「장학 담당자 변경 안내」) — 그 분류를 쓰는 게시판 주소(숭실)에서 온 글만 뗀다. 「공통」·「일반공지」 는 어디서나.
+   🔴 경희 「서울」·「국제」 는 캠퍼스라 떼지 않는다. 지우기만 한다(강조 별표 ★ 포함) · 남는 글자가 4자 미만이면 그대로 */
+/* 강조 별표 — 앞뒤 것을 같이 떼고, 떼고도 별이 남으면(「★필독★ 2027학년도 …」 처럼 제목 가운데에 별이 있다) 아무것도 안 뗀다 — 한쪽만 깎인 제목이 더 나쁘다(리뷰 2026-11-25 · 실제 제목 7건) */
+function trimStars(t) {
+  const x = String(t || '').replace(/^★+\s*/, '').replace(/\s*★+$/, '').trim();
+  return /[★☆]/.test(x) ? String(t || '') : x;
+}
+const BOARD_HEAD_ANY = /^(?:공통|일반공지)\s+(?=\S)/;
+const BOARD_HEAD_BY_HOST = [[/(?:^|\.)ssu\.ac\.kr$/, /^장학\s+(?=\S)/]];
+function stripBoardHead(title, url) {
+  const before = String(title || '').trim();
+  const host = (String(url || '').match(/^https?:\/\/([^/:?#]+)/) || [])[1] || '';
+  let t = before.replace(BOARD_HEAD_ANY, '');
+  for (const [h, re] of BOARD_HEAD_BY_HOST) if (h.test(host)) t = t.replace(re, '');
+  t = trimStars(t);
+  return t.replace(/\s/g, '').length >= 4 ? t : before;
 }
 
 /* notStale(오래된 공고 숨김)은 match-engine.js에 있다 — 화면에서 숨긴 공고를
@@ -2698,7 +2720,7 @@ function homeNewsHtml() {
     return `<a class="news-tile"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
       <span class="news-tile-photo">${src ? `<img class="news-tile-img" src="${esc(src)}" alt="" loading="lazy" decoding="async" width="148" height="104"${focus ? ` style="object-position:${esc(focus)}"` : ''}${fallback ? ` data-fallback="${esc(fallback)}"${spFocus ? ` data-fallback-focus="${esc(spFocus)}"` : ''}` : ''} />` : ''}</span>
       <span class="news-tile-meta">${esc(meta)}</span>
-      <span class="news-tile-title">${esc(unent(n.title))}</span>
+      <span class="news-tile-title">${esc(stripBoardHead(unent(n.title), n.url))}</span>
       ${/* 요약 — 로봇이 원문 첫 문장을 떠 둔 글만(collector/collect-news-desc.mjs · 2026-10-10 업무 분장 8번). 없으면 줄을 안 그린다 */ ''}
       ${n.desc ? `<span class="news-tile-desc">${esc(unent(n.desc))}</span>` : ''}
     </a>`;

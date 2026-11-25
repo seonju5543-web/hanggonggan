@@ -126,7 +126,7 @@ function takeConst(name) {
 const NEED = ['todayStart', 'dday', 'fitTone', 'fitToneNoFail', 'fitVerdict', 'fitBadgeHtml', 'applyLock',
   'cleanCardTitle', 'cardTitle', 'cardOrgLine', 'kindChip', 'cardProviderLine', 'splitTitleWho', 'cardTitleParts', 'amountLine'];   // 카드 시안 B(2026-11-02) — 칩·주최·제목 나누기·금액 줄
 const ctx = vm.createContext({ Date, Math, Number, String, JSON, console });
-vm.runInContext([...['bareOrg', 'orgBase', 'providerUnknown', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'isActivityItem', 'KIND_CHIP_CLS', 'ACT_CHIP_CLS', 'WHO_PAREN', 'NOT_WHO_PAREN', 'KOSAF_AMOUNT_UNKNOWN'].map(takeConst), ...['isDateBit', 'splitTitleDates'].map(takeFn), ...NEED.map(takeFn)].join('\n\n'),   // 카드 제목 날짜 규칙(2026-10-05) · 기관명 모름 판정(providerUnknown)
+vm.runInContext([...['bareOrg', 'orgBase', 'providerUnknown', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'isActivityItem', 'KIND_CHIP_CLS', 'ACT_CHIP_CLS', 'WHO_PAREN', 'NOT_WHO_PAREN', 'KOSAF_AMOUNT_UNKNOWN', 'BOARD_HEAD_ANY', 'BOARD_HEAD_BY_HOST'].map(takeConst), ...['isDateBit', 'splitTitleDates', 'trimStars', 'stripBoardHead'].map(takeFn), ...NEED.map(takeFn)].join('\n\n'),   // 카드 제목 날짜 규칙(2026-10-05) · 기관명 모름 판정(providerUnknown)
   ctx, { filename: 'app.js(발췌)' });
 const appFn = (n) => vm.runInContext(n, ctx);
 const stripTags = (h) => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -149,8 +149,8 @@ vm.runInContext([
   /* 카드가 쓰는 한 줄 const 는 **전부** 여기에 — 하나라도 빠지면 그 꼴의 카드(기간 한 줄·학교 사진)에서만 이 도구가 넘어진다
      (리뷰 G3 · 기간 한 줄 달린 게시판 글에서 `hintText is not defined`). 관문 「원문 링크 정직성」 app 갈래가 실제 글 꼴로 돌려 본다. */
   ...['ENTITIES', 'ENTITY_RE', 'PARTIAL_ENTITY_END', 'hintText', 'NEWS_THUMB_RE', 'SCHOOL_PHOTO_RE', 'PHOTO_FOCUS_RE',
-    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'JUNK_CHARS', 'OCR_URL_GARBLE', 'TIDY_SKIP_KEY', 'OCR_TEXT_KEY', 'OCR_MARK'].map(takeConst),
-  ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
+    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'BOARD_HEAD_ANY', 'BOARD_HEAD_BY_HOST', 'JUNK_CHARS', 'OCR_URL_GARBLE', 'TIDY_SKIP_KEY', 'OCR_TEXT_KEY', 'OCR_MARK'].map(takeConst),
+  ...['isDateBit', 'splitTitleDates', 'trimStars', 'stripBoardHead', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
   ...['esc', 'unent', 'tidyOcr', 'tidyText', 'tidyData', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // knownValue: 층2 공고 안내 칸 값이 부른다 · attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy',
     'formPdfsFor', 'docPdfsFor', 'pdfRowHtml', 'attachPdfRowsHtml', 'sheetAttachments'].map(takeFn),   // 「첨부」 칸 — 위 PDF 줄 · 맨 밑 올린 목록(2026-11-20 승인 시안)
