@@ -17738,10 +17738,9 @@ module.exports = class Anthropic {
         [0, [], { g1: 'grad-only' }, ['g1'], 'grad-only']);
     } finally { sb.done(); }
     const cfgReal = JSON.parse(readText(new URL('../collector/card-read-config.json', import.meta.url)));
-    eq('⑩ 저장소의 활동 스위치 칸이 있다 — 상한(20건 · 3달러)이 적혀 있고 enabled 는 참/거짓 값이다(켜는 것은 개발자가 「켜」라고 할 때만 — 값 자체는 여기서 재지 않는다) · 빈 결과 파일이 로봇 형식으로 있다',
-      [typeof (cfgReal.activities || {}).enabled, (cfgReal.activities || {}).maxPerRun, (cfgReal.activities || {}).maxUsdPerRun, sameFormat(readText(new URL('../data/act-read.json', import.meta.url))),
-        CR.checkData(JSON.parse(readText(new URL('../data/act-read.json', import.meta.url))))],
-      ['boolean', 20, 3, true, []]);
+    /* 결과 파일(data/act-read.json)의 꼴은 여기서 재지 않는다 — 실데이터 읽기는 톱니(REAL_READ_ALLOW)가 막는다. 그 파일은 워크플로가 저장 전에 `--activities --check` 로 잰다 */
+    eq('⑩ 저장소의 활동 스위치 칸이 있다 — 상한(20건 · 3달러)이 적혀 있고 enabled 는 참/거짓 값이다(켜는 것은 개발자가 「켜」라고 할 때만 — 값 자체는 여기서 재지 않는다)',
+      [typeof (cfgReal.activities || {}).enabled, (cfgReal.activities || {}).maxPerRun, (cfgReal.activities || {}).maxUsdPerRun], ['boolean', 20, 3]);
   }
 
   /* ── 유료 카드 읽기 (4번 · 2026-11-15 개발자 지시 · 11-21 개정) — AI 하나가 공고를 통째로 읽어 카드 칸을 쓰고 첨부를 가른다. 로봇은 꼴만 다듬어 그대로 싣는다 ── */
