@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-25",
- "count": 2038,
+ "count": 2041,
  "items": [
   {
    "title": "[삼척] 2026학년도 2학기 KNU-SOS장학생 신청 안내(4차)",
@@ -74,6 +74,24 @@
    "title": "공통 ⭐중요⭐ 2027-1학기 교내장학금 신청 안내(2026.11.24.(화) ~ 2027.1.11....",
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323640",
    "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "공통 2027년 1학기 농림축산식품부 청년창업농장학금 장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323662",
+   "attachments": [
+    {
+     "name": "2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=a7e5aed0c2cd41a7b67ec4065bff9507&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "2027년 1학기 청년창업농장학금 선발안내.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=a7e5aed0c2cd41a7b67ec4065bff9507&fileSn=2&bbsId=BMSR00040"
+    }
+   ],
    "deadlineHint": null,
    "school": "경희대학교",
    "campus": "",
@@ -374,6 +392,15 @@
    "foundAt": "2026-11-25"
   },
   {
+   "title": "[교외-1/8]2027학년도 19기 에몬스가구 에몬스 장학생 모집 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM5MDQlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
    "title": "[등록/장학] 2027년 1학기 한국농어촌희망재단 「청년창업농장학금」장학생 선발 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53748&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
@@ -572,6 +599,24 @@
    "foundAt": "2026-11-25",
    "bodyDeadline": "2026-12-06",
    "bodyDeadlineText": "타 재단 장학금 미수혜자를 우선으로 하며, 소득분위가 낮고 전체 학기 성적이 우수한 학생을 우선 추천함. 7. 지원방법: 2026. 12. 6.(일)까지 scholar2@yonsei.ac.kr로 제출 ( 이메일 제목: [세아해암_학번_학과_이름]으로 제출 필수)"
+  },
+  {
+   "title": "[한국농어촌희망재단] 2027년 1학기 농림축산식품부 청년창업농장학금 장학생 선발 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944738/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임]2. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015727/download.do"
+    },
+    {
+     "name": "[붙임]3. 2027년 1학기 청년창업농장학금 선발안내.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015728/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.12.1.(화) 10시~ 2027.1.5.(화) 17시 □ 신청방법: 한국농어촌희망재단 홈페이지(PC 또는 스마트폰, www",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
   },
   {
    "title": "2026학년도 국가우수장학금(이공계) 일시지원 신규장학생 대학추천자 선발 안내",

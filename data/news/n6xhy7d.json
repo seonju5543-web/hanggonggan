@@ -3,6 +3,27 @@
  "updatedAt": "2026-11-25",
  "items": [
   {
+   "title": "[일반] ※신청기간변경 [HUSS-글로벌공생] 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53731&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-23",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-25",
+   "thumb": "data/news/img/1d602483b3208a2d.webp",
+   "desc": "모집 안내 포스타\"> 글로벌 공생 HUSS사업단X경실련X현대자동차가 함께하는 ESG 상생캠퍼스 프로그램 안내드립니다."
+  },
+  {
+   "title": "[학사] 2027학년도 전기 대학원 학석사연계과정 지원 학생 모집(12.14~12.28)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53750&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-25",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-25",
+   "desc": "(2027.9 월 또는 2028.3 월 입학 예정 ) 1. 대학원 학 ․ 석사연계과정에 지원 학생 모집사항 안내 학 ․ 석사연계과정 : 학사과정과 석사과정을 연계하여 학사 및 석사과정 수업연한을 각각 1 학기씩 단축"
+  },
+  {
    "title": "[병무] 2026년 12월 각 군 현역병 모집 계획 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53749&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-11-25",
@@ -133,7 +154,7 @@
    "campus": "",
    "src": "b09cb042",
    "foundAt": "2026-11-20",
-   "desc": "학사일정 계절학기 수업운영 기준 [SELC LMS (selc.or.kr)에서 온라인으로 진행] 수업은 총 3주(강의 14회)로 운영되며, 지각제도는 운영하지 않음 1주차: 2026. 12. 21.(월) 강의 5회차…"
+   "desc": "2026학년도 동계계절수업 서울권역e-러닝 개설교과목 및 학사일정을 다음과 같이 알려드리오니 수업에 참고하시기 바랍니다."
   },
   {
    "title": "[일반] [광운대학교 창업보육센터] 광운창업지원센터 신규 입주기업 모집(~12.07(월))",
@@ -403,26 +424,6 @@
    "foundAt": "2026-11-11",
    "thumb": "data/news/img/ff578410cfa0ef8a.webp",
    "desc": "AI 티키타카 발표평가 전시회 프로젝트 구경하고, AI 전공도 알아보고, 커피쿠폰 받아가자! 앵커사업 (RISE 사업 ) AI 관련 학과 지원 단위과제에서는 비전공자 학생들과 인공지능융합대학 멘토가 한 팀을 이루어…"
-  },
-  {
-   "title": "[외부] [BTF푸른나무재단(청소년폭력예방재단)] 2027년도 UN청소년 대표단 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53664&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-10",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-11",
-   "thumb": "data/news/img/10b5538ca11e50ca.webp"
-  },
-  {
-   "title": "[봉사] [동방사회복지회] 위기아동 지원 기부마라톤 2026 허그런(HUG RUN) 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53655&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-10",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-11",
-   "thumb": "data/news/img/713579ab97950c56.webp"
   }
  ]
 }
