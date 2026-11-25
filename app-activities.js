@@ -25,12 +25,17 @@ let activitiesQuery = '';
 /* 정렬 둘 — 등록 최신순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
 let activitiesSort = 'recent';
 
+/* 유료 관문(2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-4) — 활동 파일과 AI 카드 결과(data/act-read.json)를 같이 받아 **거르고 얹은 목록**을 둔다
+   (match-engine publishedActivities — verify/what-shows.mjs 와 같은 함수). 탭·홈·도우미·저장·달력·양식 채우기·온보딩 분야 목록이 전부 이 목록을 본다.
+   결과 파일을 못 받으면(404·깨진 JSON → null) 숨김 표시가 달린 글만 안 보이고 나머지는 그대로다(장학금과 같다) · 옛 엔진이 캐시에서 오면 숨김 글을 통째로 감춘다(안전한 쪽) */
 function loadActivities() {
-  return fetch('data/activities.json', { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : null))
-    .catch(() => null)
-    .then((d) => {
-      tidyData(d);   // 깨진 글자 씻기(2026-11-17)
+  return Promise.all([
+    fetch('data/activities.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    fetch('data/act-read.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+  ])
+    .then(([d, ar]) => {
+      tidyData(d); tidyData(ar);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
+      if (d && Array.isArray(d.items)) d.items = typeof publishedActivities === 'function' ? publishedActivities(d.items, ar) : d.items.filter((n) => !n.paidGate || n.paidOpen);
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
       refreshActivitySnaps();
       fillInterestFields();   // 온보딩 관심 분야 칸 — 목록이 이제 왔다(고른 것은 지킨다)
@@ -273,6 +278,7 @@ function activityAsSch(n) {
     id: `act:${n.url}`, name: activityTitle(n), type: n.kind || '대외활동', eligibility: {},
     eligibilityLines: [...(n.eligibilityLines || []), ...titleTargetLines(n.title).filter((l) => !(n.eligibilityLines || []).some((x) => String(x).includes(l)))], eligibilityExcludes: n.eligibilityExcludes || [], eligibilityPriority: n.eligibilityPriority || [],
     excerpts: n.noticeLines || [], documents: [], deadline: n.deadline || null,
+    ...(n.cardRead ? { cardRead: n.cardRead } : {}),   // AI 카드(유료 관문 · 2026-11-25) — 엔진이 AI 가 쓴 자격 줄을 다시 거르지 않고, 시트 「접수」가 방법 줄을 읽는다
     activity: true, amount: [n.kind || '대외활동', activityHostLine(n)].filter(Boolean).join(' · '),   // 학교 게시판 글자는 어디에도 안 그린다(2026-11-02 개발자 결정)   // 시트·금액 줄이 읽는 값 — 달력·보관함 줄은 이것을 안 쓴다(갈래는 칩 · 둘째 줄은 주최만 — calRowHtml · 2026-11-21) — 지어낸 값이 아니라 종류·주최
   };
 }

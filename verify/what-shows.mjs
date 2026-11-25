@@ -279,11 +279,31 @@ function showFeedLinks(query) {
   const read = (p) => { try { return linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8'))).items || []; } catch (e) { return []; } };   // 앱처럼 씻는다(2026-11-17)
   const dir = (p) => fs.readdirSync(new URL(p, import.meta.url)).filter((f) => /\.json$/.test(f) && f !== 'index.json').flatMap((f) => read(`${p}${f}`));
   linkCtx.kosafList = read('../data/kosaf-open.json');
+  /* 대외활동·공모전은 앱과 같은 함수(match-engine publishedActivities)로 거르고 AI 카드를 얹는다(2026-11-25 · 유료 관문 · 설계 docs/designs/paid-gate-activities.md 5-4) —
+     학생 화면에 없는 글을 물으면 「없다」가 아니라 **왜 없는지**(카드를 기다림 · 사람에게 넘김 · 결과 파일을 못 읽음)를 말한다. 찾기는 날것 목록에서 한다(숨긴 글도 찾아야 말할 수 있다) */
+  const actRaw = read('../data/activities.json');
+  let actDoc = null; try { actDoc = linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL('../data/act-read.json', import.meta.url), 'utf8'))); } catch (e) { /* 못 읽음 — 앱도 숨김 표시가 달린 글을 감춘다 */ }
+  const actShown = new Map(ME.publishedActivities(actRaw, actDoc).map((x) => [x.url, x]));
+  const HELD_KO = { 'no-source': '읽을 원문이 없다', unreadable: 'AI 가 읽었는데 실을 내용이 없었다', 'grad-only': '대학원생만 받는 글이다' };
+  const actGateLines = (it) => {
+    const on = actShown.get(it.url);
+    if (!on) {
+      if (it.paidGate && !actDoc) return ['   🔒 학생 화면에 없음 — 유료 확인 결과 파일(data/act-read.json)을 못 읽었다(숨김 표시가 달린 글은 전부 감춘다)'];
+      const held = it.paidGate && actDoc && actDoc.gateHeld && actDoc.gateHeld[it.id];
+      if (held) return [`   🔒 학생 화면에 없음 — 유료 확인에서 사람에게 넘긴 글이다(${HELD_KO[held] || held}) · 관리자 「할 일」에서 올리거나 숨긴다`];
+      if (it.paidGate) return [`   🔒 학생 화면에 없음 — 유료 확인 전이다(AI 카드를 기다리는 중 · 숨김 표시 ${it.paidGate} · 사흘이 지나도 카드가 없으면 무료 값으로 오른다)`];
+      return [];
+    }
+    if (!on.cardRead) return it.paidGate ? [`   ⏱ 유료 확인 없이 무료 값으로 보인다 — ${it.paidOpen ? `관리자가 올렸다(${it.paidOpen})` : `숨김 표시(${it.paidGate}) 뒤 사흘이 지났다`}`] : [];
+    /* 얹힌 값(자격·발췌·안내·서류·마감)은 아래 시트 줄들이 그대로 말한다(얹은 뒤의 글을 넘긴다) — 여기서는 통과 사실과, 시트에 새로 보이는 「접수 · 방법」 줄만 */
+    const how = Array.isArray(on.cardRead.apply) ? on.cardRead.apply.filter((l) => typeof l === 'string' && l.trim()) : [];
+    return ['   🧾 AI 카드가 얹혔다(유료 확인 통과) — 아래 칸들은 얹은 뒤의 값이다', ...how.map((l) => `       접수 · 방법 ${String(l).slice(0, 84)}`)];
+  };
   const sets = [
     ['층2(한국장학재단 등록 재단)', linkFn('kosafAsScholarships')(), 'sch', (x) => x.name],
     ['학교 게시판 새 공고', dir('../data/notices/'), 'card', (x) => x.title],
     ['재단·지자체 새 공고', read('../data/external.json'), 'card', (x) => x.title],
-    ['대외활동·공모전', read('../data/activities.json'), 'activity', (x) => x.title],
+    ['대외활동·공모전', actRaw, 'activity', (x) => x.title],
     ['우리 학교 소식', dir('../data/news/'), 'card', (x) => x.title],
   ];
   let shown = 0;
@@ -292,7 +312,8 @@ function showFeedLinks(query) {
     for (const it of found.slice(0, CAP)) {
       console.log(`\n■ [${label}] ${String(nameOf(it) || '').slice(0, 80)}`);
       if (where === 'sch') for (const l of kosafFitLines(it)) console.log(l);
-      for (const l of linkLines(it, where)) console.log(l);
+      if (where === 'activity') { for (const l of actGateLines(it)) console.log(l); if (!actShown.has(it.url)) { shown += 1; continue; } }   // 학생 화면에 없는 글 — 까닭만 말한다(링크 줄은 그릴 것이 없다)
+      for (const l of linkLines(where === 'activity' ? actShown.get(it.url) : it, where)) console.log(l);
       shown += 1;
     }
     if (found.length > CAP) console.log(`   … ${label}에서 ${found.length}건이 걸렸습니다 — 앞 ${CAP}건만 보여 줍니다.`);

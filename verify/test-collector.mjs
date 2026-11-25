@@ -17892,6 +17892,68 @@ module.exports = class Anthropic {
       [typeof (cfgReal.activities || {}).enabled, (cfgReal.activities || {}).maxPerRun, (cfgReal.activities || {}).maxUsdPerRun], ['boolean', 15, 3]);
   }
 
+  /* ── 대외활동 유료 관문 ④ 학생 화면 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-4 · 승인 시안 docs/designs/mockups/paid-gate-activities) ──
+     보이는가는 장학금과 같은 함수(match-engine paidGateOpen) 하나다 — 활동 목록은 publishedActivities 가 거르고 AI 카드를 얹는다(withActRead).
+     부르는 곳은 둘: 앱(app-activities loadActivities — 탭·홈·도우미·저장·달력·양식 채우기가 그 목록을 본다)과 verify/what-shows.mjs */
+  console.log('\n■ 대외활동 유료 관문 ④ 학생 화면 — 숨긴 글은 카드가 생겨야 보인다 · AI 카드를 얹는다(승인 시안 그대로)');
+  {
+    const N = (id, over = {}) => ({ id, title: `${id} 공모전`, url: `https://act.kr/${id}`, kind: '공모전', school: '', host: '표본재단', foundAt: plus(-1), attachments: [], ...over });
+    const cardMin = { title: '', host: '', eligibility: ['대학 재학생'], excludes: [], priority: [], amount: [], apply: [], documents: [], notes: [], multi: false, head: 0, deadline: null, hash: 'h', readAt: plus(0) };
+    const list = [N('p1'), N('p2', { paidGate: plus(-1) }), N('p3', { paidGate: plus(-1) }), N('p4', { paidGate: plus(-4) }), N('p5', { paidGate: plus(-1), paidOpen: '관리자 2026-11-26' }), N('p6', { paidGate: plus(-4) }), { title: 'id 없는 글', url: 'https://act.kr/x' }];
+    const ids = (xs) => xs.map((n) => (n && n.id) || '(id 없음)');
+    const PA = ME.publishedActivities || (() => []), WA = ME.withActRead || (() => ({}));
+    eq('① 결과 파일을 못 받으면(null · 꼴이 틀림) 숨김 표시가 달린 글만 안 보인다 — 표시 없는 글·관리자가 올린 글(paidOpen)·id 없는 글은 그대로 · 목록이 없으면 빈 목록',
+      [ids(PA(list, null, plus(0))), ids(PA(list, 'x', plus(0))), PA(null, null, plus(0))], [['p1', 'p5', '(id 없음)'], ['p1', 'p5', '(id 없음)'], []]);
+    const shown = PA(list, { items: { p2: cardMin }, gateHeld: { p6: 'no-source' } }, plus(0));
+    eq('② 결과 파일이 있으면 — 카드가 실린 글은 카드를 얹어 보인다 · 사람에게 넘긴 글은 안 보인다 · 카드도 사람 몫도 아닌 글은 표시 뒤 사흘까지 숨고 나흘째부터 무료 값으로 보인다(장학금과 같은 paidGateOpen) · 올린 글은 보인다',
+      [ids(shown), shown.map((n) => !!(n && n.cardRead)), ids(PA([N('d3', { paidGate: plus(-3) }), N('d4', { paidGate: plus(-4) })], { items: {} }, plus(0)))],
+      [['p1', 'p2', 'p4', 'p5', '(id 없음)'], [false, true, false, false, false], ['d4']]);
+    /* ③ 얹기 — 설계 5-4 의 표 */
+    const n0 = { id: 'q1', title: '제1회 표본 공모전', url: 'https://act.kr/q1', kind: '공모전', school: '', host: '표본재단', paidGate: plus(-1), deadline: plus(3), deadlineHint: '접수 ~ 옛 마감',
+      excerpts: [{ label: '모집기간', text: '11. 1. ~ 11. 30.' }, { label: '대상', text: '무료 규칙이 뽑은 대상' }], eligibilityLines: ['무료 규칙의 자격 줄'], eligibilityFrom: 'ocr',
+      noticeLines: ['무료 규칙의 안내 줄', '문의처: 표본재단 사무국 02-000-0000'], documents: ['무료 규칙의 서류'] };
+    const cr0 = { ...cardMin, eligibility: ['전국 대학 재학생', '만 19세 이상인 사람'], excludes: ['휴학생'], priority: ['관련 전공자'], amount: ['대상 1팀 300만원', '최우수상 2팀 각 100만원', '참가자 전원 수료증'],
+      apply: ['전자우편 접수(sample@example.org)'], documents: ['참가신청서', '작품 파일'],
+      notes: ['일정: 접수 11.18. – 12.7.', '주제: 지역과 청년', '일정: 발표 12.20.', '유의사항: 타 공모전 수상작은 출품 불가', '일정: 발표 12.20.', '이름표 없는 줄'], deadline: { date: plus(12), quote: '12. 7.까지' } };
+    const before = JSON.stringify([n0, cr0]);
+    const w = WA(n0, cr0);
+    eq('③ 얹기 — 자격·제외·우선은 AI 가 쓴 줄 그대로 · 혜택 첫 줄은 발췌 「혜택」(제목 아래 큰 글씨 자리) · 둘째 줄부터는 「혜택:」 한 줄로 · 마감·서류는 카드 것 · 무료 규칙의 발췌·안내 줄은 싣지 않는다(문의처 줄만 남긴다)',
+      [w.eligibilityLines, w.eligibilityExcludes, w.eligibilityPriority, 'eligibilityFrom' in w, w.documents, w.deadline, 'deadlineHint' in w, w.excerpts, w.cardRead === cr0],
+      [['전국 대학 재학생', '만 19세 이상인 사람'], ['휴학생'], ['관련 전공자'], false, ['참가신청서', '작품 파일'], plus(12), false, [{ label: '혜택', text: '대상 1팀 300만원' }], true]);
+    eq('  안내 줄 — 같은 이름표의 줄은 한 줄로 묶는다(「일정: a · b」 · 처음 나온 차례 · 같은 말은 한 번) · 이름표 없는 줄은 그대로 · 문의처는 맨 뒤',
+      w.noticeLines, ['혜택: 최우수상 2팀 각 100만원 · 참가자 전원 수료증', '일정: 접수 11.18. – 12.7. · 발표 12.20.', '주제: 지역과 청년', '유의사항: 타 공모전 수상작은 출품 불가', '이름표 없는 줄', '문의처: 표본재단 사무국 02-000-0000']);
+    const long = Array.from({ length: 6 }, (_, i) => `${String(i + 1).repeat(2)}일차 일정을 마흔 글자가 되도록 길게 적은 줄입니다 가나다라마바사아`.slice(0, 40));
+    const wl = WA(n0, { ...cr0, notes: long.map((b) => `일정: ${b}`), amount: [] });
+    eq('  한 줄이 170자를 넘으면 같은 이름표로 줄을 나눈다(「공고 안내」 가 180자에서 자른다 — 글자가 잘려 사라지지 않게) · 혜택이 없으면 발췌 「혜택」도 없다',
+      [wl.noticeLines.slice(0, 2).map((l) => [l.startsWith('일정: '), l.length <= 174]), wl.noticeLines[0], wl.noticeLines[1], wl.excerpts],
+      [[[true, true], [true, true]], `일정: ${long.slice(0, 4).join(' · ')}`, `일정: ${long.slice(4).join(' · ')}`, []]);
+    const noDl = WA(n0, { ...cr0, deadline: null });
+    eq('  카드에 마감이 없으면 무료 마감과 「모집기간」 발췌를 남긴다(AI 가 못 읽었다고 비우지 않는다) · 마감 꼴이 날짜가 아니어도 같다',
+      [noDl.deadline, noDl.deadlineHint, noDl.excerpts, WA(n0, { ...cr0, deadline: { date: '12월 7일', quote: '' } }).deadline],
+      [plus(3), '접수 ~ 옛 마감', [{ label: '혜택', text: '대상 1팀 300만원' }, { label: '모집기간', text: '11. 1. ~ 11. 30.' }], plus(3)]);
+    /* ④ 칸의 꼴 — 장학금(withCardRead)과 같은 뜻: 글자 배열일 때만 덮는다 · 빈 배열은 「AI 가 그 칸에 실을 것이 없다고 봤다」 · null·글자가 아닌 값은 무료 값을 그대로 둔다 */
+    const odd = WA(n0, { eligibility: null, excludes: 'x', priority: [1, null, ' '], amount: 'x', documents: 7, notes: null, deadline: { date: 20261207 } });
+    const empty = WA(n0, { ...cardMin, eligibility: [], documents: [], amount: [], notes: [] });
+    eq('④ 칸의 꼴이 틀려도 던지지 않는다 — null·글자가 아닌 값은 그 칸의 무료 값을 그대로 둔다(자격을 안 덮었으면 엔진도 무료 길로 판정한다) · 빈 배열은 「실을 것 없음」이라 그 칸을 비운다 · 글자가 아닌 줄은 걸러 낸다',
+      [odd.eligibilityLines, odd.cardRead.eligibility, odd.documents, odd.deadline, odd.excerpts === n0.excerpts, odd.noticeLines === n0.noticeLines,
+        [empty.eligibilityLines, empty.documents, empty.excerpts, empty.noticeLines], WA(n0, { ...cardMin, eligibility: ['맞는 줄', 3, '', null] }).eligibilityLines, Object.keys(WA(n0, {})).includes('cardRead')],
+      [['무료 규칙의 자격 줄'], null, ['무료 규칙의 서류'], plus(3), true, true, [[], [], [{ label: '모집기간', text: '11. 1. ~ 11. 30.' }], ['문의처: 표본재단 사무국 02-000-0000']], ['맞는 줄'], true]);   // 빈 카드에는 마감도 없다 — 「모집기간」 발췌는 남는다(위 규칙)
+    const broken = PA([N('z1', { paidGate: plus(-1), excerpts: 'not-a-list' }), N('z2', { paidGate: plus(-1) })], { items: { z1: { ...cr0, deadline: null }, z2: 'not-a-card' } }, plus(0));   // z1 — 발췌 칸이 목록이 아니라 얹다가 넘어진다(마감이 없어 「모집기간」을 찾으러 간다)
+    eq('  🔴 한 글의 값이 깨져 있어도 목록 전체가 죽지 않는다 — 얹다가 넘어진 글·카드 꼴이 틀린 글은 무료 값 그대로 보인다(탭이 통째로 비지 않는다)',
+      [ids(broken), broken.map((n) => !!n.cardRead)], [['z1', 'z2'], [false, false]]);
+    eq('⑤ 원본 글 객체와 카드를 고치지 않는다(새 객체를 낸다) — 저장해 둔 글·다른 화면이 같은 객체를 본다', JSON.stringify([n0, cr0]) === before && w !== n0, true);
+    /* ⑥ 부르는 곳 */
+    const aa = src('app-activities.js'), ws = src('verify/what-shows.mjs');
+    eq('⑥ 부르는 곳 — 앱은 활동 파일과 결과 파일을 같이 받아 거르고 얹은 목록을 둔다(결과 파일이 404·깨진 JSON 이어도 null 로 받아 목록을 세운다 · 옛 엔진이 캐시에서 오면 숨김 글을 통째로 감춘다) · what-shows 가 같은 함수를 부른다',
+      [/fetch\('data\/act-read\.json', \{ cache: 'no-store' \}\)\.then\(\(r\) => \(r\.ok \? r\.json\(\) : null\)\)\.catch\(\(\) => null\)/.test(aa), /fetch\('data\/activities\.json', \{ cache: 'no-store' \}\)\.then\(\(r\) => \(r\.ok \? r\.json\(\) : null\)\)\.catch\(\(\) => null\)/.test(aa),
+        /typeof publishedActivities === 'function' \? publishedActivities\(d\.items, ar\) : d\.items\.filter\(\(n\) => !n\.paidGate \|\| n\.paidOpen\)/.test(aa), /publishedActivities\(/.test(ws)],
+      [true, true, true, true]);
+    eq('  활동 글을 엔진에 넘길 때 카드도 넘긴다(AI 가 쓴 자격 줄을 엔진이 다시 거르지 않는다 · 부문이 여럿인 글의 판정) · 🔴 구조화 조건(eligibility)은 지금처럼 비워 둔다 · 시트 「접수」 의 「방법」 줄이 활동 글에도 나온다(시안에서 새로 보이는 것 하나)',
+      [/\.\.\.\(n\.cardRead \? \{ cardRead: n\.cardRead \} : \{\}\)/.test(aa), /id: `act:\$\{n\.url\}`, name: activityTitle\(n\), type: n\.kind \|\| '대외활동', eligibility: \{\},/.test(aa),
+        /!act && sch\.cardRead/.test(src('app-sheet.js')), /const paidApply = \(sch\.cardRead && Array\.isArray\(sch\.cardRead\.apply\)\)/.test(src('app-sheet.js'))],
+      [true, true, false, true]);
+  }
+
   /* ── 유료 카드 읽기 (4번 · 2026-11-15 개발자 지시 · 11-21 개정) — AI 하나가 공고를 통째로 읽어 카드 칸을 쓰고 첨부를 가른다. 로봇은 꼴만 다듬어 그대로 싣는다 ── */
   console.log('\n■ 유료 카드 읽기 — AI 하나가 쓴 카드를 그대로 싣는다 · 첨부 구분 · 스위치 (2026-11-15 · 11-21 기계 검사 없음)');
   {

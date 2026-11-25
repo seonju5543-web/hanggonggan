@@ -191,7 +191,7 @@ function applySectionHtml(sch, opts) {
     : /상시/.test(rawPeriod) ? '상시'
     : '';
   /* 유료 카드 읽기가 읽은 신청 방법(원문 문장 · 줄머리 이름표를 뗀 것)이 있으면 그것을 줄마다 보인다(2026-11-15) */
-  const paidApply = (!act && sch.cardRead && Array.isArray(sch.cardRead.apply)) ? sch.cardRead.apply.filter((l) => typeof l === 'string' && knownValue(l)) : [];   // '모름'류 낱말이 든 줄은 통째로 뺀다(「공고 안내」와 같은 규칙)
+  const paidApply = (sch.cardRead && Array.isArray(sch.cardRead.apply)) ? sch.cardRead.apply.filter((l) => typeof l === 'string' && knownValue(l)) : [];   // '모름'류 낱말이 든 줄은 통째로 뺀다(「공고 안내」와 같은 규칙)
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource
