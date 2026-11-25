@@ -68,6 +68,7 @@ const noContact = (lines) => lines.filter((l) => !CONTACT.test(l));
 import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, ACT_TAIL, targetFromTitle } from './activity-vocab.mjs';
 import { readDocuments, DOC_JUNK } from './doc-list.mjs';   // 제출 서류 목록 — 장학 발췌기와 같은 규칙 한 곳(2026-10-30 · 공모전 참가신청서가 화면에 없던 것)
 import { createRequire } from 'node:module';
+import { newAttachments } from './rescue-plan.mjs';   // 다시 읽은 첨부 가운데 아직 없는 것만(같은 파일은 한 줄 · 2026-11-25)
 /* 지역 이름은 parse-requirements.js 의 REGION_CITIES 한 벌(화면·판정·알림) — 끝글자 `시|군|구|도` 로 짐작하면 `별도`·`표시`·`제도` 가 지역이 된다(2026-10-28 리뷰) */
 const PR = createRequire(import.meta.url)('../parse-requirements.js');
 const REGION_WORDS = [...new Set([...PR.REGIONS, ...Object.keys(PR.REGION_CITIES), ...Object.values(PR.REGION_CITIES).flat()])].sort((a, b) => b.length - a.length).join('|');
@@ -519,12 +520,27 @@ export function putActivityDocuments(it, docs, from, { thin = false } = {}) {
 }
 /* 이 글을 다시 읽어야 하나 — 수집 로봇의 소급 반복문과 리포트의 「남은」 수가 같은 판단을 쓴다.
    'details' = 자격까지 다시(옛 판) · 'docs' = 서류 칸만 · null = 안 읽는다. API 글은 API 로봇이 채운다(자격이 없는 글만 원문 페이지 — 2026-10-16). */
-export function actRereadNeed(it) {
+export function actRereadNeed(it, today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10)) {
   if (it.api && (it.eligibilityLines || []).length) return null;
   if (!(it.excerptsAt && it.detailsV === ACT_DETAILS_V)) return 'details';
   /* 자격을 첨부·요강·브라우저에서 읽은 글은 본문이 껍데기다 — 서류도 그 로봇(activity-docs staleDocs)이 같은 글자에서 읽는다(리뷰 2026-11-15 #7) */
   if (!it.api && !it.eligibilityFrom && it.documentsV !== ACT_DOCS_V) return 'docs';
+  /* 'attach' = 첨부만 다시(2026-11-25) — 다른 까닭이 없고 첨부 판이 옛것인 **열려 있는 게시판 글**만 한 번. 마감 지난 글·API 글·관리자가 숨긴 글은 열지 않는다 */
+  if (!it.api && !it.hidden && it.attachV !== ACT_ATTACH_V && !(it.deadline && String(it.deadline) < today)) return 'attach';
   return null;
+}
+
+/* 다시 읽을 때 첨부를 합친다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ①) — 수집 로봇의 다시 읽기는 상세가 준 첨부를 버려 왔다
+   (강원대 재능봉사 캠프 글: 지금 파일 둘이 보이는데 실린 첨부가 없었다 — 글을 올린 뒤 파일을 붙였거나 첫 받기가 끊겼던 글).
+   🔴 있던 줄은 지우지 않는다(차례도 그대로) — 그 이름으로 만든 사본·색인이 있다. 새 파일만 뒤에 더하고(같은 파일은 한 줄 · rescue-plan newAttachments) 읽은 판을 적는다.
+   페이지를 못 받은 날은 부르지 않는다(부르는 쪽이 detail.text 로 가린다) — 못 받은 것을 「첨부 없음」으로 굳히지 않게. 더한 줄 수를 돌려준다 */
+export const ACT_ATTACH_V = 1;
+export function mergeActAttachments(it, found) {
+  const have = Array.isArray(it.attachments) ? it.attachments : [];
+  const add = newAttachments(have, Array.isArray(found) ? found : []);
+  it.attachments = [...have, ...add];
+  it.attachV = ACT_ATTACH_V;
+  return add.length;
 }
 
 export default activityExcerpts;

@@ -19,7 +19,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, mergeActAttachments, ACT_ATTACH_V, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
@@ -389,6 +389,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
         const field = activityField(it.title, it.kind);
         if (field) it.field = field;
         it.excerptsAt = new Date().toISOString().slice(0, 10);   // 원문을 읽은 날 — 아래 소급 보강이 다시 읽지 않게
+        if (detail.text) it.attachV = ACT_ATTACH_V;   // 첨부도 이 판으로 읽었다(readDetailInto) — 못 받은 날은 적지 않는다(다음 실행이 다시 읽는다)
         it.school = s.school || '';
         it.campus = s.campus === '공통' ? '' : (s.campus || '');
         if (!it.school && s.host) it.host = s.host;   // 전국 글은 주최를 설정에서 받는다(제목으로 짐작하지 않는다)
@@ -660,12 +661,19 @@ for (const it of acts.items) {
     actBackfilled += 1; actDocsBackfilled += 1;
     continue;
   }
+  if (need === 'attach') {
+    /* 첨부만 — 자격·발췌·마감은 그대로 둔다(2026-11-25 · 열려 있는 글의 첨부를 한 번 소급해 다시 읽는다). 못 받으면 이레 뒤에 다시 */
+    if (detail.text) { mergeActAttachments(it, detail.attachments); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
+    actBackfilled += 1;
+    continue;
+  }
   const ex = activityExcerpts(detail.text);
   if (ex.deadline) it.deadline = ex.deadline;
   if (ex.excerpts.length) it.excerpts = ex.excerpts;
   if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
   if (detail.text) putActivityDetails(it, activityDetails(detail.text, it.title));
   if (detail.text) putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) });
+  if (detail.text) mergeActAttachments(it, detail.attachments);   // 다시 읽은 김에 새로 보이는 첨부를 더한다(있던 줄은 그대로 · 2026-11-25)
   if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
   if (detail.text) delete it.detailsTriedAt; else it.detailsTriedAt = todayIso;   // 못 받았으면 이레 뒤에 다시
   actBackfilled += 1;

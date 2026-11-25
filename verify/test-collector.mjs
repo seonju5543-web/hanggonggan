@@ -7486,7 +7486,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   {
     const V = AX.ACT_DETAILS_V, D = AX.ACT_DOCS_V;
     eq('  다시 읽기 판단 한 곳(actRereadNeed) — 옛 자격 판 → details · 자격 판은 같고 서류 판만 옛것 → docs · 둘 다 최신 → 안 읽음 · API 글(자격 있음)은 안 읽고 서류 판으로는 안 읽는다',
-      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, documentsV: D }),
+      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, documentsV: D, attachV: AX.ACT_ATTACH_V }),
         AX.actRereadNeed({ api: 'k', eligibilityLines: ['a'], excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ api: 'k', excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({})],
       ['details', 'docs', null, null, null, 'details']);
     const kept = AX.putActivityDocuments({ documents: ['참가신청서'], documentsFrom: '브라우저 본문' }, []);
@@ -7498,13 +7498,35 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
       [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ putActivityDocuments\(it, activityDocuments\(detail\.text\), null, \{ thin: thinText\(detail\.text\) \}\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),
         /남은 \$\{acts\.items\.filter\(\(n\) => actRereadNeed\(n\)\)\.length\}건/.test(cm)], [true, true]);
   }
+  /* 다시 읽을 때 첨부를 합친다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ①) — 수집 로봇의 다시 읽기가 상세가 준 첨부를 버려,
+     강원대 재능봉사 캠프 글은 지금 파일 둘이 보이는데 실린 첨부가 없었다. 있던 줄은 지우지 않고 새 파일만 더한다(같은 파일은 한 줄 — rescue-plan newAttachments).
+     열려 있는 게시판 글은 첨부 판(attachV)으로 한 번 소급해 다시 읽는다 */
+  {
+    const V = AX.ACT_DETAILS_V, D = AX.ACT_DOCS_V, A = AX.ACT_ATTACH_V, T = '2026-11-25';
+    const it = { attachments: [{ name: '공고문.hwp', url: 'https://x.kr/d/1' }, { name: '포스터.png', url: 'https://x.kr/d/2' }] };
+    const added = AX.mergeActAttachments(it, [{ name: '공고문.hwp', url: 'https://x.kr/d/1' }, { name: '신청서.hwp', url: 'https://x.kr/d/3' }, { name: '신청서.hwp (다운로드 : 3회)', url: 'https://x.kr/d/3' }]);
+    eq('다시 읽은 첨부 합치기 — 있던 줄은 그대로(차례도) · 새 파일만 더한다 · 같은 파일은 한 줄 · 읽은 판을 적는다',
+      [added, it.attachments.map((a) => a.name), it.attachV === A], [1, ['공고문.hwp', '포스터.png', '신청서.hwp'], true]);
+    const none = {};
+    eq('  찾은 것이 없어도 판은 적는다(다시 열지 않는다) · 있던 줄을 지우지 않는다',
+      [AX.mergeActAttachments(none, []), none.attachments, none.attachV === A, AX.mergeActAttachments(it, []), it.attachments.length], [0, [], true, 0, 3]);
+    const cur = { excerptsAt: 'x', detailsV: V, documentsV: D };
+    eq('  다시 읽기 판단 — 다른 까닭이 없고 첨부 판이 옛것인 열린 게시판 글만 attach · 적은 뒤에는 안 읽는다 · 마감 당일은 열린 글 · 마감 지난 글·API 글·관리자 숨김 글은 아니다 · 자격 판이 옛것이면 그쪽이 먼저',
+      [AX.actRereadNeed(cur, T), AX.actRereadNeed({ ...cur, attachV: A }, T), AX.actRereadNeed({ ...cur, deadline: T }, T), AX.actRereadNeed({ ...cur, deadline: '2026-11-24' }, T),
+        AX.actRereadNeed({ ...cur, api: 'k', eligibilityLines: ['a'] }, T), AX.actRereadNeed({ ...cur, hidden: true }, T), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }, T)],
+      ['attach', null, 'attach', null, null, null, 'details']);
+    eq('  수집 로봇 — 첨부만 다시 읽는 갈래는 첨부만 합치고 넘어간다(자격·발췌·마감은 그대로 · 못 받으면 이레 뒤에) · 자격까지 다시 읽는 갈래도 첨부를 합친다 · 새 글은 읽은 판을 적는다',
+      [/if \(need === 'attach'\) \{[^}]*?if \(detail\.text\) \{ mergeActAttachments\(it, detail\.attachments\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1;\s*continue;\s*\}/.test(cm),
+        /if \(detail\.text\) mergeActAttachments\(it, detail\.attachments\);/.test(cm), /if \(detail\.text\) it\.attachV = ACT_ATTACH_V;/.test(cm)], [true, true, true]);
+  }
+
   /* 리뷰 확정 셋(2026-11-15 #7·#8·#9) — 첨부·브라우저 자격 글은 본문 재읽기를 안 한다 · 껍데기 본문이 읽어 둔 서류를 안 지운다 · API 재구성이 서류를 이어받는다 */
   {
     const V = AX.ACT_DETAILS_V, D = AX.ACT_DOCS_V;
     const shell = '메뉴 홈 로그인'.repeat(3);
     const kept = AX.putActivityDocuments({ documents: ['참가신청서 1부'] }, [], null, { thin: AX.thinText(shell) });
     eq('  #7 자격을 첨부·요강·브라우저에서 읽은 글은 본문 서류 재읽기 대상이 아니다(첨부 로봇이 그 글자에서 읽는다) · #9 껍데기 본문은 읽어 둔 서류를 안 지운다(판만 적는다)',
-      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, eligibilityFrom: '공고문 첨부(OCR)' }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), kept.documents, kept.documentsV === D, AX.thinText(shell), AX.thinText('가'.repeat(400))],
+      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, eligibilityFrom: '공고문 첨부(OCR)', attachV: AX.ACT_ATTACH_V }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), kept.documents, kept.documentsV === D, AX.thinText(shell), AX.thinText('가'.repeat(400))],
       [null, 'docs', ['참가신청서 1부'], true, true, false]);
     const adocs = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
     eq('  #7 첨부 로봇 staleDocs 가 서류 판(documentsV)이 옛것인 첨부 자격 글도 한 번 다시 열고 · 읽은 뒤 판을 적는다',
@@ -17469,6 +17491,20 @@ module.exports = class Anthropic {
   /* 로봇이 쓰는 파일(저장소 기준) · 워크플로가 저장하는 파일 — 「로봇이 고친 파일은 전부 git add 에」를 두 원본에서 뽑아 견준다 */
   const robotWrites = (robot) => [...new Set([...robot.matchAll(/writeAtomic\('([^']+)'/g)].map((m) => (m[1].startsWith('../') ? m[1].slice(3) : `collector/${m[1]}`)))];
   const gitAdds = (wf) => [...wf.matchAll(/\[ -f (\S+) \] && git add \1(?!\S)/g)].map((m) => m[1]);
+
+  /* ── 대외활동 유료 관문 ⓪ (2026-11-25 · 설계 docs/designs/paid-gate-activities.md) — 활동 목록을 붙이는 동안 장학금 쪽은 한 글자도 달라지지 않는다.
+     🔴 장학금 지시문(SYSTEM·CARD_RULES)이나 해시 셈이 바뀌면 열려 있는 숨김 등록분을 전부 돈 내고 다시 읽는다(card-read sourceHash 가 지시문을 함께 해시한다).
+     아래 값은 활동 목록을 붙이기 **전** 코드에서 뽑았다(2026-11-25) — 장학금 지시문을 일부러 고칠 때만 그 까닭과 함께 새 값으로 바꾼다 */
+  console.log('\n■ 대외활동 유료 관문 ⓪ 장학금은 그대로다 — 지시문·해시 고정');
+  {
+    const { createHash } = await import('node:crypto');
+    const h16 = (s) => createHash('sha256').update(s).digest('hex').slice(0, 16);
+    eq('⓪ 4번 지시문(SYSTEM)과 카드 규칙(CARD_RULES)이 바이트까지 그대로다', [h16(CR.SYSTEM), h16(CR.CARD_RULES)], ['8f0be3fb63149028', 'ecc5622301936bfa']);
+    eq('  6번 지시문(SYSTEM)이 바이트까지 그대로다', h16(FR.SYSTEM), '8d137cec104ef525');
+    eq('  원문 해시(sourceHash) — 인자를 하나만 주면 장학금 지시문으로 센다(조회수 숫자는 뗀다)', CR.sourceHash('고정 원문 — 활동 관문 0\n조회수 12'), '27f7d5167dc8c975');
+    eq('  검토 해시(reviewHash) — 인자 넷이면 장학금 지시문으로 센다',
+      FR.reviewHash('고정 원문', { eligibility: ['a'], hash: 'h' }, [{ file: 'f', hash: 'x', role: 'form', formStart: '' }], [{ kind: 'form', file: 'p.pdf', bytes: 10 }]), '69b219afe7021c30');
+  }
 
   /* ── 유료 카드 읽기 (4번 · 2026-11-15 개발자 지시 · 11-21 개정) — AI 하나가 공고를 통째로 읽어 카드 칸을 쓰고 첨부를 가른다. 로봇은 꼴만 다듬어 그대로 싣는다 ── */
   console.log('\n■ 유료 카드 읽기 — AI 하나가 쓴 카드를 그대로 싣는다 · 첨부 구분 · 스위치 (2026-11-15 · 11-21 기계 검사 없음)');
