@@ -984,17 +984,41 @@
   "attGap": 0
  },
  "https://www.sogang.ac.kr/ko/detail/551919?bbsconfigfk=141&namepage=ScholarshipNotice": {
-  "tries": 2,
-  "at": "2026-11-25",
+  "tries": 3,
+  "at": "2026-11-26",
   "minBody": 100,
   "name": "[교외] 농림축산식품부 농어촌희망재단 청년창업농장학생 선발 안내(1/5 마감, 등록금 전액 및 학업장려금 2",
-  "att": "2026-11-25",
+  "att": "2026-11-26",
   "attSeen": 2,
   "attGap": 0
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323654&menuno=200318": {
   "att": "2026-11-25",
   "attSeen": 3,
+  "attGap": 0
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=160764&nocat=501": {
+  "ok": "2026-11-26",
+  "at": "2026-11-26",
+  "tries": 0,
+  "name": "[국제언어교육원] 2026년 겨울 학기 유학생활도우미 봉사장학생 모집",
+  "att": "2026-11-26",
+  "attSeen": 0,
+  "attGap": 0
+ },
+ "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767096": {
+  "att": "2026-11-26",
+  "attSeen": 0,
+  "attGap": 0
+ },
+ "https://www.yonsei.ac.kr/bbs/sc/58/944731/artclView.do": {
+  "att": "2026-11-26",
+  "attSeen": 5,
+  "attGap": 0
+ },
+ "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&menu_dvs_cd=0713&no=2516453&site_dvs_cd=kr": {
+  "att": "2026-11-26",
+  "attSeen": 1,
   "attGap": 0
  }
 }
