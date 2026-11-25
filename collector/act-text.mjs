@@ -17,7 +17,7 @@ import path from 'node:path';
 
 export const MAX_STORE_BYTES = 2 * 1024 * 1024;   // 한 글의 기록 상한 — 넘으면 큰 첨부부터 뺀다(무엇을 뺐는지 dropped 에)
 export const TEXT_WAIT_DAYS = 3;                   // 표시 뒤 이 날까지만 받는다 — 앱은 그 뒤 무료 값으로 올리고, 원문 없는 글은 사람에게 넘어간다(card-read)
-const daysSince = (from, today) => Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${String(from).slice(0, 10)}T00:00:00Z`)) / 86400000);
+export const daysSince = (from, today) => Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${String(from).slice(0, 10)}T00:00:00Z`)) / 86400000);
 /* 파일 이름으로 쓰는 id — 활동 글 id 는 `act-<지문>`·`api-<출처>-<번호>` 꼴이다. 경로 글자가 섞였으면 쓰지 않는다(폴더 밖에 파일을 만들지 않는다) */
 const safeId = (id) => /^[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(String(id || '')) && !String(id).includes('..');
 const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
