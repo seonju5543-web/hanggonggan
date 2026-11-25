@@ -377,9 +377,8 @@ async function fetchPhase(acts) {
   for (const n of order) {
     if (posts >= POSTS_PER_RUN || Date.now() > until) break;
     const forText = isTextTarget(n);
-    const forElig = needsElig(n) || (!BROWSER && staleDocs(n));
     if (!forText) {
-      if (!forElig || !dueFree(ledger[n.url], today)) continue;
+      if (!(needsElig(n) || (!BROWSER && staleDocs(n))) || !dueFree(ledger[n.url], today)) continue;
       if (BROWSER && !plainTried[n.url]) continue;           // 무료 모드가 먼저 — 그래도 못 읽은 글만 브라우저로
       if (BROWSER && ledger[n.url] && ledger[n.url].lines) continue;   // 이미 찾아 장부에 적었다 — 수집 로봇이 합치기 전까지 다시 열지 않는다
     }
@@ -388,7 +387,7 @@ async function fetchPhase(acts) {
     if (got === null) continue;                              // 글을 못 받았다 — 장부에 안 적는다(잠깐 끊긴 것을 굳히지 않게)
     manifest[n.url] = got;
     /* 자격 장부(무료 기회 두 번)는 자격을 읽으려던 글만 센다 — 글자만 받으러 간 글(자격은 이미 있다)의 기회를 깎지 않는다 */
-    if (forElig) ledger[n.url] = { ...(ledger[n.url] || {}), at: today, tries: ((ledger[n.url] || {}).tries || 0) + 1 };
+    if (needsElig(n) || (!BROWSER && staleDocs(n))) ledger[n.url] = { ...(ledger[n.url] || {}), at: today, tries: ((ledger[n.url] || {}).tries || 0) + 1 };
     if (BROWSER) fs.writeFileSync(LEDGER, JSON.stringify({ ...ledger, _common: [...common].slice(-200) }, null, 1) + '\n');   // 글마다 저장 — 시간 초과로 끊겨도 해 본 것은 남는다
     files += got.length;
   }
