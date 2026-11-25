@@ -402,7 +402,8 @@ if (process.argv[1] && ranDirectly()) {
   const WRITE = process.argv.includes('--write');
   const RECHECK = process.argv.includes('--recheck');   // 결과 파일에서 빠진 공고만 장부에 남긴 4번 응답으로 다시 만든다(결과를 잃었을 때 · 돈 0 · 있는 결과는 안 건드린다)
   const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').map((x) => x.trim()).filter(Boolean);   // 한 건 또는 쉼표로 여러 건(유료 시험) — 없으면 빈 목록
-  const SYS = ACT ? ACT_SYSTEM : SYSTEM, awaits = ACT ? actAwaits : awaitsAttach;   // 활동 목록은 제 지시문·제 기다리기 규칙
+  const SYS = ACT ? ACT_SYSTEM : SYSTEM;                // 활동 목록은 제 지시문
+  const awaits = ACT ? actAwaits : awaitsAttach;        // · 제 기다리기 규칙
   const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // KST
   /* 있는 파일이 깨져 있으면 멈춘다 — 빈 것으로 읽고 이어 가면 전부 다시 읽는다(돈) · 없는 파일만 기본값 (리뷰 I10) */
   const strictJson = (rel, dflt) => { if (!fs.existsSync(P(rel))) return dflt; try { return JSON.parse(fs.readFileSync(P(rel), 'utf8')); } catch (e) { console.error(`[card-read] ${rel} 을 읽지 못했습니다(깨진 파일) — 멈춥니다: ${e.message}`); process.exit(1); } };

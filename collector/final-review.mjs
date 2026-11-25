@@ -272,7 +272,8 @@ const ranDirectly = () => { try { return fs.realpathSync(process.argv[1]) === fs
 if (process.argv[1] && ranDirectly()) {
   const WRITE = process.argv.includes('--write');
   const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').map((x) => x.trim()).filter(Boolean);   // 지정한 글만 본다(유료 시험 워크플로) — 없으면 빈 목록(전부)
-  const SYS = ACT ? ACT_REVIEW_SYSTEM : SYSTEM, CARD_SYS = ACT ? ACT_SYSTEM : undefined;   // 활동 목록은 제 검토 지시문 · 그 카드를 쓴 4번의 지시문도 활동 것
+  const SYS = ACT ? ACT_REVIEW_SYSTEM : SYSTEM;       // 활동 목록은 제 검토 지시문
+  const CARD_SYS = ACT ? ACT_SYSTEM : undefined;      // 그 카드를 쓴 4번의 지시문도 활동 것(안 주면 장학금 것) · 🔴 한 줄에 하나씩 선언한다(관문의 「선언 없는 이름」 검사가 줄 머리의 선언만 읽는다)
   const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
   /* 있는 파일이 깨져 있으면 멈춘다 — 빈 것으로 읽고 이어 가면 카드 파일을 빈 채로 덮거나 전부 다시 본다(돈) · 없는 파일만 기본값 */
   const strictJson = (rel, dflt) => { if (!fs.existsSync(P(rel))) return dflt; try { return JSON.parse(fs.readFileSync(P(rel), 'utf8')); } catch (e) { console.error(`[final-review] ${rel} 을 읽지 못했습니다(깨진 파일) — 멈춥니다: ${e.message}`); process.exit(1); } };
