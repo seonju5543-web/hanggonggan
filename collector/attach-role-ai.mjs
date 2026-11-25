@@ -68,6 +68,9 @@ export function aiRoleByName(roles, id, attachName, hash = '') {
   if (!hash) return named[0] || null;
   return named.find((d) => !d.hash || d.hash === hash) || rows.find((d) => d.hash === hash) || null;
 }
+/** 원본을 받아 와야 하는 활동 첨부인가 — AI 가 그 첨부를 서식(form)·붙은 문서(mixed)라고 한 **활동 글**(ids)의 첨부 (2026-11-25 · 대외활동 유료 관문 5-5).
+    신청서 받기(form-pdf pickFormBacklog 의 aiWants)가 쓴다: 이름이 공고문이어도 받아야 서식 쪽을 뗄 수 있다. 장학금 공고(ids 밖)는 늘 거짓 — 그 원본은 자격 로봇이 받는다 */
+export const aiWantsOriginal = (roles, ids) => (it, a) => !!it && !!a && ids.has(it.id) && ['form', 'mixed'].includes((aiRoleByName(roles, it.id, a.name) || {}).role);
 /* 색인 줄에 적어 두는 「이 답으로 만들었다」 표시 — 답이 바뀌면(갈래·서식이 시작되는 줄) 변환 로봇이 다시 만든다 · 답이 없으면 빈 글자(예전 줄과 같다).
    🔴 서식이 시작되는 줄은 빈칸을 전부 걷고 견준다(2026-11-22) — 같은 줄을 띄어쓰기만 달리 적은 답에 다시 떼고 다시 받지 않게(쪽 찾기 formStartPage 도 빈칸을 걷고 찾는다 · 같은 쪽이 나온다) */
 export const aiSig = (d) => (d && d.role ? `${d.role}|${String(d.formStart || '').replace(/\s+/g, '')}` : '');

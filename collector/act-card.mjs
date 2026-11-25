@@ -34,6 +34,29 @@ export const ACT_FILES = {
    수집 로봇의 숨김 표시 달기와 유료 로봇이 이 함수 하나를 쓴다(갈라지면 숨겨 놓고 아무도 안 읽는다). 유료 호출은 여기에 워크플로의 환경 변수까지 맞아야 나간다 */
 export const actGateOn = (cfg) => !!cfg && cfg.enabled === true && !!cfg.activities && cfg.activities.enabled === true;
 
+/* ── 숨김 표시 (수집 로봇 collect.mjs 가 쓴다 · 설계 5-1) ──
+   표시는 활동 글의 칸 `paidGate: "YYYY-MM-DD"`(주운 날 · 한국 날짜)다. 🔴 **처음 본 게시판 글에만** 단다 — 이미 실린 글·장부에 있던 글에는 달지 않는다(한 번 보인 글을 숨기지 않는다).
+   공공 API 글은 이번 범위 밖이라 달지 않는다. 스위치가 꺼져 있으면 달지 않는다(새 글은 지금처럼 바로 보인다) */
+export function stampNewActivity(it, cfg, today) {
+  if (it && !it.api && actGateOn(cfg) && /^\d{4}-\d{2}-\d{2}$/.test(String(today || ''))) it.paidGate = today;
+  return it;
+}
+/* id 를 받지 못한 글(주소 지문이 다른 글과 겹쳐 수집 로봇이 id 를 비운 글)은 표시를 뗀다 — AI 카드와 id 로 만나므로 관문에 태울 수 없다. 그 글은 지금처럼 바로 보인다. 뗀 수를 돌려준다 */
+export function dropStampWithoutId(items) {
+  let n = 0;
+  for (const it of items || []) if (it && it.paidGate && !it.id) { delete it.paidGate; n += 1; }
+  return n;
+}
+/* 활동 글 중복 정리 + 표시 지키기 — dedupe = url-key dedupeNotices(같은 글은 하나로 · 남길 쪽은 그 함수가 고른다).
+   🔴 처음 본 글(표시 있음)이 **이미 실려 있던 글**(표시 없음 = 학생에게 보이던 글)과 같은 글이면, 어느 쪽이 남든 표시를 뗀다 — 안 떼면 보이던 글이 새 주소의 숨김 글로 바뀌어 사라진다.
+   둘 다 새 글이면 표시가 남는다. 중복 정리의 결과(무엇을 합치고 어느 쪽을 남기는가)는 바꾸지 않는다 — 합쳐진 짝을 보기만 한다 */
+export function dedupeActivities(items, dedupe) {
+  const shown = new Set();
+  const out = dedupe(items, { distinct: (a, b) => { if (!(a && a.paidGate) || !(b && b.paidGate)) { shown.add(a); shown.add(b); } return false; } });
+  for (const n of out) if (n && n.paidGate && shown.has(n)) delete n.paidGate;
+  return out;
+}
+
 /* ── 지시문 (활동용 · 응답 꼴은 장학금과 같다 — card-read SCHEMA) ── */
 const ACT_LINE_RULES = `줄마다 두 가지를 냅니다 — text 와 quote.
 - text: 학생에게 보일 문장. 자연스럽고 깔끔한 한국어로 다시 써도 됩니다(끊긴 문장 잇기 · 번호·기호 떼기 · 어색한 말 다듬기 · 「~인 자」를 「~인 학생」으로 등). 한 줄에 하나만.

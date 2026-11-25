@@ -15555,7 +15555,7 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     const dfSrc = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
     const body = dfSrc.slice(dfSrc.indexOf('async function downloadForms()'), dfSrc.indexOf('async function downloadEligDocs()'));
     eq('  받는 로봇(deepfetch downloadForms)이 이 목록을 표적 뒤 남는 자리에 넣고(MAX_NOTICES - 표적) · 쉼 장부 forms-tried.json 을 읽고 쓴다 · 등록분 제목(boardTitle 또는 name)으로 색인에 적어 PDF 로봇이 찾는다',
-      [/FP\.pickFormBacklog\(\[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.FP\.loadActivities\(root\)\], rows, \{ today, isApplicationForm, tried, max: Math\.max\(0, MAX_NOTICES - capped\.length\) \}\)/.test(body),
+      [/FP\.pickFormBacklog\(\[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.FP\.loadActivities\(root\)\], rows, \{ today, isApplicationForm, tried, max: Math\.max\(0, MAX_NOTICES - capped\.length\), aiWants: aiWantsOriginal\(loadAiRoles\(fileURLToPath\(HERE\)\), actIds\) \}\)/.test(body),
         /forms-tried\.json/.test(body), /title: it\.boardTitle \|\| it\.name \|\| it\.title, url: it\.sourceUrl \|\| it\.url \|\| '', atts, regId: it\.id/.test(body),
         /if \(n\.regId\) \{ if \(fi > before\) delete tried\[n\.regId\]; else if \(attempted && !budgetHit\) tried\[n\.regId\] = today; \}/.test(body)],
       [true, true, true, true]);
@@ -17952,6 +17952,120 @@ module.exports = class Anthropic {
       [/\.\.\.\(n\.cardRead \? \{ cardRead: n\.cardRead \} : \{\}\)/.test(aa), /id: `act:\$\{n\.url\}`, name: activityTitle\(n\), type: n\.kind \|\| '대외활동', eligibility: \{\},/.test(aa),
         /!act && sch\.cardRead/.test(src('app-sheet.js')), /const paidApply = \(sch\.cardRead && Array\.isArray\(sch\.cardRead\.apply\)\)/.test(src('app-sheet.js'))],
       [true, true, false, true]);
+  }
+
+  /* ── 대외활동 유료 관문 ⑤ 숨김 표시 · 상한 · 변환 로봇 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-1 · 5-5) ──
+     표시(paidGate)는 수집 로봇이 **처음 본 게시판 글**에만, 활동 스위치가 켜져 있을 때만 단다. 한 번 보인 글은 숨기지 않는다.
+     피드 상한 200건은 학생에게 보이는 글만 센다(숨김 글이 보이던 글을 밀어내지 않게). 변환 로봇 셋의 대상에 활동 글을 더한다 */
+  console.log('\n■ 대외활동 유료 관문 ⑤ 숨김 표시 · 상한 · 변환 로봇 — 처음 본 글에만 표시 · 한 번 보인 글은 숨기지 않는다 · 상한은 보이는 글만 센다');
+  {
+    process.env.FORM_PDF_AS_LIB = '1'; process.env.FORM_PAGES_AS_LIB = '1';
+    const AC = await import(new URL('../collector/act-card.mjs', import.meta.url));
+    const OM = await import(new URL('../collector/open-api-map.mjs', import.meta.url));
+    const UK = await import(new URL('../collector/url-key.mjs', import.meta.url));
+    const CT = await import(new URL('../collector/clean-title.mjs', import.meta.url));
+    const FPD = await import(new URL('../collector/form-pdf.mjs', import.meta.url));
+    const FPG = await import(new URL('../collector/form-pages.mjs', import.meta.url));
+    const ARR = await import(new URL('../collector/attach-role-read.mjs', import.meta.url));
+    const cm = src('collector/collect.mjs');
+    const ON = { enabled: true, activities: { enabled: true } };
+    const mk = (id, over = {}) => ({ id, title: `${id} 서포터즈 모집`, url: `https://act.kr/${id}`, kind: '대외활동', school: '시험대학교', foundAt: plus(0), attachments: [], ...over });
+    const stamp = AC.stampNewActivity || ((it) => it);
+    eq('① 숨김 표시(stampNewActivity) — 스위치 둘이 켜졌을 때 처음 본 게시판 글에만 한국 날짜로 단다 · 하나라도 꺼져 있으면 안 단다 · 공공 API 글에는 안 단다 · 날짜 꼴이 아니면 안 단다',
+      [stamp(mk('n1'), ON, plus(0)).paidGate, stamp(mk('n2'), { enabled: true }, plus(0)).paidGate, stamp(mk('n3'), { enabled: false, activities: { enabled: true } }, plus(0)).paidGate,
+        stamp(mk('n4', { api: 'youth' }), ON, plus(0)).paidGate, stamp(mk('n5'), ON, '오늘').paidGate, stamp(mk('n6'), null, plus(0)).paidGate],
+      [plus(0), undefined, undefined, undefined, undefined, undefined]);
+    eq('  수집 로봇 — 표시는 처음 본 글을 만드는 자리 **하나**에서만 단다(이미 실린 글·장부에 있던 글에는 달지 않는다) · 스위치는 유료 로봇과 같은 설정 파일·같은 함수 · 날짜는 한국 날짜 · 표시를 제 손으로 적는 줄이 없다',
+      [(cm.match(/stampNewActivity\(/g) || []).length,
+        /it\.foundAt = new Date\(\)\.toISOString\(\)\.slice\(0, 10\);\s*\n\s*stampNewActivity\(it, CARD_CFG, kstDay\(\)\);[^\n]*\n\s*seenAct\[urlKey\(it\.url\)\] = it\.foundAt;\s*\n\s*freshActs\.push\(it\);/.test(cm),
+        /const CARD_CFG = [^\n]*card-read-config\.json/.test(cm), /const kstDay = \(\) => new Date\(Date\.now\(\) \+ 9 \* 3600 \* 1000\)\.toISOString\(\)\.slice\(0, 10\);/.test(cm), /\.paidGate\s*=[^=]/.test(cm)],
+      [1, true, true, true, false]);
+    /* ② 표시가 살아남는 길 */
+    const st = () => mk('s1', { paidGate: plus(0) });
+    const apiNew = { youth: { ok: true, items: [{ title: 'API 로 온 다른 글', url: 'https://api.kr/1', kind: '대외활동', api: 'youth', id: 'api-youth-1', school: '', host: '기관' }] } };
+    const gateOf = (list) => ((list || []).find((x) => x && x.id === 's1') || {}).paidGate;
+    eq('② 표시는 그 뒤의 길에서 살아남는다 — 제목 청소 · 중복 정리 · 상한 · 공공 API 로봇이 게시판 글을 그대로 남기는 길',
+      [gateOf(CT.retitleItems([{ ...st(), title: '공지 s1 서포터즈 모집' }])), gateOf(UK.dedupeNotices([st(), mk('s2')])), gateOf(OM.capActivities([st(), mk('s2')], 5)), gateOf(OM.mergeApi([st()], apiNew, { today: plus(0) }))],
+      [plus(0), plus(0), plus(0), plus(0)]);
+    {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-gate-merge-'));
+      try {
+        const w = (n, items) => { fs.writeFileSync(path.join(dir, n), JSON.stringify({ updatedAt: plus(0), items }, null, 1)); return path.join(dir, n); };
+        const row = (over = {}) => ({ url: 'https://act.kr/m1', title: '합치는 글', kind: '대외활동', ...over });
+        const merge = (base, ours, theirs) => { const o = w('o.json', ours); const r = spawnSync(process.execPath, [fileURLToPath(new URL('../tools/merge-json-union.mjs', import.meta.url)), w('b.json', base), o, w('t.json', theirs), 'data/activities.json'], { encoding: 'utf8' }); return [r.status, JSON.parse(readText(o)).items[0]]; };
+        const [s1, m1] = merge([row({ paidGate: plus(0) })], [row({ paidGate: plus(0), paidOpen: '관리자 2026-11-26' })], [row({ paidGate: plus(0), deadline: plus(9) })]);
+        const [s2, m2] = merge([row({ paidGate: plus(0) })], [row()], [row({ paidGate: plus(0), deadline: plus(9) })]);
+        eq('  병합 도구(merge-json-union)도 표시를 지킨다 — 관리자가 올린 표식(paidOpen)과 로봇이 고친 칸이 함께 남는다 · 🔴 한쪽에서 표시를 **지워도** 다른 쪽에 남아 되살아난다(그래서 「올리기」는 표시를 지우지 않고 paidOpen 을 적는다)',
+          [s1, m1.paidGate, m1.paidOpen, m1.deadline, s2, m2.paidGate], [0, plus(0), '관리자 2026-11-26', plus(9), 0, plus(0)]);
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    }
+    const dedupeAct = AC.dedupeActivities || ((items) => items);
+    const dd = dedupeAct([mk('k2', { title: '같은 제목의 글', url: 'https://act.kr/k2-new', paidGate: plus(0) }), mk('k1', { title: '같은 제목의 글', foundAt: plus(-10) }),
+      mk('k3', { title: '둘 다 새 글', paidGate: plus(0) }), mk('k4', { title: '둘 다 새 글', url: 'https://act.kr/k4-new', paidGate: plus(0) }), mk('k5', { paidGate: plus(0) })], UK.dedupeNotices);
+    eq('  🔴 한 번 보인 글을 숨기지 않는다 — 처음 본 글이 이미 실려 있던 글과 같은 글이면(학교+제목·주소) 합친 뒤에 표시를 뗀다 · 둘 다 새 글이면 표시가 남는다 · 겹치지 않는 새 글은 그대로 · 수집 로봇의 활동 글 중복 정리가 이 함수를 쓴다',
+      [dd.length, dd.map((n) => !!n.paidGate), /acts\.items = dedupeActivities\(acts\.items, dedupeNotices\);/.test(cm)], [3, [false, true, true], true]);
+    /* ③ id 없는 글 */
+    const noId = [mk('i1', { paidGate: plus(0) }), { title: 'id 없는 글', url: 'https://act.kr/x', paidGate: plus(0) }, { title: '표시도 id 도 없는 글', url: 'https://act.kr/y' }, null];
+    eq('③ id 를 받지 못한 글은 표시를 뗀다(AI 카드와 id 로 만난다 — 그 글은 지금처럼 바로 보인다) · 뗀 수를 돌려준다 · 수집 로봇은 id 를 준 뒤 · 상한을 걸기 전에 부른다',
+      [(AC.dropStampWithoutId || (() => -1))(noId), noId.filter(Boolean).map((n) => n.paidGate),
+        cm.indexOf('dropStampWithoutId(acts.items);') > cm.indexOf('n.id = activityId(n.url)') && cm.indexOf('dropStampWithoutId(acts.items);') < cm.indexOf('capActivities(acts.items, ACT_CAP')],
+      [1, [plus(0), undefined, undefined], true]);
+    /* ④ 상한 */
+    const vis = (n) => !n.paidGate;   // 표본의 「보이는가」 — 표시가 달린 글은 아직 안 보인다
+    const many = (nVis, nHid) => [...Array.from({ length: nHid }, (_, i) => mk(`h${i}`, { paidGate: plus(0) })), ...Array.from({ length: nVis }, (_, i) => mk(`v${i}`, { foundAt: plus(-1 - i) }))];
+    const c1 = OM.capActivities(many(200, 30), 200, vis), c2 = OM.capActivities(many(205, 30), 200, vis);
+    eq('④ 🔴 상한 200건은 학생에게 보이는 글만 센다 — 보이는 글 200 + 숨김 글 30 은 230건이 다 남는다(숨김 글이 보이던 글을 밀어내지 않는다) · 보이는 글 205 + 숨김 30 은 보이는 글 가운데 가장 오래된 5건만 빠진다 · 차례는 넘겨받은 그대로 · 판정을 안 주면 예전처럼 전부 센다',
+      [c1.length, c2.length, c2.filter((n) => n.paidGate).length, many(205, 30).filter((n) => !c2.includes(n) && !c2.some((x) => x.id === n.id)).map((n) => n.id), JSON.stringify(c1.map((n) => n.id)) === JSON.stringify(many(200, 30).map((n) => n.id)), OM.capActivities(many(205, 30), 200).length],
+      [230, 230, 30, ['v200', 'v201', 'v202', 'v203', 'v204'], true, 200]);
+    eq('  수집 로봇 — 보이는가는 앱과 같은 함수(match-engine paidGateOpen)와 결과 파일로 가린다(관리자가 올린 글은 보이는 글) · 결과 파일은 읽기만 한다',
+      [/capActivities\(acts\.items, ACT_CAP, \(n\) => !!n\.paidOpen \|\| paidGateOpen\(n, ACT_READ, todayIsoAct\)\)/.test(cm), /const \{ paidGateOpen \} = createRequire\(import\.meta\.url\)\('\.\.\/match-engine\.js'\);/.test(cm),
+        /const ACT_READ = [^\n]*act-read\.json/.test(cm), /writeFileSync\([^)]*act-read/.test(cm)],
+      [true, true, true, false]);
+    /* ⑤ 감사 */
+    const AG = (() => { try { return createRequire(import.meta.url)('./act-gate-audit.cjs'); } catch { return { actGateWarnings: () => null }; } })();
+    const au = src('verify/audit-data.js');
+    eq('⑤ 감사 — 표시가 날짜 꼴이 아니거나 id 없는 글에 달려 있으면 **경고**한다(오류가 아니다 — 오류면 수집 로봇의 저장이 통째로 되돌려진다) · 멀쩡한 표시·표시 없는 글에는 말이 없다',
+      [((w) => [w.length, /날짜 꼴\(YYYY-MM-DD\)이 아닌 글 2건/.test(w[0] || ''), /id 가 없는 글 1건/.test(w[1] || '')])(AG.actGateWarnings([mk('g1', { paidGate: '11월 26일' }), mk('g2', { paidGate: true }), { title: 'id 없는 글', url: 'u', paidGate: plus(0) }]) || []),
+        AG.actGateWarnings([mk('g3', { paidGate: plus(0) }), mk('g4'), null]), /warns\.push\(\.\.\.require\('\.\/act-gate-audit\.cjs'\)\.actGateWarnings\(acts\.items \|\| \[\]\)\);/.test(au), /errors\.push\([^\n]*actGateWarnings/.test(au)],
+      [[2, true, true], [], true, false]);
+    /* ⑥ 서식 쪽 떼기 */
+    const tp = FPG.pickPageTargets({ registered: [], activities: [mk('pa', { deadline: plus(5) }), mk('ph', { hidden: true }), mk('pz', { deadline: plus(-1) }), { title: 'id 없는 글', url: 'u' }], kosaf: [], today: plus(0), extractedDir: '/x', kosafDir: '/k',
+      filesFor: (it) => ({ pa: ['form-pa-1.hwp', 'form-pa-2.png'], ph: ['form-ph-1.hwp'], pz: ['form-pz-1.hwp'] }[it.id] || []), exists: (p) => /form-p[ahz]-\d\.(?:hwp|png)$/.test(p), readdir: () => [] });
+    const fpgSrc5 = src('collector/form-pages.mjs');
+    eq('⑥ 서식 쪽 떼기의 대상(pickPageTargets)에 활동 글도 — 받아 둔 원본이 있는 열린 글만 · 관리자가 숨긴 글·마감 지난 글·id 없는 글은 아니다 · 이름은 글 제목 · 본편이 활동 피드를 읽어 넘기고 그 글의 색인 줄도 활동 글에서 찾는다',
+      [tp.map((t) => [t.id, t.name, t.files.map((f) => f.name)]), /pickPageTargets\(\{ registered: reg, activities: acts, kosaf,/.test(fpgSrc5), /const regById = new Map\(\[\.\.\.reg, \.\.\.acts\]\.map\(/.test(fpgSrc5)],
+      [[['pa', 'pa 서포터즈 모집', ['form-pa-1.hwp']]], true, true]);
+    /* ⑦ 신청서 받기 */
+    const isApp5 = (a) => /신청서|지원서/.test(String(a && a.name));
+    const items7 = [mk('fa', { attachments: [{ name: '모집 공고문.hwp', url: 'https://act.kr/f/1' }, { name: '포스터.png', url: 'https://act.kr/f/2' }] }),
+      { id: 'reg-1', name: '표본 장학금 공고', deadline: plus(9), attachments: [{ name: '선발 공고문.hwp', url: 'https://s.kr/f/1' }] }];
+    const roles7 = { fa: { 'text-h1': { file: 'text-h1', attach: '모집 공고문.hwp', hash: 'h1', role: 'mixed', by: 'review' } }, fb: { 'text-h2': { file: 'text-h2', attach: '안내문.hwp', hash: 'h2', role: 'content', by: 'read' } },
+      'reg-1': { 'elig-1.hwp': { file: 'elig-1.hwp', attach: '선발 공고문.hwp', hash: 'h3', role: 'mixed', by: 'review' } } };
+    const wants = (AR.aiWantsOriginal || (() => () => false))(roles7, new Set(['fa', 'fb']));
+    const names7 = (o) => FPD.pickFormBacklog(items7, [], { today: plus(0), isApplicationForm: isApp5, ...o }).map(({ it, atts }) => [it.id, atts.map((a) => a.name)]);
+    eq('⑦ 신청서 받기(pickFormBacklog) — 이름이 공고문인 첨부는 원래 안 받는다 · AI 가 서식·붙은 문서라고 한 **활동 글의** 첨부는 받는다(붙은 문서에서 서식 쪽을 떼려면 원본이 저장소에 있어야 한다) · 장학금 공고의 공고문은 AI 가 붙은 문서라 해도 지금처럼 안 받는다(그 원본은 자격 로봇이 이미 받는다)',
+      [names7({}), names7({ aiWants: wants }), [wants(items7[0], items7[0].attachments[0]), wants(items7[0], items7[0].attachments[1]), wants({ id: 'fb' }, { name: '안내문.hwp' }), wants(items7[1], items7[1].attachments[0]), wants(null, null)]],
+      [[], [['fa', ['모집 공고문.hwp']]], [true, false, false, false, false]]);
+    eq('  받는 로봇(deepfetch) — 밀린 목록을 고를 때 AI 의 답(첨부 구분 표)과 활동 글 id 로 만든 판정을 넘긴다',
+      [/aiWants: aiWantsOriginal\(loadAiRoles\(fileURLToPath\(HERE\)\), actIds\) \}\)/.test(src('collector/deepfetch.mjs')), /const actIds = new Set\(FP\.loadActivities\(root\)\.map\(\(n\) => n\.id\)\);/.test(src('collector/deepfetch.mjs')),
+        /import \{ loadAiRoles, aiWantsOriginal \} from '\.\/attach-role-ai\.mjs';/.test(src('collector/deepfetch.mjs'))], [true, true, true]);
+    /* ⑧ 유료 첨부 판정 */
+    const roleItems = ARR.roleItems || (() => []);
+    eq('⑧ 유료 첨부 판정의 대상(roleItems) — 활동 스위치가 켜져 있을 때만 표시가 달린 활동 글을 더한다(관리자가 올린 글·숨긴 글은 아니다) · 🔴 꺼져 있으면 장학금 공고만(활동 글에 돈을 쓰지 않는다)',
+      [roleItems([{ id: 'r1' }], [mk('ra', { paidGate: plus(0) }), mk('rb'), mk('rc', { paidGate: plus(0), paidOpen: '관리자' }), mk('rd', { paidGate: plus(0), hidden: true })], ON).map((x) => x.id),
+        roleItems([{ id: 'r1' }], [mk('ra', { paidGate: plus(0) })], { enabled: true }).map((x) => x.id), roleItems([{ id: 'r1' }], [mk('ra', { paidGate: plus(0) })], {}).map((x) => x.id)],
+      [['r1', 'ra'], ['r1'], ['r1']]);
+    {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-role-'));
+      try {
+        fs.writeFileSync(path.join(dir, 'form-ra-1.pdf'), '%PDF-1.4\n1 0 obj << /Type /Page >> endobj\n%%EOF');   // 글자 없는(스캔) PDF 한 쪽
+        const act = mk('ra', { paidGate: plus(0), attachments: [{ name: '포스터 겸 요강.pdf', url: 'https://act.kr/f/9' }] });
+        const t = ARR.pickRoleTargets(roleItems([], [act], ON), [{ file: 'form-ra-1.pdf', title: act.title, attach: '포스터 겸 요강.pdf', bytes: 40, id: 'ra' }], { today: plus(0), extractedDir: dir, ledger: {}, findRow: FPD.findRow, isOpen: FPD.isOpen });
+        eq('  그 대상에서 글자 없는 원본(스캔 PDF)이 물을 파일로 뽑힌다(고르는 함수는 장학금과 같은 것) · 본편이 그 목록을 쓴다',
+          [t.map((x) => [x.it.id, x.row.file, x.media]), /const items = roleItems\(reg, acts, cfg\);/.test(src('collector/attach-role-read.mjs')), /const targets = pickRoleTargets\(items, rows, \{/.test(src('collector/attach-role-read.mjs'))],
+          [[['ra', 'form-ra-1.pdf', 'application/pdf']], true, true]);
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    }
   }
 
   /* ── 유료 카드 읽기 (4번 · 2026-11-15 개발자 지시 · 11-21 개정) — AI 하나가 공고를 통째로 읽어 카드 칸을 쓰고 첨부를 가른다. 로봇은 꼴만 다듬어 그대로 싣는다 ── */

@@ -81,8 +81,9 @@ export const rangeLabel = (ranges) => ranges.map(([a, b]) => (a === b ? `${a}` :
 
 /* ── 대상 고르기(순수) ──────────────────────────────────────────────────────── */
 export const isOpen = (due, today) => !due || String(due) >= today;
-/** 층1·층2에서 받을 공고문 PDF 목록 — [{ id, name, due, files:[{ src, name }] }] */
-export function pickPageTargets({ registered = [], kosaf = [], eligIndex = {}, today, extractedDir, kosafDir, exists = fs.existsSync, readdir = fs.readdirSync, filesFor = null }) {
+/** 층1·활동 글·층2에서 받을 공고문 PDF 목록 — [{ id, name, due, files:[{ src, name }] }]
+    activities(2026-11-25 · 대외활동 유료 관문 5-5) — 받아 둔 원본이 있는 열린 활동 글(관리자가 숨긴 글은 아니다). 활동 글의 원본은 신청서 받기가 받은 것뿐이라 filesFor 가 골라 준다 */
+export function pickPageTargets({ registered = [], activities = [], kosaf = [], eligIndex = {}, today, extractedDir, kosafDir, exists = fs.existsSync, readdir = fs.readdirSync, filesFor = null }) {
   const out = [];
   for (const it of registered) {
     if (!it || !it.id || it.program || !isOpen(it.deadline, today)) continue;
@@ -90,6 +91,11 @@ export function pickPageTargets({ registered = [], kosaf = [], eligIndex = {}, t
     const files = (filesFor ? filesFor(it) : ((eligIndex[it.id] || {}).files || [])).filter((f) => CONVERTIBLE.test(f)).map((f) => ({ src: path.join(extractedDir, f), name: f }))
       .filter((f) => exists(f.src));
     if (files.length) out.push({ id: it.id, name: it.name || it.id, due: it.deadline || '', files });
+  }
+  for (const it of activities) {
+    if (!it || !it.id || it.hidden || !isOpen(it.deadline, today)) continue;
+    const files = (filesFor ? filesFor(it) : []).filter((f) => CONVERTIBLE.test(f)).map((f) => ({ src: path.join(extractedDir, f), name: f })).filter((f) => exists(f.src));
+    if (files.length) out.push({ id: it.id, name: it.title || it.id, due: it.deadline || '', files });
   }
   for (const k of kosaf) {
     if (!k || !k.code || !isOpen(k.due, today)) continue;
@@ -235,6 +241,8 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
   const reg = JSON.parse(fs.readFileSync(path.join(root, 'data', 'registered.json'), 'utf8')).items || [];
   let kosaf = [];
   try { kosaf = JSON.parse(fs.readFileSync(path.join(root, 'data', 'kosaf-open.json'), 'utf8')).items || []; } catch { /* 층2 없음 */ }
+  let acts = [];   // 활동 글(id 있는 것만) — 받아 둔 원본이 있으면 서식 쪽을 뗀다(2026-11-25 · 대외활동 유료 관문)
+  try { acts = (JSON.parse(fs.readFileSync(path.join(root, 'data', 'activities.json'), 'utf8')).items || []).filter((it) => it && it.id && it.url); } catch { /* 활동 피드 없음 */ }
   let eligIndex = {};
   try { eligIndex = JSON.parse(fs.readFileSync(path.join(root, 'collector', 'extracted', 'elig-docs.json'), 'utf8')); } catch { /* 첫 실행 */ }
   const outDir = path.join(root, 'data', 'form-pages');
@@ -248,8 +256,8 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
   /* AI 가 정한 첨부 갈래(4번 · 6번 — 없으면 빈 표) — 이름이 신청서여도 붙은 문서(mixed)면 여기서 서식 쪽을 떼고, 통째로 신청 양식·이 공고 문서 아님은 안 본다(층2 재단 사본에는 답이 없다) */
   const aiRoles = loadAiRoles(path.join(root, 'collector'));
   const filesFor = (it) => noticeDocFiles(it, { index: noticeIndex, sameTitle, aiRoles: (id, file, abs) => toDecisionRole((aiRoleFor(aiRoles, id, file, abs) || {}).role) });
-  const targets = pickPageTargets({ registered: reg, kosaf, eligIndex, today, extractedDir, kosafDir: path.join(root, 'data', 'kosaf-files'), filesFor });
-  const regById = new Map(reg.map((it) => [it && it.id, it]));
+  const targets = pickPageTargets({ registered: reg, activities: acts, kosaf, eligIndex, today, extractedDir, kosafDir: path.join(root, 'data', 'kosaf-files'), filesFor });
+  const regById = new Map([...reg, ...acts].map((it) => [it && it.id, it]));
   const live = new Set(targets.map((t) => t.id));
   /* 🔴 대상이 하나도 없는데 색인에 공고가 있으면 지우지 않는다 — 색인(elig-docs.json)·사본 폴더를 못 읽은 실행(얕은 체크아웃 등)이 결과를 통째로 지우고 커밋한다(리뷰) */
   const skipPrune = !targets.length && Object.keys(index.items).length > 0;
