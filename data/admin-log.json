@@ -773,6 +773,30 @@
    "by": "조세현",
    "action": "edit",
    "detail": "auto-oardid323654menuno200318 — prepDoc"
+  },
+  {
+   "at": "2026-11-25 13:24 KST",
+   "by": "Claude 정기 세션",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 장학생 → http://wongangnam.com/archives/community/2027%ED%95%99%EB%85%84%EB%8F%84-%EA%B0%95%EB%82%A8%EC%9E%A5%ED%95%99%ED%9A%8C-19%EA%B8%B0-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C-%EA%B3%B5%EA%B3%A0"
+  },
+  {
+   "at": "2026-11-25 13:24 KST",
+   "by": "Claude 정기 세션",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 학교장추천장학금 → http://www.boeun.go.kr/janghak/selectBbsNttView.do?key=1036&bbsNo=243&nttNo=228303"
+  },
+  {
+   "at": "2026-11-25 13:24 KST",
+   "by": "Claude 정기 세션",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 부산·울산·경남지역 고교 출신 협성장학생 → https://www.hscf.co.kr/kor/sub6_01.php?wr_id=16394"
+  },
+  {
+   "at": "2026-11-25 13:24 KST",
+   "by": "Claude 정기 세션",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 건설근로자 자녀 협성장학생 → https://www.hscf.co.kr/kor/sub6_01.php?wr_id=16394"
   }
  ]
 }

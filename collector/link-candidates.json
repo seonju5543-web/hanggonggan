@@ -502,6 +502,21 @@
    "source": "search",
    "by": "Claude 세션 (2026-11-20 · 남원시 사이트가 세션의 모든 접속 경로에서 400 — 로봇이 다른 망에서 확인)",
    "addedAt": "2026-11-20"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704387001"
+   },
+   "also": [
+    "2704387002"
+   ],
+   "url": "https://www.busanjin.go.kr/go06/board/view.busanjin?boardId=DONGNOTICE&menuCd=DOM_000002403001000000&dataSid=3980525",
+   "title": "2026년도 가야2동장학회 장학생 모집 안내",
+   "note": "검색 색인에서 본 부산진구청 동 소식 글 — 세션이 직접 열지 못한 미확인 후보(검색 결과 주소에서 쪽 번호·정렬 인자는 뺌)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-25 · 부산진구 사이트가 세션의 curl·브라우저 모두에서 502·연결 끊김 — 로봇이 다른 망에서 확인)",
+   "addedAt": "2026-11-25"
   }
  ]
 }
