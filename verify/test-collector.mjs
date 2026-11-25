@@ -6755,6 +6755,18 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
         '공고문.hwp', '2026 안내(최종).pdf', '참가 안내', '신청서.hwp 작성 방법 안내', '공고문.hwp (최종)', ''].map((n) => (AL.trimSiteTail || (() => undefined))(n)),
       ['제안서.hwp', '신청서.hwp', '신청서.hwp', '요강.pdf', '요강.pdf', '공고문.hwp', '2026 안내(최종).pdf', '참가 안내', '신청서.hwp 작성 방법 안내', '공고문.hwp (최종)', '']);
     const donga = 'https://korea.donga.ac.kr/korea/CMS/Board/Board.do?mCode=MN032&mode=view&mgr_seq=1002&board_seq=8520208';
+    /* 리뷰 2026-11-25 — 위 표본은 100자에서 잘린 뒤의 글자였다. 페이지가 실제로 주는 글자는 꼬리가 둘이고(용량 + 바로보기) &nbsp; 가 확장자에 바로 붙기도 한다 */
+    eq('  실제 글자 — 꼬리가 여럿 이어져도(용량 괄호 + 바로보기) · &nbsp; 가 확장자에 바로 붙어도 · K 한 글자 단위도 뗀다',
+      ['공고문.hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB) 바로보기', '2027학년도 모집요강.pdf&nbsp; &nbsp;(다운로드 : 4회) 바로보기', '신청서.hwp (71.5K)', '신청서.hwp\u00a0(12KB)', '요강.pdf (1.2MB, 45회)', '요강.pdf 미리보기 (83KB)'].map((n) => AL.trimSiteTail(n)),
+      ['공고문.hwp', '2027학년도 모집요강.pdf', '신청서.hwp', '신청서.hwp', '요강.pdf', '요강.pdf']);
+    eq('  🔴 뜻이 있는 괄호는 꼬리가 아니다 — 회차·건수 뒤에 글자가 이어지는 괄호 · 숫자 없는 「다운로드 …」 안내는 그대로 둔다(이름이 다른 두 파일이 같은 이름이 되지 않는다)',
+      ['신청서.hwp (1회차)', '신청서.hwp (2회차)', '서류.hwp (3건 이상 제출)', '신청서.hwp (다운로드 후 작성)', '요강.pdf (12회 모집)'].map((n) => AL.trimSiteTail(n)),
+      ['신청서.hwp (1회차)', '신청서.hwp (2회차)', '서류.hwp (3건 이상 제출)', '신청서.hwp (다운로드 후 작성)', '요강.pdf (12회 모집)']);
+    eq('  🔴 뷰어 링크는 파일이 아니다 — 「이름 + 미리보기」뿐인 링크는 받는 주소가 분명할 때만 첨부로 센다(뷰어 주소가 같은 이름의 둘째 줄이 되지 않는다) · 용량 꼬리가 붙은 이름은 주소와 상관없이 파일',
+      [AL.detailAttachments('<a href="/synap/doc.html?fn=1">공고문.hwp 미리보기</a>', donga), AL.detailAttachments('<a href="/bbs/1/download.do?f=9">공고문.hwp 미리보기</a>', donga).map((a) => a.name),
+        AL.detailAttachments('<a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Q1">신청서.hwp (71KB) 바로보기</a>', donga).map((a) => a.name),
+        AL.trimSiteTail('공고문.hwp 미리보기', { lonePreview: false }), AL.trimSiteTail('공고문.hwp (71KB) 미리보기', { lonePreview: false })],
+      [[], ['공고문.hwp'], ['신청서.hwp'], '공고문.hwp 미리보기', '공고문.hwp']);
     eq('  받을 때부터 뗀다 — 동아대 국어문화원 꼴(`<span>신청서.hwp (71KB)</span>` · 주소에 확장자도 내려받기 낱말도 없다): 두 파일이 제 이름과 제 주소로 잡힌다',
       AL.detailAttachments('<ul class="fileList"><li><a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA1LFk=" title="새창내려받기"><img src="/resources/_Img/Board/default/ico_hwp.gif" alt="hwp 첨부 파일"> <span> 웹툰 공모전 신청서.hwp (71KB) </span></a></li>'
         + '<li><a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA2LFk=" title="새창내려받기"><span> 웹툰 공모전 신청서.pdf (83KB) </span></a></li></ul>', donga),
@@ -7521,7 +7533,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
       [kept.documents, kept.documentsV === D, wiped.documents, wiped.documentsV === D, kept.docsV === undefined, put.documents, put.documentsFrom], [['참가신청서'], true, undefined, true, true, ['작품 설명서'], undefined]);
     eq('  서류 칸만 다시 읽는 갈래는 자격·발췌를 건드리지 않고 넘어간다(같은 판으로 이미 읽었다) · 못 받으면 이레 뒤에 다시 · 리포트의 「남은」 수도 같은 판단',
       [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ putActivityDocuments\(it, activityDocuments\(detail\.text\), null, \{ thin: thinText\(detail\.text\) \}\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),
-        /남은 \$\{acts\.items\.filter\(\(n\) => actRereadNeed\(n\)\)\.length\}건/.test(cm)], [true, true]);
+        /남은 \$\{left\.fill\}건/.test(cm)], [true, true]);   // 「남은」 은 같은 판단(actRereadNeed)으로 세되 첨부만 다시 살필 글은 따로 적는다(actRereadLeft · 리뷰 2026-11-25)
   }
   /* 다시 읽을 때 첨부를 합친다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ①) — 수집 로봇의 다시 읽기가 상세가 준 첨부를 버려,
      강원대 재능봉사 캠프 글은 지금 파일 둘이 보이는데 실린 첨부가 없었다. 있던 줄은 지우지 않고 새 파일만 더한다(같은 파일은 한 줄 — rescue-plan newAttachments).
@@ -7535,13 +7547,27 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
     const none = {};
     eq('  찾은 것이 없어도 판은 적는다(다시 열지 않는다) · 있던 줄을 지우지 않는다',
       [AX.mergeActAttachments(none, []), none.attachments, none.attachV === A, AX.mergeActAttachments(it, []), it.attachments.length], [0, [], true, 0, 3]);
+    /* 🔴 다시 읽은 글에는 **믿는 첨부만** 더한다 (리뷰 2026-11-25) — 상세가 준 첨부에는 주소에 file·attach 가 든 사이트 메뉴 링크가 섞인다(광운대 글마다 7개 · 성균관대 「부속기관」).
+       새 글은 같은 주소가 세 글 이상이면 걷히지만(stripSiteChrome), 이미 걷혀 깨끗한 글을 한 건씩 다시 읽으면 그 링크가 그 글에만 돌아와 남는다.
+       장학금의 첨부 살피기가 11-17 에 같은 일을 겪어 세운 선(rescue-plan trustedAttachment — 이름이 파일 이름이거나 주소가 분명한 내려받기 꼴)을 그대로 쓴다 */
+    const clean = { attachments: [{ name: '요강.hwp', url: 'https://kw.kr/down?no=1' }] };
+    const addedTrusted = AX.mergeActAttachments(clean, [{ name: '부설연구기관', url: 'https://kw.kr/research_attach.jsp' }, { name: '대학정보공시', url: 'https://kw.kr/info/list.do?filePath=/a/b' },
+      { name: '첨부파일 다운로드', url: 'https://kw.kr/bbs/fileDown.do?fileNo=9' }, { name: '한글뷰어 다운로드', url: 'https://kw.kr/viewer/down.do?fileNo=1' }, { name: '본문이미지-1.jpg', url: 'https://kw.kr/img/1.jpg', bodyImage: true },
+      { name: '신청서.hwp', url: 'https://kw.kr/down?no=2' }, { name: '참가 신청 양식', url: 'https://kw.kr/bbs/fileDown.do?fileNo=3' }]);
+    eq('  🔴 다시 읽은 글에는 믿는 첨부만 더한다 — 사이트 메뉴 링크·단추 글자·뷰어 안내·본문 그림은 적지 않는다 · 이름이 파일 이름이거나 주소가 분명한 내려받기 꼴인 것만',
+      [addedTrusted, clean.attachments.map((a) => a.name)], [2, ['요강.hwp', '신청서.hwp', '참가 신청 양식']]);
     const cur = { excerptsAt: 'x', detailsV: V, documentsV: D };
+    eq('  리포트의 「남은」 수 — 마감·발췌를 채울 글과 첨부만 다시 살필 글을 따로 센다(첨부만 살핀 글을 「마감·발췌를 채웠다」고 적지 않는다)',
+      [(AX.actRereadLeft || (() => undefined))([cur, { ...cur, attachV: A }, { excerptsAt: 'x', detailsV: V - 1 }, { ...cur, documentsV: D - 1 }, { ...cur, deadline: '2026-11-24' }, null], T),
+        /const left = actRereadLeft\(acts\.items\);/.test(cm), /남은 \$\{left\.fill\}건은 다음 실행에/.test(cm), /첨부를 다시 살폈습니다 \(새로 찾은 파일 \$\{actAttachAdded\}개 · 남은 \$\{left\.attach\}건은 다음 실행에\)/.test(cm),
+        /전에 실린 글 \$\{actBackfilled - actAttachBackfilled\}건의 원문을 다시 읽어 마감·발췌를 채웠습니다/.test(cm)],
+      [{ fill: 2, attach: 1 }, true, true, true, true]);
     eq('  다시 읽기 판단 — 다른 까닭이 없고 첨부 판이 옛것인 열린 게시판 글만 attach · 적은 뒤에는 안 읽는다 · 마감 당일은 열린 글 · 마감 지난 글·API 글·관리자 숨김 글은 아니다 · 자격 판이 옛것이면 그쪽이 먼저',
       [AX.actRereadNeed(cur, T), AX.actRereadNeed({ ...cur, attachV: A }, T), AX.actRereadNeed({ ...cur, deadline: T }, T), AX.actRereadNeed({ ...cur, deadline: '2026-11-24' }, T),
         AX.actRereadNeed({ ...cur, api: 'k', eligibilityLines: ['a'] }, T), AX.actRereadNeed({ ...cur, hidden: true }, T), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }, T)],
       ['attach', null, 'attach', null, null, null, 'details']);
     eq('  수집 로봇 — 첨부만 다시 읽는 갈래는 첨부만 합치고 넘어간다(자격·발췌·마감은 그대로 · 못 받으면 이레 뒤에) · 자격까지 다시 읽는 갈래도 첨부를 합친다 · 새 글은 읽은 판을 적는다',
-      [/if \(need === 'attach'\) \{[^}]*?if \(detail\.text\) \{ mergeActAttachments\(it, detail\.attachments\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1;\s*continue;\s*\}/.test(cm),
+      [/if \(need === 'attach'\) \{[^}]*?if \(detail\.text\) \{ actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actAttachBackfilled \+= 1;\s*continue;\s*\}/.test(cm),
         /if \(detail\.text\) mergeActAttachments\(it, detail\.attachments\);/.test(cm), /if \(detail\.text\) it\.attachV = ACT_ATTACH_V;/.test(cm)], [true, true, true]);
   }
 

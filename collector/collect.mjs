@@ -19,7 +19,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome, trimActivityTails } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, mergeActAttachments, ACT_ATTACH_V, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, actRereadLeft, mergeActAttachments, ACT_ATTACH_V, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
@@ -644,7 +644,7 @@ acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; e
    (못 읽었어도 적는다 — 없는 이름표를 매일 다시 찾지 않는다). */
 const todayIso = new Date().toISOString().slice(0, 10);
 const ACT_BACKFILL = 40;   // 2026-10-01 20→40 — 자격 판(detailsV) 소급으로 다시 읽을 글이 130건이다. 예산(budget.hasRoom) 안에서만 돈다
-let actBackfilled = 0, actDocsBackfilled = 0;
+let actBackfilled = 0, actDocsBackfilled = 0, actAttachBackfilled = 0, actAttachAdded = 0;
 for (const it of acts.items) {
   /* 🔴 자격 판(detailsV)이 옛것인 글도 다시 읽는다 (2026-10-01 · 소급 — 원칙 7). API 글은 API 로봇이 채우므로 건너뛴다 */
   /* API 글은 API 본문으로 읽었으니 건너뛴다 — 단 거기서 자격이 안 나온 글은 원문 페이지를 읽어 본다(제주 청년정책 「체인지메이커」: API 칸은 한 줄, 페이지엔 자격 표 · 2026-10-16) */
@@ -663,8 +663,8 @@ for (const it of acts.items) {
   }
   if (need === 'attach') {
     /* 첨부만 — 자격·발췌·마감은 그대로 둔다(2026-11-25 · 열려 있는 글의 첨부를 한 번 소급해 다시 읽는다). 못 받으면 이레 뒤에 다시 */
-    if (detail.text) { mergeActAttachments(it, detail.attachments); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
-    actBackfilled += 1;
+    if (detail.text) { actAttachAdded += mergeActAttachments(it, detail.attachments); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
+    actBackfilled += 1; actAttachBackfilled += 1;
     continue;
   }
   const ex = activityExcerpts(detail.text);
@@ -831,7 +831,10 @@ if (chronic.length) {
 
 /* 대외활동·공모전 — 컨펌 대상이 아니다(제목+링크만 앱 '대외활동' 탭에 실린다). 상태와 새 글만 적는다. */
 lines.push(`### 🎯 대외활동·공모전 새 글 ${freshActs.length}건 → 앱 '대외활동' 탭 (data/activities.json · ${acts.items.length}건 게재 중)`);
-if (actBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (그중 서류 칸만 ${actDocsBackfilled}건 · 남은 ${acts.items.filter((n) => actRereadNeed(n)).length}건은 다음 실행에)`);
+/* 첨부만 다시 살핀 글은 따로 적는다 — 「마감·발췌를 채웠다」에 섞으면 숫자가 사실과 다르다(리뷰 2026-11-25) */
+const left = actRereadLeft(acts.items);
+if (actBackfilled - actAttachBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled - actAttachBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (그중 서류 칸만 ${actDocsBackfilled}건 · 남은 ${left.fill}건은 다음 실행에)`);
+if (actAttachBackfilled) lines.push(`- 📎 열려 있는 글 ${actAttachBackfilled}건의 첨부를 다시 살폈습니다 (새로 찾은 파일 ${actAttachAdded}개 · 남은 ${left.attach}건은 다음 실행에)`);
 for (const r of actResults) {
   lines.push(`- **${r.name}** — ${r.status}`);
   for (const i of r.items) lines.push(`  - [${i.kind}] [${i.title}](${i.url})${i.deadlineHint ? ` — ⏰ ${i.deadlineHint}` : ''}`);

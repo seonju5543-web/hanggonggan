@@ -68,7 +68,7 @@ const noContact = (lines) => lines.filter((l) => !CONTACT.test(l));
 import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, ACT_TAIL, targetFromTitle } from './activity-vocab.mjs';
 import { readDocuments, DOC_JUNK } from './doc-list.mjs';   // 제출 서류 목록 — 장학 발췌기와 같은 규칙 한 곳(2026-10-30 · 공모전 참가신청서가 화면에 없던 것)
 import { createRequire } from 'node:module';
-import { newAttachments } from './rescue-plan.mjs';   // 다시 읽은 첨부 가운데 아직 없는 것만(같은 파일은 한 줄 · 2026-11-25)
+import { newAttachments, trustedAttachment } from './rescue-plan.mjs';   // 다시 읽은 첨부 가운데 아직 없는 것만(같은 파일은 한 줄 · 2026-11-25)
 /* 지역 이름은 parse-requirements.js 의 REGION_CITIES 한 벌(화면·판정·알림) — 끝글자 `시|군|구|도` 로 짐작하면 `별도`·`표시`·`제도` 가 지역이 된다(2026-10-28 리뷰) */
 const PR = createRequire(import.meta.url)('../parse-requirements.js');
 const REGION_WORDS = [...new Set([...PR.REGIONS, ...Object.keys(PR.REGION_CITIES), ...Object.values(PR.REGION_CITIES).flat()])].sort((a, b) => b.length - a.length).join('|');
@@ -533,14 +533,24 @@ export function actRereadNeed(it, today = new Date(Date.now() + 9 * 3600000).toI
 /* 다시 읽을 때 첨부를 합친다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ①) — 수집 로봇의 다시 읽기는 상세가 준 첨부를 버려 왔다
    (강원대 재능봉사 캠프 글: 지금 파일 둘이 보이는데 실린 첨부가 없었다 — 글을 올린 뒤 파일을 붙였거나 첫 받기가 끊겼던 글).
    🔴 있던 줄은 지우지 않는다(차례도 그대로) — 그 이름으로 만든 사본·색인이 있다. 새 파일만 뒤에 더하고(같은 파일은 한 줄 · rescue-plan newAttachments) 읽은 판을 적는다.
-   페이지를 못 받은 날은 부르지 않는다(부르는 쪽이 detail.text 로 가린다) — 못 받은 것을 「첨부 없음」으로 굳히지 않게. 더한 줄 수를 돌려준다 */
+   페이지를 못 받은 날은 부르지 않는다(부르는 쪽이 detail.text 로 가린다) — 못 받은 것을 「첨부 없음」으로 굳히지 않게. 더한 줄 수를 돌려준다.
+   🔴 **믿는 첨부만** 더한다 (리뷰 2026-11-25) — 상세가 준 첨부에는 주소에 file·attach 가 든 사이트 메뉴 링크가 섞인다(광운대 글마다 7개 · 성균관대 「부속기관」).
+      새 글은 같은 주소가 세 글 이상이면 걷히지만(stripSiteChrome), 이미 걷혀 깨끗한 글을 한 건씩 다시 읽으면 그 링크가 그 글에만 돌아와 남는다.
+      장학금의 첨부 살피기가 11-17 에 세운 선(rescue-plan trustedAttachment — 이름이 파일 이름이거나 주소가 분명한 내려받기 꼴 · 단추 글자·뷰어 안내·본문 그림은 아니다)을 그대로 쓴다 */
 export const ACT_ATTACH_V = 1;
 export function mergeActAttachments(it, found) {
   const have = Array.isArray(it.attachments) ? it.attachments : [];
-  const add = newAttachments(have, Array.isArray(found) ? found : []);
+  const add = newAttachments(have, (Array.isArray(found) ? found : []).filter(trustedAttachment));
   it.attachments = [...have, ...add];
   it.attachV = ACT_ATTACH_V;
   return add.length;
+}
+/** 다시 읽을 글이 얼마나 남았나 — 리포트의 「남은」 수. 마감·발췌·서류를 채울 글(fill)과 첨부만 다시 살필 글(attach)을 따로 센다:
+    첨부만 살핀 글을 「마감·발췌를 채웠다」고 적으면 며칠 동안 리포트의 숫자가 사실과 다르다(리뷰 2026-11-25). 판단은 actRereadNeed 한 곳 */
+export function actRereadLeft(items, today) {
+  const left = { fill: 0, attach: 0 };
+  for (const it of items || []) { const need = it ? actRereadNeed(it, today) : null; if (need) left[need === 'attach' ? 'attach' : 'fill'] += 1; }
+  return left;
 }
 
 export default activityExcerpts;
