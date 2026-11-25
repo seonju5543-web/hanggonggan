@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -26215,9 +26215,7 @@
    "applyPortalSource": "지침에 맞게 서류를 준비하여 INFO21로 신청해 주시기 바랍니다.",
    "applyPortalFrom": "공고문 첨부(OCR)",
    "documentsFrom": "공고문 첨부(OCR)",
-   "prepDoc": true,
-   "prepDocBasis": "시되어 있으면 인정/미기재 시 자유양식 사유서(월세+",
-   "prepDocFrom": "로봇 공고문 첨부(OCR)",
+   "prepDocFrom": "관리자 2026-11-25",
    "excerpts": [
     "가. 선발인원 및 금액: 1,000명/1인당 40만원 예정(신청인원 및 예산 상황에 따라 변동 가능)",
     "3. 신청기간 : 2026.11.25.(수)~2026.12.11.(금)23:59까지(마감 시간 엄수)"
