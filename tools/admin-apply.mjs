@@ -60,6 +60,7 @@ const LOG = 'data/admin-log.json';
 const ACTS = 'data/activities.json';
 const ACT_SRC = 'collector/activity-sources.json';
 const ACT_CFG = 'collector/activity-config.json';
+const ACT_DONE = 'collector/act-read-done.json';   // 대외활동 유료 확인 — 둘째 AI 가 넘긴 문제를 사람이 「확인했어요」로 내린 기록(앱은 받지 않는다 · 관리자 화면만 읽는다 · 2026-11-25)
 const OWN_PROGRAMS_FILE = 'collector/own-programs.json';   // 학교 제도 학습 표(kind-classify 가 쓴다) — 관리자가 되돌린 이름은 blocked 로
 let _schoolNames = null;
 const schoolTokensFor = (school) => {
@@ -934,6 +935,61 @@ switch (action) {
     writeJson(ACTS, acts);
     writeJson(ACT_CFG, cfg);
     detail = `${hide ? '숨김' : '되살림'} ${n}건 (숨긴 주소 ${cfg.hideUrls.length}개)`;
+    touched = true;
+    break;
+  }
+
+  /* ── 대외활동·공모전 유료 관문 — 사람에게 넘어온 숨김 글을 올린다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-7) ──
+     payload = { urls: [...], op: 'open' }. 그 글에 paidOpen('관리자 YYYY-MM-DD')을 적는다 — 무료 값으로 바로 학생 화면에 보인다(match-engine publishedActivities).
+     🔴 숨김 표시(paidGate)는 **지우지 않는다** — 병합 도구(tools/merge-json-union)는 같은 글의 칸을 두 쪽에서 합쳐, 지운 칸이 로봇 쪽에 남아 있다가 되살아난다.
+        그래서 「보이는가」는 paidOpen 을 먼저 본다. 숨기려면 있던 activityHide 를 쓴다 */
+  case 'activityGate': {
+    const urls = (Array.isArray(payload.urls) ? payload.urls : [payload.url]).map((u) => String(u || '').trim()).filter(Boolean);
+    if (!urls.length) fail('대상 글의 주소가 없습니다');
+    if (payload.op !== 'open') fail(`모르는 처리입니다: ${payload.op} (open)`);
+    const acts = readJson(ACTS, null);
+    if (!acts || !Array.isArray(acts.items)) fail(`${ACTS} 를 읽지 못했습니다`);
+    const keys = new Set(urls.map(canonUrl));
+    const hit = acts.items.filter((it) => it && keys.has(canonUrl(it.url)));
+    if (!hit.length) fail('그 주소의 글이 목록에 없습니다');
+    const plain = hit.filter((it) => !it.paidGate);
+    if (plain.length) fail(`유료 확인을 기다리는 글이 아닙니다(이미 학생 화면에 보이는 글): ${plain.map((it) => String(it.title || it.url).slice(0, 30)).join(' · ')}`);
+    for (const it of hit) it.paidOpen = `관리자 ${kstNow().slice(0, 10)}`;
+    writeJson(ACTS, acts);
+    detail = `유료 확인 없이 올림 ${hit.length}건(무료 값으로 학생 화면에) — ${hit.map((it) => String(it.title || '').slice(0, 24)).join(' / ')}`.slice(0, 400);
+    touched = true;
+    break;
+  }
+
+  /* ── 대외활동·공모전 유료 관문 — 둘째 AI 가 넘긴 문제를 「확인했어요」로 내린다 (2026-11-25) ──
+     payload = { items: [{ id, key }] } — key 는 관리자 화면이 본 줄(「final|갈래|문서」) 그대로.
+     🔴 장학금의 기록(data/card-read-fixes.json — 앱이 받는 파일)에 섞지 않는다. 활동용 기록은 앱이 받지 않는 collector/ 아래에 따로 둔다(관리자 화면만 읽는다).
+     목록에서 빠진 글의 기록은 이때 치운다(자라기만 하지 않게) */
+  case 'activityReviewDone': {
+    const items = Array.isArray(payload.items) ? payload.items : [];
+    if (!items.length) fail('내릴 줄이 없습니다');
+    if (items.length > LINK_FIX_MAX) fail(`한 번에 ${LINK_FIX_MAX}줄까지만 받습니다 (받은 것: ${items.length}줄)`);
+    const acts = readJson(ACTS, null);
+    if (!acts || !Array.isArray(acts.items)) fail(`${ACTS} 를 읽지 못했습니다`);
+    const live = new Map(acts.items.filter((it) => it && it.id).map((it) => [it.id, it]));
+    const doc = readJson(ACT_DONE, null) || { v: 1, items: {} };
+    if (!doc.items || typeof doc.items !== 'object' || Array.isArray(doc.items)) doc.items = {};
+    const said = [];
+    for (const x of items) {
+      /* key 는 화면이 본 그대로 — 빈칸을 줄이거나 자르면 화면의 줄과 안 맞아 「할 일」에서 영영 안 내려간다(cardLine 과 같은 규칙) */
+      const id = String((x && x.id) || ''), key = String((x && x.key) || '').replace(/[\u0000-\u001f\u007f]/g, ' ');
+      if (!live.has(id)) fail(`활동 목록에 그 글이 없습니다: ${id}`);
+      if (!key.trim()) fail(`${id} — 어느 줄인지(key)가 없습니다`);
+      if (key.length > 2000) fail(`${id} — 줄이 너무 깁니다(${key.length}자)`);
+      const e = doc.items[id] || (doc.items[id] = { done: [] });
+      e.done = Array.from(new Set([...(e.done || []), key]));
+      e.by = actor; e.at = TODAY;
+      said.push(`${String(live.get(id).title || '').slice(0, 24)} · ${key.slice(0, 40)}`);
+    }
+    for (const id of Object.keys(doc.items)) if (!live.has(id)) delete doc.items[id];
+    doc.v = 1; doc.updatedAt = `${kstNow()} KST`;
+    writeJson(ACT_DONE, doc);
+    detail = `대외활동 유료 확인 — 확인함 ${said.length}줄 — ${said.join(' / ')}`.slice(0, 600);
     touched = true;
     break;
   }

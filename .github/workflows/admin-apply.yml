@@ -19,7 +19,7 @@ on:
         # 기능이 아니라 **읽는 사람**을 위한 줄이다 — 새 동작을 만들면 여기에도 더한다.
         # unblock = 되돌리기(revert)의 짝. 잘못 막은 공고의 차단을 푼다(공고가 되살아나지는
         # 않는다 — 다음 수집 때 로봇이 다시 판단한다).
-        description: '작업 (confirm / revert / unblock / remove / edit / merge / register / unlinkForm / formQueue / autoRegister / addBoard / activityKind / activityHide / activityUnhide / activitySource / newsKind / newsHide / newsUnhide / newsThumbOff / newsThumbOn / newsSource / linkFix / linkUnfix / fieldFix / cardLine)'
+        description: '작업 (confirm / revert / unblock / remove / edit / merge / register / unlinkForm / formQueue / autoRegister / addBoard / activityKind / activityHide / activityUnhide / activityGate / activityReviewDone / activitySource / newsKind / newsHide / newsUnhide / newsThumbOff / newsThumbOn / newsSource / linkFix / linkUnfix / fieldFix / cardLine)'
         required: true
         type: string
       payload:
@@ -110,6 +110,7 @@ jobs:
           # ⚠️ 2026-09-13 점검: 이번에 새로 쓰는 파일은 없다(원문 대조는 **읽기만** 한다).
           # 대외활동·공모전 (2026-09-29) — 관리자 「활동」 탭이 고치는 파일 셋 (이슈 #79 규칙: 고친 파일은 전부 git add)
           git add data/activities.json collector/activity-sources.json collector/activity-config.json
+          [ -f collector/act-read-done.json ] && git add collector/act-read-done.json   # 대외활동 유료 확인 — 「확인했어요」로 내린 기록(2026-11-25 · activityReviewDone)
           # 교내 소식 (2026-09-30) — 관리자 「소식」 탭이 고치는 것: 학교별 파일 폴더 · 출처 · 숨김 설정 (없을 수 있는 파일은 있을 때만)
           [ -d data/news ] && git add data/news
           [ -f collector/news-sources.json ] && git add collector/news-sources.json

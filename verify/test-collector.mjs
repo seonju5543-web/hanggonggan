@@ -12446,7 +12446,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'cardLine', 'fieldFix', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
+    ['activityGate', 'activityHide', 'activityKind', 'activityReviewDone', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'cardLine', 'fieldFix', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 발췌 주인 표식 · 바닥글 — 사람이 쓴 발췌는 로봇이 안 덮고 · 원문 근거로 안 쓴다 (2026-11-17)');
@@ -18067,6 +18067,80 @@ module.exports = class Anthropic {
           [[['ra', 'form-ra-1.pdf', 'application/pdf']], true, true]);
       } finally { fs.rmSync(dir, { recursive: true, force: true }); }
     }
+  }
+
+  /* ── 대외활동 유료 관문 ⑥ 관리자 「할 일」 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-7) ──
+     사람에게 넘어온 숨김 글 → 「올리기」(무료 값으로 · paidOpen) · 「숨기기」(있던 activityHide) / 둘째 AI 가 못 고쳐 넘긴 문제 → 「확인했어요」(활동용 기록 파일)
+     🔴 「올리기」는 표시(paidGate)를 지우지 않는다 — 병합 도구가 같은 글의 칸을 두 쪽에서 합쳐 지운 칸이 되살아난다(위 ⑤ ②). 「보이는가」는 paidOpen 을 먼저 본다 */
+  console.log('\n■ 대외활동 유료 관문 ⑥ 관리자 「할 일」 — 넘어온 숨김 글을 올리거나 숨긴다 · 둘째 AI 가 넘긴 문제는 「확인했어요」로 내린다');
+  {
+    const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
+    const U = (id) => `https://ex.ac.kr/act/${id}`;
+    const seedActs = () => [
+      { id: 'g1', title: '사람에게 넘어온 글', url: U('g1'), kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: plus(-3), paidGate: plus(-3) },
+      { id: 'g2', title: '표시가 없는 글', url: U('g2'), kind: '대외활동', school: '경희대학교', campus: '', foundAt: plus(-3) },
+    ];
+    const runAct = (action, payload, extra = {}) => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-admin-'));
+      try {
+        fs.mkdirSync(path.join(dir, 'data'), { recursive: true }); fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+        const w = (rel, obj) => fs.writeFileSync(path.join(dir, rel), `${JSON.stringify(obj, null, 1)}\n`);
+        w('data/registered.json', { items: [] }); w('data/forms.json', { forms: {}, templates: {} });
+        w('data/activities.json', { updatedAt: plus(0), items: seedActs() });
+        w('collector/activity-config.json', { hideUrls: [] }); w('collector/activity-sources.json', { sources: [], parked: [] });
+        for (const [rel, obj] of Object.entries(extra)) w(rel, obj);
+        const before = readText(path.join(dir, 'data/activities.json'));
+        const r = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8', env: { ...process.env, ACTION: action, ACTOR: 'gate', PAYLOAD: JSON.stringify(payload) } });
+        const read = (rel) => { try { return JSON.parse(readText(path.join(dir, rel))); } catch { return null; } };
+        const rawActs = readText(path.join(dir, 'data/activities.json'));
+        return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, acts: JSON.parse(rawActs).items, rawActs, same: rawActs === before, done: read('collector/act-read-done.json'), fixes: fs.existsSync(path.join(dir, 'data/card-read-fixes.json')) };
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    };
+    const op = runAct('activityGate', { urls: [U('g1')], op: 'open' });
+    if (op.status !== 0) console.log(op.out.slice(-400));
+    eq('① 올리기(activityGate) — 그 글에 paidOpen(관리자 · 날짜)을 적는다 · 🔴 표시(paidGate)는 지우지 않는다 · 다른 글은 그대로 · 로봇 형식 · 올린 글은 엔진이 바로 보인다(결과 파일이 없어도 · 무료 값으로)',
+      [op.status, /^관리자 \d{4}-\d{2}-\d{2}$/.test((op.acts[0] || {}).paidOpen || ''), (op.acts[0] || {}).paidGate, 'paidOpen' in (op.acts[1] || {}), sameFormat(op.rawActs), ME.publishedActivities(op.acts, null, plus(0)).map((n) => n.id)],
+      [0, true, plus(-3), false, true, ['g1', 'g2']]);
+    eq('  막는 것 — 목록에 없는 주소 · 표시가 없는(이미 보이는) 글 · 모르는 처리 · 빈 주소: 멈추고 활동 파일을 건드리지 않는다',
+      [runAct('activityGate', { urls: ['https://ex.ac.kr/none'], op: 'open' }), runAct('activityGate', { urls: [U('g2')], op: 'open' }), runAct('activityGate', { urls: [U('g1')], op: 'close' }), runAct('activityGate', { urls: [], op: 'open' })].map((r) => [r.status !== 0, r.same]),
+      [[true, true], [true, true], [true, true], [true, true]]);
+    const dn = runAct('activityReviewDone', { items: [{ id: 'g1', key: 'final|pdf-broken|요강.hwp' }, { id: 'g1', key: 'final|unreadable|공고 카드' }] }, { 'collector/act-read-done.json': { v: 1, items: { gone: { done: ['x'], by: 'a', at: plus(-9) } } } });
+    if (dn.status !== 0) console.log(dn.out.slice(-400));
+    eq('② 확인했어요(activityReviewDone) — 활동용 기록(collector/act-read-done.json)에만 적는다: 그 글의 내린 줄 · 누가 · 언제 · 목록에서 빠진 글의 기록은 치운다 / 🔴 장학금의 기록(data/card-read-fixes.json — 앱이 받는 파일)은 만들지도 않는다 · 활동 목록도 그대로',
+      [dn.status, (dn.done || {}).v, Object.keys((dn.done || {}).items || {}), (((dn.done || {}).items || {}).g1 || {}).done, [(((dn.done || {}).items || {}).g1 || {}).by, (((dn.done || {}).items || {}).g1 || {}).at], dn.fixes, dn.same],
+      [0, 1, ['g1'], ['final|pdf-broken|요강.hwp', 'final|unreadable|공고 카드'], ['gate', plus(0)], false, true]);
+    eq('  막는 것 — 활동 목록에 없는 글 · 줄 열쇠 없음 · 빈 요청',
+      [((r) => r.status !== 0 && /활동 목록에 그 글이 없습니다/.test(r.out))(runAct('activityReviewDone', { items: [{ id: 'none', key: 'k' }] })), ((r) => r.status !== 0 && /어느 줄인지/.test(r.out))(runAct('activityReviewDone', { items: [{ id: 'g1', key: '' }] })),
+        ((r) => r.status !== 0 && /내릴 줄이 없습니다/.test(r.out))(runAct('activityReviewDone', { items: [] }))], [true, true, true]);   // 넘어져서가 아니라 까닭을 말하고 멈춘다
+    /* ③ 관리자 화면의 묶음 — admin.js 의 함수를 글자 그대로 떼어 표본 데이터로 돌린다(베끼지 않는다) */
+    const adminJs = src('_admin/admin.js');
+    const takeFn = (name) => { const m = adminJs.match(new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm')); return m ? m[0] : `function ${name}() { return []; }`; };
+    const takeConst = (name) => (adminJs.match(new RegExp(`^const ${name} = .*$`, 'm')) || [''])[0];
+    const mkAdmin = (D) => new Function('D', 'dday', `${['openForStudents', 'finalKey', 'isLegacyLine', 'PDF_KIND_KO', 'PDF_VERDICT_KO'].map(takeConst).join('\n')}
+      ${['paidReviewTodo', 'finalReviewTodo', 'gateHeldTodo', 'actHeldTodo', 'actFinalTodo', 'actChangesList', 'paidReviewCard'].map(takeFn).join('\n')}
+      return { actHeldTodo, actFinalTodo, actChangesList, paidReviewCard };`)(D, (d) => (d ? Math.round((Date.parse(d) - Date.parse(plus(0))) / 86400000) : null));
+    const act = (id, over = {}) => ({ id, title: `${id} 글`, url: U(id), kind: '공모전', paidGate: plus(-3), deadline: plus(9), ...over });
+    const D9 = { reg: [], paidReview: { items: {}, gateHeld: {} }, cardFixes: {}, finalReview: {},
+      activities: [act('h1'), act('h2', { paidOpen: `관리자 ${plus(0)}` }), act('h3', { hidden: true }), act('h4', { deadline: plus(-1) }), act('f1'), act('f2', { hidden: true }), { title: 'id 없는 글', url: U('x') }],
+      actReview: { gateHeld: { h1: 'no-source', h2: 'no-source', h3: 'unreadable', h4: 'no-source', gone: 'no-source' } },
+      actFinal: { f1: { summary: '자격을 고쳤습니다', changes: [{ field: 'eligibility', label: '지원 자격', kind: 'add', text: '대학 재학생' }], dropped: [{ kind: 'doc', name: '요강.hwp', verdict: 'broken', why: '표가 무너짐' }],
+        problems: [{ kind: 'pdf-broken', doc: '요강.hwp', reason: 'r', check: 'c' }, { kind: 'unreadable', doc: '공고 카드', reason: 'r2', check: 'c2' }] },
+        f2: { problems: [{ kind: 'pdf-empty', doc: 'x', reason: 'r', check: 'c' }] }, gone: { problems: [{ kind: 'pdf-empty', doc: 'x', reason: 'r', check: 'c' }] } },
+      actDone: { f1: { done: ['final|unreadable|공고 카드'] } } };
+    const AD9 = mkAdmin(D9);
+    eq('③ 「할 일」 묶음 — 사람에게 넘긴 활동 글은 아직 학생 화면에 없는 열린 글만(올린 글·숨긴 글·마감 지난 글·목록에서 빠진 글은 아니다) · 둘째 AI 가 넘긴 문제는 「확인했어요」 한 줄을 뺀 나머지 · 묶음의 숫자가 둘을 센다 · 고친 기록(내린 사본 포함)은 따로 — 할 일이 아니다',
+      [AD9.actHeldTodo().map((x) => [x.it.id, x.why]), AD9.actFinalTodo().map((x) => [x.it.id, x.problems.map((p) => p.kind)]), AD9.paidReviewCard().n, AD9.actChangesList().map((x) => [x.it.id, x.changes.length])],
+      [[['h1', 'no-source']], [['f1', ['pdf-broken']]], 2, [['f1', 2]]]);
+    /* ④ 배선 */
+    const ay = src('.github/workflows/admin-apply.yml'), pv = src('tools/build-admin-preview.mjs');
+    eq('④ 배선 — 화면이 활동 쪽 세 파일을 읽는다(미리보기도) · 단추 셋이 제 동작을 보낸다(올리기 activityGate · 숨기기 activityHide · 확인했어요 activityReviewDone) · 워크플로의 작업 목록에 두 동작이 있고 새 기록 파일을 저장한다',
+      [['collector/act-read-review.json', 'collector/act-final-review.json', 'collector/act-read-done.json'].filter((f) => !adminJs.includes(`readJson('${f}'`) || !pv.includes(`'${f}': readJson('${f}')`)),
+        /applyAction\('activityGate', \{ urls: \[url\], op: 'open' \}/.test(adminJs), /applyAction\('activityHide', \{ urls: \[url\] \}/.test(adminJs), /applyAction\('activityReviewDone', \{ items: \[\{ id: [^}]*key: [^}]*\}\] \}/.test(adminJs),
+        ['activityGate', 'activityReviewDone'].filter((a) => !new RegExp(`description: '작업 \\([^)]*\\b${a}\\b`).test(ay)), /\[ -f collector\/act-read-done\.json \] && git add collector\/act-read-done\.json/.test(ay)],
+      [[], true, true, true, [], true]);
+    eq('  화면의 말 — 로봇 말(gateHeld·no-source·unreadable·paidGate)을 그대로 보이지 않는다: 넘어온 까닭 셋을 사람 말로 적어 둔다',
+      [['no-source', 'grad-only', 'unreadable'].filter((k) => !new RegExp(`^const ACT_GATE_WHY = \\{[\\s\\S]*?'?${k}'?: '[^']{12,}'`, 'm').test(adminJs)), /data-act-gate-op="open">올리기\(무료 값으로\)<\/button>/.test(adminJs), /data-act-gate-op="hide">숨기기<\/button>/.test(adminJs)],
+      [[], true, true]);
   }
 
   /* ── 유료 카드 읽기 (4번 · 2026-11-15 개발자 지시 · 11-21 개정) — AI 하나가 공고를 통째로 읽어 카드 칸을 쓰고 첨부를 가른다. 로봇은 꼴만 다듬어 그대로 싣는다 ── */
