@@ -26435,7 +26435,7 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-11-25",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "시급 12,800원",
    "amountValue": 0,
    "deadline": "2026-12-02",
    "deadlineFrom": "공고 원문 · 추가 모집기간 2026. 11. 28.( 토 ) 09:00 ~ 12. 2.( 수 ) 18:00",
@@ -26468,7 +26468,28 @@
     }
    ],
    "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516453&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "openDate": "2026-11-28",
+   "eligibilityLines": [
+    "모집대상",
+    "3, 4 학년 학부 재학생",
+    "※ 2026 학년도 2 학기 한국장학재단 국가근로장학금 신청자 중 직전학기 성적 C0(70 점 /100 점 만점 ) 이상인 자 등 세부 자격요건 충족자",
+    "추가 모집기간",
+    "2026. 11. 28.( 토 ) 09:00 ~ 12. 2.( 수 ) 18:00"
+   ],
+   "excerpts": [
+    "5. 기타문의: 충남대학교 인재개발원(☎ 042-821-6168)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "3. 지원사항: 한국장학재단 및 대학에서 학생에게 근로장학금(시간당 12,800원) 지급"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }
