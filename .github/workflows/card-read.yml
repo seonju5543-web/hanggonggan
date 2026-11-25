@@ -38,7 +38,7 @@ jobs:
   read:
     runs-on: ubuntu-latest
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
-    timeout-minutes: 55   # 단계 상한의 합(사전 관문 12 + 읽기 12 + 첨부 판정 6 + 꼴 검사 2 + 규칙 관문 12 + 감사 5 = 49 + 받기·설치·저장·알림)보다 길게
+    timeout-minutes: 85   # 단계 상한의 합(사전 관문 12 + 읽기 12 + 활동 글 12 + 첨부 판정 6 + 꼴 검사 2+2 + 규칙 관문 12 + 감사 5 = 63 · 알림·기록 9 = 72 + 받기·설치·저장)보다 길게
     steps:
       - uses: actions/checkout@v7
         with:
@@ -74,6 +74,23 @@ jobs:
           if [ -n "$ONLY_ID" ]; then node collector/card-read.mjs --only="$ONLY_ID" --write | tee /tmp/card-read.txt
           else node collector/card-read.mjs --write | tee /tmp/card-read.txt; fi
 
+      # 대외활동·공모전 글의 카드 쓰기 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-8) — 같은 로봇이 활동 목록을 돈다(--activities).
+      # 🔴 스위치는 셋 — collector/card-read-config.json 의 enabled · activities.enabled · 아래 환경 변수. activities.enabled 가 꺼져 있으면 이 단계가 돌아도 부르지 않는다.
+      #    한 실행의 상한은 그 파일 activities 칸의 값(장학금과 따로 센다 — 활동 글이 몰려도 장학금 몫을 먹지 않는다).
+      # 결과는 data/act-read.json(여기 실려야 숨겨 둔 활동 글이 학생 화면에 나온다) · 장부·첨부 구분은 collector/act-*.json. 장학금 읽기가 일부 실패해도 돈다(둘 다 continue-on-error).
+      # 공고 하나만 다시 읽는 실행(only)에서는 돌지 않는다
+      - id: act
+        name: 대외활동 글 카드 쓰기 (유료)
+        if: ${{ !inputs.only }}
+        timeout-minutes: 12
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CARD_READ_ENABLE: '1'
+        run: |
+          set -o pipefail
+          node collector/card-read.mjs --activities --write | tee /tmp/act-read.txt
+
       # 유료 첨부 판정 (2026-11-20 개발자 지시 「유료로 해」) — 글자로 못 가른 스캔 PDF·그림 첨부만 파일째 모델 둘에게 보여 신청서/공고문을 묻는다.
       # 스위치·키는 위 단계와 같다(card-read-config.json enabled + CARD_READ_ENABLE) · 한 실행 상한은 같은 파일의 roleMaxPerRun·roleMaxUsdPerRun.
       # 답은 collector/attach-role-paid.json 에만 — 양식 PDF 로봇(deep-fetch.yml)이 다음 실행에 신청서 칸을 고친다. 실패해도 읽은 카드는 저장한다(continue-on-error)
@@ -93,6 +110,9 @@ jobs:
       - name: 결과 파일 꼴 검사
         timeout-minutes: 2
         run: node collector/card-read.mjs --check
+      - name: 활동 결과 파일 꼴 검사
+        timeout-minutes: 2
+        run: node collector/card-read.mjs --activities --check
 
       - name: 규칙 관문
         timeout-minutes: 12
@@ -111,8 +131,13 @@ jobs:
           [ -f collector/card-read-review.json ] && git add collector/card-read-review.json
           [ -f collector/attach-role-paid.json ] && git add collector/attach-role-paid.json
           [ -f collector/attach-role-ai.json ] && git add collector/attach-role-ai.json   # 4-1 첨부 구분(내용 문서 / 신청 양식 · 2026-11-21) — 6번이 다시 보고, 5번 변환 로봇이 이 답으로 가른다
+          # 대외활동·공모전 글의 카드·장부·사람 몫·첨부 구분(2026-11-25) — 로봇이 쓰는 활동 파일 넷(collector/act-card.mjs ACT_FILES · 관문이 견준다)
+          [ -f data/act-read.json ] && git add data/act-read.json
+          [ -f collector/act-read-ledger.json ] && git add collector/act-read-ledger.json
+          [ -f collector/act-read-review.json ] && git add collector/act-read-review.json
+          [ -f collector/act-role-ai.json ] && git add collector/act-role-ai.json
           if ! git diff --cached --quiet; then
-            git commit -m "유료 카드 읽기: $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/card-read.txt | tail -1 || echo '결과 갱신') · 첨부 판정 $(grep -o '물음 [0-9]*개(실음 [0-9]*)' /tmp/attach-role.txt | tail -1 || echo '없음')"
+            git commit -m "유료 카드 읽기: $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/card-read.txt | tail -1 || echo '결과 갱신') · 첨부 판정 $(grep -o '물음 [0-9]*개(실음 [0-9]*)' /tmp/attach-role.txt | tail -1 || echo '없음') · 활동 글 $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/act-read.txt 2>/dev/null | tail -1 || echo '없음')"
             pushed=0
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
@@ -137,10 +162,13 @@ jobs:
             data/card-read.json
             collector/attach-role-paid.json
             collector/attach-role-ai.json
+            data/act-read.json
+            collector/act-read-ledger.json
+            collector/act-role-ai.json
           retention-days: 14
 
       - name: 🚨 실패 알림
-        if: failure() || cancelled() || steps.read.outcome == 'failure' || steps.role.outcome == 'failure'
+        if: failure() || cancelled() || steps.read.outcome == 'failure' || steps.role.outcome == 'failure' || steps.act.outcome == 'failure'
         timeout-minutes: 1
         continue-on-error: true
         env:
@@ -150,6 +178,7 @@ jobs:
           body="🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **유료 카드 읽기** 가 끝까지 돌지 못했습니다.
           $(tail -5 /tmp/card-read.txt 2>/dev/null || true)
           $(tail -3 /tmp/attach-role.txt 2>/dev/null || true)
+          $(tail -3 /tmp/act-read.txt 2>/dev/null || true)
 
           실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           앱은 이미 실린 결과와 무료 길 값으로 그대로 보입니다. 잔액 부족이면 콘솔 Billing 을 확인하세요.
@@ -162,7 +191,9 @@ jobs:
         if: always()
         timeout-minutes: 1
         continue-on-error: true
-        run: node collector/card-read.mjs --stats >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          node collector/card-read.mjs --stats >> "$GITHUB_STEP_SUMMARY"
+          node collector/card-read.mjs --activities --stats >> "$GITHUB_STEP_SUMMARY"
 
       # 🔴 유료가 멈춘 숨김분 (2026-11-20 · 설계 docs/designs/paid-gate-pipeline.md 2-1) — 사흘 넘게 통과를 못 낸 새 공고는 앱이 무료 값으로 올린다(비상망).
       #    조용히 무료로 넘어가지 않게 여기서 경보를 연다. 짝(닫기)은 바로 아래 · 제목이 같아야 닫힌다(tools/alert-issue.mjs)
@@ -199,8 +230,43 @@ jobs:
         run: |
           node tools/alert-issue.mjs --mode resolve --match exact --title '🧾 유료 확인이 멈췄어요' --body "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 유료 확인을 기다리다 무료 값으로 넘어간 공고가 없습니다. 자동으로 닫습니다."
 
+      # 🔴 유료가 멈춘 활동 글 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-8) — 장학금 경보와 **다른 제목**의 짝이다(제목이 같아야 닫힌다 · tools/alert-issue.mjs).
+      #    사흘 넘게 카드도 사람 몫도 아닌 숨김 글은 앱이 무료 값으로 올린다(비상망) — 조용히 넘어가지 않게 연다. 읽고도 실을 것이 없던 글은 세지 않는다(card-read actGateStalled)
+      - id: actstall
+        name: 유료가 멈춘 활동 글 세기
+        if: always()
+        timeout-minutes: 1
+        continue-on-error: true
+        run: node collector/card-read.mjs --activities --gate-alarm >> "$GITHUB_OUTPUT"
+      - name: 🚨 대외활동 유료 확인이 사흘 넘게 멈췄어요
+        if: always() && steps.actstall.outputs.count != '' && steps.actstall.outputs.count != '0'
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          N: ${{ steps.actstall.outputs.count }}
+          LIST: ${{ steps.actstall.outputs.list }}
+        run: |
+          body="🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 새로 주운 대외활동·공모전 글 ${N}건이 사흘 넘게 유료 확인을 통과하지 못해 **무료 값으로** 학생 화면에 올라갔습니다.
+          ${LIST}
+
+          활동 스위치(collector/card-read-config.json 의 activities.enabled)가 켜져 있는데 카드 쓰기가 실패하고 있거나 잔액이 없는지 확인하세요.
+          다음 실행에서 0건이면 이 이슈는 저절로 닫힙니다."
+          node tools/alert-issue.mjs --mode open --match exact --title '🧾 대외활동 유료 확인이 멈췄어요' \
+            --label card-read --label-color 5319E7 --label-description '유료 카드 읽기 로봇 실패' --body "$body"
+      - name: ✅ 대외활동 유료 확인 회복 — 경보 닫기
+        if: always() && steps.actstall.outputs.count == '0'
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          node tools/alert-issue.mjs --mode resolve --match exact --title '🧾 대외활동 유료 확인이 멈췄어요' --body "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 유료 확인을 기다리다 무료 값으로 넘어간 대외활동·공모전 글이 없습니다. 자동으로 닫습니다."
+
       - name: 다시 성공하면 알림을 닫는다
-        if: success() && steps.read.outcome == 'success' && steps.role.outcome == 'success'
+        if: success() && steps.read.outcome == 'success' && steps.role.outcome == 'success' && steps.act.outcome != 'failure'
         timeout-minutes: 1
         continue-on-error: true
         env:

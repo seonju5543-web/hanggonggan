@@ -18,7 +18,7 @@
 6. **개발 업무 질문에는 답 끝에 `node tools/link-wanted.mjs` 결과를 붙여 링크를 요청한다**
    (학습 로봇은 검색을 못 해 사람이 새 링크를 줘야 넓어진다. 주소는 추천하지 않는다).
 7. **로봇 운영 수리(저장 전 관문·되돌리기·경보 짝 빠짐)는 묻지 않고 즉시 한다**. 규칙 파일(`collector/*.json`)을 쓰는 로봇은 저장 앞에 `test-collector` 를 거친다 — 없는 로봇이 보이면 그 자리에서 붙인다(관문 「층2 재단 글 사냥꾼」 ⑦-1).
-8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다(`card-read.yml` 도 같다 — 켜고 끄는 곳은 `card-read-config.json` `enabled` 하나 · 지금 상태는 그 파일을 본다). 비용 질문은 `gh run list` 기록으로 답한다.
+8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다(`card-read.yml` 도 같다 — 켜고 끄는 곳은 `card-read-config.json` `enabled` 하나 · 지금 상태는 그 파일을 본다 · 대외활동 스위치 `activities.enabled`·시험 `act-paid-probe.yml` 도 같다). 비용 질문은 `gh run list` 기록으로 답한다.
 
 ## 🔴 수집망 44개교 복원 (2026-09-29 지시)
 
@@ -53,6 +53,7 @@
 - 6번 = `collector/final-review.mjs`: 둘째 AI 가 원문·카드·구분·PDF 사본(파일째)을 보고 **고친 완성본**을 낸다(`applyReview` — 카드를 통째로 바꾼다 · 구분은 6번 답이 이긴다) · 카드 읽기·새벽 변환 직후에 돈다(`final-review.yml`) · 못 고친 것만 관리자 「할 일」. 옛 두 읽기의 빠진 줄(`explainLine`)은 그 공고가 닫힐 때까지 `cardLine`(→ `data/card-read-fixes.json`).
 - 보이는가 = `match-engine.js` `publishedList`·`paidGateOpen` 한 곳(앱·서비스워커·`what-shows`·인스타·검색 요약·접수 서버 · 푸시 서버는 사본) — 결과 파일을 못 받으면 숨김분은 안 보이고, 사흘 넘게 통과가 없으면 무료 값 + 경보(`card-read.yml`). 그 전 등록분은 숨기지도 다시 읽지도 않는다. 관문 「유료 관문」·「유료 최종 검토」·「유료 카드 읽기」 · `verify-card-read.js`.
 - **첨부가 신청서 칸인가 카드인가** — `attachDecision`(attachment-text) 한 곳: AI 구분(4번·6번) → 원본 내용 → 이름 규칙 · 앱은 `attIsForm`(색인 `roles`). 붙은 문서는 서식 쪽을 떼고(`formStartPage`) 공고문 사본은 앞쪽만 · 6번이 잘못됐다 한 사본은 내린다(`collector/pdf-verdicts.mjs`). 스캔 PDF·그림은 `collector/attach-role-read.mjs`. 관문 「첨부를 내용으로 가르기」·「5번 연결」.
+- **대외활동·공모전도 같은 길**(11-25 · `docs/designs/paid-gate-activities.md`): 같은 두 로봇에 `--activities` — 파일 이름만 바뀐다(`ACT_FILES` · `collector/act-card.mjs`) · 표시는 처음 본 글에만(`stampNewActivity`) · 보이는가 `publishedActivities` · 스위치는 두 설정 파일의 `activities.enabled` · 시험은 `act-paid-probe.yml`(지정한 글만 · 저장 안 함). 관문 「대외활동 유료 관문」.
 
 ## 🔴 학적정보 테일러링 (2026-10-24 개발자 지시 넷 — 원문은 설계 문서 0절)
 

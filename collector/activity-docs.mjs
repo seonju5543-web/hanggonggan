@@ -378,6 +378,7 @@ async function fetchPhase(acts) {
     if (posts >= POSTS_PER_RUN || Date.now() > until) break;
     const forText = isTextTarget(n);
     if (!forText) {
+      if (TEXT_IDS.size) continue;   // 유료 시험이 글을 지정했다(ACT_TEXT_IDS) — 그 글만 받는다(다른 글의 사이트를 두드리지 않는다)
       if (!(needsElig(n) || (!BROWSER && staleDocs(n))) || !dueFree(ledger[n.url], today)) continue;
       if (BROWSER && !plainTried[n.url]) continue;           // 무료 모드가 먼저 — 그래도 못 읽은 글만 브라우저로
       if (BROWSER && ledger[n.url] && ledger[n.url].lines) continue;   // 이미 찾아 장부에 적었다 — 수집 로봇이 합치기 전까지 다시 열지 않는다

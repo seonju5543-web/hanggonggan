@@ -1,0 +1,136 @@
+# 대외활동·공모전 유료 시험 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-8 · 8절)
+#
+# 🔴 돈이 나가는 워크플로다 — **사람이 눌러야만** 돈다(예약 없음 · push 로 깨어나지 않는다). 세션은 개발자가 채팅에서 지시했을 때만 돌린다(CLAUDE.md 🔴 8).
+# 🔴 **저장하지 않는다** — 결과는 내려받을 묶음(artifact)으로만 남는다. 시험 카드는 학생 화면에 나가지 않는다.
+#
+# 하는 일: 적어 준 활동 글 id 만 ① 원문 글자 받기(무료) → ② 카드 쓰기(유료 · card-read.mjs --activities --only) → ③ 최종 검토(유료 · final-review.mjs --activities --only)
+#   를 차례로 돌리고 결과 파일을 묶음으로 올린다. 숨김 표시가 없는 글도 id 로 지정하면 읽는다.
+#   저장소의 활동 스위치가 꺼져 있어도 돌 수 있게 **이 실행의 작업 폴더 안에서만** 두 설정 파일의 activities.enabled 를 켠다(저장소의 파일은 바뀌지 않는다 — 저장 단계가 없다).
+#   위쪽 enabled(유료 전체 스위치)가 꺼져 있으면 이 시험도 부르지 않는다. 한 실행의 상한은 설정 파일의 activities 값 그대로다.
+#   ⚠️ 원문 글자는 보통 받기만 한다(진짜 브라우저 받기는 원문 받기 워크플로의 몫 — 여기엔 없다). 스크립트로 그리는 글은 이 시험에서 「원문 없음」으로 나올 수 있다.
+# 쓰임: 켜기 전의 시험(설계 8절) · 켠 뒤 「이 글의 카드가 왜 이렇게 나왔나」를 학생 화면을 건드리지 않고 볼 때.
+
+name: 대외활동 유료 시험
+
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: '시험할 활동 글 id (쉼표 구분 · 예: act-15a4xen,act-1354f33) — 비우면 아무것도 부르지 않고 멈춘다'
+        required: true
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: act-paid-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
+    timeout-minutes: 50   # 단계 시한의 합(id 확인 1 + 스위치 1 + 글자 받기 12 + 카드 쓰기 12 + 최종 검토 12 + 기록 1 + 끝 1 = 40 + 받기·설치·묶음)보다 길게
+    env:
+      PROBE_IDS: ${{ inputs.ids }}   # 🔴 입력은 env 로만 넘긴다(run 줄에 바로 끼우면 명령으로 읽힌다)
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
+
+      - name: 시험할 글 id 확인
+        timeout-minutes: 1
+        run: |
+          ids="$(printf '%s' "$PROBE_IDS" | tr -d '[:space:]')"
+          if [ -z "$ids" ]; then echo "::error::시험할 활동 글 id 가 없습니다 — 아무것도 부르지 않습니다"; exit 1; fi
+          if ! printf '%s' "$ids" | grep -Eq '^[A-Za-z0-9._-]+(,[A-Za-z0-9._-]+)*$'; then echo "::error::id 꼴이 아닙니다 — 쉼표로 구분한 글 id 만 적어 주세요"; exit 1; fi
+          echo "IDS=$ids" >> "$GITHUB_ENV"
+
+      - name: 활동 스위치 켜기 (이 실행 안에서만)
+        timeout-minutes: 1
+        run: |
+          node -e '
+          const fs = require("fs");
+          for (const f of ["collector/card-read-config.json", "collector/final-review-config.json"]) {
+            const c = JSON.parse(fs.readFileSync(f, "utf8"));
+            c.activities = { ...(c.activities || {}), enabled: true };
+            fs.writeFileSync(f, JSON.stringify(c, null, 1) + "\n");
+            console.log(f, "· enabled:", c.enabled, "· activities.enabled:", c.activities.enabled, "(이 실행 안에서만 — 저장하지 않는다)");
+          }'
+
+      # 지정한 글만 받는다(ACT_TEXT_IDS — 다른 글의 사이트는 두드리지 않는다 · collector/activity-docs.mjs). 못 받으면 그것이 시험 결과다(다음 단계가 「원문 없음」으로 건너뛴다)
+      - name: 원문 글자 받기 (무료)
+        timeout-minutes: 12
+        continue-on-error: true
+        run: |
+          export ACT_TEXT_IDS="$IDS"
+          node collector/activity-docs.mjs --fetch
+          pip install olefile --quiet
+          python3 collector/hwp-bodytext.py collector/act-files || true
+          sudo apt-get install -y -qq poppler-utils
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 그림 글자 없이 계속"
+          python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || echo "::warning::PaddleOCR 실패 — 그림 글자 없이 계속"
+          node collector/activity-docs.mjs --apply
+
+      - id: card
+        name: 카드 쓰기 (유료)
+        timeout-minutes: 12
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CARD_READ_ENABLE: '1'
+        run: |
+          set -o pipefail
+          node collector/card-read.mjs --activities "--only=$IDS" --write | tee /tmp/act-read.txt
+
+      - id: review
+        name: 최종 검토 (유료)
+        timeout-minutes: 12
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FINAL_REVIEW_ENABLE: '1'
+        run: |
+          set -o pipefail
+          node collector/final-review.mjs --activities "--only=$IDS" --write | tee /tmp/act-final-review.txt
+
+      - name: 기록 (읽은 글 · 건당 비용)
+        if: always()
+        timeout-minutes: 1
+        continue-on-error: true
+        run: |
+          {
+            echo "## 대외활동 유료 시험 — ${IDS:-id 없음}"
+            node collector/card-read.mjs --activities --stats
+            echo
+            echo '```'
+            tail -20 /tmp/act-read.txt 2>/dev/null || true
+            tail -12 /tmp/act-final-review.txt 2>/dev/null || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 🔴 저장 단계가 없다 — 결과는 이 묶음으로만 남는다(내려받아 화면에 얹어 본다). 원문 글자 기록도 함께(무엇을 읽혔는지)
+      - name: 결과 묶음 올리기
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: act-paid-probe
+          path: |
+            data/act-read.json
+            collector/act-read-ledger.json
+            collector/act-read-review.json
+            collector/act-role-ai.json
+            collector/act-final-review.json
+            collector/act-final-review-ledger.json
+            collector/act-text
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: 유료 단계가 실패했으면 빨갛게 끝낸다
+        if: steps.card.outcome == 'failure' || steps.review.outcome == 'failure'
+        timeout-minutes: 1
+        run: exit 1

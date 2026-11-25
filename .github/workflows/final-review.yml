@@ -37,7 +37,7 @@ jobs:
   review:
     runs-on: ubuntu-latest
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
-    timeout-minutes: 55   # 단계 상한의 합(사전 관문 12 + 검토 12 + 규칙 관문 12 + 감사 5 + 저장·알림)보다 길게
+    timeout-minutes: 75   # 단계 상한의 합(사전 관문 12 + 검토 12 + 활동 글 12 + 꼴 검사 2+2 + 규칙 관문 12 + 감사 5 = 57 · 기록·알림 3 = 60 + 받기·설치·저장)보다 길게
     steps:
       - uses: actions/checkout@v7
         with:
@@ -70,12 +70,29 @@ jobs:
           set -o pipefail
           node collector/final-review.mjs --write | tee /tmp/final-review.txt
 
+      # 대외활동·공모전 글의 최종 검토 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-6 · 5-8) — 같은 로봇이 활동 목록을 돈다(--activities).
+      # 🔴 스위치는 셋 — collector/final-review-config.json 의 enabled · activities.enabled · 아래 환경 변수. 상한은 그 파일 activities 칸의 값(장학금과 따로 센다).
+      # 고친 카드는 data/act-read.json 의 그 칸에 · 기록은 collector/act-final-review.json 에. 장학금 검토가 일부 실패해도 돈다(둘 다 continue-on-error)
+      - id: act
+        name: 대외활동 글 최종 검토 (유료)
+        timeout-minutes: 12
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FINAL_REVIEW_ENABLE: '1'
+        run: |
+          set -o pipefail
+          node collector/final-review.mjs --activities --write | tee /tmp/act-final-review.txt
+
       # 저장 앞 관문 — 결과 파일의 꼴(앱이 받는 파일) · 규칙 관문 · 데이터 감사. 하나라도 빨가면 저장하지 않고 멈춘다.
       # 그때 돈을 쓴 결과를 잃지 않게 세 파일(장부 · 결과 · 고친 카드 파일)을 아티팩트로 남긴다 — 되살릴 때는 그 세 파일을 그대로 되돌려 놓는다(6번에는 다시 만들기가 없다)
       # 카드를 고치면 앱이 받는 유료 결과 파일이 바뀐다(2026-11-21) — 저장 앞에 그 파일의 꼴을 잰다(카드 읽기 로봇과 같은 검사)
       - name: 결과 파일 꼴 검사
         timeout-minutes: 2
         run: node collector/card-read.mjs --check
+      - name: 활동 결과 파일 꼴 검사
+        timeout-minutes: 2
+        run: node collector/card-read.mjs --activities --check
 
       - name: 규칙 관문
         timeout-minutes: 12
@@ -92,12 +109,16 @@ jobs:
           [ -f data/card-read.json ] && git add data/card-read.json   # 둘째 AI 가 고친 카드(2026-11-21)
           [ -f collector/final-review.json ] && git add collector/final-review.json   # 무엇을 고쳤나 · 첨부 구분(6번의 답) · PDF 사본 판정
           [ -f collector/final-review-ledger.json ] && git add collector/final-review-ledger.json
+          # 대외활동·공모전 글 — 둘째 AI 가 고친 카드 · 검토 기록 · 장부(2026-11-25 · collector/act-card.mjs ACT_FILES · 관문이 견준다)
+          [ -f data/act-read.json ] && git add data/act-read.json
+          [ -f collector/act-final-review.json ] && git add collector/act-final-review.json
+          [ -f collector/act-final-review-ledger.json ] && git add collector/act-final-review-ledger.json
           # ok 가 아닌 PDF 사본을 앱에서 내린 것(색인의 줄 · 「다시 만들지 말 것」 표시 — collector/pdf-verdicts.mjs · 2026-11-21 · 파일은 변환 로봇이 지운다)
           [ -d data/forms-pdf ] && git add -A data/forms-pdf
           [ -d data/docs-pdf ] && git add -A data/docs-pdf
           [ -d data/form-pages ] && git add -A data/form-pages
           if ! git diff --cached --quiet; then
-            git commit -m "유료 최종 검토: $(grep -o '검토 [0-9]*건' /tmp/final-review.txt | tail -1 || echo '결과 갱신')"
+            git commit -m "유료 최종 검토: $(grep -o '검토 [0-9]*건' /tmp/final-review.txt | tail -1 || echo '결과 갱신') · 활동 글 $(grep -o '검토 [0-9]*건' /tmp/act-final-review.txt 2>/dev/null | tail -1 || echo '없음')"
             pushed=0
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
@@ -116,7 +137,9 @@ jobs:
         if: always()
         timeout-minutes: 1
         continue-on-error: true
-        run: node collector/card-read.mjs --stats >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          node collector/card-read.mjs --stats >> "$GITHUB_STEP_SUMMARY"
+          node collector/card-read.mjs --activities --stats >> "$GITHUB_STEP_SUMMARY"
 
       - name: 저장하지 못했으면 장부를 남긴다 (돈을 쓴 응답 원본)
         if: failure() || cancelled()
@@ -128,10 +151,13 @@ jobs:
             collector/final-review-ledger.json
             collector/final-review.json
             data/card-read.json
+            collector/act-final-review-ledger.json
+            collector/act-final-review.json
+            data/act-read.json
           retention-days: 14
 
       - name: 🚨 실패 알림
-        if: failure() || cancelled() || steps.read.outcome == 'failure'
+        if: failure() || cancelled() || steps.read.outcome == 'failure' || steps.act.outcome == 'failure'
         timeout-minutes: 1
         continue-on-error: true
         env:
@@ -140,6 +166,7 @@ jobs:
         run: |
           body="🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **유료 최종 검토** 가 끝까지 돌지 못했습니다.
           $(tail -5 /tmp/final-review.txt 2>/dev/null || true)
+          $(tail -3 /tmp/act-final-review.txt 2>/dev/null || true)
 
           실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           못 본 공고의 카드는 4번이 쓴 그대로 학생 화면에 있습니다(고친 것은 건마다 저장됩니다 — 다음 실행이 남은 공고를 이어서 봅니다). 잔액 부족이면 콘솔 Billing 을 확인하세요.
@@ -148,7 +175,7 @@ jobs:
             --label final-review --label-color 5319E7 --label-description '유료 최종 검토 로봇 실패' --body "$body"
 
       - name: 다시 성공하면 알림을 닫는다
-        if: success() && steps.read.outcome == 'success'
+        if: success() && steps.read.outcome == 'success' && steps.act.outcome != 'failure'
         timeout-minutes: 1
         continue-on-error: true
         env:

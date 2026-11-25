@@ -12179,7 +12179,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
   const unreachable = all.filter((f) => !calls.includes(f));
   eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
-    unreachable.sort(), ['card-read.yml', 'codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'doc-pdf-probe.yml', 'error-watch.yml', 'final-review.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에) · doc-pdf-probe: 11-20 변환 진단 도구(저장 안 함 · 세션이 부른다) · final-review: 11-20 유료 최종 검토(돈이 나가 버튼을 두지 않는다)
+    unreachable.sort(), ['act-paid-probe.yml', 'card-read.yml', 'codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'doc-pdf-probe.yml', 'error-watch.yml', 'final-review.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에) · doc-pdf-probe: 11-20 변환 진단 도구(저장 안 함 · 세션이 부른다) · final-review: 11-20 유료 최종 검토(돈이 나가 버튼을 두지 않는다) · act-paid-probe: 11-25 대외활동 유료 시험(돈이 나간다 — 개발자가 지시할 때만 · 저장 안 함)
 }
 
 console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
@@ -18141,6 +18141,87 @@ module.exports = class Anthropic {
     eq('  화면의 말 — 로봇 말(gateHeld·no-source·unreadable·paidGate)을 그대로 보이지 않는다: 넘어온 까닭 셋을 사람 말로 적어 둔다',
       [['no-source', 'grad-only', 'unreadable'].filter((k) => !new RegExp(`^const ACT_GATE_WHY = \\{[\\s\\S]*?'?${k}'?: '[^']{12,}'`, 'm').test(adminJs)), /data-act-gate-op="open">올리기\(무료 값으로\)<\/button>/.test(adminJs), /data-act-gate-op="hide">숨기기<\/button>/.test(adminJs)],
       [[], true, true]);
+  }
+
+  /* ── 대외활동 유료 관문 ⑦ 워크플로 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-8) ──
+     두 유료 워크플로(card-read.yml · final-review.yml)에 활동 단계를 장학금 단계 뒤에 넣는다 — 단계마다 제 시한 · 로봇이 쓰는 활동 파일은 전부 저장 목록에 ·
+     활동 쪽 「유료 확인이 멈췄어요」 경보는 따로(여는 것·닫는 것 한 짝). 「유료 시험」(act-paid-probe.yml)은 사람이 눌러야만 돌고 저장하지 않는다 */
+  console.log('\n■ 대외활동 유료 관문 ⑦ 워크플로 — 활동 단계 · 저장 목록 · 멈춤 경보 짝 · 저장하지 않는 「유료 시험」');
+  {
+    const AC = await import(new URL('../collector/act-card.mjs', import.meta.url));
+    const F = AC.ACT_FILES || {};
+    const repoPath = (rel) => (rel.startsWith('../') ? rel.slice(3) : `collector/${rel}`);
+    const noComment = (wf) => wf.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+    const wc = noComment(wfc), wr = noComment(wff);
+    const probe = (() => { try { return noComment(src('.github/workflows/act-paid-probe.yml')); } catch { return ''; } })();
+    const actWrites = (robot) => [...robot.matchAll(/writeAtomic\('([^']+)'/g)].map((m) => repoPath(F[m[1]] || m[1]));
+    eq('① 로봇이 활동 목록에서 쓰는 파일은 전부 그 워크플로의 저장 목록(git add)에 있다 — 빠지면 돈 주고 쓴 카드·검토가 그 실행과 함께 사라진다 · 저장 못 한 날 남기는 장부 묶음에도 있다',
+      [actWrites(crSrc), actWrites(crSrc).filter((f) => !gitAdds(wc).includes(f)), actWrites(frSrc), actWrites(frSrc).filter((f) => !gitAdds(wr).includes(f)),
+        ['data/act-read.json', 'collector/act-read-ledger.json'].filter((f) => !new RegExp(`name: card-read-ledger[\\s\\S]*?\\n\\s+${f.replace(/[.\/]/g, '\\$&')}\\n`).test(wc)),
+        ['data/act-read.json', 'collector/act-final-review-ledger.json'].filter((f) => !new RegExp(`name: final-review-ledger[\\s\\S]*?\\n\\s+${f.replace(/[.\/]/g, '\\$&')}\\n`).test(wr))],
+      [['data/act-read.json', 'collector/act-read-ledger.json', 'collector/act-read-review.json', 'collector/act-role-ai.json'], [], ['data/act-read.json', 'collector/act-final-review.json', 'collector/act-final-review-ledger.json'], [], [], []]);
+    const stepById = (wf, id) => (wf.match(new RegExp(`\\n {6}- id: ${id}\\n[\\s\\S]*?(?=\\n {6}- |\\n*$)`)) || [''])[0];
+    const actC = stepById(wc, 'act'), actR = stepById(wr, 'act');
+    eq('② 활동 글 카드 쓰기 — 장학금 읽기 뒤 · 꼴 검사와 저장 앞에 돈다 · 제 시한(12분) · 일부 실패해도 읽은 것은 저장한다(continue-on-error) · 유료 스위치 환경 변수 · 장학금 한 건만 다시 읽는 실행(only)에서는 돌지 않는다',
+      [wc.indexOf('node collector/card-read.mjs --write') > 0 && wc.indexOf('node collector/card-read.mjs --activities --write') > wc.indexOf('node collector/card-read.mjs --write'),
+        wc.indexOf('node collector/card-read.mjs --activities --write') < wc.indexOf('node collector/card-read.mjs --activities --check') && wc.indexOf('node collector/card-read.mjs --activities --check') < wc.indexOf('git add data/card-read.json'),
+        /timeout-minutes: 12\n/.test(actC), /continue-on-error: true\n/.test(actC), /CARD_READ_ENABLE: '1'/.test(actC) && /ANTHROPIC_API_KEY: \$\{\{ secrets\.ANTHROPIC_API_KEY \}\}/.test(actC),
+        /if: \$\{\{ !inputs\.only \}\}\n/.test(actC), /set -o pipefail\n\s+node collector\/card-read\.mjs --activities --write \| tee \/tmp\/act-read\.txt/.test(actC)],
+      [true, true, true, true, true, true, true]);
+    eq('  활동 글 최종 검토 — 장학금 검토 뒤 · 꼴 검사와 저장 앞에 · 제 시한 · continue-on-error · 유료 스위치 환경 변수',
+      [wr.indexOf('node collector/final-review.mjs --activities --write') > wr.indexOf('node collector/final-review.mjs --write'), wr.indexOf('node collector/final-review.mjs --activities --write') < wr.indexOf('node collector/card-read.mjs --activities --check')
+        && wr.indexOf('node collector/card-read.mjs --activities --check') < wr.indexOf('git add data/card-read.json'),
+        /timeout-minutes: 12\n/.test(actR), /continue-on-error: true\n/.test(actR), /FINAL_REVIEW_ENABLE: '1'/.test(actR), /set -o pipefail\n\s+node collector\/final-review\.mjs --activities --write \| tee \/tmp\/act-final-review\.txt/.test(actR)],
+      [true, true, true, true, true, true]);
+    const stepSum = (wf) => [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].reduce((a, m) => a + Number(m[1]), 0);
+    const jobLimit = (wf) => Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1] || 0);
+    eq('  작업 시한이 단계 시한의 합보다 길다(세 워크플로) — 활동 단계가 늘어난 만큼 작업 시한도 늘렸다',
+      [jobLimit(wc) > stepSum(wc), jobLimit(wr) > stepSum(wr), jobLimit(probe) > stepSum(probe), stepSum(wc) >= 70, stepSum(wr) >= 58], [true, true, true, true, true]);
+    eq('③ 활동 쪽 멈춤 경보는 장학금 것과 **다른 제목**으로 여는 것·닫는 것 한 짝이다(제목이 같아야 닫힌다 · 제목에 날짜 없음) · 세기는 `--activities --gate-alarm` · 장학금 경보 짝은 그대로 둘',
+      [(wc.match(/--title '🧾 대외활동 유료 확인이 멈췄어요'/g) || []).length, /--mode open --match exact --title '🧾 대외활동 유료 확인이 멈췄어요'/.test(wc), /--mode resolve --match exact --title '🧾 대외활동 유료 확인이 멈췄어요'/.test(wc),
+        /- id: actstall\n[\s\S]{0,220}run: node collector\/card-read\.mjs --activities --gate-alarm >> "\$GITHUB_OUTPUT"/.test(wc),
+        /if: always\(\) && steps\.actstall\.outputs\.count != '' && steps\.actstall\.outputs\.count != '0'/.test(wc), /if: always\(\) && steps\.actstall\.outputs\.count == '0'/.test(wc), (wc.match(/--title '🧾 유료 확인이 멈췄어요'/g) || []).length],
+      [2, true, true, true, true, true, 2]);
+    eq('④ 활동 단계의 실패도 알린다(실패 알림의 조건에 든다) · 실패가 남아 있으면 알림을 닫지 않는다 · 실행 요약에 활동 기록도 적는다(두 워크플로)',
+      [/if: failure\(\) \|\| cancelled\(\) \|\| steps\.read\.outcome == 'failure' \|\| steps\.role\.outcome == 'failure' \|\| steps\.act\.outcome == 'failure'/.test(wc), /if: success\(\) && steps\.read\.outcome == 'success' && steps\.role\.outcome == 'success' && steps\.act\.outcome != 'failure'/.test(wc),
+        /if: failure\(\) \|\| cancelled\(\) \|\| steps\.read\.outcome == 'failure' \|\| steps\.act\.outcome == 'failure'/.test(wr), /if: success\(\) && steps\.read\.outcome == 'success' && steps\.act\.outcome != 'failure'/.test(wr),
+        [wc, wr].map((w) => (w.match(/card-read\.mjs --activities --stats >> "\$GITHUB_STEP_SUMMARY"/g) || []).length)],
+      [true, true, true, true, [1, 1]]);
+    /* ⑤ 유료 시험 */
+    eq('⑤ 「유료 시험」(act-paid-probe.yml) — 🔴 사람이 눌러야만 돈다(예약·push 없음) · 읽기 권한만 · 저장하지 않는다(git add·commit·push 없음) · 기본 브랜치에서만 · 작업 시한 · 입력은 env 로만 · 결과는 묶음으로(항상 올린다)',
+      [/^on:\n {2}workflow_dispatch:/m.test(probe) && !/^ {2}(?:push|schedule|workflow_run):/m.test(probe), /^permissions:\n {2}contents: read$/m.test(probe), /git (?:add|commit|push)/.test(probe),
+        /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(probe), /^ {4}timeout-minutes:\s*\d+/m.test(probe), /PROBE_IDS: \$\{\{ inputs\.ids \}\}/.test(probe) && !/run:[^\n]*\$\{\{\s*inputs\./.test(probe) && !/^\s{10,}.*\$\{\{\s*inputs\./m.test(probe),
+        /if: always\(\)\n\s+uses: actions\/upload-artifact@v\d+\n\s+with:\n\s+name: act-paid-probe/.test(probe), ['data/act-read.json', 'collector/act-read-ledger.json', 'collector/act-role-ai.json', 'collector/act-final-review.json', 'collector/act-text'].filter((f) => !probe.includes(`            ${f}\n`))],
+      [true, true, false, true, true, true, true, []]);
+    eq('  차례 — id 확인 → 스위치(이 실행 안에서만) → 글자 받기(지정한 글만) → 카드 쓰기 → 최종 검토 · 유료 열쇠는 유료 두 단계에만 · 두 로봇에 지정한 글만 넘긴다(--only) · 유료 단계가 실패하면 빨갛게 끝낸다',
+      [['IDS=$ids', 'activities.enabled', 'export ACT_TEXT_IDS="$IDS"', 'node collector/card-read.mjs --activities "--only=$IDS" --write', 'node collector/final-review.mjs --activities "--only=$IDS" --write'].map((x) => probe.indexOf(x)).every((v, i, a) => v > 0 && (i === 0 || v > a[i - 1])),
+        (probe.match(/ANTHROPIC_API_KEY: \$\{\{ secrets\.ANTHROPIC_API_KEY \}\}/g) || []).length, /CARD_READ_ENABLE: '1'/.test(stepById(probe, 'card')), /FINAL_REVIEW_ENABLE: '1'/.test(stepById(probe, 'review')),
+        /if: steps\.card\.outcome == 'failure' \|\| steps\.review\.outcome == 'failure'\n[\s\S]{0,80}run: exit 1/.test(probe)],
+      [true, 2, true, true, true]);
+    /* 셸을 실제로 돌려 본다 — id 확인과 스위치 켜기(가짜 저장소 폴더에서) */
+    {
+      const runOf = (name) => { const m = probe.match(new RegExp(`- name: ${name}\\n(?:\\s+[a-z-]+: .*\\n)*\\s+run: \\|\\n((?: {10}.*\\n?|\\n)+)`)); return m ? m[1].split('\n').map((l) => l.replace(/^ {10}/, '')).join('\n') : 'exit 97'; };
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-probe-'));
+      try {
+        fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+        const sh = (script, env = {}) => { const envFile = path.join(dir, 'gh-env.txt'); fs.writeFileSync(envFile, ''); const r = spawnSync('bash', ['-e', '-c', script], { cwd: dir, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME || '', GITHUB_ENV: envFile, ...env } }); return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, env: readText(envFile) }; };
+        const idStep = runOf('시험할 글 id 확인');
+        eq('  셸 — id 가 비었거나(빈칸뿐이어도) 꼴이 틀리면(명령 글자·빈 조각) 멈추고 아무것도 넘기지 않는다 · 맞으면 빈칸을 뗀 id 목록을 다음 단계로 넘긴다',
+          [sh(idStep, { PROBE_IDS: '' }), sh(idStep, { PROBE_IDS: '   ' }), sh(idStep, { PROBE_IDS: 'act-1;rm -rf /' }), sh(idStep, { PROBE_IDS: 'act-1,,act-2' }), sh(idStep, { PROBE_IDS: '$(whoami)' })].map((r) => [r.status !== 0, r.env])
+            .concat([sh(idStep, { PROBE_IDS: ' act-15a4xen, api-youth-12 ' })].map((r) => [r.status, r.env.trim()]))
+            .concat([[/시험할 활동 글 id 가 없습니다/.test(sh(idStep, { PROBE_IDS: '' }).out), /id 꼴이 아닙니다/.test(sh(idStep, { PROBE_IDS: 'a;b' }).out)]]),   // 까닭을 말하고 멈춘다
+          [[true, ''], [true, ''], [true, ''], [true, ''], [true, ''], [0, 'IDS=act-15a4xen,api-youth-12'], [true, true]]);
+        const cfgC = { enabled: true, maxPerRun: 20, activities: { enabled: false, maxPerRun: 20, maxUsdPerRun: 3 }, _무엇인가: '표본' }, cfgF = { enabled: false, maxPerRun: 15 };
+        fs.writeFileSync(path.join(dir, 'collector/card-read-config.json'), `${JSON.stringify(cfgC, null, 1)}\n`); fs.writeFileSync(path.join(dir, 'collector/final-review-config.json'), `${JSON.stringify(cfgF, null, 1)}\n`);
+        const sw = sh(runOf('활동 스위치 켜기 \\(이 실행 안에서만\\)'));
+        const c2 = JSON.parse(readText(path.join(dir, 'collector/card-read-config.json'))), f2 = JSON.parse(readText(path.join(dir, 'collector/final-review-config.json')));
+        eq('  셸 — 스위치 켜기는 두 설정 파일의 activities.enabled 만 켠다: 위쪽 enabled(유료 전체 스위치)는 그대로(꺼져 있으면 시험도 부르지 않는다) · 상한·다른 칸도 그대로 · 활동 칸이 없던 파일에는 칸을 만든다',
+          [sw.status, c2.activities, c2.enabled, c2.maxPerRun, c2._무엇인가, f2.enabled, f2.activities, AC.actGateOn(c2), AC.actGateOn(f2)],
+          [0, { enabled: true, maxPerRun: 20, maxUsdPerRun: 3 }, true, 20, '표본', false, { enabled: true }, true, false]);
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    }
+    eq('  글자 받기 — 시험이 글을 지정하면(ACT_TEXT_IDS) **그 글만** 받는다(다른 글의 사이트를 두드리지 않는다) · 있던 받기 조건 줄은 그대로',
+      [/if \(!forText\) \{\s*\n\s*if \(TEXT_IDS\.size\) continue;/.test(src('collector/activity-docs.mjs')), /if \(!\(needsElig\(n\) \|\| \(!BROWSER && staleDocs\(n\)\)\) \|\| !dueFree\(ledger\[n\.url\], today\)\) continue;/.test(src('collector/activity-docs.mjs'))], [true, true]);
   }
 
   /* ── 유료 카드 읽기 (4번 · 2026-11-15 개발자 지시 · 11-21 개정) — AI 하나가 공고를 통째로 읽어 카드 칸을 쓰고 첨부를 가른다. 로봇은 꼴만 다듬어 그대로 싣는다 ── */
