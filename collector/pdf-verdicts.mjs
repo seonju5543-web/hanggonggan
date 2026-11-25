@@ -27,10 +27,14 @@ const NOT_OK = ['broken', 'wrong', 'empty'];
 const readJson = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; } };
 const rm = (p, opt = {}) => { try { fs.rmSync(p, { force: true, ...opt }); } catch { /* 무시 */ } };
 
-/** collector/final-review.json 의 사본 판정을 한 줄씩 — [{ id, kind, file, name, bytes, verdict, why }] · 파일이 없으면 빈 목록 */
+/** 최종 검토의 사본 판정을 한 줄씩 — [{ id, kind, file, name, bytes, verdict, why }] · 파일이 없으면 빈 목록.
+    장학금(collector/final-review.json)과 대외활동·공모전(collector/act-final-review.json · 2026-11-25 · 이름은 act-card ACT_FILES 와 같다 — 관문이 견준다) 둘 다 읽는다:
+    글 id 가 겹치지 않고 사본 색인은 한 벌이라, 활동 쪽을 안 읽으면 6번이 내린 활동 사본을 다음 변환이 다시 올린다 */
 export function loadPdfVerdicts(root) {
-  const items = (readJson(path.join(root, 'collector', 'final-review.json')) || {}).items || {};
-  return Object.entries(items).flatMap(([id, e]) => (Array.isArray(e && e.pdfs) ? e.pdfs : []).filter(Boolean).map((p) => ({ id, ...p })));
+  return ['final-review.json', 'act-final-review.json'].flatMap((f) => {
+    const items = (readJson(path.join(root, 'collector', f)) || {}).items || {};
+    return Object.entries(items).flatMap(([id, e]) => (Array.isArray(e && e.pdfs) ? e.pdfs : []).filter(Boolean).map((p) => ({ id, ...p })));
+  });
 }
 
 /** ok 가 아닌 판정의 사본을 내린다 — verdicts: [{ id, kind: 'form'|'doc'|'pages', file: '<forms-pdf|docs-pdf|form-pages>/<색인의 file>', bytes, verdict, why }]

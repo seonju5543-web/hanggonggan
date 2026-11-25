@@ -18,6 +18,9 @@
    🔴 돈이 나가는 로봇 — 스위치 둘(final-review-config.json enabled + FINAL_REVIEW_ENABLE=1) · 실행당 상한 · 공고 하나에 보내는 PDF 쪽 수 상한(maxPdfPages).
    🔴 `data/registered.json` 을 고치지 않는다(card-read 와 같은 이유).
    실행: node collector/final-review.mjs [--write]   · FINAL_REVIEW_FAKE=<파일 {id: 응답}> 로 돈 없이(관문)
+         node collector/final-review.mjs --activities [--only=<id>,<id>] [--write]   (대외활동·공모전 목록 · 2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-6)
+            카드 쓰기와 같은 방식이다 — 파일 이름만 활동 것으로 바꿔 읽고 쓰고(collector/act-card.mjs ACT_FILES) 지시문만 활동용(ACT_REVIEW_SYSTEM).
+            스위치는 셋(설정의 enabled · activities.enabled · 환경 변수 FINAL_REVIEW_ENABLE=1) · 상한은 activities 칸의 값 · `--only` 는 지정한 글만 본다(유료 시험 워크플로)
    ============================================================ */
 import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -26,13 +29,17 @@ import { createRequire } from 'node:module';
 import { makeSources, sourceText, sourceHash, norm, FIELD_LABEL, LIST_FIELDS, closedNow, CARD_RULES, SCHEMA as CARD_SCHEMA, cardEntry, rolesOf } from './card-read.mjs';
 import { loadNoticeDocIndex } from './attachment-text.mjs';
 import { pdfPages } from './attach-role-read.mjs';
+import { ACT_FILES, ACT_SYSTEM, ACT_REVIEW_SYSTEM, actGateOn, actItems, makeActSources } from './act-card.mjs';
 import { applyPdfVerdicts, loadPdfVerdicts } from './pdf-verdicts.mjs';   // ok 가 아닌 사본을 앱에서 내린다(변환 로봇을 불러오지 않는 파일 — 그 셋은 불러오는 순간 본편이 돈다)
 
 const require = createRequire(import.meta.url);
 const HERE = new URL('.', import.meta.url);
-const P = (rel) => fileURLToPath(new URL(rel, HERE));
+/* 대외활동·공모전 목록(`--activities` · 2026-11-25) — 카드 쓰기(card-read)와 같은 방식: 파일 이름만 활동 것으로 바꿔 읽고 쓴다(act-card ACT_FILES).
+   아래 본편에 적힌 파일 이름은 장학금 것 그대로다 — 장학금 실행은 한 글자도 달라지지 않고, 두 목록은 서로의 파일을 건드릴 수 없다(관문 「대외활동 유료 관문 ③ 최종 검토」) */
+const ACT = process.argv.includes('--activities');
+const P = (rel) => fileURLToPath(new URL((ACT && ACT_FILES[rel]) || rel, HERE));
 const readJson = (rel, d) => { try { return JSON.parse(fs.readFileSync(P(rel), 'utf8')); } catch { return d; } };
-const log = (m) => console.log(`[final-review] ${m}`);
+const log = (m) => console.log(`[final-review${ACT ? ' 활동' : ''}] ${m}`);
 
 export const MODEL = 'claude-opus-5-5';
 const PRICE = [4, 20];   // 달러 / 100만 토큰 (입력, 출력) — 2026-11 요금
@@ -119,9 +126,11 @@ export const withoutJudged = (pdfs, judged) => {
 };
 /* 같은 것을 다시 보지 않게 — 지시문 · 원문 · 카드(검토 도장 reviewedAt 빼고) · 4번의 구분 · 사본 목록(파일·크기 · 앞서 내린 사본은 빼고 — withoutJudged).
    🔴 원문은 4번과 같은 해시(sourceHash — 조회수 숫자를 뗀다)로 넣는다 (리뷰 2026-11-22) — 날것으로 넣으면 본문을 다시 받을 때마다 조회수만 바뀌어 같은 공고를 돈 내고 또 본다 */
-export function reviewHash(source, entry, roles4, pdfs) {
+/* system · cardSystem = 활동 목록이 제 검토 지시문과 제 카드 지시문을 넘긴다(act-card ACT_REVIEW_SYSTEM · ACT_SYSTEM) — 안 주면 장학금 것.
+   활동 글의 해시가 장학금 지시문에 기대면 장학금 지시문을 고칠 때 활동 글까지 전부 다시 본다 */
+export function reviewHash(source, entry, roles4, pdfs, system = SYSTEM, cardSystem) {
   const { reviewedAt, ...card } = entry || {};
-  return crypto.createHash('sha256').update(SYSTEM).update('\n').update(sourceHash(source)).update('\n')
+  return crypto.createHash('sha256').update(system).update('\n').update(sourceHash(source, cardSystem)).update('\n')
     .update(JSON.stringify(card)).update(JSON.stringify((roles4 || []).map((d) => [d.file, d.hash, d.role, d.formStart || ''])))
     .update(JSON.stringify((pdfs || []).map((p) => [p.kind, p.file, p.bytes]))).digest('hex').slice(0, 16);
 }
@@ -212,7 +221,7 @@ export const reviewable = (items, cardRead, today, aiRead = {}) => items.filter(
 export const needsReview = (led, hash, giveUpAfter = 3) => !led || led.hash !== hash || !(led.done || (led.tries || 0) >= giveUpAfter);
 /* 🔴 4번이 **이 원문을** 읽고 쓴 카드인가 (리뷰 2026-11-22) — 새벽에 첨부가 도착해 원문이 바뀌었으면 4번이 곧 다시 읽어 카드를 통째로 바꾼다.
    그 전에 옛 카드를 보면 그 검토는 버려지고(돈), 4번이 다시 읽은 뒤 또 본다. 카드의 hash 는 4번이 읽은 원문의 해시다(6번은 그 값을 안 바꾼다 · 조회수만 바뀐 원문은 같은 원문) */
-export const readThisSource = (entry, source) => !!entry && entry.hash === sourceHash(source);
+export const readThisSource = (entry, source, cardSystem) => !!entry && entry.hash === sourceHash(source, cardSystem);   // cardSystem = 그 카드를 쓴 4번의 지시문(활동 목록은 ACT_SYSTEM · 안 주면 장학금 것)
 /* 🔴 포기는 그날 하루만 (리뷰 2026-11-22) — 세 번 실패한 공고를 영영 안 보면 그 카드는 아무 검토 없이 남는다(4번에는 기계 검사가 없다).
    마지막 실패가 오늘이 아니면 다시 세 번까지 해 본다(한 공고에 하루 세 번이 상한) */
 export const retryAgain = (led, hash, giveUpAfter, today) => !!led && led.hash === hash && !led.done && (led.tries || 0) >= giveUpAfter && led.failedAt !== today;
@@ -238,10 +247,10 @@ export function reviewContent(it, { source, entry, roles4 = [], parts = [], pdfs
   }
   return blocks;
 }
-export async function ask(client, content, effort) {
+export async function ask(client, content, effort, system = SYSTEM) {
   /* 카드 읽기(card-read ask)와 같은 꼴 — thinking 을 끄지 않는다 · 꼴은 output_config.format · 거절 대비 서버 쪽 대체 모델 */
   const stream = client.beta.messages.stream({
-    model: MODEL, max_tokens: 24000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default', system: SYSTEM,
+    model: MODEL, max_tokens: 24000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default', system,
     output_config: { effort, format: { type: 'json_schema', schema: SCHEMA } },
     messages: [{ role: 'user', content }],
   });
@@ -262,14 +271,19 @@ export async function ask(client, content, effort) {
 const ranDirectly = () => { try { return fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } };
 if (process.argv[1] && ranDirectly()) {
   const WRITE = process.argv.includes('--write');
+  const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').map((x) => x.trim()).filter(Boolean);   // 지정한 글만 본다(유료 시험 워크플로) — 없으면 빈 목록(전부)
+  const SYS = ACT ? ACT_REVIEW_SYSTEM : SYSTEM, CARD_SYS = ACT ? ACT_SYSTEM : undefined;   // 활동 목록은 제 검토 지시문 · 그 카드를 쓴 4번의 지시문도 활동 것
   const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
   /* 있는 파일이 깨져 있으면 멈춘다 — 빈 것으로 읽고 이어 가면 카드 파일을 빈 채로 덮거나 전부 다시 본다(돈) · 없는 파일만 기본값 */
   const strictJson = (rel, dflt) => { if (!fs.existsSync(P(rel))) return dflt; try { return JSON.parse(fs.readFileSync(P(rel), 'utf8')); } catch (e) { console.error(`[final-review] ${rel} 을 읽지 못했습니다(깨진 파일) — 멈춥니다: ${e.message}`); process.exit(1); } };
   /* maxMs 7분 — 단계 시한 12분 안에 진행 중인 한 건(PDF 를 읽어 오래 걸린다)까지 끝나게. 끊기면 돈만 나가고 결과가 없다 */
   const cfg = { enabled: false, maxPerRun: 15, maxUsdPerRun: 3, giveUpAfter: 3, effort: 'medium', maxMs: 7 * 60 * 1000, maxPdfPages: 24, ...readJson('final-review-config.json', {}) };
+  /* 활동 목록 — 스위치는 위쪽 enabled 와 activities.enabled 둘 다(act-card actGateOn) · 상한은 activities 칸의 값(목록마다 따로 센다) */
+  if (ACT) Object.assign(cfg, cfg.activities || {}, { enabled: actGateOn(cfg) });
   /* 등록 목록도 깨져 있으면 멈춘다 — 빈 목록으로 읽고 이어 가면 결과·장부가 「목록에서 빠진 공고」로 전부 지워진다 */
   const reg = strictJson('../data/registered.json', { items: [] });
-  if (!Array.isArray(reg.items)) { console.error('[final-review] data/registered.json 에 items 목록이 없습니다 — 멈춥니다'); process.exit(1); }
+  if (!Array.isArray(reg.items)) { console.error(`[final-review] ${ACT ? 'data/activities.json' : 'data/registered.json'} 에 items 목록이 없습니다 — 멈춥니다`); process.exit(1); }
+  if (ACT) reg.items = actItems(reg.items);   // 활동 글을 로봇이 읽는 모양으로(id 없는 글은 빠진다 · 저장하지 않는다)
   const cr = strictJson('../data/card-read.json', { items: {} });
   if (!cr.items) cr.items = {};
   const ledger = strictJson('final-review-ledger.json', {});
@@ -277,7 +291,9 @@ if (process.argv[1] && ranDirectly()) {
   if (!result.items) result.items = {};
   const roles4 = readJson('attach-role-ai.json', { items: {} }).items || {};
   const docIdx = loadNoticeDocIndex(P('extracted'));
-  const partsOf = makeSources({ texts: readJson('extracted/notices-text.json', {}), browserBodies: readJson('extracted/browser-bodies.json', {}), eligDocs: docIdx.elig, formRows: docIdx.forms, extractedDir: P('extracted') });
+  const partsOf = ACT
+    ? makeActSources({ storeDir: P('act-text'), formRows: docIdx.forms, extractedDir: P('extracted') })   // 활동 글의 원문 = 글자 기록 + 받아 둔 신청서 원본(카드 쓰기와 같은 덩어리 · 같은 열쇠)
+    : makeSources({ texts: readJson('extracted/notices-text.json', {}), browserBodies: readJson('extracted/browser-bodies.json', {}), eligDocs: docIdx.elig, formRows: docIdx.forms, extractedDir: P('extracted') });
   /* 앱이 보여 주는 사본의 세 색인 — 사본을 내리면(아래) 다시 읽는다 */
   const loadPdfCtx = () => ({ formsPdf: readJson('../data/forms-pdf/index.json', { items: {} }).items || {}, formPages: readJson('../data/form-pages/index.json', { items: {} }).items || {},
     docsPdf: readJson('../data/docs-pdf/index.json', { items: {} }).items || {}, dataDir: P('../data') });
@@ -297,10 +313,12 @@ if (process.argv[1] && ranDirectly()) {
   const targets = [];
   let stale = 0;
   for (const it of reviewable(reg.items, cr.items, TODAY, aiRead)) {
+    if (ONLY.length && !ONLY.includes(it.id)) continue;   // 지정한 글만(유료 시험)
+    if (ACT && it.hidden) continue;   // 관리자가 숨긴 활동 글은 학생이 못 본다 — 돈 내고 보지 않는다(카드는 그 글이 목록에 있는 동안 그대로 둔다)
     const parts = partsOf(it), source = sourceText(parts), r4 = ((roles4[it.id] || {}).docs) || [];
-    if (!readThisSource(cr.items[it.id], source)) { stale += 1; continue; }   // 4번이 새 원문으로 다시 쓴 뒤에 본다(readThisSource)
+    if (!readThisSource(cr.items[it.id], source, CARD_SYS)) { stale += 1; continue; }   // 4번이 새 원문으로 다시 쓴 뒤에 본다(readThisSource)
     const pdfs = pickPdfs(withoutJudged(pdfsOf(it, { ...pdfCtx, parts }), (result.items[it.id] || {}).pdfs), { maxPages: cfg.maxPdfPages });   // 앞서 내린 사본은 다시 보내지도 해시에 넣지도 않는다
-    const hash = reviewHash(source, cr.items[it.id], r4, pdfs);
+    const hash = reviewHash(source, cr.items[it.id], r4, pdfs, SYS, CARD_SYS);
     if (retryAgain(ledger[it.id], hash, cfg.giveUpAfter, TODAY)) ledger[it.id].tries = 0;
     if (needsReview(ledger[it.id], hash, cfg.giveUpAfter)) targets.push({ it, parts, source, r4, pdfs, hash });
   }
@@ -315,7 +333,7 @@ if (process.argv[1] && ranDirectly()) {
      학생에게 다시 보인다. 돈 0 · 스위치가 꺼져 있어도 · 두 번 적용해도 같다(이미 내린 것·다시 만든 사본은 안 건드린다). 넘어져도 검토는 잇는다(변환 로봇이 시작할 때 다시 내린다) */
   try { if (applyPdfVerdicts({ root: P('..'), verdicts: loadPdfVerdicts(P('..')), today: TODAY, deleteFiles: false }).dropped.length) pdfCtx = loadPdfCtx(); }
   catch (e) { log(`⚠ 앞서 내린 사본을 다시 내리지 못했습니다(${String((e && e.message) || e).slice(0, 120)}) — 변환 로봇이 다음 실행에 다시 내립니다`); }
-  if (!fake && !paidOn) { save(); log(`유료 스위치가 꺼져 있어 부르지 않았습니다 (final-review-config.json enabled: ${cfg.enabled} · FINAL_REVIEW_ENABLE: ${process.env.FINAL_REVIEW_ENABLE || '없음'})`); process.exit(0); }
+  if (!fake && !paidOn) { save(); log(`유료 스위치가 꺼져 있어 부르지 않았습니다 (final-review-config.json ${ACT ? 'enabled 와 activities.enabled 둘 다' : 'enabled'}: ${cfg.enabled} · FINAL_REVIEW_ENABLE: ${process.env.FINAL_REVIEW_ENABLE || '없음'})`); process.exit(0); }
   let client = null;
   if (!fake) { const { default: Anthropic } = await import('@anthropic-ai/sdk'); client = new Anthropic(); }
   const t0 = Date.now();
@@ -332,7 +350,7 @@ if (process.argv[1] && ranDirectly()) {
       try {
         const entry = cr.items[t.it.id];
         const r = fake ? { out: fake[t.it.id], usd: 0 }
-          : await ask(client, reviewContent(t.it, { source: t.source, entry, roles4: t.r4, parts: t.parts, pdfs: t.pdfs }), cfg.effort);
+          : await ask(client, reviewContent(t.it, { source: t.source, entry, roles4: t.r4, parts: t.parts, pdfs: t.pdfs }), cfg.effort, SYS);
         usd += r.usd; led.usd = Math.round(((led.usd || 0) + r.usd) * 10000) / 10000;
         const a = applyReview({ it: t.it, parts: t.parts, entry, roles4: t.r4, prevRoles: (result.items[t.it.id] || {}).roles, out: r.out, pdfs: t.pdfs, wonIn, today: TODAY });
         if (a.entry !== entry) { cr.items[t.it.id] = a.entry; crDirty = true; }
@@ -348,7 +366,7 @@ if (process.argv[1] && ranDirectly()) {
            🔴 사본 목록도 **내린 뒤의 것**으로 — 안 그러면 제가 내린 사본 때문에 「사본 목록이 바뀌었다」며 다음 실행이 같은 공고를 돈 내고 또 본다.
               이번에 ok 가 아니라고 본 사본도 뺀다(withoutJudged) — 내리지 못했거나 내린 것이 병합에서 버려져도 다음 실행의 목록(위 대상 고르기)과 같다 */
         const pdfsNow = withoutJudged(down.length ? pickPdfs(pdfsOf(t.it, { ...pdfCtx, parts: t.parts }), { maxPages: cfg.maxPdfPages }) : t.pdfs, a.pdfs);
-        const hash = reviewHash(t.source, a.entry, t.r4, pdfsNow);
+        const hash = reviewHash(t.source, a.entry, t.r4, pdfsNow, SYS, CARD_SYS);
         led.hash = hash; led.done = true; led.at = TODAY; led.raw = r.out; delete led.error;
         /* 같은 4번 읽기(readAt·원문 해시가 그대로)를 다시 본 것이면 앞서 고친 기록을 이어 붙인다 — 사본만 다시 본 검토가 첫 검토의 기록을 지우지 않게 */
         const prev = result.items[t.it.id];

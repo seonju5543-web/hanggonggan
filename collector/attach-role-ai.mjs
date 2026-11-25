@@ -27,8 +27,6 @@ const readJson = (p, d) => { try { return JSON.parse(fs.readFileSync(p, 'utf8'))
     🔴 4번의 답을 버리지 않는다(6번 줄의 read 칸에 남긴다 · 2026-11-22) — 파일을 다시 받아 바이트가 바뀐 뒤 4번만 다시 읽었으면, 옛 바이트를 본 6번의 답이
        새 답을 가려 그 파일은 「AI 답 없음」이 된다(aiRoleFor 가 바이트가 맞는 쪽을 고른다) */
 export function loadAiRoles(collectorDir) {
-  const read = readJson(path.join(collectorDir, 'attach-role-ai.json'), { items: {} }).items || {};
-  const review = readJson(path.join(collectorDir, 'final-review.json'), { items: {} }).items || {};
   const out = {};
   const put = (id, docs, by) => {
     for (const d of Array.isArray(docs) ? docs : []) {
@@ -37,8 +35,14 @@ export function loadAiRoles(collectorDir) {
       out[id][d.file] = { ...d, by, ...(was && was.by === 'read' && by === 'review' ? { read: was } : {}) };
     }
   };
-  for (const [id, e] of Object.entries(read)) put(id, e && e.docs, 'read');
-  for (const [id, e] of Object.entries(review)) put(id, e && e.roles, 'review');
+  /* 장학금의 두 파일 → 대외활동·공모전의 두 파일(2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-5 · 이름은 act-card ACT_FILES 와 같다 — 관문이 견준다).
+     글 id 가 서로 겹치지 않아 한 표에 싣는다 — 그것으로 변환 로봇 셋은 활동 글에도 AI 의 답을 쓴다 */
+  for (const [readFile, reviewFile] of [['attach-role-ai.json', 'final-review.json'], ['act-role-ai.json', 'act-final-review.json']]) {
+    const read = readJson(path.join(collectorDir, readFile), { items: {} }).items || {};
+    const review = readJson(path.join(collectorDir, reviewFile), { items: {} }).items || {};
+    for (const [id, e] of Object.entries(read)) put(id, e && e.docs, 'read');
+    for (const [id, e] of Object.entries(review)) put(id, e && e.roles, 'review');
+  }
   return out;
 }
 /* 그 공고의 답 전부 — 파일마다 6번의 답, 바로 뒤에 4번의 답 */
