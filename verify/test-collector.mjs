@@ -2475,9 +2475,10 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     /* 2026-10-01 — 공공 API 글만 seenAt(API 가 마지막으로 준 날)으로 잰다 · 게시판 글은 그대로 foundAt (「공공 API 로봇」 I3) */
     /* 2026-10-05 — 그 날짜(seenAt || foundAt)는 open-api-map.mjs actKeepDate 한 곳 · 상한도 같은 날짜로 고른다(capActivities · 점검 api-11) */
     /acts\.items = acts\.items\.filter\(\(n\) => \(actKeepDate\(n\) \|\| '9999'\) >= cutoff\)/.test(cm)
-    && /acts\.items = dedupeNotices\(acts\.items\)/.test(cm)
+    /* 2026-11-25 — 중복 정리는 같은 함수(dedupeNotices)를 숨김 표시 지키기로 감싸 부르고(act-card dedupeActivities), 상한은 「학생에게 보이는 글만」 세도록 판정을 함께 넘긴다(대외활동 유료 관문 ⑤ 절이 잰다) */
+    && /acts\.items = dedupeActivities\(acts\.items, dedupeNotices\)/.test(cm)
     && /dropUnserved\(acts\.items\.filter\(\(n\) => n\.school\)\)/.test(cm)
-    && /acts\.items = capActivities\(acts\.items, ACT_CAP\)/.test(cm), true);
+    && /acts\.items = capActivities\(acts\.items, ACT_CAP, /.test(cm), true);
   /* 🔴 블록 안에서 끝나야 한다 — 예전 [\s\S]*?continue; 는 파일 어디의 continue 에나 맞아 관문이 빈 채였다(2026-10-01 수리 · 코드는 return 으로 게시판을 마친다) */
   eq('전용 게시판은 장학 피드에 담지 않는다 (actResults 에 담고 return)', /if \(isAct\) \{\s*actResults\.push\(\{\s*name,[\s\S]{0,400}?items: freshA,\s*\}\);\s*return;/.test(cm), true);
   const strip = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
