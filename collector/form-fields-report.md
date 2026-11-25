@@ -1,9 +1,9 @@
-## 🧾 신청서 쪽 그림 · 빈칸 자리 리포트 (2026-11-24)
+## 🧾 신청서 쪽 그림 · 빈칸 자리 리포트 (2026-11-25)
 
 원본 PDF 사본(data/forms-pdf)의 쪽 그림(WebP)과 이름표 옆 빈칸 자리(fields.json)를 만듭니다 — 앱의 「양식 채우기」가 그 위에 학생 답을 얹습니다. 🔴 칸을 지어내지 않습니다(못 찾은 파일은 빈 배열).
 
-파일 76개 — 이번에 만듦 10 · 그대로 66 · 실패 0 · 빈칸 합 141(프로필로 채울 수 있는 것 126) · 빈칸 0개 파일 58 · 표 머리글 아래 칸(학생이 적는 칸) 8 · 선 없는 쪽에서 머리글로 건너뛴 줄 0
-이름표별: 연락처 10 · 이름 8 · 이메일 7 · 학번 4 · 학교 2 · 계좌번호 2 · 학과 1
+파일 74개 — 이번에 만듦 5 · 그대로 69 · 실패 0 · 빈칸 합 141(프로필로 채울 수 있는 것 126) · 빈칸 0개 파일 56 · 표 머리글 아래 칸(학생이 적는 칸) 0 · 선 없는 쪽에서 머리글로 건너뛴 줄 0
+이름표별: 이름 4 · 학교 3 · 학년 1 · 연락처 1 · 학번 1 · 이메일 1
 
 ### 빈칸을 하나도 못 찾은 파일 (학생은 원본을 받아 손으로 쓴다 · 관리자가 칸을 지정하는 길은 다음 조각)
 - auto-orykeywordpaged1slug2026-0ezoyxo · 2-2026년-숭실대-노동조합-직원-추천-장학생-선발관련-개인정보제공-동의서.pdf
@@ -12,7 +12,6 @@
 - auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds · 1-미래로장학금_재심__신청서_양식_2026_2R_.pdf
 - auto-ent2431271834artclviewdo · 1-2026-2학기_외대비전HUFSDorm_장학금_신청서_및_추천서.pdf
 - auto-ent2431271834artclviewdo · 2-개인정보수집이용동의서.pdf
-- auto-ervicenoticedetail521215 · 1-신청서류_양식_.pdf
 - act-0qcoq7g · 1-미래사회문제와_인문사회_융합세미나_수업계획서_.pdf
 - auto-0005009002000000seq31571 · 1-성과형_장학금_자격증_신청서_및_개인정보활용서.pdf
 - auto-amepagescholarshipnotice-1p6dyle · 1-개인정보_수집_및_활용_동의서.pdf
@@ -39,26 +38,25 @@
 - auto-rykeywordpaged1slug20262-0e9iyco · 2-붙임2-개인정보-수집_이용-및-제3자-제공-동의서_숭실대학생지원팀_개정후.pdf
 - auto-tegory1moddocumentuid432 · 1-선발자-제출서류서약서-및-수혜-후기-보고서.pdf
 - auto-tegory1moddocumentuid431 · 1-3-1.-2027학년도-1학기-장학선정신청서.pdf
-- auto-tegory1moddocumentuid431 · 2-3-2-2027학년도-1학기-장학선정신청서.pdf
 - auto-amepagescholarshipnotice-0k6yc5n · 1-2-_서식_자기소개서.pdf
-- auto-amepagescholarshipnotice-0k6yc5n · 2-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf
+- auto-amepagescholarshipnotice-0k6yc5n · 2-3-_서식_포토에세이.pdf
+- auto-amepagescholarshipnotice-0k6yc5n · 3-4-_서식_과학탐구활동_실행_이력서.pdf
+- auto-amepagescholarshipnotice-0k6yc5n · 4-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf
 - act-090pxw4 · 1-2026_Pre_TeX-Corps_신청서_충북대.pdf
 - act-05qwozc · 1-_양식_봉사활동_인증제도_신청서_및_증빙서류_2026_.pdf
 - act-0empyzd · 1-Attachment_2027학년도_자율전공학부_멘토_신청서_및_개인정보수집동의서.pdf
+- auto-oardid323654menuno200318 · 1-임대차계약_사실_확인서.pdf
+- act-11sr4wq · 1-붙임_지원서_양식_.pdf
 - kosaf-2000429013 · 1-_공고문_2026년_전입장학금_지원_공고_p5-6.pdf
 - auto-ent2431269128artclviewdo · 1-elig-1qi88m-1_p5-8.pdf
 - kosaf-2000204008 · 1-다자녀가정_특별지원_대학등록금_지원신청서_p1-3.pdf
 - kosaf-2700724005 · 1-2026년도내대학해외교환장학생모집_선발공고0416_p5-10.pdf
 - kosaf-2000319002 · 1-1._2026년_귀농인_자녀_학자금_지원사업_시행지침_1__p6-8.pdf
 - kosaf-2000438004 · 1-_2026년도_남원의_별_특별장학생_선발공고_요강__p9-11.pdf
-- auto-bbssc58944506artclviewdo · 1-elig-1g9py0-1_p3-5.pdf
 - kosaf-2704219001 · 1-2026년_2학기_영광군_대학생등록금_지원사업_공고_안__p7-7.pdf
 - kosaf-2000423012 · 1-2026년_워킹홀리데이_지원사업_신청자_모집_공고문_신청서식_p8-11.pdf
 - kosaf-3098537003 · 1-공고문_및_신청서_p4-5.pdf
-- kosaf-2000356002 · 1-2026년_통영시_저소득_대학생_장학금_지원대상자_선발_공고_p3-5.pdf
-- kosaf-2000356004 · 1-2026년도_통영시_지역대학생_장학금_지원대상자_선발_공고_p3-4.pdf
 - kosaf-2701180001 · 1-_공고_2026년장학회선발계획_공고_대학생__p3-8.pdf
-- auto-345bnum5233cate0qidx5233 · 1-elig-1s2isd-1_p3-5.pdf
 - kosaf-2000449006 · 1-2026년_2학기_장성군_대학생_등록금_지원사업_공고_p6-8.pdf
 - auto-0713no2516266sitedvscdkr · 1-form-1n9svq-2_p4-6.pdf
 - auto-krbbskr846184artclviewdo · 1-elig-12fzwo-1_p4-9.pdf

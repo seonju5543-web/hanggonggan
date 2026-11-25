@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": {
   "auto-sknou51815772artclviewdo": [
    {
@@ -214,17 +214,6 @@
     "name": "공공데이터 활용 사례 공모전(안내문).hwp",
     "pages": 5,
     "bytes": 275127,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "act-02ihmx2": [
-   {
-    "file": "act-02ihmx2/1-1._첨단_바이오_인재양성_부트캠프_참가자_모집_안내.pdf",
-    "name": "1. 첨단 바이오 인재양성 부트캠프 참가자 모집 안내.hwp",
-    "pages": 7,
-    "bytes": 237044,
     "fonts": "ko-nanum-1",
     "kept": 1,
     "at": "2026-11-20"
@@ -487,42 +476,6 @@
     "at": "2026-11-21"
    }
   ],
-  "act-1sm7h2v": [
-   {
-    "file": "act-1sm7h2v/1-지원자용_2025-2027_KOICA-청년중기봉사단아프리카중남미_2차_파견_단원_모집선발_안내서.pdf",
-    "name": "지원자용 2025-2027 KOICA-청년중기봉사단아프리카중남미 2차 파견 단원 모집선발 안내서.hwp",
-    "pages": 17,
-    "bytes": 860455,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "mk": 4,
-    "at": "2026-11-21"
-   }
-  ],
-  "auto-amepagescholarshipnotice-0k6yc5n": [
-   {
-    "file": "auto-amepagescholarshipnotice-0k6yc5n/1-3-_서식_포토에세이.pdf",
-    "name": "3-(서식) 포토에세이.docx",
-    "pages": 1,
-    "bytes": 43130,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "mk": 4,
-    "srcHash": "80fa70992986ef2f",
-    "at": "2026-11-24"
-   },
-   {
-    "file": "auto-amepagescholarshipnotice-0k6yc5n/2-4-_서식_과학탐구활동_실행_이력서.pdf",
-    "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
-    "pages": 4,
-    "bytes": 106832,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "mk": 4,
-    "srcHash": "68462b0a87832802",
-    "at": "2026-11-24"
-   }
-  ],
   "act-090pxw4": [
    {
     "file": "act-090pxw4/1-2026_Pre_TeX-Corps_프로그램_운영_계획_안__모집공고용.pdf",
@@ -534,6 +487,32 @@
     "mk": 4,
     "srcHash": "9257dc63a167a469",
     "at": "2026-11-24"
+   }
+  ],
+  "auto-amepagescholarshipnotice-1tlg7ak": [
+   {
+    "file": "auto-amepagescholarshipnotice-1tlg7ak/1-_붙임_2._2027년_1학기_농림축산식품부_청년창업농장학금_장학생_선발공고.pdf",
+    "name": "[붙임]2. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+    "pages": 3,
+    "bytes": 123279,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "6f7dac3a6e519797",
+    "at": "2026-11-25"
+   }
+  ],
+  "act-0tllezv": [
+   {
+    "file": "act-0tllezv/1-_2026_강원_차세대_과학전문가상_공모전_공고문.pdf",
+    "name": "「2026 강원 차세대 과학전문가상」 공모전 공고문.hwpx",
+    "pages": 17,
+    "bytes": 594768,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "d5d97dba7efb1991",
+    "at": "2026-11-25"
    }
   ]
  },

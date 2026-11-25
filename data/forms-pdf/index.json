@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-24",
+ "updatedAt": "2026-11-25",
  "items": {
   "auto-otice06doarticleno140764": [
    {
@@ -272,18 +272,6 @@
     "pages": 1,
     "bytes": 78123,
     "srcBytes": 50688,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
-  "auto-ervicenoticedetail521215": [
-   {
-    "file": "auto-ervicenoticedetail521215/1-신청서류_양식_.pdf",
-    "name": "신청서류(양식).hwp",
-    "pages": 5,
-    "bytes": 218557,
-    "srcBytes": 147456,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-18"
@@ -605,14 +593,34 @@
     "at": "2026-11-24"
    },
    {
-    "file": "auto-amepagescholarshipnotice-0k6yc5n/2-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf",
+    "file": "auto-amepagescholarshipnotice-0k6yc5n/2-3-_서식_포토에세이.pdf",
+    "name": "3-(서식) 포토에세이.docx",
+    "pages": 1,
+    "bytes": 43130,
+    "srcBytes": 28661,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-25"
+   },
+   {
+    "file": "auto-amepagescholarshipnotice-0k6yc5n/3-4-_서식_과학탐구활동_실행_이력서.pdf",
+    "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
+    "pages": 4,
+    "bytes": 106832,
+    "srcBytes": 32025,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-25"
+   },
+   {
+    "file": "auto-amepagescholarshipnotice-0k6yc5n/4-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf",
     "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
     "pages": 1,
     "bytes": 94932,
     "srcBytes": 94932,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
-    "at": "2026-11-24"
+    "at": "2026-11-25"
    }
   ],
   "act-090pxw4": [
@@ -650,6 +658,30 @@
     "fonts": "ko-nanum-1",
     "at": "2026-11-24"
    }
+  ],
+  "auto-oardid323654menuno200318": [
+   {
+    "file": "auto-oardid323654menuno200318/1-임대차계약_사실_확인서.pdf",
+    "name": "임대차계약 사실 확인서.hwp",
+    "pages": 1,
+    "bytes": 66893,
+    "srcBytes": 96768,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-25"
+   }
+  ],
+  "act-11sr4wq": [
+   {
+    "file": "act-11sr4wq/1-붙임_지원서_양식_.pdf",
+    "name": "붙임+지원서(양식).hwp",
+    "pages": 6,
+    "bytes": 303915,
+    "srcBytes": 132096,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-25"
+   }
   ]
  },
  "roles": {
@@ -676,6 +708,13 @@
   },
   "auto-tegory1moddocumentuid432": {
    "선발자-제출서류서약서-및-수혜-후기-보고서.hwp": "form"
+  },
+  "auto-amepagescholarshipnotice-0k6yc5n": {
+   "3-(서식) 포토에세이.docx": "form",
+   "4-(서식) 과학탐구활동 실행 이력서.docx": "form"
+  },
+  "auto-oardid323654menuno200318": {
+   "임대차계약 사실 확인서.hwp": "form"
   }
  },
  "rejected": {
