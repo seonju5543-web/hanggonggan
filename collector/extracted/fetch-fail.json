@@ -10,5 +10,11 @@
   "why": "HTTP 404",
   "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=597977C60FCD4D47AB4B72243C88AEE5_.pdf&ogrfname=%ED%95%B4%EC%BB%A4%ED%86%A4+%ED%99%8D%EB%B3%B4%EB%AC%BC.pdf",
   "n": 1
+ },
+ "auto-0713no2516453sitedvscdkr|[붙임 1] 「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내.hwpx": {
+  "at": "2026-11-25",
+  "why": "TypeError · fetch failed · UND_ERR_CONNECT_TIMEOUT",
+  "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2516453&atch_no=1",
+  "n": 1
  }
 }
