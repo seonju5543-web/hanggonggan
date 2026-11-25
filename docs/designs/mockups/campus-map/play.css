@@ -89,9 +89,27 @@ body.play { background: var(--page-bg); overflow: hidden; }
 /* 지도 판 — 낮은 화면에서는 낮게 시작(.peek · 안에서 굴러간다). 손잡이를 누르거나 쓸면 펴지고 접힌다 */
 #app .ms-panel:not(.sheet) > .sheet-handle { position: relative; cursor: pointer; }
 #app .ms-panel:not(.sheet) > .sheet-handle::after { content: ''; position: absolute; left: -80px; right: -80px; top: -11px; bottom: -12px; }
-#app .ms-panel.peek { max-height: 206px; }
+#app .ms-panel.peek { max-height: max(206px, 38%); }
 /* 펴고 접을 때만 움직인다 — 처음 그릴 때 움직이면 지도 보기 맞추기가 옛 높이를 잰다 */
 #app .ms-panel.anim { transition: max-height .22s ease; }
 @media (prefers-reduced-motion: reduce) { #app .ms-panel.anim { transition: none; } }
 /* 긴 이름표는 줄인다 */
 #app .m-label { max-width: 168px; overflow: hidden; text-overflow: ellipsis; }
+
+/* 처음 지도 점수(11-25) — 순위 · 점수 · 한눈에(요약 · 장점 · 확인할 것 · 점수 내역) */
+#app .place-list .pi.rank { display: grid; place-items: center; border: 0; background: var(--primary); color: #fff; border-radius: 50%; width: 26px; height: 26px; font-size: var(--t-xs); font-weight: 800; font-variant-numeric: tabular-nums; align-self: flex-start; margin-top: 2px; }
+#app .place-list li.scored .pd { display: grid; justify-items: end; gap: 1px; font-size: var(--t-2xs); font-weight: 500; }
+#app .place-list li.scored .pd .pts { font-size: var(--t-sm); font-weight: 800; color: var(--text); }
+#app .score-note { font-size: var(--t-2xs); color: var(--text-sub); line-height: 1.5; margin: 4px 0 2px; }
+#app .glance h4 { justify-content: flex-start; }
+#app .pts-chip { margin-left: auto; font-size: var(--t-xs); font-weight: 700; color: var(--primary); background: var(--surface-2); border-radius: var(--radius-pill); padding: 3px 10px; }
+#app .glance-sum { font-size: var(--t-sm); font-weight: 600; line-height: 1.5; }
+#app .gl-h { font-size: var(--t-xs); font-weight: 700; color: var(--text-sub); margin: 12px 0 4px; }
+#app ul.gl { list-style: none; display: grid; gap: 6px; }
+#app ul.gl li { position: relative; padding-left: 20px; font-size: var(--t-sm); line-height: 1.45; }
+#app ul.gl li::before { position: absolute; left: 0; top: 0; font-weight: 800; }
+#app ul.gl li.pro::before { content: '✓'; color: var(--green); }
+#app ul.gl li.con::before { content: '!'; color: var(--text-sub); left: 4px; }
+#app ul.gl li small { display: block; font-size: var(--t-2xs); color: var(--text-sub); }
+#app .gl-parts { font-size: var(--t-2xs); color: var(--text-sub); margin-top: 12px; font-variant-numeric: tabular-nums; }
+#app .gl-note { font-size: var(--t-2xs); color: var(--text-sub); margin-top: 3px; }

@@ -1,8 +1,602 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-25",
- "count": 2002,
+ "count": 2038,
  "items": [
+  {
+   "title": "[삼척] 2026학년도 2학기 KNU-SOS장학생 신청 안내(4차)",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2553&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "(붙임1)2026-2학기 KNU-SOS 장학생 선발 계획 안내(4차).hwpx",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261125090049106.hwpx&path=/bbs/34&fn=(%EB%B6%99%EC%9E%841)2026-2%ED%95%99%EA%B8%B0%20KNU-SOS%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%84%ED%9A%8D%20%EC%95%88%EB%82%B4(4%EC%B0%A8).hwpx"
+    },
+    {
+     "name": "관련서류 및 매뉴얼.zip",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261125090117410.zip&path=/bbs/34&fn=%EA%B4%80%EB%A0%A8%EC%84%9C%EB%A5%98%20%EB%B0%8F%20%EB%A7%A4%EB%89%B4%EC%96%BC.zip"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-12-09",
+   "bodyDeadlineText": "- 서류 준비 및 면담: 증빙서류 구비 후 장학사정관(학과장 등) 면담실시 - 온라인 신청 : 2026. 11. 23.(월 ) ~ 12. 9.(수 )"
+  },
+  {
+   "title": "2027년도 에몬스 장학생(19기) 모집 홍보",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2555&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[한국농어촌희망재단] 2027년 1학기 청년창업농장학생 선발 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2556&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261125013001764.hwp&path=/bbs/34&fn=2027%EB%85%84%201%ED%95%99%EA%B8%B0%20%EB%86%8D%EB%A6%BC%EC%B6%95%EC%82%B0%EC%8B%9D%ED%92%88%EB%B6%80(%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EB%86%8D%EC%9E%A5%ED%95%99%EA%B8%88)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EA%B3%B5%EA%B3%A0.hwp"
+    },
+    {
+     "name": "2027년 1학기 청년창업농장학금 선발안내.pdf",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261125013006339.pdf&path=/bbs/34&fn=2027%EB%85%84%201%ED%95%99%EA%B8%B0%20%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EB%86%8D%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%84%A0%EB%B0%9C%EC%95%88%EB%82%B4.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[국가근로] 2027학년도 1학기 1차 국가근로장학금 신청 안내",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&page=&mode=read&seq=11516",
+   "attachments": [
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://kau.ac.kr/upfile/2026/11/25/20261125123712-8fc7.pdf"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://kau.ac.kr/upfile/2026/11/25/20261125123712-b2e1.pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 ○ 신청일자 : 2026. 11. 24.(화 ) 9:00 ~ 2027. 1. 7.(목 ) 18:00 ※ 학기 중 근로는 반드시 1 차",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2027-02-09",
+   "bodyDeadlineText": "※ 한국장학재단 신청 후 교내신청 ( 종합정보시스템 ) 까지 반드시 완료하여야 국가근로 신청이 완료됨 · 국가근로 교내신청 기간( 예정 ) : 2027. 1. 22.(금 ) ~ 2027. 2. 9.(화 )"
+  },
+  {
+   "title": "공통 ⭐중요⭐ 2027-1학기 교내장학금 신청 안내(2026.11.24.(화) ~ 2027.1.11....",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323640",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내",
+   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516453&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "attachments": [
+    {
+     "name": "대학(원)별 훈련일정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/20200818_2.hwp"
+    },
+    {
+     "name": "마이크로디그리과정",
+     "url": "https://plus.cnu.ac.kr/html/kr/26file/2026_di_2010.pdf"
+    },
+    {
+     "name": "[붙임 1] 「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내.hwpx",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2516453&atch_no=1"
+    },
+    {
+     "name": "학교홈페이지관리규정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/2025_homepage_3020.hwp"
+    }
+   ],
+   "deadlineHint": "모집기간 2026. 11. 28.( 토 ) 09:00 ~ 12. 2.( 수 ) 18:00 신청방법 학사지원시스템 (CNU With U+) 을 통",
+   "school": "충남대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-12-02",
+   "bodyDeadlineText": "추가 모집기간 2026. 11. 28.( 토 ) 09:00 ~ 12. 2.( 수 ) 18:00"
+  },
+  {
+   "title": "(~2027.01.15.)(재)우산육영회 2027년 제59기 대학원 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=430",
+   "attachments": [
+    {
+     "name": "우산육영회-장학생-선발-안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=430&action=kboard_file_download&kboard-file-download-nonce=55e51d2801&file=file1"
+    }
+   ],
+   "deadlineHint": "접수기간 ; 2027년 1월 15일(화)까지 우편접수(발송일 기준), 방문접수도 가능 봉투 겉면에 필히 석사과정, 또는 박사과정 표기 바람 ※",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "(~2026.12.03.) 2026년 (재)청로장학재단 제7기 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=433",
+   "attachments": [
+    {
+     "name": "2026년-재청로장학재단-제7기-장학생-선발-안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=433&action=kboard_file_download&kboard-file-download-nonce=55e51d2801&file=file1"
+    }
+   ],
+   "deadlineHint": "접수기간: 2026년 11월 12일(목) ~ 12월 3일(목) 4) 발표일: 2026년 12월 17일(목) 2. 선발기준 1) 취약계층: 경제적",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-12-03",
+   "bodyDeadlineText": "(~2026.12.03.) 2026년 (재)청로장학재단 제7기 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "(~2027.01.15.)(재)우산육영회 2027년 제59기 대학원 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=3&uid=430",
+   "attachments": [
+    {
+     "name": "우산육영회-장학생-선발-안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=3&uid=430&action=kboard_file_download&kboard-file-download-nonce=55e51d2801&file=file1"
+    }
+   ],
+   "deadlineHint": "접수기간 ; 2027년 1월 15일(화)까지 우편접수(발송일 기준), 방문접수도 가능 봉투 겉면에 필히 석사과정, 또는 박사과정 표기 바람 ※",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "(~2026.12.03.) 2026년 (재)청로장학재단 제7기 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=3&uid=433",
+   "attachments": [
+    {
+     "name": "2026년-재청로장학재단-제7기-장학생-선발-안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=3&uid=433&action=kboard_file_download&kboard-file-download-nonce=55e51d2801&file=file1"
+    }
+   ],
+   "deadlineHint": "접수기간: 2026년 11월 12일(목) ~ 12월 3일(목) 4) 발표일: 2026년 12월 17일(목) 2. 선발기준 1) 취약계층: 경제적",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-12-03",
+   "bodyDeadlineText": "(~2026.12.03.) 2026년 (재)청로장학재단 제7기 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "(~2027.01.15.)(재)우산육영회 2027년 제59기 대학원 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=430",
+   "attachments": [
+    {
+     "name": "우산육영회-장학생-선발-안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=430&action=kboard_file_download&kboard-file-download-nonce=55e51d2801&file=file1"
+    }
+   ],
+   "deadlineHint": "접수기간 ; 2027년 1월 15일(화)까지 우편접수(발송일 기준), 방문접수도 가능 봉투 겉면에 필히 석사과정, 또는 박사과정 표기 바람 ※",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "(~2026.12.03.) 2026년 (재)청로장학재단 제7기 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=433",
+   "attachments": [
+    {
+     "name": "2026년-재청로장학재단-제7기-장학생-선발-안내.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=433&action=kboard_file_download&kboard-file-download-nonce=55e51d2801&file=file1"
+    }
+   ],
+   "deadlineHint": "접수기간: 2026년 11월 12일(목) ~ 12월 3일(목) 4) 발표일: 2026년 12월 17일(목) 2. 선발기준 1) 취약계층: 경제적",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-12-03",
+   "bodyDeadlineText": "(~2026.12.03.) 2026년 (재)청로장학재단 제7기 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "[학생지원팀] [미래의동반자재단] 2027년 1학기 CHUBB Innovation Fund 7기 장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278164&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "CHUBB Innovation Fund 7기_신청서 (학생용).docx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278164&attachNo=227775"
+    },
+    {
+     "name": "외부장학금 신청 및 추천을 위한 개인정보 수집 및 이용 동의서.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278164&attachNo=227776"
+    }
+   ],
+   "deadlineHint": "신청기간 및 방법 가. 트리니티 신청 - 신청기간: 2026. 11. 25.(수) ~ 11. 26.(목)까지 - 신청경로: 트리니티 → 학사정보",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-11-26",
+   "bodyDeadlineText": "가. 트리니티 신청 - 신청기간: 2026. 11. 25.(수) ~ 11. 26.(목)까지"
+  },
+  {
+   "title": "[홍보] 한국농어촌희망재단 2027년 1학기 청년창업농장학금 장학생 선발 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767088",
+   "attachments": [
+    {
+     "name": "[붙임] 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=%5B%25EB%25B6%2599%25EC%259E%2584%5D%202027%25EB%2585%2584%201%25ED%2595%2599%25EA%25B8%25B0%20%25EB%2586%258D%25EB%25A6%25BC%25EC%25B6%2595%25EC%2582%25B0%25EC%258B%259D%25ED%2592%2588%25EB%25B6%2580(%25EC%25B2%25AD%25EB%2585%2584%25EC%25B0%25BD%25EC%2597%2585%25EB%2586%258D%25EC%259E%25A5%25ED%2595%2599%25EA%25B8%2588)%20%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%2584%25A0%25EB%25B0%259C%25EA%25B3%25B5%25EA%25B3%25A0.hwp&filepath=/files/article/JANGHAKNOTICE/26767088/&filerealname=1DA75FBB46C04C6283BE91D5861C40F8.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "2027학년도 국가근로장학금 신청 안내(11. 24.(화) 09:00 ~ 2027. 1. 7.(목) 18:00)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767093",
+   "attachments": [
+    {
+     "name": "국가근로장학금 알리미 홍보포스터.png",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=%25EA%25B5%25AD%25EA%25B0%2580%25EA%25B7%25BC%25EB%25A1%259C%25EC%259E%25A5%25ED%2595%2599%25EA%25B8%2588%20%25EC%2595%258C%25EB%25A6%25AC%25EB%25AF%25B8%20%25ED%2599%258D%25EB%25B3%25B4%25ED%258F%25AC%25EC%258A%25A4%25ED%2584%25B0.png&filepath=/files/article/JANGHAKNOTICE/26767093/&filerealname=92AA57D89E9B42D3B15074FD545D1639.png"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 포스터.jpg",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027%25EB%2585%2584%201%25ED%2595%2599%25EA%25B8%25B0%201%25EC%25B0%25A8%20%25EA%25B5%25AD%25EA%25B0%2580%25EA%25B7%25BC%25EB%25A1%259C%25EC%259E%25A5%25ED%2595%2599%25EA%25B8%2588%20%25ED%2595%2599%25EC%2583%259D%25EC%258B%25A0%25EC%25B2%25AD%20%25ED%258F%25AC%25EC%258A%25A4%25ED%2584%25B0.jpg&filepath=/files/article/JANGHAKNOTICE/26767093/&filerealname=B5528667E3CE417A911C28ED6DDF781D.jpg"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027%25EB%2585%2584%201%25ED%2595%2599%25EA%25B8%25B0%201%25EC%25B0%25A8%20%25EA%25B5%25AD%25EA%25B0%2580%25EA%25B7%25BC%25EB%25A1%259C%25EC%259E%25A5%25ED%2595%2599%25EA%25B8%2588%20%25ED%2595%2599%25EC%2583%259D%25EC%258B%25A0%25EC%25B2%25AD%20%25EB%25B0%25A9%25EB%25B2%2595%20(%25ED%2599%2588%25ED%258E%2598%25EC%259D%25B4%25EC%25A7%2580).pdf&filepath=/files/article/JANGHAKNOTICE/26767093/&filerealname=D53D3D1A0C4D44D4A09416F9C14AF11D.pdf"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027%25EB%2585%2584%201%25ED%2595%2599%25EA%25B8%25B0%201%25EC%25B0%25A8%20%25EA%25B5%25AD%25EA%25B0%2580%25EA%25B7%25BC%25EB%25A1%259C%25EC%259E%25A5%25ED%2595%2599%25EA%25B8%2588%20%25ED%2595%2599%25EC%2583%259D%25EC%258B%25A0%25EC%25B2%25AD%20%25EB%25B0%25A9%25EB%25B2%2595%20(%25EB%25AA%25A8%25EB%25B0%2594%25EC%259D%25BC%25EC%2595%25B1).pdf&filepath=/files/article/JANGHAKNOTICE/26767093/&filerealname=3EA86445783048399B41A89E8312EAA5.pdf"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767093#n-2027%EB%85%84%201%ED%95%99%EA%B8%B0%201%EC%B0%A8%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%ED%95%99%EC%83%9D%EC%8B%A0%EC%B2%AD%20%EB%B0%A9%EB%B2%95%20(%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80).pdf"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767093#n-2027%EB%85%84%201%ED%95%99%EA%B8%B0%201%EC%B0%A8%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%ED%95%99%EC%83%9D%EC%8B%A0%EC%B2%AD%20%EB%B0%A9%EB%B2%95%20(%EB%AA%A8%EB%B0%94%EC%9D%BC%EC%95%B1).pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 11. 24.(화) 09:00 ~ 2027. 1. 7.(목) 18:00 ※ 주말 및 공휴일 포함 신청기간 내 24시간 신",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "2026-2학기 SOS두드림장학 신청 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767096",
+   "attachments": [],
+   "deadlineHint": "신청기간 ▶ ~ 12.11( 금 ) 4. 신청방법 및 제출서류 1) 신청경로 : nDRIMS > 대표 - 학사행정 > [ 학생신청 ] 신청함 >",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "2027학년도 국가근로장학금 신청 안내(11. 24.(화) 09:00 ~ 2027. 1. 7.(목) 18:00)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26767093",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "2027학년도 국가근로장학금 신청 안내(11. 24.(화) 09:00 ~ 2027. 1. 7.(목) 18:00)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26767093",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "2026-2학기 SOS두드림장학 신청 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26767096",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "2026-2학기 SOS두드림장학 신청 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26767096",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[앵커사업단] 근로장학생 모집 안내 (~11/30(월) 모집 마감)",
+   "url": "https://www.jbnu.ac.kr/web/Board/220275/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": "접수기간: 2026. 11. 25.(수) ~ 11. 30.(월) 선발방법: 지원 자격 확인 후 면접을 통한 선발 면접일정: 지원자 대상 개별 안",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-11-30",
+   "bodyDeadlineText": "[앵커사업단] 근로장학생 모집 안내 (~11/30(월) 모집 마감)"
+  },
+  {
+   "title": "[장학안내] 2026학년도 미래성장 장학 1단계 평가대상자 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71117&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[교외][생활비] 2027학년도 에몬스 장학생 선발 안내(2026. 12. 14. ~ 2027. 1. 8.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1212927/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[국가근로] 2027학년도 1학기 국가근로장학금 1차 학생 신청기간 안내(11. 24. ~ 1. 7.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1212942/artclView.do",
+   "attachments": [
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (모바일앱).pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1231379/download.do"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 (홈페이지).pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1231380/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 안내(11. 24. ~ 1. 7.) 38 2026.11.25 2026.11.25 2027학년도 1학기 국가근로장학금 \"1차\" 학생 신청",
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "1. 해당학기: 2027 학년도 1학기 2. 신청기간 : 2026. 11. 24.(화) 0 9:00 ~ 2027. 1. 7.(목) 18:00"
+  },
+  {
+   "title": "[한국장학재단] 2027학년도 1학기 국가근로장학금 1차 신청기간 안내",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%5D%202027%ED%95%99%EB%85%84%EB%8F%84%201%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%201%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%EA%B8%B0%EA%B0%84%20%EC%95%88%EB%82%B4",
+   "attachments": [],
+   "deadlineHint": "신청기간 안내 학생지원팀 2026-11-24 75 245 [교외-1/5]2027년 1학기 농림축산식품부 청년창업농장학금 신청 안내(재단지원) 학",
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[등록/장학] 2027년 1학기 한국농어촌희망재단 「청년창업농장학금」장학생 선발 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53748&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment [붙임]2._2027년_1학기_농림축산식품부(청년창업농장학금)_장학생_선발공고.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35682&ano=53748"
+    },
+    {
+     "name": "Attachment [붙임]3._2027년_1학기_청년창업농장학금_선발안내.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35683&ano=53748"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[입학에서 취업까지] [한국장학재단] 2027년 1학기 국가근로장학금 1차 신청 안내 (2026.11.24.(화) 09:00 ~ 2027.01.07.(목) 18:00 까지)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627384&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "attachments": [
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 （홈페이지）.pdf",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990693"
+    },
+    {
+     "name": "2027년 1학기 1차 국가근로장학금 학생신청 방법 （모바일앱）.pdf",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990692"
+    }
+   ],
+   "deadlineHint": "신청기간 내 신청을 완료하여 주시기 바랍니다. ★ 2027년 1학기 1차 국가근로장학금 학생신청 방법 （홈페이지）.pdf 붙임2. 2027년 1",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[입학에서 취업까지] [에몬스] 2027 에몬스 장학생 19기 모집 안내 (2026.12.14.(월) ~ 2027.01.08.(금))",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627387&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[입학에서 취업까지] [한국농어촌희망재단] 2027년 1학기 농림축산식품부장학금 신청 안내 (2026.12.01.(화) ~ 2027.01.05.(화) 17시 까지)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627389&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "attachments": [
+    {
+     "name": "※ 2027년 1학기 청년창업농장학금 게시 내용.hwp",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990701"
+    },
+    {
+     "name": "1. 2027년 1학기 농림축산식품부（청년창업농장학금） 장학생 선발공고.hwp",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990702"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "2027년 1학기 농림축산식품부 청년창업농장학금 장학생 선발 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/237484/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "(홍보) 2027년 1학기 국가장학금 1차 신청 안내(~'27.01.07(목)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=898139&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/38060CD67CC14E0BBAFF76DBED5063C4.pdf"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 08. 03.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/A84CAB85EB1B467C8E719DF534E772A9.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "(홍보) 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고(~'27.01.05.(화)~까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=898140&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/38060CD67CC14E0BBAFF76DBED5063C4.pdf"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 08. 03.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/A84CAB85EB1B467C8E719DF534E772A9.pdf"
+    },
+    {
+     "name": "[붙임]2. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=63FA5EF9CD58483FAB7EDAF854366432_.hwp&ogrfname=%5B%EB%B6%99%EC%9E%84%5D2.+2027%EB%85%84+1%ED%95%99%EA%B8%B0+%EB%86%8D%EB%A6%BC%EC%B6%95%EC%82%B0%EC%8B%9D%ED%92%88%EB%B6%80%28%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EB%86%8D%EC%9E%A5%ED%95%99%EA%B8%88%29+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C%EA%B3%B5%EA%B3%A0.hwp"
+    },
+    {
+     "name": "[붙임]2.2027년 1학기 청년창업농장학금 선발안내.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=9C5A3AB452724E4DBB0FF1FA9C36995D_.pdf&ogrfname=%5B%EB%B6%99%EC%9E%84%5D2.2027%EB%85%84+1%ED%95%99%EA%B8%B0+%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EB%86%8D%EC%9E%A5%ED%95%99%EA%B8%88+%EC%84%A0%EB%B0%9C%EC%95%88%EB%82%B4.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "[학생복지팀] 한국장학재단 2026년 2학기 국가장학금Ⅰ유형(다자녀장학금 포함) 지급 안내_재단 11월 12일 지급실행분",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770649&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
+  {
+   "title": "2027년도 [19기] 에몬스 장학생 모집 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944728/artclView.do",
+   "attachments": [],
+   "deadlineHint": "접수 기간: 2026년 12월 14일 (월, 오전 0시) ~ 2027년 1월 8일 (금, 오후 5시까지) - 선발 인원: 총 20명 / 1명당",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2027-01-08",
+   "bodyDeadlineText": "2026.12.14 ~ 2027.01.08"
+  },
+  {
+   "title": "2027년도 제35기 세아해암장학생 추천(신촌캠퍼스)",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944731/artclView.do",
+   "attachments": [
+    {
+     "name": "2-(서식) 자기소개서.docx",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015717/download.do"
+    },
+    {
+     "name": "3-(서식) 포토에세이.docx",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015718/download.do"
+    },
+    {
+     "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015719/download.do"
+    },
+    {
+     "name": "5-(서식) 공식 프로그램 참석 확약서.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015720/download.do"
+    },
+    {
+     "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015721/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-12-06",
+   "bodyDeadlineText": "타 재단 장학금 미수혜자를 우선으로 하며, 소득분위가 낮고 전체 학기 성적이 우수한 학생을 우선 추천함. 7. 지원방법: 2026. 12. 6.(일)까지 scholar2@yonsei.ac.kr로 제출 ( 이메일 제목: [세아해암_학번_학과_이름]으로 제출 필수)"
+  },
+  {
+   "title": "2026학년도 국가우수장학금(이공계) 일시지원 신규장학생 대학추천자 선발 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/283034/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 선발자명단.pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380481/download.do"
+    },
+    {
+     "name": "2. (한국장학재단)2026년 국가우수장학금(이공계) 일시지원(한 학기 지원)유형 선발 안내.hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380482/download.do"
+    },
+    {
+     "name": "3. 2026년 국가우수장학금(이공계) 일시지원(한 학기 지원)유형 학생신청 매뉴얼.pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380483/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-11-25",
+   "bodyDeadline": "2026-11-26",
+   "bodyDeadlineText": "※ 기초생활수급자 생활비 추가지원 없음 3. 한 국장학재단 학생신청 : 2026. 11 . 26.( 목 ) 15:00 까지"
+  },
   {
    "title": "[글로벌] 2026학년도 2학기 면학장학금 신청 안내(미신청자)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/272572/artclView.do",

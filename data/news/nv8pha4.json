@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-25",
  "items": [
   {
+   "title": "[모집] 2026 AI 실무 트렌드 마스터 : 차세대 Web App 빌드업 챌린지 교육 (~12.14)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160731&noCat=514",
+   "postedAt": "2026-11-25",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-25",
+   "desc": "학생활동 교육과 관련한 자세한 사항은 아래에 첨부한 수업계획안(교육 커리큘럼)을 확인 해주세요. <모집안내>"
+  },
+  {
    "title": "[문정도서관] 기말고사 기간 중 일반열람실 및 미디어라운지 운영 안내",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160724&noCat=32",
    "postedAt": "2026-11-24",
@@ -84,7 +94,6 @@
    "campus": "",
    "src": "9c41077f",
    "foundAt": "2026-11-18",
-   "thumb": "data/news/img/25f814e2f5e0a3bc.webp",
    "desc": "<모집안내> -신청기간 : 2026.11.23(월) 10시 ~ 12.14(월) 15시 (신청링크: https://forms.gle/eBd2tFJa6qNGzaD69 ) -모집인원 : 홍익대(서울) 공과대학 재학생…"
   },
   {
@@ -119,7 +128,7 @@
    "src": "9c41077f",
    "foundAt": "2026-11-17",
    "thumb": "data/news/img/0ed5528efd043442.webp",
-   "desc": "[창업교육센터] ★ 홍익 IR 피칭데이 ★ *커피쿠폰추첨제공* 2026학년도 재학생 교육 만족도 조사(~12.31) [서울] 기획처 온라인커뮤니케이션실 - 대학원생 봉사장학생(SNS 관리) 모집 공고 전체보기"
+   "desc": "2026학년도 2학기 사이버강좌 기말고사 세부 일정 및 유의 사항을 다음과 같이 안내합니다."
   },
   {
    "title": "(서울캠퍼스)2026학년도 동계계절학기 일정 안내",
@@ -425,16 +434,6 @@
    "src": "9c41077f",
    "foundAt": "2026-10-28",
    "desc": "2026학년도 하계계절학기에 동국대학교 WISE캠퍼스(경북 경주시 소재)에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
-  },
-  {
-   "title": "2027학년도 1학기 재입학 신청 안내(학부생)(11.9 10:00~11.27 23:00, 온라인 접수)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159725&noCat=500",
-   "postedAt": "2026-10-28",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/155690bda9e326dc.webp"
   }
  ]
 }

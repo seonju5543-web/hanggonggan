@@ -11560,7 +11560,7 @@
    "eligibilityFrom": "공고문 첨부(OCR)",
    "openDate": "2026-09-28",
    "excerpts": [
-    "- 접수기간: 2026. 9.28.(월)~10.23.(금)"
+    "- 접수기간: 2026. 9.28.(월)~10.23.(금) - 신청방법: 장학회 방문 또는 이메일"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
@@ -26072,8 +26072,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-11-24",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "500만원",
+   "amountValue": 5000000,
    "deadline": "2027-01-08",
    "deadlineFrom": "게시판 요약 · 1/8 마감",
    "period": "접수 ~2027-01-08",
@@ -26098,7 +26098,39 @@
     }
    ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551923?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원 자격 : 1 대한민국 국적 보유자",
+    "국내 대학에서 한 학기 이상 수료한 자로서,2027년 1학기에 재학 예정인 자",
+    "학과장 또는 지도교수의 추천을 받은 자",
+    "④직전 학기 성적이 백분위 87점 이상 또는 평점평균 3.5/4.5(3.3/4.3)이상인 자",
+    "6차세대 리더로서 우수성과 리더십이 입증되고 성장 가능성과 잠재성이 있는 인재",
+    "※ 2027년 2월 졸업 예정자, 2027년 신규 입학자, 대학원생(석사·박사 과정 및 수료자)은 지원 대상에서 제외됩니다.",
+    "지원방법 : •온라인 접수:에몬스 홈페이지(www.emons.co.kr)",
+    "•이메일문의 : scholarship@emons.co.kr",
+    "※장학생 지원은PC에서만 가능합니다.",
+    "※접수기간에만장학생 접수 페이지 하단의‘온라인 지원'버튼이 활성화됩니다.",
+    "모집요강자세히보기"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-12-14",
+   "announceDate": "2027-02-10",
+   "excerpts": [
+    "•접수 기간: 2026년12월 14일 (월,오전 0시)~2027년1월 8일(금,오후17시까지)",
+    "•선발 인원: 총20명/1명당 장학금 500만 원 지급,총 장학금1억원",
+    "※ 2027년 2월 졸업 예정자, 2027년 신규 입학자, 대학원생(석사·박사 과정 및 수료자)은 지원 대상에서 제외됩니다.",
+    "•이메일문의 : scholarship@emons.co.kr"
+   ],
+   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 5000000,
+    "ratio": 0,
+    "min": 5000000,
+    "max": 5000000,
+    "raw": "•선발 인원: 총20명/1명당 장학금 500만 원 지급,총 장학금1억원"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-amepagescholarshipnotice-1tlg7ak",
@@ -26145,7 +26177,19 @@
     }
    ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551919?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "□ 지원조건 : 졸업 후 장학금 수혜 횟수에 해당하는 기간만큼(수혜 학기당 6개월, 180일) 영농 및 농림축산식품 분야에 취업 또는 창업하여 의무종사"
+   ],
+   "eligibilityFrom": "공고문 첨부",
+   "openDate": "2026-12-01",
+   "announceDate": "2027-02-01",
+   "excerpts": [
+    "□ 신청기간 : 2026.12.1.(화) 10시~ 2027.1.5.(화) 17시",
+    "□ 신청방법 : 한국농어촌희망재단 홈페이지(PC 또는 스마트폰, www.rhof.or.kr)에서 온라인 신청",
+    "□ 결과발표 : 2027.2.1.(월) 17시 예정(재단 학생장학시스템에서 확인)"
+   ],
+   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-oardid323654menuno200318",
@@ -26230,6 +26274,201 @@
     "raw": "가. 선발인원 및 금액: 1,000명/1인당 40만원 예정(신청인원 및 예산 상황에 따라 변동 가능) 나. 신청인원이1,000명을 초과할 경우아래 순위별우선 선발 -1순위:동대문구 거주자 (주민등록등본상 본인 거주지 기준) -2순위:소득분위 하위자 (한국장학재단 학자금 지원구간 기준) -3순위:안내 지침에 따라 서류를정확히제출한자 ※Cheer-Up 장학은 "
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ghaknoticedetail26767096",
+   "name": "2026-2학기 SOS두드림장학 신청 안내",
+   "boardTitle": "2026-2학기 SOS두드림장학 신청 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「장학팀 ] 서류심사」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-25",
+   "provider": "주관 기관 원문 확인",
+   "amount": "50만원 ~ 200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-12-11",
+   "deadlineFrom": "게시판 요약 · ~ 12.11",
+   "period": "접수 ~2026-12-11",
+   "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교"
+   },
+   "documents": [
+    "신청경로 : nDRIMS> 대표 - 학사행정> [학생신청] 신청함> 장학신청 (SOS 두드림)> 장학명 : SOS 두드림> 신청유형 선택",
+    "장학금 신청서 : 엔드림스 출력",
+    "가족관계증명서 (부 또는 모 명의) : 전자가족관계등록시스템 발급",
+    "부모 각각의 건강보험증 사본 또는 자격확인서 : 국민건강보험 홈페이지",
+    "부모 각각의 2025~2026 년도 건강보험료 납부 확인서 : 국민건강보험 홈페이지",
+    "가계실업자 본인 및 자녀 : 고용보험수급자격증 및 구직등록필증 사본",
+    "가계 파산자 본인 및 자녀 : 파산확정증명원 또는 결정문 (법원에서 결정)",
+    "직계가족의 장기 투병 : 진단서",
+    "의료비 정산서 등",
+    "신청자 본인이 근로자인 경우 : 본인이 근로자로 부양가족이 표기된 건강보험증 사본",
+    "천재지변 (자연재해 등) 에 의한 피해 등 : 재해관련 증빙서류 (관공서 발급)",
+    "아동복지시설 또는 가정위탁보호 출신 확인서"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-25 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-25",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767096",
+   "sourceKind": "auto",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "6. 선발기준",
+    "▶ 긴급가계곤란정도 , 학자금지원구간 , 성적 , 학업 및 진로계획 등 종합심사"
+   ],
+   "excerpts": [
+    "10. 문의 : 장학팀 02-2260-3698/3043"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "range",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 500000,
+    "max": 2000000,
+    "raw": "7. 장학금액 심사결과에 따른 차등지급 50 만원 ~200 만원"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "3) 외국인장학과 이중수혜 불가"
+   },
+   "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-bbssc58944731artclviewdo",
+   "name": "2027년도 제35기 세아해암장학생 추천(신촌캠퍼스)",
+   "boardTitle": "2027년도 제35기 세아해암장학생 추천(신촌캠퍼스)",
+   "type": "교외",
+   "kindEvidence": [
+    "접수 이메일 도메인 yonsei.ac.kr (학교)"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-25",
+   "provider": "주관 기관 원문 확인",
+   "amount": "300만원",
+   "amountValue": 3000000,
+   "deadline": "2026-12-06",
+   "deadlineFrom": "공고 원문 · 타 재단 장학금 미수혜자를 우선으로 하며, 소득분위가 낮고 전체 학기 성적이 우수한 학생을 우선 추천함. 7. 지원방법: 2026. 12. 6.(일)까지 scholar2@yonsei.ac.kr로 제출 ( 이메일 제목: [세아해암_학번_학과_이름]으로 제출 필수)",
+   "period": "접수 ~2026-12-06",
+   "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "연세대학교"
+   },
+   "documents": [
+    "자기소개서",
+    "포토에세이",
+    "과학탐구활동 실행 이력서",
+    "재단 공식 프로그램 참석 확약서",
+    "개인정보 제공 및 사용 동의서"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-25 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-25",
+   "attachments": [
+    {
+     "name": "2-(서식) 자기소개서.docx",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015717/download.do"
+    },
+    {
+     "name": "3-(서식) 포토에세이.docx",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015718/download.do"
+    },
+    {
+     "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015719/download.do"
+    },
+    {
+     "name": "5-(서식) 공식 프로그램 참석 확약서.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015720/download.do"
+    },
+    {
+     "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015721/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/944731/artclView.do",
+   "sourceKind": "auto",
+   "applyEmail": "scholar2@yonsei.ac.kr",
+   "applyEmailSource": "7. 지원방법: 2026. 12. 6.(일)까지 scholar2@yonsei.ac.kr로 제출 ( 이메일 제목: [세아해암_학번_학과_이름]으로 제출 필수)",
+   "applyEmailFrom": "공고 원문",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "2. 지원 조건",
+    "가. 2027-1학기 기준 3학년 이과대학, 공과대학, 인공지능융합대학, 생명시스템대학 학부 재학생",
+    "나. 2026-1학기까지 전체 성적이 3.5/4.5 이상인 학생",
+    "다. 2026-2학기 기준 소득분위 8분위 이하인 학생",
+    "라. 2027년도 1학기 12학점 이상 수강 예정자",
+    "마. 재단의 장학생 네트워크 활동에 적극 참여해 자기발전을 키워갈 인재",
+    "바. 명확한 과학자 비전을 가진 우수 학생",
+    "* 취업을 목표로 수학 중인 학생 제외"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "3. 지원금액: 학기당 300만원 생활비성 장학금(2년간 4개 학기 계속 지원) 4. 진학 시 아래의 재단 동문 장학생 자격 우선 선정 혜택 -박사 장학생: 학기당 400만원 생활비 장학금(2년 4개 학기 계속지원) -박사후연구원: 연 1,000만원 연구활동비 지원(2년 계속 지원) -교수 및 연구원: 연구프로젝트 연 5,000만원(3년 계속지원), 세아해"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-0713no2516453sitedvscdkr",
+   "name": "「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내",
+   "boardTitle": "「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-25",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-12-02",
+   "deadlineFrom": "공고 원문 · 추가 모집기간 2026. 11. 28.( 토 ) 09:00 ~ 12. 2.( 수 ) 18:00",
+   "period": "접수 ~2026-12-02",
+   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-25 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-25",
+   "attachments": [
+    {
+     "name": "대학(원)별 훈련일정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/20200818_2.hwp"
+    },
+    {
+     "name": "[붙임 1] 「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내.hwpx",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2516453&atch_no=1"
+    },
+    {
+     "name": "학교홈페이지관리규정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/2025_homepage_3020.hwp"
+    }
+   ],
+   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516453&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "sourceKind": "auto"
   }
  ]
 }

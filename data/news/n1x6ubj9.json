@@ -3,6 +3,27 @@
  "updatedAt": "2026-11-25",
  "items": [
   {
+   "title": "[성균관대·POSTECH 공동주최] 행정혁신포럼「AI시대의 대학행정」참가방법 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142350&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-25",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-25",
+   "desc": "성균관대학교와 POSTECH에서 공동주최하는 행정혁신포럼 'AI시대의 대학행정' 을 아래 및 붙임과 같이 안내드리오니, 전국 대학 관계자 분들 및 대학행정에 관심있는 분들의 많은 참여 부탁드립니다."
+  },
+  {
+   "title": "2027학년도 1학기 학부·대학원 연계과정(舊학석사연계과정) 신청 안내(11/30~12/11)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142349&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-25",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-25",
+   "desc": "※ 학부·대학원 연계과정 학석박연계 트랙 대상 新대학원우수장학금 우선 선발 제도 신설(6.혜택 참고)"
+  },
+  {
    "title": "사회과학/예술대학행정실 행정조교 모집[~11.30.(월) 16:00까지]",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142313&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-24",
@@ -110,7 +131,7 @@
    "src": "45ec8fd1",
    "foundAt": "2026-11-20",
    "thumb": "data/news/img/87bcd02abc0a7d51.webp",
-   "desc": "안전보건팀 대학수학능력시험 종료 이후 수도권 주요 번화가 등에 인파밀집이 예상됨에 따라 외부 활동 중 인파사고 대비 행동요령을 다음과 같이 안내드립니다."
+   "desc": "대학수학능력시험 종료 이후 수도권 주요 번화가 등에 인파밀집이 예상됨에 따라 외부 활동 중 인파사고 대비 행동요령을 다음과 같이 안내드립니다."
   },
   {
    "title": "[AI중심대학사업단] 글로벌 IT전문가와 킹고인의 만남 시즌2 여든다섯 번째 만남 (11/25, 수, 15시)",
@@ -392,7 +413,6 @@
    "campus": "",
    "src": "45ec8fd1",
    "foundAt": "2026-11-13",
-   "thumb": "data/news/img/2e506b1b2c4385dd.webp",
    "desc": "성균관대학교와 POSTECH에서 공동주최하는 행정혁신포럼 \"AI시대의 대학행정\" 을 아래 및 붙임과 같이 안내드리오니, 전국 대학 관계자 분들 및 대학행정에 관심있는 분들의 많은 참여 부탁드립니다."
   },
   {
@@ -415,29 +435,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-11-13",
    "desc": "트랜스미디어연구소 성균관대학교 트랜스미디어연구소에서 발행하는 KCI 등재지 『trans-』가 제22권 논문을 모집합니다."
-  },
-  {
-   "title": "[채용/모집] 자연과학대학 행정조교 채용(~11/26(목))",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141910&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-13",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-13",
-   "desc": "자연과학대학 성균관대학교 자연과학대학에서 행정업무를 담당할 행정조교를 다음과 같이 모집합니다."
-  },
-  {
-   "title": "[서울특별시] BIG 기획전시 「MATERIALISM(머티리얼리즘)」 관람 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141904&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-13",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-13",
-   "thumb": "data/news/img/6b069539037f620a.webp",
-   "desc": "학생지원팀 서울특별시에서는 건축설계그룹 BIG의 기획전시 「MATERIALISM(머티리얼리즘)」을 개최합니다. 이번 전시는 건축재료를 중심으로 설계 아이디어가 실제 공간으로 구현되는 과정을 소개합니다."
   }
  ]
 }
