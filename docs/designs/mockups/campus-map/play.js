@@ -4,7 +4,8 @@
    🔴 지어내지 않는다 — 재학생 의견은 비어 있고, 이 기기에서 방금 남긴 것만 「내가 남긴 의견」으로 보인다(어디에도 보내지 않는다 · 탭을 닫으면 사라진다). */
 (function () {
   'use strict';
-  var D = window.CAMPUS_MAP, T = window.CAMPUS_TOWN, M = window.MapMock, esc = M.esc;
+  var D = window.CAMPUS_MAP, T = window.CAMPUS_TOWN, M = window.MapMock, esc = M.esc, SC = window.CampusScore;
+  var TOPN = 5;   // 처음 지도 — 갈래마다 점수 높은 n곳만 핀으로(11-25 개발자 지시 3)
   var app = document.getElementById('app');
   var KEY = 'campus-map-play-v1';
 
@@ -17,7 +18,7 @@
   var pendingAfterVerify = null;
 
   // ───────── 자료 찾기 ─────────
-  var THEME_TPL = { '학교 안': 's2', '카공': 's3', '술집·과팅': 's5', '안전': 's6' };
+  var THEME_TPL = { '학교 안': 's2', '안전': 's6' };
   var HOLD = { 't-p008': 1 };   // 중앙도서관 쉼터 — 신축 공사 기사가 있어 확인 뒤에 올린다(그림 시안 ③ 메모)
   var NAME2ID = {
     '도서관/정보전산원': 'w382499365', '제2학생회관': 'w382499348', '제1학생회관': 'w382499358',
@@ -65,14 +66,18 @@
   }
   function fmtDate(d) { var m = /^\d{4}(-\d{2}){0,2}/.exec(String(d || '')); return m ? m[0].replace(/-/g, '.') : ''; }
   function cut(q, n) { return q.length > n ? q.slice(0, n) + '…' : q; }
+  var SCTX = { asOf: T.asOf, zones: T.zones };
+  var scoreCache = {};
+  function scoreOf(p) { if (!isTown(p)) return null; return scoreCache[p.id] || (scoreCache[p.id] = SC.score(p, SCTX)); }
+  function ranked(cat, f) { return SC.rank(townAll.filter(function (p) { return p.category === cat && (!f || f(p)); }), SCTX).map(function (r) { return r.p; }); }
   var GO = '<span class="go" data-go></span>';
-  function rowHtml(p, theme) {
-    var m = isTown(p) && p.mentions && p.mentions[0];
-    var op = S.ops[p.id];
-    var sub = m ? '<small><i>' + esc(SRCSHORT[m.src] || m.src) + '</i> 「' + esc(m.q) + '」</small>'
-      : '<small>' + esc(CATLABEL[p.cat] || '') + '</small>';
+  // 목록 줄 — 리서치 장소는 순위 · 한 줄 요약 · 점수, 공공 자료 장소는 종류 · 거리
+  function rowHtml(p, theme, rank) {
+    var sc = scoreOf(p), op = S.ops[p.id];
     var mine = op && op.tags.length ? '<em class="op-n">' + esc(op.tags[0]) + ' 1' + (op.tags.length > 1 ? ' 외 ' + (op.tags.length - 1) : '') + '</em>' : '';
-    return '<li class="' + (m ? 'q2' : '') + '" data-act="place" data-key="' + esc(p.id) + '" data-theme="' + esc(theme || '') + '"><span class="pi" data-icon="' + esc(iconOf(p)) + '"></span><span class="pt"><b>' + esc(disp(p)) + '</b>' + sub + mine + '</span><span class="pd">' + esc(right(p)) + '</span>' + GO + '</li>';
+    if (!sc) return '<li data-act="place" data-key="' + esc(p.id) + '" data-theme="' + esc(theme || '') + '"><span class="pi" data-icon="' + esc(iconOf(p)) + '"></span><span class="pt"><b>' + esc(disp(p)) + '</b><small>' + esc(CATLABEL[p.cat] || '') + '</small>' + mine + '</span><span class="pd">' + esc(right(p)) + '</span>' + GO + '</li>';
+    var lead = rank ? '<span class="pi rank">' + rank + '</span>' : '<span class="pi" data-icon="' + esc(iconOf(p)) + '"></span>';
+    return '<li class="q2 scored" data-act="place" data-key="' + esc(p.id) + '" data-theme="' + esc(theme || '') + '">' + lead + '<span class="pt"><b>' + esc(disp(p)) + '</b><small>' + esc(sc.summary) + '</small>' + mine + '</span><span class="pd"><b class="pts">' + sc.total + '점</b>' + esc(right(p)) + '</span>' + GO + '</li>';
   }
   function suggestRow(theme) { return '<li class="suggest" data-act="suggest" data-theme="' + esc(theme || '') + '"><span class="pi" data-icon="plus"></span><span class="pt"><b>빠진 곳 제안하기</b></span>' + GO + '</li>'; }
   var NAV = '<nav class="bottom-nav" data-tab="home" aria-label="하단 탭"></nav>';
@@ -86,34 +91,41 @@
   }
 
   // ───────── 주제별 자료(그림이 없던 주제 + 「목록 보기」) ─────────
+  var SCORE_NOTE = '점수는 거리·근거·최근·조건·위치 확인으로 매겼어요. 학생 평가가 아니에요.';
   function themeData(theme) {
-    var town = function (cat, f) { return townAll.filter(function (p) { return p.category === cat && (!f || f(p)); }).sort(function (a, b) { return (a.lat ? a.dist : 1e6) - (b.lat ? b.dist : 1e6); }); };
     var notTransit = function (p) { return p.kind !== '교통'; };
-    if (theme === '밥집') return { head: '학보·리뷰에 나온 밥집 <b>' + town('밥집').length + '</b>곳', groups: [{ rows: town('밥집') }], dots: { layers: ['campus'], cats: { campus: ['restaurant'] } } };
-    if (theme === '복지·혜택') return { head: '학보에 나온 복지·혜택 <b>' + town('복지·혜택').length + '</b>곳', groups: [{ rows: town('복지·혜택') }], dots: {}, memo: '장학·복지 공고와 제휴 혜택 글은 관리자가 확인한 뒤 장소에 잇습니다(11-23 결정).' };
+    var pub = function (f, n) { return D.pois.filter(function (p) { return p.name && f(p); }).sort(function (a, b) { return a.dist - b.dist; }).slice(0, n || 30); };
+    if (theme === '카공') { var st = ranked('카공'); return { scored: true, head: '처음 지도 · 카공 상위 <b>' + Math.min(TOPN, st.length) + '</b>곳', groups: [{ title: '점수 높은 차례 · ' + st.length + '곳', rows: st, ranked: true }, { title: '카페 — 점수 높은 차례', rows: ranked('카페'), ranked: true }, { title: '그 밖의 카페·도서관 (공개 지도 · 이름과 위치만)', rows: pub(function (p) { return p.layer === 'study' && p.dist <= 900; }, 12) }], dots: { layers: ['study'], cats: { study: ['cafe'] }, maxDist: 700 } }; }
+    if (theme === '밥집') { var fd = ranked('밥집'); return { scored: true, head: '처음 지도 · 밥집 상위 <b>' + Math.min(TOPN, fd.length) + '</b>곳', groups: [{ title: '점수 높은 차례 · ' + fd.length + '곳', rows: fd, ranked: true }], dots: { layers: ['campus'], cats: { campus: ['restaurant'] } } }; }
+    if (theme === '술집·과팅') { var br = ranked('술집'); return { scored: true, head: '처음 지도 · 술집 <b>' + br.length + '</b>곳', groups: [{ title: '점수 높은 차례 · ' + br.length + '곳', rows: br, ranked: true }, { title: '과팅 장소', empty: '추천된 곳이 아직 없어요' }, { title: '공개 지도의 주점 (이름과 위치만)', plain: T.bars.map(function (b) { return { name: b.name, right: meters(b.dist) }; }) }], dots: {}, bars: true, extra: '<p class="p-group" style="margin-top:12px">과팅 장소</p><p class="empty-line">추천된 곳이 아직 없어요</p>' }; }
+    if (theme === '복지·혜택') { var bf = ranked('복지·혜택'); return { scored: true, head: '처음 지도 · 복지·혜택 <b>' + bf.length + '</b>곳', groups: [{ title: '점수 높은 차례', rows: bf, ranked: true }], dots: {}, memo: '장학·복지 공고와 제휴 혜택 글은 관리자가 확인한 뒤 장소에 잇습니다(11-23 결정).' }; }
     if (theme === '생활') {
       var near = [].concat(nearest('convenience', 1), nearest('pharmacy', 1), nearest('doctors', 1), nearest('coin_laundry', 1), nearest('bank', 1), nearest('post_office', 1), nearest('supermarket', 1)).sort(function (a, b) { return a.dist - b.dist; });
-      return { head: '가까운 생활 시설 · 거리는 정문에서', groups: [{ title: '종류마다 가장 가까운 곳', rows: near }, { title: '학보·학교 안내에 나온 곳', rows: town('생활', notTransit) }], dots: { layers: ['life'], maxDist: 600 }, pinsFrom: near };
+      return { head: '가까운 생활 시설 · 거리는 정문에서', groups: [{ title: '종류마다 가장 가까운 곳 (공공·공개 자료)', rows: near }, { title: '학보·학교 안내에 나온 곳 — 점수 높은 차례', rows: ranked('생활', notTransit), ranked: true }], dots: { layers: ['life'], maxDist: 600 }, pinsFrom: near };
     }
     if (theme === '교통') {
       var tr = [].concat(nearest('station', 2), nearest('bus_stop', 2), nearest('bicycle_rental', 2)).sort(function (a, b) { return a.dist - b.dist; });
-      return { head: '가까운 역·정류장 · 거리는 정문에서', groups: [{ title: '가까운 곳', rows: tr }, { title: '학보·학교 안내에 나온 길', rows: town('생활', function (p) { return p.kind === '교통'; }) }], dots: { layers: ['transit'], maxDist: 500 }, pinsFrom: tr };
+      return { head: '가까운 역·정류장 · 거리는 정문에서', groups: [{ title: '가까운 곳 (공공·공개 자료)', rows: tr }, { title: '학보·학교 안내에 나온 길 — 점수 높은 차례', rows: ranked('생활', function (p) { return p.kind === '교통'; }), ranked: true }], dots: { layers: ['transit'], maxDist: 500 }, pinsFrom: tr };
     }
-    if (theme === '카공') return { groups: [{ title: '학보·리뷰에 나온 곳', rows: town('카공') }, { title: '그 밖의 카페·도서관 (공개 지도 · 이름과 위치만)', rows: D.pois.filter(function (p) { return p.layer === 'study' && p.name && p.dist <= 900; }).sort(function (a, b) { return a.dist - b.dist; }).slice(0, 12) }] };
-    if (theme === '술집·과팅') return { groups: [{ title: '학보·리뷰에 나온 술집', rows: town('술집') }, { title: '과팅 장소', empty: '추천된 곳이 아직 없어요' }, { title: '공개 지도의 주점 (이름과 위치만)', plain: T.bars.map(function (b) { return { name: b.name, right: meters(b.dist) }; }) }] };
-    if (theme === '안전') return { groups: [{ title: '정문에서 가까운 차례', rows: D.pois.filter(function (p) { return p.layer === 'safety' && p.name; }).sort(function (a, b) { return a.dist - b.dist; }) }] };
-    return { groups: [{ title: '학교 안 건물 · 정문에서 가까운 차례', rows: D.pois.filter(function (p) { return p.layer === 'campus' && p.name && ['building', 'student_center', 'library', 'dormitory', 'facility'].indexOf(p.cat) >= 0; }).sort(function (a, b) { return a.dist - b.dist; }).slice(0, 30) }] };
+    if (theme === '안전') return { groups: [{ title: '정문에서 가까운 차례', rows: pub(function (p) { return p.layer === 'safety'; }) }] };
+    return { groups: [{ title: '학교 안 건물 · 정문에서 가까운 차례', rows: pub(function (p) { return p.layer === 'campus' && ['building', 'student_center', 'library', 'dormitory', 'facility'].indexOf(p.cat) >= 0; }) }] };
   }
   function genTheme(theme) {
     var d = themeData(theme);
-    var rows = []; d.groups.forEach(function (g) { (g.rows || []).forEach(function (p) { rows.push(p); }); });
-    var pins = (d.pinsFrom || rows).filter(function (p) { return p.lat; }).slice(0, 7);
-    var cfg = { center: 'gate', zoom: 16.25, layers: (d.dots.layers || []), pins: pins.map(function (p) { return p.id; }), labels: pins.slice(0, 2).map(function (p) { return p.id; }), rename: RENAME };
+    var first = d.groups[0].rows || [];
+    var top = d.scored ? first.slice(0, TOPN) : first;
+    var pins = (d.pinsFrom || top).filter(function (p) { return p.lat; }).slice(0, 7);
+    var cfg = { center: 'gate', zoom: 16.25, layers: (d.dots.layers || []), pins: pins.map(function (p) { return p.id; }).reverse(), labels: pins.slice(0, 2).map(function (p) { return p.id; }), rename: RENAME };
     if (d.dots.cats) cfg.cats = d.dots.cats;
     if (d.dots.maxDist) cfg.maxDist = d.dots.maxDist;
+    if (d.bars) { cfg.bars = true; cfg.maxDist = 700; }
+    if (d.scored) { cfg.numbered = {}; top.forEach(function (p, i) { if (p.lat) cfg.numbered[p.id] = i + 1; }); }
+    var nopin = d.scored ? top.filter(function (p) { return !p.lat; }).length : 0;
     var html = topHtml(theme) + mapHtml(cfg) + CREDIT + '<section class="ms-panel"><div class="sheet-handle"></div>' +
       '<div class="p-head"><p class="p-sum">' + d.head + '</p><button class="link-btn" data-act="list">목록 보기 ›</button></div>' +
-      '<ul class="place-list">' + rows.slice(0, 3).map(function (p) { return rowHtml(p, theme); }).join('') + suggestRow(theme) + '</ul>' +
+      (d.scored ? '<p class="score-note">' + SCORE_NOTE + (nopin ? ' 상위 ' + top.length + '곳 중 ' + nopin + '곳은 위치 확인 전이라 핀이 없어요.' : '') + '</p>' : '') +
+      '<ul class="place-list">' + top.slice(0, d.scored ? TOPN : 3).map(function (p, i) { return rowHtml(p, theme, d.scored ? i + 1 : 0); }).join('') + '</ul>' +
+      (d.extra || '') + '<ul class="place-list">' + suggestRow(theme) + '</ul>' +
       (d.memo ? '<p class="plan-slot"><span class="plan-tag">시안 메모</span>' + esc(d.memo) + '</p>' : '') + '</section>' + NAV;
     return { html: html, mapTop: '138px' };
   }
@@ -123,8 +135,8 @@
     intro: function () {
       return { html: '<div class="app-scroll intro"><p class="kicker">한대장 · 눌러 보는 시안 · 3판</p><h1>학교 주변 지도</h1>' +
         '<p class="lead">서울과학기술대학교 1학년 화면입니다. 실제 앱처럼 눌러서 넘겨 보세요.</p>' +
-        '<ul class="try"><li><b>홈</b>의 「우리 학교 주변」 세 줄에서 들어갑니다</li><li><b>주제 칩</b>을 누르면 지도가 바뀝니다 — 학교 안 · 카공 · 밥집 · 술집·과팅 · 생활 · 안전 · 교통 · 복지·혜택</li><li><b>핀이나 목록 줄</b>을 누르면 그 장소가 열립니다 — 목록은 손잡이를 누르면 펼쳐집니다</li><li><b>의견 남기기 · 빠진 곳 제안하기</b>를 직접 해 볼 수 있습니다</li><li><b>대학가 한눈에</b>에서 구역을 누르면 그 구역의 장소가 나옵니다</li></ul>' +
-        '<p class="fine">남긴 의견·제안은 이 화면에만 잠깐 남고 어디에도 보내지 않습니다. 학생들의 말은 학보 등 출처의 구절 그대로이고, 재학생 의견은 처음엔 비어 있습니다.</p>' +
+        '<ul class="try"><li><b>홈</b>의 「우리 학교 주변」 세 줄에서 들어갑니다</li><li><b>주제 칩</b>을 누르면 지도가 바뀝니다 — 학교 안 · 카공 · 밥집 · 술집·과팅 · 생활 · 안전 · 교통 · 복지·혜택</li><li><b>핀이나 목록 줄</b>을 누르면 그 장소가 열립니다 — 요약 · 장점 · 확인할 것 · 점수 내역이 나옵니다</li><li>카공 · 밥집 · 술집은 <b>처음 점수</b>가 높은 차례로 상위 ' + TOPN + '곳만 번호 핀으로 보입니다</li><li><b>의견 남기기 · 빠진 곳 제안하기</b>를 직접 해 볼 수 있습니다</li><li><b>대학가 한눈에</b>에서 구역을 누르면 그 구역의 장소가 나옵니다</li></ul>' +
+        '<p class="fine">남긴 의견·제안은 이 화면에만 잠깐 남고 어디에도 보내지 않습니다. 처음 점수는 학생 평가가 아니라 거리·글의 수와 날짜·글 속 낱말로 매긴 것이고, 재학생 의견은 처음엔 비어 있습니다.</p>' +
         '<button class="btn btn-primary btn-lg" data-act="start">시작하기</button>' +
         '<a class="sheet-link" href="index.html">설명이 붙은 그림 시안 보기 ›</a></div>' };
     },
@@ -158,7 +170,7 @@
     place: function (st) {
       var p = findPlace(st.key), theme = st.theme || '학교 안';
       var name = p ? disp(p) : st.key;
-      var chipTheme = THEME_TPL[theme] || ['밥집', '생활', '교통', '복지·혜택'].indexOf(theme) >= 0 ? theme : '';
+      var chipTheme = ['학교 안', '카공', '밥집', '술집·과팅', '생활', '안전', '교통', '복지·혜택'].indexOf(theme) >= 0 ? theme : '';
       var cfg = p && p.lat ? { center: [p.lat, p.lon], zoom: 16.5, offset: [0, 250], layers: [], pins: [p.id], focus: p.id, gate: false, rename: RENAME }
         : { center: 'gate', zoom: 15.5, offset: [0, 250], layers: [], pins: [] };
       var where = [];
@@ -176,6 +188,16 @@
           (op.text ? '<ul class="op-list"><li>' + esc(op.text) + '<small>방금</small></li></ul>' : '')
           : '<p class="empty-line">아직 의견이 없어요</p>') +
         '<button class="btn-ghost btn-wide" data-act="opine">' + (op ? '의견 고치기' : '의견 남기기') + '</button></section>';
+      var sec0 = '', sc = p && scoreOf(p);
+      if (sc) {
+        var li = function (x, cls) { return '<li class="' + cls + '">' + esc(x.t) + (x.q ? '<small>' + esc(SRCSHORT[x.src] || x.src) + ' 「' + esc(cut(x.q, 34)) + '」</small>' : '') + '</li>'; };
+        sec0 = '<section class="sheet-sec glance"><h4>한눈에 <span class="pts-chip">처음 점수 ' + sc.total + '점</span></h4>' +
+          '<p class="glance-sum">' + esc(sc.summary) + '</p>' +
+          (sc.pros.length ? '<p class="gl-h">장점</p><ul class="gl pro">' + sc.pros.map(function (x) { return li(x, 'pro'); }).join('') + '</ul>' : '') +
+          (sc.cons.length ? '<p class="gl-h">아쉬운 점 · 확인할 것</p><ul class="gl con">' + sc.cons.map(function (x) { return li(x, 'con'); }).join('') + '</ul>' : '') +
+          '<p class="gl-parts">' + SC.PARTS.map(function (k) { return k[1] + ' ' + sc.parts[k[0]] + '/' + SC.MAX[k[0]]; }).join(' · ') + '</p>' +
+          '<p class="gl-note">학생 평가가 아니라 자료로 매긴 처음 점수예요. 재학생 의견이 쌓이면 그 의견이 먼저 보여요.</p></section>';
+      }
       var sec2 = '';
       if (p && isTown(p) && p.mentions.length) {
         var qs = p.mentions.map(function (m, i) {
@@ -186,12 +208,12 @@
       }
       var sec3 = '';
       if (p && p.id === 't-p005') { var n = document.getElementById('tpl-s4').content.querySelector('.news-row'); if (n) sec3 = n.closest('.sheet-sec').outerHTML; }
-      var foot = (p && p.lat ? '<a class="btn-ghost btn-wide" href="https://map.kakao.com/link/to/' + encodeURIComponent(name) + ',' + p.lat + ',' + p.lon + '" target="_blank" rel="noopener">길찾기 ↗</a>' : '') +
+      var foot = (p && p.lat ? '<a class="btn-ghost btn-wide" href="https://map.naver.com/p/search/' + encodeURIComponent((isTown(p) && p.zone === 'z-campus' ? '서울과학기술대학교 ' : '') + String(name).replace(/\(.*$/, '').trim()) + '" target="_blank" rel="noopener">네이버 지도에서 보기 ↗</a>' : '') +
         '<a class="sheet-link" href="#" data-act="report">틀린 정보 알리기 ›</a>';
       var html = (chipTheme ? topHtml(chipTheme) : '<div class="ms-top"><header data-subhead="학교 주변"></header></div>') + mapHtml(cfg) + CREDIT +
         '<section class="ms-panel sheet tall"><div class="sheet-handle" data-act="back"></div>' +
         '<div class="sch-top sheet-top" style="padding-right:0"><span class="badge badge-kind">' + esc(p ? catOf(p, theme) : theme) + '</span></div>' +
-        '<h3 class="sheet-title">' + esc(name) + '</h3><p class="place-where">' + esc(where.join(' · ')) + '</p>' + sec1 + sec2 + sec3 + foot + '</section>' + NAV;
+        '<h3 class="sheet-title">' + esc(name) + '</h3><p class="place-where">' + esc(where.join(' · ')) + '</p>' + sec0 + sec1 + sec2 + sec3 + foot + '</section>' + NAV;
       return { html: html, mapTop: chipTheme ? '138px' : '64px', pid: p ? p.id : null };
     },
     course: function () {
@@ -211,7 +233,7 @@
       return { html: box.innerHTML, mapTop: t.mapTop };
     },
     zone: function (st) {
-      var z = zoneOf(st.zid); var rows = townAll.filter(function (p) { return p.zone === z.id; }).sort(function (a, b) { return (a.lat ? a.dist : 1e6) - (b.lat ? b.dist : 1e6); });
+      var z = zoneOf(st.zid); var rows = SC.rank(townAll.filter(function (p) { return p.zone === z.id; }), SCTX).map(function (r) { return r.p; });
       var pins = rows.filter(function (p) { return p.lat; }).slice(0, 6);
       var cfg = { center: [z.lat, z.lon], zoom: 15.75, offset: [0, 140], layers: [], zones: [z.id], zoneFocus: [z.id], zoneLabels: false, pins: pins.map(function (p) { return p.id; }), labels: pins.slice(0, 2).map(function (p) { return p.id; }), gate: z.dist < 700 };
       var say = z.say && z.say[0];
@@ -276,7 +298,7 @@
     M.fillUi();
     // 화면이 낮은 기기(휴대폰 브라우저)에서는 목록 판을 낮게 시작한다 — 지도가 먼저 보이게. 판 안에서 굴리거나 손잡이를 눌러 편다.
     var pn = app.querySelector('.ms-panel:not(.sheet)');
-    if (pn && app.clientHeight < 760) pn.classList.add('peek');
+    if (pn && (app.clientHeight < 760 || pn.scrollHeight > app.clientHeight * 0.45)) pn.classList.add('peek');
     var els = app.querySelectorAll('[data-map]');
     for (var i = 0; i < els.length; i++) {
       try { maps.push(els[i].closest('.thumb') ? M.mount(els[i]) : frame(els[i])); } catch (e) { console.error('지도 그리기 실패', e); }
@@ -346,10 +368,10 @@
     check: function (el) { var id = el.getAttribute('data-id'), i = S.done.indexOf(id); if (i >= 0) S.done.splice(i, 1); else S.done.push(id); save(); render(); },
     list: function () {
       var theme = curTheme(), d = themeData(theme);
-      openOverlay('<h3 class="sheet-title" style="margin-top:4px">' + esc(theme) + '</h3>' + d.groups.map(function (g) {
+      openOverlay('<h3 class="sheet-title" style="margin-top:4px">' + esc(theme) + '</h3>' + (d.scored ? '<p class="score-note">' + SCORE_NOTE + '</p>' : '') + d.groups.map(function (g) {
         return (g.title ? '<p class="p-group" style="margin-top:14px">' + esc(g.title) + '</p>' : '') +
           (g.empty ? '<p class="empty-line">' + esc(g.empty) + '</p>' : '') +
-          '<ul class="place-list">' + (g.rows || []).map(function (p) { return rowHtml(p, theme); }).join('') +
+          '<ul class="place-list">' + (g.rows || []).map(function (p, i) { return rowHtml(p, theme, g.ranked ? i + 1 : 0); }).join('') +
           (g.plain || []).map(function (r) { return '<li class="plain"><span class="pi" data-icon="술집"></span><span class="pt"><b>' + esc(r.name) + '</b></span><span class="pd">' + esc(r.right) + '</span></li>'; }).join('') + '</ul>';
       }).join('') + '<ul class="place-list" style="margin-top:6px">' + suggestRow(theme) + '</ul>', 'list');
     },
@@ -378,7 +400,7 @@
           '<label class="f-label" style="margin-top:14px">어땠나요? (여러 개 고를 수 있어요)</label><div class="pick-chips multi" id="op-tags">' +
           words.map(function (w) { return '<span class="chip' + (op.tags.indexOf(w) >= 0 ? ' active' : '') + '">' + esc(w) + '</span>'; }).join('') + '</div>' +
           '<label class="f-label">한 줄 의견 (선택)</label><input class="f-input" id="op-text" type="text" maxlength="60" placeholder="다른 학생에게 알려 주고 싶은 것" autocomplete="off" value="' + esc(op.text) + '">' +
-          '<button class="btn btn-primary btn-lg" data-act="send-opinion" style="margin-top:20px">의견 보내기</button>');
+          '<button class="btn btn-primary btn-lg" data-act="send-opinion" style="margin-top:20px">의견 보내기</button><p class="f-note">정보를 남기면 토큰을 받게 돼요(준비 중).</p>');
       });
     },
     'send-opinion': function () {
