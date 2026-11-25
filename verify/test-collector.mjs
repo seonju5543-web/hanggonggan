@@ -6747,6 +6747,31 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
         AL.detailAttachments('<span>A요강.hwp</span><a href="./downloadBbsFile.do?atchmnflNo=1">다운로드</a> <a href="./previewBbsFile.do?atchmnflNo=1">미리보기</a> <span>포스터.jpg</span><a href="./downloadBbsFile.do?atchmnflNo=2">다운로드</a>', kgu).map((a) => `${a.name}|${a.url.slice(-12)}`),
         AL.detailAttachments('<a href="/ko/downloads/">양식 다운로드</a>', kgu)],
       [[], ['A요강.hwp|atchmnflNo=1'], []]);
+    /* 사이트가 파일 이름 뒤에 붙인 꼬리 — 용량·내려받은 횟수·미리보기 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ②③).
+       꼬리 때문에 이름이 확장자로 끝나지 않아 ① 동아대 국어문화원 글은 첨부 둘이 아예 안 잡혔고(주소는 `downloadRun.do?qcode=…` 보통 링크 · 2026-11-25 페이지를 받아 확인)
+       ② 농림축산식품부 글은 잡히고도 문서로 읽히지 않았다(`….hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB`). 받을 때 떼고(detailAttachments), 실린 활동 글은 소급한다 */
+    eq('사이트 꼬리 떼기(trimSiteTail) — 용량·내려받은 횟수·미리보기 꼬리만 뗀다 · 닫는 괄호가 없어도 · 본문 문장과 이름 속 괄호·다른 괄호 꼬리는 그대로',
+      ['제안서.hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB', '신청서.hwp (다운로드 : 12회)', '신청서.hwp (71KB)', '요강.pdf [123 KB]', '요강.pdf 미리보기',
+        '공고문.hwp', '2026 안내(최종).pdf', '참가 안내', '신청서.hwp 작성 방법 안내', '공고문.hwp (최종)', ''].map((n) => (AL.trimSiteTail || (() => undefined))(n)),
+      ['제안서.hwp', '신청서.hwp', '신청서.hwp', '요강.pdf', '요강.pdf', '공고문.hwp', '2026 안내(최종).pdf', '참가 안내', '신청서.hwp 작성 방법 안내', '공고문.hwp (최종)', '']);
+    const donga = 'https://korea.donga.ac.kr/korea/CMS/Board/Board.do?mCode=MN032&mode=view&mgr_seq=1002&board_seq=8520208';
+    eq('  받을 때부터 뗀다 — 동아대 국어문화원 꼴(`<span>신청서.hwp (71KB)</span>` · 주소에 확장자도 내려받기 낱말도 없다): 두 파일이 제 이름과 제 주소로 잡힌다',
+      AL.detailAttachments('<ul class="fileList"><li><a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA1LFk=" title="새창내려받기"><img src="/resources/_Img/Board/default/ico_hwp.gif" alt="hwp 첨부 파일"> <span> 웹툰 공모전 신청서.hwp (71KB) </span></a></li>'
+        + '<li><a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA2LFk=" title="새창내려받기"><span> 웹툰 공모전 신청서.pdf (83KB) </span></a></li></ul>', donga),
+      [{ name: '웹툰 공모전 신청서.hwp', url: 'https://korea.donga.ac.kr/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA1LFk=' },
+        { name: '웹툰 공모전 신청서.pdf', url: 'https://korea.donga.ac.kr/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA2LFk=' }]);
+    eq('  🔴 파일 이름이 없는 링크는 꼬리가 있어도 첨부가 되지 않는다(「공지사항 (12)」·「자료실 [3건]」) · 내려받기 주소의 꼬리 붙은 이름은 다듬은 이름으로 실린다',
+      [AL.detailAttachments('<a href="/bbs/list.do?id=1">공지사항 (12)</a> <a href="/data/list.do">자료실 [3건]</a>', donga),
+        AL.detailAttachments('<a href="/bbs/1/download.do?f=9">장학금 신청서.hwp (다운로드 : 12회)</a>', donga).map((a) => a.name)], [[], ['장학금 신청서.hwp']]);
+    {
+      const tails = [{ id: 'act-a', attachments: [{ name: '제안서.hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB', url: 'https://m.kr/f/1' }, { name: '공고문.hwp', url: 'https://m.kr/f/2' }] },
+        { id: 'act-b', attachments: [{ name: '신청서.hwp (다운로드 : 12회)', url: 'https://m.kr/f/3' }] }, { id: 'act-c' }];
+      const nTrim = (AL.trimActivityTails || (() => undefined))(tails, new Map([['act-b', new Set(['신청서.hwp (다운로드 : 12회)'])]]));
+      eq('  실린 활동 글 소급(trimActivityTails) — 꼬리 붙은 이름만 다듬는다 · 그 이름으로 이미 사본·색인이 있는 줄은 그대로 · 바꾼 수를 돌려준다 · 첨부 없는 글도 지나간다',
+        [nTrim, tails[0].attachments.map((a) => a.name), tails[1].attachments[0].name], [1, ['제안서.hwp', '공고문.hwp'], '신청서.hwp (다운로드 : 12회)']);
+      eq('  수집 로봇이 활동 글을 발행할 때 꼬리를 먼저 다듬고 그다음 같은 파일을 한 줄로 만든다(stripSiteChrome 바로 앞)',
+        /trimActivityTails\(acts\.items, usedAttachNames\(\)\);[^\n]*\nstripSiteChrome\(\[acts\.items\]\);/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
+    }
     /* 🔴 본문이 그림 한 장인 게시판 (2026-11-02 · 홍익대 성취장학·선원가족: `<div class="b-content-box"><img src="/cms/plugin/editorImage.do?$cms$…" data-width="1080" data-height="1920">` —
        헤드리스 브라우저는 봇 차단에 걸려 그림을 못 적고 일반 fetch 물러서기는 글자만 받아 자격이 영영 비었다). 되돌리면 함수가 없다 */
     const hongik = 'https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501';

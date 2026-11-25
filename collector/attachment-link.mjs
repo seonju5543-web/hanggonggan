@@ -146,7 +146,7 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
     const hashOnly = /^#/.test(raw);
     if ((!raw || hashOnly || JS_NOT_DOWNLOAD.test(raw)) && oc) raw = `javascript:${decode(oc[1] ?? oc[2] ?? '').trim()}`;
     if (!raw || raw.startsWith('#') || JS_NOT_DOWNLOAD.test(raw)) continue;
-    let name = cleanAttachName(m[5].replace(/<[^>]+>/g, ' '));
+    let name = trimSiteTail(cleanAttachName(m[5].replace(/<[^>]+>/g, ' ')));   // 사이트 꼬리(「(71KB)」·「(다운로드 : 12회)」)는 받을 때부터 뗀다(2026-11-25)
     let url = /^javascript:/i.test(raw) ? resolveJsDownload(raw, pageUrl) || raw : null;
     if (hashOnly && url === raw && !ATTACH_EXT.test(name)) continue;   // 모르는 동작 + 파일 이름 아님 = 화면 단추
     if (!url) { try { url = new URL(raw, pageUrl).href; } catch { continue; } }
@@ -217,6 +217,35 @@ const FILE_NAME = new RegExp(FILE_NAME_SRC, 'i');
 export function fileNameIn(text) {
   const m = String(text || '').replace(/\s+/g, ' ').trim().match(FILE_NAME);
   return m ? m[1].trim() : '';
+}
+/* 사이트가 파일 이름 뒤에 붙인 꼬리 — 용량·내려받은 횟수·미리보기 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ②③).
+   꼬리 때문에 이름이 확장자로 끝나지 않으면 로봇이 그 줄을 문서로 보지 않는다 — 동아대 국어문화원 글(`신청서.hwp (71KB)` · 주소에 확장자도 내려받기 낱말도 없다)은 첨부 둘이
+   아예 안 잡혔고, 농림축산식품부 글(`….hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB`)은 잡히고도 문서로 안 읽혔다.
+   🔴 파일 이름이 맨 앞에 있고 그 뒤가 **전부 이 꼴의 꼬리**일 때만 뗀다 — 본문 문장(「신청서.hwp 작성 방법 안내」)·다른 괄호(「공고문.hwp (최종)」)는 건드리지 않는다.
+      꼬리가 없는 이름은 받은 글자 그대로 돌려준다(빈칸도 안 다듬는다 — 실린 이름이 까닭 없이 바뀌지 않게) */
+const SITE_TAIL = /^(?:\s|&nbsp;|\u00a0)*(?:[(（\[【]\s*(?:파일\s?(?:용량|크기)|용량|크기|size|다운로드|내려받기|download|\d[\d.,]*\s?(?:KB|MB|GB|bytes?|B|바이트|회|건))[^)）\]】]{0,40}[)）\]】]?|미리\s?보기|바로\s?보기)\s*$/i;
+export function trimSiteTail(name) {
+  const raw = String(name ?? '');
+  const s = raw.replace(/\s+/g, ' ').trim();
+  const f = fileNameIn(s);
+  if (!f || !s.startsWith(f)) return raw;
+  const rest = s.slice(f.length);
+  return rest && SITE_TAIL.test(rest) ? f : raw;
+}
+/** 실린 활동 글의 첨부 이름에서 사이트 꼬리를 뗀다(소급 — 수집 로봇이 발행할 때 · 같은 파일 한 줄 만들기 stripSiteChrome 앞). 바꾼 줄 수를 돌려준다.
+    used = 글 id → 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부 이름들 — 🔴 든 이름은 건드리지 않는다(이름이 바뀌면 그 사본이 주인을 잃는다) */
+export function trimActivityTails(items, used = new Map()) {
+  let n = 0;
+  for (const it of items || []) {
+    if (!it || !Array.isArray(it.attachments)) continue;
+    const keep = (it.id && used.get(it.id)) || null;
+    for (const a of it.attachments) {
+      if (!a || typeof a.name !== 'string' || (keep && keep.has(a.name))) continue;
+      const t = trimSiteTail(a.name);
+      if (t !== a.name) { a.name = t; n += 1; }
+    }
+  }
+  return n;
 }
 
 /* ── 같은 파일이 이름만 달리 여러 번 실린 줄 (2026-11-20 · 개발자 지시 *"정리하고 재발하지 않도록"*) ─────────────

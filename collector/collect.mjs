@@ -17,7 +17,7 @@ import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mj
 import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, readHuntMoves, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
-import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
+import { isAttachmentEntry, detailAttachments, stripSiteChrome, trimActivityTails } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, mergeActAttachments, ACT_ATTACH_V, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
@@ -682,6 +682,17 @@ acts.updatedAt = notices.updatedAt;
 /* 분야 목록 원본을 함께 싣는다 (2026-10-04 · 프로필 「관심 분야」 칸) — 앱은 빌드가 없어 activity-kind.mjs 를 못 들여온다.
    앱에 목록을 따로 적으면 두 벌이 되어 수집기가 갈래를 늘려도 화면은 모른다(분야 칩과 같은 이유) */
 acts.fields = ACTIVITY_FIELDS;
+/* 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부 이름 — 글 id → 이름들(읽기만). 꼬리를 다듬어 이름이 바뀌면 그 사본이 주인을 잃으므로 그런 줄은 그대로 둔다 */
+function usedAttachNames() {
+  const used = new Map();
+  const put = (id, name) => { if (!id || !name) return; if (!used.has(id)) used.set(id, new Set()); used.get(id).add(name); };
+  try { for (const line of fs.readFileSync(new URL('extracted/forms-index.txt', HERE), 'utf8').split('\n')) { const c = line.split('\t'); put(c[4], c[2]); } } catch { /* 색인 없음 */ }
+  for (const dir of ['forms-pdf', 'docs-pdf']) {
+    try { for (const [id, rows] of Object.entries(JSON.parse(fs.readFileSync(new URL(`../data/${dir}/index.json`, HERE), 'utf8')).items || {})) for (const r of rows || []) put(id, r && r.name); } catch { /* 색인 없음 */ }
+  }
+  return used;
+}
+trimActivityTails(acts.items, usedAttachNames());   // 첨부 이름의 사이트 꼬리(용량·내려받은 횟수) 떼기 — 꼬리 때문에 문서로 안 읽히던 줄(2026-11-25 · attachment-link.mjs trimSiteTail) · 소급
 stripSiteChrome([acts.items]);   // 게시판 공통 링크 걷기(attachment-link.mjs) — 활동 글은 활동끼리 센다
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 
