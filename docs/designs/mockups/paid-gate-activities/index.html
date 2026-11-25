@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>대외활동·공모전 — 새 유료 경로 시안 (2026-11-25)</title>
+<style>
+  :root { --ink: #16181d; --sub: #5b6270; --line: #e3e6eb; --bg: #f6f7f9; --card: #ffffff; --navy: #1f2a44; --blue: #2c4f8f; --warn: #a4372b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 28px 16px 64px; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 0 0 4px; }
+  p { margin: 6px 0; }
+  .lede { color: var(--sub); margin: 0 0 18px; }
+  .note { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 0 0 22px; }
+  .note b.red { color: var(--warn); }
+  .note ul, section ul { margin: 6px 0 0; padding-left: 20px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px 18px 22px; margin: 0 0 22px; }
+  .where { color: var(--sub); font-size: 14px; margin: 0 0 12px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+  .col { min-width: 0; }
+  .tag { display: inline-block; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin: 0 0 8px; }
+  .tag.now { background: #eceef2; color: #444b57; }
+  .tag.new { background: #dde6f5; color: var(--blue); }
+  .shot { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+  .shot + .shot { margin-top: 10px; }
+  .gone { border: 1px dashed #c5cad3; border-radius: 12px; padding: 22px 14px; color: var(--sub); text-align: center; font-size: 15px; background: #fafbfc; }
+  .cap { font-size: 13px; color: var(--sub); margin: 6px 2px 0; }
+  .diff { margin-top: 14px; font-size: 15px; }
+  .diff b { color: var(--navy); }
+  @media (max-width: 640px) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>대외활동·공모전 — 새 유료 경로 시안</h1>
+  <p class="lede">2026-11-25 · 설계 문서 <code>docs/designs/paid-gate-activities.md</code> 의 화면 시안 · 왼쪽이 지금 앱, 오른쪽이 새 경로</p>
+
+  <div class="note">
+    <p><b>무엇을 찍었나.</b> 지금 앱에 떠 있는 실제 활동 글 여섯 건이다. 글마다 원문(게시판 본문 · 포스터 · 첨부)을 읽어 카드를 쓰고, 앱 사본에 얹어 실제 화면을 찍었다. 그림을 그린 것이 아니다.</p>
+    <p><b class="red">카드 글은 유료 API 가 쓴 것이 아니다.</b> 이 세션의 Claude 가 설계 문서의 규칙(문장은 다듬어도 사실은 그대로 · 줄마다 원문 근거)대로 직접 읽고 썼다. 돈은 들지 않았다. 실제 유료 모델이 쓰면 문장이 조금 다를 수 있다.</p>
+    <p><b>저장소의 앱은 바뀌지 않았다.</b> 앱 파일 셋의 사본에만 새 경로를 붙였고, 학생 화면에는 아무 영향이 없다.</p>
+    <p><b>근거 대조.</b> 줄마다 붙인 원문 근거 123개 가운데 103개는 받은 글자 원문에 그대로 있었다. 나머지 20개는 포스터 그림에서 읽은 문구다(해커톤 글은 글자 원문이 없다).</p>
+    <p><b>새 경로 화면은 「더 보기」를 펼친 모습이다.</b> 실제 첫 화면에서는 「공고 안내」가 다섯 줄까지 보이고 나머지는 「더 보기」 안에 있다(지금 앱의 규칙 그대로).</p>
+  </div>
+
+  <section id="hackathon">
+    <h2>1. 서울 야간경제 활성화 해커톤</h2>
+    <p class="where">한국외국어대학교 게시판 · 본문이 포스터 한 장뿐인 글 · 읽은 곳: 포스터 그림</p>
+    <div class="pair">
+      <div class="col"><span class="tag now">지금</span><img class="shot" src="before-card-hackathon.png" alt="지금 목록 카드"><img class="shot" src="before-sheet-hackathon.png" alt="지금 상세 시트"></div>
+      <div class="col"><span class="tag new">새 경로</span><img class="shot" src="after-card-hackathon.png" alt="새 경로 목록 카드"><img class="shot" src="after-sheet-hackathon-open.png" alt="새 경로 상세 시트"></div>
+    </div>
+    <div class="diff">
+      <b>달라진 것</b>
+      <ul>
+        <li>지금은 마감일 한 줄뿐이다. 포스터에 있는 내용이 화면에 하나도 없다.</li>
+        <li>새 경로는 참가 대상(만 15세 이상 39세 이하)을 읽어 적합도가 나온다. 총상금, 접수 방법, 일정, 장소가 보인다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="essay">
+    <h2>2. 대학혁신지원사업 수기공모전</h2>
+    <p class="where">한국외국어대학교 게시판 · 포스터 + 신청서(한글 파일) + 유의사항(PDF) · 읽은 곳: 포스터 그림과 첨부 두 개의 글자</p>
+    <div class="pair">
+      <div class="col"><span class="tag now">지금</span><img class="shot" src="before-card-essay.png" alt="지금 목록 카드"><img class="shot" src="before-sheet-essay.png" alt="지금 상세 시트"></div>
+      <div class="col"><span class="tag new">새 경로</span><img class="shot" src="after-card-essay.png" alt="새 경로 목록 카드"><img class="shot" src="after-sheet-essay-open.png" alt="새 경로 상세 시트"></div>
+    </div>
+    <div class="diff">
+      <b>달라진 것</b>
+      <ul>
+        <li>지금은 「공고 안내」에 끊긴 줄 하나(「결과발표 2026년 12월 중 대학혁신지원사업」)만 있다. 내는 방법과 서류가 없다.</li>
+        <li>새 경로는 내는 곳(전자 우편), 서류 세 가지, 시상 내역, 일정, 유의사항이 보인다.</li>
+        <li>첨부 구분: 신청서는 「학생이 채워 내는 서식」, 유의사항은 「읽는 글」로 갈랐다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="kau">
+    <h2>3. 2026 KAU 리빙랩 아이디어 공모전</h2>
+    <p class="where">한국항공대학교 게시판 · 본문에 글자가 다 있는 글 · 읽은 곳: 게시판 본문과 제출양식(한글 파일)</p>
+    <div class="pair">
+      <div class="col"><span class="tag now">지금</span><img class="shot" src="before-card-kau.png" alt="지금 목록 카드"><img class="shot" src="before-sheet-kau.png" alt="지금 상세 시트"></div>
+      <div class="col"><span class="tag new">새 경로</span><img class="shot" src="after-card-kau.png" alt="새 경로 목록 카드"><img class="shot" src="after-sheet-kau-open.png" alt="새 경로 상세 시트"></div>
+    </div>
+    <div class="diff">
+      <b>달라진 것</b>
+      <ul>
+        <li>지금은 기간 줄에 뒤 문장이 붙어 나온다(「… 마. 결과발표 : 2026년 12월 중 3. 시상 가 . 최우수작 : 50 만원」). 본문에 「자격 : 본교 학부생」이 있는데도 자격 칸이 없다.</li>
+        <li>새 경로는 자격이 나와 적합도가 붙고, 내는 방법·서류·시상·일정이 칸마다 들어간다.</li>
+        <li>첨부 구분: 「제출양식.hwp」는 학생이 채우는 서식이다. 지금은 공고문 사본으로 분류돼 있다. 새 경로에서는 변환 로봇이 AI 의 구분을 받아 신청서 칸으로 옮긴다(이 시안 화면에는 아직 반영되지 않았다).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="sungshin">
+    <h2>4. 제2회 성신 SNS 홍보 영상 공모전</h2>
+    <p class="where">성신여자대학교 게시판 · 본문이 긴 글 · 읽은 곳: 게시판 본문과 지정양식(한글 파일)</p>
+    <div class="pair">
+      <div class="col"><span class="tag now">지금</span><img class="shot" src="before-card-sungshin.png" alt="지금 목록 카드"><img class="shot" src="before-sheet-sungshin.png" alt="지금 상세 시트"></div>
+      <div class="col"><span class="tag new">새 경로</span><img class="shot" src="after-card-sungshin.png" alt="새 경로 목록 카드"><img class="shot" src="after-sheet-sungshin-open.png" alt="새 경로 상세 시트"></div>
+    </div>
+    <div class="diff">
+      <b>달라진 것</b>
+      <ul>
+        <li>지금은 자격 칸이 없다. 로봇이 자격으로 뽑은 아홉 줄이 전부 상금 줄(「각 50만 원」 …)이라 화면에서 걸러졌다. 서류 칸 끝에는 질문 제목(「Q8 출품작 심사는 어떻게 진행되나요?」)이 섞여 있다.</li>
+        <li>새 경로는 자격(재학생·휴학생·교직원)이 나오고, 서류 네 가지가 깔끔하게 보인다. 주제·규격·일정이 한 줄씩 정리된다.</li>
+        <li>첨부 구분: 「지정양식 3종」도 학생이 채우는 서식인데 지금은 공고문 사본으로 분류돼 있다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="webtoon">
+    <h2>5. 쉽고 바른 정보통신기술(ICT) 공공언어 웹툰 공모전</h2>
+    <p class="where">전국 글(학교가 아닌 기관 게시판에서 주운 글) · 읽은 곳: 게시판 본문과 포스터 그림</p>
+    <div class="pair">
+      <div class="col"><span class="tag now">지금</span><img class="shot" src="before-card-webtoon.png" alt="지금 목록 카드"><img class="shot" src="before-sheet-webtoon.png" alt="지금 상세 시트"></div>
+      <div class="col"><span class="tag new">새 경로</span><img class="shot" src="after-card-webtoon.png" alt="새 경로 목록 카드"><img class="shot" src="after-sheet-webtoon-open.png" alt="새 경로 상세 시트"></div>
+    </div>
+    <div class="diff">
+      <b>달라진 것</b>
+      <ul>
+        <li>지금은 대상·접수 기간·결과 발표 세 줄이다.</li>
+        <li>새 경로는 내는 곳(전자 우편 주소), 서류, 시상 내역, 작품 규격, 유의사항이 보인다.</li>
+        <li>눈에 띈 것: 카드 윗줄의 「대한민국 정책브리핑 이벤트·공모」는 이 글을 찾은 곳이지 주최가 아니다. 원문의 주최는 문화체육관광부다. 이 시안은 윗줄을 바꾸지 않았다(설계 문서 12절의 「나중에 정할 것」).</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="kt">
+    <h2>6. KT랜선야학 대학생 멘토 선발 — 목록에서 내려가는 글</h2>
+    <p class="where">서울과학기술대학교 게시판 · 선발 안내문과 지원서가 첨부된 글 · 읽은 곳: 게시판 본문과 선발 안내문</p>
+    <div class="pair">
+      <div class="col"><span class="tag now">지금</span><img class="shot" src="before-card-kt.png" alt="지금 목록 카드"><p class="cap">마감 표시 없이 열린 글처럼 목록에 떠 있다.</p></div>
+      <div class="col"><span class="tag new">새 경로</span><div class="gone">목록에 없다<br>선발 안내문의 「제출 마감 : 2026. 4. 6.(월)」을 읽어 마감이 지난 글로 내려간다.</div></div>
+    </div>
+    <div class="diff">
+      <b>달라진 것</b>
+      <ul>
+        <li>이 글은 2026-03-23 에 올라왔고 4월 6일에 마감됐다. 지금 로봇은 마감을 읽지 못해 열린 글로 싣고 있다.</li>
+        <li>지금 자격 칸에 든 줄도 틀렸다. 「교육대상 : 서울지역 중학생」은 지원자가 아니라 멘토가 가르칠 학생이다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="note">
+    <p><b>시안을 만들며 정한 것(설계 문서에 반영한다).</b></p>
+    <ul>
+      <li>「공고 안내」는 지금도 여덟 줄까지만 보인다. 그래서 AI 의 안내 줄에는 이름표(주제 · 규격 · 참가 형태 · 일정 · 장소 · 유의사항 · 문의)를 붙이게 하고, 화면은 같은 이름표끼리 한 줄로 묶는다.</li>
+      <li>자격 칸에는 사람의 조건만 넣는다. 팀 구성과 작품 규격은 안내 칸으로 보낸다. 적합도 판정이 흐려지지 않게 하려는 것이다.</li>
+      <li>상금이 여러 등급이면 첫 줄이 제목 아래 큰 글씨로 가고 나머지는 「혜택」 한 줄로 묶인다.</li>
+      <li>「접수」의 기간 줄은 마감일만 보인다(「~ 12.07」). 접수 시작일은 「공고 안내」의 일정 줄에 있다.</li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>
