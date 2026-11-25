@@ -1,6 +1,6 @@
 ## 🛰 공공 API 로봇 리포트 (2026-11-25)
 
-- ✅ **K-Startup 사업공고** — 받은 행 112 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 93 · 마감 지남 2 · 상한 15건 초과 2
+- ✅ **K-Startup 사업공고** — 받은 행 125 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 102 · 상한 15건 초과 8
   - 자격 줄 있는 글 15/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `aply_excl_trgt_ctnt, aply_mthd_eml_rcpt_istc, aply_mthd_etc_istc, aply_mthd_fax_rcpt_istc, aply_mthd_onli_rcpt_istc, aply_mthd_pssr_rcpt_istc, aply_mthd_vst_rcpt_istc, aply_trgt, aply_trgt_ctnt, biz_aply_url, biz_enyy, biz_gdnc_url, biz_pbanc_nm, biz_prch_dprt_nm, biz_trgt_age, detl_pg_url, eval_method, intg_pbanc_biz_nm, intg_pbanc_yn, pbanc_ctnt, pbanc_ntrp_nm, pbanc_rcpt_bgng_dt, pbanc_rcpt_end_dt, pbanc_sn, prch_cnpl_no, prfn_matr, rcrt_prgs_yn, sprv_inst, support_ctnt, supt_biz_clsfc, supt_regin`
   - 대외활동 · 2026 여성벤처활성화사업 「여성벤처&스타트업 혁신성장 포럼」참여자 모집 (~2026-11-26) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179775
@@ -14,18 +14,18 @@
     - 179514 · 취약분야 상시 컨설팅 11월 참가자 모집 공고 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179514 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179514(2) · biz_gdnc_url=http://www.gdhaenaem.com/?c=169(1)
     - 179711 · [무료 세미나] 글로벌 진출 초기 챙겨야 할 GEO 전 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179711 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179711(2)
     - 179694 · 출연연, 대학 연구소기업 Business Develop → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179694 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179694(2)
+    - 179849 · [ART-AI ACADEMY] AI 숏폼 워크숍 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179849 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179849(2) · biz_gdnc_url=https://www.naroo.or.kr/bbs/content.php?co_id=program_view&np_seq=1317(1)
     - 179684 · 2026년도 스타트업 및 중소기업 성장전략 세미나 참가 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179684 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179684(2)
+    - 179871 · [창업행사] IR 피칭·피치덱 완성, 1:1 피치덱 밀 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179871 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179871(2) · biz_gdnc_url=https://www.naroo.or.kr/bbs/content.php?co_id=program_view&np_seq=1319(1)
+    - 179862 · 2026년 여성창업 change-up 피칭 대회 참가자 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179862 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179862(2) · biz_gdnc_url=https://w-startup.daegu.go.kr/business/343(2)
+    - 179841 · 2026년 초기창업패키지 로켓십 IR 경진대회 참가기업 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179841 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179841(2)
     - 179806 · <2026년 제조공정 마스터 클래스> 프로그램 참여자  → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179806 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179806(2)
     - 179834 · 2027년 상반기「IBK창공(創工) UNIST캠프」모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179834 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179834(2)
     - 179814 · 2027년 상반기 「IBK창공(創工) 서울대캠프」 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179814 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179814(2)
-    - 178445 · 2026년 서울 기후테크 기업 및 예비창업자를 위한 멘 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=178445 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=178445(2)
-    - 177060 · 2026년 노동아카데미(무료교육) 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=177060 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=177060(2)
-    - 176978 · 2026년 『창창 창업 멘토단 운영사업』 참여 창업가  → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=176978 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=176978(2)
-    - 176940 · 2026년 소상공인 투자연계 지원사업 립스 프로그램 참 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=176940 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=176940(2)
-- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 435 · 상한 15건 초과 46 · 마감 지남 2 · 같은 글 2
+- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 431 · 상한 15건 초과 52 · 같은 글 2
   - 자격 줄 있는 글 12/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
-  - 코드 칸 값(첫 세 행): gugunCd=3170000|4810000|5530000 · sidoCd=6110000|6460000|6410000
+  - 코드 칸 값(첫 세 행): gugunCd=3780000|4010000|3940000 · sidoCd=6410000|6410000|6410000
   - 대외활동 · 충북교육도서관 도서 정리[주간](대학생) (~2026-11-25) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541817
   - 대외활동 · 충북교육도서관 도서 정리[야간](대학생) (~2026-11-25) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541818
   - 대외활동 · [사당어르신종합복지관] - 대학생동행서포터즈 모집 및 진행 (~2026-11-26) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524636
@@ -80,6 +80,6 @@
     - 20260413005400212702 · 대학생 봉사활동 활성화 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236(2)
     - 20260407005400212532 · 이전공공기관 취업아카데미 운영 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147(2)
 
-data/activities.json — API 글 49 → **49건** (전체 200건)
+data/activities.json — API 글 49 → **49건** (전체 198건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
