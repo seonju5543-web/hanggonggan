@@ -1,7 +1,25 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[학부-교외장학] 2027년도 관정재단 국내대학 장학생 선발 안내(기간연장)",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46243/artclView.do",
+   "attachments": [
+    {
+     "name": "2. 관정_개인정보수집동의서.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41870/download.do"
+    },
+    {
+     "name": "1. 관정_ 지원자 인적사항.xlsx",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41871/download.do"
+    }
+   ],
+   "deadlineHint": "마감 : ~ 26. 11. 27. (금) 15:00 나. 1차 온라인 심사 업로드 : 26. 12. 16. (수) (예정) ※ (학생→재단) 학",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
   {
    "title": "[학부-교내장학] 2026-2학기 학자금대출이자면제장학금 신청 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/46229/artclView.do",
@@ -1091,32 +1109,6 @@
     }
    ],
    "deadlineHint": "신청 기한 : ~ 26. 9. 23. (수) 17:00 5. 제출 서류 : 붙임 참조&nbsp; 6. 접수처 : 통영시 통영시립도서관 교육지원팀",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "[학부-교외장학] 2027학년도 미래인재육성재단 장학생 선발 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45293/artclView.do",
-   "attachments": [
-    {
-     "name": "추천서.hwp",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41122/download.do"
-    },
-    {
-     "name": "장학생 신청서.hwp",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41123/download.do"
-    },
-    {
-     "name": "미래인재장학생 자기소개서.hwpx",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41124/download.do"
-    },
-    {
-     "name": "개인정보 수집 동의서.hwp",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41125/download.do"
-    }
-   ],
-   "deadlineHint": "제출 기한 : ~ 26. 9. 18. (금) 17:00 6. 제출처 :&nbsp; &nbsp; 인하대학교 학생회관 343호 장학복지팀 방문 제출",
    "school": "인하대학교",
    "campus": "",
    "foundAt": "2026-09-30"

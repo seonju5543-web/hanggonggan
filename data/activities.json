@@ -1,6 +1,80 @@
 {
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "김진아 외교부 제2차관, 한국국제교류재단 제주 본부 방문",
+   "url": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156790869&pWise=sub&pWiseSub=C3",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "[26-977](보도자료) 김진아 외교부 제2차관, 한국국제교류재단 제주 본부 방문.hwp",
+     "url": "https://www.korea.kr/common/download.do?fileId=198596705&tblKey=GMN"
+    },
+    {
+     "name": "[26-977](보도자료) 김진아 외교부 제2차관, 한국국제교류재단 제주 본부 방문.pdf",
+     "url": "https://www.korea.kr/common/download.do?fileId=198596706&tblKey=GMN"
+    },
+    {
+     "name": "행사 사진.jpg",
+     "url": "https://www.korea.kr/common/download.do?fileId=198596707&tblKey=GMN"
+    }
+   ],
+   "deadlineHint": null,
+   "eligibilityLines": [
+    "생계급여 기준 2030년 중위소득 35%로…기초생활보장 확대",
+    "'모두의카드' 12월부터 13세~18세 청소년도 이용 가능"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "해외·교류",
+   "excerptsAt": "2026-11-25",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-25",
+   "id": "act-1cyhkb9"
+  },
+  {
+   "title": "2027년 디비전리그 지원 사업 신규종목 공모 안내 지원대상 체육인,관련종사자",
+   "url": "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=256634&menuNo=200104&sSort=2&pageIndex=1",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간) 2026.11.10.(화) ~ 11. 26.(목) 18:00까지 ㅇ (제출서류) 공모신청서, 사업계획서, 발표자료(PPT) 및 관련",
+   "deadline": "2026-11-26",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-10 ~ 2026-11-26"
+    },
+    {
+     "label": "대상",
+     "text": "체육인,관련종사자"
+    }
+   ],
+   "eligibilityLines": [
+    "ㅇ 공모대상 : 대한체육회 회원종목단체(정회원·준회원·인정단체)",
+    "※ 기존 디비전리그 사업 지원종목 제외",
+    "ㅇ (선정규모) 신규 3개 종목 이내 / (사업기간) 2027년 1월 ~ 12월",
+    "※ 심사결과에 따라 선정규모 조정 가능하며, 적격종목이 없는 경우 미선정 가능",
+    "ㅇ (지원예산 ) 종목당 최대 500백만 원",
+    "- 사업계획, 리그 운영규모 및 심사결과 등을 고려하여 차등 지원",
+    "ㅇ 평가방법 : 요건심사(30점) 및 사업계획심사·발표평가(70점)를 통한 종합평가",
+    "지원대상 : 체육인,관련종사자"
+   ],
+   "noticeLines": [
+    "ㅇ 접수기간 : 2026.11.10.(화) ~ 11. 26.(목) 18:00까지"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-25",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "문화포털 문화지원사업",
+   "foundAt": "2026-11-25",
+   "id": "act-1lswdza"
+  },
   {
    "title": "[창업행사] IR 피칭·피치덱 완성, 1:1 피치덱 밀착 멘토링까지 한 번에!!!",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179871",
@@ -173,12 +247,16 @@
   },
   {
    "title": "[실험 참가자 모집] AI 챗봇과의 대화에 관한 사용자 경험 연구 (온라인 참여)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142379&article.offset=0&articleLimit=10",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142379&article.offset=0&articleLimit=10",
    "kind": "대외활동",
    "attachments": [
     {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
      "name": "KakaoTalk_20261125_150154296.png",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=142379&attachNo=119468"
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142379&attachNo=119468"
     }
    ],
    "deadlineHint": null,
@@ -195,23 +273,28 @@
    "detailsV": 7,
    "documentsV": 1,
    "excerptsAt": "2026-11-25",
+   "attachV": 1,
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-0v5m1qj"
+   "id": "act-1c9tqku"
   },
   {
    "title": "[마감 임박 D-8] KCI 등재지 『TRANS』 2026 전통의례와 디지털 현전 논문공모전 안내 (12/3 마감)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142376&article.offset=0&articleLimit=10",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142376&article.offset=0&articleLimit=10",
    "kind": "공모전",
    "attachments": [
     {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
      "name": "트랜스-논문투고양식.hwp",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=142376&attachNo=119464"
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142376&attachNo=119464"
     },
     {
      "name": "KCI 등재학술지 『TRANS』-2026 전통의례와 디지털 현전 논문공모전 안내.jpg",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=142376&attachNo=119465"
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142376&attachNo=119465"
     }
    ],
    "deadlineHint": "제출 기간: 11월 1일(일) ~ 12월 3일(목) 제출 마감: 12월 3일(목) 제출및 문의처: skkutmi@skku.edu 이번 논문공모전",
@@ -231,10 +314,11 @@
    "documentsV": 1,
    "field": "글쓰기·논문",
    "excerptsAt": "2026-11-25",
+   "attachV": 1,
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-0ubn8nm"
+   "id": "act-1avvq3z"
   },
   {
    "title": "[실험 참가자 모집] 정서지원 AI 대화 실험 참가자 모집 (실험 참가비 75000원)",
@@ -253,7 +337,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-0yhnl25"
+   "id": "act-0yhnl25",
+   "attachV": 1
   },
   {
    "title": "[아모레퍼시픽재단] 2026 장원(粧源)특강 개최 안내",
@@ -274,7 +359,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-0ult5cj"
+   "id": "act-0ult5cj",
+   "attachV": 1
   },
   {
    "title": "[교양대학] 2026학년도 2학기 글말교실 소감문 공모전 및 학술논문 우수작 선발대회 안내",
@@ -303,7 +389,8 @@
    "school": "국민대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1aeywgd"
+   "id": "act-1aeywgd",
+   "attachV": 1
   },
   {
    "title": "[(사)한국환경기술학회] 2026년 캡스톤디자인 온라인 경진대회 안내",
@@ -321,7 +408,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1v16hqk"
+   "id": "act-1v16hqk",
+   "attachV": 1
   },
   {
    "title": "국립중앙과학관 『시민 참여형 과학 대토론회』참여자 모집 안내",
@@ -338,7 +426,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1t32yvt"
+   "id": "act-1t32yvt",
+   "attachV": 1
   },
   {
    "title": "2027 UN 청소년 미래 정상 회의(MUNY9) 참가자 모집",
@@ -355,7 +444,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1w51r0h"
+   "id": "act-1w51r0h",
+   "attachV": 1
   },
   {
    "title": "[시립청소년문화교류센터] 2027 시드니 글로벌 인재양성 프로그램 참가자 모집",
@@ -2842,15 +2932,15 @@
    "kind": "공모전",
    "attachments": [
     {
-     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB",
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwp",
      "url": "https://www.mafra.go.kr/bbs/home/792/600782/download.do"
     },
     {
-     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwpx &nbsp;&nbsp;&nbsp;(파일 용량 : 1432 K",
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwpx",
      "url": "https://www.mafra.go.kr/bbs/home/792/600783/download.do"
     },
     {
-     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).pdf &nbsp;&nbsp;&nbsp;(파일 용량 : 631 KB)",
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).pdf",
      "url": "https://www.mafra.go.kr/bbs/home/792/600784/download.do"
     }
    ],
@@ -6241,88 +6331,6 @@
    "host": "충남청년포털",
    "foundAt": "2026-11-15",
    "id": "act-0tnjiu6",
-   "documentsV": 1
-  },
-  {
-   "title": "[대외협력사업팀] 제21기 씨티-경희대 NGO 인터십 프로그램 인턴 모집(~11/23)",
-   "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=991",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "붙임 2. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 지원서.hwp",
-     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ms4XQUrj_0fa4a0f4a56ed532b3bcda0b05753ffcd7bdfc64.hwp"
-    },
-    {
-     "name": "붙임 1. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 모집요강.pdf",
-     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_R7u1yWOs_6a3bc4f59592574e7a1984d89804613dcc2f96c4.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "인턴·일경험",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "한국대학사회봉사협의회",
-   "foundAt": "2026-11-15",
-   "id": "act-0qklvg8",
-   "deadline": "2026-11-23",
-   "deadlineFrom": "제목 · [대외협력사업팀] 제21기 씨티-경희대 NGO 인터십 프로그램 인턴 모집(~11/23)",
-   "documentsV": 1,
-   "noticeLines": [
-    "•접수기간: 2026.10.26.(월)~11.23.(월)"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "documents": [
-    "인턴 지원서1부"
-   ],
-   "documentsFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "·대상:국내 주요 시민단체, 전국 대학교 소속 학부생 및 대학원생(박사과정 제외)",
-    "•단체:전국 비영리·시민단체(NGO)00개",
-    "•인턴: 전국 대학(원)생 총 61명",
-    "·단체:①최근 2년간 활발한 활동을 전개하고 있는 비영리·시민단체 ②서울/수도권 지역 상",
-    "근자* 3인 이상, 서울/수도권 외 지역 상근자* 2인 이상 단체(인턴의 근무공간이 확보되어",
-    "야하며인턴의 근무를 관리할 수있는 상근자가 있는 단체)실제 인턴이근무하는 사무실의상근자수",
-    "·인턴: 국내외 대학교에 재학 또는 휴학 중인 학생으로서, NGO 및 시민사회 활동에 대한",
-    "관심과 참여 의지가 있는 자(외국인의 경우 TOPIK level 5 이상 보유자로 한국어를 사용",
-    "하여 근무가 가능한 자)"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
-  },
-  {
-   "title": "[대외협력사업팀] SK Telecom과 한국대학사회봉사협의회의 스마트 라이프 교육 대학생 봉사팀 모집",
-   "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=980",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "SK Telecom 사업공고문, 신청 양식.hwp",
-     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_nMqArJHK_30d7e3d8d54f5a65edc00f4765ab2a6a58a25c76.hwp"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "봉사",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "한국대학사회봉사협의회",
-   "foundAt": "2026-11-15",
-   "id": "act-0p6kphe",
-   "noticeLines": [
-    "제출기한:2026.09.15.(화)18시까지"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "참여대상 : 5개권역 5개 대학생 팀(수도권/강원/충청/전라/경상)",
-    "팀원총10명구성",
-    "신청서제출기한"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7,
-   "deadline": "2026-09-15",
-   "deadlineFrom": "공고 안내 · 제출기한:2026.09.15.(화)18시까지",
    "documentsV": 1
   },
   {
