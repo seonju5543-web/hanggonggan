@@ -11560,7 +11560,7 @@
    "eligibilityFrom": "공고문 첨부(OCR)",
    "openDate": "2026-09-28",
    "excerpts": [
-    "- 접수기간: 2026. 9.28.(월)~10.23.(금)"
+    "- 접수기간: 2026. 9.28.(월)~10.23.(금) - 신청방법: 장학회 방문 또는 이메일"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
@@ -26072,8 +26072,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-11-24",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "500만원",
+   "amountValue": 5000000,
    "deadline": "2027-01-08",
    "deadlineFrom": "게시판 요약 · 1/8 마감",
    "period": "접수 ~2027-01-08",
@@ -26098,7 +26098,39 @@
     }
    ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551923?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원 자격 : 1 대한민국 국적 보유자",
+    "국내 대학에서 한 학기 이상 수료한 자로서,2027년 1학기에 재학 예정인 자",
+    "학과장 또는 지도교수의 추천을 받은 자",
+    "④직전 학기 성적이 백분위 87점 이상 또는 평점평균 3.5/4.5(3.3/4.3)이상인 자",
+    "6차세대 리더로서 우수성과 리더십이 입증되고 성장 가능성과 잠재성이 있는 인재",
+    "※ 2027년 2월 졸업 예정자, 2027년 신규 입학자, 대학원생(석사·박사 과정 및 수료자)은 지원 대상에서 제외됩니다.",
+    "지원방법 : •온라인 접수:에몬스 홈페이지(www.emons.co.kr)",
+    "•이메일문의 : scholarship@emons.co.kr",
+    "※장학생 지원은PC에서만 가능합니다.",
+    "※접수기간에만장학생 접수 페이지 하단의‘온라인 지원'버튼이 활성화됩니다.",
+    "모집요강자세히보기"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-12-14",
+   "announceDate": "2027-02-10",
+   "excerpts": [
+    "•접수 기간: 2026년12월 14일 (월,오전 0시)~2027년1월 8일(금,오후17시까지)",
+    "•선발 인원: 총20명/1명당 장학금 500만 원 지급,총 장학금1억원",
+    "※ 2027년 2월 졸업 예정자, 2027년 신규 입학자, 대학원생(석사·박사 과정 및 수료자)은 지원 대상에서 제외됩니다.",
+    "•이메일문의 : scholarship@emons.co.kr"
+   ],
+   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 5000000,
+    "ratio": 0,
+    "min": 5000000,
+    "max": 5000000,
+    "raw": "•선발 인원: 총20명/1명당 장학금 500만 원 지급,총 장학금1억원"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-amepagescholarshipnotice-1tlg7ak",
@@ -26145,7 +26177,19 @@
     }
    ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551919?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "□ 지원조건 : 졸업 후 장학금 수혜 횟수에 해당하는 기간만큼(수혜 학기당 6개월, 180일) 영농 및 농림축산식품 분야에 취업 또는 창업하여 의무종사"
+   ],
+   "eligibilityFrom": "공고문 첨부",
+   "openDate": "2026-12-01",
+   "announceDate": "2027-02-01",
+   "excerpts": [
+    "□ 신청기간 : 2026.12.1.(화) 10시~ 2027.1.5.(화) 17시",
+    "□ 신청방법 : 한국농어촌희망재단 홈페이지(PC 또는 스마트폰, www.rhof.or.kr)에서 온라인 신청",
+    "□ 결과발표 : 2027.2.1.(월) 17시 예정(재단 학생장학시스템에서 확인)"
+   ],
+   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-oardid323654menuno200318",

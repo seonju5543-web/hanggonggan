@@ -7,7 +7,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://haeseok.or.kr/",
@@ -21,7 +21,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://gachon.or.kr/",
@@ -32,15 +32,17 @@
   {
    "host": "울진군장학재단",
    "home": "http://www.uljinsf.kr/",
-   "boardUrl": null,
+   "boardUrl": "http://www.uljinsf.kr/albino/",
    "seed": "kosaf-open",
-   "probe": {
-    "checkedAt": "2026-11-11",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "http://www.uljinsf.kr/",
-     "signals": 0
-    }
+   "autoFound": {
+    "date": "2026-11-25",
+    "signals": 5,
+    "menu": "(홈)",
+    "sample": [
+     "2026 울진사랑 특기장학금 신청 공고",
+     "2026년 울진군 대학생장학금(2차) 선정자 명단",
+     "2026년 우리珍(진)봉사단 장학기금 전달식 10-07"
+    ]
    }
   },
   {
@@ -49,7 +51,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yangcheon.go.kr/site/yangcheon/main.do",
@@ -63,7 +65,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.mpva.go.kr/",
@@ -109,7 +111,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.mincho.or.kr/",
@@ -123,7 +125,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "홈페이지 못 엶 (TimeoutError: 23)",
     "best": null
    }
@@ -134,7 +136,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.pc.go.kr/",

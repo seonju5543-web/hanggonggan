@@ -3,6 +3,30 @@
  "updatedAt": "2026-11-25",
  "schools": 45,
  "files": {
+  "서울대학교": {
+   "file": "nsgh1oi.json",
+   "count": 28
+  },
+  "연세대학교": {
+   "file": "nz3ew5y.json",
+   "count": 59
+  },
+  "건국대학교": {
+   "file": "nmpm6i7.json",
+   "count": 60
+  },
+  "광운대학교": {
+   "file": "n6xhy7d.json",
+   "count": 36
+  },
+  "명지대학교": {
+   "file": "ntyl0r5.json",
+   "count": 26
+  },
+  "가톨릭대학교": {
+   "file": "n174lvh5.json",
+   "count": 39
+  },
   "경희대학교": {
    "file": "n1w4hprp.json",
    "count": 32
@@ -30,10 +54,6 @@
   "홍익대학교": {
    "file": "nv8pha4.json",
    "count": 30
-  },
-  "광운대학교": {
-   "file": "n6xhy7d.json",
-   "count": 35
   },
   "가천대학교": {
    "file": "nzzc8bm.json",
@@ -66,14 +86,6 @@
   "상명대학교": {
    "file": "n1ozjjw8.json",
    "count": 30
-  },
-  "건국대학교": {
-   "file": "nmpm6i7.json",
-   "count": 60
-  },
-  "가톨릭대학교": {
-   "file": "n174lvh5.json",
-   "count": 38
   },
   "영남대학교": {
    "file": "n12kfbyt.json",
@@ -131,10 +143,6 @@
    "file": "n1qr99q6.json",
    "count": 28
   },
-  "서울대학교": {
-   "file": "nsgh1oi.json",
-   "count": 26
-  },
   "연세대학교 미래캠퍼스": {
    "file": "n1if6uwu.json",
    "count": 49
@@ -151,10 +159,6 @@
    "file": "n2we95k.json",
    "count": 31
   },
-  "명지대학교": {
-   "file": "ntyl0r5.json",
-   "count": 25
-  },
   "경기대학교": {
    "file": "ntxxf09.json",
    "count": 24
@@ -170,10 +174,6 @@
   "숙명여자대학교": {
    "file": "n1a4mxa4.json",
    "count": 3
-  },
-  "연세대학교": {
-   "file": "nz3ew5y.json",
-   "count": 57
   },
   "아주대학교": {
    "file": "n16dvfry.json",

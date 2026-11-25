@@ -50,7 +50,7 @@
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://www.niied.go.kr/web/main/nid/niied_board/list": {
-  "name": "국립국제교육원 대외활동·공모전",
+  "name": "국립국제교육원 공지",
   "fails": 0,
   "lastOk": "2026-11-25"
  },
@@ -115,20 +115,19 @@
  },
  "http://www.ghjanghak.kr/": {
   "name": "재단법인 김해시미래인재장학재단",
-  "fails": 110,
+  "fails": 111,
   "lastOk": null,
   "why": "⚠️ 오류 (TimeoutError: 23) — 주소 확인 필요"
  },
  "http://www.sjjh.or.kr/": {
   "name": "재단법인 상주시장학회",
-  "fails": 1,
-  "lastOk": "2026-11-24",
-  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
+  "fails": 0,
+  "lastOk": "2026-11-25"
  },
  "http://www.jiheonsf.or.kr/bbs/board.php?bo_table=tl_notice": {
   "name": "재단법인 삼원장학재단",
   "fails": 0,
-  "lastOk": "2026-11-24"
+  "lastOk": "2026-11-25"
  },
  "http://www.hjsfoundation.or.kr/": {
   "name": "한진해운장학재단",
@@ -172,9 +171,9 @@
  },
  "https://foundation.miraeasset.com/ko/news/notice/list.do": {
   "name": "미래에셋박현주재단",
-  "fails": 108,
+  "fails": 109,
   "lastOk": null,
-  "why": "⚠️ 접속 실패 (HTTP 503) — 주소 수정 필요"
+  "why": "🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요"
  },
  "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
   "name": "아산사회복지재단",
@@ -188,7 +187,7 @@
  },
  "https://www.lottefoundation.or.kr/notice": {
   "name": "롯데장학재단",
-  "fails": 108,
+  "fails": 109,
   "lastOk": null,
   "why": "🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요"
  },
@@ -205,11 +204,11 @@
  "https://www.jinjae.kr/main/": {
   "name": "전주인재육성재단",
   "fails": 0,
-  "lastOk": "2026-11-24"
+  "lastOk": "2026-11-25"
  },
  "https://uill.uri.re.kr/": {
   "name": "재단법인 울산연구원",
-  "fails": 102,
+  "fails": 103,
   "lastOk": null,
   "why": "⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)"
  },
@@ -230,7 +229,7 @@
  },
  "https://janghak.gangseo.seoul.kr/sc050101": {
   "name": "재단법인 강서구장학회(서울)",
-  "fails": 40,
+  "fails": 41,
   "lastOk": null,
   "why": "⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)"
  },
