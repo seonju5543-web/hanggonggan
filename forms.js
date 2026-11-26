@@ -712,7 +712,7 @@ function buildPrepTemplate(sch) {
   if (docs.length) sections.push({ heading: '제출 서류 확인', note: docs.join(' · '), fields: [] });
   sections.push({ heading: '제출 안내', note: prepSubmitNote(sch), fields: [] });
   return {
-    title: `${sch.name} — 지원문서`,
+    title: `${typeof cardTitleParts === 'function' ? cardTitleParts(sch).title : sch.name} — 지원문서`,   // 화면은 카드와 같은 제목(게시판 머리말·마감 조각 뗌 · 2026-11-26 화면 점검) — Node 관문엔 그 함수가 없어 원래 이름
     docName: `지원문서_${(sch.name || '').replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, 24) || '장학금'}`,
     org: sch.provider || '',
     tag: PREP_TAGS[kind],

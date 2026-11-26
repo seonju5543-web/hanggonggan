@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -26279,12 +26279,11 @@
    "id": "auto-ghaknoticedetail26767096",
    "name": "2026-2학기 SOS두드림장학 신청 안내",
    "boardTitle": "2026-2학기 SOS두드림장학 신청 안내",
-   "type": "교외",
+   "type": "교내",
    "kindEvidence": [
-    "본문 「장학팀 ] 서류심사」"
+    "관리자(조세현)가 교외 → 교내 로 정함"
    ],
-   "kindConfidence": "low",
-   "kindFrom": "로봇(원문) 2026-11-25",
+   "kindFrom": "관리자 2026-11-26",
    "provider": "주관 기관 원문 확인",
    "amount": "50만원 ~ 200만원",
    "amountValue": 2000000,
