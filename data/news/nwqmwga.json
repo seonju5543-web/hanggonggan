@@ -1,7 +1,27 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[학사안내] 북문 주변 정비공사 착공 및 차량 통제 협조 요청",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71123",
+   "postedAt": "2026-11-26",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "[대학생활] [광주국제개발협력센터] 2026년 하반기 국제개발협력 집체교육...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71121",
+   "postedAt": "2026-11-26",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/ab32fadb4e0766e5.webp"
+  },
   {
    "title": "[모집공고] [(사)한국메타교육협회] 2027년도 서부공감 위피스쿨 18기...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71120",
@@ -369,25 +389,6 @@
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71053",
    "postedAt": "2026-11-19",
    "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-19"
-  },
-  {
-   "title": "[모집공고] 전공 맞춤형 AI 교육과정 4개 모집『전남대학교 인공지능부트캠...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71052",
-   "postedAt": "2026-11-19",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-19",
-   "thumb": "data/news/img/a3959e529b58a119.webp"
-  },
-  {
-   "title": "[취업정보] 2026 대학(전남대-목포대) 간 [13시간 과정]",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71051",
-   "postedAt": "2026-11-19",
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",

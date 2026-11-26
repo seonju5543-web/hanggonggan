@@ -1,7 +1,17 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[교양교육원] 2026학년도 제12회 우수 글쓰기 공모전 시상식 개최",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11697&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-11-26",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-11-26",
+   "desc": "교양교육원(원장 강순이) 삼척교양교육센터(센터장 이명남)에서는 11월 25일 삼척캠퍼스 그린에너지연구관 국제회의실(303호)에서 '2026학년도 제12회 우수 글쓰기 공모전 시상식'을 개최하였다."
+  },
   {
    "title": "2026년 강원대학교 춘천캠퍼스 헌혈우수 대학생 선발 안내",
    "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11696&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
@@ -408,17 +418,6 @@
    "src": "784a7e0d",
    "foundAt": "2026-11-17",
    "desc": "※ 기존에 계정을 발급받은 이용자는 정상적으로 이용 가능합니다. - 문의: 정보화본부 AX인프라팀(033-250-7729, 7721)"
-  },
-  {
-   "title": "[긴급]삼척캠퍼스 통학버스 임시 노선 조정 안내(11.19/대학수학능력시험일）",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11663&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-11-17",
-   "kind": "생활",
-   "school": "강원대학교",
-   "campus": "",
-   "src": "784a7e0d",
-   "foundAt": "2026-11-17",
-   "desc": "삼척캠퍼스 통학버스 임시 노선 조정을 안내하오니 참고바랍니다. ○ 사유 : 대학수학능력시험일 출근시간 조정"
   }
  ]
 }

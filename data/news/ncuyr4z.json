@@ -1,7 +1,52 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "교내 보건진료소 12월 구강진료 예약 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220299/detailView.do",
+   "postedAt": "2026-11-26",
+   "postId": "220299",
+   "kind": "생활",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-26",
+   "desc": "교내 보건진료소에서는 교내 구성원들에게 구강진료를 무료 로 실시하고 있습니다 . 12 월 중 구강진료를 원하시는 분은 전화 예약 바랍니다 ."
+  },
+  {
+   "title": "[RED/BLUE필수] 직무자격증 과정 추가모집(※엑셀데이터분석※)-오늘 18시까지",
+   "url": "https://www.jbnu.ac.kr/web/Board/220297/detailView.do",
+   "postedAt": "2026-11-26",
+   "postId": "220297",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "[언어교육부] 12월 19일(토) 모의토익 실시 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220295/detailView.do",
+   "postedAt": "2026-11-26",
+   "postId": "220295",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-26",
+   "desc": "언어교육부 언어교육부에서 아래와 같이 모의토익을 실시하오니, 많은 관심 부탁드립니다."
+  },
+  {
+   "title": "독일학과 크리스마스 축제 <Deutsche Weihnachten> 2026년12월2일 18시-20시",
+   "url": "https://www.jbnu.ac.kr/web/Board/220292/detailView.do",
+   "postedAt": "2026-11-26",
+   "postId": "220292",
+   "kind": "행사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/c8c11fe4d1cb5adc.webp"
+  },
   {
    "title": "[해외파견] 2026-동계 JBNU English & AI 글로벌 챌린지 파견 프로그렘 선발 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/220290/detailView.do",
@@ -411,51 +456,6 @@
    "src": "e41d3fac",
    "foundAt": "2026-11-16",
    "thumb": "data/news/img/413592b923637ddf.webp"
-  },
-  {
-   "title": "<유아숲지도사> 2027년도 유아숲지도사양성과정 11기 교육생 모집",
-   "url": "https://www.jbnu.ac.kr/web/Board/219904/detailView.do",
-   "postedAt": "2026-11-16",
-   "postId": "219904",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-16",
-   "thumb": "data/news/img/ee8c257767e469b7.webp"
-  },
-  {
-   "title": "[SW중심대학사업단] 2026년 하반기 SW역량인증제 시행 및 응시 접수 안내 (~11.18.(수)까지)",
-   "url": "https://www.jbnu.ac.kr/web/Board/219887/detailView.do",
-   "postedAt": "2026-11-16",
-   "postId": "219887",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-16",
-   "desc": "⊙ 역량인증제란? - 'SW역량인증제'는 SW중심대학사업단에서 전교생을 대상으로 프로그래밍 문제해결 능력을 평가하는 무료 코딩 인증 테스트 로, 브론즈/실버/골드 3단계 레벨 인증을 통해 코딩 역량을 강화할 수…"
-  },
-  {
-   "title": "[법정의무교육] 2026년 LMS 폭력예방교육 이수 재안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/219873/detailView.do",
-   "postedAt": "2026-11-16",
-   "postId": "219873",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-16",
-   "desc": "인권센터 폭력예방교육은 법정의무교육으로 교내 구성원은 매년 1회 이상 교육을 이수 해야 합니다. [폭력예방교육 의무화 제도] 주요 내용"
-  },
-  {
-   "title": "[언어교육부] 12월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
-   "url": "https://www.jbnu.ac.kr/web/Board/219859/detailView.do",
-   "postedAt": "2026-11-15",
-   "postId": "219859",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-15",
-   "thumb": "data/news/img/4ac35f02d422d34b.webp"
   }
  ]
 }

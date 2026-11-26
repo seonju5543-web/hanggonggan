@@ -1,7 +1,18 @@
 {
  "school": "서울대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "★ 2027학년도 학부 신입생 특별시험 시행 안내",
+   "url": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=970",
+   "postedAt": "2026-11-26",
+   "school": "서울대학교",
+   "campus": "",
+   "board": "학부대학 공지",
+   "src": "efac1856",
+   "foundAt": "2026-11-26",
+   "desc": "학부대학에서는 2027학년도 학사과정 신입생을 대상으로 신입생 특별시험을 시행하고 있습니다. 모든 신입생들은 아래 내용 및 첨부파일(안내자료)을 필히 확인 해주시기 바랍니다."
+  },
   {
    "title": "2026년 12월 각 군 현역병 모집일정 안내",
    "url": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=965",
