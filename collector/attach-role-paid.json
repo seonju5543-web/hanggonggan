@@ -73,6 +73,25 @@
     "role": "unknown",
     "evidence": "「DAC List of ODA Recipients | Effective for reporting on 2025 flows」 — OECD가 만든 ODA 수원국 분류표(국가 목록)로, 신청 빈칸·서명란도 없고 지원자격·신청기간 같은 공고 안내도 없어 서식인지 공고문인지 확신할 수 없음. 공고의 지원자격 참고용 자료로 보이나 파일 자체에는 장학금 내용이 없음."
    }
+  },
+  "auto-enoticedoarticleno770709|「TGL_장학금」_모집_포스터_(영문).pdf": {
+   "id": "auto-enoticedoarticleno770709",
+   "name": "「TGL_장학금」_모집_포스터_(영문).pdf",
+   "hash": "d708a4ce05c0d417",
+   "file": "form-tqldc7-2.pdf",
+   "tries": 0,
+   "done": true,
+   "usd": 0.0211,
+   "at": "2026-11-26",
+   "a": {
+    "role": "notice",
+    "evidence": "「Eligibility International undergraduates at Korean universities」, 「Application Period 2026. 11. 25. (Wed) ~ 12. 13. (Sun)」 — 지원자격·선발인원·제출서류·신청기간을 안내하는 영문 포스터이며, 학생이 채워 넣는 빈칸이나 서명란이 없음"
+   },
+   "b": {
+    "role": "notice",
+    "evidence": "포스터 형태의 안내문: 「Eligibility International undergraduates at Korean universities」, 「Recipients 10 students」, 「Application Period 2026. 11. 25. (Wed) ~ 12. 13. (Sun)」. 신청서 빈칸이나 서명란은 없고 제출서류로 「Application form」이 언급될 뿐입니다."
+   },
+   "role": "notice"
   }
  }
 }
