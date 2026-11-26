@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-26",
- "count": 2067,
+ "count": 2072,
  "items": [
   {
    "title": "[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
@@ -18,6 +18,56 @@
    "foundAt": "2026-11-26",
    "bodyDeadline": "2026-12-02",
    "bodyDeadlineText": "- 방문제출 : 학생회관 108 호 학생지원 . 장학팀 3. 신청기간 : 2026. 11. 26( 목 ) ~ 2026. 12. 2( 수 ) 15:00 ※ 선발 완료시 마감"
+  },
+  {
+   "title": "[서울] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/273898/artclView.do",
+   "attachments": [
+    {
+     "name": "(서식)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/154773/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 11. 26( 목 ) ~ 2026. 12. 2( 수 ) 15:00 ※ 선발 완료시 마감 4. 선발기준 : 소득구간 , 성",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-26",
+   "bodyDeadline": "2026-12-02",
+   "bodyDeadlineText": "- 방문제출 : 국제학사 121 호 장학팀 3. 신청기간 : 2026. 11. 26( 목 ) ~ 2026. 12. 2( 수 ) 15:00 ※ 선발 완료시 마감"
+  },
+  {
+   "title": "[공통][교외]2027년 1학기 농림축산식품부 청년창업농장학금 선발(~1/5)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/273899/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임]2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/154774/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "[공통] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교외 대사관 등)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/273902/artclView.do",
+   "attachments": [
+    {
+     "name": "(서울캠퍼스)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/154775/download.do"
+    },
+    {
+     "name": "(글로벌캠퍼스)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/154776/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 11. 27(금 ) ~ 2026. 12. 2( 수 ) 15:00 ※ 선발 완료시 마감 4. 선발기준 : 소득구간 , 성적",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-26",
+   "bodyDeadline": "2026-12-02",
+   "bodyDeadlineText": "- 방문제출 : 학생회관 108 호 학생지원 . 장학팀 3. 신청기간 : 2026. 11. 27(금 ) ~ 2026. 12. 2( 수 ) 15:00 ※ 선발 완료시 마감"
   },
   {
    "title": "2026학년도 동계방학 중 교내 근로장학생 신청 및 선발 안내",
@@ -48,6 +98,26 @@
    "school": "고려대학교 세종캠퍼스",
    "campus": "",
    "foundAt": "2026-11-26"
+  },
+  {
+   "title": "[교외]2027년 1학기 농림축산식품부 대학장학금 선발안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274883/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임]1. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184825/download.do"
+    },
+    {
+     "name": "[붙임]2. 2027.1학기 청년창업농장학생 선발안내 포스터.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184826/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.12.1.( 화 ) 10 시 ~ 2027.1.5.( 화 ) 17 시 □ 신청방법 : 한국 농어촌희망재단 홈페이지 (PC 또",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-26",
+   "bodyDeadline": "2027-01-05",
+   "bodyDeadlineText": "○ 신청 → 대학교 추천 → 서류심사 → 보증보험가입 → 최종선발 □ 신청기간 : 2026.12.1.( 화 ) 10 시 ~ 2027.1.5.( 화 ) 17 시"
   },
   {
    "title": "2026-2학기 사회봉사활동 세부일정 안내 [졸업, 장학, 학점]",
@@ -225,6 +295,22 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027년도 에몬스가구 제17기 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142414&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": "접수 기간: 2026년 12월 14일 (월, 오전 0시) ~ 2027년 1월 8일 (금, 오후 5시까지) - 선발 인원: 총 20명 / 1명당",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-26",
+   "bodyDeadline": "2027-01-08",
+   "bodyDeadlineText": "1) 모집 정보 - 접수 기간: 2026년 12월 14일 (월, 오전 0시) ~ 2027년 1월 8일 (금, 오후 5시까지)"
   },
   {
    "title": "2027년 한국장학재단 창업기숙사 입주생 모집 안내",
