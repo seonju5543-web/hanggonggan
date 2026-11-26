@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": {
   "auto-otice06doarticleno140764": [
    {
@@ -141,50 +141,6 @@
     "at": "2026-11-17"
    }
   ],
-  "auto-ervicenoticedetail521206": [
-   {
-    "file": "auto-ervicenoticedetail521206/1-2026-2학기_재_교촌장학회_장학금신청서.pdf",
-    "name": "2026-2학기 (재)교촌장학회 장학금신청서.hwp",
-    "pages": 2,
-    "bytes": 117521,
-    "srcBytes": 156160,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-17"
-   },
-   {
-    "file": "auto-ervicenoticedetail521206/2-개인정보_수집_및_이용_동의서_2026장학_.pdf",
-    "name": "개인정보 수집 및 이용 동의서(2026장학).hwp",
-    "pages": 2,
-    "bytes": 108030,
-    "srcBytes": 60928,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
-  "auto-enoticedoarticleno770333": [
-   {
-    "file": "auto-enoticedoarticleno770333/1-붙임.근로장학생_신청서.pdf",
-    "name": "붙임.근로장학생 신청서.hwp",
-    "pages": 2,
-    "bytes": 97607,
-    "srcBytes": 62976,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-17"
-   },
-   {
-    "file": "auto-enoticedoarticleno770333/2-붙임.근로장학생_포기신청서.pdf",
-    "name": "붙임.근로장학생 포기신청서.hwp",
-    "pages": 2,
-    "bytes": 44112,
-    "srcBytes": 49664,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-17"
-   }
-  ],
   "act-0gx79pb": [
    {
     "file": "act-0gx79pb/1-2026_KT랜선야학_대학생_멘토_지원서_학교명_이름_.pdf",
@@ -241,18 +197,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-17"
-   }
-  ],
-  "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds": [
-   {
-    "file": "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds/1-미래로장학금_재심__신청서_양식_2026_2R_.pdf",
-    "name": "미래로장학금(재심)_신청서_양식(2026_2R).hwp",
-    "pages": 1,
-    "bytes": 104600,
-    "srcBytes": 690176,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
    }
   ],
   "auto-ent2431271834artclviewdo": [
@@ -392,18 +336,6 @@
     "pages": 3,
     "bytes": 174108,
     "srcBytes": 51712,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-20"
-   }
-  ],
-  "auto-2638viewdocurrentpageno1": [
-   {
-    "file": "auto-2638viewdocurrentpageno1/1-인산장학회_학번_이름_.pdf",
-    "name": "인산장학회(학번, 이름).hwp",
-    "pages": 3,
-    "bytes": 107891,
-    "srcBytes": 46080,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-20"
@@ -623,18 +555,6 @@
     "at": "2026-11-25"
    }
   ],
-  "act-090pxw4": [
-   {
-    "file": "act-090pxw4/1-2026_Pre_TeX-Corps_신청서_충북대.pdf",
-    "name": "2026 Pre TeX-Corps 신청서_충북대.hwp",
-    "pages": 3,
-    "bytes": 233961,
-    "srcBytes": 65536,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-24"
-   }
-  ],
   "act-05qwozc": [
    {
     "file": "act-05qwozc/1-_양식_봉사활동_인증제도_신청서_및_증빙서류_2026_.pdf",
@@ -670,6 +590,48 @@
     "fonts": "ko-nanum-1",
     "at": "2026-11-25"
    }
+  ],
+  "auto-bbssc58944731artclviewdo": [
+   {
+    "file": "auto-bbssc58944731artclviewdo/1-2-_서식_자기소개서.pdf",
+    "name": "2-(서식) 자기소개서.docx",
+    "pages": 2,
+    "bytes": 52405,
+    "srcBytes": 28958,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-26"
+   },
+   {
+    "file": "auto-bbssc58944731artclviewdo/2-3-_서식_포토에세이.pdf",
+    "name": "3-(서식) 포토에세이.docx",
+    "pages": 1,
+    "bytes": 43130,
+    "srcBytes": 28661,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-26"
+   },
+   {
+    "file": "auto-bbssc58944731artclviewdo/3-4-_서식_과학탐구활동_실행_이력서.pdf",
+    "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
+    "pages": 4,
+    "bytes": 106832,
+    "srcBytes": 32025,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-26"
+   },
+   {
+    "file": "auto-bbssc58944731artclviewdo/4-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf",
+    "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
+    "pages": 1,
+    "bytes": 94932,
+    "srcBytes": 94932,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-26"
+   }
   ]
  },
  "roles": {
@@ -688,9 +650,6 @@
   "auto-0713no2516266sitedvscdkr": {
    "[서식] 1~3.hwp": "form"
   },
-  "auto-2638viewdocurrentpageno1": {
-   "인산장학회(학번, 이름).hwp": "form"
-  },
   "auto-amepagescholarshipnotice-0ywblu5": {
    "[붙임2] 27년도_제출서류양식.hwp": "form"
   },
@@ -701,8 +660,9 @@
    "3-(서식) 포토에세이.docx": "form",
    "4-(서식) 과학탐구활동 실행 이력서.docx": "form"
   },
-  "auto-oardid323654menuno200318": {
-   "임대차계약 사실 확인서.hwp": "form"
+  "auto-bbssc58944731artclviewdo": {
+   "3-(서식) 포토에세이.docx": "form",
+   "4-(서식) 과학탐구활동 실행 이력서.docx": "form"
   }
  },
  "rejected": {

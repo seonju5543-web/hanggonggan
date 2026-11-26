@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": {
   "auto-sknou51815772artclviewdo": [
    {
@@ -142,17 +142,6 @@
     "at": "2026-11-20"
    }
   ],
-  "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds": [
-   {
-    "file": "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds/1-추천서__학과장_또는_지도교수___미래로재심_2026__2R.pdf",
-    "name": "추천서_(학과장_또는_지도교수)_(미래로재심_2026)_2R.hwp",
-    "pages": 1,
-    "bytes": 55708,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
   "auto-krbbskr846184artclviewdo": [
    {
     "file": "auto-krbbskr846184artclviewdo/1-2026년_재_청로장학재단_제7기_장학생_선발_안내.pdf",
@@ -181,17 +170,6 @@
     "name": "붙임1. 현장실습 네트워크 소모임 참여 학생 사전 질문지.hwp",
     "pages": 2,
     "bytes": 156444,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "act-1od884k": [
-   {
-    "file": "act-1od884k/1-붙임1._2026년_충청북도_탄소중립_창작_그림책_공모전_모집요강.pdf",
-    "name": "붙임1. 2026년 충청북도 탄소중립 창작 그림책 공모전 모집요강.hwp",
-    "pages": 9,
-    "bytes": 335067,
     "fonts": "ko-nanum-1",
     "kept": 1,
     "at": "2026-11-20"
@@ -476,19 +454,6 @@
     "at": "2026-11-21"
    }
   ],
-  "act-090pxw4": [
-   {
-    "file": "act-090pxw4/1-2026_Pre_TeX-Corps_프로그램_운영_계획_안__모집공고용.pdf",
-    "name": "2026 Pre TeX-Corps 프로그램 운영 계획(안)_모집공고용.hwpx",
-    "pages": 3,
-    "bytes": 227392,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "mk": 4,
-    "srcHash": "9257dc63a167a469",
-    "at": "2026-11-24"
-   }
-  ],
   "auto-amepagescholarshipnotice-1tlg7ak": [
    {
     "file": "auto-amepagescholarshipnotice-1tlg7ak/1-_붙임_2._2027년_1학기_농림축산식품부_청년창업농장학금_장학생_선발공고.pdf",
@@ -514,6 +479,69 @@
     "srcHash": "d5d97dba7efb1991",
     "at": "2026-11-25"
    }
+  ],
+  "auto-0713no2516453sitedvscdkr": [
+   {
+    "file": "auto-0713no2516453sitedvscdkr/1-_붙임_1_2026년_동기_국가근로장학금_취업연계_중점대학_학생_추가모집_안내.pdf",
+    "name": "[붙임 1] 「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내.hwpx",
+    "pages": 17,
+    "bytes": 623147,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "dcb30fe254698d15",
+    "at": "2026-11-26"
+   }
+  ],
+  "act-1cyhkb9": [
+   {
+    "file": "act-1cyhkb9/1-_26-977_보도자료_김진아_외교부_제2차관_한국국제교류재단_제주_본부_방문.pdf",
+    "name": "[26-977](보도자료) 김진아 외교부 제2차관, 한국국제교류재단 제주 본부 방문.hwp",
+    "pages": 2,
+    "bytes": 164789,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "1cab24e2b7257f92",
+    "at": "2026-11-26"
+   }
+  ],
+  "act-1avvq3z": [
+   {
+    "file": "act-1avvq3z/1-트랜스-논문투고양식.pdf",
+    "name": "트랜스-논문투고양식.hwp",
+    "pages": 7,
+    "bytes": 281447,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "fcd5cbef3183d825",
+    "at": "2026-11-26"
+   }
+  ],
+  "act-1nf7uh4": [
+   {
+    "file": "act-1nf7uh4/1-_농촌정책국-농촌사회서비스과_기본소득_사회연대경제_농촌형_순환경제의_답을_찾는다._9._30._06시부터_.pdf",
+    "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwp",
+    "pages": 7,
+    "bytes": 1112435,
+    "fonts": "ko-nanum-1",
+    "kept": 0.998,
+    "mk": 4,
+    "srcHash": "0be6a6480b6a320d",
+    "at": "2026-11-26"
+   },
+   {
+    "file": "act-1nf7uh4/2-_농촌정책국-농촌사회서비스과_기본소득_사회연대경제_농촌형_순환경제의_답을_찾는다._9._30._06시부터_.pdf",
+    "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwpx",
+    "pages": 7,
+    "bytes": 1112483,
+    "fonts": "ko-nanum-1",
+    "kept": 0.998,
+    "mk": 4,
+    "srcHash": "5fa0db2ee5ac2fac",
+    "at": "2026-11-26"
+   }
   ]
  },
  "tried": {
@@ -530,6 +558,11 @@
   "auto-tegory1moddocumentuid431|2.-2027학년도-1학기-대학원생-교내장학금-신청-안내.hwp": {
    "at": "2026-11-24",
    "why": "HTTP 500",
+   "mk": 4
+  },
+  "auto-oardid323654menuno200318|임대차계약 사실 확인서.hwp": {
+   "at": "2026-11-26",
+   "why": "글자 빠짐(65%)",
    "mk": 4
   }
  }
