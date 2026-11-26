@@ -122,7 +122,8 @@ jobs:
           [ -d data/docs-pdf ] && git add -A data/docs-pdf
           [ -d data/form-pages ] && git add -A data/form-pages
           if ! git diff --cached --quiet; then
-            git commit -m "유료 최종 검토: $(grep -o '검토 [0-9]*건' /tmp/final-review.txt | tail -1 || echo '결과 갱신') · 활동 글 $(grep -o '검토 [0-9]*건' /tmp/act-final-review.txt 2>/dev/null | tail -1 || echo '없음')"
+            # 대신 말은 변수로 — `grep … | tail -1 || echo` 꼴은 관 끝의 tail 이 늘 성공해 대신 말이 한 번도 안 나왔다(11-26 커밋 「… · 활동 글」 로 끊김 · 리뷰 10차 둘레)
+            git commit -m "유료 최종 검토: $(v=$(grep -o '검토 [0-9]*건' /tmp/final-review.txt 2>/dev/null | tail -1); echo "${v:-결과 갱신}") · 활동 글 $(v=$(grep -o '검토 [0-9]*건' /tmp/act-final-review.txt 2>/dev/null | tail -1); echo "${v:-없음}")"
             pushed=0
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi

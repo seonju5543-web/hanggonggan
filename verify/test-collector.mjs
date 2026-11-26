@@ -7684,7 +7684,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
     eq('  서류 칸 쓰기 — 첨부·브라우저에서 읽어 둔 목록(documentsFrom)은 빈 본문이 지우지 않는다 · 본문 목록은 비면 지운다 · 본문이 목록을 주면 본문이 이긴다(출처 표식도 뗀다) · 늘 판을 적는다',
       [kept.documents, kept.documentsV === D, wiped.documents, wiped.documentsV === D, kept.docsV === undefined, put.documents, put.documentsFrom], [['참가신청서'], true, undefined, true, true, ['작품 설명서'], undefined]);
     eq('  서류 칸만 다시 읽는 갈래는 자격·발췌를 건드리지 않고 넘어간다(같은 판으로 이미 읽었다) · 못 받으면 이레 뒤에 다시 · 리포트의 「남은」 수도 같은 판단',
-      [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ putActivityDocuments\(it, activityDocuments\(detail\.text\), null, \{ thin: thinText\(detail\.text\) \}\);(?: actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\);)? delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),   // 2026-11-26 — 받은 김에 첨부도 합친다(아래 줄이 잰다) · 자격·발췌는 그대로
+      [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ (?:const docsBefore = \(it\.documents \|\| \[\]\)\.length; )?putActivityDocuments\(it, activityDocuments\(detail\.text\), null, \{ thin: thinText\(detail\.text\) \}\);(?: actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\);)? delete it\.detailsTriedAt;(?: if \(\(it\.documents \|\| \[\]\)\.length < docsBefore\) actDocsShrunk\.push\([^\n]*?\);)? \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),   // 2026-11-26 — 받은 김에 첨부도 합친다(아래 줄이 잰다) · 자격·발췌는 그대로 · 리뷰 10차 — 서류 줄이 준 글 세기(앞뒤 두 문장)만 더 들어갈 수 있다
         /남은 \$\{left\.fill\}건/.test(cm)], [true, true]);   // 「남은」 은 같은 판단(actRereadNeed)으로 세되 첨부만 다시 살필 글은 따로 적는다(actRereadLeft · 리뷰 2026-11-25)
   }
   /* 다시 읽을 때 첨부를 합친다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ①) — 수집 로봇의 다시 읽기가 상세가 준 첨부를 버려,
@@ -18650,6 +18650,18 @@ module.exports = class Anthropic {
     const repoPath = (rel) => (rel.startsWith('../') ? rel.slice(3) : `collector/${rel}`);
     const noComment = (wf) => wf.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
     const wc = noComment(wfc), wr = noComment(wff);
+    /* 전부터 있던 것(리뷰 10차 둘레 · 11-26 로봇 커밋 「유료 최종 검토: 검토 6건 · 활동 글」 에서 찾음) — 두 로봇의 저장 커밋 글이 `grep … | tail -1 || echo '없음'` 꼴이라
+       대신 말(결과 갱신·없음)이 한 번도 안 나왔다(관 끝의 tail 이 늘 성공해 || 뒤가 안 돈다) · 활동 글이 없던 날 커밋 글이 「· 활동 글」 로 끊겼다 → 결과 파일이 없는 빈 폴더에서 그 줄을 셸로 실제로 돌려 잰다 */
+    {
+      const tmpd = fs.mkdtempSync(path.join(os.tmpdir(), 'cm-msg-'));
+      const msgOf = (wf) => {
+        const line = (wf.split('\n').find((l) => /^\s*git commit -m "유료/.test(l)) || '').trim();
+        return line ? spawnSync('bash', ['-c', line.replace(/^git commit -m /, 'printf %s ').replace(/\/tmp\//g, `${tmpd}/`)], { encoding: 'utf8' }).stdout : '(커밋 줄 없음)';
+      };
+      eq('⓪ 두 유료 로봇의 저장 커밋 글 — 결과 파일이 없으면 대신 말을 적는다(「· 활동 글」 로 끊기지 않는다 · 셸로 실제로 돌림)',
+        [msgOf(wfc), msgOf(wff)], ['유료 카드 읽기: 결과 갱신 · 첨부 판정 없음 · 활동 글 없음', '유료 최종 검토: 결과 갱신 · 활동 글 없음']);
+      fs.rmSync(tmpd, { recursive: true, force: true });
+    }
     const probe = (() => { try { return noComment(src('.github/workflows/act-paid-probe.yml')); } catch { return ''; } })();
     const actWrites = (robot) => [...robot.matchAll(/writeAtomic\('([^']+)'/g)].map((m) => repoPath(F[m[1]] || m[1]));
     eq('① 로봇이 활동 목록에서 쓰는 파일은 전부 그 워크플로의 저장 목록(git add)에 있다 — 빠지면 돈 주고 쓴 카드·검토가 그 실행과 함께 사라진다 · 저장 못 한 날 남기는 장부 묶음에도 있다',
