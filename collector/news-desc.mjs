@@ -29,21 +29,17 @@
          글 머리(<header>) 안의 그 글 제목 칸은 지우지 않는다(서울대 — 지우면 <title> 이 제목 자리가 된다).
       장부 규칙(nextEntry · applyDescs · staleRule · descToShow)도 이 파일의 순수 함수다 — 로봇은 부르기만 하고 관문이 표본으로 잰다.
    ============================================================ */
+import { createRequire } from 'node:module';
 import { makeTitleLine, normTitle } from './notice-source.mjs';
 
 export const DESC_MAX = 120;      // 카드 두 줄 남짓
 const DESC_MIN = 24;              // 이보다 짧으면 본문이라 믿기 어렵다
 export const DESC_RULE = 3;       // 규칙 판 — 장부(collector/news-desc.json)의 v 와 다르면 그 글을 다시 연다 (3: 2026-11-23 이동 단추 둘레·본문 밖 글자 — 머리말 ④⑤)
 
-/* 앱(app.js ENTITIES)이 아는 이름은 다 안다 — 관문이 대조한다(test-collector 「앱이 아는 이름 기호를 …도 다 푼다」 · 2026-11-26 리뷰 6차: 이 표만 대조에서 빠져 있었다) */
-const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', middot: '·', hellip: '…', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', ndash: '–', mdash: '—', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', times: '×', egrave: 'è', emsp: ' ', ensp: ' ' };
-const entOwn = (k) => Object.prototype.hasOwnProperty.call(ENT, k);
-function decode(s) {
-  return String(s || '')
-    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
-    .replace(/&([a-z]+);/gi, (m, k) => (entOwn(k) ? ENT[k] : entOwn(k.toLowerCase()) ? ENT[k.toLowerCase()] : m));   // 정확한 이름 먼저(&rArr; ⇒ · &rarr; →)
-}
+/* HTML 기호 풀이는 엔진(match-engine decodeEntities) 한 곳을 불러 쓴다 — 여기 따로 두었던 표는 일곱째 사본이었고 범위 밖 숫자 기호(&#99999999;)에서 넘어졌다(2026-11-26 리뷰 7차) ·
+   앱(app.js ENTITIES)이 아는 이름은 엔진도 다 안다(관문 「앱이 아는 이름 기호를 …도 다 푼다」) */
+const { decodeEntities } = createRequire(import.meta.url)('../match-engine.js');
+const decode = (s) => decodeEntities(String(s || ''));
 export const decodeNewsEntities = decode;   // 관문이 앱 ENTITIES 와 대조한다
 
 /* 게시판 화면의 껍데기 줄 — 본문이 아니다.

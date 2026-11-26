@@ -166,9 +166,11 @@ function checkEntry(it, opts = {}) {
     && opts.noticeKind(`${name} ${it.boardTitle || ''}`, ownSchool) === '교내') {
     /* 까닭은 둘 중 하나다 — 제목의 「교내」 표식(NOTICE_CAMPUS_MARK) 또는 학교 제도 이름(OWN_PROGRAMS). 한쪽만 가리키면 읽는 사람이 없는 이름을 찾는다(2026-11-26 리뷰 5차) */
     /* 「다음 수집이 고친다」 는 원문 판정 로봇이 보는 공고에만 — 그 로봇은 사람이 등록한 공고와 관리자가 정한 구분을 건너뛴다(collector/kind-classify.mjs · 리뷰 6차) */
-    const robotFixes = !!it.auto && !/^관리자/.test(String(it.kindFrom || ''));
+    const adminSet = /^관리자/.test(String(it.kindFrom || ''));   // 관리자가 정한 구분 — 「교내로 고치세요」 라고 사람 판단을 거스르지 않는다(리뷰 7차)
+    const robotFixes = !!it.auto && !adminSet;
+    const fixHint = adminSet ? '관리자가 정한 구분이라 그대로 둡니다 · ' : `${robotFixes ? '다음 수집의 원문 판정(collector/kind-classify.mjs)이 고치거나 ' : ''}교내로 고치세요 · `;
     warn(`${ownSchool}가 스스로 운영하는 장학 제도로 보이는데(제목의 「교내」 표식 또는 OWN_PROGRAMS 의 제도 이름) '${it.type}'로 등록돼 있습니다 `
-      + `— ${robotFixes ? '다음 수집의 원문 판정(collector/kind-classify.mjs)이 고치거나 ' : ''}교내로 고치세요 · 표식·제도 이름이 틀렸으면 match-engine.js 의 NOTICE_CAMPUS_MARK·OWN_PROGRAMS 를 고치세요 `
+      + `— ${fixHint}표식·제도 이름이 틀렸으면 match-engine.js 의 NOTICE_CAMPUS_MARK·OWN_PROGRAMS 를 고치세요 `
       + `(근거: docs/designs/on-campus-programs.md)`);
   }
 

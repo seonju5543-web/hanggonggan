@@ -6,7 +6,7 @@
    정식 등록 78장이 「제출 서류는 공고 원문에서 확인해 주세요」를 찍고 있었다 — 원문의 `4. 제출서류` 절에는 서류가 적혀 있는데.
    개발자 지시: *"원문에서 확인 이렇게 뜨는 게 하나도 없고 … 발췌 못하는 애들을 먼저 고쳐보자"*.
 
-   하는 일 — 원문 본문(collector/extracted · 브라우저 본문 포함)에서 extract-excerpts extractDocuments 가 읽은 서류 이름을
+   하는 일 — 원문 본문(collector/extracted · 브라우저 본문 포함)에서 doc-list readDocuments 가 읽은 서류 이름을
    documents 에 넣고 documentsFrom 에 근거(로봇·날짜)를 남긴다. 사람이 적은 서류(자리표시가 아닌 줄이 하나라도 있는 항목)와
    관리자가 손댄 항목(documentsFrom 이 '관리자')은 건드리지 않는다. 원문이 없거나 서류 절이 없으면 그대로 둔다(지어내지 않는다).
    자리는 수집 워크플로의 데이터 관문 **앞**(scope-promote·kind-classify 와 같은 줄) — 관문이 결과를 본다.

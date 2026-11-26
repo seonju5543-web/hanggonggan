@@ -4028,6 +4028,11 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     eq('    앱이 아는 이름 기호를 로봇의 제목·본문 풀이(clean-title) · 발췌 풀이(extract-excerpts) · 소식 설명 풀이(news-desc) · 엔진(decodeEntities)도 다 푼다',
       [undecoded(ctDecode), undecoded(decodeExcerptEntities), undecoded(decodeNewsEntities), undecoded(ME.decodeEntities)], [[], [], [], []]);
     /* 🔴 대소문자를 접어 찾으면 이름을 더하는 순간 &rArr;(⇒)가 &rarr;(→)로 풀린다 — 접수 기간 한 줄 풀이(deadline-hint)는 실제로 그랬다(리뷰 6차) · 풀이마다 정확한 이름을 먼저 찾는다 */
+    /* 리뷰 7차 — 소식 설명 풀이는 기호 표의 또 한 벌이었고 범위 밖 숫자 기호(&#99999999;)에서 넘어졌다 → 엔진의 decodeEntities 를 불러 쓴다(베끼지 않는다) */
+    const ndSrc = readText(new URL('../collector/news-desc.mjs', import.meta.url));
+    const safeBig = (() => { try { return decodeNewsEntities('가&#99999999;나'); } catch (e) { return `넘어짐: ${e.message}`; } })();
+    eq('    교내 소식 설명 풀이는 엔진의 decodeEntities 를 불러 쓴다(제 표를 두지 않는다) · 범위 밖 숫자 기호에서 넘어지지 않는다',
+      [/createRequire\(import\.meta\.url\)\('\.\.\/match-engine\.js'\)/.test(ndSrc) && /decodeEntities/.test(ndSrc), /const ENT = \{/.test(ndSrc), safeBig], [true, false, '가&#99999999;나']);
     const caseOf = (fn) => (typeof fn === 'function' ? fn('&rArr;&rarr;') : '(풀이 함수 없음)');
     eq('    풀이마다 대소문자를 가린다(&rArr; ⇒ · &rarr; →) — 엔진 · 제목·본문 · 발췌 · 소식 설명 · 접수 기간 한 줄',
       [caseOf(ME.decodeEntities), caseOf(ctDecode), caseOf(decodeExcerptEntities), caseOf(decodeNewsEntities), H('접수기간: 2026. 9. 1. ~ 9. 30. 포털 &rArr; 신청')],
@@ -4038,6 +4043,16 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     eq('    &emsp; 로 들여 쓴 서류 목록도 번호를 떼고 읽는다(학생이 보는 서류 목록 함수 readDocuments)',
       readDocuments('3. 제출서류\n&emsp;1) (필수) 학생복지처 특별장학금 학업계획서\n&emsp;2) (해당자) 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서\n4. 문의: 학생복지처').docs,
       ['(필수) 학생복지처 특별장학금 학업계획서', '(해당자) 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서']);
+    /* 리뷰 7차 — 같은 뿌리: 줄 맨 앞 글자를 보는 판정(※ 곁말 · 긴 • 곁말 · 서류 낱말 없는 - 줄 건너뛰기)이 기호만 풀고 빈칸을 안 깎은 줄을 봐서,
+       「&emsp;&emsp;※ …」 꼴 곁말(고려대 세종 게시판의 실제 꼴)이 서류 한 줄로 떴다 */
+    /* 리뷰 7차 — 글머리 지우개가 번호를 한 겹만 뗐다(「라 . 4. …」·「• 1. …」·「5.1. …」 → 「4.」·「1.」 이 남음 · 한국외대·고려대 세종·동국대 실제 줄) ·
+       여는 괄호 뒤 동그라미 번호는 닫는 괄호가 없어도 떼어 「(②초본이 부·모일 경우) …」 가 「초본이 부·모일 경우) …」 로 괄호가 깨졌다 */
+    eq('    번호는 두 겹까지 뗀다(번호 뒤에 빈칸이 올 때만) · 괄호 안에서 이어지는 동그라미 번호는 떼지 않는다(괄호가 깨지지 않게)',
+      readDocuments('마. 제출서류\n라 . 4. 지원자격의 다 ~ 마항 관련 각종 증빙서류\n• 1. 재학증명서 1부\n(②초본이 부·모일 경우) 가족관계 증명서\n5.1. (재단 양식) 추천서 1부\n바. 문의: 장학팀').docs,
+      ['지원자격의 다 ~ 마항 관련 각종 증빙서류', '재학증명서 1부', '(②초본이 부·모일 경우) 가족관계 증명서', '(재단 양식) 추천서 1부']);
+    eq('    &emsp; 로 들여 쓴 ※ 곁말 줄은 서류가 아니다(줄 맨 앞을 보는 판정도 기호를 풀고 빈칸을 깎은 줄로)',
+      readDocuments('나. 제출서류\n&emsp;1) (필수) 장학금 신청서\n&emsp;&emsp;※ 가족관계증명서는 부모 기준 상세로 발급\n&emsp;2) (필수) 가족관계증명서 1부\n4. 장학금액').docs,
+      ['(필수) 장학금 신청서', '(필수) 가족관계증명서 1부']);
     eq('    &middot;·&#183; 은 글자로 풀고 자른다', [H('신청기간: 2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00 제출처 장학팀 방문 접수 및 이메일 접&middot; 다음 문장').endsWith('접· 다음 문'), H('접수기간: 2026. 9. 1. ~ 9. 30. 가&#183;나 제출')], [true, '접수기간: 2026. 9. 1. ~ 9. 30. 가·나 제출']);
   }
 
@@ -14077,6 +14092,10 @@ console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)')
     eq('  경고가 까닭 둘(제목의 「교내」 표식 · 학교 제도 이름 OWN_PROGRAMS)을 다 말하고, 로봇이 등록한 공고에만 「다음 수집의 원문 판정이 고친다」 를 말한다(사람 등록·관리자 구분은 아니다)',
       [/제목의 「교내」 표식/.test(markMsg), /OWN_PROGRAMS/.test(markMsg), /kind-classify/.test(markMsg), /kind-classify/.test(msgOf(jump)), /kind-classify/.test(msgOf({ ...jump, auto: true, kindFrom: '관리자 2026-11-20' }))],
       [true, true, true, false, false]);
+    /* 리뷰 7차 — 관리자가 '교외'로 정한 공고에도 「교내로 고치세요」 라고 했다(사람 판단을 거스르는 안내) → 그 공고에는 표식·제도 이름 쪽 안내만 */
+    const adminMsg = msgOf({ ...jump, auto: true, kindFrom: '관리자 2026-11-20' });
+    eq('  관리자가 정한 구분이면 「교내로 고치세요」 를 말하지 않는다 — 표식·제도 이름이 틀렸으면 고치라는 안내만',
+      [/교내로 고치세요/.test(adminMsg), /관리자가 정한 구분/.test(adminMsg), /NOTICE_CAMPUS_MARK/.test(adminMsg), /교내로 고치세요/.test(markMsg)], [false, true, true, true]);
     eq('  이름이 70자에서 잘려도 게시판 원제목으로 잡는다',
       hits({ ...base, type: '교외', name: '공통 [공통] 2026학년도 2학기', boardTitle: base.name }, { noticeKind }).length, 1);
     eq('  이어붙인 자리를 넘어 오탐하지 않는다',
@@ -16202,17 +16221,19 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   eq('  배점표 행(「3자녀 : 5점, 4자녀 : 7점 …」·「점수 차등 부여」)은 자격 줄이 아니다 · 「성적 기준을 적용하지 않음」은 참고(aside)', ME3.requirementLines({ eligibilityLines: ['3자녀 : 5점, 4자녀 : 7점, 5자녀 이상 : 10점', '대학생: 학자금지원구간(10구간)에 따라 점수 차등 부여(20점~50점)', '직전학기 평점 3.0 이상', '1학년 재학생은 성적 기준을 적용하지 않음'] }, null, { all: true, withMeta: true }).map((it) => [it.text, it.aside]), [['직전학기 평점 3.0 이상', false], ['1학년 재학생은 성적 기준을 적용하지 않음', true]]);
   /* ⑮ 제출 서류 (2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — 자리표시뿐인 등록분 220건 중 원문 156건의 「제출서류」 절을 읽어 채운다 */
   {
-    const X5 = await import('../collector/extract-excerpts.mjs');
+    /* 학생이 보는 서류 목록 함수(doc-list readDocuments)로 잰다 — 옛 사본 extractDocuments 는 지웠다(리뷰 7차) */
+    const { readDocuments: RD } = await import('../collector/doc-list.mjs');
+    const RD5 = (t) => RD(t).docs;
     process.env.DOCS_FILL_AS_LIB = '1';
     const DF = await import('../collector/docs-fill.mjs');
     eq('⑮ 「4. 제출서류」 절 — `가.` 항목만 · 다음 절(5. 제출기한)에서 끝 · `1 부` 는 `1부`',
-      X5.extractDocuments(['4. 제출서류', '가. 장학생 추천서 1부 (붙임 양식)', '나. 재학증명서 1 부', '다. 성적증명서 1부 (2026-1학기 성적 포함)', '5. 제출기한: 2026. 8. 10.(월) 오후 1시까지', '6. 문의 : 장학팀'].join('\n')),
+      RD5(['4. 제출서류', '가. 장학생 추천서 1부 (붙임 양식)', '나. 재학증명서 1 부', '다. 성적증명서 1부 (2026-1학기 성적 포함)', '5. 제출기한: 2026. 8. 10.(월) 오후 1시까지', '6. 문의 : 장학팀'].join('\n')),
       ['장학생 추천서 1부 (붙임 양식)', '재학증명서 1부', '성적증명서 1부 (2026-1학기 성적 포함)']);
     eq('  곁말(※)·제출 방법 문장(`반드시 PDF 1개 파일로 … 제출`)·표 머리(구분·필수)는 서류가 아니다 · ① 번호와 HTML 기호(&#9312;)도 뗀다',
-      X5.extractDocuments(['2) 필수제출서류', '구분', '필수', '&#9312; 짧은 에세이 1 부 ( Hufs Ability 다운로드 )', '※ 다른 학기의 확인서는 인정하지 않음', '&#9313; 성적증명서 1 부', '반드시 PDF 1 개 파일로 제출 (파일명 : 지원서 (학번).pdf)', '3) 지원방법 : 온라인 신청'].join('\n')),
+      RD5(['2) 필수제출서류', '구분', '필수', '&#9312; 짧은 에세이 1 부 ( Hufs Ability 다운로드 )', '※ 다른 학기의 확인서는 인정하지 않음', '&#9313; 성적증명서 1 부', '반드시 PDF 1 개 파일로 제출 (파일명 : 지원서 (학번).pdf)', '3) 지원방법 : 온라인 신청'].join('\n')),
       ['짧은 에세이 1부 (Hufs Ability 다운로드)', '성적증명서 1부']);
     eq('  한 줄에 값(`제출서류 : 신청서 1부, 성적증명서 1부`) · 절이 없으면 빈 배열(지어내지 않는다) · 설명 문장만 있으면 빈 배열',
-      [X5.extractDocuments('○ 제출서류 : 신청서 1부, 성적증명서 1부, 통장 사본'), X5.extractDocuments('장학금 안내\n신청은 포털에서 합니다.'), X5.extractDocuments('3. 제출서류\n서류는 장학팀에 제출하시기 바랍니다.\n4. 문의')], [['신청서 1부', '성적증명서 1부', '통장 사본'], [], []]);
+      [RD5('○ 제출서류 : 신청서 1부, 성적증명서 1부, 통장 사본'), RD5('장학금 안내\n신청은 포털에서 합니다.'), RD5('3. 제출서류\n서류는 장학팀에 제출하시기 바랍니다.\n4. 문의')], [['신청서 1부', '성적증명서 1부', '통장 사본'], [], []]);
     const items = [{ id: 'a', documents: ['지원 자격·제출 서류는 원문 공고에서 확인'], sourceUrl: 'https://x.kr/1' }, { id: 'b', documents: ['재학증명서'], sourceUrl: 'https://x.kr/2' }, { id: 'c', documents: ['구비서류는 재공고 원문 확인'], documentsFrom: '관리자 2026-10-01', sourceUrl: 'https://x.kr/3' }, { id: 'd', documents: ['신청 방법·서류는 원문 공고 확인'], sourceUrl: 'https://x.kr/4' }];
     const NS = await import('../collector/notice-source.mjs');
     const PAD = '\n이 장학금은 학업에 뜻을 둔 학생을 돕기 위해 마련되었습니다. 신청 전 안내문을 꼼꼼히 읽어 주시기 바랍니다. 문의 사항은 장학팀으로 연락해 주세요. 많은 관심과 참여를 바랍니다. 선발된 학생에게는 개별로 연락을 드리며, 지급 시기는 학기 중 공지합니다.';   // 본문으로 치려면 MIN_BODY(100자) 넘어야 한다(notice-source hasText)
