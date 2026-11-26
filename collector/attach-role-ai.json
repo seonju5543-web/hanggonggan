@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": {
   "auto-rykeywordpaged1slug20262-0e9iyco": {
    "at": "2026-11-23",
@@ -255,6 +255,56 @@
      "role": "content",
      "formStart": "",
      "why": "유학생활도우미 봉사장학생 모집 자격·신청 방법·일정을 안내하는 포스터 공고문입니다."
+    }
+   ]
+  },
+  "auto-15nttno171908searchctgry": {
+   "at": "2026-11-27",
+   "docs": [
+    {
+     "file": "form-eiuss5-3.hwp",
+     "attach": "(학생용) 국가근로장학금 취업연계 중점대학 장학생 지원서.hwp",
+     "hash": "e02326f9c650db0a",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 작성하는 지원서·자기소개서·개인정보 동의서 서식만 들어 있습니다."
+    },
+    {
+     "file": "elig-eiuss5-1.pdf",
+     "attach": null,
+     "hash": "4714f334150bc621",
+     "role": "content",
+     "formStart": "",
+     "why": "사업 개요, 선발 기준, 유의사항을 담은 신청 안내문입니다."
+    }
+   ]
+  },
+  "auto-archgbn0searchordersort0-0ty595g": {
+   "at": "2026-11-27",
+   "docs": [
+    {
+     "file": "form-13jwrp-1.hwp",
+     "attach": "2026학년도 공로장학금 선발 계획 및 신청.접수 안내.hwp",
+     "hash": "4506e6a3b921928b",
+     "role": "other",
+     "formStart": "",
+     "why": "상위 버전 배포용 문서 안내 문구만 있고 읽을 내용이 없습니다."
+    },
+    {
+     "file": "form-13jwrp-2.hwpx",
+     "attach": "2026학년도 공로장학금 선발 계획(안).hwpx",
+     "hash": "0569e678dcbd25ba",
+     "role": "content",
+     "formStart": "",
+     "why": "신청자격·평가기준·지급 상한액·일정이 담긴 선발 계획 공고문입니다."
+    },
+    {
+     "file": "form-13jwrp-3.hwpx",
+     "attach": "(서식) 공로장학금 신청서 및 추천서 등.hwpx",
+     "hash": "4027750ae477e82b",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 작성하는 장학생 신청서와 추천서·공적조서 서식만 들어 있는 서식 파일입니다."
     }
    ]
   }
