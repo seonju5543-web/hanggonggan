@@ -20,14 +20,6 @@
   "at": "2026-11-14",
   "tries": 2
  },
- "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/790?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-22",
-  "tries": 2
- },
  "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=838568&qidx=6302&cate=10&allboard=false&nowpage=3": {
   "at": "2026-11-23",
   "tries": 2
@@ -89,8 +81,8 @@
   "tries": 2
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521245": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.inha.ac.kr/bbs/kr/8/46177/artclView.do": {
   "at": "2026-11-26",
@@ -117,15 +109,6 @@
   "at": "2026-11-20",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3539116": {
-  "at": "2026-11-21",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3515772": {
   "at": "2026-11-22",
   "tries": 1,
@@ -139,15 +122,6 @@
    "봉사활동 장소[1] 주소 : 충청남도 아산시 신창면 남성길 99(샘마을아파트) 상가동 3층",
    "충청남도 아산시 신창면 남성길 99 샘마을 아파트 상가 3층",
    "이전 봉사참여",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3551779": {
-  "at": "2026-11-23",
-  "tries": 1,
-  "lines": [
    "봉사자유형 : 성인"
   ],
   "excludes": [],
@@ -208,6 +182,10 @@
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142357&article.offset=0&articleLimit=10": {
   "at": "2026-11-25",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17596&commonMenuNo=180_35": {
+  "at": "2026-11-26",
   "tries": 1
  }
 }

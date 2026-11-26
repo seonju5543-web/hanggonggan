@@ -26796,7 +26796,12 @@
    "noForm": "자동 등록(검수 전) 2026-11-26 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "paidGate": "2026-11-26",
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    }
+   ],
    "sourceUrl": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71122&cate=8",
    "sourceKind": "auto"
   },
@@ -26841,6 +26846,10 @@
     {
      "name": "「TGL_장학금」_추천서_양식.docx",
      "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770709&attachNo=564505"
+    },
+    {
+     "name": "웹 브라우저에서 바로보기",
+     "url": "https://www.smu.ac.kr/flexer/index.jsp?ftype=pdf&attachNo=564503"
     }
    ],
    "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770709&article.offset=0&articleLimit=10",
@@ -26903,6 +26912,16 @@
     {
      "name": "붙임. Trinity DESIGNer 배지 리스트(2025.11.20.).pdf",
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278243&attachNo=227827"
+    },
+    {
+     "name": "본문이미지-891x1260.png",
+     "url": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/11/XMvUgvQSYLSdgtphLOLWfZwGpo.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-511x348.png",
+     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278243&article.offset=0&articleLimit=10&srCategoryId=22",
@@ -26959,6 +26978,15 @@
     {
      "name": "(학생용) 국가근로장학금 취업연계 중점대학 장학생 지원서.hwp",
      "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365395"
+    },
+    {
+     "name": "국가근로장학금 취업연계중점대학 장학생 모집(26동계).jpg",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365392"
+    },
+    {
+     "name": "본문이미지-500x500.png",
+     "url": "https://www.cbnu.ac.kr/site/www/images/common/ai_woowang_glass_new_nova.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=171908&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
@@ -27038,6 +27066,26 @@
     {
      "name": "(서식) 공로장학금 신청서 및 추천서 등.hwpx",
      "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261126053754364.hwpx&path=/bbs/34&fn=(%EC%84%9C%EC%8B%9D)%20%EA%B3%B5%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%84%9C%20%EB%B0%8F%20%EC%B6%94%EC%B2%9C%EC%84%9C%20%EB%93%B1.hwpx"
+    },
+    {
+     "name": "본문이미지-2481x3508.jpg",
+     "url": "https://kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261126052635182.png&fn=2026_%EA%B3%B5%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88_%ED%8F%AC%EC%8A%A4%ED%84%B0_A4_%EC%B5%9C%EC%A2%85.png&siteId=neibis&menuSn=750",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-4096x4096.png",
+     "url": "https://kangwon.ac.kr/assets/ko/images/main/sns-instagram.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-500x500.png",
+     "url": "https://kangwon.ac.kr/assets/ko/images/main/sns-facebook.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-640x443.png",
+     "url": "https://kangwon.ac.kr/assets/ko/images/main/sns-youtube.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2557&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
