@@ -42,9 +42,11 @@ export function stampNewActivity(it, cfg, today) {
   return it;
 }
 /* id 를 받지 못한 글(주소 지문이 다른 글과 겹쳐 수집 로봇이 id 를 비운 글)은 표시를 뗀다 — AI 카드와 id 로 만나므로 관문에 태울 수 없다. 그 글은 지금처럼 바로 보인다. 뗀 수를 돌려준다 */
+/* 🔴 표시를 지우지 않고 「로봇이 열었다」 표식(paidOpen)을 더한다 — 지우면 병합 도구가 다른 쪽 판에서 되살려 그 글이 다시 숨는다(최종 리뷰 2026-11-26 · 관리자 「올리기」와 같은 칸) */
+export const ROBOT_OPEN_NO_ID = '로봇 · id 없는 글';
 export function dropStampWithoutId(items) {
   let n = 0;
-  for (const it of items || []) if (it && it.paidGate && !it.id) { delete it.paidGate; n += 1; }
+  for (const it of items || []) if (it && it.paidGate && !it.id && !it.paidOpen) { it.paidOpen = ROBOT_OPEN_NO_ID; n += 1; }
   return n;
 }
 /* 활동 글 중복 정리 + 표시 지키기 — dedupe = url-key dedupeNotices(같은 글은 하나로 · 남길 쪽은 그 함수가 고른다).
@@ -53,10 +55,10 @@ export function dropStampWithoutId(items) {
 /* 🔴 isShown = 그 글이 학생에게 보이던가(수집 로봇은 앱과 같은 판정을 넘긴다 — paidOpen 이거나 paidGateOpen). 표시는 한 번 달면 지워지지 않아
    (카드가 실려도 · 사흘이 지나도 · 관리자가 올려도) 「표시 없음」만으로는 보이던 글을 못 가린다(최종 리뷰 C1 · 2026-11-26). 넘기지 않으면 예전처럼 표시 없음 = 보이던 글.
    셋이 이어 합쳐져도(A~B~C) 짝을 따라 전해진다 · 남은 글이 보이던 글이면 그 표시는 그대로 둔다(카드·검토가 이어진다) */
-export function dedupeActivities(items, dedupe, isShown = (n) => !!n && !n.paidGate) {
+export function dedupeActivities(items, dedupe, isShown = (n) => !!n && !n.paidGate && !n.paidOpen, today = '') {
   const shown = new Set();
   const out = dedupe(items, { distinct: (a, b) => { if (isShown(a) || isShown(b) || shown.has(a) || shown.has(b)) { shown.add(a); shown.add(b); } return false; } });
-  for (const n of out) if (n && n.paidGate && shown.has(n) && !isShown(n)) delete n.paidGate;
+  for (const n of out) if (n && n.paidGate && shown.has(n) && !isShown(n)) n.paidOpen = `로봇 ${today ? `${today} ` : ''}· 보이던 글과 같은 글`;   // 지우지 않고 표식을 더한다(병합 때 되살아나지 않게)
   return out;
 }
 

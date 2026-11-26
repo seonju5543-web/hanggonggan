@@ -121,6 +121,8 @@ function serve() {
   let apiCalls = 0;
   let PAGE_ITEMS = null;   // 화면이 실제로 받은 목록 (아래 raw 가로채기가 채운다)
   let ACT_ITEMS = [];      // 「활동」 탭이 실제로 받은 목록 (2026-09-29)
+  let ACT_READ = null;     // 화면이 받은 활동 결과 파일(data/act-read.json) — 배지가 앱과 같은 판정으로 세는지 견준다(2026-11-26)
+  const ME = require('../match-engine.js');
   /* 대외활동 유료 확인(2026-11-25) — 「할 일」의 「넘어온 숨김 글」·「둘째 AI 가 넘긴 문제」는 활동 스위치가 켜져야 생긴다. 꺼진 저장소에서도 그 묶음을 재려고
      열려 있는 활동 글 둘에 숨김 표시를 얹어 응답하고(글 수는 그대로), 그 두 글의 기록 파일 둘을 가짜로 준다. 열린 글이 모자라면 검사용 글 둘을 끼운다 */
   const GATE_DAY = (n) => new Date(Date.now() + 9 * 3600e3 + n * 86400e3).toISOString().slice(0, 10);
@@ -265,6 +267,7 @@ function serve() {
       body = JSON.stringify(db);
       ACT_ITEMS = JSON.parse(body).items;
     }
+    if (rel === 'data/act-read.json') { try { ACT_READ = JSON.parse(body); } catch { ACT_READ = null; } }
     if (rel === 'data/kosaf-open.json') {
       const db = JSON.parse(body);
       db.items = (db.items || []).concat([{ code: 'verify0001', org: '검사용재단', name: '검사용 재단 장학금', kind: '기타', due: LFX.kosafDue,
@@ -2228,7 +2231,12 @@ function serve() {
     const rowsN = await page.locator('#screen-activities [data-act-rows] [data-row]').count();
     ok(rowsN === visible.length, '「활동」 탭 — 글 수가 화면이 받은 목록(숨긴 글 제외)과 같다', `${rowsN} / ${visible.length}`);
     const badge = await page.$eval('#n-activities', (e) => e.textContent.trim());
-    ok(badge === String(visible.length), '  탭 배지도 같은 수', badge);
+    /* 2026-11-26 — 배지·「게재 중」은 **앱에 보이는 글** 수다(유료 확인을 기다리는 숨김 글은 빼고 — 앱의 판정 match-engine paidGateOpen 으로 센다).
+       목록 줄은 그대로 숨기지 않은 글 전부(관리자가 숨김 글도 올리기 취소·숨기기 한다) · 검사용 숨김 표시가 둘이라 둘이 빠져야 한다 */
+    const appVisible = ACT_ITEMS.filter((n) => n && n.url && !n.hidden && (!!n.paidOpen || ME.paidGateOpen(n, ACT_READ, GATE_DAY(0))));
+    const shownCard = await page.$$eval('#screen-activities [data-stat]', (els) => { const c = els.find((e) => (e.querySelector('.k') || {}).textContent === '게재 중'); return c ? c.querySelector('.v').textContent.trim() : null; });
+    ok(badge === String(appVisible.length) && shownCard === String(appVisible.length) && visible.length - appVisible.length === 2,
+      '  탭 배지·「게재 중」은 앱에 보이는 글 수(유료 확인을 기다리는 검사용 숨김 글 둘은 빠진다 — 앱과 같은 판정)', `${badge} · ${shownCard} / ${appVisible.length} (숨기지 않은 글 ${visible.length})`);
     const hiddenN = await page.locator('#screen-activities [data-act-hidden] [data-row]').count();
     ok(hiddenN === ACT_ITEMS.filter((n) => n.hidden).length, '  숨긴 글은 접힌 칸에 따로', String(hiddenN));
     /* 칩으로 거른다 */
@@ -2395,6 +2403,11 @@ function serve() {
     ok(finRows.length === 1 && finRows[0][0] === GATE_FX.fin.id && finRows[0][1] === 'final|pdf-broken|검사용 요강.hwp' && /확인했어요/.test(finRows[0][2]),
       '  둘째 AI 가 넘긴 문제 한 줄 — 「확인했어요」 단추', JSON.stringify(finRows).slice(0, 200));
     await page.click('#todo-paid [data-act-gate-row] [data-act-gate-op="open"]');
+    await page.waitForTimeout(500);
+    /* 2026-11-26 — 「올리기」는 한 번 묻고 돈다(askSheet · 잘못 눌러 되돌릴 수 없는 일을 막는다). 묻는 창이 뜨고 아직 아무것도 안 보냈다 → 창의 「올리기」를 눌러야 보낸다 */
+    const askOpen = await page.evaluate(() => { const g = document.querySelector('[data-ask-go]'); return g ? [g.innerText.trim(), !!g.closest('[hidden]')] : null; });
+    ok(Array.isArray(askOpen) && askOpen[0] === '올리기' && !askOpen[1] && sent.length === 0, '  「올리기」를 누르면 묻는 창이 먼저 뜬다(아직 보내지 않았다)', JSON.stringify([askOpen, sent.length]));
+    await page.click('[data-ask-go]');
     await page.waitForTimeout(800);
     const p1 = (() => { try { return JSON.parse(sent[0]?.inputs?.payload || '{}'); } catch { return {}; } })();
     ok(sent[0]?.inputs?.action === 'activityGate' && Array.isArray(p1.urls) && p1.urls[0] === GATE_FX.held.url && p1.op === 'open',

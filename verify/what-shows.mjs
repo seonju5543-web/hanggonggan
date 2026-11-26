@@ -302,7 +302,7 @@ function showFeedLinks(query) {
       if (it.paidGate) return [`   🔒 학생 화면에 없음 — 유료 확인 전이다(AI 카드를 기다리는 중 · 숨김 표시 ${it.paidGate} · 사흘이 지나도 카드가 없으면 무료 값으로 오른다)`];
       return [];
     }
-    if (!on.cardRead) return it.paidGate ? [`   ⏱ 유료 확인 없이 무료 값으로 보인다 — ${it.paidOpen ? `관리자가 올렸다(${it.paidOpen})` : `숨김 표시(${it.paidGate}) 뒤 사흘이 지났다`}`] : [];
+    if (!on.cardRead) return it.paidGate ? [`   ⏱ 유료 확인 없이 무료 값으로 보인다 — ${it.paidOpen ? `${/^관리자/.test(String(it.paidOpen)) ? '관리자가 올렸다' : '수집 로봇이 열어 두었다'}(${it.paidOpen})` : `숨김 표시(${it.paidGate}) 뒤 사흘이 지났다`}`] : [];
     /* 얹힌 값(자격·발췌·안내·서류·마감)은 아래 시트 줄들이 그대로 말한다(얹은 뒤의 글을 넘긴다) — 여기서는 통과 사실과, 시트에 새로 보이는 「접수 · 방법」 줄만 */
     const how = Array.isArray(on.cardRead.apply) ? on.cardRead.apply.filter((l) => typeof l === 'string' && linkFn('knownValue')(l)) : [];   // 앱 시트와 같이 '모름'류 낱말이 든 줄은 통째로 뺀다(applySectionHtml)
     return ['   🧾 AI 카드가 얹혔다(유료 확인 통과) — 아래 칸들은 얹은 뒤의 값이다', ...how.map((l) => `       접수 · 방법 ${String(l).slice(0, 84)}`)];

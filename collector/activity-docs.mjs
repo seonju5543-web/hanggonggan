@@ -35,9 +35,10 @@ import { FETCH_HEADERS } from './http-headers.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
-import { activityDetails, eligLineOk, ACT_DETAILS_V, ACT_DOCS_V, activityDocuments, putActivityDocuments } from './activity-excerpts.mjs';
+import { activityDetails, eligLineOk, ACT_DETAILS_V, ACT_DOCS_V, activityDocuments, putActivityDocuments, titleWords, ownsImageText } from './activity-excerpts.mjs';
 import { ACT_SIGNAL } from './activity-vocab.mjs';
-import { writeStore, wantsText, textDue, pruneStore } from './act-text.mjs';   // 유료 관문 — 원문 글자 기록(글자만 · 2026-11-25)
+import { writeStore, wantsText, textDue, pruneStore } from './act-text.mjs';
+import { MIN_BODY } from './notice-source.mjs';   // 본문 분량의 문턱 한 곳(장학금 원문 받기와 같은 100자)   // 유료 관문 — 원문 글자 기록(글자만 · 2026-11-25)
 import { detailByRule } from './activity-detail-rules.mjs';   // 온통청년처럼 글·포스터가 JSON 에 있는 게시판 — 수집 로봇과 같은 함수(2026-10-28)
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
 
@@ -54,7 +55,7 @@ const LEDGER = BROWSER ? BROWSER_LEDGER : PLAIN_LEDGER;
 const STORE_DIR = fileURLToPath(new URL('act-text/', HERE));
 const NAMES = path.join(DIR, 'names.json');                      // 이번 실행이 받은 파일 → 첨부 이름 { 파일: 이름 } (페이지에서 주운 그림은 이름이 없다)
 const TEXT_IDS = new Set(String(process.env.ACT_TEXT_IDS || '').split(',').map((s) => s.trim()).filter(Boolean));   // 「유료 시험」 워크플로가 지정한 글 — 표시가 없어도 받는다
-const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);                   // 커밋 — 모드마다 제 장부만 쓴다(두 로봇이 같은 파일을 안 쓴다)
+const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 한국 날짜
 const log = (m) => console.log(`[activity-docs] ${m}`);
 
 const POSTS_PER_RUN = Number(process.env.ACT_DOCS_POSTS || 15);   // 한 실행에 받는 글
@@ -404,28 +405,25 @@ async function fetchPhase(acts) {
   log(`받기 — 글 ${posts}건 · 파일 ${files}개`);
 }
 
-/* 글 제목의 낱말 — 흔한 말(모집·안내·청년·공모전…)은 뺀다. 그림이 **그 글의 포스터인지** 가리는 데 쓴다 */
-const GENERIC_WORD = /^(?:모집|안내|공고|참가자|참여자|선발|신청|운영|프로그램|개최|지원|대상|기간|마감|일반|공통|공지|외부|학사|봉사|모집중|추가|하반기|상반기|공모전|참가|참여|교육|특강|청년|대학생|학생|사업|활동|행사|홍보|국제교류|10월|11월|12월)$/;
-/* 🔴 대괄호 안도 낱말이다 — `[구리시 청년성장프로젝트] 10월 …` 의 고유한 이름이 거기 있다(통째로 버렸더니 그 포스터를 놓쳤다).
-   `[일반]`·`[공통]` 같은 꼬리표는 GENERIC_WORD 가 거른다 */
-export const titleWords = (title) => [...new Set(String(title || '').replace(/기간\s*:.*$/g, ' ')
-  .split(/[^가-힣A-Za-z0-9]+/).filter((w) => w.length >= 2 && !/^\d+$/.test(w) && !GENERIC_WORD.test(w)))];
-/** OCR 로 읽은 그림이 이 글의 것인가 — 글 제목 낱말이 하나라도 그림 글자에 있어야 한다.
-    🔴 사이트 옆 홍보물(「제주도 내 공공임대주택에 입주한 가구」)이 「청년 체인지메이커 아카데미」의 자격으로 붙을 뻔했다(2026-10-03 실측) */
-export const ownsImageText = (text, title) => { const t = String(text || '').replace(/\s/g, ''); return titleWords(title).some((w) => t.includes(w)); };
+/* 글 제목의 낱말 · 그림 글자가 그 글의 것인가 — activity-excerpts.mjs 한 곳(수집 로봇의 다시 읽기도 쓴다 · 2026-11-26 옮김) · 여기서는 불러 쓰고 그대로 내보낸다(옛 쓰임 그대로) */
+export { titleWords, ownsImageText };
 
 /** 받은 파일(act-files) → 원문 글자 기록 한 건 { body, bodyFrom, docs } — 두 모드가 같은 함수(2026-11-25 · act-text.mjs writeStore 에 넘긴다).
     · 본문: 브라우저 모드는 브라우저가 그린 글자(-B.txt) · 무료 모드는 페이지 글자(-P.txt · 규칙 게시판은 -R.txt).
       글 제목의 낱말이 한 번도 없으면 그 글의 페이지가 아니다(포털 첫 화면·메뉴 껍데기) → 빈 본문(브라우저가 이어받는다). 제목이 흔한 말뿐이면 가릴 수 없어 받는다.
     · 첨부: 글자를 뽑은 파일만 · 이름은 받을 때 적어 둔 것(names) · 지문은 원본 바이트 · 페이지에서 주운 그림(OCR)과 따라간 요강 페이지는 그 글의 것만(자격 고르기와 같은 거름 ownsImageText) */
 const sha16 = (s) => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 16);
+const BROWSER_MIN_BODY = 40;   // 브라우저 본문의 바닥 — 유료 카드 로봇이 읽는 원문의 바닥(한글 40자)과 같다
 export function storeFromFiles(n, files, names = {}, { key = keyOf(n.url), dir = DIR, readText = (p) => (/\.txt$/.test(p) ? fs.readFileSync(p, 'utf8') : attachmentText(p)), isOcr = isOcrSource, hashOf = fileHash, mode = BROWSER ? 'browser' : 'plain' } = {}) {
   const read = (f) => { try { return String(readText(path.join(dir, f)) || ''); } catch { return ''; } };
   const owns = (text) => !titleWords(n.title).length || ownsImageText(text, n.title);
   const list = files || [];
   const bodyFile = mode === 'browser' ? `${key}-B.txt` : (list.includes(`${key}-R.txt`) ? `${key}-R.txt` : `${key}-P.txt`);
   const rawBody = read(bodyFile);
-  const body = rawBody.trim() && owns(rawBody) ? rawBody : '';
+  /* 🔴 본문은 **제목 낱말을 뺀 한글 분량**으로 잰다(최종 리뷰 2026-11-26) — 머리 <title> 만 있는 페이지(스크립트로 그리는 글)도 제목 글자가 본문이 되어 진짜 브라우저가 받을 차례가 오지 않았다.
+     무료 받기는 MIN_BODY(모자라면 브라우저가 이어받는다) · 브라우저는 마지막 길이라 40자(유료가 읽는 원문의 바닥 — 짧은 진짜 본문을 버리지 않는다) */
+  const beyondTitle = (text) => { let t = String(text || '').replace(/[^가-힣]/g, ''); for (const w of titleWords(n.title)) { const k = w.replace(/[^가-힣]/g, ''); if (k) t = t.split(k).join(''); } return t.length; };
+  const body = rawBody.trim() && owns(rawBody) && beyondTitle(rawBody) >= (mode === 'browser' ? BROWSER_MIN_BODY : MIN_BODY) ? rawBody : '';
   const bodyFrom = body ? (mode === 'browser' ? 'browser' : bodyFile.endsWith('-R.txt') ? 'rule' : 'plain') : '';
   const docs = [];
   for (const f of list) {

@@ -231,7 +231,11 @@ export function fileNameIn(text) {
        이름표로 시작하는 괄호(「(다운로드 …)」)는 숫자가 들어 있을 때만 꼬리다(「(다운로드 후 작성)」은 그대로). 떼면 이름이 다른 두 파일이 같은 이름이 된다 */
 const TAIL_SP = String.raw`(?:\s|&nbsp;)`;
 const TAIL_NUM = String.raw`\d[\d.,]*\s?(?:KB|MB|GB|K|M|G|bytes?|B|바이트|회|건)(?![가-힣A-Za-z])`;
-const TAIL_BRACKET = String.raw`[(（\[【]\s*(?:(?:파일\s?(?:용량|크기)|용량|크기|size|다운로드|내려받기|download)(?=[^)）\]】]*\d)[^)）\]】]{0,40}|${TAIL_NUM}(?:[\s,·/|]*${TAIL_NUM})*\s*)[)）\]】]?`;
+/* 이름표 괄호는 「이름표 + 숫자(+ 단위)」만 꼬리다(최종 리뷰 2026-11-26) — 숫자만 들어 있으면 떼던 때 「(다운로드 후 2부 작성)」·「(크기 1년 보관)」·「(size: 2 pages)」의 뜻이 잘렸다(장학금 첨부 이름에도 쓰는 함수) */
+const TAIL_LABEL = String.raw`(?:파일\s?(?:용량|크기)|용량|크기|size|다운로드|내려받기|download)`;
+const TAIL_LNUM = String.raw`\d[\d.,]*\s?(?:KB|MB|GB|K|M|G|bytes?|B|바이트|회|건)?(?![가-힣A-Za-z\d])`;   // 이름표 뒤 숫자(+ 단위) — 뒤에 글자가 바로 이어지면 꼬리가 아니다
+const TAIL_PAIR = String.raw`${TAIL_LABEL}\s*[:：]?\s*${TAIL_LNUM}`;
+const TAIL_BRACKET = String.raw`[(（\[【]\s*(?:${TAIL_PAIR}(?:\s*[,·/|]\s*${TAIL_PAIR})*|${TAIL_NUM}(?:[\s,·/|]*${TAIL_NUM})*)\s*[)）\]】]?`;
 const TAIL_PREVIEW = String.raw`(?:미리\s?보기|바로\s?보기)`;
 const SITE_TAIL = new RegExp(String.raw`^(?:${TAIL_SP}*(?:${TAIL_BRACKET}|${TAIL_PREVIEW}))+${TAIL_SP}*$`, 'i');
 const LONE_PREVIEW = new RegExp(String.raw`^(?:${TAIL_SP}*${TAIL_PREVIEW})+${TAIL_SP}*$`, 'i');
@@ -247,6 +251,15 @@ export function trimSiteTail(name, { lonePreview = true } = {}) {
 }
 /** 실린 활동 글의 첨부 이름에서 사이트 꼬리를 뗀다(소급 — 수집 로봇이 발행할 때 · 같은 파일 한 줄 만들기 stripSiteChrome 앞). 바꾼 줄 수를 돌려준다.
     used = 글 id → 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부 이름들 — 🔴 든 이름은 건드리지 않는다(이름이 바뀌면 그 사본이 주인을 잃는다) */
+/** 꼬리를 떼지 않을 이름 — 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부(글 id → 이름들). 꼬리를 다듬어 이름이 바뀌면 그 사본이 주인을 잃는다.
+    formsIndex = collector/extracted/forms-index.txt 글자(줄마다 탭 칸 · 셋째 = 이름 · 다섯째 = 글 id) · pdfIndexes = data/forms-pdf·docs-pdf 의 index.json(깨졌으면 null) — 수집 로봇이 읽어 넘긴다(2026-11-26) */
+export function usedAttachNamesFrom({ formsIndex = '', pdfIndexes = [] } = {}) {
+  const used = new Map();
+  const put = (id, name) => { if (!id || !name) return; if (!used.has(id)) used.set(id, new Set()); used.get(id).add(name); };
+  for (const line of String(formsIndex || '').split('\n')) { const c = line.split('\t'); put(c[4], c[2]); }
+  for (const idx of pdfIndexes || []) for (const [id, rows] of Object.entries((idx && idx.items) || {})) for (const r of rows || []) put(id, r && r.name);
+  return used;
+}
 export function trimActivityTails(items, used = new Map()) {
   let n = 0;
   for (const it of items || []) {

@@ -356,11 +356,16 @@ function activitySheetNotices(n) {
   /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
   const seenText = [...(n.excerpts || []).map((x) => noticeFlat(x.text)), ...(n.eligibilityLines || []).map(noticeFlat)].filter((x) => x.length >= 6);
   const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => noticeFlat(l).includes(e)));
+  /* 긴 혜택 첫 줄(40자 넘음)은 카드의 「혜택:」 줄 앞에 붙여 한 줄로 — 「혜택」 두 줄이 되지 않게(합쳐 170자를 넘으면 두 줄 그대로 — 시트가 180자에서 자른다 · 최종 리뷰 2026-11-26) */
+  const bi = benefit && benefit.length > 40 ? notice.findIndex((l) => /^혜택\s*[:：]/.test(l)) : -1;
+  const merged = bi >= 0 ? `혜택: ${benefit} · ${notice[bi].replace(/^혜택\s*[:：]\s*/, '')}` : '';
+  const one = !!merged && merged.length <= 174;
   return [
-    ...(benefit && benefit.length > 40 ? [`혜택: ${benefit}`] : []),
-    ...(titleWho.length ? [`대상: ${titleWho.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
+    ...(benefit && benefit.length > 40 ? [one ? merged : `혜택: ${benefit}`] : []),
+    /* 제목에서 뗀 대상 괄호 — 「제목 대상」 이름표로 넘긴다(시트가 「대상」 으로 보인다 · 「대상」 그대로면 시트의 NS_SKIP 이 빼서 화면 어디에도 안 남았다 · 2026-11-26) */
+    ...(titleWho.length ? [`제목 대상: ${titleWho.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
     ...rows.map((x) => `${x.label}: ${unent(x.text)}`),
-    ...notice,
+    ...(one ? notice.filter((_, i) => i !== bi) : notice),
   ];
 }
 function openActivityDetail(url) {

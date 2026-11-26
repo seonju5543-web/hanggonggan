@@ -246,7 +246,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages, paidReview, cardFixes, cardRead, finalReview, actReview, actFinal, actDone] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages, paidReview, cardFixes, cardRead, finalReview, actReview, actFinal, actDone, actRead] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -277,6 +277,7 @@ async function loadAll() {
       readJson('collector/act-read-review.json', { items: {}, gateHeld: {} }),
       readJson('collector/act-final-review.json', { items: {} }),
       readJson('collector/act-read-done.json', { v: 1, items: {} }),
+      readJson('data/act-read.json', { items: {}, gateHeld: {} }),   // 활동 글의 AI 카드(마감) · 사람에게 넘긴 글 — 「할 일」의 마감 · 보이는 글 수가 앱과 같은 판정을 쓴다(2026-11-26)
     ]);
   D.paidReview = { items: (paidReview && paidReview.items) || {}, gateHeld: (paidReview && paidReview.gateHeld) || {} };
   D.cardFixes = (cardFixes && cardFixes.items) || {};
@@ -285,6 +286,8 @@ async function loadAll() {
   D.actReview = { gateHeld: (actReview && actReview.gateHeld) || {} };
   D.actFinal = (actFinal && actFinal.items) || {};
   D.actDone = (actDone && actDone.items) || {};
+  D.actRead = (actRead && actRead.items) || {};
+  D.actHeld = (actRead && actRead.gateHeld) || {};
 
   D.reg = reg.items || [];
   D.formsPdf = (formsPdf && formsPdf.items) || {};
@@ -847,7 +850,7 @@ function renderCounts() {
   const rb = byId('n-robots');
   if (rb && !rb.dataset.filled) { rb.textContent = '—'; rb.className = 'tab-n'; }
   set('n-insta', instaGroups().prepared.length + instaNewComments().length, true);   // 눌러야 할 것 = 게시 대기 + 답 안 한 댓글
-  set('n-activities', D.activities.filter((n) => n && n.url && !n.hidden).length);   // 앱에 보이는 글 수
+  set('n-activities', D.activities.filter((n) => n && n.url && actVisible(n)).length);   // 앱에 보이는 글 수 — 유료 확인을 기다리는 숨김 글은 빼고(앱과 같은 판정 · 2026-11-26)
   set('n-news', D.newsSources.sources.filter((s) => !s.boardUrl).length, true);   // 사람 손이 필요한 것 = 게시판 주소가 없는 학교 수
 }
 
@@ -914,17 +917,32 @@ function gateHeldTodo() {
    ① 사람에게 넘긴 숨김 글(collector/act-read-review.json 의 gateHeld) — 아직 학생 화면에 없다 → 올리기(무료 값으로 · activityGate) · 숨기기(activityHide)
    ② 둘째 AI 가 스스로 못 고쳐 넘긴 것(collector/act-final-review.json 의 problems) → 확인했어요(activityReviewDone → collector/act-read-done.json)
    ③ 둘째 AI 가 고친 기록(actChangesList) — 접어서 보인다 · 할 일이 아니다 */
+/* 학생 화면에 보이는가 — 앱의 판정(match-engine paidGateOpen + 관리자가 올린 paidOpen · 숨긴 글은 아니다). 관리자 화면에는 엔진이 실리지 않아 **사본**이다 —
+   관문 「대외활동 유료 관문 ⑥」이 표본마다 엔진과 견준다(엔진을 바꾸면 여기도) */
+function actVisible(n) {
+  if (!n || n.hidden) return false;
+  if (!n.paidGate || n.paidOpen) return true;
+  if ((D.actRead || {})[n.id]) return true;
+  if ((D.actHeld || {})[n.id]) return false;
+  const waited = (Date.parse(`${today()}T00:00:00Z`) - Date.parse(`${String(n.paidGate).slice(0, 10)}T00:00:00Z`)) / 86400000;
+  return Number.isFinite(waited) && waited > 3;
+}
+/* 「할 일」이 여닫는 마감 — 카드가 읽은 마감이 있으면 그것(학생 화면이 쓰는 마감 · 2026-11-26) */
+function actOpenNow(it) {
+  const d = ((((D.actRead || {})[it && it.id]) || {}).deadline || {}).date;
+  return openForStudents(/^\d{4}-\d{2}-\d{2}$/.test(String(d || '')) ? { ...it, deadline: d } : it);
+}
 function actHeldTodo() {
   const live = new Map((D.activities || []).filter((n) => n && n.id).map((n) => [n.id, n]));
   return Object.entries((D.actReview && D.actReview.gateHeld) || {}).map(([id, why]) => ({ it: live.get(id), why }))
-    .filter((x) => x.it && x.it.paidGate && !x.it.paidOpen && !x.it.hidden && openForStudents(x.it));
+    .filter((x) => x.it && x.it.paidGate && !x.it.paidOpen && !x.it.hidden && actOpenNow(x.it));
 }
 function actFinalTodo() {
   const live = new Map((D.activities || []).filter((n) => n && n.id).map((n) => [n.id, n]));
   const out = [];
   for (const [id, r] of Object.entries(D.actFinal || {})) {
     const it = live.get(id);
-    if (!it || it.hidden || !openForStudents(it)) continue;
+    if (!it || it.hidden || !actOpenNow(it)) continue;
     const done = new Set(((D.actDone || {})[id] || {}).done || []);
     const ps = ((r && r.problems) || []).filter((p) => !done.has(finalKey(p)));
     if (ps.length) out.push({ it, problems: ps });
@@ -935,7 +953,7 @@ function actChangesList() {
   const live = new Map((D.activities || []).filter((n) => n && n.id).map((n) => [n.id, n]));
   const dropOf = (d) => ({ kind: 'drop', label: PDF_KIND_KO[d.kind] || 'PDF 사본', text: d.name || '', why: [PDF_VERDICT_KO[d.verdict], d.why].filter(Boolean).join(' — ') });
   return Object.entries(D.actFinal || {}).map(([id, r]) => ({ it: live.get(id), summary: (r && r.summary) || '', changes: [...((r && r.changes) || []), ...((r && r.dropped) || []).map(dropOf)] }))
-    .filter((x) => x.it && !x.it.hidden && openForStudents(x.it) && x.changes.length);
+    .filter((x) => x.it && !x.it.hidden && actOpenNow(x.it) && x.changes.length);
 }
 /* 사람에게 넘어온 까닭 — 로봇 말(no-source 등)을 그대로 보이지 않는다 */
 const ACT_GATE_WHY = {
@@ -989,7 +1007,7 @@ function paidReviewHtml() {
   const all = paidReviewTodo(), held = gateHeldTodo(), fin = finalReviewTodo(), fixed = finalChangesList();
   const aHeld = actHeldTodo(), aFin = actFinalTodo(), aFixed = actChangesList();   // 대외활동·공모전(2026-11-25)
   const aFinN = aFin.reduce((a, x) => a + x.problems.length, 0);
-  const alink = (n) => (n.url ? `<a href="${esc(n.url)}" target="_blank" rel="noopener">원문 열기 ↗</a>` : '');
+  const alink = (n) => { const u = safeUrl(n.url); return u ? `<a href="${esc(u)}" target="_blank" rel="noopener">원문 열기 ↗</a>` : ''; };   // 바깥 게시판·API 에서 온 주소 — javascript: 같은 것을 거른다(2026-11-26)
   const pick = (legacy) => all.map(({ it, lines: ls }) => ({ it, lines: ls.filter((l) => isLegacyLine(l) === legacy) })).filter((x) => x.lines.length);
   const lines = pick(false), legacy = pick(true);
   if (!all.length && !held.length && !fin.length && !fixed.length && !aHeld.length && !aFin.length && !aFixed.length) return '';
@@ -1070,8 +1088,10 @@ function bindPaidReview(root = byId('screen-todo')) {
     e.stopPropagation();
     const url = (b.closest('[data-act-gate-row]') || { dataset: {} }).dataset.actGateRow;
     if (!url) return;
-    if (b.dataset.actGateOp === 'open') await applyAction('activityGate', { urls: [url], op: 'open' }, '올리기(무료 값으로)');
-    else await applyAction('activityHide', { urls: [url] }, '숨기기');
+    /* 한 번 묻고 돈다 — 「활동」 탭의 숨기기와 같은 창(askSheet · 2026-11-26) · 올린 글은 「활동」 탭에서 「올리기 취소」로 되돌린다 */
+    const it = (D.activities || []).find((n) => n && n.url === url); const lines = [{ t: it ? it.title : url, m: url }];
+    if (b.dataset.actGateOp === 'open') askSheet({ title: '이 글을 학생 화면에 올립니다(무료 값으로)', note: '유료 확인(AI 카드) 없이 무료 길 값으로 보입니다. 되돌리려면 「활동」 탭의 그 글에서 「올리기 취소」.', lines, goLabel: '올리기', run: () => applyAction('activityGate', { urls: [url], op: 'open' }, '올리기(무료 값으로)') });
+    else askSheet({ title: '이 글을 앱에서 숨깁니다', note: '지우지 않습니다 — 표식만 붙어 「활동」 탭의 「숨긴 글」에서 되살릴 수 있습니다.', lines, goLabel: '숨기기', danger: true, run: () => applyAction('activityHide', { urls: [url] }, '숨기기') });
   }));
   $$('[data-act-done-op]', root).forEach((b) => b.addEventListener('click', async (e) => {
     e.stopPropagation();
@@ -3371,6 +3391,7 @@ function actItemRowHtml(n, hiddenRow) {
         ${hiddenRow
           ? `<button class="btn btn-sm" data-act-unhide="${esc(n.url)}">되살리기</button>`
           : `<button class="btn btn-sm" data-act-kind="${esc(n.url)}" data-kind="${esc(other)}">${esc(other)}(으)로</button>
+             ${n.paidGate && /^관리자/.test(String(n.paidOpen || '')) ? `<button class="btn btn-sm" data-act-gate-undo="${esc(n.url)}">올리기 취소</button>` : ''}
              <button class="btn btn-sm danger" data-act-hide="${esc(n.url)}">숨기기</button>`}
       </div>
       <div></div>
@@ -3405,7 +3426,7 @@ function renderActivities() {
          숨기기는 지우는 것이 아니라 표식이라 되살릴 수 있습니다. 출처를 더하면 다음 수집(07:41·11:41)부터 읽습니다.</p>
     </div>
     <div class="cards">
-      <div class="card ${shownItems.length ? 'is-ok' : 'is-warn'}" data-stat><div class="v">${shownItems.length}</div><div class="k">게재 중</div><div class="d">앱에 보이는 글 · 데이터 기준일 ${esc(D.actUpdatedAt || '아직 수집 전')}</div></div>
+      <div class="card ${shownItems.filter(actVisible).length ? 'is-ok' : 'is-warn'}" data-stat><div class="v">${shownItems.filter(actVisible).length}</div><div class="k">게재 중</div><div class="d">앱에 보이는 글 · 데이터 기준일 ${esc(D.actUpdatedAt || '아직 수집 전')}</div></div>
       <div class="card" data-stat><div class="v">${hidden.length}</div><div class="k">숨긴 글</div><div class="d">파일에는 남고 앱에는 안 보입니다</div></div>
       <div class="card ${noUrl ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${src.length}</div><div class="k">출처 게시판</div><div class="d">${noUrl ? `주소 미설정 ${noUrl}곳` : '전부 주소가 있습니다'} · 보관 ${parked.length}곳</div></div>
     </div>
@@ -3469,6 +3490,13 @@ async function handleActivityClick(e) {
     askSheet({ title: '이 글을 앱에서 숨깁니다', note: '지우지 않습니다 — 표식만 붙어 「숨긴 글」에서 되살릴 수 있습니다. 로봇이 다시 발행해도 숨김이 유지됩니다.',
       lines: [{ t: titleOf(url), m: url }], goLabel: '숨기기', danger: true,
       run: () => applyAction('activityHide', { urls: [url] }, '숨기기') });
+    return true;
+  }
+  if ((el = q('data-act-gate-undo'))) {   // 관리자가 올린 글을 되돌린다(2026-11-26) — 다시 유료 확인을 기다린다
+    const url = el.dataset.actGateUndo;
+    askSheet({ title: '올리기를 취소합니다', note: '이 글은 다시 유료 확인(AI 카드)을 기다립니다 — 사흘이 지났으면 무료 값 그대로 보이고, 사람에게 넘어온 글이면 「할 일」로 돌아갑니다.',
+      lines: [{ t: titleOf(url), m: url }], goLabel: '올리기 취소',
+      run: () => applyAction('activityGate', { urls: [url], op: 'undo' }, '올리기 취소') });
     return true;
   }
   if ((el = q('data-act-unhide'))) {

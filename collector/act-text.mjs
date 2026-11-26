@@ -21,6 +21,8 @@ export const daysSince = (from, today) => Math.round((Date.parse(`${today}T00:00
 /* 파일 이름으로 쓰는 id — 활동 글 id 는 `act-<지문>`·`api-<출처>-<번호>` 꼴이다. 경로 글자가 섞였으면 쓰지 않는다(폴더 밖에 파일을 만들지 않는다) */
 const safeId = (id) => /^[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(String(id || '')) && !String(id).includes('..');
 const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
+/* 이름이 있는 첨부는 이름으로도 한 번만(최종 리뷰 2026-11-26) — 받을 때마다 워터마크·날짜를 박아 바이트가 바뀌는 사이트는 같은 첨부가 지문마다 한 번씩 실려 원문이 바뀌고 같은 글을 다시 샀다 · 처음 것을 쓴다 */
+const nameKey = (d) => (d && String(d.name || '').trim() ? `${['attach', 'img', 'guide'].includes(d.from) ? d.from : 'attach'}|${String(d.name).trim()}` : '');
 const readOne = (file) => { try { const j = JSON.parse(fs.readFileSync(file, 'utf8')); return j && typeof j === 'object' && !Array.isArray(j) ? j : null; } catch { return null; } };
 
 export const storeFile = (dir, id, mode = 'plain') => path.join(dir, `${id}${mode === 'browser' ? '.browser' : ''}.json`);
@@ -35,9 +37,10 @@ export function writeStore(dir, id, mode, rec, today) {
   let changed = !old;
   if (!hasText(next.body) && rec && hasText(rec.body)) { next.body = rec.body; next.bodyFrom = String(rec.bodyFrom || ''); changed = true; }
   const have = new Set(next.docs.map((d) => d && d.hash));
+  const haveName = new Set(next.docs.map(nameKey).filter(Boolean));
   for (const d of (rec && rec.docs) || []) {
-    if (!d || !d.hash || !hasText(d.text) || have.has(d.hash)) continue;
-    have.add(d.hash);
+    if (!d || !d.hash || !hasText(d.text) || have.has(d.hash) || (nameKey(d) && haveName.has(nameKey(d)))) continue;
+    have.add(d.hash); if (nameKey(d)) haveName.add(nameKey(d));
     next.docs.push({ name: String(d.name || ''), hash: String(d.hash), from: ['attach', 'img', 'guide'].includes(d.from) ? d.from : 'attach', ocr: !!d.ocr, text: d.text });
     changed = true;
   }
@@ -67,8 +70,8 @@ export function readStore(dir, id) {
   if (!p && !b) return null;
   const seen = new Set(); const docs = [];
   for (const d of [...((p && p.docs) || []), ...((b && b.docs) || [])]) {
-    if (!d || !d.hash || !hasText(d.text) || seen.has(d.hash)) continue;
-    seen.add(d.hash); docs.push(d);
+    if (!d || !d.hash || !hasText(d.text) || seen.has(d.hash) || (nameKey(d) && seen.has(nameKey(d)))) continue;
+    seen.add(d.hash); if (nameKey(d)) seen.add(nameKey(d)); docs.push(d);
   }
   if (p && hasText(p.body)) return { body: p.body, bodyFrom: p.bodyFrom || 'plain', docs };
   if (b && hasText(b.body)) return { body: b.body, bodyFrom: b.bodyFrom || 'browser', docs };

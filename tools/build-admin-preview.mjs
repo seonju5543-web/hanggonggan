@@ -67,7 +67,7 @@ const DATA = {
   /* 대외활동·공모전 유료 확인 (2026-11-25) — 「할 일」의 같은 묶음 */
   'collector/act-read-review.json': readJson('collector/act-read-review.json'),
   'collector/act-final-review.json': readJson('collector/act-final-review.json'),
-  'collector/act-read-done.json': readJson('collector/act-read-done.json'),
+  'collector/act-read-done.json': readJson('collector/act-read-done.json'), 'data/act-read.json': readJson('data/act-read.json'),
   'data/kosaf-open.json': readJson('data/kosaf-open.json'),
   'data/external.json': readJson('data/external.json'),
   'data/notices/index.json': readJson('data/notices/index.json'),

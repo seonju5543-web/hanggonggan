@@ -946,17 +946,31 @@ switch (action) {
   case 'activityGate': {
     const urls = (Array.isArray(payload.urls) ? payload.urls : [payload.url]).map((u) => String(u || '').trim()).filter(Boolean);
     if (!urls.length) fail('대상 글의 주소가 없습니다');
-    if (payload.op !== 'open') fail(`모르는 처리입니다: ${payload.op} (open)`);
+    if (!['open', 'undo'].includes(payload.op)) fail(`모르는 처리입니다: ${payload.op} (open · undo)`);
     const acts = readJson(ACTS, null);
     if (!acts || !Array.isArray(acts.items)) fail(`${ACTS} 를 읽지 못했습니다`);
-    const keys = new Set(urls.map(canonUrl));
-    const hit = acts.items.filter((it) => it && keys.has(canonUrl(it.url)));
-    if (!hit.length) fail('그 주소의 글이 목록에 없습니다');
-    const plain = hit.filter((it) => !it.paidGate);
-    if (plain.length) fail(`유료 확인을 기다리는 글이 아닙니다(이미 학생 화면에 보이는 글): ${plain.map((it) => String(it.title || it.url).slice(0, 30)).join(' · ')}`);
-    for (const it of hit) it.paidOpen = `관리자 ${kstNow().slice(0, 10)}`;
+    /* 🔴 하나라도 아니면 아무것도 안 한다(최종 리뷰 2026-11-26) — 일부만 맞으면 맞는 것만 올리고 나머지를 조용히 넘겼다 */
+    const byKey = new Map(acts.items.filter((it) => it && it.url).map((it) => [canonUrl(it.url), it]));
+    const missing = urls.filter((u) => !byKey.has(canonUrl(u)));
+    if (missing.length) fail(`그 주소의 글이 목록에 없습니다: ${missing.join(' · ').slice(0, 300)}`);
+    const hit = [...new Set(urls.map((u) => byKey.get(canonUrl(u))))];
+    const names = (xs) => xs.map((it) => String(it.title || it.url).slice(0, 30)).join(' · ');
+    if (payload.op === 'open') {
+      const plain = hit.filter((it) => !it.paidGate);
+      if (plain.length) fail(`유료 확인을 기다리는 글이 아닙니다(이미 학생 화면에 보이는 글): ${names(plain)}`);
+      for (const it of hit) it.paidOpen = `관리자 ${kstNow().slice(0, 10)}`;
+      detail = `유료 확인 없이 올림 ${hit.length}건(무료 값으로 학생 화면에) — ${hit.map((it) => String(it.title || '').slice(0, 24)).join(' / ')}`.slice(0, 400);
+    } else {
+      /* 올리기 취소 — 관리자가 올린 표식만 비운다(지우지 않고 빈 글자 — 병합 도구는 같은 칸이면 나중 쪽 값을 쓰고 한쪽에만 있는 칸은 살려, 지우면 되살아난다).
+         로봇이 연 글(같은 글 · id 없는 글)은 되돌리지 않는다 — 되돌리면 보이던 글이 숨는다 */
+      const robot = hit.filter((it) => it.paidOpen && !/^관리자/.test(String(it.paidOpen)));
+      if (robot.length) fail(`로봇이 연 글은 되돌리지 않습니다(이미 보이던 글과 같은 글 · id 없는 글 — 되돌리면 보이던 글이 숨습니다): ${names(robot)}`);
+      const notOpened = hit.filter((it) => !it.paidGate || !/^관리자/.test(String(it.paidOpen || '')));
+      if (notOpened.length) fail(`관리자가 올린 글이 아닙니다: ${names(notOpened)}`);
+      for (const it of hit) it.paidOpen = '';
+      detail = `올리기 취소 ${hit.length}건(다시 유료 확인을 기다린다) — ${hit.map((it) => String(it.title || '').slice(0, 24)).join(' / ')}`.slice(0, 400);
+    }
     writeJson(ACTS, acts);
-    detail = `유료 확인 없이 올림 ${hit.length}건(무료 값으로 학생 화면에) — ${hit.map((it) => String(it.title || '').slice(0, 24)).join(' / ')}`.slice(0, 400);
     touched = true;
     break;
   }

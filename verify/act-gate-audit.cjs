@@ -9,7 +9,7 @@ function actGateWarnings(items) {
   for (const n of items || []) {
     if (!n || n.paidGate == null) continue;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(n.paidGate))) bad.push(n);
-    else if (!n.id) noId.push(n);
+    else if (!n.id && !n.paidOpen) noId.push(n);   // 수집 로봇이 「id 없는 글」 표식을 단 글은 이미 보인다(2026-11-26)
   }
   const names = (xs) => xs.slice(0, 3).map((n) => String(n.title || n.url || '').slice(0, 30)).join(' · ');
   return [

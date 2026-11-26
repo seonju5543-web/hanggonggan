@@ -69,6 +69,19 @@ import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, ACT_TAIL, targetFromTitle } from './acti
 import { readDocuments, DOC_JUNK } from './doc-list.mjs';   // 제출 서류 목록 — 장학 발췌기와 같은 규칙 한 곳(2026-10-30 · 공모전 참가신청서가 화면에 없던 것)
 import { createRequire } from 'node:module';
 import { newAttachments, trustedAttachment } from './rescue-plan.mjs';   // 다시 읽은 첨부 가운데 아직 없는 것만(같은 파일은 한 줄 · 2026-11-25)
+
+/* 글 제목의 낱말 — (2026-11-26 activity-docs.mjs 에서 옮김) 흔한 말(모집·안내·청년·공모전…)은 뺀다. 그림이 **그 글의 포스터인지** 가리는 데 쓴다 */
+const GENERIC_WORD = /^(?:모집|안내|공고|참가자|참여자|선발|신청|운영|프로그램|개최|지원|대상|기간|마감|일반|공통|공지|외부|학사|봉사|모집중|추가|하반기|상반기|공모전|참가|참여|교육|특강|청년|대학생|학생|사업|활동|행사|홍보|국제교류|10월|11월|12월)$/;
+/* 🔴 대괄호 안도 낱말이다 — `[구리시 청년성장프로젝트] 10월 …` 의 고유한 이름이 거기 있다(통째로 버렸더니 그 포스터를 놓쳤다).
+   `[일반]`·`[공통]` 같은 꼬리표는 GENERIC_WORD 가 거른다 */
+export const titleWords = (title) => [...new Set(String(title || '').replace(/기간\s*:.*$/g, ' ')
+  .split(/[^가-힣A-Za-z0-9]+/).filter((w) => w.length >= 2 && !/^\d+$/.test(w) && !GENERIC_WORD.test(w)))];
+/** OCR 로 읽은 그림이 이 글의 것인가 — 글 제목 낱말이 하나라도 그림 글자에 있어야 한다.
+    🔴 사이트 옆 홍보물(「제주도 내 공공임대주택에 입주한 가구」)이 「청년 체인지메이커 아카데미」의 자격으로 붙을 뻔했다(2026-10-03 실측) */
+export const ownsImageText = (text, title) => { const t = String(text || '').replace(/\s/g, ''); return titleWords(title).some((w) => t.includes(w)); };
+/** 다시 읽은 페이지가 아직 **그 글**인가 — 제목 낱말이 그 페이지에 하나라도 있어야 한다(장학금의 fallbackIsThisNotice 와 같은 확인 · 최종 리뷰 2026-11-26).
+    주소가 다른 글·목록으로 바뀐 페이지에서 남의 첨부·서류를 붙이지 않는다 · 제목이 흔한 말뿐이면 가릴 수 없어 받는다 */
+export const rereadIsThisPost = (text, title) => !titleWords(title).length || ownsImageText(text, title);
 /* 지역 이름은 parse-requirements.js 의 REGION_CITIES 한 벌(화면·판정·알림) — 끝글자 `시|군|구|도` 로 짐작하면 `별도`·`표시`·`제도` 가 지역이 된다(2026-10-28 리뷰) */
 const PR = createRequire(import.meta.url)('../parse-requirements.js');
 const REGION_WORDS = [...new Set([...PR.REGIONS, ...Object.keys(PR.REGION_CITIES), ...Object.values(PR.REGION_CITIES).flat()])].sort((a, b) => b.length - a.length).join('|');

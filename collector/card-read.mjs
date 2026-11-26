@@ -275,10 +275,14 @@ export function gateStalled(items, data, today, waitDays = 3) {
       그래서 활동 글은 **사흘째**(표시한 날 = 0일)에 넘기고, 나흘째부터는 전에 넘긴 글(prevHeld — 지난 실행의 gateHeld)만 넘긴 채로 둔다.
       사흘째 실행이 없었던 글은 무료 값으로 남는다(보였다가 사라지지 않는다). 넘긴 글도 원문이 오면 풀려 다시 대상이 된다.
    예외 하나 — 대학원생 전용으로 드러난 글은 이미 보였어도 내린다(장학금 2026-11-25 결정과 같다). 장학금 쪽 동작은 바꾸지 않는다(위 함수 그대로) */
+/* 🔴 앱은 마감 다음 날까지 글을 보인다(app.js CLOSED_KEEP_DAYS 1 · app-activities activitiesForMe) — 로봇이 마감 당일이 지나자마자 넘김을 풀면 그 하루 무료 값으로 보인다(최종 리뷰 2026-11-26).
+   그래서 활동 글의 「닫힘」은 하루 늦게 잰다(넘기기·멈춤 세기 둘 다) */
+const ACT_KEEP_DAYS = 1;
+const actClosed = (it, today) => closedNow(it, null, new Date(Date.parse(`${today}T00:00:00Z`) - ACT_KEEP_DAYS * 86400000).toISOString().slice(0, 10));
 export function actGateHeldOf(items, partsOf, ledger, paid, today, prevHeld = {}, waitDays = 3) {
   const out = {};
   for (const it of items) {
-    if (!it.paidGate || it.paidOpen || it.hidden || paid[it.id] || closedNow(it, null, today)) continue;
+    if (!it.paidGate || it.paidOpen || it.hidden || paid[it.id] || actClosed(it, today)) continue;
     const led = ledger[it.id];
     if (led && led.gradOnly) { out[it.id] = 'grad-only'; continue; }
     const waited = daysSince(it.paidGate, today);
@@ -292,7 +296,7 @@ export function actGateHeldOf(items, partsOf, ledger, paid, today, prevHeld = {}
 export function actGateStalled(items, data, ledger, today, waitDays = 3) {
   const paid = (data && data.items) || {}, held = (data && data.gateHeld) || {};
   return items.filter((it) => it.paidGate && !it.paidOpen && !it.hidden && !paid[it.id] && !held[it.id] && !((ledger || {})[it.id] || {}).done
-    && !closedNow(it, null, today) && daysSince(it.paidGate, today) > waitDays);
+    && !actClosed(it, today) && daysSince(it.paidGate, today) > waitDays);
 }
 /* 유료 관문 기록 (2026-11-21 개발자 지시 「위의 두개도 켜서」 — 실제 비용·통과 재기를 켠다) — 이미 저장되는 장부·결과 파일에서 센다(돈 0).
    유료 로봇이 돌 때마다 실행 요약 칸에 적힌다(card-read.yml · final-review.yml 의 `--stats` 단계). 비용은 장부의 usd(실패한 시도까지 실제로 쓴 돈).
@@ -429,7 +433,8 @@ if (process.argv[1] && ranDirectly()) {
     process.exit(0);
   }
   if (process.argv.includes('--gate-alarm')) {   // 경보 세기(GITHUB_OUTPUT 꼴 · 읽기만) — 값에 줄바꿈이 들어가지 않게 누른다
-    const st = ACT ? actGateStalled(reg.items, data, readJson('card-read-ledger.json', {}), TODAY) : gateStalled(reg.items, data, TODAY), one = (x) => String(x || '').replace(/[\r\n]+/g, ' ').trim();
+    /* 활동 스위치가 꺼져 있으면 0 — 꺼진 동안 표시 글이 사흘 뒤 무료 값으로 오르는 것은 정한 동작이다(멈춤이 아니다 · 경보 문구도 「켜져 있는데…」 · 최종 리뷰 2026-11-26) */
+    const st = ACT ? (cfg.enabled ? actGateStalled(reg.items, data, readJson('card-read-ledger.json', {}), TODAY) : []) : gateStalled(reg.items, data, TODAY), one = (x) => String(x || '').replace(/[\r\n]+/g, ' ').trim();
     console.log(`count=${st.length}`);
     console.log(`list=${one(st.slice(0, 12).map((it) => `${one(it.name).slice(0, 40)}(${it.id})`).join(' / ')).slice(0, 900)}`);
     process.exit(0);
@@ -457,10 +462,13 @@ if (process.argv[1] && ranDirectly()) {
     }
     return n;
   };
+  /* 활동 목록은 유료가 실제로 도는 실행에서만 새로 사람에게 넘긴다 — 스위치가 꺼진 동안 넘기면 끈 뒤에도 그 글이 숨는다(꺼진 동안은 사흘 뒤 무료 값으로 오르는 것이 정한 동작 · 최종 리뷰 2026-11-26).
+     켜 있을 때 넘긴 글은 그대로 둔다 · 아래(유료를 부를지 정한 뒤)에서 다시 정한다 */
+  let actHoldNew = cfg.enabled;
   const save = () => {
     sweepGrad();
     data.updatedAt = TODAY;
-    data.gateHeld = ACT ? actGateHeldOf(reg.items, partsOf, ledger, data.items, TODAY, data.gateHeld || {}) : gateHeldOf(reg.items, partsOf, ledger, data.items, TODAY);
+    data.gateHeld = ACT ? (actHoldNew ? actGateHeldOf(reg.items, partsOf, ledger, data.items, TODAY, data.gateHeld || {}) : (data.gateHeld || {})) : gateHeldOf(reg.items, partsOf, ledger, data.items, TODAY);
     writeAtomic('../data/card-read.json', data); writeAtomic('card-read-ledger.json', ledger);
     writeAtomic('card-read-review.json', { updatedAt: TODAY, ...reviewOf(ledger, data.gateHeld) });
     roles.updatedAt = TODAY; writeAtomic('attach-role-ai.json', roles);
@@ -513,6 +521,7 @@ if (process.argv[1] && ranDirectly()) {
   log(`대상 ${targets.length}건 (유료 확인을 기다리는 숨김 등록분 가운데 마감 전이고 · 원문이 있고 · 이 원문을 아직 안 읽은 것) · 첨부를 기다리는 것 ${waiting}건 · 이미 실린 것 ${Object.keys(data.items).length}건 · 내린 것 ${pruned}건`);
   const fake = process.env.CARD_READ_FAKE ? JSON.parse(fs.readFileSync(process.env.CARD_READ_FAKE, 'utf8')) : null;
   const paidOn = cfg.enabled === true && process.env.CARD_READ_ENABLE === '1';
+  actHoldNew = !!fake || paidOn;
   if (!WRITE) { targets.slice(0, 30).forEach((t) => log(`  · ${t.it.id} · ${String(t.it.name).slice(0, 40)} · 원문 ${t.text.length}자`)); log('미리보기 — 부르지 않았습니다 (--write 로 반영)'); process.exit(0); }
   if (!fake && !paidOn) { if (pruned) save(); log(`유료 스위치가 꺼져 있어 부르지 않았습니다 (card-read-config.json ${ACT ? 'enabled 와 activities.enabled 둘 다' : 'enabled'}: ${cfg.enabled} · CARD_READ_ENABLE: ${process.env.CARD_READ_ENABLE || '없음'})`); process.exit(0); }
 

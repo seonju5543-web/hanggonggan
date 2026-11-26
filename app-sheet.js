@@ -61,6 +61,7 @@ const NS_LABELS = [
   [/^(?:제출|구비|필수)\s?서류$/, '제출 서류'],
   [/^(?:기타\s?)?(?:관련\s?)?문의(?:처)?(?:\s?및\s?.*)?$|^전화$|^연락처$|^기타\s?사항\s?및\s?문의처$/, '문의'],
   [/^기타\s?사항$|^유의\s?사항$|^참고$/, '참고'],
+  [/^제목\s?대상$/, '대상'],   // 활동 글 제목에서 뗀 대상 괄호(activitySheetNotices) — 「대상」 이름표 그대로면 아래 NS_SKIP 이 빼서 화면 어디에도 안 남았다(2026-11-26)
 ];
 const NS_SKIP = /^(?:지원|신청|응모|모집|선발|추천)\s?(?:자격|대상|요건)$|^자격\s?요건$|^대상$/;
 const NS_DANGLE = /(?:하고|하며|하여|이며|및|또는|으로|에서|,|\(|：|:|~|-|·)$/;
@@ -136,9 +137,11 @@ function noticeSummaryRows(lines) {
     if (seen.has(k)) continue;
     seen.add(k);
     rows.push({ label, body });
-    if (rows.length >= 8) break;
   }
-  return rows;
+  if (rows.length <= 8) return rows;
+  /* 여덟 줄까지만 보인다 — 여덟째 뒤로 밀린 「문의」 줄은 여덟째 자리에 둔다(잘리지 않게 · 설계 docs/designs/paid-gate-activities.md 5-4 「문의처 줄은 남긴다」 · 최종 리뷰 2026-11-26) */
+  const q = rows.findIndex((r, i) => i >= 8 && r.label === '문의');
+  return q < 0 ? rows.slice(0, 8) : [...rows.slice(0, 7), rows[q]];
 }
 /* 글 속 주소 → 누를 수 있는 짧은 링크 (2026-11-17 개발자 지시 "가독성이 떨어지는 등 … 모두 수리") — 「온라인 접수https://www.k-startup.go.kr/web/contents/webPMSBizUnvs.do?returnUrl=…」
    처럼 긴 주소가 글자째 떠서 줄이 읽히지 않았다. 주소는 원문 그대로 링크에 담고, 보이는 글자만 사이트 이름(「forms.gle ↗」)으로 줄인다(글자를 지어내지 않는다).
