@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-26",
  "items": [
   {
+   "title": "[채용/모집] 탄소중립연구소 행정인력 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142417&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-26",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-26",
+   "desc": "탄소중립 에너지복지 연구센터 성균관대학교 탄소중립연구소에서 함께 근무할 행정인력을 다음과 같이 모집하오니 많은 관심과 지원을 바랍니다."
+  },
+  {
+   "title": "[주의] 강의실 방문 판매 관련 결제 주의",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142419&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-26",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/dd54180624a87b70.webp",
+   "desc": "최근 교내 강의실에서 '학교가 비용의 90%를 지원한다'고 설명하며 ‘커넥츠 영단기 대학생 특별지원 프로그램’ 신청을 권유한 뒤 문자로 결제를 요청한 사례가 접수되었습니다."
+  },
+  {
    "title": "미래인문학기반사회혁신창업교육연구단 BK연구교수 채용",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142410&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-26",
@@ -41,7 +63,8 @@
    "campus": "",
    "src": "45ec8fd1",
    "foundAt": "2026-11-26",
-   "thumb": "data/news/img/68fc9586c104c8df.webp"
+   "thumb": "data/news/img/68fc9586c104c8df.webp",
+   "desc": "영문교정 이나고(Enago)에서 아래와 같이 <실험실의 발견이 약이 되기까지 – 신약개발 입문편> 웨비나를 진행하오니, 많은 관심과 참여 바랍니다."
   },
   {
    "title": "성균관대학교 AI반도체혁신연구소 행정직원 모집(~12/08(화)까지)",
@@ -105,7 +128,8 @@
    "school": "성균관대학교",
    "campus": "",
    "src": "45ec8fd1",
-   "foundAt": "2026-11-25"
+   "foundAt": "2026-11-25",
+   "desc": "성균경영인포럼에서 아래와 같이 근로학생을 모집합니다. 1. 모집인원 : 1명"
   },
   {
    "title": "[포럼 안내] AI 대전환과 일의 미래 ― 기업, 노동시장, 그리고 불평등의 재편",
@@ -115,7 +139,8 @@
    "school": "성균관대학교",
    "campus": "",
    "src": "45ec8fd1",
-   "foundAt": "2026-11-25"
+   "foundAt": "2026-11-25",
+   "desc": "성균관대학교 경영대학 BK21 교육연구단과 인천대학교 경제정책연구소가 공동으로 각 분야 전문가들을 모시고 송도에서 본 포럼을 개최합니다. 학계와 현업에서 관심있는 분들의 많은 참여를 기다립니다."
   },
   {
    "title": "[성균관대·POSTECH 공동주최] 행정혁신포럼「AI시대의 대학행정」참가방법 안내",
@@ -410,27 +435,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-11-17",
    "desc": "안녕하세요. 성균관대학교 뇌과학뇌공학과 시스템 신경과학 연구실(PI: 김재현 교수)에서 대학원 진학(2027년 후기 혹은 2028년 전기)을 희망하는 학부 학생을 대상으로 연구 인턴을 모집합니다."
-  },
-  {
-   "title": "[인사캠] 2026년 12월 체력증진센터(경영관, 600주년기념관) 회원모집 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142011&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-17",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-17",
-   "desc": "성균관대학교 인문사회과학캠퍼스 체력증진센터 2026년 12월 회원을 아래와 같이 모집하오니 교내 구성원 여러분들의 많은 이용 바랍니다. Ⅰ. 등록 기준일 - 2026년 12월 1일(화)"
-  },
-  {
-   "title": "성균관대학교 교무처 교무팀(서울) 자체계약직원 채용",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142019&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-16",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-16",
-   "desc": "성균관대학교 교무처 교무팀(서울)에서 함께 근무할 자체계약직원을 다음과 같이 모집하오니 많은 관심과 지원 바랍니다."
   }
  ]
 }

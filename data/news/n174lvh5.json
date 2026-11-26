@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-26",
  "items": [
   {
+   "title": "[시설건축팀] 다솔관 일부 난방공급 중지 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278231&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-26",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-26",
+   "desc": "다솔관 난방을 공급하는 냉.온수기 고장으로 인하여 26.11.26 10:00부터 난방공급이 중단된 상태입니다. 현재 보수중에 있으나 보수 완료시까지 많은 기간이 소요될 것으로 예상됩니다."
+  },
+  {
    "title": "결핵 예방수칙 및 보건당국 지침에 따른 학사 운영 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278223&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-26",
@@ -41,7 +51,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "src": "5d85d287",
-   "foundAt": "2026-11-26"
+   "foundAt": "2026-11-26",
+   "desc": "안녕하세요, 대학일자리플러스센터입니다. 관심 있는 학생들의 많은 지원을 바라며, 자세한 내용은 첨부파일을 참고해주세요. 감사합니다."
   },
   {
    "title": "[기숙사운영센터] 2027학년도 1학기 프란치스코관 모집공고 2027学年度第1学期方济各馆招生公告",
@@ -264,7 +275,7 @@
    "src": "5d85d287",
    "foundAt": "2026-11-08",
    "thumb": "data/news/img/1c72b81b00f4fe3b.webp",
-   "desc": "◎ 일시 : [6 차 ] 2026.11.19.( 목 ) 11:00 ◎ 장소 : T108 호 ( 미카엘관 교수동 ) ◎ 발표 : [6 차 ] 김용일 교수 ( 인공지능학과 ), 오종원 교수 ( 바이오메디컬화학공학과 ),"
+   "desc": "안녕하세요 . 교수학습개발원에서 신임 교수님들의 연구 비전을 공유하며 학문적 교류를 나누고 소통하는 자리를 마련하였습니다 . 자유로운 분위기 속에서 연구 방향을 나누는 유익한 시간이 될 것입니다 . 많은 관심과…"
   },
   {
    "title": "[가톨릭공유대학(CU12)] 2026학년도 겨울 계절학기 수강신청 안내",
@@ -307,7 +318,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "src": "5d85d287",
-   "foundAt": "2026-11-08"
+   "foundAt": "2026-11-08",
+   "desc": "※ 가톨릭대학교와 성공회대학교는 양교 학점교류 협정에 따라 학점교류 제도를 운영하고 있습니다. 이에 학점교류 제도 및 신청과 관련된 사항을 안내드립니다."
   },
   {
    "title": "[학사행정팀] 2026학년도 겨울계절학기 타대학 소속 학점교류생 안내사항",
@@ -420,16 +432,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-30",
    "thumb": "data/news/img/d41b64c36abf4908.webp"
-  },
-  {
-   "title": "2026-겨울계절학기 영남대학교 학점교류 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277274&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-29",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-29"
   }
  ]
 }
