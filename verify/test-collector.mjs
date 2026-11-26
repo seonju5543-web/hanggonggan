@@ -3763,6 +3763,10 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
     eq('  "교내/교외"·"교내·교외" 도 교내가 아니다',
       ['[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)', '2026 교내·교외 장학금 통합 안내', '교내 / 교외 근로장학생 모집'].map(typeOf),
       ['교외', '교외', '교외']);
+    /* 리뷰 3차(M1 · 2026-11-26) — 쉼표로 늘어놓은 「(교내, 교외)」 도 둘 다다(가천대 실제 제목 · 실시간 2건 + 정식 등록 1건이 교내였다).
+       반대로 「/」 뒤에 「외」로 시작하는 딴 낱말(「교내/외국인 …」)은 교외라는 뜻이 아니다 — 「/」 는 「교외」 앞에서만 둘 다로 읽는다 */
+    eq('  "(교내, 교외)" 도 교내가 아니다 · "교내/외국인 …" 은 그대로 교내다(「/」 뒤가 「교외」 일 때만 둘 다)',
+      ['[메디컬] 2026-2학기 일반(교내, 교외) 국가근로장학생 2차 추가모집', '2026-2학기 교내/외국인 유학생 장학금 신청 안내'].map(typeOf), ['교외', '교내']);
     /* 🔴 반대쪽 함정 — 대괄호 표식만 보면 게시판이 대괄호 없이 쓰는 **진짜 교내 공고**를 놓친다.
        실측(notices.json 120판): 제목에 `교내` 가 든 31건 중 12건만 잡히고 19건이 교외로 떨어졌다. */
     eq('  대괄호가 없어도 제목이 "교내" 라고 하면 교내다',
@@ -6728,6 +6732,22 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
         <a href="/files/form.pdf">신청 양식.pdf</a>`, st).map((a) => a.url),
       ['https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=A_.hwp&ogrfname=%EA%B3%B5%EA%B3%A0%EB%AC%B8.hwp',
        'https://www.seoultech.ac.kr/files/form.pdf']);
+    /* 리뷰 3차에서 드러남(2026-11-26) — 링크 글자가 그림·압축 파일 이름(「…포스터.png」·「…신청서류.zip」)이면 문서 확장자가 아니라고 단추로 보고 바로 앞 줄 —
+       **앞 첨부의 이름**을 가져왔다(서울과기대 활동 글 3 · 장학 공고 3). 학생은 서식 이름을 누르고 포스터를 받았고, 첨부 구분은 포스터를 서식으로 알았다 */
+    eq('  🔴 링크 글자가 파일 이름이면(그림·압축 파일 포함) 그 이름 그대로 — 앞 첨부의 이름을 빌리지 않는다',
+      AL.detailAttachments(`<li><a href="javascript:downloadfile('/storage/www/bbs/6302','A_.hwp','멘토링 계획서(양식).hwp' );">멘토링 계획서(양식).hwp</a></li>
+        <li><a href="javascript:downloadfile('/storage/www/bbs/6302','B_.png','대학생멘토 모집 포스터.png' );">대학생멘토 모집 포스터.png</a></li>
+        <li><a href="javascript:downloadfile('/storage/www/bbs/6302','C_.zip','3. (양식) 신청서류.zip' );">3. (양식) 신청서류.zip</a></li>`, st).map((a) => a.name),
+      ['멘토링 계획서(양식).hwp', '대학생멘토 모집 포스터.png', '3. (양식) 신청서류.zip']);
+    /* 이미 실린 빌린 이름은 저장 때 다듬기(stripSiteChrome)가 되돌린다 — 받는 주소에 원래 이름이 실린 규칙(서울과기대 ogrfname — 우리가 호출의 셋째 인자로 지은 주소)만 ·
+       같은 글의 다른 줄과 이름이 겹칠 때만(빌린 이름) · 보이는 이름이 원래 이름과 띄어쓰기만 다른 줄은 사이트가 보인 이름 그대로 */
+    const ST_DL = (f, og) => `https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?${new URLSearchParams({ fpath: '/storage/www/bbs/6302', fname: f, ogrfname: og })}`;
+    const borrowed = [{ url: 'https://www.seoultech.ac.kr/service/board/rec?do=commonview&bidx=872856', attachments: [
+      { name: '멘토링 계획서(양식).hwp', url: ST_DL('A_.hwp', '멘토링 계획서(양식).hwp') }, { name: '멘토링 계획서(양식).hwp', url: ST_DL('B_.png', '대학생멘토 모집 포스터.png') },
+      { name: '붙임2. 동의 매뉴얼(홈페이지 모바일앱).pdf', url: ST_DL('C_.pdf', '붙임2. 동의 매뉴얼(홈페이지  모바일앱).pdf') }] }];
+    eq('  🔴 이미 실린 빌린 이름은 다듬기가 받는 주소의 원래 이름으로 되돌린다(원칙 7 소급) · 같은 글의 다른 줄과 겹치는 이름만 · 띄어쓰기만 다른 이름은 그대로 · 한 번 더 불러도 0',
+      [AL.stripSiteChrome([borrowed]), borrowed[0].attachments.map((a) => a.name), AL.stripSiteChrome([borrowed])],
+      [1, ['멘토링 계획서(양식).hwp', '대학생멘토 모집 포스터.png', '붙임2. 동의 매뉴얼(홈페이지 모바일앱).pdf'], 0]);
   }
   {
     const AL = await import(new URL('../collector/attachment-link.mjs', import.meta.url));
@@ -6773,6 +6793,10 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     eq('  🔴 이름표로 시작해도 숫자 뒤에 글자가 이어지는 괄호는 뜻이다 — 「이름표 + 숫자(+ 단위)」만 꼬리 · 이름표 둘(용량 · 다운로드)도 꼬리',
       ['신청서.hwp (다운로드 후 2부 작성)', '양식.docx (크기 1년 보관)', '안내.pdf (size: 2 pages)', '요강.pdf (다운로드 2회 이상 금지)', '신청서.hwp (다운로드 12)', '신청서.hwp (Download: 34)', '요강.pdf (파일 크기 : 2.5 MB · 다운로드 : 7회)', '요강.pdf (용량 120KB'].map((n) => AL.trimSiteTail(n)),
       ['신청서.hwp (다운로드 후 2부 작성)', '양식.docx (크기 1년 보관)', '안내.pdf (size: 2 pages)', '요강.pdf (다운로드 2회 이상 금지)', '신청서.hwp', '신청서.hwp', '요강.pdf', '요강.pdf']);
+    /* 리뷰 3차(M7) — 이름표 괄호를 「이름표 + 숫자」로 좁힌 뒤 못 떼는 꼬리가 생겼다: 「다운로드 횟수」·「다운로드수」·「Downloads」 이름표 · 이름표 쌍 뒤에 단위 붙은 수만 이어지는 꼴(「12회, 1.2MB」) */
+    eq('  이름표 뒤 「횟수」·「수」·영문 복수도 이름표 · 이름표 쌍 뒤에 용량만 이어져도 꼬리 — 뜻이 있는 괄호(「다운로드 수량 2부」)는 그대로',
+      ['신청서.hwp (다운로드 횟수 : 5회)', '신청서.hwp (다운로드수 : 12)', '신청서.hwp (Downloads: 12)', '신청서.hwp (다운로드 : 12회, 1.2MB)', '신청서.hwp (다운로드 12 · 1.2MB)', '신청서.hwp (다운로드 수량 2부)'].map((n) => AL.trimSiteTail(n)),
+      ['신청서.hwp', '신청서.hwp', '신청서.hwp', '신청서.hwp', '신청서.hwp', '신청서.hwp (다운로드 수량 2부)']);
     eq('  🔴 뷰어 링크는 파일이 아니다 — 「이름 + 미리보기」뿐인 링크는 받는 주소가 분명할 때만 첨부로 센다(뷰어 주소가 같은 이름의 둘째 줄이 되지 않는다) · 용량 꼬리가 붙은 이름은 주소와 상관없이 파일',
       [AL.detailAttachments('<a href="/synap/doc.html?fn=1">공고문.hwp 미리보기</a>', donga), AL.detailAttachments('<a href="/bbs/1/download.do?f=9">공고문.hwp 미리보기</a>', donga).map((a) => a.name),
         AL.detailAttachments('<a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Q1">신청서.hwp (71KB) 바로보기</a>', donga).map((a) => a.name),
@@ -7572,8 +7596,19 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
        ③ 꼬리를 떼지 않을 이름(그 이름으로 받은 원본·사본이 있는 첨부)은 순수 함수가 고른다(수집 로봇은 불러오면 돌아 관문이 못 쟀다) */
     eq('다시 읽은 페이지가 그 글인가(rereadIsThisPost) — 제목 낱말이 페이지에 있다 · 다른 글 페이지는 아니다 · 제목이 흔한 말뿐이면 받는다 · 수집 로봇은 아닌 페이지면 이레 뒤에 다시 연다(남의 첨부·서류를 안 붙인다)',
       [(AX.rereadIsThisPost || (() => null))('제10회 농촌 아이디어 공모전\n참가 대상 전국 대학생', '제10회 농촌 아이디어 공모전'), (AX.rereadIsThisPost || (() => null))('도시 재생 해커톤 참가자 모집\n참가 대상 전국 대학생', '제10회 농촌 아이디어 공모전'),
-        (AX.rereadIsThisPost || (() => null))('아무 글자', '참가자 모집 안내'), /const detail = await fetchDetail\(it\);\s*\n\s*if \(detail\.text && !rereadIsThisPost\(detail\.text, it\.title\)\) \{ it\.detailsTriedAt = todayIso; actBackfilled \+= 1; continue; \}/.test(cm)],
+        (AX.rereadIsThisPost || (() => null))('아무 글자', '참가자 모집 안내'), /const detail = await fetchDetail\(it\);\s*\n\s*if \(detail\.text && !rereadIsThisPost\(detail\.text, it\.title\)\) \{ it\.detailsTriedAt = todayIso; it\.rereadMiss = \(it\.rereadMiss \|\| 0\) \+ 1; actBackfilled \+= 1; continue; \}/.test(cm)],
       [true, false, true, true]);
+    /* 리뷰 3차(M6) — 제목 낱말 하나만 있으면 통과해, 「2026년」 같은 흔한 낱말 하나로 거의 모든 페이지가 그 글이 됐다 → 숫자가 없는 제목 낱말 둘(그런 낱말이 하나뿐이면 하나) ·
+       진짜 글인데 제목 낱말이 페이지에 없으면(스크립트로 그리는 글) 이레마다 영영 다시 열었다 → 두 번 아니면 그만 연다(rereadMiss) */
+    const RP = AX.rereadIsThisPost || (() => null);
+    const T2 = '청년 체인지메이커 아카데미 2026년 참가자 모집';
+    eq('  🔴 그 글인가는 숫자 없는 제목 낱말 둘로 본다(그런 낱말이 하나뿐이면 하나) — 「2026년」 하나·「아카데미」 하나만 든 페이지는 아니다 · 둘 다 있으면 그 글 · 숫자 낱말뿐인 제목은 그 낱말들로(둘까지) · 흔한 말뿐이면 받는다',
+      [RP('2026년 공지 목록', T2), RP('평생교육 아카데미 안내', T2), RP('체인지메이커 아카데미 참가 안내', T2), RP('2026년 제5기 서포터즈 활동 안내', '2026년 제5기 청년 서포터즈 모집'),
+        RP('2026년 행사', '2026년 제5기'), RP('2026년 제5기 안내', '2026년 제5기'), RP('아무 글자', '참가자 모집 안내')],
+      [false, false, true, true, false, true, true]);
+    eq('  🔴 다시 읽은 페이지가 두 번 그 글이 아니면 그만 연다(rereadMiss — 스크립트로 그리는 글은 다시 열어도 같다) · 맞으면 센 것을 지운다 · 수집 로봇이 센다',
+      [AX.actRereadNeed({ rereadMiss: 2 }), AX.actRereadNeed({ rereadMiss: 1 }), /it\.rereadMiss = \(it\.rereadMiss \|\| 0\) \+ 1;/.test(cm), /if \(detail\.text && it\.rereadMiss\) delete it\.rereadMiss;/.test(cm)],
+      [null, 'details', true, true]);
     eq('  서류 칸만 다시 읽는 갈래도 새 첨부를 합친다(믿는 첨부만 · 있던 줄 그대로)', /if \(need === 'docs'\) \{[\s\S]{0,400}?actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\)[\s\S]{0,200}?continue;/.test(cm), true);
     {
       const AL0 = await import('../collector/attachment-link.mjs');
@@ -17655,6 +17690,15 @@ module.exports = class Anthropic {
       AT.writeStore(dir, 'act-w', 'plain', { url: 'https://x.kr/w', body: '', docs: [doc('w2', '워터마크가 바뀐 같은 신청서 글자', { name: '신청서.hwp' }), doc('w3', '진짜 새 첨부', { name: '요강.pdf' }), doc('w4', '그림 글자', { name: '', from: 'img', ocr: true })] }, '2026-11-27');
       eq('  🔴 이름이 있는 첨부는 이름으로도 한 번만 싣는다(바이트가 바뀐 같은 첨부 — 처음 것 그대로) · 다른 이름·이름 없는 그림 글자는 지문으로 더한다',
         AT.readStore(dir, 'act-w').docs.map((d) => [d.name, d.text]), [['신청서.hwp', '처음 받은 신청서 글자'], ['요강.pdf', '진짜 새 첨부'], ['', '그림 글자']]);
+      /* 리뷰 3차(I2 · 2026-11-26) — 이름 거름이 한 번 받기 안에서도 걸려, 이름만 같은 **다른 파일**의 뒤엣것을 버렸다(서울과기대 act-0dyt0rm — 「멘토링 계획서(양식).hwp」 두 줄 중 하나는 포스터 그림 ·
+         서식이 먼저면 포스터의 자격·혜택 글자가 AI 에 안 갔다). 이름은 이미 저장된 첨부(다른 날)와 다른 모드의 기록에만 견준다 */
+      const PLAN = '멘토링 계획서(양식).hwp';
+      AT.writeStore(dir, 'act-n', 'plain', { url: 'https://x.kr/n', body: '', docs: [doc('n1', '계획서 서식 글자', { name: PLAN }), doc('n2', '포스터 글자 — 자격·혜택', { name: PLAN })] }, '2026-11-26');
+      const sameBatch = AT.readStore(dir, 'act-n').docs.map((d) => d.hash);
+      AT.writeStore(dir, 'act-n', 'plain', { url: 'https://x.kr/n', body: '', docs: [doc('n3', '워터마크가 바뀐 계획서', { name: PLAN }), doc('n4', '워터마크가 바뀐 포스터', { name: PLAN })] }, '2026-11-27');
+      AT.writeStore(dir, 'act-n', 'browser', { url: 'https://x.kr/n', body: '', docs: [doc('n5', '브라우저로 다시 받은 계획서', { name: PLAN }), doc('n6', '브라우저만 본 안내문 1', { name: '안내문.pdf' }), doc('n7', '브라우저만 본 안내문 2', { name: '안내문.pdf' })] }, '2026-11-27');
+      eq('  🔴 이름 거름은 이미 저장된 첨부(다른 날)와 다른 모드의 기록에만 — 한 번 받기 안에서 이름만 같은 두 파일은 둘 다 싣는다(뒤엣것이 포스터일 수 있다) · 다음 날 다시 받은 같은 이름은 안 싣는다 · 브라우저 기록의 같은 이름은 무료 받기에 있으면 빼고, 없으면 둘 다',
+        [sameBatch, AT.readStore(dir, 'act-n').docs.map((d) => d.hash)], [['n1', 'n2'], ['n1', 'n2', 'n6', 'n7']]);
       eq('  🔴 바뀐 것 없이 다시 받은 날도 「오늘 받아 봤다」를 남긴다 — 본문이 빈 글을 같은 날 수집할 때마다 다시 받지 않는다(하루 한 번) · 다음 날은 다시 차례 · 바뀐 것이 없으니 쓴 글로 세지 않고 내용이 바뀐 날(at)도 그대로',
         [triedNext, wroteAgain, due('act-c', 'plain', '2026-11-27'), due('act-c', 'plain', '2026-11-28'), JSON.parse(rawOf('act-c', 'plain')).at, sameFormat(rawOf('act-c', 'plain'))], [true, false, false, true, '2026-11-26', true]);
 
@@ -17690,6 +17734,11 @@ module.exports = class Anthropic {
       eq('  🔴 본문은 제목 낱말을 뺀 실제 분량으로 잰다 — 제목뿐인 페이지는 본문이 아니다(브라우저가 이어받는다) · 무료 받기는 100자 · 브라우저는 40자(짧은 진짜 본문은 브라우저 기록으로 남는다)',
         [thin('제10회 농촌 아이디어 공모전', 'plain'), thin('제10회 농촌 아이디어 공모전', 'browser'), thin(SHORT, 'plain'), thin(SHORT, 'browser') === SHORT, thin(`${SHORT}\n${LONG_BODY}`, 'plain').length > 0],
         ['', '', '', true, true]);
+      /* 리뷰 3차(M5) — 제목 낱말에서 숫자를 떼면 한 글자가 남는 것(「2026년」→「년」)을 본문 전체에서 지워, 경계에 있는 진짜 본문이 100자 아래로 떨어져 브라우저를 기다렸다(활동 제목 200건 중 57건이 그런 낱말) */
+      const yearPost = { url: 'https://x.kr/y', title: '2026년 제5기 청년 서포터즈 모집' };
+      const yearBody = `제5기 청년 서포터즈 안내\n${'가'.repeat(85)}\n${'년'.repeat(8)}${'기'.repeat(7)}`;
+      eq('  🔴 본문 분량을 잴 때 두 글자 미만의 제목 조각(「2026년」→「년」)은 빼지 않는다 — 그 글자가 본문 어디에 있든 지워 진짜 본문을 버렸다',
+        AD.storeFromFiles(yearPost, [], {}, { ...io, key: 'k6', readText: () => yearBody, mode: 'plain' }).body, yearBody);
       eq('  본문 분량의 문턱은 notice-source MIN_BODY 한 곳을 불러 쓴다(장학금 원문 받기와 같은 100자 — 숫자를 베껴 적지 않는다)', /import \{ MIN_BODY \} from '\.\/notice-source\.mjs'/.test(readText(new URL('../collector/activity-docs.mjs', import.meta.url))), true);
       const adSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
       eq('⑦ 첨부 로봇 — 글자를 받을 글을 지금 대상보다 먼저 돈다 · 🔴 활동 목록 파일을 쓰는 곳은 무료 모드 한 곳뿐(브라우저 모드는 안 쓴다) · 끝에 제 모드 기록만 가지치기 · 시험 워크플로의 id 목록(ACT_TEXT_IDS)',
@@ -18032,32 +18081,49 @@ module.exports = class Anthropic {
     /* 최종 리뷰(화면 I1 · 2026-11-26) — 시트 「공고 안내」는 '모름'류 낱말(app.js SAYS_UNKNOWN — 「확인 필요」·「미확인」·「원문 확인」 …)이 든 줄을 **통째로** 뺀다(app-sheet noticeSummaryRows).
        같은 이름표로 묶은 **뒤에** 빼면 한 줄의 낱말이 형제 줄까지 데려가 지원을 막는 유의사항이 조용히 사라진다 → 묶기 **전에** 줄마다 같은 낱말로 거른다(낱말은 앱의 그 한 곳을 넘겨받는다) */
     const SAYS = new Function(`${(appSource().match(/^const SAYS_UNKNOWN = .*;$/m) || ['const SAYS_UNKNOWN = null;'])[0]}\nreturn SAYS_UNKNOWN;`)();
+    /* 시트의 「공고 안내」 구간(NS_LABELS … sourceNoteHtml)을 앱 글자 그대로 싣는다 — 얹기가 시트의 비교 열쇠(noticeFlat)·이름표(nsLabel)를 넘겨받는 것을 앱 함수 그대로 잰다 */
+    const vmx = await import('node:vm');
+    const sheetSrc = appSource(); const sline = (re) => (sheetSrc.match(re) || [''])[0];
+    const sfn = (n) => { const a = sheetSrc.indexOf(`function ${n}(`); return a < 0 ? '' : sheetSrc.slice(a, sheetSrc.indexOf('\n}\n', a) + 2); };
+    const ctxN = vmx.createContext({ joinSpacedSyllables: ME.joinSpacedSyllables, stripListNumber: ME.stripListNumber });
+    vmx.runInContext([sline(/^const ENTITIES = .*$/m), sline(/^const ENTITY_RE = .*$/m), sline(/^const PARTIAL_ENTITY_END = .*$/m), sfn('unent'), sfn('esc'), sline(/^const SAYS_UNKNOWN = .*$/m),
+      sheetSrc.slice(sheetSrc.indexOf('const NS_LABELS = ['), sheetSrc.indexOf('\nfunction sourceNoteHtml('))].join('\n\n'), ctxN);
+    const SHEET = (name) => vmx.runInContext(`typeof ${name} === 'undefined' ? undefined : ${name}`, ctxN);
+    const OPTS = { dropRe: SAYS, flat: SHEET('noticeFlat'), label: SHEET('nsLabel') };
+    const rowsOf = (ls) => (SHEET('noticeSummaryRows') || (() => []))(ls).map((r) => r.label);
     const notesU = ['일정: 접수 11.18. – 12.7.', '유의사항: 타 공모전 수상작은 출품 불가', '유의사항: 수상 후 표절이 확인되면 수상 취소', '유의사항: 참가비는 입금 후 확인 필요'];
-    const wu = WA(n0, { ...cr0, notes: notesU, amount: ['대상 1팀 300만원', '부상은 추후 확인 필요', '참가자 전원 수료증'] }, SAYS);
-    const pu = (PA([{ ...n0, id: 'q2' }], { items: { q2: { ...cr0, notes: notesU } } }, plus(0), SAYS)[0] || {});
-    eq('  🔴 「모름」류 낱말이 든 줄은 묶기 전에 그 줄만 뺀다 — 같은 이름표의 다른 사실(형제 줄)은 남는다 · 혜택 둘째 줄부터도 같다 · 목록 얹기(publishedActivities)도 같은 낱말을 넘겨받는다 · 앱·도구가 그 낱말(app.js SAYS_UNKNOWN 한 곳)을 넘긴다',
+    const wu = WA(n0, { ...cr0, notes: notesU, amount: ['대상 1팀 300만원', '부상은 추후 확인 필요', '참가자 전원 수료증'] }, { dropRe: SAYS });
+    const pu = (PA([{ ...n0, id: 'q2' }], { items: { q2: { ...cr0, notes: notesU } } }, plus(0), { dropRe: SAYS })[0] || {});
+    eq('  🔴 「모름」류 낱말이 든 줄은 묶기 전에 그 줄만 뺀다 — 같은 이름표의 다른 사실(형제 줄)은 남는다 · 혜택 둘째 줄부터도 같다 · 목록 얹기(publishedActivities)도 같은 낱말을 넘겨받는다 · 앱·도구가 그 낱말(app.js SAYS_UNKNOWN 한 곳)과 시트의 비교 열쇠·이름표를 넘긴다',
       [SAYS instanceof RegExp, (wu.noticeLines || []).filter((l) => /^(?:유의사항|혜택):/.test(l)), (pu.noticeLines || []).filter((l) => /^유의사항:/.test(l)),
-        /publishedActivities\(d\.items, ar, undefined, SAYS_UNKNOWN\)/.test(src('app-activities.js')), /ME\.publishedActivities\(actRaw, actDoc, undefined, linkFn\('SAYS_UNKNOWN'\)\)/.test(src('verify/what-shows.mjs'))],
+        /publishedActivities\(d\.items, ar, undefined, \{ dropRe: SAYS_UNKNOWN, flat: noticeFlat, label: nsLabel \}\)/.test(src('app-activities.js')),
+        /ME\.publishedActivities\(actRaw, actDoc, undefined, \{ dropRe: linkFn\('SAYS_UNKNOWN'\), flat: linkFn\('noticeFlat'\), label: linkFn\('nsLabel'\) \}\)/.test(src('verify/what-shows.mjs'))],
       [true, ['혜택: 참가자 전원 수료증', '유의사항: 타 공모전 수상작은 출품 불가 · 수상 후 표절이 확인되면 수상 취소'], ['유의사항: 타 공모전 수상작은 출품 불가 · 수상 후 표절이 확인되면 수상 취소'], true, true]);
+    /* 리뷰 3차(I3 · 2026-11-26) — 시트(activitySheetNotices)는 위 칸에 이미 나온 문장(자격 줄·발췌)을 품은 안내 줄을 통째로 뺐다. 그런데 얹기가 이미 같은 이름표끼리 묶은 뒤라
+       한 조각이 자격 줄을 되풀이하면 같은 줄의 다른 사실(「타 공모전 수상작은 출품 불가」·「팀 단위 참가도 가능」)까지 사라졌다 → 얹기가 묶기 **전에** 줄마다 거른다 · 시트는 얹은 줄을 다시 거르지 않는다 */
+    const ws1 = WA(n0, { ...cr0, eligibility: ['대한민국 대학생'], amount: [], notes: ['대한민국 대학생이라면 누구나 참가할 수 있습니다.', '팀 단위 참가도 가능합니다.'] }, OPTS);
+    const ws2 = WA(n0, { ...cr0, eligibility: ['만 19세 이상인 사람'], amount: ['상금 100만원'], notes: ['유의사항: 만 19세 이상인 사람만 응모할 수 있습니다', '유의사항: 타 공모전 수상작은 출품 불가', '혜택: 상금 100만원 지급'] }, OPTS);
+    eq('  🔴 위 칸(자격 줄 · 혜택 첫 줄 · 남긴 모집기간)에 이미 나온 문장을 품은 줄은 묶기 전에 그 줄만 뺀다 — 같은 이름표의 다른 사실은 남는다(시트의 비교 열쇠 noticeFlat 을 넘겨받는다)',
+      [ws1.noticeLines, ws2.noticeLines, WA(n0, { ...cr0, eligibility: ['대한민국 대학생'], amount: [], notes: ['대한민국 대학생이라면 누구나 참가할 수 있습니다.'] }).noticeLines],
+      [['안내: 팀 단위 참가도 가능합니다.', '문의처: 표본재단 사무국 02-000-0000'], ['유의사항: 타 공모전 수상작은 출품 불가', '문의처: 표본재단 사무국 02-000-0000'],
+        ['안내: 대한민국 대학생이라면 누구나 참가할 수 있습니다.', '문의처: 표본재단 사무국 02-000-0000']]);   // 열쇠를 안 넘기면(Node 의 다른 쓰임) 거르지 않는다
+    /* 리뷰 3차(I4 · 2026-11-26) — 시트는 같은 뜻의 이름표를 한 이름으로 보인다(NS_LABELS — 문의·문의처·연락처·전화 → 「문의」 · 유의사항·참고·기타사항 → 「참고」).
+       얹기가 글자 그대로의 이름표로 묶으면 AI 의 「문의」와 무료 「문의처」가 「문의」 두 줄이 됐다 → 묶는 열쇠는 시트의 이름표(nsLabel) · 줄에 적는 이름표는 처음 나온 것 그대로 */
+    const wm = WA(n0, { ...cr0, amount: [], notes: ['문의: 사무국 02-111-1111', '유의사항: 전 일정 참석', '참고: 참가비 없음', '기타사항: 숙소 제공'] }, OPTS);
+    eq('  🔴 시트가 한 이름으로 보이는 이름표는 한 줄로 묶는다 — AI 「문의」 + 무료 「문의처」 = 문의 한 줄 · 유의사항·참고·기타사항 = 한 줄 · 시트에서도 「문의」 한 줄',
+      [wm.noticeLines, rowsOf(wm.noticeLines)], [['문의: 사무국 02-111-1111 · 표본재단 사무국 02-000-0000', '유의사항: 전 일정 참석 · 참가비 없음 · 숙소 제공'], ['문의', '참고']]);
     /* 최종 리뷰(화면 B M2 · 2026-11-26) — ① 콜론 바로 뒤가 숫자인 「일정:12.5.」 를 이름표로 못 읽어 따로 한 줄이 됐다(이름표가 글자뿐이면 숫자가 뒤따라도 이름표다 · 「09:00」·「1:1」 처럼 이름표 자리가 숫자면 아니다)
        ② 이름표 없는 AI 줄은 시트가 문장 꼴이 아니면 뺀다(「팀 단위 참가 가능」) — 「안내」 이름표로 한 줄에 묶는다 */
     const wd = WA(n0, { ...cr0, amount: [], notes: ['일정:12.5. 예선', '일정: 12.12. 본선', '09:00 집결', '1:1 멘토링 제공', '팀 단위 참가 가능', '외국인 참가 가능'] });
     eq('  「일정:12.5.」 도 이름표다(이름표가 글자뿐이면) · 시각·「1:1」 은 이름표가 아니다 · 이름표 없는 줄은 「안내」 한 줄로 묶는다(시트가 문장 꼴이 아닌 줄을 빼지 않게)',
       wd.noticeLines, ['일정: 12.5. 예선 · 12.12. 본선', '안내: 09:00 집결 · 1:1 멘토링 제공 · 팀 단위 참가 가능 · 외국인 참가 가능', '문의처: 표본재단 사무국 02-000-0000']);
-    /* 최종 리뷰(화면 B M1 · 2026-11-26) — 「공고 안내」는 여덟 줄까지만 보인다. 이름표가 많은 글은 맨 끝 「문의」가 잘렸다(설계 5-4 「문의처 줄은 남긴다」) → 여덟째 뒤로 밀린 문의 줄은 여덟째 자리에 둔다 */
-    {
-      const vmx = await import('node:vm');
-      const src = appSource(); const line = (re) => (src.match(re) || [''])[0];
-      const fnSrc = (n) => { const a = src.indexOf(`function ${n}(`); return a < 0 ? '' : src.slice(a, src.indexOf('\n}\n', a) + 2); };
-      const ctxN = vmx.createContext({ joinSpacedSyllables: ME.joinSpacedSyllables, stripListNumber: ME.stripListNumber });
-      vmx.runInContext([line(/^const ENTITIES = .*$/m), line(/^const ENTITY_RE = .*$/m), line(/^const PARTIAL_ENTITY_END = .*$/m), fnSrc('unent'), fnSrc('esc'), line(/^const SAYS_UNKNOWN = .*$/m),
-        src.slice(src.indexOf('const NS_LABELS = ['), src.indexOf('\nfunction sourceNoteHtml('))].join('\n\n'), ctxN);
-      const rowsOf = (ls) => vmx.runInContext('noticeSummaryRows', ctxN)(ls).map((r) => r.label);
-      const many = ['혜택: 상금 100만원', '주제: 지역과 청년', '참가 형태: 2~4인 팀', '일정: 예선 12.5.', '장소: 서울 시민청', '선발 규모: 본선 20팀', '유의사항: 전 일정 참석', '심사: 서류와 발표', '시상: 12월 20일', '문의: 사무국 02-000-0000'];
-      eq('  🔴 「공고 안내」가 여덟 줄을 넘으면 맨 끝 「문의」를 여덟째 자리에 둔다(잘리지 않는다) · 여덟 줄 안이면 그대로 · 문의가 없으면 앞 여덟 줄',
-        [rowsOf(many), rowsOf(many.slice(0, 7).concat(many[9])), rowsOf(many.slice(0, 9)).length],
-        [['혜택', '주제', '참가 형태', '일정', '장소', '선발 규모', '참고', '문의'], ['혜택', '주제', '참가 형태', '일정', '장소', '선발 규모', '참고', '문의'], 8]);
-    }
+    /* 「공고 안내」는 여덟 줄까지 — 규칙은 그대로다(설계 5-4 「여덟 줄 규칙 자체는 바꾸지 않는다」).
+       리뷰 3차(I4 · 2026-11-26) — 한때 여덟째 뒤의 「문의」를 여덟째 자리로 끌어왔는데, 앞 여덟 줄에 문의가 이미 있어도 끌어와 문의가 두 줄이 되고 「제출 서류」 같은 다른 줄이 사라졌다.
+       같은 뜻의 이름표를 한 줄로 묶는 것(위 nsLabel 묶음)이 설계의 길이다 */
+    const many = ['혜택: 상금 100만원', '주제: 지역과 청년', '참가 형태: 2~4인 팀', '일정: 예선 12.5.', '장소: 서울 시민청', '선발 규모: 본선 20팀', '유의사항: 전 일정 참석', '심사: 서류와 발표', '시상: 12월 20일', '문의: 사무국 02-000-0000'];
+    eq('  「공고 안내」는 여덟 줄까지 — 차례 그대로 앞 여덟 줄(규칙은 바꾸지 않는다) · 뒤의 「문의」를 끌어와 문의가 두 줄이 되거나 다른 줄이 사라지지 않는다 · 문의처·전화도 「문의」 이름',
+      [rowsOf(many), rowsOf(['혜택: 상금', '주제: 청년', '문의처: 사무국', '일정: 12.5.', '장소: 서울', '선발 규모: 20팀', '유의사항: 참석', '제출 서류: 신청서', '심사: 발표', '전화: 02-000-0000'])],
+      [['혜택', '주제', '참가 형태', '일정', '장소', '선발 규모', '참고', '심사'], ['혜택', '주제', '문의', '일정', '장소', '선발 규모', '참고', '제출 서류']]);
     const long = Array.from({ length: 6 }, (_, i) => `${String(i + 1).repeat(2)}일차 일정을 마흔 글자가 되도록 길게 적은 줄입니다 가나다라마바사아`.slice(0, 40));
     const wl = WA(n0, { ...cr0, notes: long.map((b) => `일정: ${b}`), amount: [] });
     eq('  한 줄이 170자를 넘으면 같은 이름표로 줄을 나눈다(「공고 안내」 가 180자에서 자른다 — 글자가 잘려 사라지지 않게) · 혜택이 없으면 발췌 「혜택」도 없다',
@@ -18082,7 +18148,7 @@ module.exports = class Anthropic {
     const aa = src('app-activities.js'), ws = src('verify/what-shows.mjs');
     eq('⑥ 부르는 곳 — 앱은 활동 파일과 결과 파일을 같이 받아 거르고 얹은 목록을 둔다(결과 파일이 404·깨진 JSON 이어도 null 로 받아 목록을 세운다 · 옛 엔진이 캐시에서 오면 숨김 글을 통째로 감춘다) · what-shows 가 같은 함수를 부른다',
       [/fetch\('data\/act-read\.json', \{ cache: 'no-store' \}\)\.then\(\(r\) => \(r\.ok \? r\.json\(\) : null\)\)\.catch\(\(\) => null\)/.test(aa), /fetch\('data\/activities\.json', \{ cache: 'no-store' \}\)\.then\(\(r\) => \(r\.ok \? r\.json\(\) : null\)\)\.catch\(\(\) => null\)/.test(aa),
-        /typeof publishedActivities === 'function' \? publishedActivities\(d\.items, ar, undefined, SAYS_UNKNOWN\) : d\.items\.filter\(\(n\) => !n\.paidGate \|\| n\.paidOpen\)/.test(aa), /publishedActivities\(/.test(ws)],
+        /typeof publishedActivities === 'function' \? publishedActivities\(d\.items, ar, undefined, \{ dropRe: SAYS_UNKNOWN, flat: noticeFlat, label: nsLabel \}\) : d\.items\.filter\(\(n\) => !n\.paidGate \|\| n\.paidOpen\)/.test(aa), /publishedActivities\(/.test(ws)],
       [true, true, true, true]);
     /* 최종 리뷰(화면 I2 · 2026-11-26) — 화면 이야기는 what-shows 로만 한다(CLAUDE.md 「매 세션」 1). 카드가 얹힌 활동 글에서 도구가 시트와 다른 줄을 말했다:
        제외 줄 ✗ 를 자격 줄에서만 셌고(카드는 제외·우대를 따로 낸다 → 늘 0줄) · 「우선 선발 기준」을 안 말했고 · 「방법」 줄을 '모름'류 낱말로 거르지 않았고 · 「공고 안내」를 저장된 줄로만 만들었다(시트는 긴 혜택·제목 괄호 대상·발췌를 앞에 둔다).
@@ -18091,9 +18157,10 @@ module.exports = class Anthropic {
       const wsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-ws-act-'));
       try {
         const longB = '대상 1팀 상금 300만원과 함께 후속 창업 지원 프로그램 참여 기회를 드립니다';
-        const post = { id: 'ws-act-fixture-1', title: '(대학생) 표본 창업 공모전 참가자 모집', url: 'https://act.kr/ws-act-fixture-1', kind: '공모전', school: '', host: '표본재단', foundAt: plus(-1), paidGate: plus(-1), attachments: [] };
+        const post = { id: 'ws-act-fixture-1', title: '(대학생) 표본 창업 공모전 참가자 모집', url: 'https://act.kr/ws-act-fixture-1', kind: '공모전', school: '', host: '표본재단', foundAt: plus(-1), paidGate: plus(-1), attachments: [],
+          noticeLines: ['문의처: 표본재단 사무국 02-000-0000'] };
         const card = { ...cardMin, eligibility: ['만 19세 이상인 사람'], excludes: ['휴학생'], priority: ['관련 전공자'], amount: [longB, '참가자 전원 수료증'], apply: ['온라인 접수(구글 폼)', '접수 방법은 원문에서 확인 필요'],
-          documents: ['참가신청서'], notes: ['일정: 예선 12.5.', '유의사항: 전 일정 참석 필수'], deadline: { date: plus(12), quote: '12. 7.까지' } };
+          documents: ['참가신청서'], notes: ['일정: 예선 12.5.', '유의사항: 만 19세 이상인 사람만 응모할 수 있습니다', '유의사항: 전 일정 참석 필수', '문의: 사무국 02-111-1111'], deadline: { date: plus(12), quote: '12. 7.까지' } };
         const wf = (n, o) => { const p = path.join(wsDir, n); fs.writeFileSync(p, JSON.stringify(o)); return p; };
         const robotOpened = { ...post, id: 'ws-act-fixture-2', url: 'https://act.kr/ws-act-fixture-2', title: '표본 로봇이 연 공모전', paidGate: plus(-1), paidOpen: `로봇 ${plus(0)} · 보이던 글과 같은 글` };
         const env = { ...process.env, WHAT_SHOWS_REGISTERED: wf('reg.json', { items: [] }), WHAT_SHOWS_ACTIVITIES: wf('acts.json', { updatedAt: plus(0), items: [post, robotOpened] }), WHAT_SHOWS_ACT_READ: wf('read.json', { updatedAt: plus(0), items: { [post.id]: card }, gateHeld: {} }) };
@@ -18110,6 +18177,9 @@ module.exports = class Anthropic {
            제목에서 뗀 짧은 대상 괄호(「(대학생)」)가 시트 이름표 거름(NS_SKIP 「대상」)에 걸려 화면 어디에도 안 남았다 → 「제목 대상」 이름표로 넘겨 「대상」 으로 보인다 */
         eq('  ⑨ 「혜택」은 한 줄(긴 첫 줄 + 카드의 혜택 줄) · 제목에서 뗀 대상 괄호는 「대상」 줄로 보인다(시트 이름표 거름에 안 걸린다)',
           [sec('─ 공고 안내').filter((l) => /^· 혜택 · /.test(l)).length, sec('─ 공고 안내').filter((l) => /^· 대상 · /.test(l))], [1, ['· 대상 · 대학생']]);
+        /* 리뷰 3차(I3·I4 · 2026-11-26) — 시트가 자격 줄을 되풀이한 조각 때문에 같은 이름표의 다른 사실(「전 일정 참석 필수」)까지 지웠고 · AI 「문의」와 무료 「문의처」가 「문의」 두 줄이었다 */
+        eq('  ⑩ 자격 줄을 되풀이한 안내 조각만 빠지고 같은 이름표의 다른 사실은 보인다 · 문의는 한 줄(AI 「문의」 + 무료 「문의처」)',
+          sec('─ 공고 안내').filter((l) => /^· (?:참고|문의) · /.test(l)), ['· 참고 · 전 일정 참석 필수', '· 문의 · 사무국 02-111-1111 · 표본재단 사무국 02-000-0000']);
       } finally { fs.rmSync(wsDir, { recursive: true, force: true }); }
     }
     eq('  활동 글을 엔진에 넘길 때 카드도 넘긴다(AI 가 쓴 자격 줄을 엔진이 다시 거르지 않는다 · 부문이 여럿인 글의 판정) · 🔴 구조화 조건(eligibility)은 지금처럼 비워 둔다 · 시트 「접수」 의 「방법」 줄이 활동 글에도 나온다(시안에서 새로 보이는 것 하나)',
@@ -18175,6 +18245,10 @@ module.exports = class Anthropic {
       eq('  🔴 보이던 글과 합쳐진 새 글은 표시를 지우지 않고 「로봇이 열었다」 표식(paidOpen)을 더한다 — 병합 때 되살아나 다시 숨지 않는다 · 수집 로봇이 오늘 날짜를 넘긴다',
         [mm.length, mm[0].id, mm[0].paidGate, String(mm[0].paidOpen || ''), /dedupeActivities\(acts\.items, dedupeNotices, [^\n]*todayIsoAct\)\), todayIsoAct\);/.test(cm)],
         [1, 'm2', plus(0), `로봇 ${plus(0)} · 보이던 글과 같은 글`, true]);
+      /* 리뷰 3차(M4) — 판정을 넘기지 않을 때의 기본(`!paidGate && !paidOpen`)이 관리자가 **연** 글을 「안 보이던 글」로 봐서, 새 주소의 같은 글과 합치면 남은 글이 숨었다 */
+      const mo = dedupeAct([mk('o2', { title: '관리자가 연 글', url: 'https://act.kr/o2-new', paidGate: plus(0) }), mk('o1', { title: '관리자가 연 글', foundAt: plus(-3), paidGate: plus(-3), paidOpen: `관리자 ${plus(-1)}` })], UK.dedupeNotices, undefined, plus(0));
+      eq('  🔴 판정을 넘기지 않아도(기본) 관리자가 연 글(표시 + paidOpen)은 보이던 글이다 — 새 주소의 같은 글과 합쳐도 남은 글이 보인다',
+        [mo.length, mo.map((n) => !n.paidGate || !!n.paidOpen)], [1, [true]]);
     }
     /* 🔴 최종 리뷰(로봇 C1 · 2026-11-26) — 「보이던 글」은 표시가 **없는** 글만이 아니다. 표시는 한 번 달면 지워지지 않으므로(카드가 실려도 · 사흘이 지나도 · 관리자가 올려도 그대로)
        켠 뒤 주운 글은 보이든 안 보이든 표시를 단다 → 표시만 보면 보이던 글 A 와 새로 주운 같은 글 B 가 둘 다 「새 글」이 되어, B 가 남으면 A 가 학생 화면에서 사라지고 B 를 다시 돈 내고 읽었다.
@@ -18286,7 +18360,8 @@ module.exports = class Anthropic {
         const r = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8', env: { ...process.env, ACTION: action, ACTOR: 'gate', PAYLOAD: JSON.stringify(payload) } });
         const read = (rel) => { try { return JSON.parse(readText(path.join(dir, rel))); } catch { return null; } };
         const rawActs = readText(path.join(dir, 'data/activities.json'));
-        return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, acts: JSON.parse(rawActs).items, rawActs, same: rawActs === before, done: read('collector/act-read-done.json'), fixes: fs.existsSync(path.join(dir, 'data/card-read-fixes.json')) };
+        return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, acts: JSON.parse(rawActs).items, rawActs, same: rawActs === before, done: read('collector/act-read-done.json'), fixes: fs.existsSync(path.join(dir, 'data/card-read-fixes.json')),
+          cfg: read('collector/activity-config.json'), rawCfg: readText(path.join(dir, 'collector/activity-config.json')) };
       } finally { fs.rmSync(dir, { recursive: true, force: true }); }
     };
     const op = runAct('activityGate', { urls: [U('g1')], op: 'open' });
@@ -18309,6 +18384,37 @@ module.exports = class Anthropic {
       [un.status, (un.acts.find((n) => n.id === 'g3') || {}).paidOpen, (un.acts.find((n) => n.id === 'g3') || {}).paidGate, sameFormat(un.rawActs),
         ((r) => r.status !== 0 && /로봇이 연 글/.test(r.out) && r.same)(runAct('activityGate', { urls: [U('g4')], op: 'undo' }, opened)), ((r) => r.status !== 0 && r.same)(runAct('activityGate', { urls: [U('g1')], op: 'undo' }, opened))],
       [0, '', plus(-3), true, true, true]);
+    /* 리뷰 3차(M2) — 「올리기」가 이미 열린 글도 받아, 로봇이 연 글도 올리기 → 올리기 취소를 거치면 숨겨졌다(「로봇이 연 글은 되돌리지 않는다」를 돌아가는 길) */
+    eq('  🔴 이미 열린 글(관리자·로봇 어느 쪽이든)은 다시 올리지 않는다 — 로봇이 연 글이 올리기 → 취소로 숨겨지는 길을 막는다 · 활동 파일은 그대로',
+      [runAct('activityGate', { urls: [U('g4')], op: 'open' }, opened), runAct('activityGate', { urls: [U('g3')], op: 'open' }, opened)].map((r) => [r.status !== 0, /이미 열린 글/.test(r.out), r.same]),
+      [[true, true, true], [true, true, true]]);
+    /* 리뷰 3차(M3) — 로봇은 `git pull --rebase` 로 저장해 다시 얹는 로봇 판이 나중 쪽이 되고, 병합 도구(merge-json-union)는 같은 칸이면 나중 쪽 값을 쓴다.
+       그래서 취소 전에 시작한 수집이 취소 뒤에 저장하면 로봇 판의 옛 「관리자 …」가 이겨 취소가 조용히 사라졌다(취소 뒤 다시 올린 것도 같다).
+       → 숨기기(hideUrls)와 같은 길: 관리자의 결정은 collector/activity-config.json 의 paidOpenUrls 에도 적고, 수집 로봇이 실행마다 다시 건다(collect.mjs applyAdminOpen) */
+    const ocfg = op.cfg || {}, ucfg = runAct('activityGate', { urls: [U('g3')], op: 'undo' }, { ...opened, 'collector/activity-config.json': { hideUrls: [], paidOpenUrls: { [U('g3')]: `관리자 ${plus(-1)}`, 'https://ex.ac.kr/act/gone': `관리자 ${plus(-9)}` } } });
+    eq('  🔴 올리기·취소는 설정 파일(paidOpenUrls)에도 적는다 — 올리면 그 주소에 「관리자 날짜」 · 취소하면 그 주소를 뺀다 · 목록에서 빠진 글의 줄은 이때 치운다 · 숨긴 주소 목록은 그대로 · 로봇 형식',
+      [Object.keys(ocfg.paidOpenUrls || {}), /^관리자 \d{4}-\d{2}-\d{2}$/.test((ocfg.paidOpenUrls || {})[U('g1')] || ''), (ucfg.cfg || {}).paidOpenUrls, (ucfg.cfg || {}).hideUrls, sameFormat(op.rawCfg)],
+      [[U('g1')], true, {}, [], true]);
+    {
+      const AC6 = await import(new URL('../collector/act-card.mjs', import.meta.url));
+      const { canonUrl: cu } = await import(new URL('../collector/canon-url.mjs', import.meta.url));
+      const V = (seq, page) => `https://ex.ac.kr/view.do?seq=${seq}&page=${page}`;
+      const drift = [
+        { id: 'a', url: V(1, 1), paidGate: plus(-3), paidOpen: `관리자 ${plus(-2)}` },   // 취소했는데 로봇 판이 이겨 되살아난 표식
+        { id: 'b', url: V(2, 1), paidGate: plus(-3), paidOpen: '' },                      // 올렸는데 로봇 판(옛 취소)이 이겨 비워진 표식
+        { id: 'c', url: V(3, 1), paidGate: plus(-3), paidOpen: '로봇 · id 없는 글' },    // 로봇 표식 — 설정에 있어도 건드리지 않는다
+        { id: 'd', url: V(4, 1), paidGate: plus(-3) },                                    // 아무 결정도 없는 글 — 칸을 만들지 않는다
+        { id: 'e', url: V(5, 2), paidGate: plus(-3), paidOpen: `관리자 ${plus(-1)}` },   // 설정과 같은 글(쪽 번호만 다른 주소) — 그대로
+      ];
+      const map = new Map([[cu(V(2, 9)), `관리자 ${plus(-1)}`], [cu(V(3, 9)), `관리자 ${plus(-1)}`], [cu(V(5, 9)), `관리자 ${plus(-1)}`]]);
+      const fixedN = AC6.applyAdminOpen(drift, map, cu);
+      eq('  🔴 수집 로봇은 실행마다 설정(paidOpenUrls)대로 관리자 표식을 다시 건다 — 설정에 없는 「관리자 …」 는 빈 글자로(취소) · 설정에 있는데 비었으면 다시 「관리자 …」 · 로봇 표식·결정 없는 글은 그대로 · 설정을 못 읽으면(null) 아무것도 안 한다',
+        [fixedN, drift.map((n) => ('paidOpen' in n ? n.paidOpen : '(칸 없음)')), AC6.applyAdminOpen([{ url: V(9, 1), paidOpen: `관리자 ${plus(-1)}` }], null, cu)],
+        [2, ['', `관리자 ${plus(-1)}`, '로봇 · id 없는 글', '(칸 없음)', `관리자 ${plus(-1)}`], 0]);
+      const cm6 = src('collector/collect.mjs');
+      eq('  수집 로봇이 설정의 paidOpenUrls 를 읽고, 숨긴 주소를 다시 거는 자리에서 applyAdminOpen 을 부른다(설정을 못 읽으면 null — 아무것도 안 한다)',
+        [/paidOpenUrls/.test(cm6), /applyAdminOpen\(acts\.items, actOpen, canonUrl\)/.test(cm6), /let actOpen = null;/.test(cm6)], [true, true, true]);
+    }
     const dn = runAct('activityReviewDone', { items: [{ id: 'g1', key: 'final|pdf-broken|요강.hwp' }, { id: 'g1', key: 'final|unreadable|공고 카드' }] }, { 'collector/act-read-done.json': { v: 1, items: { gone: { done: ['x'], by: 'a', at: plus(-9) } } } });
     if (dn.status !== 0) console.log(dn.out.slice(-400));
     eq('② 확인했어요(activityReviewDone) — 활동용 기록(collector/act-read-done.json)에만 적는다: 그 글의 내린 줄 · 누가 · 언제 · 목록에서 빠진 글의 기록은 치운다 / 🔴 장학금의 기록(data/card-read-fixes.json — 앱이 받는 파일)은 만들지도 않는다 · 활동 목록도 그대로',
@@ -18446,9 +18552,11 @@ module.exports = class Anthropic {
     /* 최종 리뷰(로봇 A M8 · 2026-11-26) — 예약 워크플로는 돈을 쓰기 전에 가짜 응답으로 관문을 돈다. 시험은 그 단계 없이 바로 돈을 썼다(스위치·상한·같은 원문 다시 안 읽기가 무력해져도 모른다) */
     {
       const preP = (probe.match(/- name: 사전 관문 \(가짜 응답 — 돈 0\)\n[\s\S]*?(?=\n {6}- )/) || [''])[0];
-      eq('  ⑧ 시험도 돈을 쓰기 전에 사전 관문(가짜 응답 — 돈 0)을 돈다 — 규칙 관문 · 데이터 감사 · 결과 파일 꼴 둘 · pipefail · 첫 유료 단계 앞 · 제 시한',
+      /* 리뷰 3차 — 사전 관문이 「원문 글자 받기」 뒤에 있어, 관문이 빨개도 지정한 글의 사이트는 이미 두드린 뒤였다 → 스위치를 켠 바로 뒤(스위치가 켜진 상태로 잰다) · 받기 앞 */
+      const at = (s) => probe.indexOf(s);
+      eq('  ⑧ 시험도 돈을 쓰기 전에 사전 관문(가짜 응답 — 돈 0)을 돈다 — 규칙 관문 · 데이터 감사 · 결과 파일 꼴 둘 · pipefail · 🔴 스위치를 켠 뒤·사이트를 두드리기(글자 받기) 전 · 첫 유료 단계 앞 · 제 시한',
         [/set -o pipefail\n\s+node verify\/test-collector\.mjs \| tail -40/.test(preP), /node verify\/audit-data\.js/.test(preP), /node collector\/card-read\.mjs --check\n/.test(preP), /node collector\/card-read\.mjs --activities --check/.test(preP),
-          probe.indexOf('- name: 사전 관문') > 0 && probe.indexOf('- name: 사전 관문') < probe.indexOf('- id: card'), /timeout-minutes: \d+/.test(preP)],
+          at('- name: 활동 스위치 켜기') > 0 && at('- name: 활동 스위치 켜기') < at('- name: 사전 관문') && at('- name: 사전 관문') < at('- name: 원문 글자 받기') && at('- name: 사전 관문') < at('- id: card'), /timeout-minutes: \d+/.test(preP)],
         [true, true, true, true, true, true]);
     }
     /* 셸을 실제로 돌려 본다 — id 확인과 스위치 켜기(가짜 저장소 폴더에서) */

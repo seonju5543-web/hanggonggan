@@ -32,7 +32,7 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
-    timeout-minutes: 65   # 단계 시한의 합(id 확인 1 + 스위치 1 + 글자 받기 15 + 사전 관문 12 + 카드 쓰기 12 + 최종 검토 12 + 기록 1 + 끝 1 = 55 + 받기·설치·묶음)보다 길게
+    timeout-minutes: 65   # 단계 시한의 합(id 확인 1 + 스위치 1 + 사전 관문 12 + 글자 받기 15 + 카드 쓰기 12 + 최종 검토 12 + 기록 1 + 끝 1 = 55 + 받기·설치·묶음)보다 길게
     env:
       PROBE_IDS: ${{ inputs.ids }}   # 🔴 입력은 env 로만 넘긴다(run 줄에 바로 끼우면 명령으로 읽힌다)
     steps:
@@ -62,6 +62,18 @@ jobs:
             console.log(f, "· enabled:", c.enabled, "· activities.enabled:", c.activities.enabled, "(이 실행 안에서만 — 저장하지 않는다)");
           }'
 
+      # 부르기 전에 안전장치를 가짜 응답으로 시험한다(돈 0) — 예약 워크플로(card-read.yml)와 같은 사전 관문(최종 리뷰 2026-11-26).
+      # 스위치·상한·「같은 원문은 다시 안 읽는다」가 무력해졌거나 결과 파일이 깨져 있으면 여기서 멈춘다 · 🔴 pipefail — 안 걸면 이 단계의 성패가 tail 의 것이 된다
+      # 🔴 스위치를 켠 바로 뒤(켜진 상태로 잰다) · 원문 글자 받기 **앞** — 뒤에 두면 관문이 빨개도 지정한 글의 사이트를 이미 두드린 뒤다(리뷰 3차)
+      - name: 사전 관문 (가짜 응답 — 돈 0)
+        timeout-minutes: 12
+        run: |
+          set -o pipefail
+          node verify/test-collector.mjs | tail -40
+          node verify/audit-data.js | tail -15
+          node collector/card-read.mjs --check
+          node collector/card-read.mjs --activities --check
+
       # 지정한 글만 받는다(ACT_TEXT_IDS — 다른 글의 사이트는 두드리지 않는다 · collector/activity-docs.mjs). 못 받으면 그것이 시험 결과다(다음 단계가 「원문 없음」으로 건너뛴다)
       - name: 원문 글자 받기 (무료)
         timeout-minutes: 15
@@ -78,17 +90,6 @@ jobs:
           pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 그림 글자 없이 계속"
           python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || echo "::warning::PaddleOCR 실패 — 그림 글자 없이 계속"
           node collector/activity-docs.mjs --apply
-
-      # 부르기 전에 안전장치를 가짜 응답으로 시험한다(돈 0) — 예약 워크플로(card-read.yml)와 같은 사전 관문(최종 리뷰 2026-11-26).
-      # 스위치·상한·「같은 원문은 다시 안 읽는다」가 무력해졌거나 결과 파일이 깨져 있으면 여기서 멈춘다 · 🔴 pipefail — 안 걸면 이 단계의 성패가 tail 의 것이 된다
-      - name: 사전 관문 (가짜 응답 — 돈 0)
-        timeout-minutes: 12
-        run: |
-          set -o pipefail
-          node verify/test-collector.mjs | tail -40
-          node verify/audit-data.js | tail -15
-          node collector/card-read.mjs --check
-          node collector/card-read.mjs --activities --check
 
       - id: card
         name: 카드 쓰기 (유료)

@@ -35,7 +35,7 @@ function loadActivities() {
   ])
     .then(([d, ar]) => {
       tidyData(d); tidyData(ar);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
-      if (d && Array.isArray(d.items)) d.items = typeof publishedActivities === 'function' ? publishedActivities(d.items, ar, undefined, SAYS_UNKNOWN) : d.items.filter((n) => !n.paidGate || n.paidOpen);
+      if (d && Array.isArray(d.items)) d.items = typeof publishedActivities === 'function' ? publishedActivities(d.items, ar, undefined, { dropRe: SAYS_UNKNOWN, flat: noticeFlat, label: nsLabel }) : d.items.filter((n) => !n.paidGate || n.paidOpen);
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
       refreshActivitySnaps();
       fillInterestFields();   // 온보딩 관심 분야 칸 — 목록이 이제 왔다(고른 것은 지킨다)
@@ -353,9 +353,10 @@ function activitySheetNotices(n) {
   const parts = splitTitleWho(activityTitle(n));
   /* 제목에서 뗀 괄호 대상 — 카드에 대상 줄이 없어(2026-11-15) 여기가 그 글자가 남는 유일한 자리다. 자격 줄이 이미 같은 말을 하면 한 번만 */
   const titleWho = parts.who.filter((w) => !(n.eligibilityLines || []).some((l) => String(l).replace(/\s/g, '').includes(w.replace(/\s/g, ''))));
-  /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
+  /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01).
+     🔴 AI 카드를 얹은 줄(noticeChecked)은 얹기가 묶기 전에 이미 걸렀다 — 여기서 다시 거르면 묶인 줄이 통째로 빠져 같은 이름표의 다른 사실까지 사라진다(리뷰 3차 I3 · match-engine withActRead) */
   const seenText = [...(n.excerpts || []).map((x) => noticeFlat(x.text)), ...(n.eligibilityLines || []).map(noticeFlat)].filter((x) => x.length >= 6);
-  const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => noticeFlat(l).includes(e)));
+  const notice = n.noticeChecked ? (n.noticeLines || []) : (n.noticeLines || []).filter((l) => !seenText.some((e) => noticeFlat(l).includes(e)));
   /* 긴 혜택 첫 줄(40자 넘음)은 카드의 「혜택:」 줄 앞에 붙여 한 줄로 — 「혜택」 두 줄이 되지 않게(합쳐 170자를 넘으면 두 줄 그대로 — 시트가 180자에서 자른다 · 최종 리뷰 2026-11-26) */
   const bi = benefit && benefit.length > 40 ? notice.findIndex((l) => /^혜택\s*[:：]/.test(l)) : -1;
   const merged = bi >= 0 ? `혜택: ${benefit} · ${notice[bi].replace(/^혜택\s*[:：]\s*/, '')}` : '';

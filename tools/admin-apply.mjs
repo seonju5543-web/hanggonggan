@@ -940,7 +940,8 @@ switch (action) {
   }
 
   /* ── 대외활동·공모전 유료 관문 — 사람에게 넘어온 숨김 글을 올린다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-7) ──
-     payload = { urls: [...], op: 'open' }. 그 글에 paidOpen('관리자 YYYY-MM-DD')을 적는다 — 무료 값으로 바로 학생 화면에 보인다(match-engine publishedActivities).
+     payload = { urls: [...], op: 'open' | 'undo' }. 그 글에 paidOpen('관리자 YYYY-MM-DD')을 적는다 — 무료 값으로 바로 학생 화면에 보인다(match-engine publishedActivities).
+     같은 결정을 collector/activity-config.json 의 paidOpenUrls 에도 적는다 — 수집 로봇이 실행마다 다시 건다(아래 · 리뷰 3차 M3) · 이미 열린 글은 다시 올리지 않는다(M2).
      🔴 숨김 표시(paidGate)는 **지우지 않는다** — 병합 도구(tools/merge-json-union)는 같은 글의 칸을 두 쪽에서 합쳐, 지운 칸이 로봇 쪽에 남아 있다가 되살아난다.
         그래서 「보이는가」는 paidOpen 을 먼저 본다. 숨기려면 있던 activityHide 를 쓴다 */
   case 'activityGate': {
@@ -955,10 +956,20 @@ switch (action) {
     if (missing.length) fail(`그 주소의 글이 목록에 없습니다: ${missing.join(' · ').slice(0, 300)}`);
     const hit = [...new Set(urls.map((u) => byKey.get(canonUrl(u))))];
     const names = (xs) => xs.map((it) => String(it.title || it.url).slice(0, 30)).join(' · ');
+    /* 🔴 관리자의 결정은 설정 파일(activity-config.json paidOpenUrls)에도 적는다 — 수집 로봇이 실행마다 다시 건다(collect.mjs applyAdminOpen · 숨기기 hideUrls 와 같은 길).
+       글의 칸만 고치면 취소 전에 시작한 수집이 취소 뒤에 저장할 때 로봇 판(나중 쪽)의 옛 값이 이겨 결정이 조용히 사라졌다(리뷰 3차 M3 · 병합 도구는 같은 칸이면 나중 쪽 값).
+       목록에서 빠진 글의 줄은 이때 치운다(자라기만 하지 않게) */
+    const cfg = readJson(ACT_CFG, { hideUrls: [] });
+    const opens = cfg.paidOpenUrls && typeof cfg.paidOpenUrls === 'object' && !Array.isArray(cfg.paidOpenUrls) ? cfg.paidOpenUrls : {};
+    const hitKeys = new Set(hit.map((it) => canonUrl(it.url)));
+    for (const u of Object.keys(opens)) if (!byKey.has(canonUrl(u)) || hitKeys.has(canonUrl(u))) delete opens[u];
     if (payload.op === 'open') {
       const plain = hit.filter((it) => !it.paidGate);
       if (plain.length) fail(`유료 확인을 기다리는 글이 아닙니다(이미 학생 화면에 보이는 글): ${names(plain)}`);
-      for (const it of hit) it.paidOpen = `관리자 ${kstNow().slice(0, 10)}`;
+      /* 리뷰 3차(M2) — 이미 열린 글은 다시 올리지 않는다: 로봇이 연 글도 올리기 → 올리기 취소를 거치면 숨겨졌다(「로봇이 연 글은 되돌리지 않는다」를 돌아가는 길) */
+      const already = hit.filter((it) => it.paidOpen);
+      if (already.length) fail(`이미 열린 글입니다(관리자가 올렸거나 로봇이 연 글 — 다시 올릴 것이 없습니다): ${names(already)}`);
+      for (const it of hit) { it.paidOpen = `관리자 ${kstNow().slice(0, 10)}`; opens[it.url] = it.paidOpen; }
       detail = `유료 확인 없이 올림 ${hit.length}건(무료 값으로 학생 화면에) — ${hit.map((it) => String(it.title || '').slice(0, 24)).join(' / ')}`.slice(0, 400);
     } else {
       /* 올리기 취소 — 관리자가 올린 표식만 비운다(지우지 않고 빈 글자 — 병합 도구는 같은 칸이면 나중 쪽 값을 쓰고 한쪽에만 있는 칸은 살려, 지우면 되살아난다).
@@ -967,10 +978,12 @@ switch (action) {
       if (robot.length) fail(`로봇이 연 글은 되돌리지 않습니다(이미 보이던 글과 같은 글 · id 없는 글 — 되돌리면 보이던 글이 숨습니다): ${names(robot)}`);
       const notOpened = hit.filter((it) => !it.paidGate || !/^관리자/.test(String(it.paidOpen || '')));
       if (notOpened.length) fail(`관리자가 올린 글이 아닙니다: ${names(notOpened)}`);
-      for (const it of hit) it.paidOpen = '';
+      for (const it of hit) it.paidOpen = '';   // 설정 파일의 그 주소 줄은 위에서 뺐다
       detail = `올리기 취소 ${hit.length}건(다시 유료 확인을 기다린다) — ${hit.map((it) => String(it.title || '').slice(0, 24)).join(' / ')}`.slice(0, 400);
     }
+    cfg.paidOpenUrls = opens;
     writeJson(ACTS, acts);
+    writeJson(ACT_CFG, cfg);
     touched = true;
     break;
   }

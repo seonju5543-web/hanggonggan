@@ -37,8 +37,8 @@ import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails, eligLineOk, ACT_DETAILS_V, ACT_DOCS_V, activityDocuments, putActivityDocuments, titleWords, ownsImageText } from './activity-excerpts.mjs';
 import { ACT_SIGNAL } from './activity-vocab.mjs';
-import { writeStore, wantsText, textDue, pruneStore } from './act-text.mjs';
-import { MIN_BODY } from './notice-source.mjs';   // 본문 분량의 문턱 한 곳(장학금 원문 받기와 같은 100자)   // 유료 관문 — 원문 글자 기록(글자만 · 2026-11-25)
+import { writeStore, wantsText, textDue, pruneStore } from './act-text.mjs';   // 유료 관문 — 원문 글자 기록(글자만 · 2026-11-25)
+import { MIN_BODY } from './notice-source.mjs';   // 본문 분량의 문턱 한 곳(장학금 원문 받기와 같은 100자)
 import { detailByRule } from './activity-detail-rules.mjs';   // 온통청년처럼 글·포스터가 JSON 에 있는 게시판 — 수집 로봇과 같은 함수(2026-10-28)
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
 
@@ -422,7 +422,8 @@ export function storeFromFiles(n, files, names = {}, { key = keyOf(n.url), dir =
   const rawBody = read(bodyFile);
   /* 🔴 본문은 **제목 낱말을 뺀 한글 분량**으로 잰다(최종 리뷰 2026-11-26) — 머리 <title> 만 있는 페이지(스크립트로 그리는 글)도 제목 글자가 본문이 되어 진짜 브라우저가 받을 차례가 오지 않았다.
      무료 받기는 MIN_BODY(모자라면 브라우저가 이어받는다) · 브라우저는 마지막 길이라 40자(유료가 읽는 원문의 바닥 — 짧은 진짜 본문을 버리지 않는다) */
-  const beyondTitle = (text) => { let t = String(text || '').replace(/[^가-힣]/g, ''); for (const w of titleWords(n.title)) { const k = w.replace(/[^가-힣]/g, ''); if (k) t = t.split(k).join(''); } return t.length; };
+  /* 두 글자 미만의 조각(「2026년」→「년」 · 「5기」→「기」)은 빼지 않는다 — 그 글자를 본문 전체에서 지워 경계의 진짜 본문을 버렸다(리뷰 3차 M5) */
+  const beyondTitle = (text) => { let t = String(text || '').replace(/[^가-힣]/g, ''); for (const w of titleWords(n.title)) { const k = w.replace(/[^가-힣]/g, ''); if (k.length >= 2) t = t.split(k).join(''); } return t.length; };
   const body = rawBody.trim() && owns(rawBody) && beyondTitle(rawBody) >= (mode === 'browser' ? BROWSER_MIN_BODY : MIN_BODY) ? rawBody : '';
   const bodyFrom = body ? (mode === 'browser' ? 'browser' : bodyFile.endsWith('-R.txt') ? 'rule' : 'plain') : '';
   const docs = [];

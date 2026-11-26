@@ -2235,8 +2235,12 @@ function serve() {
        목록 줄은 그대로 숨기지 않은 글 전부(관리자가 숨김 글도 올리기 취소·숨기기 한다) · 검사용 숨김 표시가 둘이라 둘이 빠져야 한다 */
     const appVisible = ACT_ITEMS.filter((n) => n && n.url && !n.hidden && (!!n.paidOpen || ME.paidGateOpen(n, ACT_READ, GATE_DAY(0))));
     const shownCard = await page.$$eval('#screen-activities [data-stat]', (els) => { const c = els.find((e) => (e.querySelector('.k') || {}).textContent === '게재 중'); return c ? c.querySelector('.v').textContent.trim() : null; });
-    ok(badge === String(appVisible.length) && shownCard === String(appVisible.length) && visible.length - appVisible.length === 2,
-      '  탭 배지·「게재 중」은 앱에 보이는 글 수(유료 확인을 기다리는 검사용 숨김 글 둘은 빠진다 — 앱과 같은 판정)', `${badge} · ${shownCard} / ${appVisible.length} (숨기지 않은 글 ${visible.length})`);
+    /* 🔴 숨김 글 수를 고정 숫자로 재지 않는다 — 진짜 data/activities.json 에 유료 확인을 기다리는 글이 하나라도 있으면 차이가 2 를 넘는다(리뷰 3차 I1 · 실데이터에 기댄 고정 검사 금지).
+       대신 검사용 숨김 글 둘이 목록 줄엔 있고 앱 판정에선 빠지는지 본다(빠지지 않으면 이 검사가 판정을 재지 않는 것이다) */
+    const gateIds = [GATE_FX.held.id, GATE_FX.fin.id];
+    const fxListed = gateIds.every((id) => visible.some((n) => n.id === id)), fxOut = gateIds.every((id) => !appVisible.some((n) => n.id === id));
+    ok(badge === String(appVisible.length) && shownCard === String(appVisible.length) && fxListed && fxOut,
+      '  탭 배지·「게재 중」은 앱에 보이는 글 수(유료 확인을 기다리는 검사용 숨김 글 둘은 빠진다 — 앱과 같은 판정)', `${badge} · ${shownCard} / ${appVisible.length} (숨기지 않은 글 ${visible.length} · 검사용 숨김 글 목록에 ${fxListed} · 앱 판정에서 빠짐 ${fxOut})`);
     const hiddenN = await page.locator('#screen-activities [data-act-hidden] [data-row]').count();
     ok(hiddenN === ACT_ITEMS.filter((n) => n.hidden).length, '  숨긴 글은 접힌 칸에 따로', String(hiddenN));
     /* 칩으로 거른다 */

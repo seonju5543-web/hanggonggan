@@ -79,9 +79,17 @@ export const titleWords = (title) => [...new Set(String(title || '').replace(/�
 /** OCR 로 읽은 그림이 이 글의 것인가 — 글 제목 낱말이 하나라도 그림 글자에 있어야 한다.
     🔴 사이트 옆 홍보물(「제주도 내 공공임대주택에 입주한 가구」)이 「청년 체인지메이커 아카데미」의 자격으로 붙을 뻔했다(2026-10-03 실측) */
 export const ownsImageText = (text, title) => { const t = String(text || '').replace(/\s/g, ''); return titleWords(title).some((w) => t.includes(w)); };
-/** 다시 읽은 페이지가 아직 **그 글**인가 — 제목 낱말이 그 페이지에 하나라도 있어야 한다(장학금의 fallbackIsThisNotice 와 같은 확인 · 최종 리뷰 2026-11-26).
-    주소가 다른 글·목록으로 바뀐 페이지에서 남의 첨부·서류를 붙이지 않는다 · 제목이 흔한 말뿐이면 가릴 수 없어 받는다 */
-export const rereadIsThisPost = (text, title) => !titleWords(title).length || ownsImageText(text, title);
+/** 다시 읽은 페이지가 아직 **그 글**인가(장학금의 fallbackIsThisNotice 와 같은 확인 · 최종 리뷰 2026-11-26) — 주소가 다른 글·목록으로 바뀐 페이지에서 남의 첨부·서류를 붙이지 않는다.
+    🔴 숫자가 없는 제목 낱말 **둘**이 그 페이지에 있어야 한다(그런 낱말이 하나뿐이면 하나 · 리뷰 3차 M6 — 낱말 하나로 보면 「2026년」 하나로 거의 모든 페이지가 그 글이 됐다).
+    숫자 낱말뿐인 제목은 그 낱말 하나로 · 제목이 흔한 말뿐이면 가릴 수 없어 받는다 */
+export const rereadIsThisPost = (text, title) => {
+  const words = titleWords(title);
+  if (!words.length) return true;
+  const plain = words.filter((w) => !/\d/.test(w));
+  const pool = plain.length ? plain : words;
+  const t = String(text || '').replace(/\s/g, '');
+  return pool.filter((w) => t.includes(w)).length >= Math.min(2, pool.length);
+};
 /* 지역 이름은 parse-requirements.js 의 REGION_CITIES 한 벌(화면·판정·알림) — 끝글자 `시|군|구|도` 로 짐작하면 `별도`·`표시`·`제도` 가 지역이 된다(2026-10-28 리뷰) */
 const PR = createRequire(import.meta.url)('../parse-requirements.js');
 const REGION_WORDS = [...new Set([...PR.REGIONS, ...Object.keys(PR.REGION_CITIES), ...Object.values(PR.REGION_CITIES).flat()])].sort((a, b) => b.length - a.length).join('|');
@@ -533,7 +541,10 @@ export function putActivityDocuments(it, docs, from, { thin = false } = {}) {
 }
 /* 이 글을 다시 읽어야 하나 — 수집 로봇의 소급 반복문과 리포트의 「남은」 수가 같은 판단을 쓴다.
    'details' = 자격까지 다시(옛 판) · 'docs' = 서류 칸만 · null = 안 읽는다. API 글은 API 로봇이 채운다(자격이 없는 글만 원문 페이지 — 2026-10-16). */
+/* 다시 읽은 페이지가 이만큼 그 글이 아니었으면 그만 연다(리뷰 3차 M6) — 스크립트로 그리는 글·다른 글로 바뀐 주소는 이레마다 다시 열어도 같았다(마감까지 영영) */
+export const REREAD_MISS_MAX = 2;
 export function actRereadNeed(it, today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10)) {
+  if ((it.rereadMiss || 0) >= REREAD_MISS_MAX) return null;
   if (it.api && (it.eligibilityLines || []).length) return null;
   if (!(it.excerptsAt && it.detailsV === ACT_DETAILS_V)) return 'details';
   /* 자격을 첨부·요강·브라우저에서 읽은 글은 본문이 껍데기다 — 서류도 그 로봇(activity-docs staleDocs)이 같은 글자에서 읽는다(리뷰 2026-11-15 #7) */

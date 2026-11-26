@@ -291,7 +291,7 @@ function showFeedLinks(query) {
   /* WHAT_SHOWS_ACTIVITIES · WHAT_SHOWS_ACT_READ — 관문 표본용(2026-11-26 · WHAT_SHOWS_REGISTERED 와 같은 뜻): 실데이터 대신 표본 활동 목록·결과 파일로 돈다. 평소에는 쓰지 않는다 */
   const actRaw = read(process.env.WHAT_SHOWS_ACTIVITIES || '../data/activities.json');
   let actDoc = null; try { actDoc = linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(process.env.WHAT_SHOWS_ACT_READ || '../data/act-read.json', import.meta.url), 'utf8'))); } catch (e) { /* 못 읽음 — 앱도 숨김 표시가 달린 글을 감춘다 */ }
-  const actShown = new Map(ME.publishedActivities(actRaw, actDoc, undefined, linkFn('SAYS_UNKNOWN')).map((x) => [x.url, x]));
+  const actShown = new Map(ME.publishedActivities(actRaw, actDoc, undefined, { dropRe: linkFn('SAYS_UNKNOWN'), flat: linkFn('noticeFlat'), label: linkFn('nsLabel') }).map((x) => [x.url, x]));
   const HELD_KO = { 'no-source': '읽을 원문이 없다', unreadable: 'AI 가 읽었는데 실을 내용이 없었다', 'grad-only': '대학원생만 받는 글이다' };
   const actGateLines = (it) => {
     const on = actShown.get(it.url);

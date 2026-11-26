@@ -21,7 +21,9 @@ export const daysSince = (from, today) => Math.round((Date.parse(`${today}T00:00
 /* 파일 이름으로 쓰는 id — 활동 글 id 는 `act-<지문>`·`api-<출처>-<번호>` 꼴이다. 경로 글자가 섞였으면 쓰지 않는다(폴더 밖에 파일을 만들지 않는다) */
 const safeId = (id) => /^[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(String(id || '')) && !String(id).includes('..');
 const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
-/* 이름이 있는 첨부는 이름으로도 한 번만(최종 리뷰 2026-11-26) — 받을 때마다 워터마크·날짜를 박아 바이트가 바뀌는 사이트는 같은 첨부가 지문마다 한 번씩 실려 원문이 바뀌고 같은 글을 다시 샀다 · 처음 것을 쓴다 */
+/* 이름이 있는 첨부는 이름으로도 한 번만(최종 리뷰 2026-11-26) — 받을 때마다 워터마크·날짜를 박아 바이트가 바뀌는 사이트는 같은 첨부가 지문마다 한 번씩 실려 원문이 바뀌고 같은 글을 다시 샀다 · 처음 것을 쓴다.
+   🔴 이름은 **이미 저장된 첨부(다른 날)와 다른 모드의 기록**에만 견준다 — 한 번 받기 안의 같은 이름은 서로 다른 파일이다(리뷰 3차 I2 · 서울과기대 act-0dyt0rm 의 「멘토링 계획서(양식).hwp」 두 줄 중 하나는 포스터).
+   ponytail: 같은 이름의 둘 중 하나가 첫날 못 받아지고 다음 날 받아지면 그것은 빠진다(본문이 빈 글만 다시 받는다 — 드물다) · 잦아지면 열쇠에 첨부 자리(몇째 파일)를 넣는다 */
 const nameKey = (d) => (d && String(d.name || '').trim() ? `${['attach', 'img', 'guide'].includes(d.from) ? d.from : 'attach'}|${String(d.name).trim()}` : '');
 const readOne = (file) => { try { const j = JSON.parse(fs.readFileSync(file, 'utf8')); return j && typeof j === 'object' && !Array.isArray(j) ? j : null; } catch { return null; } };
 
@@ -37,10 +39,10 @@ export function writeStore(dir, id, mode, rec, today) {
   let changed = !old;
   if (!hasText(next.body) && rec && hasText(rec.body)) { next.body = rec.body; next.bodyFrom = String(rec.bodyFrom || ''); changed = true; }
   const have = new Set(next.docs.map((d) => d && d.hash));
-  const haveName = new Set(next.docs.map(nameKey).filter(Boolean));
+  const storedName = new Set(next.docs.map(nameKey).filter(Boolean));   // 이미 저장된 것만 — 이번 받기에서 더한 이름은 넣지 않는다
   for (const d of (rec && rec.docs) || []) {
-    if (!d || !d.hash || !hasText(d.text) || have.has(d.hash) || (nameKey(d) && haveName.has(nameKey(d)))) continue;
-    have.add(d.hash); if (nameKey(d)) haveName.add(nameKey(d));
+    if (!d || !d.hash || !hasText(d.text) || have.has(d.hash) || (nameKey(d) && storedName.has(nameKey(d)))) continue;
+    have.add(d.hash);
     next.docs.push({ name: String(d.name || ''), hash: String(d.hash), from: ['attach', 'img', 'guide'].includes(d.from) ? d.from : 'attach', ocr: !!d.ocr, text: d.text });
     changed = true;
   }
@@ -69,10 +71,13 @@ export function readStore(dir, id) {
   const p = readOne(storeFile(dir, id, 'plain')), b = readOne(storeFile(dir, id, 'browser'));
   if (!p && !b) return null;
   const seen = new Set(); const docs = [];
-  for (const d of [...((p && p.docs) || []), ...((b && b.docs) || [])]) {
-    if (!d || !d.hash || !hasText(d.text) || seen.has(d.hash) || (nameKey(d) && seen.has(nameKey(d)))) continue;
-    seen.add(d.hash); if (nameKey(d)) seen.add(nameKey(d)); docs.push(d);
-  }
+  const plainNames = new Set(((p && p.docs) || []).map(nameKey).filter(Boolean));   // 이름은 다른 모드의 기록에만 견준다(한 모드 안의 같은 이름은 다른 파일)
+  const add = (d, otherNames) => {
+    if (!d || !d.hash || !hasText(d.text) || seen.has(d.hash) || (otherNames && nameKey(d) && otherNames.has(nameKey(d)))) return;
+    seen.add(d.hash); docs.push(d);
+  };
+  for (const d of (p && p.docs) || []) add(d, null);
+  for (const d of (b && b.docs) || []) add(d, plainNames);
   if (p && hasText(p.body)) return { body: p.body, bodyFrom: p.bodyFrom || 'plain', docs };
   if (b && hasText(b.body)) return { body: b.body, bodyFrom: b.bodyFrom || 'browser', docs };
   return { body: '', bodyFrom: '', docs };

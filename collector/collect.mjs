@@ -25,7 +25,7 @@ import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스�
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
 import { tidyExternal, dropReason as externalDropReason, fillDeadlineFromHint } from './external-clean.mjs';
-import { actGateOn, stampNewActivity, dropStampWithoutId, dedupeActivities } from './act-card.mjs';   // 대외활동 유료 관문의 숨김 표시(2026-11-25) — 스위치 판정은 유료 로봇과 같은 함수
+import { actGateOn, stampNewActivity, dropStampWithoutId, dedupeActivities, applyAdminOpen } from './act-card.mjs';   // 대외활동 유료 관문의 숨김 표시(2026-11-25) — 스위치 판정은 유료 로봇과 같은 함수
 import { actKeepDate, capActivities } from './open-api-map.mjs';   // 활동 피드 60일·상한이 같은 날짜를 쓴다 (순수 모듈 — 불러도 아무것도 실행하지 않는다)
 import { canonUrl, activityId } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
@@ -103,7 +103,14 @@ const kstDay = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(
 const ACT_CAP = 200;         // 폰이 통째로 받는 파일 — 상한을 두어 작게 유지한다
 /* 관리자가 숨긴 글 (activity-config.json hideUrls · 2026-09-29) — 지우지 않고 hidden 표식을 붙인다(되살리기가 된다) */
 let actHide = new Set();
-try { actHide = new Set((JSON.parse(fs.readFileSync(new URL('activity-config.json', HERE), 'utf8')).hideUrls || []).map(canonUrl)); } catch { /* 설정 없음 */ }
+/* 관리자의 「올리기」·「올리기 취소」(activity-config.json paidOpenUrls · 2026-11-26 리뷰 3차 M3) — 실행마다 그대로 다시 건다(act-card applyAdminOpen). 칸이 없거나 못 읽으면 null(건드리지 않는다) */
+let actOpen = null;
+try {
+  const actCfg = JSON.parse(fs.readFileSync(new URL('activity-config.json', HERE), 'utf8'));
+  actHide = new Set((actCfg.hideUrls || []).map(canonUrl));
+  const po = actCfg.paidOpenUrls;
+  if (po && typeof po === 'object' && !Array.isArray(po)) actOpen = new Map(Object.entries(po).map(([u, by]) => [canonUrl(u), String(by || '')]));
+} catch { /* 설정 없음 */ }
 
 /* ── 재단·지자체 장학 게시판 → 교외 공고 확대 (2026-09-26 · 노션 F-13) ─────────────
    external-sources.json 의 boardUrl 이 있는 곳(find-boards.mjs 가 찾았거나 사람이 적은 곳)을 같은 루프에서
@@ -634,6 +641,7 @@ acts.items = acts.items.filter((n) => !notActivity(n.title) && !unreadableSource
   }
 }
 dropStampWithoutId(acts.items);   // id 를 받지 못한 글은 숨김 표시를 뗀다 — AI 카드와 id 로 만난다(그 글은 지금처럼 바로 보인다)
+applyAdminOpen(acts.items, actOpen, canonUrl);   // 관리자의 올리기·취소를 설정대로 — 병합 때 로봇 판이 이겨 사라진 결정을 되돌린다 · 아래 중복 정리·상한이 「보이는 글」을 세기 전에
 const todayIsoAct = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);   // 한국 날짜 — 결과 발표가 지났는지 잰다(deadlineFromNotice ④)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
 acts.items.forEach(sanitizeSteps);   // 「1. 2. 3.」 단계 번호 떼기 — 연락처 단계가 빠지면 「3.」부터 남던 1365 글(2026-11-02 · activity-excerpts.mjs stripStepNumber) · 소급
@@ -665,7 +673,8 @@ for (const it of acts.items) {
   if (it.detailsTriedAt && (Date.parse(todayIso) - Date.parse(it.detailsTriedAt)) < 7 * 86400000) continue;
   if (!budget.hasRoom(20000)) break;
   const detail = await fetchDetail(it);
-  if (detail.text && !rereadIsThisPost(detail.text, it.title)) { it.detailsTriedAt = todayIso; actBackfilled += 1; continue; }   // 다시 읽은 페이지가 그 글이 아니다(주소가 다른 글·목록으로 바뀜) — 남의 첨부·서류를 안 붙이고 이레 뒤에 다시(2026-11-26)
+  if (detail.text && !rereadIsThisPost(detail.text, it.title)) { it.detailsTriedAt = todayIso; it.rereadMiss = (it.rereadMiss || 0) + 1; actBackfilled += 1; continue; }   // 다시 읽은 페이지가 그 글이 아니다(주소가 다른 글·목록으로 바뀜) — 남의 첨부·서류를 안 붙이고 이레 뒤에 다시 · 두 번이면 그만(actRereadNeed REREAD_MISS_MAX)
+  if (detail.text && it.rereadMiss) delete it.rereadMiss;   // 그 글이 맞았다 — 센 것을 지운다
   if (need === 'docs') {
     /* 서류 칸만 — 자격·발췌·마감은 그대로 둔다(같은 판으로 이미 읽었다). 못 받으면 이레 뒤에 다시 · 받은 김에 새 첨부도 합친다(안 합치면 다음 실행에 첨부 갈래로 한 번 더 받는다 · 2026-11-26) */
     if (detail.text) { putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) }); actAttachAdded += mergeActAttachments(it, detail.attachments); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;

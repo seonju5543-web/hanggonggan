@@ -118,6 +118,8 @@ const TEMPLATE_NAME = /'\s*\+|\+\s*'|fileItem\.|\$\{/;
 /* 내려받기 꼴 주소. `downloadBbsFile.do`(경기대·충북대 selectBbsNttView 게시판 · 2026-11-02)는 `download\.do` 로는 안 걸려 첨부 0건이었다.
    ⚠️ 맨 `download` 로 넓히지 말 것(리뷰) — `/ko/downloads/`·`/attach/list` 같은 메뉴 링크가 첨부가 되어 상한 8을 먼저 채운다 */
 const DOWNLOAD_URL = /mode=download|download\.do|downloadBbsFile\.do|fileDown|attach|bbs_download/i;
+/* 링크 글자 자체가 파일 이름인가 — 문서·그림·압축 파일. 이 꼴이면 앞 줄에서 이름을 찾지 않는다(detailAttachments) */
+const LINK_FILE_NAME = /\.(?:hwpx?|docx?|pdf|xlsx?|pptx?|zip|7z|alz|egg|png|jpe?g|gif|bmp|webp|tiff?|txt|hwt|odt|rtf|csv)$/i;
 /* 단추 글자뿐인 링크 — 파일 이름은 바로 앞 요소에 있다(`<span>요강.hwp</span> <a href="downloadBbsFile.do…">다운로드</a>`) · 브라우저 길(rescue-bodies)도 이 낱말을 받는다 */
 export const BUTTON_WORD = /^(?:다운로드|내려받기|파일\s?다운로드|download|첨부\s?파일)$/i;
 
@@ -154,7 +156,8 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
     if (ATTACH_EXT.test(url) || DOWNLOAD_URL.test(url)) name = trimSiteTail(name);
     /* 단추 글자(`다운로드`)뿐이면 파일 이름은 바로 앞 요소에 있다 — 태그를 줄로 바꿔 마지막 파일 이름 줄을 쓴다(지어내지 않는다 · 없으면 그대로).
        스크립트 호출(과기정통부)뿐 아니라 보통 내려받기 주소의 단추(경기대·충북대 · 2026-11-02)도 같다 */
-    if (!ATTACH_EXT.test(name) && ((/^javascript:/i.test(raw) && url !== raw) || (BUTTON_WORD.test(name) && DOWNLOAD_URL.test(url)))) {
+    /* 🔴 링크 글자가 이미 파일 이름이면(그림·압축 파일 포함 — 문서 확장자 ATTACH_EXT 만 보면 「…포스터.png」를 단추로 보고 **앞 첨부의 이름**을 빌렸다 · 서울과기대 6건 · 리뷰 3차) 그대로 쓴다 */
+    if (!LINK_FILE_NAME.test(name) && ((/^javascript:/i.test(raw) && url !== raw) || (BUTTON_WORD.test(name) && DOWNLOAD_URL.test(url)))) {
       const before = src.slice(Math.max(0, m.index - 500), m.index).replace(/<[^>]+>/g, '\n').split('\n').map((s) => s.replace(/\s+/g, ' ').trim());
       /* 🔴 **바로 앞의 글자 줄 하나**만 본다(리뷰 2026-11-02) — 확장자 있는 줄을 거슬러 찾으면 `<span>포스터.jpg</span><a>다운로드</a>` 의 단추가
          그 앞 행의 `요강.hwp` 이름을 훔쳐 이름·주소 짝이 지어진다. 앞 줄에 파일 이름이 없으면 그대로(아래서 단추 글자로 버려진다) */
@@ -232,10 +235,11 @@ export function fileNameIn(text) {
 const TAIL_SP = String.raw`(?:\s|&nbsp;)`;
 const TAIL_NUM = String.raw`\d[\d.,]*\s?(?:KB|MB|GB|K|M|G|bytes?|B|바이트|회|건)(?![가-힣A-Za-z])`;
 /* 이름표 괄호는 「이름표 + 숫자(+ 단위)」만 꼬리다(최종 리뷰 2026-11-26) — 숫자만 들어 있으면 떼던 때 「(다운로드 후 2부 작성)」·「(크기 1년 보관)」·「(size: 2 pages)」의 뜻이 잘렸다(장학금 첨부 이름에도 쓰는 함수) */
-const TAIL_LABEL = String.raw`(?:파일\s?(?:용량|크기)|용량|크기|size|다운로드|내려받기|download)`;
+/* 「다운로드 횟수」·「다운로드수」·「Downloads」 도 이름표다(리뷰 3차 M7 — 좁힌 뒤 못 떼던 꼬리) */
+const TAIL_LABEL = String.raw`(?:(?:파일\s?(?:용량|크기)|용량|크기|size|다운로드|내려받기|downloads?)(?:\s?(?:횟수|수))?)`;
 const TAIL_LNUM = String.raw`\d[\d.,]*\s?(?:KB|MB|GB|K|M|G|bytes?|B|바이트|회|건)?(?![가-힣A-Za-z\d])`;   // 이름표 뒤 숫자(+ 단위) — 뒤에 글자가 바로 이어지면 꼬리가 아니다
 const TAIL_PAIR = String.raw`${TAIL_LABEL}\s*[:：]?\s*${TAIL_LNUM}`;
-const TAIL_BRACKET = String.raw`[(（\[【]\s*(?:${TAIL_PAIR}(?:\s*[,·/|]\s*${TAIL_PAIR})*|${TAIL_NUM}(?:[\s,·/|]*${TAIL_NUM})*)\s*[)）\]】]?`;
+const TAIL_BRACKET = String.raw`[(（\[【]\s*(?:${TAIL_PAIR}(?:\s*[,·/|]\s*(?:${TAIL_PAIR}|${TAIL_NUM}))*|${TAIL_NUM}(?:[\s,·/|]*${TAIL_NUM})*)\s*[)）\]】]?`;   // 이름표 쌍 뒤에는 쌍이나 단위 붙은 수(「12회, 1.2MB」)
 const TAIL_PREVIEW = String.raw`(?:미리\s?보기|바로\s?보기)`;
 const SITE_TAIL = new RegExp(String.raw`^(?:${TAIL_SP}*(?:${TAIL_BRACKET}|${TAIL_PREVIEW}))+${TAIL_SP}*$`, 'i');
 const LONE_PREVIEW = new RegExp(String.raw`^(?:${TAIL_SP}*${TAIL_PREVIEW})+${TAIL_SP}*$`, 'i');
@@ -249,8 +253,6 @@ export function trimSiteTail(name, { lonePreview = true } = {}) {
   if (!rest || !SITE_TAIL.test(rest)) return raw;
   return !lonePreview && LONE_PREVIEW.test(rest) ? raw : f;
 }
-/** 실린 활동 글의 첨부 이름에서 사이트 꼬리를 뗀다(소급 — 수집 로봇이 발행할 때 · 같은 파일 한 줄 만들기 stripSiteChrome 앞). 바꾼 줄 수를 돌려준다.
-    used = 글 id → 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부 이름들 — 🔴 든 이름은 건드리지 않는다(이름이 바뀌면 그 사본이 주인을 잃는다) */
 /** 꼬리를 떼지 않을 이름 — 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부(글 id → 이름들). 꼬리를 다듬어 이름이 바뀌면 그 사본이 주인을 잃는다.
     formsIndex = collector/extracted/forms-index.txt 글자(줄마다 탭 칸 · 셋째 = 이름 · 다섯째 = 글 id) · pdfIndexes = data/forms-pdf·docs-pdf 의 index.json(깨졌으면 null) — 수집 로봇이 읽어 넘긴다(2026-11-26) */
 export function usedAttachNamesFrom({ formsIndex = '', pdfIndexes = [] } = {}) {
@@ -260,6 +262,8 @@ export function usedAttachNamesFrom({ formsIndex = '', pdfIndexes = [] } = {}) {
   for (const idx of pdfIndexes || []) for (const [id, rows] of Object.entries((idx && idx.items) || {})) for (const r of rows || []) put(id, r && r.name);
   return used;
 }
+/** 실린 활동 글의 첨부 이름에서 사이트 꼬리를 뗀다(소급 — 수집 로봇이 발행할 때 · 같은 파일 한 줄 만들기 stripSiteChrome 앞). 바꾼 줄 수를 돌려준다.
+    used = 글 id → 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부 이름들(위 usedAttachNamesFrom) — 🔴 든 이름은 건드리지 않는다(이름이 바뀌면 그 사본이 주인을 잃는다) */
 export function trimActivityTails(items, used = new Map()) {
   let n = 0;
   for (const it of items || []) {
@@ -330,10 +334,31 @@ export function collapseSameFiles(atts, pageUrl = '') {
   return out;
 }
 
+/* 빌린 이름 되돌리기 (2026-11-26 · 리뷰 3차에서 드러남) — 예전 detailAttachments 는 링크 글자가 그림·압축 파일 이름이면 앞 첨부의 이름을 빌려 왔다(서울과기대 활동 3 · 장학 3).
+   받는 주소에 **원래 이름이 실린** 규칙(서울과기대 bbs_download.jsp 의 ogrfname — 우리가 호출의 셋째 인자로 지은 주소)만 그 이름으로 되돌린다.
+   🔴 같은 글의 다른 줄과 이름이 겹칠 때만(빌린 이름) — 사이트가 보인 이름이 원래 이름과 다른 것(띄어쓰기 등)은 사이트가 보인 그대로 둔다 */
+const ORIGINAL_NAME_AT = [{ host: /(^|\.)seoultech\.ac\.kr$/i, path: /\/hcm\/bbs\/bbs_download\.jsp$/i, param: 'ogrfname' }];
+const originalNameOf = (url) => {
+  let u; try { u = new URL(String(url || '')); } catch { return ''; }
+  const r = ORIGINAL_NAME_AT.find((x) => x.host.test(u.hostname) && x.path.test(u.pathname));
+  return r ? String(u.searchParams.get(r.param) || '').trim() : '';
+};
+export function unborrowNames(atts) {
+  const list = atts || [];
+  const count = new Map();
+  for (const a of list) if (a && a.name) count.set(a.name, (count.get(a.name) || 0) + 1);
+  return list.map((a) => {
+    if (!a || !a.name || count.get(a.name) < 2) return a;
+    const real = originalNameOf(a.url);
+    return real && real !== a.name ? { ...a, name: real } : a;
+  });
+}
+
 export const CHROME_MIN_PAGES = 3;
 /** lists: 공고 배열 여럿([notices.items, registered.items, …]). 첨부 목록을 **그 자리에서** 다듬고 고친 개수를 돌려준다 —
     ① 게시판 공통 링크 걷기 ② 같은 파일 한 줄로(collapseSameFiles) ③ 이제 풀 수 있게 된 `javascript:` 내려받기 호출을 진짜 주소로(resolveJsDownload —
-    규칙을 더하면 이미 실린 글에도 저절로 닿는다 · 운영 원칙 7 소급). 저장하는 로봇이 저장 직전에 부르므로 지난 글도 다음 실행에 걷힌다 */
+    규칙을 더하면 이미 실린 글에도 저절로 닿는다 · 운영 원칙 7 소급) ④ 앞 첨부에서 빌린 이름을 받는 주소의 원래 이름으로(unborrowNames).
+    저장하는 로봇이 저장 직전에 부르므로 지난 글도 다음 실행에 걷힌다 */
 export function stripSiteChrome(lists, min = CHROME_MIN_PAGES) {
   const pages = new Map();
   for (const arr of lists) for (const it of arr || []) for (const a of it.attachments || []) {
@@ -353,8 +378,10 @@ export function stripSiteChrome(lists, min = CHROME_MIN_PAGES) {
       changed += 1;
       return { ...a, url: real };
     });
-    const one = collapseSameFiles(solved, page);
-    changed += solved.length - one.length;
+    const collapsed = collapseSameFiles(solved, page);
+    changed += solved.length - collapsed.length;
+    const one = unborrowNames(collapsed);   // ④ 앞 첨부에서 빌린 이름 → 받는 주소의 원래 이름(위 unborrowNames)
+    changed += one.filter((a, i) => a !== collapsed[i]).length;
     removed += changed;
     if (changed) it.attachments = one;
   }

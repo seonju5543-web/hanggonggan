@@ -64,6 +64,12 @@ const NS_LABELS = [
   [/^제목\s?대상$/, '대상'],   // 활동 글 제목에서 뗀 대상 괄호(activitySheetNotices) — 「대상」 이름표 그대로면 아래 NS_SKIP 이 빼서 화면 어디에도 안 남았다(2026-11-26)
 ];
 const NS_SKIP = /^(?:지원|신청|응모|모집|선발|추천)\s?(?:자격|대상|요건)$|^자격\s?요건$|^대상$/;
+/* 이름표 → 시트가 보이는 이름(같은 뜻은 한 이름 — 위 NS_LABELS) — 아래 noticeSummaryRows 와, 활동 카드 얹기의 묶음 열쇠(match-engine withActRead · 앱·what-shows 가 넘긴다)가 같이 쓴다 */
+function nsLabel(raw) {
+  const key = String(raw || '').replace(/\s+/g, '');
+  const hit = NS_LABELS.find(([re]) => re.test(key));
+  return hit ? hit[1] : String(raw || '').trim();
+}
 const NS_DANGLE = /(?:하고|하며|하여|이며|및|또는|으로|에서|,|\(|：|:|~|-|·)$/;
 /* 줄로 쪼개진 원문을 **읽을 수 있는 줄**로 (2026-10-16 개발자 "공고 안내에도 그냥 원문에서 절만 잘라서") — 글자는 그대로, 잇기만 한다
    · 납작한 표 `활동일시` ↵ `ㅇ 2026.10.18` → `활동일시 : 2026.10.18` (NS_BARE_LABEL — 이름표만 남은 줄은 다음 줄의 이름표다)
@@ -120,10 +126,8 @@ function noticeSummaryRows(lines) {
     const m = t.match(/^([가-힣A-Za-z0-9\s·]{1,16}?)\s*[:：](?!\d|\/\/)\s*(.+)$/) || t.match(/^[(（]([가-힣A-Za-z0-9\s·]{1,12})[)）]\s*(.+)$/) || t.match(/^([가-힣\s]{2,8})[)）]\s*(.+)$/);
     let label = '', body = t;
     if (m) {
-      const key = m[1].replace(/\s+/g, '');
-      if (NS_SKIP.test(key)) continue;
-      const hit = NS_LABELS.find(([re]) => re.test(key));
-      label = hit ? hit[1] : m[1].trim();
+      if (NS_SKIP.test(m[1].replace(/\s+/g, ''))) continue;
+      label = nsLabel(m[1]);
       body = m[2].trim();
     }
     if (!label && !NS_SENTENCE.test(body)) continue;   // 이름표 없는 줄은 문장이거나 알맹이가 있어야 한다(2026-10-16)
@@ -137,11 +141,9 @@ function noticeSummaryRows(lines) {
     if (seen.has(k)) continue;
     seen.add(k);
     rows.push({ label, body });
+    if (rows.length >= 8) break;
   }
-  if (rows.length <= 8) return rows;
-  /* 여덟 줄까지만 보인다 — 여덟째 뒤로 밀린 「문의」 줄은 여덟째 자리에 둔다(잘리지 않게 · 설계 docs/designs/paid-gate-activities.md 5-4 「문의처 줄은 남긴다」 · 최종 리뷰 2026-11-26) */
-  const q = rows.findIndex((r, i) => i >= 8 && r.label === '문의');
-  return q < 0 ? rows.slice(0, 8) : [...rows.slice(0, 7), rows[q]];
+  return rows;
 }
 /* 글 속 주소 → 누를 수 있는 짧은 링크 (2026-11-17 개발자 지시 "가독성이 떨어지는 등 … 모두 수리") — 「온라인 접수https://www.k-startup.go.kr/web/contents/webPMSBizUnvs.do?returnUrl=…」
    처럼 긴 주소가 글자째 떠서 줄이 읽히지 않았다. 주소는 원문 그대로 링크에 담고, 보이는 글자만 사이트 이름(「forms.gle ↗」)으로 줄인다(글자를 지어내지 않는다).

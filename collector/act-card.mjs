@@ -49,13 +49,32 @@ export function dropStampWithoutId(items) {
   for (const it of items || []) if (it && it.paidGate && !it.id && !it.paidOpen) { it.paidOpen = ROBOT_OPEN_NO_ID; n += 1; }
   return n;
 }
+/* 관리자의 올리기·취소를 설정(collector/activity-config.json paidOpenUrls — tools/admin-apply activityGate 가 쓴다)대로 다시 건다 — 수집 로봇이 실행마다(숨기기 hideUrls 와 같은 길).
+   🔴 글의 칸만 믿으면 결정이 사라진다(리뷰 3차 M3) — 로봇은 `git pull --rebase` 로 저장해 로봇 판이 나중 쪽이 되고, 병합 도구는 같은 칸이면 나중 쪽 값을 쓴다.
+   설정에 있으면 「관리자 …」 · 없는데 「관리자 …」 면 빈 글자(취소 — 지우지 않는다: 지우면 병합 때 되살아난다) · 로봇 표식(「로봇 …」)은 건드리지 않는다 ·
+   map 이 null(설정을 못 읽었거나 그 칸이 없다)이면 아무것도 안 한다. keyOf = canonUrl(같은 글의 다른 주소 꼴). 고친 글 수를 돌려준다 */
+export function applyAdminOpen(items, map, keyOf) {
+  if (!(map instanceof Map)) return 0;
+  let n = 0;
+  for (const it of items || []) {
+    if (!it || !it.url) continue;
+    const cur = String(it.paidOpen || '');
+    if (cur && !/^관리자/.test(cur)) continue;
+    const want = String(map.get(keyOf(it.url)) || '');
+    if (want && !/^관리자/.test(want)) continue;   // 꼴이 틀린 값은 걸지 않는다
+    if (cur === want) continue;
+    it.paidOpen = want;
+    n += 1;
+  }
+  return n;
+}
 /* 활동 글 중복 정리 + 표시 지키기 — dedupe = url-key dedupeNotices(같은 글은 하나로 · 남길 쪽은 그 함수가 고른다).
    🔴 처음 본 글(표시 있음)이 **이미 실려 있던 글**(표시 없음 = 학생에게 보이던 글)과 같은 글이면, 어느 쪽이 남든 표시를 뗀다 — 안 떼면 보이던 글이 새 주소의 숨김 글로 바뀌어 사라진다.
    둘 다 새 글이면 표시가 남는다. 중복 정리의 결과(무엇을 합치고 어느 쪽을 남기는가)는 바꾸지 않는다 — 합쳐진 짝을 보기만 한다 */
 /* 🔴 isShown = 그 글이 학생에게 보이던가(수집 로봇은 앱과 같은 판정을 넘긴다 — paidOpen 이거나 paidGateOpen). 표시는 한 번 달면 지워지지 않아
-   (카드가 실려도 · 사흘이 지나도 · 관리자가 올려도) 「표시 없음」만으로는 보이던 글을 못 가린다(최종 리뷰 C1 · 2026-11-26). 넘기지 않으면 예전처럼 표시 없음 = 보이던 글.
+   (카드가 실려도 · 사흘이 지나도 · 관리자가 올려도) 「표시 없음」만으로는 보이던 글을 못 가린다(최종 리뷰 C1 · 2026-11-26). 넘기지 않으면 표시가 없거나 열린(paidOpen) 글 = 보이던 글(사흘 규칙·카드는 모른다).
    셋이 이어 합쳐져도(A~B~C) 짝을 따라 전해진다 · 남은 글이 보이던 글이면 그 표시는 그대로 둔다(카드·검토가 이어진다) */
-export function dedupeActivities(items, dedupe, isShown = (n) => !!n && !n.paidGate && !n.paidOpen, today = '') {
+export function dedupeActivities(items, dedupe, isShown = (n) => !!n && (!n.paidGate || !!n.paidOpen), today = '') {   // 기본 — 표시가 없거나 열린 글(리뷰 3차 M4 · 관리자가 연 글을 안 보이던 글로 봤다)
   const shown = new Set();
   const out = dedupe(items, { distinct: (a, b) => { if (isShown(a) || isShown(b) || shown.has(a) || shown.has(b)) { shown.add(a); shown.add(b); } return false; } });
   for (const n of out) if (n && n.paidGate && shown.has(n) && !isShown(n)) n.paidOpen = `로봇 ${today ? `${today} ` : ''}· 보이던 글과 같은 글`;   // 지우지 않고 표식을 더한다(병합 때 되살아나지 않게)
