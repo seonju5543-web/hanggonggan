@@ -4016,6 +4016,19 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     const appNames = Object.keys(new Function(`${(appSrc.match(/const ENTITIES = \{[^\n]+\};/) || ['const ENTITIES = {};'])[0]} return ENTITIES;`)()).filter((k) => !k.startsWith('#'));
     const { HINT_ENT } = await import('../collector/deadline-hint.mjs');
     eq('    앱이 아는 이름 기호를 로봇도 다 푼다', appNames.filter((k) => !(k in HINT_ENT)), []);
+    /* 리뷰 5차(M2·M3) — 로봇의 다른 두 풀이(제목·본문 clean-title decodeEntities · 발췌 extract-excerpts)와 엔진(match-engine decodeEntities)은 앱 표와 대조하는 관문이 없었다 —
+       &emsp; 가 새 본문에 남아 그 뒤 목록 번호를 못 뗐고(「&emsp;1) (필수) …」), 엔진 표에는 앱이 아는 이름 일곱이 빠져 있었다 · 엔진은 대소문자를 접어 &rArr; 를 → 로 풀었다 */
+    const { decodeEntities: ctDecode } = await import('../collector/clean-title.mjs');
+    const { decodeExcerptEntities } = await import('../collector/extract-excerpts.mjs');
+    const ME = createRequire(import.meta.url)('../match-engine.js');   // 이 절 범위에는 엔진이 없다 — 여기서 싣는다
+    /* 「푼다」 = 기호 글자(&이름;)가 남지 않는다 — 제목 풀이는 둥근 따옴표를 곧은 따옴표로 일부러 바꾼다(2026-10-27 · 글자가 앱과 꼭 같을 필요는 없다) */
+    const undecoded = (fn) => (typeof fn === 'function' ? appNames.filter((k) => fn(`가&${k};나`).includes(`&${k};`)) : ['(풀이 함수 없음)']);
+    eq('    앱이 아는 이름 기호를 로봇의 제목·본문 풀이(clean-title) · 발췌 풀이(extract-excerpts) · 엔진(decodeEntities)도 다 푼다 · 엔진은 대소문자를 가린다(&rArr; ⇒ · &rarr; →)',
+      [undecoded(ctDecode), undecoded(decodeExcerptEntities), undecoded(ME.decodeEntities), ME.decodeEntities('&rArr;&rarr;')], [[], [], [], '⇒→']);
+    const { extractDocuments: exDocs } = await import('../collector/extract-excerpts.mjs');
+    eq('    &emsp; 로 들여 쓴 서류 목록도 번호를 떼고 읽는다(고려대 세종 학생복지처 특별장학금 꼴 — 예전엔 「&emsp;1) (필수) …」 그대로)',
+      exDocs('3. 제출서류\n&emsp;1) (필수) 학생복지처 특별장학금 학업계획서\n&emsp;2) (해당자) 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서\n4. 문의: 학생복지처'),
+      ['(필수) 학생복지처 특별장학금 학업계획서', '(해당자) 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서']);
     eq('    &middot;·&#183; 은 글자로 풀고 자른다', [H('신청기간: 2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00 제출처 장학팀 방문 접수 및 이메일 접&middot; 다음 문장').endsWith('접· 다음 문'), H('접수기간: 2026. 9. 1. ~ 9. 30. 가&#183;나 제출')], [true, '접수기간: 2026. 9. 1. ~ 9. 30. 가·나 제출']);
   }
 
@@ -14047,6 +14060,10 @@ console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)')
     eq('  경고다 (오류로 두면 사람이 고친 값이 파이프라인을 잠근다)',
       hits({ ...base, type: '교외' }, { noticeKind })[0].level, 'warn');
     eq('  교내면 조용하다', hits({ ...base, type: '교내' }, { noticeKind }).length, 0);
+    /* 리뷰 5차(M4) — 제목의 「교내」 표식 때문인데도 경고가 OWN_PROGRAMS 만 가리켜, 읽는 사람이 표에 없는 이름을 찾았다(조선대 「교내 외국어 JUMP」 · 다음 수집의 원문 판정이 고친다) */
+    const markMsg = ((hits({ ...base, type: '교외', name: '2026-2학기 교내 외국어 JUMP 장학생 선발 공고', eligibility: { schoolOnly: '조선대학교' } }, { noticeKind })[0]) || {}).msg || '';
+    eq('  경고가 까닭 둘(제목의 「교내」 표식 · 학교 제도 이름 OWN_PROGRAMS)을 다 말하고, 다음 수집의 원문 판정이 고친다는 것도 말한다',
+      [/제목의 「교내」 표식/.test(markMsg), /OWN_PROGRAMS/.test(markMsg), /kind-classify/.test(markMsg)], [true, true, true]);
     eq('  이름이 70자에서 잘려도 게시판 원제목으로 잡는다',
       hits({ ...base, type: '교외', name: '공통 [공통] 2026학년도 2학기', boardTitle: base.name }, { noticeKind }).length, 1);
     eq('  이어붙인 자리를 넘어 오탐하지 않는다',
@@ -18127,6 +18144,11 @@ module.exports = class Anthropic {
     const ws3 = WA(n0, { ...cr0, eligibility: ['만 19세 이상인 사람'], amount: [], notes: ['유의사항: 만 19세 이상인 사람만 응모할 수 있으며, 미성년자는 보호자 동의서를 함께 내야 합니다', '유의사항: 만 19세 이상인 사람만 응모할 수 있습니다'] }, OPTS);
     eq('  🔴 겹친 문장 뒤에 다른 조건이 이어지는 줄은 남긴다(그 조건이 사라지지 않게) — 되풀이뿐인 줄만 뺀다',
       ws3.noticeLines, ['유의사항: 만 19세 이상인 사람만 응모할 수 있으며, 미성년자는 보호자 동의서를 함께 내야 합니다', '문의처: 표본재단 사무국 02-000-0000']);
+    /* 리뷰 5차(I1) — 길이(20자)로 가르면 짧은 막는 조건이 여전히 빠졌다(「…이라도 재학생이 아니면 참가할 수 없습니다」 남는 말 18자 · 「…미성년자는 동의서 필수」 19자 — 틀린 안심) →
+       남은 말이 맺음말(「만 응모할 수 있습니다」·「이라면 누구나 참가 가능」·「지급」)뿐일 때만 뺀다 · 그 밖에는 남긴다(겹쳐 보이는 편이 조건이 사라지는 편보다 낫다) */
+    const ws4 = WA(n0, { ...cr0, eligibility: ['만 19세 이상인 사람'], amount: [], notes: ['유의사항: 만 19세 이상인 사람이라도 재학생이 아니면 참가할 수 없습니다', '참고: 만 19세 이상인 사람만 응모할 수 있으며, 미성년자는 동의서 필수'] }, OPTS);
+    eq('  🔴 남은 말이 맺음말뿐일 때만 뺀다 — 짧아도 다른 조건(재학생이 아니면 · 동의서 필수)이 있으면 남긴다',
+      ws4.noticeLines, ['유의사항: 만 19세 이상인 사람이라도 재학생이 아니면 참가할 수 없습니다 · 만 19세 이상인 사람만 응모할 수 있으며, 미성년자는 동의서 필수', '문의처: 표본재단 사무국 02-000-0000']);
     /* 리뷰 3차(I4 · 2026-11-26) — 시트는 같은 뜻의 이름표를 한 이름으로 보인다(NS_LABELS — 문의·문의처·연락처·전화 → 「문의」 · 유의사항·참고·기타사항 → 「참고」).
        얹기가 글자 그대로의 이름표로 묶으면 AI 의 「문의」와 무료 「문의처」가 「문의」 두 줄이 됐다 → 묶는 열쇠는 시트의 이름표(nsLabel) · 줄에 적는 이름표는 처음 나온 것 그대로 */
     const wm = WA(n0, { ...cr0, amount: [], notes: ['문의: 사무국 02-111-1111', '유의사항: 전 일정 참석', '참고: 참가비 없음', '기타사항: 숙소 제공', '참고: 세부 일정은 확인 필요'] }, OPTS);

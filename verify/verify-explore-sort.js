@@ -252,6 +252,8 @@ const PROFILE = {
     liveNotices = { updatedAt: '2026-09-12', items: (liveNotices && liveNotices.items || []).concat([
       at('검사용 우리 학교 공고', 1),
       at('[공통][교내] 검사용 교내 가족장학금 신청 안내', 2),
+      /* 대괄호 없이 「교내」 라고 적은 글 — 엔진은 2026-09-18 부터 이것도 교내로 본다(NOTICE_CAMPUS_MARK). 실데이터에 기대지 않고 심어 둔다(리뷰 5차) */
+      at('2026-2학기 검사용 교내 특별장학금 신청 안내', 3),
     ]) };
     renderHome();
   });
@@ -262,6 +264,7 @@ const PROFILE = {
      게시판 글은 제목·링크뿐이라 주최를 모르므로 '교내' 라고 부를 수 없다. */
   await page.click('.filter-chip[data-filter="교내"]'); await page.waitForTimeout(500);
   const nt = await page.evaluate(() => ({
+    학교: state.profile.school,
     교외섞임: [...document.querySelectorAll('#explore-list .sch-card:not(.notice-card)')]
       .map((e) => e.dataset.detail)
       .filter((id) => ((allScholarships() || []).find((s) => s.id === id) || {}).type === '교외').length,
@@ -284,10 +287,15 @@ const PROFILE = {
   /* 🔴 **주최를 모르는 게시판 글은 이 칸에 오지 않는다** (2026-09-18 오전 지시) —
      그런데 학교가 스스로 `[교내]` 라고 적어 둔 글은 온다(같은 날 오후 지적).
      두 줄이 함께 서야 뜻이 산다: 아무거나 오지도 않고, 적어 둔 것을 놓치지도 않는다. */
+  /* 🔴 「[교내]」 대괄호를 요구하지 않는다 — 엔진은 대괄호 없는 「교내 …」 도 교내로 본다. 대괄호를 세면 학교가 대괄호 없이 교내 글을 올리는 날
+     앱은 멀쩡한데 이 검사가 빨개진다(실데이터에 기댄 검사 · 리뷰 5차). 교내 칸의 글마다 **엔진의 판정**(noticeKind)이 교내인지 보고, 표식 없는 심은 글이 없는지 본다 */
+  const ME = require('../match-engine.js');
   eq('🔴 주최 모르는 게시판 글은 교내 칸에 나오지 않는다',
-    nt.탐색안_제목.filter((t) => !/\[교내\]/.test(t)).length, 0);
+    [nt.탐색안_제목.filter((t) => ME.noticeKind(t, nt.학교) !== '교내').length, nt.탐색안_제목.filter((t) => /검사용 우리 학교 공고/.test(t)).length], [0, 0]);
   eq('🔴 학교가 [교내] 라고 적어 둔 글은 교내 칸에 나온다',
     nt.탐색안_제목.filter((t) => /검사용 교내 가족장학금/.test(t)).length, 1);
+  eq('  대괄호 없이 「교내」 라고 적은 글도 교내 칸에 나온다(엔진의 교내 표식 그대로)',
+    nt.탐색안_제목.filter((t) => /검사용 교내 특별장학금/.test(t)).length, 1);
   eq('  대신 홈에 나온다 (사라지지 않는다)', nt.홈안_공고 > 0, true);
   eq('  홈에는 표식 없는 것도 그대로 나온다', nt.홈제목.some((t) => /검사용 우리 학교 공고/.test(t)), true);
   eq('  등록 공고 자리에 교외가 섞이지 않는다', nt.교외섞임, 0);

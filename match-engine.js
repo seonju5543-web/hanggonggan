@@ -1712,11 +1712,12 @@ const NON_ELIG_SECTION = /^(필수|공통|추가|기타|구비|첨부|제출)?\s
 const ELIG_SECTION = /(신청|지원|응모|선발|모집|추천)?\s*(자격|대상|요건)\s*[:：]?\s*$/;
 
 /* HTML 엔터티가 글자로 남은 줄 — `형제 &middot; 자매` (2026-10-15 카드 전수). 브라우저 없이도 돌아야 해서(서비스워커·Node) 표로 푼다 */
-const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', middot: '·', bull: '•', hellip: '…', ndash: '–', mdash: '—', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', emsp: ' ' };   // emsp — 서류 목록 들여쓰기(2026-11-26 · 앱 ENTITIES 와 같이)
+const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', middot: '·', bull: '•', hellip: '…', ndash: '–', mdash: '—', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', emsp: ' ', ensp: ' ', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', times: '×', egrave: 'è' };   // 앱 ENTITIES 가 아는 이름은 다 안다(2026-11-26 리뷰 5차 — 대조 관문 test-collector 「앱이 아는 이름 기호를 …도 다 푼다」 · 엔진만 쓰는 감사·채점기가 앱과 다른 글자를 보지 않게)
 function decodeEntities(s) {
   return String(s || '').replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, k) => {
     if (k[0] === '#') { const n = /^#x/i.test(k) ? parseInt(k.slice(2), 16) : parseInt(k.slice(1), 10); return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : m; }
-    return Object.prototype.hasOwnProperty.call(ENTITY_MAP, k.toLowerCase()) ? ENTITY_MAP[k.toLowerCase()] : m;
+    const key = Object.prototype.hasOwnProperty.call(ENTITY_MAP, k) ? k : k.toLowerCase();   // 🔴 대소문자를 먼저 가린다 — &rArr;(⇒) 와 &rarr;(→) 는 다른 글자다(접으면 ⇒ 가 → 로 풀렸다)
+    return Object.prototype.hasOwnProperty.call(ENTITY_MAP, key) ? ENTITY_MAP[key] : m;
   });
 }
 /* 자간이 벌어진 낱말 — 한글 문서(HWP·PDF)에서 글자를 뽑으면 `타 생 활 비성`·`가 계 곤란자` 처럼 음절마다 띄어 온다.
@@ -2553,6 +2554,9 @@ function publishedList(list, doc, today, fixes) {
       (최종 리뷰 2026-11-26 dropRe · 리뷰 3차 I3 — 위 칸(자격 줄·혜택 첫 줄·남긴 모집기간)에 이미 나온 문장을 품은 줄. 시트가 묶인 줄을 통째로 빼던 것을 이리로 옮겼다 · noticeChecked 표식)
    🔴 묶는 열쇠는 시트가 보이는 이름표다(리뷰 3차 I4) — 글자 그대로 묶으면 AI 「문의」와 무료 「문의처」가 시트에서 「문의」 두 줄이 됐다 · 줄에 적는 이름표는 처음 나온 것 그대로
    ⚠️ 원본 글 객체를 고치지 않는다(새 객체) · 제목·주최는 얹지 않는다 · 제목의 괄호 대상을 자격 줄에 더하는 규칙(app-activities activityAsSch)은 그대로다 */
+/* 「위 칸과 겹친 안내 줄」에서 겹친 글자를 걷고 남아도 되는 말 — 맺음말(「만 응모할 수 있습니다」·「이라면 누구나 참가 가능」·「지급」)을 이루는 조각.
+   긴 조각을 앞에 둔다(「이라면」 → 「이」 차례). 이것만 남은 줄은 되풀이라 뺀다 · 다른 말(재학생·아니면·동의서·필수 …)이 하나라도 남으면 남긴다(withActRead repeatsOnly) */
+const ACT_CLOSING_BITS = /누구나|모두|이라면|라면|이면|에게|으로|에한해|에한함|해당|대상|응모|참가|참여|지원|신청|접수|지급|수여|시상|제공|할수있습니다|할수있음|할수있다|가능합니다|가능함|가능|합니다|입니다|됩니다|드립니다|예정|만|은|는|을|를|이|가|의|에|로|및|함|임|됨|[.,。!~]/g;
 function withActRead(n, cr, opts) {
   const o = opts && typeof opts === 'object' ? opts : {};
   /* 🔴 `instanceof RegExp` 로 묻지 않는다 — what-shows 는 앱 코드를 칸막이(vm) 안에서 돌려 그 안에서 만든 정규식을 넘기는데, 칸막이가 다르면 답이 '아니오'라 도구에서만 거르기가 꺼졌다(리뷰 4차 I1) */
@@ -2581,12 +2585,14 @@ function withActRead(n, cr, opts) {
       rows.push({ label, body }); if (key) at.set(key, rows.length - 1);
     };
     const seen = flat ? [...(out.eligibilityLines || []), ...out.excerpts.map((x) => x.text)].map((x) => flat(x)).filter((x) => x.length >= 6) : [];   // 시트의 옛 거름과 같은 대상 · 같은 길이 바닥
-    /* 되풀이뿐인 줄만 뺀다 — 겹친 글자를 빼고도 이름표 뒤에 남는 말이 20자 이상이면 다른 조건이 함께 있는 줄이라 남긴다(리뷰 4차 M5 · 「…응모할 수 있으며, 미성년자는 보호자 동의서를 함께 내야 합니다」 가 통째로 빠졌다) */
+    /* 되풀이뿐인 줄만 뺀다 — 겹친 글자와 이름표를 걷고 남은 말이 **맺음말뿐**(ACT_CLOSING_BITS 를 걷으면 아무것도 안 남는다)일 때만.
+       🔴 길이로 가르지 않는다 — 20자로 갈랐더니 짧은 막는 조건(「…이라도 재학생이 아니면 참가할 수 없습니다」·「…미성년자는 동의서 필수」)이 빠졌다(리뷰 4차 M5 → 5차 I1 · 틀린 안심).
+       맺음말이 아닌 말이 조금이라도 남으면 남긴다 — 겹쳐 보이는 편이 조건이 사라지는 편보다 낫다 */
     const repeatsOnly = (l) => {
       if (!seen.some((e) => flat(l).includes(e))) return false;
       let rest = flat(String(l).replace(/^[가-힣A-Za-z0-9\s·()]{1,16}?\s*[:：](?!\d|\/\/)\s*/, ''));
       for (const e of seen) rest = rest.split(e).join('');
-      return rest.length < 20;
+      return !rest.replace(ACT_CLOSING_BITS, '');
     };
     const keep = (l) => !(dropRe && dropRe.test(String(l))) && !repeatsOnly(l);
     for (const x of (Am || []).slice(1).filter(keep)) put('혜택', x);

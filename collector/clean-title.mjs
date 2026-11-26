@@ -26,6 +26,7 @@ export function decodeEntities(t) {
     .replace(/&rarr;/g, '→').replace(/&rArr;/g, '⇒').replace(/&ge;/g, '≥').replace(/&le;/g, '≤').replace(/&larr;/g, '←').replace(/&ldquo;/g, '“').replace(/&rdquo;/g, '”')
     .replace(/&ndash;/g, '–').replace(/&mdash;/g, '—')
     .replace(/&middot;/g, '·').replace(/&bull;/g, '•').replace(/&hellip;/g, '…')
+    .replace(/&sim;/g, '∼').replace(/&times;/g, '×').replace(/&egrave;/g, 'è').replace(/&emsp;|&ensp;/g, ' ')   // 앱 ENTITIES 가 아는 이름은 다 푼다(2026-11-26 리뷰 5차 · &emsp; 가 새 본문에 남아 그 뒤 목록 번호를 못 뗐다)
     .replace(/&amp;/g, '&');   // 반드시 마지막 — 먼저 풀면 &amp;quot; 가 이중 해제된다
 }
 

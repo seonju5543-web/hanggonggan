@@ -295,9 +295,11 @@ const ENT = [[/&lt;/g, '<'], [/&gt;/g, '>'], [/&quot;/g, '"'], [/&#39;|&apos;/g,
      저장된 원문 전수에서 안 풀린 것이 이 7종이라 전부 넣는다. */
   [/&diams;/g, '♦'], [/&Dagger;/g, '‡'], [/&rArr;/g, '⇒'], [/&sim;/g, '∼'],
   [/&copy;/g, '©'], [/&ne;/g, '≠'], [/&divide;/g, '÷'],
+  [/&egrave;/g, 'è'], [/&emsp;|&ensp;/g, ' '],   // 앱 ENTITIES 가 아는 이름은 다 푼다(2026-11-26 리뷰 5차 · 「&emsp;1) (필수) …」 의 목록 번호를 못 뗐다)
   [/&#(\d+);/g, (_, n) => String.fromCharCode(+n)],   // 숫자 표기(&#39; 등)도 함께
   [/&amp;/g, '&']];
 const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);
+export const decodeExcerptEntities = unent;   // 관문이 앱 ENTITIES 와 대조한다(test-collector 「앱이 아는 이름 기호를 …도 다 푼다」)
 
 /* ============================================================================
    마감일 읽기 (2026-08-30 신설 — 끝난 공고를 학생에게 보여주고 있었다)
