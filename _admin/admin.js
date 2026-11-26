@@ -246,7 +246,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages, paidReview, cardFixes, cardRead, finalReview] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages, paidReview, cardFixes, cardRead, finalReview, actReview, actFinal, actDone] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -273,11 +273,18 @@ async function loadAll() {
       readJson('data/card-read-fixes.json', { v: 1, items: {} }),
       readJson('data/card-read.json', { items: {} }),
       readJson('collector/final-review.json', { items: {} }),
+      /* 대외활동·공모전 유료 확인(2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-7) — 사람에게 넘긴 숨김 글 · 둘째 AI 의 기록 · 「확인했어요」 기록 */
+      readJson('collector/act-read-review.json', { items: {}, gateHeld: {} }),
+      readJson('collector/act-final-review.json', { items: {} }),
+      readJson('collector/act-read-done.json', { v: 1, items: {} }),
     ]);
   D.paidReview = { items: (paidReview && paidReview.items) || {}, gateHeld: (paidReview && paidReview.gateHeld) || {} };
   D.cardFixes = (cardFixes && cardFixes.items) || {};
   D.cardRead = (cardRead && cardRead.items) || {};
   D.finalReview = (finalReview && finalReview.items) || {};
+  D.actReview = { gateHeld: (actReview && actReview.gateHeld) || {} };
+  D.actFinal = (actFinal && actFinal.items) || {};
+  D.actDone = (actDone && actDone.items) || {};
 
   D.reg = reg.items || [];
   D.formsPdf = (formsPdf && formsPdf.items) || {};
@@ -903,11 +910,45 @@ function gateHeldTodo() {
   return Object.entries((D.paidReview && D.paidReview.gateHeld) || {}).map(([id, why]) => ({ it: live.get(id), why }))
     .filter((x) => x.it && x.it.paidGate && openForStudents(x.it));
 }
+/* ── 대외활동·공모전 유료 확인 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-7) — 글은 정식 등록 목록이 아니라 활동 목록(D.activities)에서 찾는다 ──
+   ① 사람에게 넘긴 숨김 글(collector/act-read-review.json 의 gateHeld) — 아직 학생 화면에 없다 → 올리기(무료 값으로 · activityGate) · 숨기기(activityHide)
+   ② 둘째 AI 가 스스로 못 고쳐 넘긴 것(collector/act-final-review.json 의 problems) → 확인했어요(activityReviewDone → collector/act-read-done.json)
+   ③ 둘째 AI 가 고친 기록(actChangesList) — 접어서 보인다 · 할 일이 아니다 */
+function actHeldTodo() {
+  const live = new Map((D.activities || []).filter((n) => n && n.id).map((n) => [n.id, n]));
+  return Object.entries((D.actReview && D.actReview.gateHeld) || {}).map(([id, why]) => ({ it: live.get(id), why }))
+    .filter((x) => x.it && x.it.paidGate && !x.it.paidOpen && !x.it.hidden && openForStudents(x.it));
+}
+function actFinalTodo() {
+  const live = new Map((D.activities || []).filter((n) => n && n.id).map((n) => [n.id, n]));
+  const out = [];
+  for (const [id, r] of Object.entries(D.actFinal || {})) {
+    const it = live.get(id);
+    if (!it || it.hidden || !openForStudents(it)) continue;
+    const done = new Set(((D.actDone || {})[id] || {}).done || []);
+    const ps = ((r && r.problems) || []).filter((p) => !done.has(finalKey(p)));
+    if (ps.length) out.push({ it, problems: ps });
+  }
+  return out;
+}
+function actChangesList() {
+  const live = new Map((D.activities || []).filter((n) => n && n.id).map((n) => [n.id, n]));
+  const dropOf = (d) => ({ kind: 'drop', label: PDF_KIND_KO[d.kind] || 'PDF 사본', text: d.name || '', why: [PDF_VERDICT_KO[d.verdict], d.why].filter(Boolean).join(' — ') });
+  return Object.entries(D.actFinal || {}).map(([id, r]) => ({ it: live.get(id), summary: (r && r.summary) || '', changes: [...((r && r.changes) || []), ...((r && r.dropped) || []).map(dropOf)] }))
+    .filter((x) => x.it && !x.it.hidden && openForStudents(x.it) && x.changes.length);
+}
+/* 사람에게 넘어온 까닭 — 로봇 말(no-source 등)을 그대로 보이지 않는다 */
+const ACT_GATE_WHY = {
+  'no-source': '숨겨 둔 지 사흘째인데 이 글의 원문(본문·첨부)을 받지 못해 유료 확인을 못 했습니다.',
+  'grad-only': '유료가 읽어 보니 대학원생만 받는 글입니다 — 학부생 앱이라 학생 화면에 올리지 않았습니다. 원문을 보고 대학원생 전용이 맞으면 「숨기기」, 학부생도 받으면 「올리기」를 눌러 주세요.',
+  unreadable: '유료가 원문을 읽었지만 카드에 실을 내용을 찾지 못했습니다(메뉴뿐인 화면·오류 화면·로그인 화면일 수 있습니다).',
+};
 /* 옛 방식(두 번 읽기 · 11-20 전에 읽은 공고)에서 한쪽만 낸 줄은 기계 검사가 잡은 것이 아니다 — 따로 접어 두고 할 일 숫자에 안 센다(그 공고들이 마감되면 사라진다) */
 const isLegacyLine = (l) => l.kind === 'agree';
 function paidReviewCard() {
   const n = paidReviewTodo().reduce((a, x) => a + x.lines.filter((l) => !isLegacyLine(l)).length, 0) + gateHeldTodo().length
-    + finalReviewTodo().reduce((a, x) => a + x.problems.length, 0);
+    + finalReviewTodo().reduce((a, x) => a + x.problems.length, 0)
+    + actHeldTodo().length + actFinalTodo().reduce((a, x) => a + x.problems.length, 0);   // 대외활동·공모전의 넘어온 글 · 둘째 AI 가 넘긴 문제도 같은 묶음에 센다(2026-11-25)
   return { n, tone: 'is-warn', k: '유료 확인에서 사람이 볼 것',
     d: '유료 확인을 못 해 아직 학생 화면에 없는 공고와, 최종 검토(둘째 AI)가 스스로 고치지 못해 넘긴 것입니다. 무엇을 확인하면 되는지 적혀 있습니다.',
     btn: '<button class="btn btn-sm" data-paid-card>아래에서 보기</button>', okD: '유료 확인이 사람에게 넘긴 것이 없습니다' };
@@ -946,15 +987,18 @@ function finalProblemHtml(it, p) {
 }
 function paidReviewHtml() {
   const all = paidReviewTodo(), held = gateHeldTodo(), fin = finalReviewTodo(), fixed = finalChangesList();
+  const aHeld = actHeldTodo(), aFin = actFinalTodo(), aFixed = actChangesList();   // 대외활동·공모전(2026-11-25)
+  const aFinN = aFin.reduce((a, x) => a + x.problems.length, 0);
+  const alink = (n) => (n.url ? `<a href="${esc(n.url)}" target="_blank" rel="noopener">원문 열기 ↗</a>` : '');
   const pick = (legacy) => all.map(({ it, lines: ls }) => ({ it, lines: ls.filter((l) => isLegacyLine(l) === legacy) })).filter((x) => x.lines.length);
   const lines = pick(false), legacy = pick(true);
-  if (!all.length && !held.length && !fin.length && !fixed.length) return '';
+  if (!all.length && !held.length && !fin.length && !fixed.length && !aHeld.length && !aFin.length && !aFixed.length) return '';
   const group = ({ it, lines: ls }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${ls.length}줄</span></h3>
         <div>${ls.map((l) => paidLineHtml(it, l)).join('')}</div></div>`;
   const link = (it) => (it.sourceUrl ? `<a href="${esc(it.sourceUrl)}" target="_blank" rel="noopener">원문 열기 ↗</a>` : '');
   return `
     <details id="todo-paid" data-paid-section>
-      <summary>유료 확인에서 사람이 볼 것 — 유료 확인을 못 한 공고 ${held.length}건 · 최종 검토가 넘긴 것 ${fin.reduce((a, x) => a + x.problems.length, 0)}건 · 옛 방식에서 빠진 줄 ${lines.reduce((a, x) => a + x.lines.length, 0)}줄(${lines.length}건)</summary>
+      <summary>유료 확인에서 사람이 볼 것 — 유료 확인을 못 한 공고 ${held.length}건 · 최종 검토가 넘긴 것 ${fin.reduce((a, x) => a + x.problems.length, 0)}건 · 옛 방식에서 빠진 줄 ${lines.reduce((a, x) => a + x.lines.length, 0)}줄(${lines.length}건)${aHeld.length + aFinN ? ` · 대외활동·공모전 ${aHeld.length + aFinN}건` : ''}</summary>
       <p class="muted">새 공고는 AI 가 카드를 쓰고 둘째 AI(최종 검토)가 원문과 대조해 스스로 고칩니다 — 여기에는 스스로 못 고친 것만 옵니다. 「옛 방식에서 빠진 줄」은 11월 20일 전에 읽은 공고의 것으로, 학생 화면에는 그 줄이 빠진 채 올라가 있습니다(원문을 확인한 뒤 살리기·고쳐서 싣기·버리기).</p>
       ${held.length ? `<div class="pgroup"><h3>유료 확인을 못 해 아직 학생 화면에 없는 공고</h3><div>${held.map(({ it, why }) => `
         <div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-gate-row="${esc(it.id)}"><div>
@@ -966,11 +1010,28 @@ function paidReviewHtml() {
         </div></div>`).join('')}</div></div>` : ''}
       ${fin.length ? `<div class="pgroup"><h3>최종 검토 — 둘째 AI 가 스스로 고치지 못해 넘긴 것</h3>${fin.map(({ it, problems }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${problems.length}건</span></h3>
         <div>${problems.map((p) => finalProblemHtml(it, p)).join('')}</div></div>`).join('')}</div>` : ''}
+      ${aHeld.length ? `<div class="pgroup" data-act-held><h3>유료 확인을 못 해 아직 학생 화면에 없는 대외활동·공모전 글</h3><div>${aHeld.map(({ it, why }) => `
+        <div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-act-gate-row="${esc(it.url)}"><div>
+          <div><b>${esc(it.title)}</b> ${alink(it)}</div>
+          <div>${esc(ACT_GATE_WHY[why] || '유료 확인을 못 했습니다.')}</div>
+          <div><b>확인할 것</b> 원문을 열어 진짜 모집 글인지 보고, 올릴지 숨길지 정해 주세요.</div>
+          <div class="btn-row"><button class="btn btn-sm" data-act-gate-op="open">올리기(무료 값으로)</button>
+            <button class="btn btn-sm" data-act-gate-op="hide">숨기기</button></div>
+        </div></div>`).join('')}</div></div>` : ''}
+      ${aFin.length ? `<div class="pgroup" data-act-final><h3>대외활동·공모전 최종 검토 — 둘째 AI 가 스스로 고치지 못해 넘긴 것</h3>${aFin.map(({ it, problems }) => `<div class="pgroup"><h3>${esc(it.title)} ${alink(it)} <span class="pill">${problems.length}건</span></h3>
+        <div>${problems.map((p) => `<div class="paid-line" style="padding:var(--space-12) 0;border-top:1px solid var(--line)" data-act-done-row="${esc(it.id)}" data-act-done-key="${esc(finalKey(p))}">
+          <div><div><span class="pill">문서</span> <b>${esc(p.doc || '')}</b></div>
+            <div><b>무엇이 걸렸나</b> ${esc(p.reason || '')}</div>
+            <div><b>확인할 것</b> ${esc(p.check || '')}</div>
+            <div class="btn-row"><button class="btn btn-sm" data-act-done-op>확인했어요(목록에서 내리기)</button></div></div></div>`).join('')}</div></div>`).join('')}</div>` : ''}
       ${lines.map(group).join('')}
       ${legacy.length ? `<details><summary>옛 방식(두 번 읽기)에서 한쪽만 낸 줄 ${legacy.reduce((a, x) => a + x.lines.length, 0)}줄(${legacy.length}건) — 11월 20일 전에 읽은 공고라 마감되면 저절로 사라집니다</summary>
         ${legacy.map(group).join('')}</details>` : ''}
       ${fixed.length ? `<details data-final-changes><summary>둘째 AI(최종 검토)가 스스로 고친 것 ${fixed.reduce((a, x) => a + x.changes.length, 0)}건(공고 ${fixed.length}건) — 확인할 일이 아니라 기록입니다</summary>
         ${fixed.map(({ it, summary, changes }) => `<div class="pgroup"><h3>${esc(it.name)} ${link(it)} <span class="pill">${changes.length}건</span></h3>
+          ${summary ? `<p class="muted">${esc(summary)}</p>` : ''}<div>${changes.map(finalChangeHtml).join('')}</div></div>`).join('')}</details>` : ''}
+      ${aFixed.length ? `<details data-act-final-changes><summary>둘째 AI(최종 검토)가 대외활동·공모전 글에서 스스로 고친 것 ${aFixed.reduce((a, x) => a + x.changes.length, 0)}건(글 ${aFixed.length}건) — 확인할 일이 아니라 기록입니다</summary>
+        ${aFixed.map(({ it, summary, changes }) => `<div class="pgroup"><h3>${esc(it.title)} ${alink(it)} <span class="pill">${changes.length}건</span></h3>
           ${summary ? `<p class="muted">${esc(summary)}</p>` : ''}<div>${changes.map(finalChangeHtml).join('')}</div></div>`).join('')}</details>` : ''}
     </details>`;
 }
@@ -1003,6 +1064,20 @@ function bindPaidReview(root = byId('screen-todo')) {
     } else {
       await applyAction('revert', { ids: [id] }, '빼기(재등록 차단)');
     }
+  }));
+  /* 대외활동·공모전(2026-11-25) — 넘어온 숨김 글: 올리기(무료 값으로 · 표시는 그대로 두고 paidOpen 을 적는다) · 숨기기(있던 동작) / 둘째 AI 가 넘긴 문제: 확인했어요 */
+  $$('[data-act-gate-op]', root).forEach((b) => b.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const url = (b.closest('[data-act-gate-row]') || { dataset: {} }).dataset.actGateRow;
+    if (!url) return;
+    if (b.dataset.actGateOp === 'open') await applyAction('activityGate', { urls: [url], op: 'open' }, '올리기(무료 값으로)');
+    else await applyAction('activityHide', { urls: [url] }, '숨기기');
+  }));
+  $$('[data-act-done-op]', root).forEach((b) => b.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const row = b.closest('[data-act-done-row]');
+    if (!row) return;
+    await applyAction('activityReviewDone', { items: [{ id: row.dataset.actDoneRow, key: row.dataset.actDoneKey }] }, '확인했어요');
   }));
 }
 

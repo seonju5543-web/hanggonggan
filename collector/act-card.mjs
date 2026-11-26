@@ -12,7 +12,7 @@
    🔴 이 파일은 card-read.mjs 를 불러오지 않는다 — card-read 가 이 파일을 부른다(서로 부르면 지시문 글자가 만들어지기 전에 읽힌다).
    관문: verify/test-collector.mjs 「대외활동 유료 관문 ② 카드 쓰기」
    ============================================================ */
-import { readStore, daysSince } from './act-text.mjs';
+import { readStore, daysSince, textDue } from './act-text.mjs';
 import { attachmentText } from './attachment-text.mjs';
 import { fileHash16 } from './attach-role-ai.mjs';
 import { fileNameIn } from './attachment-link.mjs';
@@ -33,6 +33,32 @@ export const ACT_FILES = {
 /* 활동 스위치 — 설정 파일의 `enabled` 와 `activities.enabled` 가 **둘 다** true 일 때만(설계 5-8). 위쪽을 끄면 장학금과 활동이 함께 멈춘다.
    수집 로봇의 숨김 표시 달기와 유료 로봇이 이 함수 하나를 쓴다(갈라지면 숨겨 놓고 아무도 안 읽는다). 유료 호출은 여기에 워크플로의 환경 변수까지 맞아야 나간다 */
 export const actGateOn = (cfg) => !!cfg && cfg.enabled === true && !!cfg.activities && cfg.activities.enabled === true;
+
+/* ── 숨김 표시 (수집 로봇 collect.mjs 가 쓴다 · 설계 5-1) ──
+   표시는 활동 글의 칸 `paidGate: "YYYY-MM-DD"`(주운 날 · 한국 날짜)다. 🔴 **처음 본 게시판 글에만** 단다 — 이미 실린 글·장부에 있던 글에는 달지 않는다(한 번 보인 글을 숨기지 않는다).
+   공공 API 글은 이번 범위 밖이라 달지 않는다. 스위치가 꺼져 있으면 달지 않는다(새 글은 지금처럼 바로 보인다) */
+export function stampNewActivity(it, cfg, today) {
+  if (it && !it.api && actGateOn(cfg) && /^\d{4}-\d{2}-\d{2}$/.test(String(today || ''))) it.paidGate = today;
+  return it;
+}
+/* id 를 받지 못한 글(주소 지문이 다른 글과 겹쳐 수집 로봇이 id 를 비운 글)은 표시를 뗀다 — AI 카드와 id 로 만나므로 관문에 태울 수 없다. 그 글은 지금처럼 바로 보인다. 뗀 수를 돌려준다 */
+export function dropStampWithoutId(items) {
+  let n = 0;
+  for (const it of items || []) if (it && it.paidGate && !it.id) { delete it.paidGate; n += 1; }
+  return n;
+}
+/* 활동 글 중복 정리 + 표시 지키기 — dedupe = url-key dedupeNotices(같은 글은 하나로 · 남길 쪽은 그 함수가 고른다).
+   🔴 처음 본 글(표시 있음)이 **이미 실려 있던 글**(표시 없음 = 학생에게 보이던 글)과 같은 글이면, 어느 쪽이 남든 표시를 뗀다 — 안 떼면 보이던 글이 새 주소의 숨김 글로 바뀌어 사라진다.
+   둘 다 새 글이면 표시가 남는다. 중복 정리의 결과(무엇을 합치고 어느 쪽을 남기는가)는 바꾸지 않는다 — 합쳐진 짝을 보기만 한다 */
+/* 🔴 isShown = 그 글이 학생에게 보이던가(수집 로봇은 앱과 같은 판정을 넘긴다 — paidOpen 이거나 paidGateOpen). 표시는 한 번 달면 지워지지 않아
+   (카드가 실려도 · 사흘이 지나도 · 관리자가 올려도) 「표시 없음」만으로는 보이던 글을 못 가린다(최종 리뷰 C1 · 2026-11-26). 넘기지 않으면 예전처럼 표시 없음 = 보이던 글.
+   셋이 이어 합쳐져도(A~B~C) 짝을 따라 전해진다 · 남은 글이 보이던 글이면 그 표시는 그대로 둔다(카드·검토가 이어진다) */
+export function dedupeActivities(items, dedupe, isShown = (n) => !!n && !n.paidGate) {
+  const shown = new Set();
+  const out = dedupe(items, { distinct: (a, b) => { if (isShown(a) || isShown(b) || shown.has(a) || shown.has(b)) { shown.add(a); shown.add(b); } return false; } });
+  for (const n of out) if (n && n.paidGate && shown.has(n) && !isShown(n)) delete n.paidGate;
+  return out;
+}
 
 /* ── 지시문 (활동용 · 응답 꼴은 장학금과 같다 — card-read SCHEMA) ── */
 const ACT_LINE_RULES = `줄마다 두 가지를 냅니다 — text 와 quote.
@@ -157,6 +183,9 @@ export function makeActSources({ storeDir, formRows = [], extractedDir }) {
       const t = textOf(r.file);
       if (t.replace(/[^가-힣]/g, '').length >= 40) add(r.file, r.attach, hash, r.attach, t);   // 서식은 글자가 적다 — 한글 40자면 가를 수 있다(장학금과 같은 선)
     }
+    /* 본문 대기 — 무료 받기의 본문이 비었고 진짜 브라우저가 아직 그 글을 안 열었다(act-text textDue browser · 최종 리뷰 2026-11-26) → actAwaits 가 본문도 기다린다.
+       원문 덩어리가 아니라 목록에 붙은 표식이다(원문 글자·지문에 안 든다) */
+    out.bodyPending = !!it.id && textDue(storeDir, it.id, 'browser', '');
     return out;
   };
 }
@@ -169,6 +198,7 @@ const DOC_NAME = /\.(?:hwpx?|docx?|pdf)$/i;
 const nameKey = (s) => { const v = String(s || '').replace(/\s+/g, ' ').trim(); return fileNameIn(v) || v; };   // 사이트가 붙인 꼬리(「신청서.hwp (71KB)」)는 떼고 견준다
 export function actAwaits(it, parts, today, days = 2) {
   if (!(days > 0) || !it || !it.paidGate || daysSince(it.paidGate, today) >= days) return false;
+  if (parts && parts.bodyPending) return true;   // 본문도 기다린다 — 몇 시간 뒤 브라우저 본문이 와 원문이 바뀌면 같은 글을 다시 산다(첨부 기다리기와 같은 이중 결제 · 최종 리뷰 2026-11-26)
   const have = new Set((parts || []).filter((x) => x && x.tag && x.attach).map((x) => nameKey(x.attach)));
   return (it.attachments || []).some((a) => a && !a.bodyImage && DOC_NAME.test(nameKey(a.name)) && !have.has(nameKey(a.name)));
 }

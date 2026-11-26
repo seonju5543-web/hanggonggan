@@ -378,6 +378,7 @@ async function fetchPhase(acts) {
     if (posts >= POSTS_PER_RUN || Date.now() > until) break;
     const forText = isTextTarget(n);
     if (!forText) {
+      if (TEXT_IDS.size) continue;   // 유료 시험이 글을 지정했다(ACT_TEXT_IDS) — 그 글만 받는다(다른 글의 사이트를 두드리지 않는다)
       if (!(needsElig(n) || (!BROWSER && staleDocs(n))) || !dueFree(ledger[n.url], today)) continue;
       if (BROWSER && !plainTried[n.url]) continue;           // 무료 모드가 먼저 — 그래도 못 읽은 글만 브라우저로
       if (BROWSER && ledger[n.url] && ledger[n.url].lines) continue;   // 이미 찾아 장부에 적었다 — 수집 로봇이 합치기 전까지 다시 열지 않는다
@@ -436,7 +437,9 @@ export function storeFromFiles(n, files, names = {}, { key = keyOf(n.url), dir =
     const ocr = !guide && !!isOcr(p);
     const fromImg = /\di\.\w+$/.test(f);
     if ((guide || (fromImg && ocr)) && !owns(text)) continue;    // 남의 글 막기
-    const hash = guide ? `T-${sha16(text)}` : hashOf(p);
+    /* 따라간 요강 페이지의 지문은 **그 자리**(글 주소 · 몇째 링크) — 글자로 매기면 방문자 수만 바뀌어도 새 덩어리가 붙어 원문 지문이 바뀌고 같은 글을 다시 산다(최종 리뷰 2026-11-26).
+       같은 자리는 처음 받은 글자 그대로(act-text writeStore) · 첨부는 원본 바이트 지문 그대로 */
+    const hash = guide ? `T-${sha16(`${n.url}#${f.replace(/^.*-(L\d*)\.txt$/, '$1')}`)}` : hashOf(p);
     if (!hash) continue;
     docs.push({ name: guide ? '' : String(names[f] || ''), hash, from: guide ? 'guide' : fromImg ? 'img' : 'attach', ocr, text });
   }

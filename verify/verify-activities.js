@@ -529,7 +529,7 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     ] };
     const GATE_READ = { updatedAt: iso(0), gateHeld: { 'g-held': 'no-source' }, items: { 'g-card': { title: '2026 캠퍼스 창업 해커톤', host: '창업지원단', eligibility: ['만 19~34세 대한민국 국민'], excludes: ['휴학생'], priority: [],
       amount: ['대상 1팀 300만원', '참가자 전원 수료증', '우수팀 후속 지원'], apply: ['온라인 접수(구글 폼)'], documents: ['참가신청서', '개인정보 수집·이용 동의서'],
-      notes: ['일정: 예선 12.5.', '참가 형태: 2~4인 팀', '일정: 본선 12.12.', '유의사항: 전 일정 참석 필수'], multi: false, head: 0, deadline: { date: iso(12), quote: '접수 마감' }, hash: 'h', readAt: iso(0) } } };
+      notes: ['일정: 예선 12.5.', '참가 형태: 2~4인 팀', '일정: 본선 12.12.', '유의사항: 전 일정 참석 필수', '유의사항: 숙박 지원 여부는 추후 확인 필요'], multi: false, head: 0, deadline: { date: iso(12), quote: '접수 마감' }, hash: 'h', readAt: iso(0) } } };
     const gate = async (readMode) => {
       const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, serviceWorkers: 'block' });
       await ctx.addInitScript((pr) => { if (!localStorage.getItem('handaejang.v1')) localStorage.setItem('handaejang.v1', JSON.stringify({ profile: pr, applications: [], docs: {}, notify: {} })); }, PROFILE);
@@ -576,10 +576,12 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
         [sheet.apply.map((r) => r[0]), sheet.apply.filter((r) => r[0] !== '기간')], [['기간', '방법', '서류'], [['방법', '온라인 접수(구글 폼)'], ['서류', '참가신청서 · 개인정보 수집·이용 동의서']]]);
       eq('⑧ 「지원 자격」 — AI 가 쓴 줄로 판정한다(✓ 나이) · 제외 줄이 같은 칸에 · 무료 규칙이 뽑은 자격 줄은 없다',
         [sheet.reasons[0], sheet.reasons.some((l) => /휴학생/.test(l)), /무료 규칙이 뽑은 자격 줄/.test(sheet.text)], ['✓ 만 19~34세 대한민국 국민', true, false]);
-      eq('⑧ 「공고 안내」 — 같은 이름표끼리 한 줄(혜택 둘째 줄부터 · 일정 둘) · 문의처는 남는다 · 무료 규칙이 뽑은 발췌·안내 줄은 싣지 않는다',
+      eq('⑧ 「공고 안내」 — 같은 이름표끼리 한 줄(혜택 둘째 줄부터 · 일정 둘) · 문의처는 남는다 · 무료 규칙이 뽑은 발췌·안내 줄은 싣지 않는다 · 「확인 필요」 줄은 그 줄만 빠지고 같은 이름표의 형제 줄은 남는다',
         [sheet.notice.some((l) => /^혜택/.test(l) && l.includes('참가자 전원 수료증 · 우수팀 후속 지원')), sheet.notice.some((l) => /^일정/.test(l) && l.includes('예선 12.5. · 본선 12.12.')),
-          sheet.notice.some((l) => l.includes('2~4인 팀')), sheet.notice.some((l) => l.includes('창업지원단 02-000-0000')), /무료 규칙이 뽑은 (?:안내 줄|대상|서류)/.test(sheet.text)],
-        [true, true, true, true, false]);
+          sheet.notice.some((l) => l.includes('2~4인 팀')), sheet.notice.some((l) => l.includes('창업지원단 02-000-0000')), /무료 규칙이 뽑은 (?:안내 줄|대상|서류)/.test(sheet.text),
+          /* 최종 리뷰(화면 I1 · 2026-11-26) — '모름'류 낱말(「확인 필요」)이 든 줄은 그 줄만 빠지고, 같은 이름표의 형제 줄(「전 일정 참석 필수」)은 남는다 · 시트는 「유의사항」을 「참고」 이름표로 그린다(app-sheet NS_LABELS) */
+          sheet.notice.some((l) => /^참고/.test(l) && l.includes('전 일정 참석 필수')), /확인 필요/.test(sheet.text)],
+        [true, true, true, true, false, true, false]);
       /* 담아 두면 그 글의 사본에도 얹은 값이 들어간다 — 피드에서 빠진 뒤에 쓰이는 사본이 무료 값으로 돌아가지 않게 */
       eq('⑧ 담아 둔 글의 사본 — 얹은 값(AI 가 쓴 자격 줄 · 마감 · 카드)이 그대로 들어간다',
         await page.evaluate(() => { const u = 'https://dep.hufs.ac.kr/bbs/g/g-card'; toggleSave(`act:${u}`); const sv = state.saved.find((x) => x.id === `act:${u}`); const sn = (sv && sv.snap) || {};

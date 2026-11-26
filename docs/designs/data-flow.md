@@ -63,6 +63,13 @@ notices.json 의 새 공고
 `collector/card-read.mjs`(4번 — AI 하나가 카드를 쓰고 첨부를 내용 문서/신청 양식으로 가른다 · 2026-11-21 기계 검사 없음) 가 `data/card-read.json` 에 실어야 학생 화면에 나온다(`match-engine.js` `publishedList`) →
 `collector/final-review.mjs`(6번 — 둘째 AI)가 카드 읽기 직후와 새벽 PDF 변환 직후에 원문·카드·첨부 구분·PDF 사본을 다시 보고 카드를 고친 완성본으로 바꾼다(`collector/final-review.json` 에 무엇을 고쳤나 · 스스로 못 고친 것만 관리자 「할 일」).
 
+🔴 **대외활동·공모전도 같은 길 (2026-11-25 · `docs/designs/paid-gate-activities.md` · 스위치를 꺼 둔 채 지었다)** — 수집 로봇이 **처음 본** 활동 글에만 `paidGate`(처음 본 날)를 달아 숨긴다(`collector/act-card.mjs` `stampNewActivity` — 활동 스위치가 켜져 있을 때만 · 이미 보이던 글에는 달지 않는다) →
+원문 글자를 글마다 작은 파일로 받는다(`collector/act-text.mjs` — 받는 일은 `collector/activity-docs.mjs` · 첨부 원본은 저장소에 두지 않는다) →
+같은 두 로봇이 `--activities` 로 돈다(파일 이름만 `ACT_FILES` 로 바뀐다 — 카드는 `data/act-read.json` · 지시문은 활동용 `ACT_SYSTEM`·`ACT_REVIEW_SYSTEM`) →
+앱은 `match-engine.js` `publishedActivities` 로 숨김을 거르고 카드를 얹는다(`withActRead`).
+사흘째에도 원문이 없으면 관리자 「할 일」로 넘어가고(「올리기」 = `tools/admin-apply.mjs` `activityGate` 가 `paidOpen` 을 더한다), 사흘을 넘겨 카드도 사람 몫도 아닌 글은 무료 값으로 오른다(경보 「🧾 대외활동 유료 확인이 멈췄어요」).
+지정한 글만 **저장 없이** 돌려 보는 길은 `act-paid-probe.yml`(사람이 눌러야만 돈다 · 결과는 내려받는 묶음).
+
 🔴 **저장 직전에 데이터 관문**(`verify/audit-data.js`)이 선다. 통과 못 하면 **그 실행이 새로
 등록한 것만 골라 되돌리고**(`revert-auto.mjs`) 리포트에 🚨 를 남긴다. 잘못된 공고가 앱에 하루도 못 나간다.
 

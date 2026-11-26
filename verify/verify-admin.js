@@ -121,6 +121,17 @@ function serve() {
   let apiCalls = 0;
   let PAGE_ITEMS = null;   // 화면이 실제로 받은 목록 (아래 raw 가로채기가 채운다)
   let ACT_ITEMS = [];      // 「활동」 탭이 실제로 받은 목록 (2026-09-29)
+  /* 대외활동 유료 확인(2026-11-25) — 「할 일」의 「넘어온 숨김 글」·「둘째 AI 가 넘긴 문제」는 활동 스위치가 켜져야 생긴다. 꺼진 저장소에서도 그 묶음을 재려고
+     열려 있는 활동 글 둘에 숨김 표시를 얹어 응답하고(글 수는 그대로), 그 두 글의 기록 파일 둘을 가짜로 준다. 열린 글이 모자라면 검사용 글 둘을 끼운다 */
+  const GATE_DAY = (n) => new Date(Date.now() + 9 * 3600e3 + n * 86400e3).toISOString().slice(0, 10);
+  const GATE_FX = (() => {
+    let items = [];
+    try { items = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/activities.json'), 'utf8')).items || []; } catch { /* 없음 */ }
+    const open = items.filter((n) => n && n.id && n.url && n.title && !n.hidden && !n.paidGate && (!n.deadline || n.deadline >= GATE_DAY(0))).slice(0, 2);
+    if (open.length === 2) return { add: false, held: { id: open[0].id, url: open[0].url, title: open[0].title }, fin: { id: open[1].id, url: open[1].url, title: open[1].title } };
+    const mk = (id, title) => ({ id, title, url: `https://example.ac.kr/act/${id}`, kind: '공모전', school: '', host: '검사용', foundAt: GATE_DAY(-3), attachments: [], deadline: GATE_DAY(9) });
+    return { add: true, held: mk('verify-gate-held', '검사용 넘어온 숨김 글'), fin: mk('verify-gate-final', '검사용 둘째 AI 가 넘긴 글') };
+  })();
   await page.route('https://api.github.com/**', async (route) => {
     apiCalls += 1;
     const u = route.request().url();
@@ -166,6 +177,9 @@ function serve() {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ school: '검사용대학교', items: [
         { title: '검사용 소식 목록 표식', url: LFX.newsMark, school: '검사용대학교', campus: '', foundAt: '2026-10-03', postId: '77' }] }) });
     }
+    if (rel === 'collector/act-read-review.json') return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ updatedAt: GATE_DAY(0), items: {}, gateHeld: { [GATE_FX.held.id]: 'no-source' } }) });
+    if (rel === 'collector/act-final-review.json') return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ updatedAt: GATE_DAY(0), items: { [GATE_FX.fin.id]: { summary: '검사용 요약', changes: [],
+      problems: [{ kind: 'pdf-broken', doc: '검사용 요강.hwp', reason: '앱에 올렸던 공고문·안내문 사본 「검사용 요강.hwp」의 변환이 잘못됐습니다.', check: '원본 첨부를 열어 확인해 주세요.' }] } } }) });
     if (!f.startsWith(ROOT) || !fs.existsSync(f)) return route.fulfill({ status: 404, body: '' });
     let body = fs.readFileSync(f, 'utf8');
     /* 🔴 검수 대기가 0건이면 '컨펌 작업대'와 '다중 선택' 검사가 **조용히 사라진다**
@@ -246,6 +260,9 @@ function serve() {
         );
         body = JSON.stringify(db);
       }
+      if (GATE_FX.add) db.items.push({ ...GATE_FX.held }, { ...GATE_FX.fin });
+      for (const n of db.items) if (n && (n.id === GATE_FX.held.id || n.id === GATE_FX.fin.id)) n.paidGate = GATE_DAY(-3);
+      body = JSON.stringify(db);
       ACT_ITEMS = JSON.parse(body).items;
     }
     if (rel === 'data/kosaf-open.json') {
@@ -2350,6 +2367,48 @@ function serve() {
 
   /* 콘솔 오류 */
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 3).join(' | '));
+
+  /* ══ 대외활동 유료 확인 — 「할 일」의 넘어온 숨김 글 · 둘째 AI 가 넘긴 문제 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-7) ══
+     보는 것: 넘어온 글이 사람 말로 뜬다(로봇 말 없음) · 「올리기」가 activityGate 와 그 글의 주소를 보낸다 · 「확인했어요」가 activityReviewDone 과 그 줄을 보낸다.
+     저장소 쪽(표시를 지우지 않는다 · 활동용 기록 파일)은 test-collector 「대외활동 유료 관문 ⑥」이 잰다 */
+  {
+    const sent = [];
+    await page.route('**/actions/workflows/**/dispatches', (route) => {
+      try { sent.push(JSON.parse(route.request().postData() || '{}')); } catch { sent.push('parse-fail'); }
+      route.fulfill({ status: 204, body: '' });
+    });
+    await page.route('**/actions/workflows/**/runs**', (route) => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ workflow_runs: [{ id: 31, status: 'completed', conclusion: 'success', created_at: new Date(Date.now() + 5000).toISOString(), html_url: 'https://example.invalid/run' }] }),
+    }));
+    const idle = () => page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).then(() => true, () => false);
+    const openPaid = () => page.evaluate(() => { const d = document.querySelector('#todo-paid'); if (d) d.open = true; return !!d; });
+    await idle();
+    await page.click('.tab[data-tab="todo"]');
+    await page.waitForSelector('#screen-todo:not([hidden])');
+    ok(await openPaid(), '유료 확인(대외활동) — 「할 일」에 유료 확인 묶음이 있다');
+    const heldRows = await page.$$eval('#todo-paid [data-act-gate-row]', (els) => els.map((e) => [e.dataset.actGateRow, e.innerText.replace(/\s+/g, ' ')]));
+    ok(heldRows.length === 1 && heldRows[0][0] === GATE_FX.held.url && /원문\(본문·첨부\)을 받지 못해/.test(heldRows[0][1]) && /올리기\(무료 값으로\)/.test(heldRows[0][1]) && /숨기기/.test(heldRows[0][1]),
+      '  사람에게 넘어온 숨김 글 한 줄 — 까닭을 사람 말로 · 단추 둘(올리기 · 숨기기)', JSON.stringify(heldRows).slice(0, 200));
+    ok(!/no-source|gateHeld|paidGate|unreadable/.test(heldRows.map((r) => r[1]).join(' ')), '  로봇 말(no-source·gateHeld…)이 화면에 없다');
+    const finRows = await page.$$eval('#todo-paid [data-act-done-row]', (els) => els.map((e) => [e.dataset.actDoneRow, e.dataset.actDoneKey, e.innerText.replace(/\s+/g, ' ')]));
+    ok(finRows.length === 1 && finRows[0][0] === GATE_FX.fin.id && finRows[0][1] === 'final|pdf-broken|검사용 요강.hwp' && /확인했어요/.test(finRows[0][2]),
+      '  둘째 AI 가 넘긴 문제 한 줄 — 「확인했어요」 단추', JSON.stringify(finRows).slice(0, 200));
+    await page.click('#todo-paid [data-act-gate-row] [data-act-gate-op="open"]');
+    await page.waitForTimeout(800);
+    const p1 = (() => { try { return JSON.parse(sent[0]?.inputs?.payload || '{}'); } catch { return {}; } })();
+    ok(sent[0]?.inputs?.action === 'activityGate' && Array.isArray(p1.urls) && p1.urls[0] === GATE_FX.held.url && p1.op === 'open',
+      '  「올리기」가 activityGate 와 그 글의 주소 · op open 을 보낸다', JSON.stringify(sent[0]?.inputs || null).slice(0, 160));
+    await idle();
+    await openPaid();
+    await page.click('#todo-paid [data-act-done-row] [data-act-done-op]');
+    await page.waitForTimeout(800);
+    const p2 = (() => { try { return JSON.parse(sent[1]?.inputs?.payload || '{}'); } catch { return {}; } })();
+    ok(sent[1]?.inputs?.action === 'activityReviewDone' && Array.isArray(p2.items) && p2.items[0]?.id === GATE_FX.fin.id && p2.items[0]?.key === 'final|pdf-broken|검사용 요강.hwp',
+      '  「확인했어요」가 activityReviewDone 과 그 글 · 그 줄을 보낸다', JSON.stringify(sent[1]?.inputs || null).slice(0, 160));
+    await idle();
+    await page.unroute('**/actions/workflows/**/dispatches');
+  }
 
   /* ══ 못 읽은 파일 — 화면이 그 숫자를 단정하지 않는가 (2026-09-14) ═══════════
      🔴 관리자 화면이 말하는 「게시판 2곳」은 파일에서 센 것이다. 그 파일을 못 읽었을 때

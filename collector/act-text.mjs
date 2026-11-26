@@ -41,8 +41,11 @@ export function writeStore(dir, id, mode, rec, today) {
     next.docs.push({ name: String(d.name || ''), hash: String(d.hash), from: ['attach', 'img', 'guide'].includes(d.from) ? d.from : 'attach', ocr: !!d.ocr, text: d.text });
     changed = true;
   }
-  if (!changed) return false;
-  next.at = today;
+  /* 🔴 바뀐 것이 없어도 「오늘 받아 봤다」(tried)는 남긴다 — 안 남기면 textDue 가 그날 수집할 때마다 본문이 빈 글을 다시 받는다(최종 리뷰 2026-11-26 · 하루에 여러 번 두드리지 말 것).
+     본문이 빈 기록만(본문이 있으면 다시 받을 일이 없다) · 그날 이미 적었으면 쓰지 않는다(빈 커밋 없음) · 내용이 바뀐 날(at)은 바뀐 날만 */
+  if (!changed && (hasText(next.body) || old.tried === today)) return false;
+  if (changed) next.at = today;
+  next.tried = today;
   const bytes = () => Buffer.byteLength(JSON.stringify(next, null, 1));
   while (bytes() > MAX_STORE_BYTES && next.docs.length) {
     let big = 0;
@@ -54,7 +57,7 @@ export function writeStore(dir, id, mode, rec, today) {
   const tmp = `${file}.tmp`;
   fs.writeFileSync(tmp, `${JSON.stringify(next, null, 1)}\n`);
   fs.renameSync(tmp, file);
-  return true;
+  return changed;   // 「받아 봤다」만 적은 날은 쓴 글로 세지 않는다
 }
 
 /** 두 모드의 기록을 합쳐 읽는다 — 없으면 null. 본문은 무료 받기 것이 비지 않았으면 그것, 아니면 브라우저 것 · 첨부는 지문으로 한 번씩(무료 받기 것이 먼저 · 차례는 저장된 그대로) */
@@ -90,7 +93,7 @@ export function textDue(dir, id, mode, today) {
   const p = readOne(storeFile(dir, id, 'plain'));
   if (mode === 'browser') return !!p && !hasText(p.body) && !readOne(storeFile(dir, id, 'browser'));
   if (!p) return true;
-  return !hasText(p.body) && p.at !== today;
+  return !hasText(p.body) && (p.tried || p.at) !== today;   // tried — 마지막으로 받아 본 날(바뀐 것이 없던 날도 · 옛 기록은 at)
 }
 
 /** 목록에서 빠진 글의 기록을 지운다 — 제 모드의 파일만(다른 워크플로의 파일을 건드리지 않는다). 지운 수를 돌려준다 */

@@ -48,7 +48,7 @@ async function dismissNotify(page) {
   const later = await page.$('#btn-nf-later');
   if (later) await later.click().catch(() => {});
   else await page.keyboard.press('Escape').catch(() => {});
-  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 3000 }).catch(() => {});
+  await page.waitForSelector('#notify-sheet[hidden]', { state: 'attached', timeout: 3000 }).catch(() => {});
 }
 
 (async () => {

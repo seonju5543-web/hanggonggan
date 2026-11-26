@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { MODELS, PRICE } from './card-read.mjs';
 import { roleText } from './attachment-text.mjs';
 import { loadFormRules, cleanAttachName } from './form-rules.mjs';
+import { actGateOn } from './act-card.mjs';   // 활동 스위치 — 켜져 있을 때만 활동 글의 첨부를 묻는다(2026-11-25)
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const MAX_BYTES = 5 * 1024 * 1024;
@@ -62,6 +63,12 @@ export function agreeRole(a, b) {
   return ra && ra === rb && ROLES.includes(ra) && ra !== 'unknown' ? ra : null;
 }
 
+/** 볼 글 목록 — 정식 등록 공고 + (활동 스위치가 켜져 있을 때만) 숨김 표시가 달린 활동 글 (2026-11-25 · 대외활동 유료 관문 5-5).
+    🔴 돈이 나가는 로봇이다 — 활동 스위치(card-read-config.json 의 enabled 와 activities.enabled 둘 다)가 꺼져 있으면 활동 글은 하나도 넣지 않는다.
+    관리자가 올린 글(paidOpen)·숨긴 글은 아니다. 상한은 장학금과 같이 쓴다(roleMaxPerRun · roleMaxUsdPerRun) */
+export function roleItems(reg, acts, cfg) {
+  return [...(reg || []), ...(actGateOn(cfg) ? (acts || []).filter((n) => n && n.paidGate && !n.paidOpen && !n.hidden) : [])];
+}
 /** 물을 파일 — 마감 전 정식 등록 공고의 첨부 중, 받아 둔 원본이 PDF·그림이고, 글자로 못 가른 것(docRole null), 아직 이 바이트로 안 물은 것 */
 export function pickRoleTargets(items, rows, { today, extractedDir, ledger = {}, giveUpAfter = 3, findRow, isOpen }) {
   const out = [];
@@ -125,16 +132,18 @@ export async function runAttachRole({ root, today, write = false, env = process.
   const data = rd('collector/attach-role-paid.json', { items: {} });
   if (!data.items || typeof data.items !== 'object') data.items = {};
   const reg = rd('data/registered.json', { items: [] }).items || [];
+  const acts = FP.loadActivities(root);   // 활동 글(id 있는 것만) — 대상에 넣는 것은 roleItems 가 스위치를 보고 정한다
+  const items = roleItems(reg, acts, cfg);
   const idxPath = path.join(root, 'collector', 'extracted', 'forms-index.txt');
   const rows = fs.existsSync(idxPath) ? FP.parseFormsIndex(fs.readFileSync(idxPath, 'utf8')) : [];
   loadFormRules(root);   // data.js 가 없는 저장소면 여기서 멈춘다(양식 로봇과 같은 전제)
 
   /* 마감이 지나거나 사라진 공고의 줄은 뺀다(자라기만 하지 않게) */
-  const live = new Set(reg.filter((it) => it && it.id && !it.hidden && FP.isOpen(it, today)).map((it) => it.id));
+  const live = new Set([...reg, ...acts].filter((it) => it && it.id && !it.hidden && FP.isOpen(it, today)).map((it) => it.id));   // 활동 글의 답도 그 글이 열려 있는 동안 남긴다(스위치를 꺼도 받은 답을 버리지 않는다)
   let pruned = 0;
   for (const k of Object.keys(data.items)) if (!live.has(k.split('|')[0])) { delete data.items[k]; pruned += 1; }
 
-  const targets = pickRoleTargets(reg, rows, { today, extractedDir: path.join(root, 'collector', 'extracted'), ledger: data.items, giveUpAfter: cfg.giveUpAfter, findRow: FP.findRow, isOpen: FP.isOpen });
+  const targets = pickRoleTargets(items, rows, { today, extractedDir: path.join(root, 'collector', 'extracted'), ledger: data.items, giveUpAfter: cfg.giveUpAfter, findRow: FP.findRow, isOpen: FP.isOpen });
   log(`대상 ${targets.length}개 (마감 전 정식 등록 · 글자로 못 가른 PDF·그림 · ${MAX_PAGES}쪽·5MB 이하 · 이 바이트로 아직 안 물음) · 실린 답 ${Object.values(data.items).filter((e) => e.role).length}개 · 뺀 줄 ${pruned}`);
   const save = () => { data.updatedAt = today; const tmp = `${outPath}.tmp`; fs.writeFileSync(tmp, `${JSON.stringify(data, null, 1)}\n`); fs.renameSync(tmp, outPath); };
   if (!write) { targets.slice(0, 30).forEach((t) => log(`  · ${t.key} · ${t.row.file} · ${Math.round(t.bytes / 1024)}KB`)); log('미리보기 — 부르지 않았습니다 (--write 로 반영)'); return { targets, called: 0 }; }

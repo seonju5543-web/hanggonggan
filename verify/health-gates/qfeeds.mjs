@@ -401,7 +401,7 @@ export default async function qfeeds(eq, ctx) {
     eq('  actKeepDate — API 글은 seenAt · 게시판 글은 foundAt · 상한보다 적으면 그대로',
       [actKeepDate(items[2]), actKeepDate(items[0]), capActivities(items, 5).length], ['2026-10-04', '2026-10-03', 4]);
     eq('  수집 로봇의 60일 거름과 상한이 같은 날짜(actKeepDate)를 쓴다',
-      [/acts\.items = acts\.items\.filter\(\(n\) => \(actKeepDate\(n\) \|\| '9999'\) >= cutoff\)/.test(collectSrc), /acts\.items = capActivities\(acts\.items, ACT_CAP\)/.test(collectSrc), /acts\.items\.slice\(0, ACT_CAP\)/.test(collectSrc)],
+      [/acts\.items = acts\.items\.filter\(\(n\) => \(actKeepDate\(n\) \|\| '9999'\) >= cutoff\)/.test(collectSrc), /acts\.items = capActivities\(acts\.items, ACT_CAP, /.test(collectSrc), /acts\.items\.slice\(0, ACT_CAP\)/.test(collectSrc)],   // 2026-11-25 — 상한에 「보이는가」 판정이 붙었다(숨김 글은 상한 밖 · 대외활동 유료 관문)
       [true, true, false]);
   }
 
