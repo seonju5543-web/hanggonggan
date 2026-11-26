@@ -1,7 +1,38 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[에듀테크센터] 2026 PNU AI+X VIBETHON 참가 신청 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512466",
+   "postedAt": "2026-11-26",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/c169d26027ef3153.webp",
+   "desc": "● ● ● ● 주관: 부산대학교 · Google for Education 신청 대상 부산대학교 학부생 시그니엘 부산 볼룸 에서 펼쳐지는 단 하루의 바이브코딩 해커톤. 부산대학교 Google Workspace for…"
+  },
+  {
+   "title": "[AI융합교육원] 2026학년도 겨울계절수업 「데이터분석입문」 수강신청 대상 확...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512461",
+   "postedAt": "2026-11-26",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-26",
+   "desc": "AI융합교육원에서 2026학년도 겨울계절수업 「데이터분석입문」 교과목의 수강신청 대상을 확대합니다."
+  },
+  {
+   "title": "[언어교육원] 2026학년도 재학생의 외국어 학습 수요 설문조사 경품 지급 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512459",
+   "postedAt": "2026-11-26",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-26"
+  },
   {
    "title": "[국제처][기관토플] 2026학년도 기관토플(토플ITP)시험 시행 계획 안내(4...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512456",
@@ -393,38 +424,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-11-18",
    "desc": "2026학년도 겨울계절수업 계명대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[에듀테크센터] 11/20(금) Google Korea가 부산대에 찾아옵니다! ...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512294",
-   "postedAt": "2026-11-18",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-18",
-   "desc": "[부산대학교 교육혁신본부 에듀테크센터 &times; Google for Education Partnership] 11/20(금) Google Korea에서 부산대에 찾아옵니다! (Career Meetup 행사 안내)"
-  },
-  {
-   "title": "「오늘, 마음의 날씨를 체크해 보세요!」 마음체크 참여 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512241",
-   "postedAt": "2026-11-17",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-17",
-   "thumb": "data/news/img/24d1ad1ad3d24937.webp",
-   "desc": "안녕하세요. 효원상담원입니다. 마음체크는 현재 자신의 마음건강 상태를 살펴보고, 필요한 심리지원 정보를 확인할 수 있는 간단한 검사입니다. ✔ 약 3분 이면 현재 나의 마음건강 상태를 확인할 수 있습니다."
-  },
-  {
-   "title": "[사학과] Pre-BK 해외학자 초청강연 개최",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512240",
-   "postedAt": "2026-11-17",
-   "kind": "행사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-17",
-   "desc": "사학과에서 <해외학자 초청강연>을 개최합니다. *주제: 식민지 공창제도는 어떻게 설계되었는가: 대만의 경험으로 본 일본 제국의 성(性) 관리 *일시: 다음 주 월요일(11/23) 오후 3시 *장소: 부산대학교…"
   }
  ]
 }

@@ -1,6 +1,6 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
   {
    "title": "글로벌인문사회융합연구사업단, 산·학·연 성과공유회 성료",
@@ -133,7 +133,7 @@
    "src": "f8a29ec6",
    "foundAt": "2026-11-03",
    "thumb": "data/news/img/bf12f5ab335abe51.webp",
-   "desc": "대외협력팀 우리 대학은 지난 2일 서울캠퍼스에서 2026학년도 2학기 소동제 ‘VOYAGE: GAMEMODE’를 개최했다."
+   "desc": "우리 대학은 지난 2일 서울캠퍼스에서 2026학년도 2학기 소동제 ‘VOYAGE: GAMEMODE’를 개최했다."
   },
   {
    "title": "2026 바이오헬스 혁신융합대학 직무박람회 개최",
@@ -179,17 +179,6 @@
    "foundAt": "2026-10-27",
    "desc": "상명대학교(총장 김종희)는 27일 천안시청 소회의실에서 천안시와 '건축·도시디자인 기반 시민공간 혁신과 지역가치 창출을 위한 관·학 협약'을 체결했다고 밝혔다.",
    "thumb": "data/news/img/be7a20760a321f85.webp"
-  },
-  {
-   "title": "인도네시아 국립 폴리테크닉대학 대표단 방문행사 ‘KIND 2026’ 성료",
-   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769707&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-26",
-   "school": "상명대학교",
-   "campus": "",
-   "src": "f8a29ec6",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/b0e3e63937365fbb.webp",
-   "desc": "우리 대학은 지난 23일 인도네시아 국립 폴리테크닉대학 방문행사 ‘KIND 2026(Korea-Indonesia Networking Day)’을 개최하고 성황리에 마쳤다."
   }
  ]
 }

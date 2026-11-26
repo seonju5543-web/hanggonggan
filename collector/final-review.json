@@ -567,8 +567,8 @@
   },
   "auto-bbssc58944731artclviewdo": {
    "name": "2027년도 제35기 세아해암장학생 추천(신촌캠퍼스)",
-   "hash": "8f9d607e4c371c95",
-   "at": "2026-11-25",
+   "hash": "d2b8a8d90ae46215",
+   "at": "2026-11-26",
    "readAt": "2026-11-25",
    "cardHash": "0ec8776b3ff7834b",
    "summary": "고친 것 없음",
@@ -599,7 +599,40 @@
      "why": "학생이 활동 내용을 채워 내는 과학탐구활동 실행 이력서 서식과 그 서식의 작성 가이드만 들어 있습니다."
     }
    ],
-   "pdfs": [],
+   "pdfs": [
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-bbssc58944731artclviewdo/1-2-_서식_자기소개서.pdf",
+     "name": "2-(서식) 자기소개서.docx",
+     "bytes": 52405,
+     "verdict": "ok",
+     "why": "A1 자기소개서 서식의 머리칸과 Q1~Q3 문항, 작성 안내가 2쪽에 걸쳐 빠짐없이 읽힙니다."
+    },
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-bbssc58944731artclviewdo/2-3-_서식_포토에세이.pdf",
+     "name": "3-(서식) 포토에세이.docx",
+     "bytes": 43130,
+     "verdict": "ok",
+     "why": "A2 포토에세이 서식의 머리칸, 사진 첨부란, 부가설명 안내가 그대로 들어 있습니다."
+    },
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-bbssc58944731artclviewdo/3-4-_서식_과학탐구활동_실행_이력서.pdf",
+     "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
+     "bytes": 106832,
+     "verdict": "ok",
+     "why": "A3 이력서 서식의 실행활동 1~3 표와 4쪽의 작성 가이드까지 원본 내용이 모두 읽힙니다."
+    },
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-bbssc58944731artclviewdo/4-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf",
+     "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
+     "bytes": 94932,
+     "verdict": "ok",
+     "why": "원문에 같은 내용의 첨부는 없으나, 사본 자체가 세아해암학술장학재단 제35기 지원자용 개인정보 수집 및 사용 동의서로 글자와 표가 온전히 읽힙니다."
+    }
+   ],
    "problems": []
   },
   "auto-ghaknoticedetail26767096": {
