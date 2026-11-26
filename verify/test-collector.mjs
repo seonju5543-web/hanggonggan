@@ -4060,6 +4060,24 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     eq('    괄호 안에 서류 이름이 있으면 소제목이 아니라 서류다 · 괄호에 서류 이름이 없는 소제목(「추가 제출 가능 서류 (해당자만)」)은 그대로 뺀다',
       readDocuments('5. 제출서류\n5.1. (재단 양식) 추천서 1부\n추가 제출 가능 서류 (해당자만)\n5.5. 소득분위서류(2026년 2학기 한국장학재단 학자금 지원구간 통지서)\n6. 문의: 장학팀').docs,
       ['(재단 양식) 추천서 1부', '소득분위서류(2026년 2학기 한국장학재단 학자금 지원구간 통지서)']);
+    /* 리뷰 9차 — 날짜·참조 막음이 반쪽이었다: 줄이 번호로 **바로** 시작하는 꼴(「① 또는 ② …」·「①~③ 중 …」·「1)~3) …」·「가) 의 경우 …」)과 붙여 쓴 날짜(「10.1. 이후 …」·「12.31. 기준 …」)는
+       여전히 지워졌다 → 두 겹이 같은 막음(NOT_MARK) 하나를 쓴다 · 날짜는 「숫자.」 꼴뿐이다(「1. 1) 신청서」 는 두 겹 다 뗀다) · 「의 」·소수점 막음도 잠근다 */
+    eq('    줄이 번호로 바로 시작해도 · 붙여 쓴 날짜도 떼지 않는다 · 「의 」·소수점 막음 · 「1. 1)」 은 두 겹 다 · 「5.1.」 절 번호는 뗀다',
+      readDocuments('마. 제출서류\n① 또는 ② 해당자: 가족관계증명서 1부\n①~③ 중 택1 증빙서류 1부\n1)~3) 해당자 증빙서류 1부\n10.1. 이후 발급분 재학증명서 1부\n12.31. 기준 주민등록등본 1부\n- ③ 의 경우 주민등록초본 1부\n• 1. 3.0 이상 성적증명서 1부\n1. 1) 장학금 신청서 1부\n5.1. (재단 양식) 추천서 1부\n바. 문의: 장학팀').docs,
+      ['① 또는 ② 해당자: 가족관계증명서 1부', '①~③ 중 택1 증빙서류 1부', '1)~3) 해당자 증빙서류 1부', '10.1. 이후 발급분 재학증명서 1부', '12.31. 기준 주민등록등본 1부', '③ 의 경우 주민등록초본 1부', '3.0 이상 성적증명서 1부', '장학금 신청서 1부', '(재단 양식) 추천서 1부']);
+    /* 리뷰 9차 — 소제목 판정이 괄호 안의 **안내 말**(※ … 증명서는 … 인정 · 아래 증명서 중 …)까지 서류 이름으로 쳐서 소제목이 서류로 떴고, 괄호에 든 서류가 바로 아래 줄에 또 나오면 두 번 떴다 ·
+       80자 넘는 줄은 괄호 앞에서 먼저 잘려 소제목 판정이 괄호를 못 봤다(「일시적 가계곤란 입증서류(… 확인서 …)」 가 통째로 빠짐 — 187행 주석의 바로 그 예) */
+    eq('    ※·「아래 … 중」 안내 괄호는 서류 이름으로 치지 않는다 · 괄호의 서류가 아래 줄에 또 나오면 그 괄호 줄은 소제목 · 80자 넘는 줄도 괄호를 보고 판정한다(이름은 괄호 앞까지)',
+      [readDocuments('5. 제출서류\n자격 확인 서류 (※ 모든 증명서는 공고일 이후 발급분만 인정)\n1) 재학증명서 1부\n소득 관련 서류(아래 증명서 중 해당 서류 1부)\n2) 소득금액증명원 1부\n선택 제출 자료 (포트폴리오 등)\n3) 포트폴리오 1부\n6. 문의: 장학팀').docs,
+        readDocuments('5. 제출서류\n라. 일시적 가계곤란 입증서류(채무변제 상환내역 확인서, 법원판결/결정문 사본, 부도사실 확인원, 실직 확인서, 폐업 사실 증명원, 중증진료 등록확인증 등)\n6. 문의: 장학팀').docs],
+      [['재학증명서 1부', '소득금액증명원 1부', '포트폴리오 1부'], ['일시적 가계곤란 입증서류']]);
+    /* 전부터 있던 것(리뷰 9차가 원문에서 찾음) — 첫 거름에 영수증·등록증·스캔본 낱말이 없어 열린 공고(서강대 삼성꿈)의 필수 서류 「외국인등록증 스캔본」이 빠졌다 ·
+       「(… 소득분위가 없을 경우 아래 대체 서류 제출)」 조건 줄이 빠져 대체 서류 1)~4) 가 모두 필수로 보였다(두산연강 · 고려대 세종) → 조건 괄호 줄은 남긴다(원문 글자 그대로) */
+    eq('    영수증·등록증·스캔본도 서류다 · 「… 경우 아래 대체 서류 제출」 조건 괄호 줄은 남긴다(아래 서류가 언제 필요한지)',
+      [readDocuments('5. 제출서류\n① 여권 사본\n② 외국인등록증 스캔본\n③ 2026학년도 2학기 등록금 납입영수증\n6. 문의: 장학팀').docs,
+        readDocuments('5. 제출서류\n5.5. 소득분위서류(2026년 2학기 한국장학재단 학자금 지원구간 통지서)\n(군 복무, 휴학 등으로 2026년 2학기 소득분위가 없을 경우 아래 대체 서류 제출) * 대체 서류(1, 2, 3, 4 모두 하나의 PDF파일로 스캔하여 제출)\n1) 부모님 건강보험료 납부 확인서\n2) 부모님 지방세 과세증명서\n6. 문의: 장학팀').docs],
+      [['여권 사본', '외국인등록증 스캔본', '2026학년도 2학기 등록금 납입영수증'],
+        ['소득분위서류(2026년 2학기 한국장학재단 학자금 지원구간 통지서)', '(군 복무, 휴학 등으로 2026년 2학기 소득분위가 없을 경우 아래 대체 서류 제출)', '부모님 건강보험료 납부 확인서', '부모님 지방세 과세증명서']]);
     eq('    &emsp; 로 들여 쓴 ※ 곁말 줄은 서류가 아니다(줄 맨 앞을 보는 판정도 기호를 풀고 빈칸을 깎은 줄로)',
       readDocuments('나. 제출서류\n&emsp;1) (필수) 장학금 신청서\n&emsp;&emsp;※ 가족관계증명서는 부모 기준 상세로 발급\n&emsp;2) (필수) 가족관계증명서 1부\n4. 장학금액').docs,
       ['(필수) 장학금 신청서', '(필수) 가족관계증명서 1부']);
@@ -16233,8 +16251,12 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   {
     /* 리뷰 8차 — extract-excerpts.mjs 는 불러오는 순간 발췌 로봇 본편이 도는 파일이다(EXCERPTS_AS_LIB=1 이면 건너뛴다). docs-fill 이 정적으로 불러와 돌 때마다 본편이 한 번 더 돌았다
        (네 로봇이 함께 쓰는 단계 시한 안에서) → 수집 모듈은 표시를 켠 뒤 동적으로 불러온다(activity-excerpts 와 같은 길) */
+    /* export … from · 부수 효과만 있는 import · 큰따옴표도 정적 불러오기다(리뷰 9차 — 셋 다 불러오는 순간 본편이 돈다) · 동적 await import 는 아니다 */
+    const STATIC_EX = /^\s*(?:import|export)\b[^;]*?['"]\.\/extract-excerpts\.mjs['"]/m;
+    eq('  정적 불러오기 찾기가 export … from · 부수 효과 import · 큰따옴표도 잡는다(동적 await import 는 아니다)',
+      ["export { unent } from './extract-excerpts.mjs';", "import './extract-excerpts.mjs';", 'import { x } from "./extract-excerpts.mjs";', "const { x } = await import('./extract-excerpts.mjs');"].map((s) => STATIC_EX.test(s)), [true, true, true, false]);
     const staticEx = fs.readdirSync(new URL('../collector/', import.meta.url)).filter((f) => /\.mjs$/.test(f) && f !== 'extract-excerpts.mjs')
-      .filter((f) => /^\s*import\s[^;]*?from\s+'\.\/extract-excerpts\.mjs'/m.test(readText(new URL(`../collector/${f}`, import.meta.url))));
+      .filter((f) => STATIC_EX.test(readText(new URL(`../collector/${f}`, import.meta.url))));
     eq('  🔴 발췌 로봇(extract-excerpts)을 정적으로 불러오는 수집 모듈이 없다 — 불러오는 순간 본편이 돈다(EXCERPTS_AS_LIB 를 켠 뒤 동적으로)', staticEx, []);
     /* 학생이 보는 서류 목록 함수(doc-list readDocuments)로 잰다 — 옛 사본 extractDocuments 는 지웠다(리뷰 7차) */
     const { readDocuments: RD } = await import('../collector/doc-list.mjs');
@@ -16258,8 +16280,8 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     eq('  채우기 로봇 — 자리표시뿐인 글만(사람이 적은 서류·관리자 표식·원문 없음은 그대로) · 근거 표식을 남긴다',
       [r5.filled, items[0].documents, items[0].documentsFrom, items[1].documents, items[2].documents, items[3].documents], [1, ['재학증명서 1부', '성적증명서 1부'], '로봇 2026-10-17 · 원문 「제출서류」 절', ['재학증명서'], ['구비서류는 재공고 원문 확인'], ['신청 방법·서류는 원문 공고 확인']]);
     const appD = appSource();
-    eq('  자리표시 판정은 앱(DOC_PLACEHOLDER)과 로봇(isDocPlaceholder)이 같은 글자 · 앱은 서류가 없으면 칸을 접는다(문구 없음) · 관리자가 서류를 고치면 documentsFrom 표식',
-      [(appD.match(/const DOC_PLACEHOLDER = (\/.*?\/);/) || [])[1], (readText(new URL('../collector/extract-excerpts.mjs', import.meta.url)).match(/const DOC_PLACEHOLDER = (\/.*?\/);/) || [])[1], /제출 서류는 공고 원문에서 확인해 주세요\.<\/p>/.test(appD.slice(appD.indexOf('<h4>지원 자격</h4>'))), /docText \? row\('서류', docText\) : ''/.test(appD) && /const docs = \(act \? act\.documents \|\| \[\] : sch\.documents \|\| \[\]\)\.filter\(\(doc\) => !DOC_PLACEHOLDER\.test\(doc\)\);/.test(appD), /if \(changed\.includes\('documents'\)\) it\.documentsFrom = OWNER;/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url)))],
+    eq('  자리표시 판정은 앱(DOC_PLACEHOLDER)과 로봇(doc-list 한 곳 — 채우기·발췌 로봇이 같이 쓴다)이 같은 글자 · 앱은 서류가 없으면 칸을 접는다(문구 없음) · 관리자가 서류를 고치면 documentsFrom 표식',
+      [(appD.match(/const DOC_PLACEHOLDER = (\/.*?\/);/) || [])[1], (readText(new URL('../collector/doc-list.mjs', import.meta.url)).match(/export const DOC_PLACEHOLDER = (\/.*?\/);/) || [])[1], /제출 서류는 공고 원문에서 확인해 주세요\.<\/p>/.test(appD.slice(appD.indexOf('<h4>지원 자격</h4>'))), /docText \? row\('서류', docText\) : ''/.test(appD) && /const docs = \(act \? act\.documents \|\| \[\] : sch\.documents \|\| \[\]\)\.filter\(\(doc\) => !DOC_PLACEHOLDER\.test\(doc\)\);/.test(appD), /if \(changed\.includes\('documents'\)\) it\.documentsFrom = OWNER;/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url)))],
       ['/(원문\\s*공고|공고문|재?공고\\s*원문)(에서)?\\s*확인/', '/(원문\\s*공고|공고문|재?공고\\s*원문)(에서)?\\s*확인/', false, true, true]);
     eq('  두 수집 워크플로가 데이터 관문 앞에서 돌린다', ['collect-scholarships.yml', 'browser-collect.yml'].map((f) => /node collector\/docs-fill\.mjs/.test(readText(new URL(`../.github/workflows/${f}`, import.meta.url)))), [true, true]);
   }

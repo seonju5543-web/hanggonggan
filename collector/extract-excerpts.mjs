@@ -40,7 +40,7 @@ import { sameTitle } from './detail-url.mjs';
 const noticeDocFiles = (it, opts = {}) => noticeDocFiles0(it, { sameTitle, ...opts });
 import { findApplyEmail, humanOwnedEmail, staleApplyEmail, staleInTexts } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
-import { readDocuments, placeholderOnly as docsPlaceholderOnly, DOC_PLACEHOLDER_LINE, hasDocSection } from './doc-list.mjs';
+import { readDocuments, placeholderOnly as docsPlaceholderOnly, DOC_PLACEHOLDER_LINE, hasDocSection, isDocPlaceholder } from './doc-list.mjs';   // 자리표시 판정도 doc-list 한 곳(리뷰 9차)
 /* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
    ⚠️ `_cr` 는 위에서 이미 들여왔다 — 다시 import 하면 그 자리에서 죽는다(실제로 그랬다). */
 const { findApplyPortal } = _cr(import.meta.url)('../apply-channel.js');
@@ -1137,9 +1137,7 @@ function cutAtNextSection(lines) {
 }
 /* 제출 서류 목록은 collector/doc-list.mjs readDocuments 한 곳이다 — 여기 있던 옛 사본 extractDocuments(2026-10-17)는 11-15 부터 아무도 안 썼고,
    관문이 그 사본을 재는 바람에 학생 목록의 버그를 못 봤다(2026-11-26 리뷰 7차 · 지웠다) */
-/* 자리표시 서류 — 앱(app.js DOC_PLACEHOLDER)과 같은 글자. 바꾸면 둘 다(관문이 대조한다) */
-const DOC_PLACEHOLDER = /(원문\s*공고|공고문|재?공고\s*원문)(에서)?\s*확인/;
-const isDocPlaceholder = (doc) => DOC_PLACEHOLDER.test(String(doc || ''));
+/* 자리표시 서류 판정은 doc-list.mjs 한 곳(isDocPlaceholder — 앱 DOC_PLACEHOLDER 와 같은 글자 · 여기서 다시 내보낸다) */
 
 export { REQ_SIGNAL, completeTitle, titleTailDeadline, extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
          extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW, cutAtNextSection, isDocPlaceholder,

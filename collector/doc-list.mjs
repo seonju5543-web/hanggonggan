@@ -27,11 +27,18 @@ const NEXT_HEAD = /^\s*(?:[\[(【〔]?\s*)?(?:[\d①-⑳]+\s*[.)]?\s*|[가-힣]\
 const NEXT_HEAD_BARE = /^(신청\s*절차|접수\s*(장소|처)|신청\s*방법|신청\s*기간|접수\s*기간|접수\s*방법|제출\s*방법|제출\s*기한|제출\s*처|문의|유의\s*사항|기타|선발\s*(인원|방법|절차|일정)|지원\s*자격|신청\s*자격|지급|심사|발표|지원\s*내용|장학\s*금액|지원\s*금액|일정|향후|결과)/;
 /* 🔴 여는 괄호가 있으면 닫는 괄호까지 와야 글머리다 — 「(②초본이 부·모일 경우) …」 의 「(②」 를 떼어 괄호가 깨졌다(2026-11-26 리뷰 7차) ·
    숫자 글머리 뒤에 빈칸과 또 「숫자.」 가 오면 날짜다(「10. 1. 이후 …」 — 떼면 10월이 사라진다 · 리뷰 8차) */
-const BULLET = /^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ√]+|^\s*(?:[\[(【〔]\s*(?:\d{1,2}|[①-⑳]|[가나다라마바사아자차카타파하])\s*[.)\]】〕]|\d{1,2}\s*[.)\]】〕](?!\s+\d{1,2}\s*[.)](?!\d))|[①-⑳]\s*[.)\]】〕]?|[가나다라마바사아자차카타파하]\s*[.)\]】〕])\s*/;
+/* 번호처럼 보여도 번호가 아닌 자리(두 겹이 같이 쓴다 · 리뷰 8·9차) — 뒤에 범위(~)·참조 말(또는·의·에·중)·때 말(이후·이전·기준·까지·부터·현재)이 오거나,
+   붙여 쓴 날짜 뒤에 그런 말이 온다(「10.1. 이후」·「12.31. 기준」) · NOT_DATE — 숫자 글머리 뒤 빈칸 + 「숫자.」 는 날짜다(「10. 1. 이후」 · 날짜는 「숫자.」 꼴뿐 — 「1. 1) 신청서」 는 날짜가 아니다) */
+const NOT_MARK = String.raw`(?!\s*(?:\d{1,2}\s*\.\s*)*(?:[~∼〜～\-–]|(?:또는|의|에|중)\s)|\s*(?:\d{1,2}\s*\.\s*)+(?:이후|이전|기준|까지|부터|현재))`;   // 때 말은 날짜 숫자 뒤에서만(「③ 이전 학기 성적증명서」 의 ③ 은 번호다)
+const NOT_DATE = String.raw`(?!\s+\d{1,2}\s*\.(?!\d))`;
+const BULLET = new RegExp(String.raw`^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ√]+|^\s*(?:[\[(【〔]\s*(?:\d{1,2}|[①-⑳]|[가나다라마바사아자차카타파하])\s*[.)\]】〕]${NOT_MARK}|\d{1,2}\s*[.)\]】〕]${NOT_DATE}${NOT_MARK}|[①-⑳]\s*[.)\]】〕]?${NOT_MARK}|[가나다라마바사아자차카타파하]\s*[.)\]】〕]${NOT_MARK})\s*`);
 /* 둘째 겹 번호(「라 . 4. …」·「• 1. …」·「5.1. …」) — 번호 뒤에 빈칸이 올 때만 · 여는 괄호로 시작하는 것은 건드리지 않는다(리뷰 7차) */
 /* 🔴 날짜·범위·참조는 떼지 않는다 — 뒤에 「숫자.」(날짜 「10. 1.」)·물결표·「또는 」·「의 」·「에 」가 오면 번호가 아니다(「○ 10. 1. 이후 발급분 …」 의 10월이 사라졌다 · 리뷰 8차) */
-const BULLET2 = /^(?:\d{1,2}\s*[.)]|[①-⑳]|[가나다라마바사아자차카타파하]\s*[.)])\s+(?=\S)(?!\d{1,2}\s*[.)](?!\d)|[~∼〜～\-–]|또는\s|의\s|에\s)/;
+const BULLET2 = new RegExp(String.raw`^(?:\d{1,2}\s*[.)]${NOT_DATE}|[①-⑳]|[가나다라마바사아자차카타파하]\s*[.)])${NOT_MARK}\s+(?=\S)`);
 const DOC_WORD = /\d\s*(?:부|매|통)(?![가-힣])|서|증명|사본|원본|통장|신분증|사진|등본|확인|계획|추천|동의|지원|신청|소개|이력|포트폴리오|성적|재학|졸업|가족|소득|수급/;
+/* 첫 거름에만 더하는 서류 낱말(전부터 빠져 있던 것 · 리뷰 9차) — 「외국인등록증 스캔본」(서강대 삼성꿈 · 열린 공고)·「등록금 납입영수증」·「원천징수영수증」 이 빠졌다.
+   🔴 DOC_WORD 에 넣지 않는다 — 한 줄 가르기도 그 목록을 써서 OCR 표 줄이 조각났다(리뷰어 실측) */
+const DOC_WORD_FIRST = /영수증|등록증/;   // 「스캔본」 은 넣지 않는다 — 앞 줄에서 이어진 조각(「페이지(특약사항 포함) 스캔본」)까지 서류가 됐다
 export const WRITE_DOC = /자기소개서|자소서|학업계획서|수학계획서|연구계획서|활동계획서|사유서|지원\s*동기|에세이|포부|소개서|계획서/;
 const APPLY_DOC = new RegExp(WRITE_DOC.source.replace('사유서|', ''));   // 사유서를 뺀 작성형 서류(자기소개서·계획서…) — freeFormBasis
 export const FREE_FORM = /자유\s*(양식|서식|형식)|별도\s*(의\s*)?(양식|서식)(은|이)?\s*(없|무)|(양식|서식)\s*(은|이)?\s*(없음|없습니다|무)|서식\s*자유|자유롭게\s*작성|양식\s*자유|형식\s*자유/;
@@ -63,13 +70,22 @@ const isNoteSentence = (core) => {
 };
 /* 소제목(「필수 제출 서류」「추가 제출 가능 서류 (…)」「지원 분야별 필수 제출 자료」) — 서류 이름이 아니다: 서류·자료로 끝나고 구체적인 서류 낱말이 없다 */
 const DOC_NOUN = /증명|증빙|사본|원본|신청서|지원서|원서|확인서|동의서|추천서|계획서|소개서|사유서|서약서|통장|등본|초본|신분증|사진|성적표|통지서|통보서|이력서|진단서|신고서|명세서|영수증|기록부|자격증|수료증|합격증|기획서|설명서|제안서|포트폴리오|증$|[가-힣](?<!에|로|부터|으로)서(?=\s*(\d\s*[부매통]|[(\[<【〈]|$))/;   // …서로 끝나는 서류 이름(내역서·기술서·진술서) — 「…에서」「…로서」는 아니다
-const isSubHead = (c) => { const bare = (/^[\[(【〔]/.test(c) && /[\])】〕]$/.test(c)) ? c.slice(1, -1).trim() : c; const core = bare.replace(/\s*[\[(【〔][^\])】〕]*[\])】〕]\s*$/, '').trim(); return /(서류|자료)$/.test(core) && !DOC_NOUN.test(bare); };   // 괄호 안에 구체적인 서류 이름이 있으면 소제목이 아니라 서류다(「소득분위서류(… 지원구간 통지서)」 · 리뷰 8차)
-const isDocLike = (c) => {
-  if (!DOC_WORD.test(c) && !MEDIA_DOC.test(c)) return false;            // 공모전 제출물(작품·영상·PPT)도 서류다
+/* 소제목의 끝 괄호가 **안내 말**이면(※ … · 아래 … 중 해당 … · … 인정 · 발급분 · 가능) 그 괄호의 서류 낱말로 소제목을 풀지 않는다(「자격 확인 서류 (※ 모든 증명서는 … 인정)」 · 리뷰 9차) */
+const GUIDE_PAREN = /^\s*[※*]|아래|중\s*(?:해당|택|\d|하나)|인정|발급분|가능/;
+const isSubHead = (c) => {
+  const bare = (/^[\[(【〔]/.test(c) && /[\])】〕]$/.test(c)) ? c.slice(1, -1).trim() : c;
+  const m = bare.match(/\s*[\[(【〔]([^\])】〕]*)[\])】〕]\s*$/);
+  const core = (m ? bare.slice(0, m.index) : bare).trim();
+  if (!/(서류|자료)$/.test(core) || DOC_NOUN.test(core)) return false;
+  /* 괄호 안에 구체적인 서류 이름이 있으면 서류다(「소득분위서류(… 지원구간 통지서)」 · 리뷰 8차) — 안내 괄호는 빼고 */
+  return !(m && DOC_NOUN.test(m[1]) && !GUIDE_PAREN.test(m[1]));
+};
+const isDocLike = (c, full = c) => {   // full — 80자 넘어 괄호 앞에서 자른 줄의 원래 글자(소제목 판정은 괄호까지 보고 한다 · 리뷰 9차)
+  if (!DOC_WORD.test(c) && !DOC_WORD_FIRST.test(c) && !MEDIA_DOC.test(c)) return false;            // 공모전 제출물(작품·영상·PPT)도 서류다
   if (c.replace(/\s/g, '').length < 4 && !DOC_NOUN.test(c)) return false;   // 「신청서」「등본」 같은 짧은 이름은 두고 OCR 조각(「서재다」)만 뺀다
   /* 괄호로 시작하는 줄은 앞 서류의 설명이다 — 단 괄호 뒤에 서류 이름이 오는 줄은 서류다(「(필수) 장학금 신청서 1부」「(해당자만) 수능성적표 사본」 · 2026-11-18 · docs-fill 을 합치며 잃었다) */
   if (/^[(（]/.test(c) && !DOC_NOUN.test(c.replace(/^[(（][^)）]*[)）]\s*/, ''))) return false;
-  if (HEAD_ONLY.test(c) || FILE_NOTE.test(c) || isSubHead(c)) return false;
+  if (HEAD_ONLY.test(c) || FILE_NOTE.test(c) || isSubHead(full)) return false;
   if (NOT_DOC.test(c) && !(/^\d{4}\s*[.년]/.test(c) && !/☎|https?:|www\.|\d{2,4}-\d{3,4}-\d{4}|[:：]/.test(c) && DOC_NOUN.test(c))) return false;   // 「2026 년 2 학기 학자금 지원구간 확인서 1부」 — 연도로 시작하는 서류 이름은 날짜 줄이 아니다
   if (DOC_JUNK.test(c)) return false;
   /* 서류 이름 뒤의 ※ 곁말(「국가근로장학생지원서 1부 ※지도교수 추천서는 공란으로 제출(…)」)은 판정에서 뗀다 — 앞 조각이 서류 이름이면 그 조각으로 본다 */
@@ -180,12 +196,27 @@ const NOTE_HEAD = (bare) => {
   return n <= 20 && /(확인\s*사\s*항|비\s*고)\s*[:：]?\s*$/.test(bare) && !DOC_NOUN.test(bare);
 };
 
+/* 「선택 제출 자료 (포트폴리오 등)」 — 괄호의 예시 서류(쉼표로 가른 이름 · 끝의 「등」 은 뗀다)가 모두 아래 줄에 그대로 또 나오면 소제목이다(리뷰 9차) */
+const listedBelow = (d, below) => {
+  const m = String(d).match(/^(.*?)\s*[\[(【〔]([^\])】〕]*)[\])】〕]\s*$/);
+  if (!m || !/(서류|자료)$/.test(m[1].trim()) || DOC_NOUN.test(m[1])) return false;
+  const flat = (x) => String(x).replace(/\s+/g, '');
+  const names = m[2].split(/[,，]/).map((x) => flat(x.replace(/\s*등\s*$/, ''))).filter((x) => x.length >= 2);
+  return names.length > 0 && names.every((n) => below.some((b) => flat(b).includes(n)));
+};
+/* 조건 괄호 줄 — 「(군 복무, 휴학 등으로 … 소득분위가 없을 경우 아래 대체 서류 제출)」: 아래 서류가 **언제** 필요한지 말한다. 빼면 대체 서류가 모두 필수로 보였다
+   (두산연강 · 고려대 세종 · 리뷰 9차 · 원문 글자 그대로 한 줄) */
+const COND_PAREN = /^[(（][^)）]*(?:경우|때)[^)）]*(?:아래|대체)[^)）]*제출[^)）]*[)）]/;
+
 function listFrom(lines, start, inline, headMark) {
   const out = [];
   const push = (s) => { for (const p of splitInline(s)) {
     let c = cleanDoc(p);
+    const cond = c.match(COND_PAREN);   // 조건 괄호 줄은 괄호 그대로 한 줄(아래 대체 서류가 언제 필요한지)
+    if (cond) { if (!out.includes(cond[0])) out.push(cond[0]); continue; }
+    const full = c;
     if (c.length > 80 && /[(（]/.test(c)) c = c.slice(0, c.search(/[(（]/)).trim();   // 「라. 일시적 가계곤란 입증서류(채무변제 상환내역 확인서, …, 진단서 등)」 — 괄호 앞 이름은 살린다(리뷰)
-    if (c.length >= 2 && c.length <= 80 && isDocLike(c) && !out.includes(c)) out.push(c);
+    if (c.length >= 2 && c.length <= 80 && isDocLike(c, full) && !out.includes(c)) out.push(c);
   } };
   if (inline) push(inline);
   const inlineHit = out.length > 0;   // ④ 한 줄 목록이 실제로 서류를 냈을 때만 '아래는 서류 이름만' — 「6. 신청서류 : 각 학과 사무실로 원본 제출」 아래 표는 그대로 읽는다
@@ -211,8 +242,8 @@ function listFrom(lines, start, inline, headMark) {
     if (inlineHit && !(DOC_NOUN.test(bare) || WRITE_DOC.test(bare) || MEDIA_DOC.test(bare))) continue;   // ④ 한 줄 목록 아래는 서류·제출물 이름만(아닌 줄은 건너뛴다 — 끊으면 「작품(이미지 파일)」 뒤가 사라졌다 · 리뷰)
     push(l);
   }
-  /* 「원문 공고에서 확인」 같은 안내 줄은 서류가 아니다 */
-  return out.filter((d) => !/(원문\s*공고|공고문|홈페이지)(에서|를)?\s*(확인|참고)/.test(d));
+  /* 「원문 공고에서 확인」 같은 안내 줄은 서류가 아니다 · 괄호에 든 예시 서류가 **모두** 아래 줄에 또 나오는 「…서류/자료 (예시)」 줄은 소제목이다(두 번 뜨지 않게 · 리뷰 9차) */
+  return out.filter((d, i) => !/(원문\s*공고|공고문|홈페이지)(에서|를)?\s*(확인|참고)/.test(d) && !listedBelow(d, out.slice(i + 1)));
 }
 
 /** 원문 글자 → 제출 서류 이름들 (원문 글자 그대로 · 없으면 []) */
@@ -228,7 +259,7 @@ export function extractDocumentList(text) {
     /* 목록의 절반 이상은 서류 명사(증명서·신청서·사본·등본·계획서…)여야 목록이다 — 무너진 OCR 표의 칸 머리 「제출 서류」 아래 조각들을 서류로 내지 않는다 */
     /* 서류 명사가 하나도 없으면 목록이 아니다(무너진 OCR 표의 칸 머리 아래 조각) · 있으면 **버리지 않고 마지막 서류 명사 뒤 꼬리만 자른다**
        (리뷰 2026-11-15 — 절반 규칙이 「참가신청서 / 팀 소개 영상 / 발표 PPT / 에세이」 같은 활동 목록을 통째로 버리고, 인하대 공고에선 다음 장학금의 목록으로 넘어갔다) */
-    const isNoun = (d) => DOC_NOUN.test(d) || WRITE_DOC.test(d) || MEDIA_DOC.test(d) || /\d\s*(?:부|매|통)(?![가-힣])/.test(d);   // 「장학생 신상카드 1부」도 서류
+    const isNoun = (d) => DOC_NOUN.test(d) || WRITE_DOC.test(d) || MEDIA_DOC.test(d) || /\d\s*(?:부|매|통)(?![가-힣])/.test(d) || /서류$/.test(d);   // 「…서류」 로 끝나 여기까지 온 줄은 괄호 앞에서 자른 서류다(소제목은 isDocLike 가 이미 뺐다 · 「일시적 가계곤란 입증서류」 · 리뷰 9차)   // 「장학생 신상카드 1부」도 서류
     let last = -1; got.forEach((d, k) => { if (isNoun(d)) last = k; });
     if (last >= 0) return got.slice(0, last + 1);   // 못 건지면 다음 머리 후보로
   }
@@ -261,8 +292,10 @@ export function readDocuments(text) {
   return { docs, basis, free: !!basis };
 }
 
-/* 자리표시 안내 줄(자동 등록·층2) — 이것만 든 목록은 '비어 있는 것'이다 */
-export const DOC_PLACEHOLDER = /(원문\s*공고|공고문)(에서)?\s*확인/;
+/* 자리표시 안내 줄(자동 등록·층2) — 이것만 든 목록은 '비어 있는 것'이다 · 🔴 앱(app.js DOC_PLACEHOLDER)과 같은 글자 **한 곳**(로봇 둘이 여기서 가져간다 · 관문이 앱과 대조한다).
+   전에는 발췌 로봇 사본과 글자가 달라 「구비서류는 재공고 원문 확인」 한 줄을 채우기 로봇은 '비었다'로, 발췌 로봇은 '사람이 적은 목록'으로 봤다(리뷰 9차) */
+export const DOC_PLACEHOLDER = /(원문\s*공고|공고문|재?공고\s*원문)(에서)?\s*확인/;
+export const isDocPlaceholder = (doc) => DOC_PLACEHOLDER.test(String(doc || ''));
 /* 자동 등록이 두는 자리표시 한 줄 — 로봇이 옛 목록을 되돌릴 때 같은 글자를 쓴다(extract-excerpts fillDocuments) */
 export const DOC_PLACEHOLDER_LINE = '지원 자격·제출 서류는 원문 공고에서 확인';
 /* 로봇 목록을 자리표시로 되돌려도 되는가 — 원문에 서류 절 머리가 **있는데** 지금 규칙으로 목록이 안 나올 때만.
