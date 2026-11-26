@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-11-26",
- "count": 2094,
+ "updatedAt": "2026-11-27",
+ "count": 2099,
  "items": [
   {
    "title": "[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
@@ -86,6 +86,48 @@
    "bodyDeadlineText": "2026학년도 동계방학 교내 근로장학생 선발을 다음과 같이 안내하오니 근로를 희망하는 학생은 통합정보시스템(knuin.knu.ac.kr)에서 신청하시기 바랍니다. 1. 신청기간: 2026. 11 . 26.(목) 9시 ~ 12 . 1.(화) 18시"
   },
   {
+   "title": "2027년 (재)협성문화재단 협성장학생 선발 안내",
+   "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNzkmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "attachments": [
+    {
+     "name": "부산 울산 경남지역 고교 출신 대학생 협성장학생 선발계획안.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzkmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    },
+    {
+     "name": "건설노동자 자녀 협성장학생 선발 계획안.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzkmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=1"
+    }
+   ],
+   "deadlineHint": "접수 기간: 2026. 12. 14.(월) ~ 2027. 1. 4.(월) 6. 접수처: 협성문화재단(등기우편 접수, 접수마감일 도착 분까지 인정",
+   "school": "경북대학교",
+   "campus": "",
+   "foundAt": "2026-11-26",
+   "bodyDeadline": "2027-01-04",
+   "bodyDeadlineText": "4. 지원 내용: 등록금 및 매 학기 학습보조금(생활비) 50만원 5. 접수 기간: 2026. 12. 14.(월) ~ 2027. 1. 4.(월)"
+  },
+  {
+   "title": "2026학년도 강릉.원주캠퍼스 공로장학금 신청 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2557&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "2026학년도 공로장학금 선발 계획 및 신청.접수 안내.hwp",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261126053747186.hwp&path=/bbs/34&fn=2026%ED%95%99%EB%85%84%EB%8F%84%20%EA%B3%B5%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%84%A0%EB%B0%9C%20%EA%B3%84%ED%9A%8D%20%EB%B0%8F%20%EC%8B%A0%EC%B2%AD.%EC%A0%91%EC%88%98%20%EC%95%88%EB%82%B4.hwp"
+    },
+    {
+     "name": "2026학년도 공로장학금 선발 계획(안).hwpx",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261126053751457.hwpx&path=/bbs/34&fn=2026%ED%95%99%EB%85%84%EB%8F%84%20%EA%B3%B5%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%84%A0%EB%B0%9C%20%EA%B3%84%ED%9A%8D(%EC%95%88).hwpx"
+    },
+    {
+     "name": "(서식) 공로장학금 신청서 및 추천서 등.hwpx",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261126053754364.hwpx&path=/bbs/34&fn=(%EC%84%9C%EC%8B%9D)%20%EA%B3%B5%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%84%9C%20%EB%B0%8F%20%EC%B6%94%EC%B2%9C%EC%84%9C%20%EB%93%B1.hwpx"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
    "title": "[교내]☆★2026학년도 2학기 학생복지처 특별장학금 신청 안내(~12/7)",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274854/artclView.do",
    "attachments": [
@@ -147,6 +189,46 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-26"
+  },
+  {
+   "title": "[학부대학운영팀] 2026학년도 2학기 Trinity DESIGNer 오픈배지 장학금 신청 안내 (~2026.12.16.)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278243&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "붙임. Trinity DESIGNer 배지 리스트(2025.11.20.).pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278243&attachNo=227827"
+    }
+   ],
+   "deadlineHint": "신청 기간 2026.11.26.(목) ~ 2026.12.16.(수) 7. 장학금 신청 방법 TRINITY 접속 ▷ 학사정보 ▷ 등록/장학 ▷ 장",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-26",
+   "bodyDeadline": "2026-12-16",
+   "bodyDeadlineText": "[장학][학부대학운영팀] 2026학년도 2학기 Trinity DESIGNer 오픈배지 장학금 신청 안내 (~2026.12.16.) | 가톨릭대학교"
+  },
+  {
+   "title": "26학년도 동계 국가근로장학금 취업연계중점대학사업 장학생 모집",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=171908&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
+   "attachments": [
+    {
+     "name": "2026 국가근로장학금 취업연계중점대학 모집 안내(학생용).pdf",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365393"
+    },
+    {
+     "name": "2026학년도 국가근로장학금 취업연계 중점대학 참여기업 명단(동계).xlsx",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365394"
+    },
+    {
+     "name": "(학생용) 국가근로장학금 취업연계 중점대학 장학생 지원서.hwp",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365395"
+    }
+   ],
+   "deadlineHint": "마감: 12월 7일(월) 23:59까지 ❍ 근로 시간: 일 최대 8시간(09:00~18:00)/ 주 최대 40시간 근무 ❍ 장학금 지급 단가:",
+   "school": "충북대학교",
+   "campus": "",
+   "foundAt": "2026-11-26",
+   "bodyDeadline": "2026-12-07",
+   "bodyDeadlineText": "- 접수마감: 12월 7일(월) 23:59까지"
   },
   {
    "title": "2027-1학기 교육보호장학(새터민 및 새터민 자녀) 신청안내",
@@ -425,6 +507,34 @@
    "foundAt": "2026-11-26",
    "bodyDeadline": "2026-11-30",
    "bodyDeadlineText": "2026학년도 2학기 학생통합서비스센터 국가근로장학생 추가 모집 안내(11/26~11/30 16:00)"
+  },
+  {
+   "title": "[장학] 2026. 2학기 한국방송통신대학교 교외(발전기금, 출판문화원,아시아발전재단)장학생 선발",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/823539/artclView.do",
+   "attachments": [
+    {
+     "name": "(재)★붙임1_(공지사항) 2026. 2학기 교외장학생(발전기금재단, 출판문화원, 아시아발전재단) 선발 안내.hwp",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/283969/download.do"
+    },
+    {
+     "name": "(재)★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/283970/download.do"
+    },
+    {
+     "name": "(재)★붙임3-1_교외장학(발전기금,출판문화원,아시아발전재단) 신청 매뉴얼_PC.pdf",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/283971/download.do"
+    },
+    {
+     "name": "(재)★붙임3-2_교외장학(발전기금,출판문화원,아시아발전재단) 신청 매뉴얼_모바일.pdf",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/283972/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 및 방법 구분 내용 활동기간 2026. 7. 15.( 수 ) ~ 12. 7.( 월 ) ※ 2026. 2 학기 수강신청일 ~ 장학신청 마",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "foundAt": "2026-11-26",
+   "bodyDeadline": "2026-12-08",
+   "bodyDeadlineText": "신청기간 2026. 11. 30.( 월 ) 09:00 ~ 12. 8.( 화 ) 18:00 [9 일간 ]"
   },
   {
    "title": "2026학년도 2학기 국가근로장학금 희망근로기관 4차신청 및 선발안내",

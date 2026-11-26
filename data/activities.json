@@ -1,6 +1,83 @@
 {
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "[청년모아] AI 취업 역량 강화 청년 26캠퍼스 참여자 모집 2026.11 . 17",
+   "url": "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17596&commonMenuNo=180_35",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "신청기간 상시 진행일정 2026. 11. 24. ~ 12. 3. 19:00-22:00 (화, 목) 4회차 장소 대전 중구 청년모아 강의실 (대전",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "상시"
+    },
+    {
+     "label": "일시",
+     "text": "2026. 11. 24. (화) ~ 12. 3. (목) 19:00 ~ 22:00 4회차 진행"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026. 11. 24. ~ 12. 3. 19:00-22:00 (화, 목) 4회차"
+    }
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-26",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "대전청년포털",
+   "foundAt": "2026-11-26",
+   "id": "act-035fxk9",
+   "deadline": "2026-12-03",
+   "deadlineFrom": "원문 기간 · 신청기간 상시 진행일정 2026. 11. 24. ~ 12. 3. 19:00-22:00 (화, 목) 4회차 장소 대전 중구 청년모아 강의실 (대전"
+  },
+  {
+   "title": "[청년벙커] 2026 덕업일탈 참여자 모집 2026.11 . 16",
+   "url": "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17601&commonMenuNo=180_35",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "신청기간 26-11-13~26-11-24 진행일정 2026-11-24 17:30~21:30 장소 대덕구 청년벙커 대상 제한없음 담당기관 대덕구",
+   "deadline": "2026-11-24",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "26-11-13~26-11-24"
+    },
+    {
+     "label": "일시",
+     "text": "11. 24.(화) 17:30~21:30"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-24 17:30~21:30"
+    },
+    {
+     "label": "대상",
+     "text": "대전 청년 40명"
+    }
+   ],
+   "eligibilityLines": [
+    "- 대상 : 대전 청년 40명",
+    "ㅇ 주요 프로그램",
+    "- 덕업일기(記) 성과 전시",
+    "- 『급류』 정대건 작가와 함께하는 북토크",
+    "- 일상의 소리로 만드는 음악 창작 워크숍"
+   ],
+   "noticeLines": [
+    "신청기간 : 26-11-13~26-11-24"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-26",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "대전청년포털",
+   "foundAt": "2026-11-26",
+   "id": "act-164me40"
+  },
   {
    "title": "11월 주말 이용자 관리 등 업무보조 청년 봉사자 모집(12시~18시)",
    "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541961",
@@ -6281,48 +6358,6 @@
    "campus": "",
    "foundAt": "2026-11-16",
    "id": "act-1rzcx8b",
-   "documentsV": 1
-  },
-  {
-   "title": "충청남도 청년 정신건강 서포터즈 「마음·잇길」 활동보고회",
-   "url": "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "접수기간 : ~2026. 11. 1.(일)까지 ▪ 신청방법 : 충남광역정신건강복지센터 홈페이지 자세한 내용과 참가 신청은 포스터 내 QR코드를",
-   "deadline": "2026-11-01",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "~2026. 11. 1.(일)까지"
-    },
-    {
-     "label": "일시",
-     "text": "2026. 11. 4.(수) 13:30~18:00"
-    }
-   ],
-   "detailsV": 7,
-   "field": "서포터즈·기자단",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "충남청년포털",
-   "foundAt": "2026-11-15",
-   "id": "act-0cvjo3y",
-   "documentsV": 1
-  },
-  {
-   "title": "우리동네 청년 사장님을 소개합니다 공모전 응원 댓글 이벤트",
-   "url": "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/790?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "충남청년포털",
-   "foundAt": "2026-11-15",
-   "id": "act-0rum1n7",
    "documentsV": 1
   },
   {
