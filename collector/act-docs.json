@@ -188,12 +188,12 @@
   "tries": 1
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521245": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.inha.ac.kr/bbs/kr/8/46177/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://apac.spectory.net/tcs15kr": {
   "at": "2026-11-19",
@@ -204,16 +204,16 @@
   "tries": 1
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161847/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161583/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161878/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161676/artclView.do": {
   "at": "2026-11-19",
@@ -297,6 +297,10 @@
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142357&article.offset=0&articleLimit=10": {
   "at": "2026-11-25",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542487": {
+  "at": "2026-11-26",
   "tries": 1
  }
 }

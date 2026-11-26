@@ -1317,6 +1317,30 @@
    "added": "2026-11-25",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-ent2431273181artclviewdo",
+   "name": "[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
+   "target": "2026학년도 2학기(동계방학) 국가근로 장학생 모집 ",
+   "added": "2026-11-26",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-jong659274854artclviewdo",
+   "name": "[교내]☆★2026학년도 2학기 학생복지처 특별장학금 신청 안내(~12/7)",
+   "target": "☆★2026학년도 2학기 학생복지처 특별장학금 신청 안",
+   "added": "2026-11-26",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-8bnum57138cate0qidx57138-0bjhkqt",
+   "name": "[미래융합대학] 2026학년도 2학기 국가 근로장학생 모집(교체 선발)",
+   "target": "2026학년도 2학기 국가 근로장학생 모집(교체 선발)",
+   "added": "2026-11-26",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

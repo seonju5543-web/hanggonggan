@@ -402,7 +402,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.dooeul.or.kr/home/main/index.do",
@@ -416,7 +416,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.sri.re.kr/nuri/",
@@ -430,7 +430,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TypeError: UNABLE_TO_VERIFY_LEAF_SIGNATURE)",
     "best": null
    }
@@ -441,7 +441,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (HTTP 404)",
     "best": null
    }
@@ -468,8 +468,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
-    "why": "홈페이지 못 엶 (TypeError: ERR_TLS_CERT_ALTNAME_INVALID)",
+    "checkedAt": "2026-11-26",
+    "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
   },
@@ -479,7 +479,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.namgu.gwangju.kr/",
@@ -493,7 +493,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.gyeongnam.go.kr/",
@@ -507,7 +507,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.buan.go.kr/index.buan",

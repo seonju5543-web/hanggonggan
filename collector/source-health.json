@@ -6,25 +6,25 @@
  },
  "https://www.hufs.ac.kr/hufs/11302/subview.do": {
   "name": "한국외국어대학교 대외활동·공모전 「진로·취업」",
-  "fails": 110,
+  "fails": 111,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://isss.khu.ac.kr/globalcenter/user/bbs/BMSR00040/list.do?menuNo=7900041": {
   "name": "경희대학교 대외활동·공모전 「취업/경력」",
-  "fails": 110,
+  "fails": 111,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://goodjob.khu.ac.kr/bbs/board.php?bo_table=s2_5": {
   "name": "경희대학교 대외활동·공모전 「사회진출 프로그램 공지」",
-  "fails": 110,
+  "fails": 111,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://youth.seoul.go.kr/bbs/list.do?key=2303300002": {
   "name": "서울시 청년몽땅정보통 대외활동·공모전",
-  "fails": 110,
+  "fails": 111,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
@@ -45,7 +45,7 @@
  },
  "https://kov.koica.go.kr/ho/cobb/ovhHoCobbBbsNormalList.do?menuId=MENU0000000000000162&bbsSn=1004": {
   "name": "KOICA 봉사단 대외활동·공모전",
-  "fails": 110,
+  "fails": 111,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
@@ -61,7 +61,7 @@
  },
  "https://culture.seoul.go.kr/culture/bbs/B0000014/list.do?menuNo=200118": {
   "name": "서울문화포털 공모소식 대외활동·공모전",
-  "fails": 103,
+  "fails": 104,
   "lastOk": "2026-10-15",
   "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
@@ -224,13 +224,13 @@
  },
  "https://www.dsa.or.kr/data.html?Table=ins_bbs43": {
   "name": "대산농촌재단",
-  "fails": 1,
+  "fails": 2,
   "lastOk": "2026-11-25",
   "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://janghak.gangseo.seoul.kr/sc050101": {
   "name": "재단법인 강서구장학회(서울)",
-  "fails": 42,
+  "fails": 43,
   "lastOk": null,
   "why": "⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)"
  },
