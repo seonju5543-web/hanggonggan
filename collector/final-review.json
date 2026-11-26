@@ -948,7 +948,104 @@
    "roles": [],
    "pdfs": [],
    "problems": []
+  },
+  "auto-0713no2516453sitedvscdkr": {
+   "name": "「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내",
+   "hash": "b64238bec8c9bbaf",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "54a99d928a3f91ad",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-15nttno171908searchctgry": {
+   "name": "26학년도 동계 국가근로장학금 취업연계중점대학사업 장학생 모집",
+   "hash": "ea35765c8beb25fc",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "87a9f5575f008e99",
+   "summary": "희망 기업 배정 관련 유의사항의 근거를 서식(A1) 문구에서 안내문(A2) 문구로 바꾸며 원문에 없던 '지원 현황' 표현을 뺐고, 근로 기관(지역 내 공공기관 및 중소기업 8개사) 안내를 유의사항에 추가했습니다.",
+   "changes": [
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "근로 기관은 지역 내 공공기관 및 중소기업 8개사입니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "기업 사정에 따라 희망하는 기업으로 배정되지 않을 수 있습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "지원 현황 및 기업 사정에 따라 희망 기업 배정이 어려울 수 있습니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "form-eiuss5-3.hwp",
+     "attach": "(학생용) 국가근로장학금 취업연계 중점대학 장학생 지원서.hwp",
+     "hash": "e02326f9c650db0a",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 작성하는 지원서·자기소개서·개인정보 동의서 서식만 들어 있습니다."
+    },
+    {
+     "file": "elig-eiuss5-1.pdf",
+     "attach": null,
+     "hash": "4714f334150bc621",
+     "role": "content",
+     "formStart": "",
+     "why": "사업 개요, 선발 절차·기준, 유의사항을 담은 신청 안내문(읽는 글)입니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-archgbn0searchordersort0-0ty595g": {
+   "name": "2026학년도 강릉.원주캠퍼스 공로장학금 신청 안내",
+   "hash": "a132e73284d8e6cd",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "1f5b9c2430b5e40e",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-13jwrp-1.hwp",
+     "attach": "2026학년도 공로장학금 선발 계획 및 신청.접수 안내.hwp",
+     "hash": "4506e6a3b921928b",
+     "role": "other",
+     "formStart": "",
+     "why": "상위 버전 배포용 문서라는 안내 문구만 있고 읽을 내용이 없습니다."
+    },
+    {
+     "file": "form-13jwrp-2.hwpx",
+     "attach": "2026학년도 공로장학금 선발 계획(안).hwpx",
+     "hash": "0569e678dcbd25ba",
+     "role": "content",
+     "formStart": "",
+     "why": "신청자격·신청서류·평가기준·지급 상한액·일정이 담긴 선발 계획 공고문입니다."
+    },
+    {
+     "file": "form-13jwrp-3.hwpx",
+     "attach": "(서식) 공로장학금 신청서 및 추천서 등.hwpx",
+     "hash": "4027750ae477e82b",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 작성하는 장학생 신청서와 함께 제출할 추천서·공적조서 서식만 들어 있는 서식 파일입니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
   }
  },
- "updatedAt": "2026-11-26"
+ "updatedAt": "2026-11-27"
 }
