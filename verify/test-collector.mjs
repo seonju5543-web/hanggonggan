@@ -4029,10 +4029,10 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
       [undecoded(ctDecode), undecoded(decodeExcerptEntities), undecoded(decodeNewsEntities), undecoded(ME.decodeEntities)], [[], [], [], []]);
     /* 🔴 대소문자를 접어 찾으면 이름을 더하는 순간 &rArr;(⇒)가 &rarr;(→)로 풀린다 — 접수 기간 한 줄 풀이(deadline-hint)는 실제로 그랬다(리뷰 6차) · 풀이마다 정확한 이름을 먼저 찾는다 */
     /* 리뷰 7차 — 소식 설명 풀이는 기호 표의 또 한 벌이었고 범위 밖 숫자 기호(&#99999999;)에서 넘어졌다 → 엔진의 decodeEntities 를 불러 쓴다(베끼지 않는다) */
-    const ndSrc = readText(new URL('../collector/news-desc.mjs', import.meta.url));
+    /* 🔴 파일 글자 모양이 아니라 **답**으로 잰다(리뷰 8차 — 낱말 검사는 주석에도 걸려 늘 참이었다) · 앞의 둘은 옛 표가 엔진과 다르게 풀던 글자다(&#0; → 빈 글자 · &#38;lt; → <) */
     const safeBig = (() => { try { return decodeNewsEntities('가&#99999999;나'); } catch (e) { return `넘어짐: ${e.message}`; } })();
-    eq('    교내 소식 설명 풀이는 엔진의 decodeEntities 를 불러 쓴다(제 표를 두지 않는다) · 범위 밖 숫자 기호에서 넘어지지 않는다',
-      [/createRequire\(import\.meta\.url\)\('\.\.\/match-engine\.js'\)/.test(ndSrc) && /decodeEntities/.test(ndSrc), /const ENT = \{/.test(ndSrc), safeBig], [true, false, '가&#99999999;나']);
+    eq('    교내 소식 설명 풀이는 엔진의 decodeEntities 와 같은 답을 낸다(제 표를 두지 않는다) · 범위 밖 숫자 기호에서 넘어지지 않는다',
+      [['&#0;', '&#38;lt;', '&#99999999;', '&rArr;&rarr;', '가&nbsp;나&amp;다'].every((x) => decodeNewsEntities(x) === ME.decodeEntities(x)), safeBig], [true, '가&#99999999;나']);
     const caseOf = (fn) => (typeof fn === 'function' ? fn('&rArr;&rarr;') : '(풀이 함수 없음)');
     eq('    풀이마다 대소문자를 가린다(&rArr; ⇒ · &rarr; →) — 엔진 · 제목·본문 · 발췌 · 소식 설명 · 접수 기간 한 줄',
       [caseOf(ME.decodeEntities), caseOf(ctDecode), caseOf(decodeExcerptEntities), caseOf(decodeNewsEntities), H('접수기간: 2026. 9. 1. ~ 9. 30. 포털 &rArr; 신청')],
@@ -4050,6 +4050,16 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     eq('    번호는 두 겹까지 뗀다(번호 뒤에 빈칸이 올 때만) · 괄호 안에서 이어지는 동그라미 번호는 떼지 않는다(괄호가 깨지지 않게)',
       readDocuments('마. 제출서류\n라 . 4. 지원자격의 다 ~ 마항 관련 각종 증빙서류\n• 1. 재학증명서 1부\n(②초본이 부·모일 경우) 가족관계 증명서\n5.1. (재단 양식) 추천서 1부\n바. 문의: 장학팀').docs,
       ['지원자격의 다 ~ 마항 관련 각종 증빙서류', '재학증명서 1부', '(②초본이 부·모일 경우) 가족관계 증명서', '(재단 양식) 추천서 1부']);
+    /* 리뷰 8차 — 둘째 겹 지우개가 글머리 뒤의 **날짜·범위·참조**까지 지웠다: 「○ 10. 1. 이후 발급분 …」 → 「1. 이후 발급분 …」(10월이 사라져 옛 등본을 낼 수 있다) ·
+       「- ① 또는 ② 해당자 …」 → 「또는 ② …」 · 「• 1) ~ 3) 중 …」 → 「~ 3) 중 …」 — 원문 글자 그대로(원칙 8-1) · 글머리 없이 날짜로 시작하는 줄(「10. 1. 이후 …」)도 날짜를 떼지 않는다 */
+    eq('    글머리 뒤의 날짜·범위·참조 번호는 떼지 않는다(원문 그대로)',
+      readDocuments('마. 제출서류\n○ 10. 1. 이후 발급분 주민등록등본 1부\n- ① 또는 ② 해당자: 가족관계증명서 1부\n• 1) ~ 3) 중 해당 증빙서류 1부\n10. 1. 이후 발급분 재학증명서 1부\n바. 문의: 장학팀').docs,
+      ['10. 1. 이후 발급분 주민등록등본 1부', '① 또는 ② 해당자: 가족관계증명서 1부', '1) ~ 3) 중 해당 증빙서류 1부', '10. 1. 이후 발급분 재학증명서 1부']);
+    /* 리뷰 8차(전부터 있던 것) — 소제목 판정이 끝 괄호를 떼고 「…서류」 로 끝나는지만 봐서, 괄호 안에 진짜 서류 이름이 있는 줄(「소득분위서류(… 지원구간 통지서)」)이 소제목으로 빠졌다
+       (저장 원문에서 되살아나는 서류 줄 8 — 가계곤란 입증서류(… 확인서 …) · 관계 서류(가족관계증명서 등) 등 · 지원에 필요한 서류가 학생 목록에서 사라져 있었다) */
+    eq('    괄호 안에 서류 이름이 있으면 소제목이 아니라 서류다 · 괄호에 서류 이름이 없는 소제목(「추가 제출 가능 서류 (해당자만)」)은 그대로 뺀다',
+      readDocuments('5. 제출서류\n5.1. (재단 양식) 추천서 1부\n추가 제출 가능 서류 (해당자만)\n5.5. 소득분위서류(2026년 2학기 한국장학재단 학자금 지원구간 통지서)\n6. 문의: 장학팀').docs,
+      ['(재단 양식) 추천서 1부', '소득분위서류(2026년 2학기 한국장학재단 학자금 지원구간 통지서)']);
     eq('    &emsp; 로 들여 쓴 ※ 곁말 줄은 서류가 아니다(줄 맨 앞을 보는 판정도 기호를 풀고 빈칸을 깎은 줄로)',
       readDocuments('나. 제출서류\n&emsp;1) (필수) 장학금 신청서\n&emsp;&emsp;※ 가족관계증명서는 부모 기준 상세로 발급\n&emsp;2) (필수) 가족관계증명서 1부\n4. 장학금액').docs,
       ['(필수) 장학금 신청서', '(필수) 가족관계증명서 1부']);
@@ -16221,6 +16231,11 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   eq('  배점표 행(「3자녀 : 5점, 4자녀 : 7점 …」·「점수 차등 부여」)은 자격 줄이 아니다 · 「성적 기준을 적용하지 않음」은 참고(aside)', ME3.requirementLines({ eligibilityLines: ['3자녀 : 5점, 4자녀 : 7점, 5자녀 이상 : 10점', '대학생: 학자금지원구간(10구간)에 따라 점수 차등 부여(20점~50점)', '직전학기 평점 3.0 이상', '1학년 재학생은 성적 기준을 적용하지 않음'] }, null, { all: true, withMeta: true }).map((it) => [it.text, it.aside]), [['직전학기 평점 3.0 이상', false], ['1학년 재학생은 성적 기준을 적용하지 않음', true]]);
   /* ⑮ 제출 서류 (2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — 자리표시뿐인 등록분 220건 중 원문 156건의 「제출서류」 절을 읽어 채운다 */
   {
+    /* 리뷰 8차 — extract-excerpts.mjs 는 불러오는 순간 발췌 로봇 본편이 도는 파일이다(EXCERPTS_AS_LIB=1 이면 건너뛴다). docs-fill 이 정적으로 불러와 돌 때마다 본편이 한 번 더 돌았다
+       (네 로봇이 함께 쓰는 단계 시한 안에서) → 수집 모듈은 표시를 켠 뒤 동적으로 불러온다(activity-excerpts 와 같은 길) */
+    const staticEx = fs.readdirSync(new URL('../collector/', import.meta.url)).filter((f) => /\.mjs$/.test(f) && f !== 'extract-excerpts.mjs')
+      .filter((f) => /^\s*import\s[^;]*?from\s+'\.\/extract-excerpts\.mjs'/m.test(readText(new URL(`../collector/${f}`, import.meta.url))));
+    eq('  🔴 발췌 로봇(extract-excerpts)을 정적으로 불러오는 수집 모듈이 없다 — 불러오는 순간 본편이 돈다(EXCERPTS_AS_LIB 를 켠 뒤 동적으로)', staticEx, []);
     /* 학생이 보는 서류 목록 함수(doc-list readDocuments)로 잰다 — 옛 사본 extractDocuments 는 지웠다(리뷰 7차) */
     const { readDocuments: RD } = await import('../collector/doc-list.mjs');
     const RD5 = (t) => RD(t).docs;

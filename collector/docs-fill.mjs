@@ -13,7 +13,10 @@
    관문: verify/test-collector.mjs 「공고 카드 품질」 ⑮.
    ============================================================ */
 import fs from 'node:fs';
-import { isDocPlaceholder } from './extract-excerpts.mjs';
+/* 🔴 extract-excerpts.mjs 는 불러오는 순간 발췌 로봇 본편이 통째로 도는 파일이다 — 표시를 켠 뒤 동적으로 불러온다(activity-excerpts 와 같은 길 · 2026-11-26 리뷰 8차:
+   정적으로 불러와 이 로봇이 돌 때마다 본편이 한 번 더 돌았다 — 네 로봇이 함께 쓰는 단계 시한 안에서) */
+process.env.EXCERPTS_AS_LIB = process.env.EXCERPTS_AS_LIB || '1';
+const { isDocPlaceholder } = await import('./extract-excerpts.mjs');
 import { readDocuments, DOC_PLACEHOLDER_LINE, hasDocSection } from './doc-list.mjs';   // 🔴 서류 목록 규칙은 doc-list 한 곳(2026-11-15 리뷰 — 이 로봇만 옛 규칙 사본 extractDocuments 를 써서 고친 규칙이 74건에 안 닿았다)
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 import { DOC_JUNK } from './doc-list.mjs';
