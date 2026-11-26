@@ -35,7 +35,7 @@ import { FETCH_HEADERS } from './http-headers.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
-import { activityDetails, eligLineOk, ACT_DETAILS_V, ACT_DOCS_V, activityDocuments, putActivityDocuments, titleWords, ownsImageText } from './activity-excerpts.mjs';
+import { activityDetails, eligLineOk, ACT_DETAILS_V, ACT_DOCS_V, activityDocuments, putActivityDocuments, titleWords, ownsImageText, actClosed } from './activity-excerpts.mjs';
 import { ACT_SIGNAL } from './activity-vocab.mjs';
 import { writeStore, wantsText, textDue, pruneStore } from './act-text.mjs';   // 유료 관문 — 원문 글자 기록(글자만 · 2026-11-25)
 import { MIN_BODY } from './notice-source.mjs';   // 본문 분량의 문턱 한 곳(장학금 원문 받기와 같은 100자)
@@ -86,7 +86,10 @@ export const needsElig = (n) => !n.hidden && !(n.eligibilityLines && n.eligibili
    첨부에서 뽑은 줄은 영영 옛 규칙이었다(중국언어문화 경진대회 안내문 — 「참가제한」 항목 다섯이 자격 줄로 남았다).
    · 다시 못 읽으면(파일이 내려갔다 · 기회 두 번을 다 썼다 — dueFree) **읽어 둔 줄은 그대로 둔다** — 지우지 않는다
    · 브라우저 모드는 하지 않는다(자격 0줄인 글만 연다 — 같은 글을 두 로봇이 다시 두드리지 않게) · 읽은 판은 docsV 에 적는다 */
-export const staleDocs = (n) => !n.hidden && /^(?:공고문 첨부|요강 페이지)/.test(n.eligibilityFrom || '') && ((n.docsV || 0) < ACT_DETAILS_V || n.documentsV !== ACT_DOCS_V);   // 서류 판(documentsV)이 옛것이어도 한 번 다시 연다 — 서류는 자격을 준 그 글자에서(2026-11-18)
+export const staleDocs = (n, today = kstToday()) => !n.hidden && /^(?:공고문 첨부|요강 페이지)/.test(n.eligibilityFrom || '') && ((n.docsV || 0) < ACT_DETAILS_V || (n.documentsV !== ACT_DOCS_V && !actClosed(n, today)));   // 서류 판(documentsV)이 옛것이어도 한 번 다시 연다 — 서류는 자격을 준 그 글자에서(2026-11-18) · 서류 판으로는 마감 지난 글을 안 연다(무료 기회를 아낀다 · 리뷰 10차)
+/* 새로 읽은 서류 목록으로 바꿀 글 — 목록이 없거나, 있는 목록이 이 로봇이 첨부·요강에서 읽어 둔 것일 때(리뷰 10차 — 비었을 때만 채워서 서류 판을 올려 다시 연 글은 판 번호만 바뀌고 새 규칙이 닿지 않았다) ·
+   본문이 준 목록(출처 표식 없음 — 본문이 이긴다)·브라우저 장부 목록·관리자 목록은 그대로 */
+export const fileDocsWin = (n) => !(n.documents || []).length || /^(?:공고문 첨부|요강 페이지)/.test(n.documentsFrom || '');
 
 /** 받을 후보 — 첨부(공고문·포스터) 먼저, 그다음 본문 그림. 서식·꾸밈 그림은 뺀다. */
 /** 글 제목이 HTML 에 마지막으로 나온 자리부터 (없으면 전체) — activity-excerpts.mjs atTitle 과 같은 생각 */
@@ -486,7 +489,7 @@ function applyPhase(acts) {
     if (!wantElig) continue;
     found.add(n.url);
     if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from, ...((d.documents || []).length ? { documents: d.documents } : {}) }; got += 1; continue; }
-    if ((d.documents || []).length && !(n.documents || []).length) putActivityDocuments(n, d.documents, d.from);   // 본문이 준 목록이 있으면 본문이 이긴다
+    if ((d.documents || []).length && fileDocsWin(n)) putActivityDocuments(n, d.documents, d.from);   // 본문이 준 목록이 있으면 본문이 이긴다 · 이 로봇이 읽어 둔 목록은 새로 읽은 것으로(fileDocsWin)
     n.documentsV = ACT_DOCS_V;   // 첨부 글자로 서류를 읽어 봤다 — 다시 열지 않는다(목록이 없어도)
     n.eligibilityLines = d.eligibilityLines;
     if (d.eligibilityExcludes.length) n.eligibilityExcludes = d.eligibilityExcludes; else delete n.eligibilityExcludes;   // 다시 읽은 글 — 옛 제외 줄이 남지 않게

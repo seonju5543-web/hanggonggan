@@ -663,6 +663,7 @@ acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; e
 const todayIso = new Date().toISOString().slice(0, 10);
 const ACT_BACKFILL = 40;   // 2026-10-01 20→40 — 자격 판(detailsV) 소급으로 다시 읽을 글이 130건이다. 예산(budget.hasRoom) 안에서만 돈다
 let actBackfilled = 0, actDocsBackfilled = 0, actAttachBackfilled = 0, actAttachAdded = 0;
+const actDocsShrunk = [];   // 서류 칸만 다시 읽어 서류 줄이 준 글(리뷰 10차 — 활동 본문은 저장소에 없어 미리 잴 수 없다 · 리포트로 본다)
 for (const it of acts.items) {
   /* 🔴 자격 판(detailsV)이 옛것인 글도 다시 읽는다 (2026-10-01 · 소급 — 원칙 7). API 글은 API 로봇이 채우므로 건너뛴다 */
   /* API 글은 API 본문으로 읽었으니 건너뛴다 — 단 거기서 자격이 안 나온 글은 원문 페이지를 읽어 본다(제주 청년정책 「체인지메이커」: API 칸은 한 줄, 페이지엔 자격 표 · 2026-10-16) */
@@ -677,7 +678,7 @@ for (const it of acts.items) {
   if (detail.text && it.rereadMiss) { delete it.rereadMiss; delete it.rereadMissV; }   // 그 글이 맞았다 — 센 것을 지운다
   if (need === 'docs') {
     /* 서류 칸만 — 자격·발췌·마감은 그대로 둔다(같은 판으로 이미 읽었다). 못 받으면 이레 뒤에 다시 · 받은 김에 새 첨부도 합친다(안 합치면 다음 실행에 첨부 갈래로 한 번 더 받는다 · 2026-11-26) */
-    if (detail.text) { putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) }); actAttachAdded += mergeActAttachments(it, detail.attachments); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
+    if (detail.text) { const docsBefore = (it.documents || []).length; putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) }); actAttachAdded += mergeActAttachments(it, detail.attachments); delete it.detailsTriedAt; if ((it.documents || []).length < docsBefore) actDocsShrunk.push(`${String(it.title || '').slice(0, 40)} ${docsBefore}→${(it.documents || []).length}줄`); } else it.detailsTriedAt = todayIso;
     actBackfilled += 1; actDocsBackfilled += 1;
     continue;
   }
@@ -854,6 +855,7 @@ lines.push(`### 🎯 대외활동·공모전 새 글 ${freshActs.length}건 → 
 /* 첨부만 다시 살핀 글은 따로 적는다 — 「마감·발췌를 채웠다」에 섞으면 숫자가 사실과 다르다(리뷰 2026-11-25) */
 const left = actRereadLeft(acts.items);
 if (actBackfilled - actAttachBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled - actAttachBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (그중 서류 칸만 ${actDocsBackfilled}건 · 남은 ${left.fill}건은 다음 실행에)`);
+if (actDocsShrunk.length) lines.push(`- ⚠️ 서류 칸만 다시 읽어 서류 줄이 준 글 ${actDocsShrunk.length}건 — 원문을 열어 목록이 맞는지 보세요: ${actDocsShrunk.slice(0, 8).join(' · ')}${actDocsShrunk.length > 8 ? ' …' : ''}`);   // 리뷰 10차
 if (actAttachBackfilled) lines.push(`- 📎 열려 있는 글 ${actAttachBackfilled}건의 첨부를 다시 살폈습니다 (새로 찾은 파일 ${actAttachAdded}개 · 남은 ${left.attach}건은 다음 실행에)`);
 if (left.gaveUp) lines.push(`- ⏹ 다시 읽은 페이지가 두 번 그 글이 아니라 그만 연 글 ${left.gaveUp}건 — 자격 규칙 판(ACT_DETAILS_V)이 바뀌면 다시 연다(스크립트로 그리는 글·다른 글로 바뀐 주소)`);
 for (const r of actResults) {

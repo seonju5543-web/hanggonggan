@@ -345,6 +345,9 @@ const DOC_SLOTS = [
   { slot: 'recommend',  label: '추천서',            match: /추천서/,       issue: '지도교수님께 요청 (양식은 공고 첨부 확인)' },
 ];
 function slotForDoc(doc) {
+  /* 괄호 하나로 된 줄(「(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)」 — 로봇 doc-list 의 조건 괄호 줄)은 서류가 아니라 아래 서류가 **언제** 필요한지 말한다 —
+     보관함 칸을 붙이면 그 줄에 「아직 안 올렸어요」가 붙고 「n개 준비 안 됨」에도 셌다(리뷰 10차) · 체크리스트·공유·도우미가 모두 이 함수를 쓴다 */
+  if (/^\s*[(（][^)）]*[)）]\s*$/.test(String(doc || ''))) return null;
   return DOC_SLOTS.find((s) => s.match.test(doc)) || null;
 }
 

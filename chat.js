@@ -389,7 +389,7 @@ function chatAnswerDocuments(q) {
   if (hit && realDocs(hit.sch).length) {
     const rows = realDocs(hit.sch).map((doc) => {
       const st = chatSafe(() => docWalletStatus(doc), null);
-      const name = String(doc).replace(/\s*\(.*\)$/, '');
+      const name = String(doc).replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '') || String(doc);   // 끝 괄호만 뗀다 · 다 지워지면 원래 글자(리뷰 10차 · 앱 체크리스트와 같은 규칙)
       if (st && st.ok) return `✓ ${name} — 보관함에 있어요`;
       return `□ ${name}`;
     });
@@ -404,7 +404,7 @@ function chatAnswerDocuments(q) {
 
   const count = {};
   chatApplyable().forEach((m) => realDocs(m.sch).forEach((doc) => {
-    const name = String(doc).replace(/\s*\(.*\)$/, '');
+    const name = String(doc).replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '') || String(doc);
     count[name] = (count[name] || 0) + 1;
   }));
   const top = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 6);
@@ -716,7 +716,7 @@ function chatFieldRegistered(m, field) {
     }
     const rows = docs.map((doc) => {
       const st = chatSafe(() => docWalletStatus(doc), null);
-      return `${st && st.ok ? '✓' : '□'} ${String(doc).replace(/\s*\(.*\)$/, '')}${st && st.ok ? ' — 서류함에 있어요' : ''}`;
+      return `${st && st.ok ? '✓' : '□'} ${String(doc).replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '') || String(doc)}${st && st.ok ? ' — 서류함에 있어요' : ''}`;
     });
     return {
       text: `'${name}'에 필요한 서류예요.`, list: rows, ...card,

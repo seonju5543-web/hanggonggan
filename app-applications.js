@@ -134,7 +134,7 @@ function docChecklistHtml(sch) {
   const tracked = marks.filter((m) => m.st);
   const missing = tracked.filter((m) => !m.st.ok);
   const rows = marks.map(({ doc, st }) => {
-    const name = esc(doc.replace(/\s*\(.*\)$/, ''));
+    const name = esc(doc.replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '') || doc);   // 끝 괄호만 뗀다 · 다 지워지면 원래 글자(리뷰 10차 · 증명서류 체크리스트와 같은 규칙)
     if (st && st.ok) return `<li class="dc-ok">${name}</li>`;
     if (st) return `<li class="dc-miss">${name}<em>${esc(st.slot.issue)}</em></li>`;
     /* 보관함에 칸이 없는 서류 — 앱이 있는지 모르므로 빈 네모만 둔다(「보관함에서 확인할 수 없는 서류」 글자는 2026-11-21 개발자 지시로 지움) */

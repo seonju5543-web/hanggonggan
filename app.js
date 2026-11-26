@@ -2141,7 +2141,7 @@ function essayDefsFor(sch) {
     .filter((doc) => !/자동/.test(doc))
     .map((doc) => {
       const def = ESSAY_DEFS.find((e) => e.match.test(doc));
-      return def ? { doc: doc.replace(/\s*\(.*\)$/, ''), ...def } : null;
+      return def ? { doc: doc.replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '') || doc, ...def } : null;   // 끝 괄호만 뗀다 · 다 지워지면 원래 글자(리뷰 10차 — 「(양식) 자기소개서(…)」 의 도우미 이름이 비었다)
     })
     .filter(Boolean);
 }
@@ -2195,7 +2195,8 @@ function certStatusListHtml(sch, opts) {
     /* 🔴 서류 이름은 **수집한 외부 글**이다(층1 documents · 층2 재단 칸) — 전부 esc 를 거친다 (2026-09-23 리뷰).
        예전엔 마지막 갈래만 거쳐서, 이름에 든 태그가 그대로 그려졌다(가짜 '발급처' 링크를 심을 수 있었다).
        이 목록이 이제 확인 전 신청 준비 시트에도 뜨므로 더는 미룰 수 없다. st.text 에도 파일 이름이 든다. */
-    const name = esc(doc.replace(/\s*\(.*\)$/, ''));
+    /* 이름은 **끝 괄호만** 뗀다 — 처음 「(」 부터 지워 「(서식3) 추천서(선택)」 이 빈 이름이 됐다 · 다 지워지면(괄호 하나로 된 줄) 원래 글자(리뷰 10차 · 신청 내역 체크리스트와 같은 규칙) */
+    const name = esc(doc.replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '') || doc);
     if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${esc(st.text)}</li>`;
     if (st) return `<li class="doc-miss">□ ${name} — ${esc(st.text)}</li>`;
     /* △ · □ 줄 꼬리 안내(「연동 후 자동 첨부」·「공식 제출 시 함께 준비하세요」)는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) — 원문 서류 이름만 보인다 */

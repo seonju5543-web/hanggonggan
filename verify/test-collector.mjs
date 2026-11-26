@@ -1476,6 +1476,31 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
   eq('🔴 보관함 상태가 있는 갈래도 서류 이름의 태그를 그리지 않는다',
     /<a |<i>/.test(certE({ ok: true, text: '<b>파일</b>' })({ documents: evil })), false);
   eq('  보관함 상태가 없는 갈래(△ 자동)도 그리지 않는다', /<a |<i>/.test(certE(null)({ documents: evil })), false);
+  /* 리뷰 10차 — 보관함 칸이 있는 줄의 이름은 **끝 괄호만** 뗀다: 처음 「(」 부터 끝까지 지워 「(서식3) 추천서(선택)」·「(선택) 학과(부)장 또는 교수 추천서(해당자만 제출)」
+     (지금 실린 정식 등록 둘)가 빈 이름이 됐다 · 괄호 하나로 된 조건 줄(doc-list 의 조건 괄호 줄)처럼 다 지워지면 원래 글자 — 두 체크리스트(증명서류 · 제출 서류)가 같은 규칙 */
+  const stMiss = { ok: false, slot: { issue: '발급처' }, text: '아직 안 올렸어요' };
+  const trimDocs = ['(서식3) 추천서(선택)', '(선택) 학과(부)장 또는 교수 추천서(해당자만 제출)', '성적증명서 1부(원본)', '주민등록등본(세대원 전원)(원본)', '(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)'];
+  const trimWant = ['(서식3) 추천서', '(선택) 학과(부)장 또는 교수 추천서', '성적증명서 1부', '주민등록등본', '(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)'];
+  const dcList = new Function('ESSAY_DEFS', 'docWalletStatus', 'esc', `${take('isUnknownDoc')}\n${take('docChecklistHtml')}\nreturn docChecklistHtml;`)([], () => stMiss, escReal);
+  eq('  체크리스트 이름은 끝 괄호만 뗀다 · 다 지워지면 원래 글자(증명서류 체크리스트 · 신청 내역 제출 서류)',
+    [[...certE(stMiss)({ documents: trimDocs }).matchAll(/□ ([^<]*?) — /g)].map((m) => m[1]), [...dcList({ documents: trimDocs }).matchAll(/<li class="dc-miss">([^<]*)<em>/g)].map((m) => m[1])],
+    [trimWant, trimWant]);
+  /* 같은 뿌리(전부터 있던 것 · 리뷰 10차가 찾은 자리의 이웃) — 서류 이름을 줄이는 자리가 다섯 더 있었고 모두 처음 「(」 부터 지웠다: 서류 도우미(essayDefsFor)·도우미 답 셋(chat.js)·
+     신청 준비 작성 서류(forms.js prepWriteDocs) — 실린 정식 등록 「(양식) 자기소개서(졸업 후 진로계획 포함/ …)」 의 도우미 이름이 비었다 */
+  const essayFn = new Function('ESSAY_DEFS', `${take('essayDefsFor')}\nreturn essayDefsFor;`)([{ key: 'intro', match: /자기소개서/ }]);
+  eq('  서류 도우미 이름도 끝 괄호만 뗀다(「(양식) 자기소개서(…)」 → 「(양식) 자기소개서」)',
+    essayFn({ documents: ['(양식) 자기소개서(졸업 후 진로계획 포함/ A4용지 2장, 글자 10point, 행간 160)', '자기소개서 1부(자유 양식)'] }).map((d) => d.doc), ['(양식) 자기소개서', '자기소개서 1부']);
+  {
+    const greedy = /\.replace\(\/\\s\*\\\(\.\*\\\)\$\/, ''\)/;
+    eq('  처음 「(」 부터 끝까지 지우는 이름 줄이기가 학생 화면 파일에 남지 않았다(app.js · 떼어 낸 화면 · 도우미 · 양식 엔진)',
+      ['app.js', 'app-applications.js', 'app-prep.js', 'app-sheet.js', 'app-my.js', 'app-activities.js', 'chat.js', 'forms.js'].filter((f) => greedy.test(readText(new URL(`../${f}`, import.meta.url)))), []);
+  }
+  /* 리뷰 10차 — 조건 괄호 줄(「(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)」)은 서류가 아니라 아래 서류가 **언제** 필요한지 말하는 줄이다 — 보관함 칸을 붙이면
+     그 줄에 「아직 안 올렸어요」 가 붙고 「n개 준비 안 됨」 에도 센다 → 괄호 하나로 된 줄은 보관함 칸이 없다(보관함 짝 찾기 slotForDoc 한 곳 — 체크리스트·공유·도우미가 같이 쓴다) */
+  const slotOf = new Function(`${readText(new URL('../data.js', import.meta.url))}\nreturn slotForDoc;`)();
+  eq('  괄호 하나로 된 조건 줄은 보관함 칸이 없다 · 보통 서류 · 앞에 괄호가 붙은 서류는 그대로 칸이 있다',
+    [slotOf('(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)'), (slotOf('재학증명서 1부') || {}).slot, (slotOf('(서식3) 추천서(선택)') || {}).slot],
+    [null, 'enrollCert', 'recommend']);
   /* 상세 시트의 '제출 서류' 목록도 안내 줄에 '직접' 배지를 달지 않는다 */
   const detailSrc = take('applySectionHtml').replace(/\/\*[\s\S]*?\*\//g, '');   // 2026-11-02 승인 시안 — 서류는 「접수」 절의 한 줄(applySectionHtml)
   eq('  상세 시트의 제출 서류 줄(「접수 · 서류」)도 안내 줄을 거른다', /documents \|\| \[\]\)\.filter\(\(doc\) => !DOC_PLACEHOLDER\.test\(doc\)\)/.test(detailSrc), true);
@@ -4071,13 +4096,29 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
       [readDocuments('5. 제출서류\n자격 확인 서류 (※ 모든 증명서는 공고일 이후 발급분만 인정)\n1) 재학증명서 1부\n소득 관련 서류(아래 증명서 중 해당 서류 1부)\n2) 소득금액증명원 1부\n선택 제출 자료 (포트폴리오 등)\n3) 포트폴리오 1부\n6. 문의: 장학팀').docs,
         readDocuments('5. 제출서류\n라. 일시적 가계곤란 입증서류(채무변제 상환내역 확인서, 법원판결/결정문 사본, 부도사실 확인원, 실직 확인서, 폐업 사실 증명원, 중증진료 등록확인증 등)\n6. 문의: 장학팀').docs],
       [['재학증명서 1부', '소득금액증명원 1부', '포트폴리오 1부'], ['일시적 가계곤란 입증서류']]);
-    /* 전부터 있던 것(리뷰 9차가 원문에서 찾음) — 첫 거름에 영수증·등록증·스캔본 낱말이 없어 열린 공고(서강대 삼성꿈)의 필수 서류 「외국인등록증 스캔본」이 빠졌다 ·
+    /* 전부터 있던 것(리뷰 9차가 원문에서 찾음) — 첫 거름에 영수증·등록증 낱말이 없어 열린 공고(서강대 삼성꿈)의 필수 서류 「외국인등록증 스캔본」이 빠졌다(「스캔본」 낱말은 일부러 안 넣었다 — 앞 줄에서 이어진 조각까지 서류가 됐다) ·
        「(… 소득분위가 없을 경우 아래 대체 서류 제출)」 조건 줄이 빠져 대체 서류 1)~4) 가 모두 필수로 보였다(두산연강 · 고려대 세종) → 조건 괄호 줄은 남긴다(원문 글자 그대로) */
-    eq('    영수증·등록증·스캔본도 서류다 · 「… 경우 아래 대체 서류 제출」 조건 괄호 줄은 남긴다(아래 서류가 언제 필요한지)',
+    eq('    영수증·등록증으로 끝나는 서류 이름도 서류다(「외국인등록증 스캔본」) · 「… 경우 아래 대체 서류 제출」 조건 괄호 줄은 남긴다(아래 서류가 언제 필요한지)',
       [readDocuments('5. 제출서류\n① 여권 사본\n② 외국인등록증 스캔본\n③ 2026학년도 2학기 등록금 납입영수증\n6. 문의: 장학팀').docs,
         readDocuments('5. 제출서류\n5.5. 소득분위서류(2026년 2학기 한국장학재단 학자금 지원구간 통지서)\n(군 복무, 휴학 등으로 2026년 2학기 소득분위가 없을 경우 아래 대체 서류 제출) * 대체 서류(1, 2, 3, 4 모두 하나의 PDF파일로 스캔하여 제출)\n1) 부모님 건강보험료 납부 확인서\n2) 부모님 지방세 과세증명서\n6. 문의: 장학팀').docs],
       [['여권 사본', '외국인등록증 스캔본', '2026학년도 2학기 등록금 납입영수증'],
         ['소득분위서류(2026년 2학기 한국장학재단 학자금 지원구간 통지서)', '(군 복무, 휴학 등으로 2026년 2학기 소득분위가 없을 경우 아래 대체 서류 제출)', '부모님 건강보험료 납부 확인서', '부모님 지방세 과세증명서']]);
+    /* 리뷰 10차 — ① 소제목의 안내 괄호 낱말이 넓어(중 택1·중 1부·중 하나·발급분·가능·인정) 「…서류(서류 이름 … 중 1부)」 같은 **필수 서류 한 줄**이 소제목으로 빠졌다(8차에 고친 사고와 같은 꼴 ·
+       지금 원문엔 0건이라 측정에 안 잡혔다) → 안내 괄호는 ※ 로 시작하거나 「아래」 를 가리킬 때만 · 지금까지 관문은 지우는 쪽만 봤다 — 남기는 쪽도 잠근다 */
+    eq('    안내 말 없는 괄호의 「…서류(서류 이름 … 중 1부·택1·하나·발급분·가능·인정)」 는 필수 서류다(소제목으로 빼지 않는다)',
+      readDocuments('5. 제출서류\n학적 서류(재학증명서 또는 휴학증명서 중 1부)\n신분 확인 서류(주민등록증, 운전면허증 중 택1 사본)\n소득 관련 서류(건강보험료 납부확인서 또는 소득금액증명원 중 하나)\n가족 관련 서류(가족관계증명서, 공고일 이후 발급분)\n경력 서류(재직증명서 제출 가능)\n어학 서류(TOEIC 성적표 등 공인 성적 인정)\n6. 문의: 장학팀').docs,
+      ['학적 서류(재학증명서 또는 휴학증명서 중 1부)', '신분 확인 서류(주민등록증, 운전면허증 중 택1 사본)', '소득 관련 서류(건강보험료 납부확인서 또는 소득금액증명원 중 하나)', '가족 관련 서류(가족관계증명서, 공고일 이후 발급분)', '경력 서류(재직증명서 제출 가능)', '어학 서류(TOEIC 성적표 등 공인 성적 인정)']);
+    /* 리뷰 10차 — ② 때 말(이후·기준…) 막음이 동그라미·가.·(1) 번호에도 걸려 번호가 남았다(「가. 10. 1. 이후 …」) → 때 말 막음은 숫자 번호에만(숫자 번호는 날짜의 앞 숫자일 수 있다) ·
+       ③ 붙여 쓴 기간(「10.1.~10.31.」 · 실제 원문 「8.6.~8.12.」)을 지키는 조각(범위 앞의 「숫자.」 되풀이)이 검사로 잠기지 않았다 */
+    eq('    동그라미·가.·(1) 번호 뒤의 띄어 쓴 날짜는 번호만 뗀다 · 붙여 쓴 기간(10.1.~10.31.)의 앞 숫자는 번호가 아니다',
+      readDocuments('마. 제출서류\n가. 10. 1. 이후 발급분 재학증명서 1부\n① 9. 1. 기준 주민등록등본 1부\n(1) 10. 1. 이후 발급분 가족관계증명서 1부\n10.1.~10.31. 발급분 성적증명서 1부\n바. 문의: 장학팀').docs,
+      ['10. 1. 이후 발급분 재학증명서 1부', '9. 1. 기준 주민등록등본 1부', '10. 1. 이후 발급분 가족관계증명서 1부', '10.1.~10.31. 발급분 성적증명서 1부']);
+    /* 리뷰 10차 — ④ 30자 넘는 줄에서 목록을 끊을지는 옛 낱말 목록만 봐서 「② … 등록금 납입영수증(학교 포털 출력본, 직인 날인)」 에서 끊기고 뒤의 「통장 사본 1부」 까지 사라졌다 ·
+       ⑤ 영수증·등록증 낱말은 줄이 **그 서류 이름으로 끝날 때만**(뒤에 사본·원본·스캔본·출력본·「n부」·괄호 하나는 붙어도 된다) — 「기부금 영수증 발행」 은 안내 문장이다 · 「스캔본」 조각만으로는 서류가 아니다 */
+    eq('    30자 넘는 영수증 줄에서 목록을 끊지 않는다 · 영수증·등록증은 그 이름으로 끝나는 줄만 서류다',
+      [readDocuments('5. 제출서류\n① 장학금 신청서 1부\n② 2026학년도 2학기 등록금 납입영수증(학교 포털 출력본, 직인 날인)\n③ 통장 사본 1부\n6. 문의: 장학팀').docs,
+        readDocuments('5. 제출서류\n① 장학금 신청서 1부\no 연말정산 시 기부금 영수증 발행\n페이지(특약사항 포함) 스캔본\n② 외국인등록증 스캔본\n③ 원천징수영수증 1부\n6. 문의: 장학팀').docs],
+      [['장학금 신청서 1부', '2026학년도 2학기 등록금 납입영수증(학교 포털 출력본, 직인 날인)', '통장 사본 1부'], ['장학금 신청서 1부', '외국인등록증 스캔본', '원천징수영수증 1부']]);
     eq('    &emsp; 로 들여 쓴 ※ 곁말 줄은 서류가 아니다(줄 맨 앞을 보는 판정도 기호를 풀고 빈칸을 깎은 줄로)',
       readDocuments('나. 제출서류\n&emsp;1) (필수) 장학금 신청서\n&emsp;&emsp;※ 가족관계증명서는 부모 기준 상세로 발급\n&emsp;2) (필수) 가족관계증명서 1부\n4. 장학금액').docs,
       ['(필수) 장학금 신청서', '(필수) 가족관계증명서 1부']);
@@ -7688,7 +7729,12 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
       [AX.actRereadNeed({ rereadMiss: 2, rereadMissV: DV }), AX.actRereadNeed({ rereadMiss: 2, rereadMissV: DV - 1 }), AX.actRereadNeed({ rereadMiss: 2 }), AX.actRereadNeed({ rereadMiss: 1, rereadMissV: DV }),
         /it\.rereadMiss = it\.rereadMissV === ACT_DETAILS_V \? \(it\.rereadMiss \|\| 0\) \+ 1 : 1; it\.rereadMissV = ACT_DETAILS_V;/.test(cm), /if \(detail\.text && it\.rereadMiss\) \{ delete it\.rereadMiss; delete it\.rereadMissV; \}/.test(cm)],
       [null, 'details', 'details', 'details', true, true]);
-    eq('  서류 칸만 다시 읽는 갈래도 새 첨부를 합친다(믿는 첨부만 · 있던 줄 그대로)', /if \(need === 'docs'\) \{[\s\S]{0,400}?actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\)[\s\S]{0,200}?continue;/.test(cm), true);
+    eq('  서류 칸만 다시 읽는 갈래도 새 첨부를 합친다(믿는 첨부만 · 있던 줄 그대로)', /if \(need === 'docs'\) \{[\s\S]{0,400}?actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\)[\s\S]{0,400}?continue;/.test(cm), true);   // 뒤 창 200→400 — 리뷰 10차가 그 사이에 줄 준 글 세기를 넣었다
+    /* 리뷰 10차 — 서류 판을 올려 열린 글의 서류 칸만 다시 읽을 때 껍데기가 아닌 본문이 빈 목록·짧은 목록을 내면 서류 줄이 준다 — 활동 본문은 저장소에 없어 미리 잴 수 없다 →
+       줄이 준 글은 수집 리포트에 이름과 줄 수를 남긴다(첫 실행 리포트로 본다) */
+    eq('  서류 칸만 다시 읽어 서류 줄이 준 글은 리포트에 이름과 줄 수를 남긴다',
+      [/const docsBefore = \(it\.documents \|\| \[\]\)\.length;/.test(cm), /if \(\(it\.documents \|\| \[\]\)\.length < docsBefore\) actDocsShrunk\.push\(/.test(cm),
+        /서류 칸만 다시 읽어 서류 줄이 준 글 \$\{actDocsShrunk\.length\}건/.test(cm)], [true, true, true]);
     {
       const AL0 = await import('../collector/attachment-link.mjs');
       const used = (AL0.usedAttachNamesFrom || (() => new Map()))({ formsIndex: ['x\ty\t신청서.hwp (71KB)\tz\tact-1', 'x\ty\t\tz\tact-2', '', 'x\ty\t요강.pdf\tz\t'].join('\n'),
@@ -7707,6 +7753,12 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
       [AX.actRereadNeed(cur, T), AX.actRereadNeed({ ...cur, attachV: A }, T), AX.actRereadNeed({ ...cur, deadline: T }, T), AX.actRereadNeed({ ...cur, deadline: '2026-11-24' }, T),
         AX.actRereadNeed({ ...cur, api: 'k', eligibilityLines: ['a'] }, T), AX.actRereadNeed({ ...cur, hidden: true }, T), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }, T)],
       ['attach', null, 'attach', null, null, null, 'details']);
+    /* 리뷰 10차 — 서류 판(ACT_DOCS_V)을 올리면 마감 지난 글까지 다시 열었다(첨부만 다시 읽는 갈래는 이미 건너뛴다) · 서류 칸만 고치는 갈래라 마감이 지나면 학생이 쓸 일이 없다 ·
+       자격 판이 옛것인 글(details)은 마감 지난 글도 연다 — 그 갈래는 마감일까지 다시 읽는다(잘못 읽은 마감이 고쳐질 수 있다) */
+    eq('  서류 판만 옛것인 글 — 열린 글·마감 당일은 docs · 마감 지난 글은 서류 판으로는 열지 않는다 · 자격 판이 옛것이면 마감 지난 글도 details',
+      [AX.actRereadNeed({ ...cur, documentsV: D - 1, attachV: A }, T), AX.actRereadNeed({ ...cur, documentsV: D - 1, attachV: A, deadline: T }, T),
+        AX.actRereadNeed({ ...cur, documentsV: D - 1, attachV: A, deadline: '2026-11-24' }, T), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1, deadline: '2026-11-24' }, T)],
+      ['docs', 'docs', null, 'details']);
     eq('  수집 로봇 — 첨부만 다시 읽는 갈래는 첨부만 합치고 넘어간다(자격·발췌·마감은 그대로 · 못 받으면 이레 뒤에) · 자격까지 다시 읽는 갈래도 첨부를 합친다 · 새 글은 읽은 판을 적는다',
       [/if \(need === 'attach'\) \{[^}]*?if \(detail\.text\) \{ actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actAttachBackfilled \+= 1;\s*continue;\s*\}/.test(cm),
         /if \(detail\.text\) mergeActAttachments\(it, detail\.attachments\);/.test(cm), /if \(detail\.text\) it\.attachV = ACT_ATTACH_V;/.test(cm)], [true, true, true]);
@@ -7722,7 +7774,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
       [null, 'docs', ['참가신청서 1부'], true, true, false]);
     const adocs = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
     eq('  #7 첨부 로봇 staleDocs 가 서류 판(documentsV)이 옛것인 첨부 자격 글도 한 번 다시 열고 · 읽은 뒤 판을 적는다',
-      [/staleDocs = \(n\) => [^\n]*n\.documentsV !== ACT_DOCS_V/.test(adocs), /n\.documentsV = ACT_DOCS_V;/.test(adocs)], [true, true]);
+      [/staleDocs = \(n, today = kstToday\(\)\) => [^\n]*n\.documentsV !== ACT_DOCS_V/.test(adocs), /n\.documentsV = ACT_DOCS_V;/.test(adocs)], [true, true]);   // 오늘 인자는 리뷰 10차(마감 지난 글은 서류 판으로 안 연다)
     const OM = await import('../collector/open-api-map.mjs');
     const om = readText(new URL('../collector/open-api-map.mjs', import.meta.url));
     eq('  #8 API 로봇이 글을 다시 만들 때 오늘 서류가 없으면 어제 서류(출처·판 포함)를 이어받는다',
@@ -20137,6 +20189,21 @@ module.exports = class Anthropic {
   const docsSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
   eq('  무료 모드만 다시 읽는다(브라우저 모드는 자격 0줄인 글만) · 읽은 판을 docsV 에 적는다 · 다시 읽은 글은 옛 제외 줄을 남기지 않는다',
     [/needsElig\(n\) \|\| \(!BROWSER && staleDocs\(n\)\)\) \|\| !dueFree/.test(docsSrc), /n\.docsV = ACT_DETAILS_V;/.test(docsSrc), /else delete n\.eligibilityExcludes;/.test(docsSrc)], [true, true, true]);
+  /* 리뷰 10차 — 서류 판(documentsV)만 옛것인 첨부 자격 글은 마감이 지났으면 다시 열지 않는다(그 글의 무료 기회 두 번을 아낀다 · 수집 로봇 docs 갈래와 같은 선 · 마감 당일은 연다) ·
+     자격 판(docsV)이 옛것이면 마감 지난 글도 그대로 연다 */
+  eq('첨부 자격 글의 서류 판 소급 — 열린 글·마감 당일만 · 마감 지난 글은 서류 판으로는 안 연다(자격 판이 옛것이면 연다)',
+    [AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V, documentsV: AX.ACT_DOCS_V - 1 }, '2026-11-26'),
+      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V, documentsV: AX.ACT_DOCS_V - 1, deadline: '2026-11-26' }, '2026-11-26'),
+      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V, documentsV: AX.ACT_DOCS_V - 1, deadline: '2026-11-25' }, '2026-11-26'),
+      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V - 1, documentsV: AX.ACT_DOCS_V, deadline: '2026-11-25' }, '2026-11-26')],
+    [true, true, false, true]);
+  /* 리뷰 10차 — 첨부 로봇은 글에 서류가 **없을 때만** 채워서, 서류 판을 올려 다시 연 글 중 이미 첨부에서 읽은 목록이 있는 글(지금 9건)은 판 번호만 바뀌고 새 규칙이 닿지 않았다 →
+     이 로봇이 첨부·요강에서 읽어 둔 목록(documentsFrom 「공고문 첨부…」·「요강 페이지…」)은 새로 읽은 목록으로 바꾼다 · 본문이 준 목록(표식 없음 — 본문이 이긴다)·브라우저 장부 목록·관리자 목록은 그대로 */
+  const win = AD.fileDocsWin || (() => '없음');
+  eq('첨부 로봇이 새로 읽은 서류 목록으로 바꾸는 글 — 빈 글 · 첨부·요강에서 읽어 둔 글 / 안 바꾸는 글 — 본문 목록 · 브라우저 장부 목록 · 관리자 목록 · 읽기 단계가 이 판단을 쓴다',
+    [win({}), win({ documents: ['옛'], documentsFrom: '공고문 첨부(OCR)' }), win({ documents: ['옛'], documentsFrom: '요강 페이지' }), win({ documents: ['옛'] }), win({ documents: ['옛'], documentsFrom: '브라우저 본문' }),
+      win({ documents: ['옛'], documentsFrom: '관리자 2026-11-26' }), /if \(\(d\.documents \|\| \[\]\)\.length && fileDocsWin\(n\)\) putActivityDocuments\(n, d\.documents, d\.from\);/.test(docsSrc)],
+    [true, true, true, false, false, false, true]);
 }
 
 console.log('■ 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) — 있을 수 없는 값은 칠 때부터 막는다');

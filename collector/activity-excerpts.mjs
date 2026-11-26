@@ -525,8 +525,13 @@ export function activityDocuments(text) {
 /* 제출 서류 판(documentsV · 🔴 `docsV` 는 첨부 로봇의 '첨부 자격 판'이라 이름을 나눴다 — 같은 칸을 쓰면 두 로봇이 서로의 도장을 덮어 매 실행 같은 글을 번갈아 다시 읽는다 · 2026-11-18) — 서류 규칙이 바뀌면 올린다. 다르면 수집 로봇이 원문을 다시 읽어 **서류 칸만** 고친다(자격 칸은 건드리지 않는다 —
    자격 판(detailsV)을 올리면 주소가 목록 화면으로 바뀐 글의 자격 줄까지 지워질 수 있다 · 2026-11-15 추적).
    1 (2026-11-15): 10-30 에 서류 칸을 더하고 판을 안 올려 이미 읽은 글 199건 중 1건만 서류가 있었다 + doc-list 절 경계
-   2 (2026-11-26): doc-list 서류 규칙이 여러 번 바뀌었다(리뷰 5~9차 — 「&emsp;」 들여쓰기 · 날짜·범위·참조 보존 · 둘째 겹 번호 · 괄호 안 서류 이름의 소제목 · 영수증·등록증 · 조건 괄호 줄) —
-      이미 읽은 활동 글(게시판 글 117건)에도 닿게 한 번 다시 읽는다(무료 · 한 실행 최대 ACT_BACKFILL 건 · 원칙 7 소급) */
+   2 (2026-11-26): doc-list 서류 규칙이 여러 번 바뀌었다(리뷰 5~10차 — 「&emsp;」 들여쓰기 · 날짜·범위·참조 보존 · 둘째 겹 번호 · 괄호 안 서류 이름의 소제목 · 영수증·등록증 · 조건 괄호 줄) —
+      이미 읽은 활동 글에도 닿게 한 번 다시 읽는다(무료 · 한 실행 최대 ACT_BACKFILL 건 · 원칙 7 소급).
+   🔴 판을 올리면 생기는 일(리뷰 10차 — 말하지 않은 효과였다):
+      ① 수집 로봇은 본문에서 자격을 읽은 게시판 글을 다시 연다 — **마감 지난 글은 서류 판으로는 열지 않는다**(actClosed · 첨부 갈래와 같은 선 · 마감 당일은 연다)
+      ② 첨부·요강에서 자격을 읽은 글은 첨부 로봇(activity-docs staleDocs)이 다시 연다(같은 선으로 마감 지난 글은 뺀다) — 그 글의 무료 기회(두 번 · 이레 간격 dueFree)를 하나 쓴다 ·
+         기회를 다 쓴 글은 옛 목록 그대로 둔다(같은 사이트를 거듭 두드리지 않는 쪽을 골랐다)
+      ③ 첨부 로봇이 첨부·요강에서 읽어 둔 목록은 새로 읽은 목록으로 바꾼다(fileDocsWin — 전엔 비었을 때만 채워 판 번호만 바뀌었다) · 본문 목록·브라우저 장부 목록·관리자 목록은 그대로 */
 export const ACT_DOCS_V = 2;
 /* 글 하나에 서류 목록을 붙인다 — 수집 로봇(새 글 · 소급) · 첨부 로봇(activity-docs) · API 로봇이 **같은 함수**.
    목록이 없으면 칸을 지우되, 첨부·브라우저에서 읽어 둔 목록(documentsFrom)은 본문 재읽기가 비었다고 지우지 않는다(껍데기 본문이 덮지 않게). */
@@ -547,14 +552,16 @@ export function putActivityDocuments(it, docs, from, { thin = false } = {}) {
    🔴 센 때의 자격 규칙 판(rereadMissV)이 지금 판과 같을 때만 — 판이 올라가면 다시 연다(소급에서 빠지지 않게 · 리뷰 4차 M6) · 그만 연 글은 리포트가 센다(actRereadLeft gaveUp) */
 export const REREAD_MISS_MAX = 2;
 const rereadGaveUp = (it) => (it.rereadMiss || 0) >= REREAD_MISS_MAX && it.rereadMissV === ACT_DETAILS_V;
+/* 마감 지난 글(마감 당일은 열린 글) — 서류·첨부만 고치는 다시 읽기는 건너뛴다(학생이 쓸 일이 없다 · 리뷰 10차) · 첨부 로봇 staleDocs 도 같은 잣대 */
+export const actClosed = (it, today) => !!(it && it.deadline && String(it.deadline) < today);
 export function actRereadNeed(it, today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10)) {
   if (rereadGaveUp(it)) return null;
   if (it.api && (it.eligibilityLines || []).length) return null;
   if (!(it.excerptsAt && it.detailsV === ACT_DETAILS_V)) return 'details';
   /* 자격을 첨부·요강·브라우저에서 읽은 글은 본문이 껍데기다 — 서류도 그 로봇(activity-docs staleDocs)이 같은 글자에서 읽는다(리뷰 2026-11-15 #7) */
-  if (!it.api && !it.eligibilityFrom && it.documentsV !== ACT_DOCS_V) return 'docs';
+  if (!it.api && !it.eligibilityFrom && it.documentsV !== ACT_DOCS_V && !actClosed(it, today)) return 'docs';
   /* 'attach' = 첨부만 다시(2026-11-25) — 다른 까닭이 없고 첨부 판이 옛것인 **열려 있는 게시판 글**만 한 번. 마감 지난 글·API 글·관리자가 숨긴 글은 열지 않는다 */
-  if (!it.api && !it.hidden && it.attachV !== ACT_ATTACH_V && !(it.deadline && String(it.deadline) < today)) return 'attach';
+  if (!it.api && !it.hidden && it.attachV !== ACT_ATTACH_V && !actClosed(it, today)) return 'attach';
   return null;
 }
 
