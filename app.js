@@ -406,7 +406,7 @@ function ddayWords(d) {
    ⚠️ 상세 시트 제목도 이 함수를 쓴다(2026-10-06 사장님 지시 · 개선안 E). 원문과 대조할 글자는
       '공고 원문 안내' 발췌와 원문 링크가 그대로 준다. */
 function cardTitle(sch) {
-  return cleanCardTitle(stripBoardHead(sch.name, sch.sourceUrl));   // 게시판 분류 머리말(공통·일반공지·장학 ★)부터 뗀다(2026-11-25)
+  return cleanCardTitle(stripBoardHead(sch.name, sch.sourceUrl));   // 게시판 분류 머리말(공통·일반공지·장학 별표)부터 뗀다(2026-11-25)
 }
 
 /* 카드 맨 윗줄의 `교외 · 기관명`. 🔴 **제목이 이미 기관명을 담고 있으면 기관명을 뺀다** —
@@ -496,7 +496,7 @@ function splitTitleWho(title) {
 }
 /* 정식 등록 공고 — 게시판 머리말이 대괄호와 같은 낱말이면(「공통 [공통] 2026…」) 그 머리말도 뗀다(지우기만) */
 function cardTitleParts(sch) {
-  const raw = stripBoardHead(String(sch.name || '').trim().replace(/^\s*(\S{2,8})\s+(?=[[【]\s*\1\s*[\]】])/, ''), sch.sourceUrl);   // 게시판 분류 머리말(공통·일반공지·장학 ★) — stripBoardHead 한 곳(2026-11-25 · 전엔 해 앞의 「공통」만 뗐다)
+  const raw = stripBoardHead(String(sch.name || '').trim().replace(/^\s*(\S{2,8})\s+(?=[[【]\s*\1\s*[\]】])/, ''), sch.sourceUrl);   // 게시판 분류 머리말(공통·일반공지·장학 별표) — stripBoardHead 한 곳(2026-11-25 · 전엔 해 앞의 「공통」만 뗐다)
   /* 🔴 장학 제목의 괄호는 떼지 않는다 — 장학 카드엔 「대상 · …」 줄이 없어 뗀 글자가 갈 자리가 없다(지우기가 된다 · 리뷰 2026-11-02). 끝 마침표만 */
   return { title: cleanCardTitle(raw).replace(/\.\s*$/, '').trim(), who: [] };
 }
@@ -524,7 +524,7 @@ function cleanCardTitle(name) {
   /* 🔴 앞 표식은 **대괄호만** 뗀다 — 소괄호를 넣으면 '(재)무안군승달장학회'의 법인 표기와
      '(서울캠퍼스)' 같은 구분자가 사라진다(실측으로 확인하고 좁혔다). */
   t = t.replace(/^(?:[[【]\s*[^\]】]{1,12}\s*[\]】]\s*)+/, '').trim();
-  t = trimStars(t);   // 대괄호 표식 뒤의 강조 별표(`[국가/신청] ★2026 …` · 2026-11-25)
+  t = trimStars(t);   // 대괄호 표식 뒤의 강조 별표(`[국가/신청] 별표2026 …` · 2026-11-25)
   t = splitTitleDates(t).title;   // 날짜·기간은 한 곳에서(2026-10-05)
   t = t.replace(/[\s·\-–—:,]+$/, '').trim();
   return t.length >= 4 ? t : before;
@@ -587,8 +587,8 @@ function splitTitleDates(title) {
    🔴 경희 「서울」·「국제」 는 캠퍼스라 떼지 않는다. 지우기만 한다(강조 별표 ★ 포함) · 남는 글자가 4자 미만이면 그대로 */
 /* 강조 별표 — 앞뒤 것을 같이 떼고, 떼고도 별이 남으면(「★필독★ 2027학년도 …」 처럼 제목 가운데에 별이 있다) 아무것도 안 뗀다 — 한쪽만 깎인 제목이 더 나쁘다(리뷰 2026-11-25 · 실제 제목 7건) */
 function trimStars(t) {
-  const x = String(t || '').replace(/^★+\s*/, '').replace(/\s*★+$/, '').trim();
-  return /[★☆]/.test(x) ? String(t || '') : x;
+  const x = String(t || '').replace(/^\u2605+\s*/, '').replace(/\s*\u2605+$/, '').trim();   // \u2605 = 검은 별 · \u2606 = 흰 별 — 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 Node 판에 따라 이모지로 센다 · app-sheet 와 같은 관례)
+  return /[\u2605\u2606]/.test(x) ? String(t || '') : x;
 }
 const BOARD_HEAD_ANY = /^(?:공통|일반공지)\s+(?=\S)/;
 const BOARD_HEAD_BY_HOST = [[/(?:^|\.)ssu\.ac\.kr$/, /^장학\s+(?=\S)/]];
@@ -825,7 +825,7 @@ function esc(s) {
    **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다.
    2026-09-30 에 여덟 개를 더했다 — 44개교 복원으로 들어온 게시판들이 `&lsquo;`·`&#40;` 등을
    담아 왔다(관문이 잡았다). 숫자 기호도 **보이는 글자인 것만** 이름을 대고 넣는다(위 🔴 그대로). */
-const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', ldquo: '“', rdquo: '”', times: '×', egrave: 'è' };   // rArr·ge — 수집 글에 나온 겹화살표·부등호(2026-10-12 ui-tone) · ldquo·rdquo — 큰따옴표(2026-10-24 ui-tone) · times·egrave — 소식 글(「센터 &times; Google」·「Herm&egrave;s」 2026-11-17)
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', ldquo: '“', rdquo: '”', times: '×', egrave: 'è', emsp: ' ' };   // rArr·ge — 수집 글에 나온 겹화살표·부등호(2026-10-12 ui-tone) · ldquo·rdquo — 큰따옴표(2026-10-24 ui-tone) · times·egrave — 소식 글(「센터 &times; Google」·「Herm&egrave;s」 2026-11-17) · emsp — 서류 목록 들여쓰기(「&emsp;1) (필수) 학업계획서」 2026-11-26 ui-tone · 빈칸 하나로)
 /* 🔴 **목록을 두 벌 두지 않는다** (2026-09-13). 예전에는 정규식에 이름이 한 벌 더 박혀 있어서,
    ENTITIES 에 `middot` 를 더해도 정규식이 그걸 몰라 **아무 일도 안 일어났다**(실측).
    이 저장소가 여러 번 데인 자리다 — 목록에서 정규식을 만든다. */

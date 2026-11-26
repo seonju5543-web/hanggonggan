@@ -1711,7 +1711,7 @@ const NON_ELIG_SECTION = /^(필수|공통|추가|기타|구비|첨부|제출)?\s
 const ELIG_SECTION = /(신청|지원|응모|선발|모집|추천)?\s*(자격|대상|요건)\s*[:：]?\s*$/;
 
 /* HTML 엔터티가 글자로 남은 줄 — `형제 &middot; 자매` (2026-10-15 카드 전수). 브라우저 없이도 돌아야 해서(서비스워커·Node) 표로 푼다 */
-const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', middot: '·', bull: '•', hellip: '…', ndash: '–', mdash: '—', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”' };
+const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', middot: '·', bull: '•', hellip: '…', ndash: '–', mdash: '—', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', emsp: ' ' };   // emsp — 서류 목록 들여쓰기(2026-11-26 · 앱 ENTITIES 와 같이)
 function decodeEntities(s) {
   return String(s || '').replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, k) => {
     if (k[0] === '#') { const n = /^#x/i.test(k) ? parseInt(k.slice(2), 16) : parseInt(k.slice(1), 10); return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : m; }
