@@ -1,7 +1,45 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[국제교류] 2027-2028 중국 정부초청 장학생 선발 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53751&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment (붙임 1) 2027-2028 중국 정부초청 장학생 모집요강.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35688&ano=53751"
+    },
+    {
+     "name": "Attachment (붙임 2) 중국유학관리정보시스템 이용안내.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35689&ano=53751"
+    }
+   ],
+   "deadlineHint": "마감 일시 : 2027. 2. 5.( 금 ) 24:00 까지 ( 한국 시간 기준 ) ※ 선발요강 등 세부사항은 [ 붙임 ] 문서 참조 붙임 1.",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
   {
    "title": "[등록/장학] 2027년 1학기 한국농어촌희망재단 「청년창업농장학금」장학생 선발 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53748&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -9,10 +47,6 @@
     {
      "name": "부설기관",
      "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
     },
     {
      "name": "연구지원팀",

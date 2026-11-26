@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": {
   "auto-o2432actionviewno9994682": [
    {
@@ -341,14 +341,6 @@
     "at": "2026-11-14"
    }
   ],
-  "auto-enoticedoarticleno770333": [
-   {
-    "src": "elig-szl3lw-1.pdf",
-    "srcBytes": 63744,
-    "none": true,
-    "at": "2026-11-17"
-   }
-  ],
   "auto-0005009002000000seq31571": [
    {
     "src": "elig-gr6loy-1.pdf",
@@ -534,6 +526,14 @@
   ],
   "auto-oardid323654menuno200318": [
    {
+    "src": "form-13cgcf-2.hwp",
+    "srcBytes": 96768,
+    "none": true,
+    "at": "2026-11-26",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   },
+   {
     "src": "elig-13cgcf-1.pdf",
     "srcBytes": 147118,
     "none": true,
@@ -585,6 +585,24 @@
     "srcBytes": 148098,
     "none": true,
     "at": "2026-11-25"
+   }
+  ],
+  "auto-amepagescholarshipnotice-1tlg7ak": [
+   {
+    "src": "elig-1g99jp-1.hwp",
+    "srcBytes": 66048,
+    "none": true,
+    "at": "2026-11-26",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   },
+   {
+    "src": "elig-1g99jp-2.pdf",
+    "srcBytes": 1792070,
+    "none": true,
+    "at": "2026-11-26",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
    }
   ]
  }

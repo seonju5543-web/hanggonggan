@@ -1,6 +1,91 @@
 {
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "11월 주말 이용자 관리 등 업무보조 청년 봉사자 모집(12시~18시)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541961",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-27",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-27 ~ 2026-11-27"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-07 ~ 2026-11-28"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울특별시 금천구 벚꽃로 10길 45, 독산청소년문화의집"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "독산청소년문화의집",
+   "api": "vol1365",
+   "apiId": "3541961",
+   "id": "api-vol1365-3541961",
+   "detailsV": 7,
+   "eligibilityLines": [
+    "- 신청대상 : 대학생 또는 청년 봉사자",
+    "★ 꼭 확인해주세요 !!",
+    "* 활동 전 성범죄전력조회가 진행되며, 이에 동의하지 않으시는 경우 활동 참여가 불가능합니다."
+   ],
+   "noticeLines": [
+    "봉사일시 : 2026년 11월 8일(일), 11월 22일(일) / 12:00~18:00(6시간)",
+    "장 소 : 독산청소년문화의집 1층 안내데스크 (서울 금천구 벚꽃로10길 45)",
+    "신청대상 : 대학생 또는 청년 봉사자",
+    "봉사내용 : 청소년문화의집 안내데스크 업무보조(이용자 관리 및 질서 지도 등)",
+    "★ 꼭 확인해주세요 !!",
+    "* 봉사활동 조건에 적합하지 않을 경우 활동이 반려될 수 있으므로 승인여부 확인 후 참여 부탁드립니다."
+   ],
+   "foundAt": "2026-11-26",
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
+  },
+  {
+   "title": "11월 대학생 교육 봉사활동",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542487",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-27",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-27 ~ 2026-11-27"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-01 ~ 2026-11-29"
+    },
+    {
+     "label": "활동지역",
+     "text": "경상북도교육청과학원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "경상북도교육청과학원",
+   "api": "vol1365",
+   "apiId": "3542487",
+   "id": "api-vol1365-3542487",
+   "detailsV": 7,
+   "noticeLines": [
+    "과학원 방문 학생 대상 전시물 체험 안내",
+    "과학원 내 안전 지도 및 질서 유지 지원",
+    "각종 체험프로그램 운영 및 학습 활동 보조",
+    "이외 과학원 방문 학생 교육, 과학문화 확산, 운영 지원과 관련된 다양한 활동"
+   ],
+   "foundAt": "2026-11-26",
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
+  },
   {
    "title": "[창업행사] IR 피칭·피치덱 완성, 1:1 피치덱 밀착 멘토링까지 한 번에!!!",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179871",
@@ -39,8 +124,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-25",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026년 여성창업 change-up 피칭 대회 참가자 모집",
@@ -79,8 +164,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-25",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "(재)안산인재육성재단 안산시 대학생 본인부담 등록금 반값지원 서류 정리 및 사무지원",
@@ -123,8 +208,8 @@
     "모집대상 : 컴퓨터 문서활동 가능한 성인 (엑셀 및 인터넷 활용 가능)"
    ],
    "foundAt": "2026-11-25",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "[14:00~18:00] 대학생 자원봉사자 모집(서창도서관)",
@@ -168,17 +253,95 @@
     "활동 혜택: 1365 자원봉사포털 자원봉사 시간"
    ],
    "foundAt": "2026-11-25",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
-   "title": "[실험 참가자 모집] AI 챗봇과의 대화에 관한 사용자 경험 연구 (온라인 참여)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142379&article.offset=0&articleLimit=10",
+   "title": "김진아 외교부 제2차관, 한국국제교류재단 제주 본부 방문",
+   "url": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156790869&pWise=sub&pWiseSub=C3",
    "kind": "대외활동",
    "attachments": [
     {
+     "name": "[26-977](보도자료) 김진아 외교부 제2차관, 한국국제교류재단 제주 본부 방문.hwp",
+     "url": "https://www.korea.kr/common/download.do?fileId=198596705&tblKey=GMN"
+    },
+    {
+     "name": "[26-977](보도자료) 김진아 외교부 제2차관, 한국국제교류재단 제주 본부 방문.pdf",
+     "url": "https://www.korea.kr/common/download.do?fileId=198596706&tblKey=GMN"
+    },
+    {
+     "name": "행사 사진.jpg",
+     "url": "https://www.korea.kr/common/download.do?fileId=198596707&tblKey=GMN"
+    }
+   ],
+   "deadlineHint": null,
+   "eligibilityLines": [
+    "생계급여 기준 2030년 중위소득 35%로…기초생활보장 확대",
+    "'모두의카드' 12월부터 13세~18세 청소년도 이용 가능"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "해외·교류",
+   "excerptsAt": "2026-11-25",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-25",
+   "id": "act-1cyhkb9"
+  },
+  {
+   "title": "2027년 디비전리그 지원 사업 신규종목 공모 안내 지원대상 체육인,관련종사자",
+   "url": "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=256634&menuNo=200104&sSort=2&pageIndex=1",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간) 2026.11.10.(화) ~ 11. 26.(목) 18:00까지 ㅇ (제출서류) 공모신청서, 사업계획서, 발표자료(PPT) 및 관련",
+   "deadline": "2026-11-26",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-10 ~ 2026-11-26"
+    },
+    {
+     "label": "대상",
+     "text": "체육인,관련종사자"
+    }
+   ],
+   "eligibilityLines": [
+    "ㅇ 공모대상 : 대한체육회 회원종목단체(정회원·준회원·인정단체)",
+    "※ 기존 디비전리그 사업 지원종목 제외",
+    "ㅇ (선정규모) 신규 3개 종목 이내 / (사업기간) 2027년 1월 ~ 12월",
+    "※ 심사결과에 따라 선정규모 조정 가능하며, 적격종목이 없는 경우 미선정 가능",
+    "ㅇ (지원예산 ) 종목당 최대 500백만 원",
+    "- 사업계획, 리그 운영규모 및 심사결과 등을 고려하여 차등 지원",
+    "ㅇ 평가방법 : 요건심사(30점) 및 사업계획심사·발표평가(70점)를 통한 종합평가",
+    "지원대상 : 체육인,관련종사자"
+   ],
+   "noticeLines": [
+    "ㅇ 접수기간 : 2026.11.10.(화) ~ 11. 26.(목) 18:00까지"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-25",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "문화포털 문화지원사업",
+   "foundAt": "2026-11-25",
+   "id": "act-1lswdza"
+  },
+  {
+   "title": "[실험 참가자 모집] AI 챗봇과의 대화에 관한 사용자 경험 연구 (온라인 참여)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142379&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
      "name": "KakaoTalk_20261125_150154296.png",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=142379&attachNo=119468"
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142379&attachNo=119468"
     }
    ],
    "deadlineHint": null,
@@ -195,23 +358,28 @@
    "detailsV": 7,
    "documentsV": 1,
    "excerptsAt": "2026-11-25",
+   "attachV": 1,
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-0v5m1qj"
+   "id": "act-1c9tqku"
   },
   {
    "title": "[마감 임박 D-8] KCI 등재지 『TRANS』 2026 전통의례와 디지털 현전 논문공모전 안내 (12/3 마감)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142376&article.offset=0&articleLimit=10",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142376&article.offset=0&articleLimit=10",
    "kind": "공모전",
    "attachments": [
     {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
      "name": "트랜스-논문투고양식.hwp",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=142376&attachNo=119464"
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142376&attachNo=119464"
     },
     {
      "name": "KCI 등재학술지 『TRANS』-2026 전통의례와 디지털 현전 논문공모전 안내.jpg",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=download&articleNo=142376&attachNo=119465"
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142376&attachNo=119465"
     }
    ],
    "deadlineHint": "제출 기간: 11월 1일(일) ~ 12월 3일(목) 제출 마감: 12월 3일(목) 제출및 문의처: skkutmi@skku.edu 이번 논문공모전",
@@ -231,10 +399,11 @@
    "documentsV": 1,
    "field": "글쓰기·논문",
    "excerptsAt": "2026-11-25",
+   "attachV": 1,
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-0ubn8nm"
+   "id": "act-1avvq3z"
   },
   {
    "title": "[실험 참가자 모집] 정서지원 AI 대화 실험 참가자 모집 (실험 참가비 75000원)",
@@ -253,7 +422,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-0yhnl25"
+   "id": "act-0yhnl25",
+   "attachV": 1
   },
   {
    "title": "[아모레퍼시픽재단] 2026 장원(粧源)특강 개최 안내",
@@ -274,7 +444,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-0ult5cj"
+   "id": "act-0ult5cj",
+   "attachV": 1
   },
   {
    "title": "[교양대학] 2026학년도 2학기 글말교실 소감문 공모전 및 학술논문 우수작 선발대회 안내",
@@ -303,7 +474,8 @@
    "school": "국민대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1aeywgd"
+   "id": "act-1aeywgd",
+   "attachV": 1
   },
   {
    "title": "[(사)한국환경기술학회] 2026년 캡스톤디자인 온라인 경진대회 안내",
@@ -321,7 +493,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1v16hqk"
+   "id": "act-1v16hqk",
+   "attachV": 1
   },
   {
    "title": "국립중앙과학관 『시민 참여형 과학 대토론회』참여자 모집 안내",
@@ -338,7 +511,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1t32yvt"
+   "id": "act-1t32yvt",
+   "attachV": 1
   },
   {
    "title": "2027 UN 청소년 미래 정상 회의(MUNY9) 참가자 모집",
@@ -355,7 +529,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1w51r0h"
+   "id": "act-1w51r0h",
+   "attachV": 1
   },
   {
    "title": "[시립청소년문화교류센터] 2027 시드니 글로벌 인재양성 프로그램 참가자 모집",
@@ -373,7 +548,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1u74j5o"
+   "id": "act-1u74j5o",
+   "attachV": 1
   },
   {
    "title": "제60회 단종문화제 슬로건 공모전 안내",
@@ -391,7 +567,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1uh44un"
+   "id": "act-1uh44un",
+   "attachV": 1
   },
   {
    "title": "[봉사] [사회봉사단] 2026 장애인식개선 캠페인 「닿는 말, 보이는 말」 에필로그 체험 부스 안내",
@@ -455,7 +632,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-11-25",
-   "id": "act-1evwcfu"
+   "id": "act-1evwcfu",
+   "attachV": 1
   },
   {
    "title": "[ART-AI ACADEMY] AI 숏폼 워크숍",
@@ -495,8 +673,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-24",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026년 초기창업패키지 로켓십 IR 경진대회 참가기업 모집 (4회차: 자율 분야)",
@@ -544,8 +722,8 @@
    ],
    "documentsV": 1,
    "foundAt": "2026-11-24",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "(16시~18시) 2026년 11월 동춘나래도서관 대학생자원봉사 모집",
@@ -592,8 +770,8 @@
     "도서관 정기휴관일(월요일) 및 법정공휴일은 봉사활동 불가"
    ],
    "foundAt": "2026-11-24",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026년 여성창업기업 네트워킹 DAY 참여자 모집",
@@ -689,7 +867,8 @@
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-11-24",
-   "id": "act-11sr4wq"
+   "id": "act-11sr4wq",
+   "attachV": 1
   },
   {
    "title": "[일반] [공학교육혁신센터] 2026년 CISCO NETWORKING ACADEMY 겨울 특강 참가자 모집",
@@ -938,8 +1117,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-23",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "(14시~16시) 2026년 11월 동춘나래도서관 대학생자원봉사 모집",
@@ -986,8 +1165,8 @@
     "도서관 정기휴관일(월요일) 및 법정공휴일은 봉사활동 불가"
    ],
    "foundAt": "2026-11-23",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "이전공공기관 취업아카데미 운영",
@@ -1021,8 +1200,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-23",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
@@ -1693,96 +1872,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
-  },
-  {
-   "title": "충북교육도서관 도서 정리[주간](대학생)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541817",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-25",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-27 ~ 2026-11-25"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-01 ~ 2026-11-29"
-    },
-    {
-     "label": "활동지역",
-     "text": "충청북도 청주시 서원구 충렬로 19(사직동, 충북교육도서관) 2층 종합자료실 안내데스크"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "충청북도교육도서관",
-   "api": "vol1365",
-   "apiId": "3541817",
-   "id": "api-vol1365-3541817",
-   "detailsV": 7,
-   "eligibilityLines": [
-    "봉사자유형: 대학생"
-   ],
-   "noticeLines": [
-    "※필독※",
-    "준비물: App Store(아이폰), Play Store(안드로이드)에서 1365자원봉사 어플 설치 후 로그인 필요(봉사 시작 전까지 꼭 해주셔야합니다.)",
-    "봉사활동 장소 착각에 따른 시작 QR코드 촬영불가시 귀가 조치",
-    "장소: 충청북도 청주시 서원구 충렬로 19(사직동, 충북교육도서관) 2층 종합자료실 안내데스크",
-    "봉사기간: 2026.11. 1.(일)~2026. 11. 29.(일) [공휴일 제외]",
-    "활동시간: 09:00~18:00 (시간 조정 불가)"
-   ],
-   "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
-  },
-  {
-   "title": "충북교육도서관 도서 정리[야간](대학생)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541818",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-25",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-27 ~ 2026-11-25"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-03 ~ 2026-11-27"
-    },
-    {
-     "label": "활동지역",
-     "text": "충청북도 청주시 서원구 충렬로 19(사직동, 충북교육도서관) 2층 종합자료실 안내데스크"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "충청북도교육도서관",
-   "api": "vol1365",
-   "apiId": "3541818",
-   "id": "api-vol1365-3541818",
-   "detailsV": 7,
-   "eligibilityLines": [
-    "봉사자유형: 대학생"
-   ],
-   "noticeLines": [
-    "※필독※",
-    "준비물: App Store(아이폰), Play Store(안드로이드)에서 1365자원봉사 어플 설치 후 로그인 필요(봉사 시작 전까지 꼭 해주셔야합니다.)",
-    "봉사활동 장소 착각에 따른 시작 QR코드 촬영불가시 귀가 조치",
-    "장소: 충청북도 청주시 서원구 충렬로 19(사직동, 충북교육도서관) 2층 종합자료실 안내데스크",
-    "봉사기간: 2026.11. 3.(화)~2026. 11. 27.(금) [공휴일 제외]",
-    "활동시간: 17:00~21:00 (시간 조정 불가)"
-   ],
-   "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "[사당어르신종합복지관] - 대학생동행서포터즈 모집 및 진행",
@@ -1826,8 +1917,8 @@
     "자격사항 : 대학생, 휴학생"
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "양천공원 책쉼터 서가정리 자원봉사활동(대학생, 11월 매주 금,토,일, 공휴일 제외)",
@@ -1867,8 +1958,8 @@
     "활동조건"
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25",
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26",
    "eligibilityLines": [
     "봉사자유형 : 성인"
    ],
@@ -1915,8 +2006,8 @@
     "3진 아웃제 운영 [관리대장]에 등록 후 해당자 추추 봉사 신청시 사전통보 없이 봉사신청 거절"
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "(대학생만) (15:00~ 18:00 화~일요일) 2026년 12월 연수꿈담도서관 자원봉사 모집",
@@ -1959,8 +2050,8 @@
     "3진 아웃제 운영 [관리대장]에 등록 후 해당자 추추 봉사 신청시 사전통보 없이 봉사신청 거절"
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "큰솔봉사단 - 진로콘서트 행사 보조 스텝 모집",
@@ -1998,8 +2089,8 @@
     "마. 봉사내용 : 진로콘서트 스텝"
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25",
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26",
    "eligibilityLines": [
     "봉사자유형 : 성인"
    ],
@@ -2048,8 +2139,8 @@
     "봉사 시작 시점 연령 만 18세 이상 ~ 만 65세 이하이신 대학생 및 성인"
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "［대학생,대학원생］초등 기초학습 지도 자원봉사 모집",
@@ -2085,8 +2176,8 @@
     "프로그램 보조"
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25",
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26",
    "eligibilityLines": [
     "아동·청소년",
     "활동구분",
@@ -2139,8 +2230,8 @@
     "자원봉사센터에서 활동교육을 받고, 아이들을 좋아하는 분들이면 누구나 할수 있습니다."
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "(12시~14시) 2026년 11월 동춘나래도서관 대학생자원봉사 모집",
@@ -2187,8 +2278,8 @@
     "도서관 정기휴관일(월요일) 및 법정공휴일은 봉사활동 불가"
    ],
    "foundAt": "2026-11-21",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "취약분야 상시 컨설팅 11월 참가자 모집 공고",
@@ -2226,8 +2317,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-20",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "[무료 세미나] 글로벌 진출 초기 챙겨야 할 GEO 전략",
@@ -2268,8 +2359,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-20",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026년 규제개선 대국민 아이디어 공모전 지원대상 일반인",
@@ -2635,8 +2726,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-19",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "모두의 창업 등 정부지원사업 완벽 대비! 「1:1 창업 멘토링」 참가자 모집",
@@ -2675,8 +2766,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-19",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026년 12월 현장실습 지원금 지급 일정 안내",
@@ -2842,15 +2933,15 @@
    "kind": "공모전",
    "attachments": [
     {
-     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB",
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwp",
      "url": "https://www.mafra.go.kr/bbs/home/792/600782/download.do"
     },
     {
-     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwpx &nbsp;&nbsp;&nbsp;(파일 용량 : 1432 K",
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwpx",
      "url": "https://www.mafra.go.kr/bbs/home/792/600783/download.do"
     },
     {
-     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).pdf &nbsp;&nbsp;&nbsp;(파일 용량 : 631 KB)",
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).pdf",
      "url": "https://www.mafra.go.kr/bbs/home/792/600784/download.do"
     }
    ],
@@ -3224,8 +3315,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-18",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2027년 상반기「IBK창공(創工) UNIST캠프」모집 공고",
@@ -3275,8 +3366,8 @@
    ],
    "documentsV": 1,
    "foundAt": "2026-11-18",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "[봉사] [(사)코드클럽한국위원회] 현대오토에버 스마트 모빌리티 공학 체험캠프 대학생 교육기부자 모집",
@@ -3461,8 +3552,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-17",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "평택고용센터 - '청년 JOB Tour: 고용센터 한바퀴' 청년 페스타",
@@ -3485,8 +3576,8 @@
     "사회초년생이 알아야할 돈 관리 첫 걸음"
    ],
    "foundAt": "2026-11-17",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "국무조정실 - 청년미래콘서트_취·창업편 그룹 멘토링 신청 안내",
@@ -3504,8 +3595,8 @@
    "id": "api-youthContent-10889",
    "detailsV": 7,
    "foundAt": "2026-11-17",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "접수전 SNS 콘텐츠 제작 및 홍보 역량 강화 교육 프로그램 참여자 모집",
@@ -4222,8 +4313,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-16",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2027년 상반기 「IBK창공(創工) 서울대캠프」 모집 공고",
@@ -4276,8 +4367,8 @@
    ],
    "documentsV": 1,
    "foundAt": "2026-11-16",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "제79회 단디벤처포럼 [2026 단디벤처 투자로드쇼] 일반참가자 모집",
@@ -6244,88 +6335,6 @@
    "documentsV": 1
   },
   {
-   "title": "[대외협력사업팀] 제21기 씨티-경희대 NGO 인터십 프로그램 인턴 모집(~11/23)",
-   "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=991",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "붙임 2. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 지원서.hwp",
-     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_ms4XQUrj_0fa4a0f4a56ed532b3bcda0b05753ffcd7bdfc64.hwp"
-    },
-    {
-     "name": "붙임 1. 제21기 씨티-경희대 NGO 인턴십 프로그램 인턴 모집요강.pdf",
-     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_R7u1yWOs_6a3bc4f59592574e7a1984d89804613dcc2f96c4.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "인턴·일경험",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "한국대학사회봉사협의회",
-   "foundAt": "2026-11-15",
-   "id": "act-0qklvg8",
-   "deadline": "2026-11-23",
-   "deadlineFrom": "제목 · [대외협력사업팀] 제21기 씨티-경희대 NGO 인터십 프로그램 인턴 모집(~11/23)",
-   "documentsV": 1,
-   "noticeLines": [
-    "•접수기간: 2026.10.26.(월)~11.23.(월)"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "documents": [
-    "인턴 지원서1부"
-   ],
-   "documentsFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "·대상:국내 주요 시민단체, 전국 대학교 소속 학부생 및 대학원생(박사과정 제외)",
-    "•단체:전국 비영리·시민단체(NGO)00개",
-    "•인턴: 전국 대학(원)생 총 61명",
-    "·단체:①최근 2년간 활발한 활동을 전개하고 있는 비영리·시민단체 ②서울/수도권 지역 상",
-    "근자* 3인 이상, 서울/수도권 외 지역 상근자* 2인 이상 단체(인턴의 근무공간이 확보되어",
-    "야하며인턴의 근무를 관리할 수있는 상근자가 있는 단체)실제 인턴이근무하는 사무실의상근자수",
-    "·인턴: 국내외 대학교에 재학 또는 휴학 중인 학생으로서, NGO 및 시민사회 활동에 대한",
-    "관심과 참여 의지가 있는 자(외국인의 경우 TOPIK level 5 이상 보유자로 한국어를 사용",
-    "하여 근무가 가능한 자)"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
-  },
-  {
-   "title": "[대외협력사업팀] SK Telecom과 한국대학사회봉사협의회의 스마트 라이프 교육 대학생 봉사팀 모집",
-   "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=980",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "SK Telecom 사업공고문, 신청 양식.hwp",
-     "url": "https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_nMqArJHK_30d7e3d8d54f5a65edc00f4765ab2a6a58a25c76.hwp"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "봉사",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "한국대학사회봉사협의회",
-   "foundAt": "2026-11-15",
-   "id": "act-0p6kphe",
-   "noticeLines": [
-    "제출기한:2026.09.15.(화)18시까지"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "참여대상 : 5개권역 5개 대학생 팀(수도권/강원/충청/전라/경상)",
-    "팀원총10명구성",
-    "신청서제출기한"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7,
-   "deadline": "2026-09-15",
-   "deadlineFrom": "공고 안내 · 제출기한:2026.09.15.(화)18시까지",
-   "documentsV": 1
-  },
-  {
    "title": "(주)데이톤 - 프로젝트 기반 UXUI 디자인 실전 캠프 과정 7기",
    "url": "https://www.youthcenter.go.kr/bbs03View/48/10885",
    "kind": "대외활동",
@@ -6351,8 +6360,8 @@
     "이력서, 포트폴리오 컨설팅"
    ],
    "foundAt": "2026-11-14",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "대학생 봉사활동 활성화",
@@ -6387,8 +6396,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-12",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "게임아카데미 운영",
@@ -6423,8 +6432,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-06",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "청년 취업 아카데미",
@@ -6456,8 +6465,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-06",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "HD현대삼호- [K-뉴딜 아카데미] HD현대 선박건조 필드테크니션 교육생 모집",
@@ -6488,8 +6497,8 @@
     "- 기숙사 무료 제공 (조/중/석식 포함)"
    ],
    "foundAt": "2026-11-04",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026 서울형 청년인턴 직무캠프",
@@ -6525,8 +6534,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-10-20",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25",
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26",
    "eligibilityLines": [
     "지원대상 : 18 ~ 34세 서울시 거주 청년 270명"
    ],
@@ -6565,8 +6574,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-10-20",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "청년 생명사랑 서포터즈 운영",
@@ -6603,8 +6612,8 @@
     "https://www.usspc.or.kr/"
    ],
    "foundAt": "2026-10-04",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "(연수구) 청년 자격증 응시료 지원",
@@ -6657,8 +6666,8 @@
     "건강보험자격득실확인서(신청월 발급본)(필수)"
    ],
    "foundAt": "2026-10-02",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026년 평택시 청년창업도전 아카데미",
@@ -6692,8 +6701,8 @@
     "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000"
    ],
    "foundAt": "2026-10-02",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026년 청년정책 종합상담 참여자 모집(기존 전라남도 22개 시·군 대상)",
@@ -6731,8 +6740,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "2026년 찬찬히 청년 사회생활(정서·심리)지원 캠퍼스 참여자 모집",
@@ -6773,8 +6782,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "k-뉴딜 아카데미",
@@ -6819,8 +6828,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "첨단산업 인재양성 부트캠프",
@@ -6859,8 +6868,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "청년정책 서포터즈",
@@ -6897,8 +6906,8 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   },
   {
    "title": "청년 행정체험연수 운영",
@@ -6946,8 +6955,8 @@
     "부모의 주민등록등본"
    ],
    "foundAt": "2026-09-30",
-   "seenAt": "2026-11-25",
-   "excerptsAt": "2026-11-25"
+   "seenAt": "2026-11-26",
+   "excerptsAt": "2026-11-26"
   }
  ],
  "fields": {

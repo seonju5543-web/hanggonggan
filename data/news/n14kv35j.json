@@ -1,7 +1,28 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "인공지능혁신융합대학사업단 RE:Local 참가 수요조사 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898171&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-26",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-26",
+   "desc": "인공지능혁신융합대학사업단에서 2026 AICOSS 제주 Re:Local 참가 수요조사를 아래와 같이 시행하오니, 관심있는 학생들은 참여하여 주시기 바랍니다."
+  },
+  {
+   "title": "[교육혁신원] 생성형 AI 활용 교수전략 개발을 위한 학생 요구 설문조사 안내 (100명 경품 증정)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898176&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-26",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/2cd0ce8b83d8df1c.webp",
+   "desc": "안녕하세요. 서울과학기술대학교 교육혁신원입니다. 교육혁신원에서는 학생들의 생성형 AI 활용 경험과 요구를 파악하여 보다 효과적인 교수방법을 개발하고자 설문조사를 실시합니다."
+  },
   {
    "title": "[앵커사업단] 카카오톡 채널 추가 이벤트(2026년 12월 11까지, 테크뇽 텀블러 추첨 증정)",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898101&qidx=4691&cate=10&allboard=false&nowpage=1",
@@ -403,27 +424,6 @@
    "foundAt": "2026-11-08",
    "thumb": "data/news/img/9c94d481caa41a63.webp",
    "desc": "※ 당첨자 발표 : 12월 중 도서관 홈페이지 ※ 문의 : 도서관 970-9041 [국제교류처] 2026학년도 하반기 무료 영어 클리닉(English Clinic) 참여자 모집(재학생/교직원, 그룹상담 가능)…"
-  },
-  {
-   "title": "[학생상담센터] 2026학년도 2학기 마음나눔 카페 '오늘, 커피한잔' 사전 모집 중!",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897275&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-30",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-11-08",
-   "desc": "\"오늘 공강인데 누구랑 가볍게 수다 떨 사람~?“ \"집단상담? 심리치료? 너무 무겁고 내 깊은 이야기 하기 부담스러웠다면?\" 마음나눔카페로 오세요!"
-  },
-  {
-   "title": "[홍보실] 가을愛 문을 열다 - SeoulTech Autumn Music Night",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897059&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-26",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/06d528e92b9b9c31.webp",
-   "desc": "깊어가는 가을, 서울과기대에서 펼쳐지는 특별한 음악 쉼표, 서울과학기술대학교 모든 구성원과 함께 하는 가을 미니콘서트에 초대합니다."
   }
  ]
 }

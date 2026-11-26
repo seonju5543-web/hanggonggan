@@ -317,12 +317,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://hmg-scholar.recruiter.co.kr/career/home",
-     "signals": 0
-    }
+    "checkedAt": "2026-11-26",
+    "why": "홈페이지 못 엶 (TypeError: ECONNRESET)",
+    "best": null
    }
   },
   {
@@ -347,7 +344,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TypeError: EAI_AGAIN)",
     "best": null
    }
@@ -358,7 +355,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TimeoutError: 23)",
     "best": null
    }
@@ -369,7 +366,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yanggu.go.kr/",
@@ -383,12 +380,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://www.jinan.go.kr/index.jinan",
-     "signals": 0
-    }
+    "checkedAt": "2026-11-26",
+    "why": "홈페이지 못 엶 (HTTP 416)",
+    "best": null
    }
   },
   {
@@ -397,7 +391,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
     "best": null
    }
@@ -408,7 +402,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.dooeul.or.kr/home/main/index.do",
@@ -422,7 +416,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.sri.re.kr/nuri/",
@@ -436,7 +430,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TypeError: UNABLE_TO_VERIFY_LEAF_SIGNATURE)",
     "best": null
    }
@@ -447,7 +441,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (HTTP 404)",
     "best": null
    }
@@ -474,8 +468,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
-    "why": "홈페이지 못 엶 (TypeError: ERR_TLS_CERT_ALTNAME_INVALID)",
+    "checkedAt": "2026-11-26",
+    "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
   },
@@ -485,7 +479,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.namgu.gwangju.kr/",
@@ -499,7 +493,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.gyeongnam.go.kr/",
@@ -513,7 +507,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.buan.go.kr/index.buan",

@@ -1727,6 +1727,25 @@
   "verifiedAt": "2026-11-18",
   "also": []
  },
+ "kosaf|2704387001|https://www.busanjin.go.kr/go06/board/view.busanjin?boardId=DONGNOTICE&menuCd=DOM_000002403001000000&dataSid=3980525": {
+  "ds": "kosaf",
+  "key": "2704387001",
+  "url": "https://www.busanjin.go.kr/go06/board/view.busanjin?boardId=DONGNOTICE&menuCd=DOM_000002403001000000&dataSid=3980525",
+  "source": "search",
+  "by": "Claude 세션 (2026-11-25 · 부산진구 사이트가 세션의 curl·브라우저 모두에서 502·연결 끊김 — 로봇이 다른 망에서 확인)",
+  "title": "2026년도 가야2동장학회 장학생 모집 안내",
+  "firstAt": "2026-11-26",
+  "lastAt": "2026-11-26",
+  "tries": 1,
+  "status": "pending",
+  "why": "못 엶(열기 실패: page.goto: Timeout 20000ms exceeded.) — 다시 봅니다",
+  "checks": {
+   "C": "ok",
+   "L": "unread"
+  },
+  "round": "2026-11-27",
+  "nextAt": "2026-11-27"
+ },
  "notices|https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88|https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260909&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&": {
   "ds": "notices",
   "key": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88",

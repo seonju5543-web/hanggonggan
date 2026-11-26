@@ -2,10 +2,10 @@
  "note": "교내 소식 요약 장부 — collector/collect-news-desc.mjs 가 쓴다. posts: 글 열쇠별 결과(desc 원문 발췌 · none 못 뜸 · err 다시 시도 — 전에 뜬 desc 는 재시도 동안 그대로 둔다 · v 규칙 판 — collector/news-desc.mjs DESC_RULE 과 다르면 다시 연다).",
  "posts": {
   "url:https://www.ajou.ac.kr/kr/ajou/notice.do?article.offset=0&articleLimit=10&articleNo=377712&mode=view": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 2,
+   "tries": 3,
    "desc": "⚠️ 진행일 3일 전 이력서 및 자기소개서 필수 제출 👉 신청하기"
   },
   "url:https://www.ajou.ac.kr/kr/ajou/notice.do?article.offset=0&articleLimit=10&articleNo=377708&mode=view": {
@@ -15,10 +15,10 @@
    "tries": 3
   },
   "url:https://www.ajou.ac.kr/kr/ajou/notice.do?article.offset=0&articleLimit=10&articleNo=377697&mode=view": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 2,
+   "tries": 3,
    "desc": "오는 10월 29일 진행되는 2026 창업오디션에서는, 우수 청년창업팀의 팀 확장 및 협업 기회, 창업 멘토링·강연 등 다양한 프로그램을 지원하고자 예비창업자·대학생·청년 등을 대상으로 사전 수요조사를 진행합니다."
   },
   "url:https://www.ajou.ac.kr/kr/ajou/notice.do?article.offset=0&articleLimit=10&articleNo=377696&mode=view": {
@@ -35,39 +35,24 @@
    "desc": "한양대학교 ERICA IC-PBL 교수학습센터에서는 대학원생과 학부생이 함께 전공 지식을 심화하고 실제 연구를 경험할 수 있는 「 2026 Next Scholar 」 프로그램의 참여팀을 모집합니다 . Next…"
   },
   "url:https://www.hanyang.ac.kr/notice_all?_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=121201&p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_mode=view&p_p_state=normal": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 HTTP 403",
-   "tries": 2,
+   "tries": 3,
    "desc": "캠퍼스 게시 서울 2027학년도 1학기 재입학 관련하여 아래와 같이 안내드립니다. 첨부된 파일 확인 후, 기간 내 신청하여주시기 바랍니다. ※학사경고제적자는 재입학 신청시 서약서 파일업로드 제출"
   },
   "url:https://www.hanyang.ac.kr/notice_all?_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=121202&p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_mode=view&p_p_state=normal": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 HTTP 403",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.hanyang.ac.kr/notice_all?_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=121301&p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_mode=view&p_p_state=normal": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 HTTP 403",
-   "tries": 2,
+   "tries": 3,
    "desc": "ㆍ 가격 결정에 영향을 주는 요소 ㆍ 비용/고객/경쟁 중심적 가격 결정 방법 ㆍ 원가/손익에 대한 기본적 이해"
-  },
-  "post:서울시립대학교:31705": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026년 11월 [은밀한독서단] 참여자를 모집합니다. 중앙도서관에서는 한 달 동안 한 권의 책을 읽고, 함께 이야기 나누며 지식과 즐거움을 공유하는 ‘은밀한 독서단’을 운영합니다."
-  },
-  "url:https://www.hufs.ac.kr/bbs/hufs/2180/269811/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026학년도 동계방학기간 국제학사 GlobeeDorm 기숙사 입사생(남·여)을 아래와 같이 모집하오니 기간 내에 신청하시기 바랍니다."
-  },
-  "post:중앙대학교:30282": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271570&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
    "at": "2026-10-28",
@@ -75,173 +60,8 @@
    "err": "글 화면에 그 글의 제목이 없음",
    "tries": 3
   },
-  "url:https://www.knou.ac.kr/bbs/knou/51/819829/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "◎ 커버스토리 : 서울지역대학 동아리 - \"우리에게 동아리는 비타민, 공기, 또 다른 세상\" ◎ 뉴스 : 방송대 한국어교육 봉사단 2기 위촉"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367600&mode=view&no=369": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "나 . 입찰참가자격 등록 마감 일시 및 장소 : 2026 년 11 월 5 일 ( 목 ) 10:00, 나라장터 (www.g2b.go.kr)"
-  },
-  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140773&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "성균관대학교 인공지능 연구실인 BMIL (비밀; Brain and Machine Intelligence Lab, 전자전기컴퓨터공학과)에서는 2026년 겨울방학동안 함께 할 학부생 인턴을 모집합니다."
-  },
-  "post:경희대학교:323401": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "1. 제출방법 ① 채용사이트를 통해 입사지원서 제출 ▶ https://jusung.career.greetinghr.com/ko/o/241242 ② 추천채용 서류 미래인재센터 이메일 제출 ▶…"
-  },
-  "post:동국대학교:26766715": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:전북대학교:218830": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "정보혁신처 AI정보화과 설문응답은 JUMP 앱 의 PUSH 알림창 을 클릭해주세요."
-  },
-  "post:서울시립대학교:31708": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "「서울시립대학교 학사내규」일부개정 사항을 붙임과 같이 공고합니다. 붙임 1. 공고문 1부."
-  },
-  "url:https://www.mju.ac.kr/bbs/mjukr/141/236569/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "이번 관현악의 밤 “Opera Gala Night” 은 명지대학교 개교 78 주년을 기념하여 마련된 뜻깊은 무대입니다 . 다양한 오페라 아리아와 중창 , 그리고 한국 가곡이 어우러진 이번 공연은 학부생과 대학원생…"
-  },
-  "url:https://www.knou.ac.kr/bbs/knou/51/819834/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "핼러윈데이('26.10.31. )를 앞두고 '26.10.23.(금)부터 전국 주요 번화가에 인파밀집이 예상됨에 따라 선제적 안전관리를 위해 도로·광장 ·공원 다중운집인파재난 위기경보가 아래와 같이 발령되었음을…"
-  },
-  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140771&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "의료인공지능융합인재양성사업단 안녕하세요. 성균관대학교 의료인공지능융합인재양성사업단에서 '의료 인공지능 특화 융합인재 양성 사업'에 참여하는 학부생을 대상으로 의료AI 입문·실습 교육을 실시하오니 관심있는 학생들의…"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367599&mode=view&no=368": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:서울시립대학교:31707": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "「서울시립대학교 학칙」일부개정 사항을 붙임과 같이 공고합니다. 붙임 1. 공고문 1부."
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367598&mode=view&no=367": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "3. 협조 사항 가 . 크레인 작업 동안 주변 통행 시 신호수의 안내에 따라 통행하여 주시기 바랍니다 . ( 작업 중 종합과학관 A 동 및 C 동 도로의 차량통행은 통제됩니다 .)"
-  },
-  "post:서울시립대학교:31706": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "붙임 1. 공고문 1부. 2. 규정 전문 1부. 3. 신구조문대비표 1부. 끝."
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367575&mode=view&no=371": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "3. 장소: ECC 이삼봉홀 가. 현장투표 - 시간: 12:00~13:00 (본 행사 전)"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367597&mode=view&no=366": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "핼러윈 데이('26.10.31.)를 앞두고 '26.10.23.(금)부터 전국 주요 번화가에 인파밀집이 예상됨에 따라 선제적 안전관리를 위해 「도로·광장·공원 다중운집인파재난」위기경보가 아래와 같이 발령되었음을…"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367591&mode=view&no=363": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "중간시험 채플 휴무기간 종료 후, 다음주 월요일(10/26)부터 채플이 재개 됩니다. 대강당 4주차 채플(10/26~10/30)은 ' 말씀채플 '로 진행됩니다."
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367493&mode=view&no=371": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "안녕하세요. 정보인프라팀입니다. 방화벽 장비 점검으로 인해 아래와 같이 중요 정보서비스가 간헐적으로 중지되오니 이용에 참고하시기 바랍니다."
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367449&mode=view&no=371": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "- 모집대상 및 인원: 수도권역 일반대 또는 전문대 재(휴)학생 10명 내외"
-  },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70796": {
    "at": "2026-10-27",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70795": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70794": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=897059&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "깊어가는 가을, 서울과기대에서 펼쳐지는 특별한 음악 쉼표, 서울과학기술대학교 모든 구성원과 함께 하는 가을 미니콘서트에 초대합니다."
-  },
-  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=170965&pageUnit=10": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511762&mCode=MN095&mgr_seq=3&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "반갑습니다 . 마음이 쉬어가는 곳 , 효원상담원입니다 . 중간고사 이후 속상한 마음을 달래줄 수 있는 심리기술훈련으로 초대합니다 6 차 주제 내 안의 긍정자원을 찾는 심리안정화 기술 익히기 6 차 일정 :…"
-  },
-  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277121&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:서울시립대학교:31728": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:서울교육대학교:55491": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.hufs.ac.kr/bbs/hufs/2180/269907/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "[모집] 2026 한국외대 서울앵커사업단 「로컬 크리에이터 양성 교육」 참가자 모집 지역의 발견이 창업의 시작이 되다!"
-  },
-  "url:https://kau.ac.kr/kaulife/notice.php?code=s1101&mode=read&seq=11385": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "가 . 위기경보 : ' 주의 ' 단계 발령 나 . 발령일시 : '26.10.23.( 금 ) 17:00 ~ '26.11.1.( 일 ) 06:00"
-  },
-  "url:https://www.yonsei.ac.kr/bbs/wj/104/944476/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "교양영어 교과 이수 의무가 있는 미래캠퍼스 학생으로 유효한 공인영어성적표를 신청기간 내 소지 하여, 교양영어 과목 이수 의무를 면제 받고자 하는 자는 다음 절차에 따라 신청 가능"
-  },
-  "post:고려대학교:000060000000061567": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:동국대학교:26766751": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "- 모집: 2026년 11월 15일(일) 24:00까지 - 신청: 모집폼( https://moaform.com/q/DbO6rt ) [양식] 신청서 업로드"
-  },
-  "url:https://www.pknu.ac.kr/main/163?action=view&no=726753": {
-   "at": "2026-10-26",
    "v": 2,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
@@ -256,180 +76,10 @@
    "v": 3,
    "desc": "우리 대학은 지난 23일 인도네시아 국립 폴리테크닉대학 방문행사 ‘KIND 2026(Korea-Indonesia Networking Day)’을 개최하고 성황리에 마쳤다."
   },
-  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282325/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "일자리지원팀 내 - 일 , 직무 브랜딩 포트폴리오 공모전에 참여해주신 재학생 여러분 감사합니다 . 여러분의 수상을 진심으로 축하드립니다 . 공모전 심사 결과를 아래와 같이 안내합니다 ."
-  },
-  "url:https://www.knou.ac.kr/bbs/knou/51/819943/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "재학생 여러분, 안녕하세요? 한국방송통신대학교 진로심리상담실입니다. 저희 상담실에서는 이번에, 여러분의 학습 특성을 이해하고 효과적인 학습 혹은, 적응 방법을 찾는데 도움을 드리고자, 자기조절학습 및 대학생활적응…"
-  },
-  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140797&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "1. 채용분야 및 인원 가. 채용분야: 행정 나. 채용인원: 1명 2. 담당업무"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367625&mode=view&no=385": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:전북대학교:218895": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.inha.ac.kr/bbs/kr/8/45946/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "인하대학교 정석학술정보관에서는 아래와 같이 사무원 (사서 ) 채용을 공고 하오니 많은 지원 바랍니다 ."
-  },
-  "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53559&tpage=1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2515947&site_dvs_cd=kr": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11574&searchGbn=0&searchOrderSort=0": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "[목요도서관 제7강 추가 사전신청자 모집_비교과/도서관 마일리지 및 상시학습 부여] -강연 일시: 2026. 10. 29.( 목 ) 12:00~13:00 -추가 모집기간: 10 월 26 일 (월 ) ~ 28 일 (…"
-  },
-  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EB%B6%80%EC%83%9D-%EB%B0%8F-%EB%8C%80%ED%95%99%EC%9B%90%EC%83%9D-%EB%8C%80%EC%83%81-%ED%8F%AD%EB%A0%A5%EC%98%88%EB%B0%A9%EA%B5%90%EC%9C%A1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "해당 교육은 법정의무교육으로 미이수 시 성적조회가 제한되오니 기한 내 이수를 부탁드립니다."
-  },
-  "url:https://www.mju.ac.kr/bbs/mjukr/141/236589/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "- 문의사항 : 대학교육혁신원 교육인증센터 (02-300-1732, cap@mju.ac.kr) 대학교육혁신원장"
-  },
-  "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159596&mode=view&noCat=32": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "세종캠퍼스 앵커사업단(세종) 1. 셔틀버스 운행 개요 - 운행일자: 2026. 10. 30.(금) (하루)"
-  },
-  "post:중앙대학교:30284": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
   "url:https://www.yonsei.ac.kr/bbs/sc/58/944481/artclView.do": {
    "at": "2026-11-25",
    "v": 3,
    "desc": "2026학년도 겨울 계절제 수업은 대면 강의 원칙에 따라 운영될 예정임을 알려드립니다. 일부 수업은 동영상 강의와 함께 블렌딩으로 이루어질 예정이므로 수강신청 전 반드시 수업계획서를 확인하시기 바랍니다."
-  },
-  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626807&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "- 모집전공: *수학교육전공* - 원서접수: 11.02.(월) ~ 11.13.(금) 17:00"
-  },
-  "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=897055&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "1. 정문 및 주변 환경개선공사 시행에 따른 학내 모든 구성원의 협조에 감사드립니다 ."
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70805": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=170935&pageUnit=10": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 국민대 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
-  },
-  "post:서울시립대학교:31727": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "< 자유열람실 ( 좌석 , 스터디룸 ) 자율배석 운영 안내 > ※ 운영기간 : 10 월 27 일 ( 화 ) 13:00 ~ 10 월 30 일 ( 금 ) 18:00 서버 보안 (PHP) 취약점 긴급 조치 작업으로 인해…"
-  },
-  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277106&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511754&mCode=MN095&mgr_seq=3&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.yonsei.ac.kr/bbs/wj/104/944463/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:동국대학교:26766750": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.hufs.ac.kr/bbs/hufs/2180/269827/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "입학설명회 신청 링크: https://forms.gle/ ojbFJnd2Tuai29xh9 학과 홈페이지 주소: https://gsiasmajor.hufs. ac.kr/gsiasmajor/kiass"
-  },
-  "url:https://www.pknu.ac.kr/main/163?action=view&no=726749": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.knou.ac.kr/bbs/knou/51/819351/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "◦ ｢ 학업성적 평가처리 규정 ｣ 제 6 조 ( 결시자의 성적인정 ) ◦ ｢ 학업성적 평가처리에 관한 지침 ｣ 제 21 조 ( 결시자 성적인정 )"
-  },
-  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282310/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "조선대학교 대학원에서는 웰에이징대학원 3개 융합학과(바이오메디·에이지테크·라이프케어융합학과)의 출범을 공식적으로 알리고, 신설 융합학과의 교육·연구 분야 및 대학원 학사제도를 소개하고자 「2026학년도…"
-  },
-  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140796&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "◇ 서류접수기간 : 2026년 10월 23일(금) ~11월 30일(월) 자정(밤12시)까지"
-  },
-  "post:전북대학교:218883": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "대학원 대학원혁신부 안녕하세요 전북대학교 제 14 대 리본 대학원 총학생회입니다 . 다양한 학문적 배경을 가진 대학원생들이 한자리에 모여 자신의 연구를 공유하고 소통하는 < 제 1 회 천하제일 연구자랑대회 > 를…"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367623&mode=view&no=384": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "1. 신청자격 2026학년도 2학기 현재 비사범대 교직 설치 전공(학과)에 3, 4학기 이수중인 재학생과 3학기를 이수한 휴학생"
-  },
-  "url:https://www.inha.ac.kr/bbs/kr/8/45942/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "전공 과목이 어려우신가요? 옆에서 지도해 줄 선생님이 필요하신가요? 성적을 잘 받길 원하시나요? 우수 학생이 직접 알려주는 수업에 참여하여 이 모든 목표를 달성해보세요!"
-  },
-  "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53558&tpage=1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "식단 안내 알림광장 공지사항 자유게시판 취업정보 광운미디어 광운소식 뉴스레터 광운Story 브로슈어 홍보아이템 제보 최신연구성과 세계2%과학자 AI 활용 수업 사례 지금 광운대 학부모서비스"
-  },
-  "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159589&mode=view&noCat=32": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "세종캠퍼스 앵커사업단(세종) 세종일자리경제진흥원과 고려대학교 세종캠퍼스와 공동 주최하는 2026년 산업별 기업설명회를 개최합니다. 학생 및 구직자 여러분들의 많은 참여 부탁드립니다."
-  },
-  "url:https://www.mju.ac.kr/bbs/mjukr/141/236582/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "1. 채용분야 및 지원자격 채용부서 주요업무 자격요건 및 우대사항 스마트시스템공과대학 교학팀 학사관리 및 행정업무"
-  },
-  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%E2%96%A0-2026-2%ED%95%99%EA%B8%B0-%EB%B9%84%EC%A0%84%EC%B1%84%ED%94%8C-%EC%84%A4%EB%AC%B8%EC%A1%B0%EC%82%AC-%EC%B0%B8%EC%97%AC-%EC%95%88%EB%82%B4": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "본교 채플 운영의 지속적인 개선을 목적으로 이번 학기 비전채플을 이수한 재학생 여러분의 소중한 의견을 구합니다 . 설문에 진지하게 참여 및 응답해주시기 바랍니다 ."
   },
   "url:https://www.yonsei.ac.kr/bbs/sc/58/944478/artclView.do": {
    "at": "2026-11-25",
@@ -441,330 +91,10 @@
    "v": 2,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
-  "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=897042&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "10월에는 이달의 검사 중 호응이 좋았던 ' BCT 인아웃 밸런스 역량 검사 '를 재공개합니다! ✔ 행사 내용"
-  },
-  "post:서울시립대학교:31722": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "□ 기 간 : 10.28(수) ~ 11.10(화) 총 5회 □ 내 용 : 회계·세무·법 분야 현직자들을 모시고 실제 업무와 진로 선택 경험을 나누는 자리"
-  },
-  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626806&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
-  },
-  "url:https://www.yonsei.ac.kr/bbs/wj/104/944471/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70804": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
   "post:동국대학교:26766745": {
    "at": "2026-10-27",
    "v": 2,
    "desc": "튜터링 운영 교과목 (학수번호+분반 동일)의 수강생이라면 튜티로 참여 가능합니다. 자세한 사항은 아래 이미지 및 첨부파일 참고 바랍니다. 감사합니다. (아래 이미지 클릭 시 드림패스 로 이동합니다.)"
-  },
-  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511750&mCode=MN095&mgr_seq=3&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "- 기간 : 2026. 10. 26.(월) ~ 10. 27.(화) - 장소(내용): 시월광장(연예인 및 동아리 공연, 부스 운영 등), 제6공학관 및 운죽정 앞(낙서 도로)"
-  },
-  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277077&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "취업·진로 관련 정보와 서비스를 한곳에서 통합 제공하는 가톨릭대학교 대학일자리플러스센터 홈페이지 가 새롭게 문을 열었습니다."
-  },
-  "url:https://www.hufs.ac.kr/bbs/hufs/2180/269817/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "안녕하세요. 학생상담센터에서 마약예방캠페인을 진행합니다. 일시: 2026년 10월 27일 (화) 오후 1시~ 장소: 국제학사 앞 오셔서 참여하시고 상품 받아가세요~"
-  },
-  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140237&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "11월 3일 화요일, 삼양그룹의 임원과 채용실무자들이 성균관대학교에 찾아옵니다. 임원이 직접 들려주는 삼양의 다양한 산업소개와 면접 TIP, 채용실무자와 함께하는 면접 경험 기회와 자소서 기반 취업 상담 기회를…"
-  },
-  "url:https://www.pknu.ac.kr/main/163?action=view&no=726747": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282303/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "앵커사업단 관심 기업·공공기관의 채용정보를 한자리에서! 「2026 제1회 전남·광주 앵커사업단 취업박람회」에서 하나은행, 한화시스템, 한국수자원공사, 광주교통공사 등 주요 기업·공공기관의 채용설명회가 진행 됩니다."
-  },
-  "post:전북대학교:218878": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "대학원 대학원혁신부 안녕하세요 전북대학교 제 14 대 리본 대학원 총학생회입니다 . 다양한 학문적 배경을 가진 대학원생들이 한자리에 모여 자신의 연구를 공유하고 소통하는 < 제 1 회 천하제일 연구자랑대회 > 를…"
-  },
-  "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53557&tpage=1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "자격 요건 신청 방법 수강료 납부 유의사항 교류대학일정 ✅ 교류 자격 지원 자격 : 1학년(2개 학기) 이상 이수한 재학생 신청 불가 : 2027. 2월 졸업예정자 및 현재 휴학 중인 학생 🚀 신청 방법 01…"
-  },
-  "url:https://www.inha.ac.kr/bbs/kr/8/45940/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "1️⃣ 검사명: CAT-2 대학적응력검사 ✅ 대학생의 대학적응력과 대학적응경향성 측정 ✅ 학업적, 심리적, 사회적, 대학기관적 측면 확인 가능 2️⃣ 실시 방법 ✅ '인하대학교 학생상담실' 카카오톡 채널 입장 ✅…"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367622&mode=view&no=383": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "법학전문대학원 행정실에서는 2026 학년도 2학기 동안 근무할 C급조교 1명을 모집합니다."
-  },
-  "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159585&mode=view&noCat=500": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:서울시립대학교:31273": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "인재개발실 #대학일자리플러스센터 #외국계기업 #글로벌기업"
-  },
-  "post:서울교육대학교:55487": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EB%B2%A0%EC%96%B4%EB%93%9C%ED%95%99%EB%B6%80%EB%8C%80%ED%95%99-%EA%B5%90%EC%96%91%EA%B5%90%EC%9C%A1%EC%9A%B4%EC%98%81%ED%8C%80-%EA%B3%84-3": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "본교 베어드학부대학 교양교육운영팀에서 아래와 같이 육아휴직 대체 계약직 직원을 모집합니다 모집 관련 자세한 사항은 아래의 모집공고를 참고하여 주시기 바랍니다."
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70803": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511747&mCode=MN095&mgr_seq=3&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626798&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "이미지 확대보기 이미지 확대보기 이미지 확대보기 이미지 확대보기 이미지 확대보기 이미지 확대보기 ·디프테리아· 미리 알고, 더 건강하게 다녀오세요."
-  },
-  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277049&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.hufs.ac.kr/bbs/hufs/2180/269818/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "안녕하세요(●'◡'●) (서울)학생상담센터에서 ‘또래상담 홍보캠페인’ 부스를 운영합니다. 또래상담자들과 함께 나의 고민을 살펴보고 해결 방법을 찾아보아요! 고민을 먹어치우는 배고픈 공룡도 여러분을 기다리고 있답니다."
-  },
-  "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53550&tpage=1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.pknu.ac.kr/main/163?action=view&no=726745": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026년 MBC 대학가요제 무대 설치를 위해 대운동장 사용을 아래와 같이 제한하오니, 협조하여 주시기 바랍니다."
-  },
-  "post:전북대학교:218875": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:서울시립대학교:31726": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.inha.ac.kr/bbs/kr/8/45930/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "- (2027학년도 전과전형) 학과별 면접(실기)고사 평가기준(최종) - 2027학년도 전과전형 안내문"
-  },
-  "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159560&mode=view&noCat=500": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026학년도 동계계절학기에 한성대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367621&mode=view&no=382": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "과학기술정보통신부의 PHP 비상대응 체계 가동에 따라 좌석 발급(PHP 언어 사용) 서비스를 일시 중단합니다."
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70802": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B5%AD%EC%A0%9C%EC%B2%98-%EA%B5%AD%EC%A0%9C%ED%8C%80-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90%EC%9D%BC%EB%B0%98-2": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "본교 숭실대학교 국제처 국제팀에서 아래와 같이 육아휴직 대체 계약직 직원을 모집합니다. 모집 관련 자세한 사항은 아래의 모집공고를 참고하여 주시기 바랍니다."
-  },
-  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511746&mCode=MN095&mgr_seq=3&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "위스콘신대학교 한국대표에서는 귀 대학 재학생들이 글로벌 환경에 대한 이해를 넓히고, 향후 해외 취업 및 국제적 진로를 준비할 수 있도록 미국 university of wisconsin-stout에서 운영되는…"
-  },
-  "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53549&tpage=1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "학생상 담실에서는 집중 상담 주간 ALL CARE WEEK(4/28–5/4) 기간 동안 뇌파 맥파 측정을 통한 집중도와 스트레스 상태를 파악하고 해석상담을 진행합니다."
-  },
-  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626797&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "※유의사항: 본심사 신청서 제출 기간과 동일하니 해당하시는 분들은 모든 서류를 한꺼번에 제출하시기 바랍니다. ※제출관련"
-  },
-  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277116&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "탄소중립에 동참하고, 일회성 물품 사용의 근절을 통해 자원절약을 실천하는 'CUK 당근마켓' 의 운영을 아래와 같이 안내합니다. 여러분이 직접 만들어가는 나눔의 장이 활성화될 수 있도록 많은 관심과 참여 바랍니다."
-  },
-  "url:https://www.pknu.ac.kr/main/163?action=view&no=726744": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026 MBC 대학가요제 개최에 따라 행사 당일 안전확보를 위해 차량, 주차, 보행자를 통제할 예정이니, 참고하여 주시기 바랍니다."
-  },
-  "post:전북대학교:218872": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "전북대RISE사업단 - 교육기간 : 2026. 11. 9. ( 월 ) ~ 11. 25.( 수 ) 14:00 ~ 18:00(4 시간 ) / 총 4 회 실시 -교육장소 : 전북대 공과대학 8 호관 전산실 302 호 ,…"
-  },
-  "post:서울시립대학교:31724": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "안녕하세요, 100주년기념도서관입니다. 올해 마지막 저자와의 만남은 박준 시인 님과 함께합니다!"
-  },
-  "url:https://www.inha.ac.kr/bbs/kr/8/45929/artclView.do": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "안녕하세요 원격교육지원센터입니다. '실감 3면 콘텐츠 및 MR/VR 체험Day'를 실시하오니 여러분의 많은 관심과 참여 바랍니다."
-  },
-  "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159557&mode=view&noCat=500": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026학년도 동계계절학기에 상명대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70801": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367619&mode=view&no=381": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "학생서비스센터는 교내의 습득물을 접수하고 주인을 찾아드립니다. &bull; 물품을 습득한 이화인은 학생서비스센터(ECC B303호)로 접수해 주시기 바랍니다."
-  },
-  "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53551&tpage=1": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511740&mCode=MN095&mgr_seq=3&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026학년도 예술 분야 전공역량 강화를 위한 동계 부산대와 함께하는 너의 재능이 보여 프로그램 참여자를 다음과 같이 모집하오니 봉사활동에 관심있는 우리 대학 학부 재학생의 많은 지원을 바랍니다."
-  },
-  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%ED%95%99%EC%88%A0%EC%9B%90-%ED%96%89%EC%A0%95%ED%8C%80-%EC%9D%BC%EB%B0%98%EA%B3%84%EC%95%BD%EC%A7%81-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277039&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "대학일자리플러스센터 홈페이지가 새롭게 오픈했습니다! 진로·취업 정보도 확인하고, 센터에 바라는 점도 자유롭게 들려주세요. 여러분의 소중한 의견이 더 나은 대학일자리플러스센터를 만듭니다!"
-  },
-  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626796&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "※유의사항 1. 논문지도보고서 등 미제출서류가 있으신분들은 제출을 완료해주셔야 공개발표 신청서 접수가 가능합니다."
-  },
-  "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159553&mode=view&noCat=32": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "- 교육 기간 : 2026년 11월 4일(수) ~ 11월 13일(금) 17:00 ~ 22:00 (일 5시간, 총 8일/40시간)"
-  },
-  "url:https://www.pknu.ac.kr/main/163?action=view&no=726741": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "post:전북대학교:218871": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "국제처 국제협력과 2027학년도 전기 학부 외국인 특별전형 1차 면접일정을 안내합니다. *자세한 일정은 지원자 이메일로 개별 공지"
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70800": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367617&mode=view&no=380": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "LG전자에서 본교 학생들을 대상으로 「하이-엘지! 캠퍼스어택」을 개최합니다. 이번 행사에서는 이화여대 출신 LG전자 현직 리더들이 직접 방문하여 직무 경험과 커리어 성장 스토리를 공유할 예정입니다."
-  },
-  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%EB%85%84-%EA%B8%B0%EB%B3%B8-%ED%9B%88%EB%A0%A8-3%EC%B0%A8%EB%8B%B9%ED%95%B4%EB%85%84%EB%8F%84-%EC%9D%B4%EC%9B%94-%EB%B0%8F-%ED%9B%84%EB%B0%98%EA%B8%B0-%EC%9E%91%EA%B3%84-%ED%9B%88%EB%A0%A8": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "1. 학생 예비군 기본훈련23~25년 불참자(당해년도 / 이월 보충) 및 후반기 작계 훈련 계획을 아래와 같이 통보 하니 대학(원)별 수업 일정 및 업무에 참고 하시기 바랍니다."
-  },
-  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277119&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70799": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626795&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026학년도 2학기 서비스경영전문대학원 종합시험 결과를 종합정보서비스(KUTIS)에서 확인하시기 바랍니다."
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367616&mode=view&no=379": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "나. 입찰참가자격 등록 마감 일시 및 장소: 2026년 11월 5일(목) 10:00, 나라장터(www.g2b.go.kr)"
-  },
-  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277117&mode=view": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367611&mode=view&no=377": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "나. 입찰참가자격 등록 마감: 2026년 11월 3일(화) 11:00, 나라장터(g2b.go.kr)"
-  },
-  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70798": {
-   "at": "2026-10-26",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
-  },
-  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626790&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "2026학년도 추계 학술답사와 관련하여 수강생과 비수강생 간의 공지 전달 방식 및 객실 배정 절차에 대한 일부 오해가 확인되어, 학과의 공식 운영 원칙과 사실관계를 다음과 같이 안내합니다."
-  },
-  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626773&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-10-26",
-   "v": 2,
-   "desc": "바쁘신 와중 2026년 10월 28일(수) 글로벌녹색성장연구소(GGGI)에서 개최되는 제13차 그린라운드테이블 관련 내용 공유드리고자 연락드렸습니다."
   },
   "post:서울시립대학교:31731": {
    "at": "2026-10-27",
@@ -823,8 +153,8 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=924": {
-   "at": "2026-10-27",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "서울대학교 학부대학 직원(기간제)을 채용하고자 아래와 같이 공고하오니 많은 지원 바랍니다."
   },
   "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159621&mode=view&noCat=514": {
@@ -974,8 +304,8 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://kau.ac.kr/kaulife/notice.php?code=s1101&mode=read&seq=11387": {
-   "at": "2026-10-27",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "대학 구내전화 교환기 전원(전기) 교체공사로 인하여 아래와 같이 구내전화가 불통되오니 대학 구성원들의 많은 양해 바랍니다."
   },
   "post:서울시립대학교:31744": {
@@ -1070,10 +400,10 @@
    "desc": "가. 신청자격 : 2학년 1학기생부터 등록한 재학생 나. 신청기간 : 2026.11.02(월) ~ 11.06(금)"
   },
   "url:https://www.yonsei.ac.kr/bbs/sc/58/944486/artclView.do": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1,
+   "tries": 2,
    "desc": "1. 안내 개요 최근 웹서비스 개발에 사용되는 서버 실행 환경인 Node.js에서 접근제어 미흡 및 인증서 미흡 관련 보안 취약점(CVE-2026-105482, CVE-2026-105483,…"
   },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70813": {
@@ -1468,9 +798,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.yonsei.ac.kr/bbs/wj/104/944505/artclView.do": {
-   "at": "2026-10-28",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "※자세한 내용은 첨부 파일 확인 부탁드립니다."
   },
   "post:동국대학교:26766780": {
    "at": "2026-10-28",
@@ -1585,8 +915,8 @@
    "desc": "2026학년도 겨울계절수업 성균관대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
   },
   "url:https://www.yonsei.ac.kr/bbs/wj/104/944502/artclView.do": {
-   "at": "2026-10-28",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "연세대학교 미래캠퍼스 앵커사업단에서는 대학의 지역 연계 및 산학협력 기능을 확대하고, 지역 산업과의 동반 성장을 도모하고자 강원 전략산업육성 비R&D 수혜기업을 모집하오니 많은 관심과 참여 바랍니다."
   },
   "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277244&mode=view": {
@@ -1876,10 +1206,10 @@
    "desc": "10월 29일(목) 11:00~16:00 김수환관 1층에서 진행하며, 다양한 선물도 준비되어있으니 많은 참여 부탁드립니다. * 날씨로 인해 안드레아관 데크 &rarr; 김수환관 1층으로 장소가 변경되었습니다."
   },
   "url:https://kau.ac.kr/kaulife/notice.php?code=s1101&mode=read&seq=11401": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1,
+   "tries": 2,
    "desc": "2026 학년도 동계 계절학기를 다음과 같이 실시하오니, 수강에 참고하시기 바랍니다 ."
   },
   "post:서울시립대학교:31758": {
@@ -2224,9 +1554,10 @@
    "desc": "2026학년도 겨울계절수업 중앙대학교 첨단소재나노융합 혁신융합대학사업 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
   },
   "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516025&site_dvs_cd=kr": {
-   "at": "2026-10-30",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
+   "at": "2026-11-26",
+   "v": 3,
+   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
+   "tries": 1
   },
   "post:전북대학교:219116": {
    "at": "2026-10-29",
@@ -2315,8 +1646,8 @@
    "desc": "채용 부서 경영대학원 교학팀 모집인원 1. 지원 자격 및 우대사항 담당업무 경영대학원 교학팀 행정업무 등 지원 자격"
   },
   "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516029&site_dvs_cd=kr": {
-   "at": "2026-10-30",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.inha.ac.kr/bbs/kr/8/45991/artclView.do": {
@@ -2627,9 +1958,9 @@
    "desc": "1. 신청기간 : 2026.11.09(월) ~ 11.20(금) 2. 신청대상 : 현재 1학년 2학기 이상 재학생(휴학생 불허)"
   },
   "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516035&site_dvs_cd=kr": {
-   "at": "2026-10-30",
-   "v": 2,
-   "desc": "나. 일 시: 2026. 11. 3.(화) 14:00~15:30 다. 장 소: 인재개발원(E5) 2층 시너지실"
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:중앙대학교:30301": {
    "at": "2026-10-30",
@@ -2873,8 +2204,8 @@
    "desc": "1. 전공결정 신청 대상 2026-2 학기 현재 재학생으로 가 .2026학년도 호크마교양대학 호크마학부로 입학한 전공(학과) 미결정자 나. 2026학년도 학부별로 입학한 전공 미결정자"
   },
   "url:https://www.kookmin.ac.kr/user/kmuNews/notice/4/12491/view.do?currentPageNo=1": {
-   "at": "2026-11-01",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367722&mode=view&no=358": {
@@ -2958,8 +2289,8 @@
    "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
   },
   "url:https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?article.offset=0&articleLimit=10&articleNo=232204487&mode=view&ref=calendar&srYearMonth=2026-11": {
-   "at": "2026-11-01",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "1. 신청기간 : 2026.11.03.(화) 17:00 까지 ※ 수업학적팀 신청서 제출 기준"
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367575&mode=view&no=360": {
@@ -3972,11 +3303,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.smu.ac.kr/webzine/today.do?article.offset=0&articleLimit=10&articleNo=769917&mode=view": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
-   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 1,
-   "desc": "대외협력팀 우리 대학은 지난 2일 서울캠퍼스에서 2026학년도 2학기 소동제 ‘VOYAGE: GAMEMODE’를 개최했다."
+   "desc": "우리 대학은 지난 2일 서울캠퍼스에서 2026학년도 2학기 소동제 ‘VOYAGE: GAMEMODE’를 개최했다."
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=726831": {
    "at": "2026-11-03",
@@ -4341,8 +3670,8 @@
    "desc": "1. 일시 : 2026년 11월 25일(수) ~ 27일(금) (온라인 11/25, 오프라인 11/26~27)"
   },
   "post:경희대학교:323523": {
-   "at": "2026-11-08",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "서울캠퍼스 내 금연구역을 아래와 같이 안내드리오니 교내 구성원분들께서 지정된 흡연구역을 이용해주시기 바랍니다."
   },
   "post:전북대학교:219516": {
@@ -4356,8 +3685,8 @@
    "desc": "본교 글로벌인재유치팀(前국제입학팀)에서 근무할 사무원(계약직) 채용과 관련하여 아래와 같이 공고하오니 많은 지원 바랍니다."
   },
   "post:동국대학교 WISE캠퍼스:521113": {
-   "at": "2026-11-08",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "미래 글로벌 비지니스 현장에서 직접 활약할 해외 무역전문가를 양성하기 위해 국가에서 지원해주는 청년무역양성사업단 활동혜택 -1인당 교육지원비 평균 500만원 이상 -해외무역 박람회 평균 2회 참가 지원 -국내…"
   },
   "post:경북대학교:11793926015576": {
@@ -4423,9 +3752,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www3.chosun.ac.kr/bbs/chosun/117/282603/artclView.do": {
-   "at": "2026-11-08",
-   "v": 2,
-   "desc": "성과관리팀 2026 학년도 조선대학교 교육수요자 만족도 조사를 다음과 같이 실시하오니 많은 관심과 참여 바랍니다 ."
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "2026 학년도 조선대학교 교육수요자 만족도 조사를 다음과 같이 실시하오니 많은 관심과 참여 바랍니다 ."
   },
   "url:https://www.hufs.ac.kr/bbs/hufs/2180/270772/artclView.do": {
    "at": "2026-11-08",
@@ -4543,9 +3872,9 @@
    "desc": "명지대학교에서 운영 중인 진로 혹은 심리와 관련한 모든 프로그램에 대하여 명지대학교 학우분의 의견을 조사하고자 하니 , 많은 관심과 참여 부탁드립니다 . 설문기간 : 2026.11.02.( 월 ) ~…"
   },
   "post:동국대학교 WISE캠퍼스:521072": {
-   "at": "2026-11-08",
-   "v": 2,
-   "desc": "3. 재가입 방법: nDRIMS 홈페이지(https://ndrims.dongguk.ac.kr)에서 통합ID 신청"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "이에 우리 대학은 학사행정정보시스템(nDRIMS)의 보안 수준을 강화하고, 비정상적인 접근 및 사이버 공격으로부터 학생과 교직원의 개인정보 및 학사정보를 안전하게 보호하기 위해 4년 이상 접속 이력이 없는 계정을…"
   },
   "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%EC%88%AD%EC%8B%A4%EA%B0%80%EC%A1%B1%EC%88%98%EC%9A%94%EC%98%88%EB%B0%B0-%EC%95%88%EB%82%B411%EC%9B%94-11%EC%9D%BC": {
    "at": "2026-11-08",
@@ -4585,8 +3914,8 @@
    "tries": 1
   },
   "url:https://www3.chosun.ac.kr/bbs/chosun/117/282599/artclView.do": {
-   "at": "2026-11-08",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.gachon.ac.kr/bbs/kor/475/126753/artclView.do": {
@@ -5095,8 +4424,8 @@
    "desc": "안녕하세요. 에너지바이오대학에서는 2026학년도 학과별 학술 성과를 공유하고 학생들의 학문적 역량을 발표하는 「 2026학년도 에너지바이오대학 학술제 」를 개최합니다."
   },
   "url:https://www.hufs.ac.kr/bbs/hufs/2180/271108/artclView.do": {
-   "at": "2026-11-09",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "2026년도 금연문화 바로 세우기의 일환으로 서울캠퍼스 보건실에서는 [찾아가는 금연 클리닉]을 운영하고자 하오니 많은 관심 및 참여 부탁드립니다."
   },
   "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1512049&mCode=MN095&mgr_seq=3&mode=view": {
@@ -5135,8 +4464,8 @@
    "desc": "삼성융합의과학원 성균관대학교 삼성융합의과학원(SAIHST)에서는 오는 12월 3일(목), ‘Physical AI in Medicine: From Recognition and Reasoning to Embodied…"
   },
   "post:경희대학교:323524": {
-   "at": "2026-11-09",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "안녕하세요. 경희대학교 (국제)심리상담센터입니다. 국제캠퍼스 학부 재학생들 위한 학습전략/대학생 핵심역량 심리검사 를 준비했습니다."
   },
   "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53629&tpage=1": {
@@ -5355,8 +4684,8 @@
    "desc": "(전자정보공학과/산업인공지능학과 /화장품산업학과 ) ※ 모집요강 3~4쪽의 지원자격을 잘 확인하시기 바랍니다."
   },
   "url:https://www.hufs.ac.kr/bbs/hufs/2180/271180/artclView.do": {
-   "at": "2026-11-09",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "한국외국어대학교 서울캠퍼스 예비군연대입니다. 2026년도 후반기 학생예비군 기본 3차훈련을 다음과 같이 실시하니 대상자는 착오 없이 참석하여 주시기 바랍니다."
   },
   "post:서울시립대학교:31791": {
@@ -5386,9 +4715,9 @@
    "tries": 3
   },
   "url:https://www3.chosun.ac.kr/bbs/chosun/117/282686/artclView.do": {
-   "at": "2026-11-09",
-   "v": 2,
-   "desc": "나. 일시: 2026. 11. 18.(수) 10:00~17:00 다. 장소: 조선대학교 중앙도서관 1층 커리어라운지"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "해외취업에 관심 있는 학생들을 위한 「2026 전남광주 글로벌 커리어 박람회」를 다음과 같이 개최하오니, 여러분의 많은 관심과 참여 바랍니다.🌏 ✈️ 1. 행사 개요"
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367859&mode=view&no=333": {
    "at": "2026-11-09",
@@ -5569,10 +4898,9 @@
    "desc": "나 . 현장설명을 입찰공고의 첨부자료로 대체합니다 . 현장설명자료를 숙지하시어 입찰에 참가하여 주시기 바랍니다 . 현장설명자료 미숙지로 인한 책임은 업체에 있음을 알려드립니다 ."
   },
   "post:서울교육대학교:55693": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
-   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 1
+   "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141705&mode=view": {
    "at": "2026-11-09",
@@ -5685,17 +5013,17 @@
    "desc": "자유전공학부 자유전공학부가 우리대학 재학생을 초대합니다 2026년 자유전공학부 재학생이 우리대학 전공에 대해 탐색할 수 있도록, 많은 참여와 지원을 보내준 서울시립대학교 재학생 여러분을 초대하여 감사의 마음으로…"
   },
   "url:https://www.yonsei.ac.kr/bbs/wj/104/944593/artclView.do": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1,
+   "tries": 2,
    "desc": "2026년도 연세대학교 미래캠퍼스 위험성평가를 다음과 같이 실시할 예정이오니, 각 부서에서는 평가가 원활이 이루어질 수 있도록 협조하여 주시기 바랍니다."
   },
   "post:동국대학교:26766931": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.sejong.ac.kr/kor/intro/notice1.do?article.offset=0&articleLimit=10&articleNo=896004&mode=view": {
    "at": "2026-11-25",
@@ -5835,8 +5163,8 @@
    "desc": "위스콘신대학교 한국사무소 에서는 귀 대학 재학생들이 글로벌 환경에 대한 이해를 넓히고, 향후 해외 취업 및 국제적 진로를 준비할 수 있도록 미국 university of wisconsin?stout에서 운영되는…"
   },
   "post:경희대학교:323540": {
-   "at": "2026-11-10",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "단국대학교부속 소프트웨어고등학교 교육 봉사 학생 모집 공고(겨울방학) 1. 봉사 내용 : 고등학교 1 ‧ 2 학년 학습 멘토링"
   },
   "post:전북대학교:219621": {
@@ -5910,10 +5238,9 @@
    "desc": "충북대학교 국가공무원(행정)전입(지방직 경력경쟁채용)희망자를 다음과 같이 공개모집하오니 많은 응모 바랍니다. 충북대학교총장 대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
   },
   "post:서울교육대학교:55720": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
-   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 1
+   "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:중앙대학교:30327": {
    "at": "2026-11-10",
@@ -5937,8 +5264,8 @@
    "desc": "교육혁신과 제3회 다전공 이수자 연말파티 ’다전공의 밤‘ 에 초대합니다. 다전공으로 올 한 해도 정말 수고 많으셨죠? 한 해 동안 열심히 달려온 다전공자 여러분을 위해 CICA가 특별한 연말파티를 준비했습니다!"
   },
   "url:https://www.knou.ac.kr/bbs/knou/51/821892/artclView.do": {
-   "at": "2026-11-10",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "1. 교과목: 스포츠의학검사론 2. 내용: 일반계산기 사용가능(공학용 계산기 사용불가)"
   },
   "url:https://www3.chosun.ac.kr/bbs/chosun/117/282712/artclView.do": {
@@ -5977,10 +5304,10 @@
    "desc": "안녕하세요 인하대학교 건설사업팀입니다. 교내 학생 복지시설(임대매장)의 이용 만족도와 개선 의견을 듣고자 설문조사를 실시합니다."
   },
   "post:경북대학교:11794301164462": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=160222&mode=view&noCat=500": {
    "at": "2026-11-10",
@@ -6187,10 +5514,10 @@
    "desc": "○ 일시: 2026년 12월 12일(토) 14:00~17:05 ○ 장소: 이화여자대학교 법학관 405호(이태영홀)"
   },
   "url:https://www.smu.ac.kr/webzine/today.do?article.offset=0&articleLimit=10&articleNo=770195&mode=view": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
-   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 1,
+   "err": "글 열기 실패 (TimeoutError: 23)",
+   "tries": 2,
    "desc": "대외협력팀 상명대학교 간호학과는 11월 10일(화) 한누리관에서 ‘2026년 나이팅게일 선서식'을 열었다."
   },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70963": {
@@ -6299,9 +5626,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:중앙대학교:30332": {
-   "at": "2026-11-11",
-   "v": 2,
-   "desc": "■ 일 시: 2026.11.18.(수) ~ 11.19. (목) [2일 간] ■장 소: 310관 1층 로비 ■참석대상: -본교 재학생(유학생, GKS 정부초청장학생 포함) -초청 교환학생 -기타 교내외 구성원 국가별…"
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:동국대학교:26766949": {
    "at": "2026-11-25",
@@ -6420,10 +5747,10 @@
    "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
   },
   "post:동국대학교:26766950": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1,
+   "tries": 2,
    "desc": "- 학술/문화관 K247 학명세미나실 3. 참여 대상 - 본교 학부생 (재학/휴학/수료/졸업생)"
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141803&mode=view": {
@@ -6453,8 +5780,8 @@
    "desc": "교무처에서는 학생의 원활한 학업활동 및 학교생활 지원을 위한 전담지도교수 상담을 다음과 같이 안내합니다 . 2026-2 학기 재학생은 아래 세부사항을 참고하여 2026-2 학기 전담지도교수 상담에 차질이 없도록…"
   },
   "post:동국대학교 WISE캠퍼스:521158": {
-   "at": "2026-11-11",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "안녕하십니까. 정각원행정팀 입니다. 11. 16.(월) 전 동국인 월요아침예불 은 교내 사정으로 봉행되지 않음 을 알려드립니다. 감사합니다."
   },
   "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516237&site_dvs_cd=kr": {
@@ -6585,8 +5912,8 @@
    "desc": "학생역량지원시스템 - 경력관리 입력 이벤트에 참여해 주신 학생 여러분에게 감사 드립니다. 우수 입력자를 다음과 같이 선정하여 안내드립니다."
   },
   "post:중앙대학교:30334": {
-   "at": "2026-11-12",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271913&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
@@ -6656,8 +5983,8 @@
    "desc": "2026. 2학기 아르바이트 학생 채용 안내 1. 근무기간 : 2026.12.01. ~ 2026.12.18."
   },
   "post:중앙대학교:30333": {
-   "at": "2026-11-12",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53670&tpage=1": {
@@ -6781,10 +6108,10 @@
    "desc": "근무일시 모집대상 ○ 서울시립대학교 대학원생 및 졸업생 ( ※ 학부생 및 교직원 지원불가 ) 모집인원 시험감독"
   },
   "url:https://kau.ac.kr/kaulife/notice.php?code=s1101&mode=read&seq=11465": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1,
+   "tries": 2,
    "desc": "2027 학년도 수시모집 논술고사의 원활한 운영을 위하여 다음과 같이 대학원생 고사 감독자를 모집하오니 , 대학원생 여러분의 많은 참여 바랍니다 ."
   },
   "url:https://www.sejong.ac.kr/kor/intro/notice1.do?article.offset=0&articleLimit=10&articleNo=896131&mode=view": {
@@ -6838,8 +6165,8 @@
    "desc": "[ 동계방학 / 계절학기 패키지 ]- 재학용 전용 1) 2026- 겨울학기 ( 동계방학 ) 기간 중 계절학기 수강 등 학습목적의 생활관 이용 기회 제공"
   },
   "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EA%B5%90%EC%9C%A1%EC%88%98%EC%9A%94%EC%9E%90%EB%A7%8C%EC%A1%B1%EB%8F%84%EC%A1%B0%EC%82%AC-%EC%B0%B8%EC%97%AC-%EC%95%88%EB%82%B4": {
-   "at": "2026-11-12",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=953": {
@@ -6863,9 +6190,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.mju.ac.kr/bbs/mjukr/141/237143/artclView.do": {
-   "at": "2026-11-12",
-   "v": 2,
-   "desc": "➩ Myicap 만족도설문조사 실시 11 .27( 금 ) 자정까지 7. 기타 관련 문의 : 02-300-1671 (ABI-X 사업단 담당자 ) * 참여 신청 후 불참할 경우 , ABI-X 사업단 프로그램 참여에…"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "우리대학교 대학혁신지원사업 AI·Bigdata·ICT 융합교육사업단에서는 사업단 주관 AI·Bigdata·ICT 융합전공 ( 인문 ICT 콘텐츠 , 응용데이터사이언스 , 스포츠 ICT, 인공지능 ICT 융합 )…"
   },
   "post:서울시립대학교:31838": {
    "at": "2026-11-12",
@@ -6913,9 +6240,9 @@
    "desc": "공정한 입시 진행을 위하여 학부모, 동반자 및 일반인(학부생 등 교내구성원 포함)의 캠퍼스 출입을 엄격히 제한합니다."
   },
   "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%ED%95%99%EC%88%A0%EC%9B%90-%ED%96%89%EC%A0%95%ED%8C%80-%EC%9D%BC%EB%B0%98%EA%B3%84%EC%95%BD%EC%A7%81-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0-2": {
-   "at": "2026-11-12",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "본교 숭실학술원 행정팀에서 아래와 같이 계약직 직원을 모집합니다. 모집 관련 자세한 사항은 아래의 모집공고를 참고하여 주시기 바랍니다."
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141861&mode=view": {
    "at": "2026-11-12",
@@ -7188,8 +6515,8 @@
    "desc": "이화여대 창지단 마스코트 데뷔조 최종 2인, 여러분의 선택은? 데뷔시키고, 이름 짓고, 에어팟 · 디지털 카메라 받아가자! https://forms.gle/C9X9o2mBbWmtxFYi6 반짝이는 아이디어로 세상을…"
   },
   "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=897781&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
-   "at": "2026-11-13",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:서울시립대학교:31844": {
@@ -7198,9 +6525,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171609&pageUnit=10": {
-   "at": "2026-11-13",
-   "v": 2,
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "충북대학교 앵커사업단 지역정주형 보건의료 혁신 클러스터 인재 양성센터에서 「2026 보건의료 혁신 클러스터 성과교류회」를 개최하오니 많은 관심과 참여 부탁드립니다."
   },
   "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277777&mode=view": {
    "at": "2026-11-25",
@@ -7244,9 +6571,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.mju.ac.kr/bbs/mjukr/141/237161/artclView.do": {
-   "at": "2026-11-13",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "2027 학년도 1 학기 대비 수강 희망 교과목 사전조사를 아래와 같이 실시합니다 . 학생 수요에 따른 강좌를 개설하여 원활한 졸업학점 취득 지원 및 교육 선택권을 강화하는 중요한 자료가 되므로 반드시 참여하여…"
   },
   "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%9E%85%ED%95%99%EC%B2%98-%EC%9E%85%ED%95%99%ED%8C%80-%EB%8B%A8%EC%8B%9C%EA%B0%84-%EA%B7%BC%EB%A1%9C%EC%9E%90-%EC%B1%84%EC%9A%A9%EA%B3%B5": {
    "at": "2026-11-25",
@@ -7305,8 +6632,8 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=160321&mode=view&noCat=500": {
-   "at": "2026-11-13",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "「학사학위취득의 유예」와 관련하여, 학사학위취득유예를 희망하는 졸업대상 학생들을 위한 구체적인 일정을 아래와 같이 안내드립니다."
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367933&mode=view&no=339": {
@@ -7325,9 +6652,9 @@
    "desc": "국립부경대학교공고 제2026-75호 본 공고는「국립부경대학교공고 제2026-73호(2026.11.5.)」의 원서접수마감일을 연장한다는 변경공고이오니, 응시자는 아래의 변경사항을 확인하시기 바랍니다. 국립부경대학교총장"
   },
   "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=160320&mode=view&noCat=500": {
-   "at": "2026-11-13",
-   "v": 2,
-   "desc": "학사지원팀 2026학년도 2학기 강의평가를 아래와 같이 시행하오니, 강의의 질을 높이고 학생들의 강의 만족도를 제고할 수 있도록 학생 여러분들의 적극적인 참여 부탁드립니다."
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "2026학년도 2학기 강의평가를 아래와 같이 시행하오니, 강의의 질을 높이고 학생들의 강의 만족도를 제고할 수 있도록 학생 여러분들의 적극적인 참여 부탁드립니다."
   },
   "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=627205&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
    "at": "2026-11-13",
@@ -7350,9 +6677,9 @@
    "desc": "1. 신청자격: 봉사활동에 뜻을 가지고책임감 있게활동할 한국국적의 이화여대 대학(원)생"
   },
   "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=160309&mode=view&noCat=514": {
-   "at": "2026-11-13",
-   "v": 2,
-   "desc": "학생활동 학생지원팀 교외 공모전 및 대회 수상자에 대해 학생상벌위원회 심의를 거쳐 포상할 예정입니다. 희망하는 학생은 소속 학과 사무실 또는 단과대학 행정실에 서류를 제출해 주시기 바랍니다."
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "학생활동 교외 공모전 및 대회 수상자에 대해 학생상벌위원회 심의를 거쳐 포상할 예정입니다. 희망하는 학생은 소속 학과 사무실 또는 단과대학 행정실에 서류를 제출해 주시기 바랍니다."
   },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70989": {
    "at": "2026-11-13",
@@ -7550,8 +6877,8 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=897799&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
-   "at": "2026-11-16",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "11월에는 이달의 검사 중 호응이 좋았던 ' 회복탄력성 검사 '를 재공개합니다! QR 코드로 검사 미리 실시 후 행사 당일 부스로 방문하여 다과를 수령하는 참여 방식도 가능하니 많은 참여 바랍니다~! ✔ 행사 내용"
   },
   "url:https://www.hufs.ac.kr/bbs/hufs/2180/271680/artclView.do": {
@@ -7590,10 +6917,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.knou.ac.kr/bbs/knou/51/822423/artclView.do": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www3.chosun.ac.kr/bbs/chosun/117/282817/artclView.do": {
    "at": "2026-11-25",
@@ -7621,8 +6948,8 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.mju.ac.kr/bbs/mjukr/141/237207/artclView.do": {
-   "at": "2026-11-16",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "명지대학교 융합교육지원센터에서 학문 간 경계를 넘는 창의적 인재를 양성하고 수요자 중심 교육 선택권 강화를 위해 개최한 ‘2026 학년도 학생설계전공 교육과정 개발 학생공모전 ’ 의 최종 수상자를 아래와 같이…"
   },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70996": {
@@ -7681,9 +7008,9 @@
    "desc": "최근 S/W업체들이 경영여건 변화와 실적개선 필요성 등으로 인해 라이선스 준수 여부 점검을 강화하고 있으며, 관련 법무법인을 통한 저작권 침해 경고 및 내용증명 발송 사례도 발생하고 있사오니 각 부서 및 학과에서는…"
   },
   "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171623&pageUnit=10": {
-   "at": "2026-11-16",
-   "v": 2,
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 서원 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367948&mode=view&no=327": {
    "at": "2026-11-16",
@@ -8103,10 +7430,10 @@
    "tries": 3
   },
   "post:고려대학교:000060000000061712": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.knou.ac.kr/bbs/knou/51/822628/artclView.do": {
    "at": "2026-11-25",
@@ -8185,16 +7512,15 @@
    "desc": "2027 학년도 1 학기 복수전공 이수자 선발 결과를 다음과 같이 안내하오니 확인하시기 바랍니다 . ▣ 승인 일시 : 2026. 11. 17.(화) ▣ 승인 조회 :"
   },
   "url:https://www.kookmin.ac.kr/user/kmuNews/notice/4/12573/view.do?currentPageNo=1": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
-   "err": "글 열기 실패 (TypeError: UND_ERR_SOCKET)",
-   "tries": 1
+   "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:고려대학교:000060000000061707": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271978&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
    "at": "2026-11-19",
@@ -8213,10 +7539,10 @@
    "desc": "성균관대학교 인문사회과학캠퍼스 체력증진센터 2026년 12월 회원을 아래와 같이 모집하오니 교내 구성원 여러분들의 많은 이용 바랍니다. Ⅰ. 등록 기준일 - 2026년 12월 1일(화)"
   },
   "post:고려대학교:000060000000061685": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367977&mode=view&no=330": {
    "at": "2026-11-17",
@@ -8487,9 +7813,9 @@
    "desc": "■ 강연 소개 < 한국포스트휴먼 연구회 > 와 < 과학기술과 사회 네트워크 > 의 공동으로 주최하는 이번 학술대회는 종말을 상상함으로써 현재의 세계를 낯설게 바라보기 위해 기획되었다 . 기후위기 , 핵 , 인공지능…"
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=727025": {
-   "at": "2026-11-17",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "국립부경대학교 산학협력단에서는 2027학년도 전기 일반대학원 블루푸드스마트시템전공 계약학과 ( 석사과정 ) 신입생 을 아래와 같이 모집하오니 관심있는 산업체 및 우수한 인재들의 많은 지원 바랍니다 ."
   },
   "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=160451&mode=view&noCat=500": {
    "at": "2026-11-25",
@@ -8618,10 +7944,10 @@
    "tries": 3
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=727055": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1,
+   "tries": 2,
    "desc": "학생성공지원과 안녕하세요 국립부경대학교 상상옷장입니다 : ) 2027학년도 대학수학능력시험이 시행됨에 따라 2026. 11. 19.(목) 은 상상옷장을 10:00부터 운영 하오니 이용에 참고하시기 바랍니다."
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142083&mode=view": {
@@ -8928,10 +8254,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=727058": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142105&mode=view": {
    "at": "2026-11-18",
@@ -8954,9 +8280,9 @@
    "desc": "연금관리학과 1. 초청 명사 : 연금관리학과 전공주임교수 전경민 2. 일시/장소 : 2026.11.18(수) 12:30 / 3호관 105호"
   },
   "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53710&tpage=1": {
-   "at": "2026-11-18",
-   "v": 2,
-   "desc": "- 장소: 서울 SETEC 제3전시관 (온라인 생중계 병행) - 대상: 대학(원)생 및 청년 누구나"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "산업의 미래를 이끌어갈 혁신인재(학·석·박사)와 산업계가 함께하는 통합 교류 및 우수성과 공유의 장을 마련하고자 2026 청년 뉴턴[NEW:TURN] 개최합니다."
   },
   "post:동국대학교 WISE캠퍼스:521238": {
    "at": "2026-11-25",
@@ -9044,9 +8370,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53708&tpage=1": {
-   "at": "2026-11-18",
-   "v": 2,
-   "desc": "1. 채용분야 및 지원자격 2. 응시자격 및 우대조건 가. 일반사항 1) 성별, 학력, 거주지 제한 없음"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "직원 채용 공고 광운대학교 산학협력단「도봉구 청년창업센터」 에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다."
   },
   "post:전북대학교:219985": {
    "at": "2026-11-18",
@@ -9079,8 +8405,8 @@
    "desc": "성균관대학교 기계기술연구소 행정조교를 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다."
   },
   "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53707&tpage=1": {
-   "at": "2026-11-18",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:전북대학교:219982": {
@@ -9164,10 +8490,10 @@
    "desc": "광운창업지원센터에서는 신규 입주기업을 모집하고 있으니 , 기술기반의 경쟁력 있는 사업아이템을 가진 예비창업자 및 창업 5 년 이내의 우수 기업의 많은 관심과 지원 바랍니다 ."
   },
   "url:https://www.inha.ac.kr/bbs/kr/8/46183/artclView.do": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1,
+   "tries": 2,
    "desc": "출국 전 , 여권 , 비자 / 신분증 , 증빙자료 사본 / 여행자보험 / 해외안전여행 앱은 필수입니다 . 해외안전여행 앱 또는 홈페이지 (www.0404.go.kr) 를 통해 아래 사항을 확인해주세요 ."
   },
   "url:https://www.mju.ac.kr/bbs/mjukr/141/237319/artclView.do": {
@@ -9186,8 +8512,8 @@
    "desc": "모집 요건 가. 지원자격 : 학사 학위 이상 소지자 나. 지원조건 : 조교 임용규정에 결격 사유가 없는 자"
   },
   "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=627288&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-11-19",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "2026학년도 전기 졸업사정관련 일정을 다음과 같이 안내하오니 졸업 해당 학생들은 참고해주시길 바랍니다."
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=727062": {
@@ -9216,9 +8542,9 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=627286&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-11-19",
-   "v": 2,
-   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368024&mode=view&no=331": {
    "at": "2026-11-19",
@@ -9286,10 +8612,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:동국대학교:26767048": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1,
+   "tries": 2,
    "desc": "안녕하세요. 동국대학교 인권센터입니다. 우리 대학은 교내 구성원의 인권의식 향상과 인권친화적인 대학문화 조성을 위해 「2026학년도 인권실태조사」를 실시하고 있습니다."
   },
   "post:서울시립대학교:31874": {
@@ -9334,8 +8660,8 @@
    "desc": "2026학년도 해외선교봉사활동 참가자를 다음과 같이 추가 모집하니 많은 지원 바랍니다."
   },
   "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=627289&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
-   "at": "2026-11-19",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "※ 공지사항 확인 후 문의 시 ☎ 031.249.9063 ※ 문의 시 학번 및 성명을 확인하고 있습니다. 최근 학생 사칭으로 인해 확인하오니, 불편하시더라도 협조 부탁드립니다."
   },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=71053": {
@@ -9469,10 +8795,8 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.sungshin.ac.kr/bbs/main_kor/3181/161474/artclView.do": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
-   "err": "글 열기 실패 (TypeError: ECONNRESET)",
-   "tries": 1,
    "desc": "2. 교육 대상 : 전체 재학생 3. 신청기간 : 2026.11.2.(월) ~ 12.6.(일)"
   },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=71048": {
@@ -9516,10 +8840,10 @@
    "desc": "- 영어 의사소통 능력과 AI 이해 활용 역량을 높이고, 어학연수, 기업탐방이 결합된 프로그램"
   },
   "url:https://www.sungshin.ac.kr/bbs/main_kor/3181/161253/artclView.do": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 열기 실패 (TypeError: ECONNRESET)",
-   "tries": 1,
+   "tries": 2,
    "desc": "2027 학년도 1 학기 전과 선발 계획을 다음과 같이 안내합니다 . 전과 후 전공학점 변경 , 졸업학점 취득 계획 등을 충분히 고려하여 지원하기 바랍니다 ."
   },
   "url:https://www.sungshin.ac.kr/bbs/main_kor/3181/161220/artclView.do": {
@@ -9563,10 +8887,10 @@
    "desc": "미래캠퍼스 2026학년도 겨울 계절제 수업 1차 폐강 대상 교과목을 아래와 같이 안내해 드립니다. ▣ 1차 폐강 교과목(기준일 2026. 11. 20. 16:00 기준_폐강과목 추가) 2 학 정번호 실습분반 교과목명"
   },
   "url:https://sejong.korea.ac.kr/bbs/koreaSejong/656/274666/artclView.do": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2,
+   "tries": 3,
    "desc": "2026학년도 겨울계절수업의 수강정원이 아래와 같이 증원될 예정이오니, 수강신청 시 참고하시기 바랍니다."
   },
   "post:중앙대학교:30347": {
@@ -9952,15 +9276,14 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11672&searchGbn=0&searchOrderSort=0": {
-   "at": "2026-11-20",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "□ (행복주택이란?) 젊은 계층의 주거 불안 해소를 위해 국가 재정과 주택도시기금을 지원받아 대중교통이 편리하고 직주근접이 가능한 부지에 주변 시세보다 저렴하게 공급하는 공공임대주택"
   },
   "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EA%B5%90%EC%A7%81-%EC%A0%81%C2%B7%EC%9D%B8%EC%84%B1%EA%B2%80%EC%82%AC-%EC%84%B1%EC%9D%B8%EC%A7%80-%EA%B5%90%EC%9C%A1-%EC%9D%91%EA%B8%89%EC%B2%98": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
-   "err": "글 열기 실패 (TypeError: UND_ERR_SOCKET)",
-   "tries": 1
+   "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=71059": {
    "at": "2026-11-20",
@@ -9993,8 +9316,8 @@
    "desc": "사무국 총무과 1. 귀 기관의 무궁한 발전을 기원합니다 . 2. 우리 조직위원회에서는 전 세계 대학생들의 스포츠 축제인 「 2027 충청 유니버시아드대회 」 의 성공적인 개최를 위해 대회의 상징인 성화를 국민과…"
   },
   "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11673&searchGbn=0&searchOrderSort=0": {
-   "at": "2026-11-20",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "제8회 강원교양인 토론대회에 참가해주신 학생 여러분께 감사드리며, 예선 심사 결과를 아래와 같이 알려드립니다."
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368066&mode=view&no=341": {
@@ -10008,8 +9331,8 @@
    "desc": "★ 2026년 마지막 마음나눔카페! 이야기할 곳이 필요하다면 마음나눔카페로 오세요. 바쁜 일상속에서 다과를 먹으며, 다양한 주제(수다, 게임 등)로 이야기를 나누는 시간이에요!"
   },
   "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11669&searchGbn=0&searchOrderSort=0": {
-   "at": "2026-11-20",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "강원대학교 춘천캠퍼스에서는 [매주 수요일은 강원대학교 후원의 집 가는 날]로 지정하여 대학에 기부해 주시는 업체에 고마움을 전하고자 ‘후원의 집’의 이용을 독려하오니 구성원 여러분의 많은 참여와 홍보를 부탁드립니다."
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368065&mode=view&no=340": {
@@ -10203,9 +9526,9 @@
    "desc": "2027학년도 수시모집 논술고사 시행에 따라 수험생 및 학부모 등 대규모 인원의 교내 방문이 예정되어 있습니다."
   },
   "post:서울시립대학교:31887": {
-   "at": "2026-11-23",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "서울시립대학교 공고 제 2026-540 호 붙임 1. 신 ․ 구조문 대비표 1 부 . 서 울 시 립 대 학 교 총 장 #총장후보자"
   },
   "url:https://www.hufs.ac.kr/bbs/hufs/2180/272391/artclView.do": {
    "at": "2026-11-25",
@@ -10319,8 +9642,8 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "post:서울시립대학교:31883": {
-   "at": "2026-11-23",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "교육혁신원 서울시립대학교 교육혁신원 교양교육부에서는 기 개발된 다학제 융합 교양교과목의 교육 만족도 및 학습경험을 확인하고, 향후 교양교육 개선에 활용하고자 다음과 같이 만족도조사를 실시합니다."
   },
   "url:https://www.hufs.ac.kr/bbs/hufs/2180/272386/artclView.do": {
@@ -10464,8 +9787,8 @@
    "desc": "도서관에서는 강원대학교 5대 핵심역량 강화 독서 프로그램으로 학생들의 독서 습관 및 핵심역량 강화를 장려하기 위해 재학생 여러분의 많은 관심과 참여를 부탁드립니다."
   },
   "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1512361&mCode=MN095&mgr_seq=3&mode=view": {
-   "at": "2026-11-23",
-   "v": 2,
+   "at": "2026-11-26",
+   "v": 3,
    "desc": "「부산대학교 재정 및 회계의 운영에 관한 규정」 제5조의3에 따라 2026학년도 제5회 재정위원회를 다음과 같이 개최함을 안내드립니다."
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368087&mode=view&no=335": {
@@ -10864,10 +10187,10 @@
    "desc": "건강증진센터에서는 정기적으로 다양한 주제의 건강강좌를 개최하고 있으며 12월에는 병원임종과 존엄한 죽음 에 관한 내용을 다루고자 합니다. 교직원 및 학생 여러분의 많은 관심과 참여를 부탁드립니다."
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=272126&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.smu.ac.kr/webzine/today.do?article.offset=0&articleLimit=10&articleNo=770636&mode=view": {
    "at": "2026-11-24",
@@ -10950,10 +10273,10 @@
    "desc": "성평등가족부는 9~24 세 취약계층 여성청소년 생리용품 구매비용 ( 바우처 ) 지원 사업을 운영하고 있습니다 . 올해부터 신청 시기와 관계없이 연간 지원금 전액 (16 만 8 천원 ) 을 지급하고 있으며 ,…"
   },
   "url:https://www.hufs.ac.kr/bbs/hufs/2180/272557/artclView.do": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "post:서울시립대학교:31899": {
    "at": "2026-11-24",
@@ -11131,10 +10454,10 @@
    "desc": "총장후보자 선거운동은 후보자 등록 마감 이후인 2026. 12. 3.( 목 ) 18:00 부터 가능하며 , 마감 직후 진행될 후보자 의견수렴 회의 ( 후보자간 룰미팅 ) 에서 후보자 기호추첨을 실시할 예정이오니,…"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=272128&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "post:동국대학교:26767086": {
    "at": "2026-11-25",
@@ -11382,10 +10705,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=272138&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-11-25",
+   "at": "2026-11-26",
    "v": 3,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368158&mode=view&no=346": {
    "at": "2026-11-25",
@@ -11751,6 +11074,196 @@
    "at": "2026-11-25",
    "v": 3,
    "desc": "이화여자대학교 창업지원단은 새로운 창업 아이디어를 만나고, 그 아이디어를 사업으로 발전시켜 온 창업가들의 이야기를 나누는 2026 이화 창업페스타」를 개최합니다."
+  },
+  "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=898171&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "인공지능혁신융합대학사업단에서 2026 AICOSS 제주 Re:Local 참가 수요조사를 아래와 같이 시행하오니, 관심있는 학생들은 참여하여 주시기 바랍니다."
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1512466&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "● ● ● ● 주관: 부산대학교 · Google for Education 신청 대상 부산대학교 학부생 시그니엘 부산 볼룸 에서 펼쳐지는 단 하루의 바이브코딩 해커톤. 부산대학교 Google Workspace for…"
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=278223&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "최근 교내 결핵 예방 및 관리와 관련한 문의가 있어, 구성원 여러분의 불안을 해소하고 정확한 의학적 정보와 예방수칙을 안내드립니다."
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171900&pageUnit=10": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "붙임과 같이 공고합니다. 기타 자세한 내용은 붙임 공고문을 참조하시기 바랍니다"
+  },
+  "url:https://www.sookmyung.ac.kr/kr/news/important-notice.do?article.offset=0&articleLimit=10&articleNo=96152&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "최근 타 대학 및 외부 기관에서 전자기기 및 생성형 AI를 활용한 부정행위 사례가 늘고 있습니다. 이는 성실하게 시험을 준비한 모든 학생의 노력과 공정성을 훼손하는 일입니다."
+  },
+  "post:서울시립대학교:31917": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "서울시립대학교 청년취업사관학교 AI 융합 전문가 과정 Ⅱ ■ 교육 안내 생성형 AI 활용 영상 · 광고 콘텐츠 제작"
+  },
+  "url:https://www.sejong.ac.kr/kor/intro/notice1.do?article.offset=0&articleLimit=10&articleNo=897088&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "세종아트갤러리 안녕하세요 . 세종아트갤러리에서 2027 년 상반기 대관 신청에 관한 공지사항을 알립니다 . 각 학과는 이를 숙지하여 이용에 차질 없으시길 바랍니다 . 전시 대관 신청 기간을 지켜주십시오 . 공지된…"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=727129": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "「2026학년도 자유전공학부 성과공유회」가 아래와 같이 개최될 예정이오니, 많은 참여 바랍니다."
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/283066/artclView.do": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "2026 [우리동네 대학박물관] 체험 프로그램 🕯️<밤을 밝히던 온기, 사방등> 🕯️ 조선대학교 박물관에서 차가운 겨울밤을 은은하게 밝혀줄 특별한 전통 공예 체험 프로그램을 준비했습니다!"
+  },
+  "url:https://www.knou.ac.kr/bbs/knou/51/823524/artclView.do": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "나 . 게시 장소 : 단국대학교 장애학생지원센터 누리집 > 장애학생 지원 > 이공계열 맞춤형 기초 교육 콘텐츠"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368196&mode=view&no=348": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "나 . 입찰서류제출 마감일시 및 장소 : 2026. 12 3.( 목 ) 11:00, 이비즈포유 (http://www.ebiz4u.co.kr)"
+  },
+  "post:전북대학교:220299": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "교내 보건진료소에서는 교내 구성원들에게 구강진료를 무료 로 실시하고 있습니다 . 12 월 중 구강진료를 원하시는 분은 전화 예약 바랍니다 ."
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11697&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "교양교육원(원장 강순이) 삼척교양교육센터(센터장 이명남)에서는 11월 25일 삼척캠퍼스 그린에너지연구관 국제회의실(303호)에서 '2026학년도 제12회 우수 글쓰기 공모전 시상식'을 개최하였다."
+  },
+  "url:https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=970": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "학부대학에서는 2027학년도 학사과정 신입생을 대상으로 신입생 특별시험을 시행하고 있습니다. 모든 신입생들은 아래 내용 및 첨부파일(안내자료)을 필히 확인 해주시기 바랍니다."
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=71123": {
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.inha.ac.kr/bbs/kr/8/46247/artclView.do": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "최근 인공지능(AI)을 활용한 시험 부정행위 사례가 증가함에 따라 공정한 시험 운영과 학업윤리 준수의 중요성이 더욱 강조되고 있습니다."
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142410&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "미래인문학소셜앙트레프레너십 융합전공 1. 채용분야 및 지원자격 가. 직종: 연구교수"
+  },
+  "url:https://www.kookmin.ac.kr/user/kmuNews/notice/4/12618/view.do?currentPageNo=1": {
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=898176&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "안녕하세요. 서울과학기술대학교 교육혁신원입니다. 교육혁신원에서는 학생들의 생성형 AI 활용 경험과 요구를 파악하여 보다 효과적인 교수방법을 개발하고자 설문조사를 실시합니다."
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1512461&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "AI융합교육원에서 2026학년도 겨울계절수업 「데이터분석입문」 교과목의 수강신청 대상을 확대합니다."
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171901&pageUnit=10": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 청주대 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
+  },
+  "post:서울시립대학교:31915": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "* 모든 과정은 UOStory에서 개별 신청(반도체 특화 강의는 4회차 통합 신청) * 서류 컨설팅, 서류 워크숍, 면접 워크숍은 UOStory 신청자 중 기준에 따라 선발 예정 * 자세한 내용 UOStory 신청…"
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=278200&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "안녕하세요 . 교수학습개발원에서 신임 교수님들의 연구 비전을 공유하며 학문적 교류를 나누고 소통하는 자리를 마련하였습니다 . 자유로운 분위기 속에서 연구 방향을 나누는 유익한 시간이 될 것입니다 . 많은 관심과…"
+  },
+  "url:https://www.knou.ac.kr/bbs/knou/51/823518/artclView.do": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "가 . 훈련개요 ( ※ 세부내용 첨부 모집 공고문 참조 ) 훈련직무 ai?sw 엔지니어 ax 경영지원 훈련장소 서류접수기간 훈련기간 훈련내용 ai?sw 엔지니어링"
+  },
+  "post:전북대학교:220297": {
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368194&mode=view&no=347": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "나 . 입찰서류제출 마감일시 및 장소 : 2026. 12 3.( 목 ) 11:00, 이비즈포유 (http://www.ebiz4u.co.kr)"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=71121": {
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.inha.ac.kr/bbs/kr/8/46219/artclView.do": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "1. 초빙분야 및 인원 세부 초빙 분야 및 인원은 별도 첨부 문서 확인 주의사항 인하대학교 내 한 개 분야에 한하여 지원 가능 (중복 지원 불가)"
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142234&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "예필재가 2027년 상반기‘언론인을 꿈꾸는 성균인’을 찾습니다. 언론인의 길을 걸으려는 성균인은 예필재의 문을 힘껏 두드리기 바랍니다. 예필재는 예비 언론인들을 위한 공간입니다."
+  },
+  "url:https://sejong.korea.ac.kr/bbs/koreaSejong/664/274435/artclView.do": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "교내·외 의견수렴 안내 고려대학교 세종 캠퍼스는 변화하는 대학 환경과 캠퍼스의 강점·성과를 반영하여, 앞으로의 중장기 발전방향을 담은 「NEW VISION 2030」 수립 및 중장기 발전계획을 고도화 하고 있습니다."
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1512459&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "post:전북대학교:220295": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "언어교육부 언어교육부에서 아래와 같이 모의토익을 실시하오니, 많은 관심 부탁드립니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368158&mode=view&no=349": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "1. 중복교과목 선택입력 마감 : ~ 2026년 12월 14일(월) 23:59 까지"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=71114": {
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=278196&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142401&mode=view": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "성균관대학교 일반대학원 “AI응용공학과”는 도메인 지식과 AI 기술을 융합하여 첨단 제조 AX (AI전환)으로 학업을 이어갈 학부·대학원 연계과정 신청을 받습니다."
+  },
+  "post:전북대학교:220292": {
+   "at": "2026-11-26",
+   "v": 3,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368178&mode=view&no=345": {
+   "at": "2026-11-26",
+   "v": 3,
+   "desc": "연구교수 · 연구원 채용공고 이화여자대학교 꿈이음 센터에서는 『 의무교육단계 미취학 · 학업중단학생 학습지원 사업 ( 이하 ‘ 꿈이음 ’) 』 을 수행할 수 있는 우수한 연구교수 및 연구원을 채용하고자 하오니 ,…"
   }
  }
 }

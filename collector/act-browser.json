@@ -28,54 +28,6 @@
   "at": "2026-11-22",
   "tries": 2
  },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=991": {
-  "at": "2026-11-22",
-  "tries": 2,
-  "lines": [
-   "·대상:국내 주요 시민단체, 전국 대학교 소속 학부생 및 대학원생(박사과정 제외)",
-   "•단체:전국 비영리·시민단체(NGO)00개",
-   "•인턴: 전국 대학(원)생 총 61명",
-   "·단체:①최근 2년간 활발한 활동을 전개하고 있는 비영리·시민단체 ②서울/수도권 지역 상",
-   "근자* 3인 이상, 서울/수도권 외 지역 상근자* 2인 이상 단체(인턴의 근무공간이 확보되어",
-   "야하며인턴의 근무를 관리할 수있는 상근자가 있는 단체)실제 인턴이근무하는 사무실의상근자수",
-   "·인턴: 국내외 대학교에 재학 또는 휴학 중인 학생으로서, NGO 및 시민사회 활동에 대한",
-   "관심과 참여 의지가 있는 자(외국인의 경우 TOPIK level 5 이상 보유자로 한국어를 사용",
-   "하여 근무가 가능한 자)"
-  ],
-  "excludes": [],
-  "from": "공고문 첨부(OCR)",
-  "documents": [
-   "인턴 지원서1부"
-  ]
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=978": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=971&page=2": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=957&page=3": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=954&page=3": {
-  "at": "2026-11-22",
-  "tries": 2,
-  "lines": [
-   "-대사협 회원대학에 재직 중인 교수 또는 교직원",
-   "-전 일정 참여 가능한 자",
-   "-해외여행에 결격사유가 없는 자",
-   "-해외 봉사활동을 수행하는데 심신이 적합 또는 건강한 자",
-   "-대학생 해외 봉사활동 또는 봉사활동 인솔 경험이 있는 분",
-   "-파견팀별 활동 내용에 해당 전공자 및 특기를 가진 분",
-   "-파견국 언어 또는 영어로 의사소통 가능한 분",
-   "-인솔자와 협업이 가능하며, 단원 관리에 적극적이며 책임감이 있는 분"
-  ],
-  "excludes": [],
-  "from": "공고문 첨부(OCR)"
- },
  "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=838568&qidx=6302&cate=10&allboard=false&nowpage=3": {
   "at": "2026-11-23",
   "tries": 2
@@ -125,24 +77,24 @@
   "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161847/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161583/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161878/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521245": {
   "at": "2026-11-19",
   "tries": 1
  },
  "https://www.inha.ac.kr/bbs/kr/8/46177/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://form.naver.com/response/JsbhhcPWUcK": {
   "at": "2026-11-20",
@@ -252,6 +204,10 @@
  },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12652/view.do?currentPageNo=1": {
   "at": "2026-11-24",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142357&article.offset=0&articleLimit=10": {
+  "at": "2026-11-25",
   "tries": 1
  }
 }

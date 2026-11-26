@@ -1,7 +1,18 @@
 {
  "school": "숙명여자대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[학부] 2026-2 기말시험 시행 안내",
+   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=96152&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-26",
+   "kind": "학사",
+   "school": "숙명여자대학교",
+   "campus": "",
+   "src": "72128af9",
+   "foundAt": "2026-11-26",
+   "desc": "최근 타 대학 및 외부 기관에서 전자기기 및 생성형 AI를 활용한 부정행위 사례가 늘고 있습니다. 이는 성실하게 시험을 준비한 모든 학생의 노력과 공정성을 훼손하는 일입니다."
+  },
   {
    "title": "[졸업] 수료생 졸업신청(2027년 2월 졸업) 및 졸업 인증제 제출 안내",
    "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=96121&article.offset=0&articleLimit=10",

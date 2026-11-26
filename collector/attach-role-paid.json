@@ -1,25 +1,6 @@
 {
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": {
-  "auto-enoticedoarticleno770333|붙임.샘물근로배정부서 확인.pdf": {
-   "id": "auto-enoticedoarticleno770333",
-   "name": "붙임.샘물근로배정부서 확인.pdf",
-   "hash": "c14822220aaef889",
-   "file": "form-szl3lw-4.pdf",
-   "tries": 0,
-   "done": true,
-   "usd": 0.0181,
-   "at": "2026-11-20",
-   "a": {
-    "role": "notice",
-    "evidence": "샘물 시스템 화면 캡처에 「공란시는 미선발됨」 안내가 빨간 글씨로 표시되어 있습니다. 「(학생)근로장학신청」 메뉴 경로에도 표시가 되어 있어, 근로배정부서를 확인하는 방법을 알려 주는 안내 자료입니다. 학생이 채워 내는 서식이 아닙니다."
-   },
-   "b": {
-    "role": "notice",
-    "evidence": "샘물 통합정보시스템 (학생)근로장학신청 화면 캡처에 붉은 박스로 「공란시는 미선발됨」 표시 — 학생이 작성해 제출하는 서식이 아니라 근로배정부서 확인 방법을 보여 주는 안내 이미지"
-   },
-   "role": "notice"
-  },
   "auto-ent2431269444artclviewdo|붙임2.[생활비] 온라인 체크리스트.pdf": {
    "id": "auto-ent2431269444artclviewdo",
    "name": "붙임2.[생활비] 온라인 체크리스트.pdf",

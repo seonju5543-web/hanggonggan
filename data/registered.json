@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -26490,6 +26490,362 @@
     "raw": "3. 지원사항: 한국장학재단 및 대학에서 학생에게 근로장학금(시간당 12,800원) 지급"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-oarticleno160764nocat501",
+   "name": "[국제언어교육원] 2026년 겨울 학기 유학생활도우미 봉사장학생 모집",
+   "boardTitle": "[국제언어교육원] 2026년 겨울 학기 유학생활도우미 봉사장학생 모집",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-12-14",
+   "deadlineFrom": "게시판 요약 · ~12.14",
+   "period": "접수 ~2026-12-14",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-26",
+   "attachments": [
+    {
+     "name": "본문이미지-720x1701.jpg",
+     "url": "https://www.hongik.ac.kr/cms/plugin/editorImage.do?%24cms%24EwBmDYHoEZsgrA1gJwM4BkDKAbVAxTAJQGMBDQgYQGltCAJAUQDcB3bCgCwC8A6eABwCmAcyA%20",
+     "bodyImage": true
+    }
+   ],
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160764&noCat=501",
+   "sourceKind": "auto",
+   "excerpts": [
+    "2027년 1학기 1차 국가근로장학금 학생 신청기간 안내"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "announceDate": "2026-12-18",
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "eligibilityLines": [
+    "01.신청자격",
+    "1.본교 학부 재학생(대학원생.휴학생. 학기 초과자는 신청 불가)",
+    "※학기 초과자 중 등록금 전액 남부자는 신청 가능"
+   ]
+  },
+  {
+   "id": "auto-ent2431273181artclviewdo",
+   "name": "[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
+   "boardTitle": "[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-12-02",
+   "deadlineFrom": "공고 원문 · - 방문제출 : 학생회관 108 호 학생지원 . 장학팀 3. 신청기간 : 2026. 11. 26( 목 ) ~ 2026. 12. 2( 수 ) 15:00 ※ 선발 완료시 마감",
+   "period": "접수 ~2026-12-02",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-26",
+   "attachments": [
+    {
+     "name": "(서식)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153947/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/273181/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-11-26",
+   "eligibilityLines": [
+    "1. 신청대상 : 2026 학년도 2 학기 국가근로장학금을 신청 하였으며 , 국가근로장학금 장학생 기본요건 ( 소득구간 9 구간 이하 등 ) 을 충족하는 글로벌캠퍼스 재학생",
+    "4. 선발기준 : 소득구간 , 성적 등 고려"
+   ],
+   "excerpts": [
+    "3. 신청기간 : 2026. 11. 26( 목 ) ~ 2026. 12. 2( 수 ) 15:00 ※ 선발 완료시 마감",
+    "7. 문의처 : 031-330-4034( 학생지원 ."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-jong659274854artclviewdo",
+   "name": "[교내]☆★2026학년도 2학기 학생복지처 특별장학금 신청 안내(~12/7)",
+   "boardTitle": "[교내]☆★2026학년도 2학기 학생복지처 특별장학금 신청 안내(~12/7)",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-12-07",
+   "deadlineFrom": "게시판 요약 · ~12/7",
+   "period": "접수 ~2026-12-07",
+   "summary": "고려대학교 세종캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교 세종캠퍼스"
+   },
+   "documents": [
+    "&emsp;1) (필수) 학생복지처 특별장학금 학업계획서",
+    "&emsp;&emsp;- 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서, 가족관계증명서",
+    "&emsp;&emsp;- 가계파산자 본인 및 자녀: 폐업사실증명서",
+    "가족관계증명서"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-26",
+   "attachments": [
+    {
+     "name": "2026년 2학기 학생복지처 특별장학금 학업계획서.hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184795/download.do"
+    }
+   ],
+   "sourceUrl": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274854/artclView.do",
+   "sourceKind": "auto",
+   "applyPortal": "KUPID",
+   "applyPortalSource": "가. 고려대학교 포털(KUPID, http://portal.korea.ac.kr ) 로그인 → 등록/장학 → 장학금(일반) → 장학금신청 메뉴에서 \"학생복지처 특별장학금\" 신청",
+   "applyPortalFrom": "공고 원문",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "다. 선발심사 이전에 국가장학금 I유형을 신청 하고, 소득분위 산정결과가 있어야 함 (국가장학금 수혜 여부와는 무관함)",
+    "&emsp;&emsp;- 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서, 가족관계증명서"
+   ],
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "&emsp;&emsp;※ 산불 등 재난재해로 재난재해극복장학금을 이미 수혜한 경우, 동일 피해 사실로 중복 수혜 불가."
+   },
+   "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-8bnum57138cate0qidx57138-0bjhkqt",
+   "name": "[미래융합대학] 2026학년도 2학기 국가 근로장학생 모집(교체 선발)",
+   "boardTitle": "[미래융합대학] 2026학년도 2학기 국가 근로장학생 모집(교체 선발)",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "시급 10,320원",
+   "amountValue": 0,
+   "deadline": "2026-11-27",
+   "deadlineFrom": "공고 원문 · 4. 근로기간: 2026. 12. 18. ~ 2027. 2. 12. 5. 신청기간: 2026. 11. 27.(금) 09:00 ~ 18:00",
+   "period": "접수 ~2026-11-27",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "국가근로장학생 지원서 [붙임1]",
+    "성적증명서 1부"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-26",
+   "attachments": [
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/38060CD67CC14E0BBAFF76DBED5063C4.pdf"
+    },
+    {
+     "name": "(붙임1) 국가근로장학생 지원서.hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=C32E6EFDD8BD4FD6B86EAEAA94083529_.hwp&ogrfname=%28%EB%B6%99%EC%9E%841%29+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D+%EC%A7%80%EC%9B%90%EC%84%9C.hwp"
+    },
+    {
+     "name": "(붙임2) 근로가능 시간표 서식_이름.xlsx",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=090198EA5A304DCAA1DD2E89E55504FE_.xlsx&ogrfname=%28%EB%B6%99%EC%9E%842%29+%EA%B7%BC%EB%A1%9C%EA%B0%80%EB%8A%A5+%EC%8B%9C%EA%B0%84%ED%91%9C+%EC%84%9C%EC%8B%9D_%EC%9D%B4%EB%A6%84.xlsx"
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=898178&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "2. 자격요건",
+    "가. 본교 재학생",
+    "※ 수업연한 초과자 및 학사학위취득유예자 포함, 휴학생 지원 불가",
+    "나. 직전 학기 성적 70점 이상 취득자",
+    "다. 2026학년도 2학기 학자금 지원구간 9구간 이하인 자"
+   ],
+   "excerpts": [
+    "5. 신청기간: 2026. 11. 27.(금) 09:00 ~ 18:00",
+    "다. 제출처: 미래융합대학 근로 담당자 이메일(jhcho746@seoultech.ac.kr)",
+    "10. 문의: 미래융합대학 행정실(☏02-970-9194)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "나. 시급: 10,320원"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-zc3cnavcodeknu1619416593-0226qa1",
+   "name": "2026학년도 동계방학 중 교내 근로장학생 신청 및 선발 안내",
+   "boardTitle": "2026학년도 동계방학 중 교내 근로장학생 신청 및 선발 안내",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-12-01",
+   "deadlineFrom": "공고 원문 · 2026학년도 동계방학 교내 근로장학생 선발을 다음과 같이 안내하오니 근로를 희망하는 학생은 통합정보시스템(knuin.knu.ac.kr)에서 신청하시기 바랍니다. 1. 신청기간: 2026. 11 . 26.(목) 9시 ~ 12 . 1.(화) 18시",
+   "period": "접수 ~2026-12-01",
+   "summary": "경북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경북대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-26",
+   "attachments": [
+    {
+     "name": "통합정보시스템 교내근로장학생 학생 신청 및 근로 합격 확인 방법.hwp",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzgmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    }
+   ],
+   "sourceUrl": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNzgmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "sourceKind": "auto",
+   "openDate": "2026-11-26",
+   "eligibilityLines": [
+    "3. 신청대상: 2026. 2학기 학부 재학생"
+   ],
+   "eligibilityExcludes": [
+    "- 수업연한 초과자, 휴학생, 학사학위취득유예자",
+    "- 국가근로장학, 다문화탈북학생멘토링 장학, 대학생 청소년 교육지원 장학(대청교) 등 학교 내 근로장학 중복 선발자",
+    "※ 동일기관 연속 3회 근무 불가(예시: 학생과에서 2026. 하계방학, 2026. 2학기 모두 근무했다면, 2026. 동계방학에는 다른 기관에서 근무 가능)",
+    "5. 1인당 근무시간 및 장학금액: 80시간 이내, 856,000원 이내(10,700원/시간당) ※ 2027년도 최저시급 10,700원 반영"
+   ],
+   "excerpts": [
+    "1. 신청기간: 2026. 11 . 26.(목) 9시 ~ 12 . 1.(화) 18시",
+    "3. 신청대상: 2026. 2학기 학부 재학생",
+    "5. 1인당 근무시간 및 장학금액: 80시간 이내, 856,000원 이내(10,700원/시간당) ※ 2027년도 최저시급 10,700원 반영"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-spxboardid5cate8key71122",
+   "name": "[장학안내] [한국농수산식품유통공사] 「aT 꿈씨앗 장학금」 장학생 선발 ...",
+   "boardTitle": "[장학안내] [한국농수산식품유통공사] 「aT 꿈씨앗 장학금」 장학생 선발 ...",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「한국농수산식품유통공사」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "전남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "전남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-26",
+   "attachments": [],
+   "sourceUrl": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71122&cate=8",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-enoticedoarticleno770709",
+   "name": "「TGL 장학금」 제1기 외국인 유학생 장학생 선발 안내",
+   "boardTitle": "「TGL 장학금」 제1기 외국인 유학생 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "상명대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "상명대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-26",
+   "attachments": [
+    {
+     "name": "「TGL_장학금」_모집_포스터_(국문).pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770709&attachNo=564503"
+    },
+    {
+     "name": "「TGL_장학금」_모집_포스터_(영문).pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770709&attachNo=564504"
+    },
+    {
+     "name": "「TGL_장학금」_추천서_양식.docx",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770709&attachNo=564505"
+    }
+   ],
+   "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770709&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
   }
  ]
 }
