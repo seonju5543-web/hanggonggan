@@ -35,13 +35,16 @@ export const DESC_MAX = 120;      // 카드 두 줄 남짓
 const DESC_MIN = 24;              // 이보다 짧으면 본문이라 믿기 어렵다
 export const DESC_RULE = 3;       // 규칙 판 — 장부(collector/news-desc.json)의 v 와 다르면 그 글을 다시 연다 (3: 2026-11-23 이동 단추 둘레·본문 밖 글자 — 머리말 ④⑤)
 
-const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', middot: '·', hellip: '…', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', ndash: '–', mdash: '—' };
+/* 앱(app.js ENTITIES)이 아는 이름은 다 안다 — 관문이 대조한다(test-collector 「앱이 아는 이름 기호를 …도 다 푼다」 · 2026-11-26 리뷰 6차: 이 표만 대조에서 빠져 있었다) */
+const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', middot: '·', hellip: '…', lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”', ndash: '–', mdash: '—', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', times: '×', egrave: 'è', emsp: ' ', ensp: ' ' };
+const entOwn = (k) => Object.prototype.hasOwnProperty.call(ENT, k);
 function decode(s) {
   return String(s || '')
     .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
     .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
-    .replace(/&([a-z]+);/gi, (m, k) => (k.toLowerCase() in ENT ? ENT[k.toLowerCase()] : m));
+    .replace(/&([a-z]+);/gi, (m, k) => (entOwn(k) ? ENT[k] : entOwn(k.toLowerCase()) ? ENT[k.toLowerCase()] : m));   // 정확한 이름 먼저(&rArr; ⇒ · &rarr; →)
 }
+export const decodeNewsEntities = decode;   // 관문이 앱 ENTITIES 와 대조한다
 
 /* 게시판 화면의 껍데기 줄 — 본문이 아니다.
    FIELD: 본문 문장을 시작하지 않는 이름표 — 뒤에 값이 같은 줄에 붙어도(「작성자 IC-PBL교수학습센터 …」) 줄째 뺀다.

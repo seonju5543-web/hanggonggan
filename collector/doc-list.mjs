@@ -89,7 +89,8 @@ const isDocLike = (c) => {
 function cleanDoc(line) {
   /* 띄어쓰기 다듬기 — 원문 글자는 그대로, 빈칸만: 「1 부」→「1부」 · 「( 첨부양식 )」→「(첨부양식)」 (HWP·PDF 에서 뽑은 글자는 낱자 사이가 벌어진다 ·
      2026-11-18 docs-fill 을 이 규칙으로 합치자 74건이 「성적증명서 1 부」로 나빠졌다 — 옛 사본 tidyDoc 이 하던 것을 이 한 곳으로) */
-  return decodeEntities(String(line || '')).replace(BULLET, '').replace(/\s+/g, ' ').replace(/[,;、]\s*$/, '')
+  /* 🔴 기호를 푼 **뒤에** 앞뒤 빈칸을 깎고 글머리를 뗀다 — 「&emsp;1) …」 은 풀면 앞이 빈칸이라 글머리 지우개가 그 빈칸만 먹고 「1)」 이 남았다(2026-11-26 리뷰 6차 · 고려대 세종 저장 원문) */
+  return decodeEntities(String(line || '')).trim().replace(BULLET, '').replace(/\s+/g, ' ').replace(/[,;、]\s*$/, '')
     .replace(/(\d)\s+(부|매|통|장|부씩)(?=\s|$|[(\[,.·])/g, '$1$2').replace(/([(\[【〔<〈])\s+/g, '$1').replace(/\s+([)\]】〕>〉])/g, '$1').trim();
 }
 /* 절 머리 자체·표 머리(「구 비 서 류」)·너무 짧은 조각(OCR 「서재다」)·파일 이름 안내는 서류가 아니다 */

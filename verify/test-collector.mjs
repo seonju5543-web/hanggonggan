@@ -4017,17 +4017,26 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     const { HINT_ENT } = await import('../collector/deadline-hint.mjs');
     eq('    앱이 아는 이름 기호를 로봇도 다 푼다', appNames.filter((k) => !(k in HINT_ENT)), []);
     /* 리뷰 5차(M2·M3) — 로봇의 다른 두 풀이(제목·본문 clean-title decodeEntities · 발췌 extract-excerpts)와 엔진(match-engine decodeEntities)은 앱 표와 대조하는 관문이 없었다 —
-       &emsp; 가 새 본문에 남아 그 뒤 목록 번호를 못 뗐고(「&emsp;1) (필수) …」), 엔진 표에는 앱이 아는 이름 일곱이 빠져 있었다 · 엔진은 대소문자를 접어 &rArr; 를 → 로 풀었다 */
+       &emsp; 가 새 본문에 남아 그 뒤 목록 번호를 못 뗐고(「&emsp;1) (필수) …」), 엔진 표에는 앱이 아는 이름 일곱이 빠져 있어 &rArr;·&rarr; 가 아예 안 풀렸다 */
     const { decodeEntities: ctDecode } = await import('../collector/clean-title.mjs');
     const { decodeExcerptEntities } = await import('../collector/extract-excerpts.mjs');
     const ME = createRequire(import.meta.url)('../match-engine.js');   // 이 절 범위에는 엔진이 없다 — 여기서 싣는다
-    /* 「푼다」 = 기호 글자(&이름;)가 남지 않는다 — 제목 풀이는 둥근 따옴표를 곧은 따옴표로 일부러 바꾼다(2026-10-27 · 글자가 앱과 꼭 같을 필요는 없다) */
+    /* 「푼다」 = 기호 글자(&이름;)가 남지 않는다 — 제목 풀이는 둥근 따옴표를 곧은 따옴표로 일부러 바꾼다(2026-10-27 · 글자가 앱과 꼭 같을 필요는 없다).
+       교내 소식 설명 풀이(news-desc)도 같이 잰다(리뷰 6차 — 표가 하나 더 있었다) */
+    const { decodeNewsEntities } = await import('../collector/news-desc.mjs');
     const undecoded = (fn) => (typeof fn === 'function' ? appNames.filter((k) => fn(`가&${k};나`).includes(`&${k};`)) : ['(풀이 함수 없음)']);
-    eq('    앱이 아는 이름 기호를 로봇의 제목·본문 풀이(clean-title) · 발췌 풀이(extract-excerpts) · 엔진(decodeEntities)도 다 푼다 · 엔진은 대소문자를 가린다(&rArr; ⇒ · &rarr; →)',
-      [undecoded(ctDecode), undecoded(decodeExcerptEntities), undecoded(ME.decodeEntities), ME.decodeEntities('&rArr;&rarr;')], [[], [], [], '⇒→']);
-    const { extractDocuments: exDocs } = await import('../collector/extract-excerpts.mjs');
-    eq('    &emsp; 로 들여 쓴 서류 목록도 번호를 떼고 읽는다(고려대 세종 학생복지처 특별장학금 꼴 — 예전엔 「&emsp;1) (필수) …」 그대로)',
-      exDocs('3. 제출서류\n&emsp;1) (필수) 학생복지처 특별장학금 학업계획서\n&emsp;2) (해당자) 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서\n4. 문의: 학생복지처'),
+    eq('    앱이 아는 이름 기호를 로봇의 제목·본문 풀이(clean-title) · 발췌 풀이(extract-excerpts) · 소식 설명 풀이(news-desc) · 엔진(decodeEntities)도 다 푼다',
+      [undecoded(ctDecode), undecoded(decodeExcerptEntities), undecoded(decodeNewsEntities), undecoded(ME.decodeEntities)], [[], [], [], []]);
+    /* 🔴 대소문자를 접어 찾으면 이름을 더하는 순간 &rArr;(⇒)가 &rarr;(→)로 풀린다 — 접수 기간 한 줄 풀이(deadline-hint)는 실제로 그랬다(리뷰 6차) · 풀이마다 정확한 이름을 먼저 찾는다 */
+    const caseOf = (fn) => (typeof fn === 'function' ? fn('&rArr;&rarr;') : '(풀이 함수 없음)');
+    eq('    풀이마다 대소문자를 가린다(&rArr; ⇒ · &rarr; →) — 엔진 · 제목·본문 · 발췌 · 소식 설명 · 접수 기간 한 줄',
+      [caseOf(ME.decodeEntities), caseOf(ctDecode), caseOf(decodeExcerptEntities), caseOf(decodeNewsEntities), H('접수기간: 2026. 9. 1. ~ 9. 30. 포털 &rArr; 신청')],
+      ['⇒→', '⇒→', '⇒→', '⇒→', '접수기간: 2026. 9. 1. ~ 9. 30. 포털 ⇒ 신청']);
+    /* 🔴 학생이 보는 서류 목록을 만드는 함수(doc-list readDocuments — 발췌 로봇·docs-fill·활동 발췌가 쓴다)로 잰다. 리뷰 5차 수리는 아무도 안 쓰는 옛 사본(extractDocuments)을 쟀고,
+       진짜 함수는 줄 앞뒤 빈칸을 **기호를 풀기 전에** 깎아 「&emsp;1) …」 이 「1) …」 로 남았다(저장된 원문엔 &emsp; 가 날것으로 남아 있다 · 고려대 세종 학생복지처 특별장학금 · 리뷰 6차) */
+    const { readDocuments } = await import('../collector/doc-list.mjs');
+    eq('    &emsp; 로 들여 쓴 서류 목록도 번호를 떼고 읽는다(학생이 보는 서류 목록 함수 readDocuments)',
+      readDocuments('3. 제출서류\n&emsp;1) (필수) 학생복지처 특별장학금 학업계획서\n&emsp;2) (해당자) 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서\n4. 문의: 학생복지처').docs,
       ['(필수) 학생복지처 특별장학금 학업계획서', '(해당자) 가계실업자 본인 및 자녀: 고용보험수급자격인정명세서']);
     eq('    &middot;·&#183; 은 글자로 풀고 자른다', [H('신청기간: 2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00 제출처 장학팀 방문 접수 및 이메일 접&middot; 다음 문장').endsWith('접· 다음 문'), H('접수기간: 2026. 9. 1. ~ 9. 30. 가&#183;나 제출')], [true, '접수기간: 2026. 9. 1. ~ 9. 30. 가·나 제출']);
   }
@@ -14061,9 +14070,13 @@ console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)')
       hits({ ...base, type: '교외' }, { noticeKind })[0].level, 'warn');
     eq('  교내면 조용하다', hits({ ...base, type: '교내' }, { noticeKind }).length, 0);
     /* 리뷰 5차(M4) — 제목의 「교내」 표식 때문인데도 경고가 OWN_PROGRAMS 만 가리켜, 읽는 사람이 표에 없는 이름을 찾았다(조선대 「교내 외국어 JUMP」 · 다음 수집의 원문 판정이 고친다) */
-    const markMsg = ((hits({ ...base, type: '교외', name: '2026-2학기 교내 외국어 JUMP 장학생 선발 공고', eligibility: { schoolOnly: '조선대학교' } }, { noticeKind })[0]) || {}).msg || '';
-    eq('  경고가 까닭 둘(제목의 「교내」 표식 · 학교 제도 이름 OWN_PROGRAMS)을 다 말하고, 다음 수집의 원문 판정이 고친다는 것도 말한다',
-      [/제목의 「교내」 표식/.test(markMsg), /OWN_PROGRAMS/.test(markMsg), /kind-classify/.test(markMsg)], [true, true, true]);
+    const jump = { ...base, type: '교외', name: '2026-2학기 교내 외국어 JUMP 장학생 선발 공고', eligibility: { schoolOnly: '조선대학교' } };
+    const msgOf = (it) => ((hits(it, { noticeKind })[0]) || {}).msg || '';
+    const markMsg = msgOf({ ...jump, auto: true });
+    /* 리뷰 6차 — 원문 판정 로봇은 사람이 등록한 공고·관리자가 정한 구분은 건너뛴다(kind-classify) → 그런 공고에는 「다음 수집이 고친다」 를 말하지 않는다(기다려도 안 고쳐진다) */
+    eq('  경고가 까닭 둘(제목의 「교내」 표식 · 학교 제도 이름 OWN_PROGRAMS)을 다 말하고, 로봇이 등록한 공고에만 「다음 수집의 원문 판정이 고친다」 를 말한다(사람 등록·관리자 구분은 아니다)',
+      [/제목의 「교내」 표식/.test(markMsg), /OWN_PROGRAMS/.test(markMsg), /kind-classify/.test(markMsg), /kind-classify/.test(msgOf(jump)), /kind-classify/.test(msgOf({ ...jump, auto: true, kindFrom: '관리자 2026-11-20' }))],
+      [true, true, true, false, false]);
     eq('  이름이 70자에서 잘려도 게시판 원제목으로 잡는다',
       hits({ ...base, type: '교외', name: '공통 [공통] 2026학년도 2학기', boardTitle: base.name }, { noticeKind }).length, 1);
     eq('  이어붙인 자리를 넘어 오탐하지 않는다',

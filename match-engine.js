@@ -1716,7 +1716,7 @@ const ENTITY_MAP = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' '
 function decodeEntities(s) {
   return String(s || '').replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, k) => {
     if (k[0] === '#') { const n = /^#x/i.test(k) ? parseInt(k.slice(2), 16) : parseInt(k.slice(1), 10); return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : m; }
-    const key = Object.prototype.hasOwnProperty.call(ENTITY_MAP, k) ? k : k.toLowerCase();   // 🔴 대소문자를 먼저 가린다 — &rArr;(⇒) 와 &rarr;(→) 는 다른 글자다(접으면 ⇒ 가 → 로 풀렸다)
+    const key = Object.prototype.hasOwnProperty.call(ENTITY_MAP, k) ? k : k.toLowerCase();   // 🔴 대소문자를 먼저 가린다 — &rArr;(⇒) 와 &rarr;(→) 는 다른 글자다(접어 찾으면 이름을 더하는 순간 ⇒ 가 → 로 풀린다 · 접수 기간 한 줄 풀이 deadline-hint 가 실제로 그랬다 · 엔진엔 예전에 두 이름이 다 없어 아예 안 풀렸다)
     return Object.prototype.hasOwnProperty.call(ENTITY_MAP, key) ? ENTITY_MAP[key] : m;
   });
 }
