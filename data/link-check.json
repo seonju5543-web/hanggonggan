@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-26T18:36:32.283Z",
+ "updatedAt": "2026-11-26T19:36:38.191Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -74,13 +74,17 @@
    "v": "other",
    "at": "2026-11-24"
   },
+  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53731&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+   "v": "other",
+   "at": "2026-11-27"
+  },
   "https://www.mafra.go.kr/home/5109/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGaG9tZSUyRjc5MiUyRjU3OTMwMCUyRmFydGNsVmlldy5kbyUzRg%3D%3D": {
    "v": "other",
    "at": "2026-11-25"
   },
   "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
    "v": "other",
-   "at": "2026-11-25"
+   "at": "2026-11-27"
   },
   "https://www.sogang.ac.kr/ko/detail/551490?bbsConfigFk=141&namepage=ScholarshipNotice": {
    "v": "other",
@@ -92,7 +96,7 @@
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
-   "at": "2026-11-25"
+   "at": "2026-11-27"
   },
   "https://www.yonsei.ac.kr/bbs/sc/58/944486/artclView.do": {
    "v": "other",
