@@ -129,7 +129,7 @@
  },
  "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713": {
   "ok": false,
-  "checkedAt": "2026-11-12"
+  "checkedAt": "2026-11-26"
  },
  "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&cate=8": {
   "ok": false,
@@ -197,7 +197,7 @@
  },
  "https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8": {
   "ok": false,
-  "checkedAt": "2026-10-30"
+  "checkedAt": "2026-11-26"
  },
  "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&": {
   "ok": false,
@@ -306,7 +306,7 @@
  },
  "https://youth.gyeongnam.go.kr/": {
   "ok": false,
-  "checkedAt": "2026-11-12"
+  "checkedAt": "2026-11-26"
  },
  "http://www.ghjanghak.kr/": {
   "ok": false,
@@ -322,7 +322,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-25"
+  "checkedAt": "2026-11-26"
  },
  "https://www.ikef.or.kr/page.php?id=%2Fkj%2Fscholar_schedule": {
   "ok": true,
@@ -330,7 +330,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-25"
+  "checkedAt": "2026-11-26"
  },
  "https://foundation.miraeasset.com/ko/news/notice/list.do": {
   "ok": false,
@@ -358,7 +358,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-25"
+  "checkedAt": "2026-11-26"
  },
  "https://paan.or.kr/": {
   "ok": false,
@@ -390,11 +390,11 @@
  },
  "https://asanmirae.or.kr:449/main/": {
   "ok": false,
-  "checkedAt": "2026-11-12"
+  "checkedAt": "2026-11-26"
  },
  "https://www.yonkang.org/kr": {
   "ok": false,
-  "checkedAt": "2026-11-12"
+  "checkedAt": "2026-11-26"
  },
  "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
   "ok": true,
@@ -402,7 +402,7 @@
    "kind": "page",
    "param": "pageIndex"
   },
-  "checkedAt": "2026-11-25"
+  "checkedAt": "2026-11-26"
  },
  "https://www.iljufoundation.org/homepage/index.do": {
   "ok": false,
@@ -470,7 +470,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-25"
+  "checkedAt": "2026-11-26"
  },
  "https://www.sookmyung.ac.kr/kr/news/event.do": {
   "ok": false,
@@ -486,7 +486,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-25"
+  "checkedAt": "2026-11-26"
  },
  "https://www.seoultech.ac.kr/service/board/rec": {
   "ok": true,
@@ -494,7 +494,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-25"
+  "checkedAt": "2026-11-26"
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice05.do": {
   "ok": false,
@@ -510,7 +510,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-25"
+  "checkedAt": "2026-11-26"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice_outside.do": {
   "ok": false,

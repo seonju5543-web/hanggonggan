@@ -184,6 +184,79 @@
      "why": "모집 정보·지원 자격·지원 방법을 담은 장학생 모집 포스터로, 학생이 채우는 서식이 없습니다."
     }
    ]
+  },
+  "auto-8bnum57138cate0qidx57138-0bjhkqt": {
+   "at": "2026-11-26",
+   "docs": [
+    {
+     "file": "form-1n554h-2.hwp",
+     "attach": "(붙임1) 국가근로장학생 지원서.hwp",
+     "hash": "8103ff43c4f0d45a",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 직접 작성해 제출하는 국가근로장학생 지원서 서식(하단 추천서 칸 포함)만 들어 있는 파일입니다."
+    }
+   ]
+  },
+  "auto-ent2431273181artclviewdo": {
+   "at": "2026-11-26",
+   "docs": [
+    {
+     "file": "form-yu94q5-1.hwp",
+     "attach": "(서식)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+     "hash": "26ef732582080dcd",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 소속·성명·지원부서·지원동기 등을 직접 채워 내는 지원서 서식만 들어 있습니다."
+    }
+   ]
+  },
+  "auto-jong659274854artclviewdo": {
+   "at": "2026-11-26",
+   "docs": [
+    {
+     "file": "form-1gicjt-1.hwp",
+     "attach": "2026년 2학기 학생복지처 특별장학금 학업계획서.hwp",
+     "hash": "0eb37de01e81b00c",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 인적 사항과 학업 계획을 직접 작성해 제출하는 학업계획서 서식만 들어 있습니다."
+    }
+   ]
+  },
+  "auto-enoticedoarticleno770709": {
+   "at": "2026-11-26",
+   "docs": [
+    {
+     "file": "form-tqldc7-3.docx",
+     "attach": "「TGL_장학금」_추천서_양식.docx",
+     "hash": "e8d70fd5de1f509d",
+     "role": "content",
+     "formStart": "",
+     "why": "추천인이 직접 작성·서명하는 추천서 양식으로, 학생이 채우는 서식이 아니다."
+    },
+    {
+     "file": "elig-tqldc7-1.pdf",
+     "attach": null,
+     "hash": "00a4b9117883fb2c",
+     "role": "content",
+     "formStart": "",
+     "why": "지원 자격·우대 사항·장학금액·접수 방법·제출 서류·모집기간이 담긴 공고 포스터이다."
+    }
+   ]
+  },
+  "auto-oarticleno160764nocat501": {
+   "at": "2026-11-26",
+   "docs": [
+    {
+     "file": "elig-qlp1z6-1.jpg",
+     "attach": null,
+     "hash": "4afdb226dede85c9",
+     "role": "content",
+     "formStart": "",
+     "why": "유학생활도우미 봉사장학생 모집 자격·신청 방법·일정을 안내하는 포스터 공고문입니다."
+    }
+   ]
   }
  }
 }

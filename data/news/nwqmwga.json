@@ -3,6 +3,37 @@
  "updatedAt": "2026-11-26",
  "items": [
   {
+   "title": "[채용공고] 2026년 제7회 국제협력과 기간제 계약직 직원 공개채용시험 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71126",
+   "postedAt": "2026-11-26",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "[학사안내] [SMART영농창업특성화사업단] 교직원 대상 배추 나눔 행사",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71125",
+   "postedAt": "2026-11-26",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/ee8aeb0429636117.webp"
+  },
+  {
+   "title": "[취업정보] [동원금속(Dongwon Autopart Technology ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71124",
+   "postedAt": "2026-11-26",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/8e3e41dc174bb27f.webp"
+  },
+  {
    "title": "[학사안내] 북문 주변 정비공사 착공 및 차량 통제 협조 요청",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71123",
    "postedAt": "2026-11-26",
@@ -364,35 +395,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-11-20"
-  },
-  {
-   "title": "[채용공고] 2026년 제3회 전남대학교 패키지 지원대학 사업 전문/사무 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71055",
-   "postedAt": "2026-11-20",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-20"
-  },
-  {
-   "title": "[취업정보] [★일정변경] 2026년 글로컬대학사업 「(직무부트캠프) 현직...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71054",
-   "postedAt": "2026-11-20",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-20"
-  },
-  {
-   "title": "[채용공고] 2026년 제12회 전남대학교 앵커사업단 직원 채용 공고",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71053",
-   "postedAt": "2026-11-19",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-19"
   }
  ]
 }

@@ -736,6 +736,218 @@
    ],
    "pdfs": [],
    "problems": []
+  },
+  "auto-8bnum57138cate0qidx57138-0bjhkqt": {
+   "name": "[미래융합대학] 2026학년도 2학기 국가 근로장학생 모집(교체 선발)",
+   "hash": "13e8fc4f10a8d16f",
+   "at": "2026-11-26",
+   "readAt": "2026-11-26",
+   "cardHash": "b13fca8166079c04",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-1n554h-2.hwp",
+     "attach": "(붙임1) 국가근로장학생 지원서.hwp",
+     "hash": "8103ff43c4f0d45a",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 직접 작성해 제출하는 국가근로장학생 지원서 서식(하단 지도교수 추천서 칸 포함)만 들어 있고 읽는 공고문은 없습니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-ent2431273181artclviewdo": {
+   "name": "[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
+   "hash": "e2c00a1469f76311",
+   "at": "2026-11-26",
+   "readAt": "2026-11-26",
+   "cardHash": "b1ebd0c162a494c1",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-yu94q5-1.hwp",
+     "attach": "(서식)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+     "hash": "26ef732582080dcd",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 소속·성명·학번·지원부서·지원동기 등을 직접 채워 내는 지원서 서식만 들어 있습니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-oarticleno160764nocat501": {
+   "name": "[국제언어교육원] 2026년 겨울 학기 유학생활도우미 봉사장학생 모집",
+   "hash": "9b9df684ed2c42af",
+   "at": "2026-11-26",
+   "readAt": "2026-11-26",
+   "cardHash": "6c0aaee66a916f6c",
+   "summary": "외국어 급수 줄에서 원문에 없는 「점수」 표기를 빼고, 서로 떨어진 원문을 합쳤던 활동기간·OT 줄을 원문 근거별로 나누었습니다. 나머지는 원문과 일치해 그대로 두었습니다.",
+   "changes": [
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "add",
+     "text": "학기 초과자 중 등록금을 전액 납부한 학생(신청 가능)"
+    },
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "remove",
+     "text": "학기 초과자 중 등록금 전액 납부자는 신청 가능"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "외국어 능력을 기재하는 경우 본인 실력을 공인된 급수로 명확히 기재해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "활동 기간은 12월 24일(목)~1월 24일(일) 약 4주입니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "활동 기간 동안 5회 이상 만나 한국생활 및 한국어 학습 등을 돕습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "OT는 12월 23일(수) 오후 6시 Google Meet로 진행됩니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "OT에 불참하면 자동 탈락됩니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "외국어 능력을 기재하는 경우 공인된 급수(점수)를 명확히 기재해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "활동 기간은 12월 24일(목)~1월 24일(일) 약 4주이며, 기간 중 5회 이상 만나야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "12월 23일(수) 오후 6시 Google Meet로 진행되는 OT에 불참하면 자동 탈락됩니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "elig-qlp1z6-1.jpg",
+     "attach": null,
+     "hash": "4afdb226dede85c9",
+     "role": "content",
+     "formStart": "",
+     "why": "유학생활도우미 봉사장학생 모집 자격·신청 방법·일정을 안내하는 포스터 공고문으로 학생이 채우는 서식이 없습니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-jong659274854artclviewdo": {
+   "name": "[교내]☆★2026학년도 2학기 학생복지처 특별장학금 신청 안내(~12/7)",
+   "hash": "cc4fc59176cdfbe0",
+   "at": "2026-11-26",
+   "readAt": "2026-11-26",
+   "cardHash": "3e83ec8fd928b40b",
+   "summary": "마감시간 관련 유의사항을 원문 근거에 맞게 두 줄로 나눈 것 외에는 고친 것 없음.",
+   "changes": [
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "마감시간 내에 신청서 작성 및 제출을 완료해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "마감 이후 제출 시 오류로 접수되지 않을 수 있으니 시간을 엄수해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "마감시간 내에 신청서 작성 및 제출을 완료해야 하며, 마감 이후 제출 시 오류로 접수되지 않을 수 있으니 시간을 엄수해야 합니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "form-1gicjt-1.hwp",
+     "attach": "2026년 2학기 학생복지처 특별장학금 학업계획서.hwp",
+     "hash": "0eb37de01e81b00c",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 인적 사항과 학업 계획을 직접 작성해 제출하는 학업계획서 서식만 들어 있습니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-enoticedoarticleno770709": {
+   "name": "「TGL 장학금」 제1기 외국인 유학생 장학생 선발 안내",
+   "hash": "20c379f6e711a6a7",
+   "at": "2026-11-26",
+   "readAt": "2026-11-26",
+   "cardHash": "e757513b01f97a8e",
+   "summary": "기존 카드 내용은 원문과 일치하여 그대로 두었고, 추천서 양식에 적힌 '추천인이 직접 작성·서명' 안내를 유의사항에 추가했습니다.",
+   "changes": [
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "추천서는 추천인이 직접 작성하고 서명해야 합니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "form-tqldc7-3.docx",
+     "attach": "「TGL_장학금」_추천서_양식.docx",
+     "hash": "e8d70fd5de1f509d",
+     "role": "content",
+     "formStart": "",
+     "why": "추천인이 직접 작성·서명하는 추천서 양식으로, 학생이 채워 내는 서식이 아니다."
+    },
+    {
+     "file": "elig-tqldc7-1.pdf",
+     "attach": null,
+     "hash": "00a4b9117883fb2c",
+     "role": "content",
+     "formStart": "",
+     "why": "지원 자격·우대 사항·장학금액·접수 방법·제출 서류·모집기간이 담긴 공고 포스터이다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-spxboardid5cate8key71122": {
+   "name": "[장학안내] [한국농수산식품유통공사] 「aT 꿈씨앗 장학금」 장학생 선발 ...",
+   "hash": "f419bc0a4f21ad72",
+   "at": "2026-11-26",
+   "readAt": "2026-11-26",
+   "cardHash": "2ab74797db557eeb",
+   "summary": "선발 결과 공고라 신청 관련 칸은 비워 두는 것이 맞으며, 기존 유의사항 한 줄에 원문 근거만 붙였습니다. 고친 내용은 없습니다.",
+   "changes": [],
+   "roles": [],
+   "pdfs": [],
+   "problems": []
   }
  },
  "updatedAt": "2026-11-26"

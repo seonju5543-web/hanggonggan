@@ -2275,7 +2275,7 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">서류 작성</h3>
-        <p class="sheet-provider">${esc(sch.name)}${/* 「고른 답으로 초안 문장을 엮습니다」는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>
+        <p class="sheet-provider">${esc(cardTitleParts(sch).title)}${/* 「고른 답으로 초안 문장을 엮습니다」는 2026-11-21 개발자 지시로 지움(학생이 읽지 않는 안내) */ ''}</p>
         ${docPrep.defs.map((def, di) => `
           <div class="dp-block">
             <h4>${esc(def.doc)}</h4>
@@ -2313,7 +2313,7 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">작성 내용 확인</h3>
-        <p class="sheet-provider">${esc(sch.name)} · 내용을 직접 수정할 수 있습니다</p>
+        <p class="sheet-provider">${esc(cardTitleParts(sch).title)} · 내용을 직접 수정할 수 있습니다</p>
         ${docPrep.texts.map((t, i) => `
           <div class="dp-block">
             <h4>${esc(t.doc)}</h4>

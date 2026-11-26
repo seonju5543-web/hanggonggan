@@ -23,14 +23,6 @@
   "at": "2026-11-14",
   "tries": 1
  },
- "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/790?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-22",
-  "tries": 2
- },
  "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11441": {
   "at": "2026-11-23",
   "tries": 2
@@ -300,6 +292,10 @@
   "tries": 1
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542487": {
+  "at": "2026-11-26",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17596&commonMenuNo=180_35": {
   "at": "2026-11-26",
   "tries": 1
  }
