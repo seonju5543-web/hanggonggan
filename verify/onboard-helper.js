@@ -90,7 +90,7 @@ async function dismissNotify(page) {
   const later = await page.$('#btn-nf-later');
   if (later) await later.click().catch(() => {});
   else await page.keyboard.press('Escape').catch(() => {});
-  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
+  await page.waitForSelector('#notify-sheet[hidden]', { state: 'attached', timeout: 4000 }).catch(() => {});
 }
 
 /* 🔴 **글꼴이 안 실린 환경에서는 '폭' 검사를 믿지 말 것** (2026-09-13 · 내가 직접 밟은 함정).

@@ -145,6 +145,7 @@ auth.users (Supabase 가 관리)
 앱이 받는 것은 `data/act-read.json` 하나(글 id → AI 가 쓴 카드 · `gateHeld` 는 사람에게 넘긴 글 · 스위치가 꺼져 있으면 빈 채).
 나머지는 로봇 기록장이다 — 원문 글자(collector 의 act-text 폴더 · 글마다 한 파일 · 뽑은 글자만), 사람 몫과 검토 기록(`collector/act-read-review.json` · `collector/act-final-review.json`), 관리자가 「확인했어요」를 누른 기록(`collector/act-read-done.json`), 돈을 쓴 응답의 장부와 첨부 구분(로봇이 처음 쓸 때 생긴다).
 장학금 쪽 파일과 이름만 다르고 꼴은 같다 — 짝은 `collector/act-card.mjs` `ACT_FILES` 한 곳에 적혀 있다.
+
 🔴 폰은 `notices.json` 을 **통째로** 받는다 — 학교가 40곳쯤 넘으면 학교별 파일로 나눈다(미리 하지 말 것).
 
 ## 5. 같은 것을 가리키는 열쇠

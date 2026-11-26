@@ -35,7 +35,7 @@ function loadActivities() {
   ])
     .then(([d, ar]) => {
       tidyData(d); tidyData(ar);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
-      if (d && Array.isArray(d.items)) d.items = typeof publishedActivities === 'function' ? publishedActivities(d.items, ar) : d.items.filter((n) => !n.paidGate || n.paidOpen);
+      if (d && Array.isArray(d.items)) d.items = typeof publishedActivities === 'function' ? publishedActivities(d.items, ar, undefined, SAYS_UNKNOWN) : d.items.filter((n) => !n.paidGate || n.paidOpen);
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
       refreshActivitySnaps();
       fillInterestFields();   // 온보딩 관심 분야 칸 — 목록이 이제 왔다(고른 것은 지킨다)
@@ -344,6 +344,25 @@ function activityLinkHtml(n) {
   return href ? `<a class="btn btn-primary btn-lg" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : '';
 }
 
+/* 활동 시트 「공고 안내」에 넘기는 줄 — 시트(openActivityDetail)와 verify/what-shows.mjs 가 이 함수 하나를 쓴다(최종 리뷰 2026-11-26 · 도구가 시트와 다른 줄을 말하지 않게).
+   차례: 긴 혜택(40자 넘음 — 짧으면 제목 아래 큰 글씨) → 제목에서 뗀 괄호 대상 → 발췌(혜택·모집기간은 다른 자리 · 자격 줄이 있으면 대상도) → 원문 안내(위 칸에 이미 나온 문장은 뺀다) */
+function activitySheetNotices(n) {
+  const benefit = unent(activityBenefit(n));
+  /* 「대상」 발췌는 자격 줄이 있으면 위 「지원 자격」이 이미 보여 준다 — 같은 A·B·C 조건이 「모집 안내」에 한 번 더 떴다(쇼미더임팩트 · 2026-10-16 개발자 지적) */
+  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && x.label !== '모집기간' && !(x.label === '대상' && (n.eligibilityLines || []).length));   // 모집기간은 「접수 · 기간」 줄이 말한다(승인 시안 2026-11-02)
+  const parts = splitTitleWho(activityTitle(n));
+  /* 제목에서 뗀 괄호 대상 — 카드에 대상 줄이 없어(2026-11-15) 여기가 그 글자가 남는 유일한 자리다. 자격 줄이 이미 같은 말을 하면 한 번만 */
+  const titleWho = parts.who.filter((w) => !(n.eligibilityLines || []).some((l) => String(l).replace(/\s/g, '').includes(w.replace(/\s/g, ''))));
+  /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
+  const seenText = [...(n.excerpts || []).map((x) => noticeFlat(x.text)), ...(n.eligibilityLines || []).map(noticeFlat)].filter((x) => x.length >= 6);
+  const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => noticeFlat(l).includes(e)));
+  return [
+    ...(benefit && benefit.length > 40 ? [`혜택: ${benefit}`] : []),
+    ...(titleWho.length ? [`대상: ${titleWho.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
+    ...rows.map((x) => `${x.label}: ${unent(x.text)}`),
+    ...notice,
+  ];
+}
 function openActivityDetail(url) {
   if (typeof trackUse === 'function') trackUse('detail', url);   // 이용 횟수 — 주소는 보내지 않고 지문으로(usage-report.js)
   { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = url; }
@@ -352,17 +371,10 @@ function openActivityDetail(url) {
   const { sch, result, fit, fd } = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
   const benefit = unent(activityBenefit(n));
-  /* 「대상」 발췌는 자격 줄이 있으면 위 「지원 자격」이 이미 보여 준다 — 같은 A·B·C 조건이 「모집 안내」에 한 번 더 떴다(쇼미더임팩트 · 2026-10-16 개발자 지적) */
-  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && x.label !== '모집기간' && !(x.label === '대상' && (n.eligibilityLines || []).length));   // 모집기간은 「접수 · 기간」 줄이 말한다(승인 시안 2026-11-02)
   const parts = splitTitleWho(activityTitle(n));
-  /* 제목에서 뗀 괄호 대상 — 카드에 대상 줄이 없어(2026-11-15) 여기가 그 글자가 남는 유일한 자리다. 자격 줄이 이미 같은 말을 하면 한 번만 */
-  const titleWho = parts.who.filter((w) => !(n.eligibilityLines || []).some((l) => String(l).replace(/\s/g, '').includes(w.replace(/\s/g, ''))));
   /* 「접수 · 기간」 — 발췌 모집기간(없으면 기간 토막 deadlineHint)을 그대로 넘긴다 · 날짜만 있는 글은 applySectionHtml 이 마감으로 말한다(리뷰 2026-11-02 · 9건이 「원문 확인」으로 떴다) */
   const recruit = ((n.excerpts || []).find((x) => x.label === '모집기간') || {}).text || (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintText(n.deadlineHint) : '');
   if (recruit) sch.period = unent(recruit);
-  /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
-  const seenText = [...(n.excerpts || []).map((x) => noticeFlat(x.text)), ...(n.eligibilityLines || []).map(noticeFlat)].filter((x) => x.length >= 6);
-  const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => noticeFlat(l).includes(e)));
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
@@ -373,12 +385,7 @@ function openActivityDetail(url) {
       ${sheetHeadHtml({ x: n, d, save: saveBtnHtml(`act:${n.url}`) })}
       <h3 class="sheet-title">${esc(parts.title)}</h3>
       ${benefit && benefit.length <= 40 ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
-      ${sheetSectionsHtml({ sch, result, fit, fd, activity: n, noticeLines: [
-        ...(benefit && benefit.length > 40 ? [`혜택: ${benefit}`] : []),
-        ...(titleWho.length ? [`대상: ${titleWho.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
-        ...rows.map((x) => `${x.label}: ${unent(x.text)}`),
-        ...notice,
-      ] })}
+      ${sheetSectionsHtml({ sch, result, fit, fd, activity: n, noticeLines: activitySheetNotices(n) })}
       ${activityLinkHtml(n)}
     </div>`;
   openSheetShell();

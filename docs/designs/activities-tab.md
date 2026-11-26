@@ -139,6 +139,7 @@
 - **학생 화면**: `match-engine.js` `publishedActivities`(숨김 거르기 + `withActRead` 로 카드 얹기) — 승인 시안 `docs/designs/mockups/paid-gate-activities/` 그대로(안내 줄을 이름표로 묶는다). `node verify/what-shows.mjs` 가 같은 함수로 말한다.
 - **관리자 「할 일」**: 넘어온 숨김 글을 올리거나(`activityGate` — `paidOpen` 을 더한다) 숨긴다(`activityHide`) · 둘째 AI 가 넘긴 문제는 「확인했어요」(`activityReviewDone`).
 - **스위치 셋**: 설정 파일의 `enabled` · 그 안 `activities.enabled` · 워크플로의 환경 변수. 상한도 `activities` 칸의 값(장학금과 따로 센다). 🔴 켜는 것은 개발자가 채팅에서 지시할 때만.
+- **최종 리뷰에서 고친 것(11-26)**: 중복 정리는 앱과 같은 「보이는가」(`paidOpen` · `paidGateOpen`)로 보이던 글을 가린다(표시는 한 번 달면 안 지워진다) · 본문이 빈 글은 하루 한 번만 다시 받는다(`tried`) · 요강 페이지 지문은 글자가 아니라 그 자리 · 무료 본문이 비고 브라우저가 아직이면 본문도 기다린다(`bodyPending`) · 묶기 전에 '모름'류 낱말 줄을 뺀다(`dropRe` — 앱의 `SAYS_UNKNOWN`) · 시트 「공고 안내」 줄은 `activitySheetNotices` 한 곳(what-shows 가 같은 함수를 부른다).
 - **시험**: `act-paid-probe.yml` — 사람이 눌러야만 돌고(예약·push 없음), 적어 준 글 id 만 읽고, **저장하지 않는다**(결과는 내려받는 묶음). 작업 폴더 안에서만 활동 스위치를 켠다.
 - **같이 고친 첨부 수리 셋**: 다시 읽을 때 사이트 메뉴 링크를 첨부로 붙이지 않는다(`mergeActAttachments`) · 이름 꼬리(`(71KB)`·`미리보기`)를 뗀다(`trimSiteTail`) · 남은 다시 읽기 수를 리포트에(`actRereadLeft`). 이 셋의 검사는 「대외활동·공모전 — 제출 서류 · 신청서 원본 PDF」 절과 「공고문 첨부에서 자격 읽기」 절에 있다.
 - 관문: `verify/test-collector.mjs` 「대외활동 유료 관문」 ⓪~⑦ · 드라이버 `verify/verify-activities.js` ⑧ 절 · `verify/verify-admin.js`.

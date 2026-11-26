@@ -642,7 +642,7 @@ acts.items.forEach(sanitizeDocs);   // 서류 칸의 사이트 맨 아래 줄·�
 acts.items.forEach(sanitizeForeign);   // 칸 안에 딸려 온 다른 글 제목 걷기(activity-excerpts.mjs otherPostTitle · 2026-11-17) · 소급
 acts.items.forEach((n) => deadlineFromNotice(n, todayIsoAct));   // 마감이 빈 글은 원문 기간 줄·제목 「(~11/23)」에서 마감을 읽는다 · 결과 발표가 지난 글은 닫힌다 — 끝난 모집이 '진행 중'으로 뜨지 않게(2026-11-17) · 소급
 acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
-acts.items = dedupeActivities(acts.items, dedupeNotices);   // 같은 글은 하나로 — 이미 실려 있던 글과 합쳐진 새 글은 숨김 표시를 뗀다(한 번 보인 글을 숨기지 않는다 · act-card.mjs)
+acts.items = dedupeActivities(acts.items, dedupeNotices, (n) => !!n && (!!n.paidOpen || paidGateOpen(n, ACT_READ, todayIsoAct)));   // 같은 글은 하나로 — 학생에게 보이던 글(앱과 같은 판정)과 합쳐진 새 글은 숨김 표시를 뗀다(한 번 보인 글을 숨기지 않는다 · act-card.mjs)
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
 acts.items = capActivities(acts.items, ACT_CAP, (n) => !!n.paidOpen || paidGateOpen(n, ACT_READ, todayIsoAct));   // 🔴 상한은 학생에게 보이는 글만 센다 — 숨김 글이 보이던 글을 밀어내지 않게 ·   // 상한은 살아 있는 날(actKeepDate)로 고르고 순서는 foundAt 그대로 — 오래 열린 API 글이 잘렸다 '새 글'로 돌아오지 않게(점검 api-11)

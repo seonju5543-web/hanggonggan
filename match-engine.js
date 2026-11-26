@@ -2544,8 +2544,10 @@ function publishedList(list, doc, today, fixes) {
      마감 → deadline   · 접수 방법 → 카드 그대로(cardRead.apply — 시트 「접수」의 방법 줄)   · 서류 → documents   · 안내 줄 → noticeLines
    🔴 안내 줄은 **같은 이름표끼리 한 줄로 묶는다**(「일정: a · b · c」) — 「공고 안내」는 여덟 줄까지만 보여 준다(app-sheet noticeSummaryRows). AI 가 쓴 줄을 그대로 넣으면 뒤쪽 줄이 잘린다.
       글자는 그대로 두고 잇기만 한다 · 한 줄이 170자를 넘으면 같은 이름표로 줄을 나눈다(그 함수가 180자에서 자른다).
+   🔴 dropRe — 시트가 통째로 빼는 '모름'류 낱말(app.js SAYS_UNKNOWN 을 앱·what-shows 가 넘긴다). 묶기 **전에** 줄마다 거른다 — 묶은 뒤에 빼면 한 줄의 낱말이 같은 이름표의
+      다른 사실까지 데려가 지원을 막는 유의사항이 사라진다(최종 리뷰 2026-11-26). 넘기지 않으면(Node 의 다른 쓰임) 거르지 않는다
    ⚠️ 원본 글 객체를 고치지 않는다(새 객체) · 제목·주최는 얹지 않는다 · 제목의 괄호 대상을 자격 줄에 더하는 규칙(app-activities activityAsSch)은 그대로다 */
-function withActRead(n, cr) {
+function withActRead(n, cr, dropRe) {
   const arr = (x) => (Array.isArray(x) ? x.filter((l) => typeof l === 'string' && l.trim()) : null);
   const out = Object.assign({}, n, { cardRead: cr });
   const E = arr(cr.eligibility), X = arr(cr.excludes), Pr = arr(cr.priority), D = arr(cr.documents), Am = arr(cr.amount), N = arr(cr.notes);
@@ -2566,8 +2568,9 @@ function withActRead(n, cr) {
       if (label && i != null && (rows[i].body + ' · ' + body).length <= 170) { rows[i].body += ' · ' + body; return; }
       rows.push({ label, body }); if (label) at.set(label, rows.length - 1);
     };
-    for (const x of (Am || []).slice(1)) put('혜택', x);
-    for (const l of [...(N || []), ...contact]) {
+    const keep = (l) => !(dropRe instanceof RegExp && dropRe.test(String(l)));
+    for (const x of (Am || []).slice(1).filter(keep)) put('혜택', x);
+    for (const l of [...(N || []), ...contact].filter(keep)) {
       const m = String(l).match(/^([가-힣A-Za-z0-9\s·]{1,14}?)\s*[:：](?!\d|\/\/)\s*(.+)$/);   // 이름표: 내용(「1:1 매칭」·주소의 콜론은 이름표가 아니다)
       if (m) put(m[1].trim(), m[2].trim()); else put('', String(l).trim());
     }
@@ -2578,13 +2581,13 @@ function withActRead(n, cr) {
 /* 활동 목록을 거르고(보이는가 — 장학금과 같은 paidGateOpen 하나 · 관리자가 올린 글 paidOpen 은 늘 보인다) AI 카드를 얹는다.
    🔴 결과 파일을 못 받으면(doc null) 숨김 표시가 달린 글만 안 보이고 나머지는 그대로다 · 그 목록을 보는 곳은 전부 이 함수로(앱 loadActivities · verify/what-shows.mjs).
    🔴 한 글의 값이 깨져 얹다가 넘어져도 그 글만 무료 값으로 낸다 — 탭이 통째로 비지 않는다 */
-function publishedActivities(list, doc, today) {
+function publishedActivities(list, doc, today, dropRe) {
   const t = today || kstToday();
   const items = doc && typeof doc === 'object' && doc.items && typeof doc.items === 'object' ? doc.items : null;
   return (list || []).filter((n) => !!(n && n.paidOpen) || paidGateOpen(n, doc, t)).map((n) => {
     const cr = n && n.id && items ? items[n.id] : null;
     if (!cr || typeof cr !== 'object') return n;
-    try { return withActRead(n, cr); } catch (e) { return n; }
+    try { return withActRead(n, cr, dropRe); } catch (e) { return n; }
   });
 }
 

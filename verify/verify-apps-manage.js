@@ -72,7 +72,7 @@ const eq = (label, got, want) => {
   const later = await page.$('#btn-nf-later');
   if (later) await later.click().catch(() => {});
   else await page.keyboard.press('Escape');
-  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
+  await page.waitForSelector('#notify-sheet[hidden]', { state: 'attached', timeout: 4000 }).catch(() => {});
   await page.waitForTimeout(300);
 
   await page.click('.nav-item[data-nav="applications"]');

@@ -437,7 +437,9 @@ export function storeFromFiles(n, files, names = {}, { key = keyOf(n.url), dir =
     const ocr = !guide && !!isOcr(p);
     const fromImg = /\di\.\w+$/.test(f);
     if ((guide || (fromImg && ocr)) && !owns(text)) continue;    // 남의 글 막기
-    const hash = guide ? `T-${sha16(text)}` : hashOf(p);
+    /* 따라간 요강 페이지의 지문은 **그 자리**(글 주소 · 몇째 링크) — 글자로 매기면 방문자 수만 바뀌어도 새 덩어리가 붙어 원문 지문이 바뀌고 같은 글을 다시 산다(최종 리뷰 2026-11-26).
+       같은 자리는 처음 받은 글자 그대로(act-text writeStore) · 첨부는 원본 바이트 지문 그대로 */
+    const hash = guide ? `T-${sha16(`${n.url}#${f.replace(/^.*-(L\d*)\.txt$/, '$1')}`)}` : hashOf(p);
     if (!hash) continue;
     docs.push({ name: guide ? '' : String(names[f] || ''), hash, from: guide ? 'guide' : fromImg ? 'img' : 'attach', ocr, text });
   }
