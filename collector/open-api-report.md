@@ -1,6 +1,6 @@
 ## 🛰 공공 API 로봇 리포트 (2026-11-26)
 
-- ✅ **K-Startup 사업공고** — 받은 행 125 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 102 · 상한 15건 초과 8
+- ✅ **K-Startup 사업공고** — 받은 행 132 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 109 · 상한 15건 초과 8
   - 자격 줄 있는 글 15/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `aply_excl_trgt_ctnt, aply_mthd_eml_rcpt_istc, aply_mthd_etc_istc, aply_mthd_fax_rcpt_istc, aply_mthd_onli_rcpt_istc, aply_mthd_pssr_rcpt_istc, aply_mthd_vst_rcpt_istc, aply_trgt, aply_trgt_ctnt, biz_aply_url, biz_enyy, biz_gdnc_url, biz_pbanc_nm, biz_prch_dprt_nm, biz_trgt_age, detl_pg_url, eval_method, intg_pbanc_biz_nm, intg_pbanc_yn, pbanc_ctnt, pbanc_ntrp_nm, pbanc_rcpt_bgng_dt, pbanc_rcpt_end_dt, pbanc_sn, prch_cnpl_no, prfn_matr, rcrt_prgs_yn, sprv_inst, support_ctnt, supt_biz_clsfc, supt_regin`
   - 대외활동 · 2026 여성벤처활성화사업 「여성벤처&스타트업 혁신성장 포럼」참여자 모집 (~2026-11-26) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179775
@@ -22,10 +22,10 @@
     - 179806 · <2026년 제조공정 마스터 클래스> 프로그램 참여자  → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179806 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179806(2)
     - 179834 · 2027년 상반기「IBK창공(創工) UNIST캠프」모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179834 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179834(2)
     - 179814 · 2027년 상반기 「IBK창공(創工) 서울대캠프」 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179814 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179814(2)
-- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 431 · 상한 15건 초과 50 · 마감 지남 2 · 같은 글 2
+- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 421 · 상한 15건 초과 62 · 같은 글 2
   - 자격 줄 있는 글 11/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
-  - 코드 칸 값(첫 세 행): gugunCd=3780000|4010000|3940000 · sidoCd=6410000|6410000|6410000
+  - 코드 칸 값(첫 세 행): gugunCd=4090000|4060000|3860000 · sidoCd=6410000|6410000|6410000
   - 대외활동 · [사당어르신종합복지관] - 대학생동행서포터즈 모집 및 진행 (~2026-11-26) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524636
   - 대외활동 · 양천공원 책쉼터 서가정리 자원봉사활동(대학생, 11월 매주 금,토,일, 공휴일 제외) (~2026-11-26) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3539116
   - 대외활동 · (대학생만) (09:00~ 12:00 화~일요일) 2026년 12월 연수꿈담도서관 자원봉사 모집 (~2026-11-26) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3548182
@@ -56,7 +56,7 @@
     - 10889 · 국무조정실 - 청년미래콘서트_취·창업편 그룹 멘토링 신 → https://www.youthcenter.go.kr/bbs03View/48/10889 · 살핀 칸: 주소 칸 없음
     - 10885 · (주)데이톤 - 프로젝트 기반 UXUI 디자인 실전 캠 → https://www.youthcenter.go.kr/bbs03View/48/10885 · 살핀 칸: 주소 칸 없음
     - 10865 · HD현대삼호- [K-뉴딜 아카데미] HD현대 선박건조  → https://www.youthcenter.go.kr/bbs03View/48/10865 · 살핀 칸: 주소 칸 없음
-- ✅ **온통청년 청년정책** — 받은 행 3997 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 3741 · 마감 지남 99 · 상한 15건 초과 89 · 원문 주소 없음 39 · 같은 글 12 · 같은 기관 홈페이지(원문 주소 없음) 2
+- ✅ **온통청년 청년정책** — 받은 행 3994 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 3738 · 마감 지남 99 · 상한 15건 초과 89 · 원문 주소 없음 39 · 같은 글 12 · 같은 기관 홈페이지(원문 주소 없음) 2
   - 자격 줄 있는 글 12/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `plcyNo, bscPlanCycl, bscPlanPlcyWayNo, bscPlanFcsAsmtNo, bscPlanAsmtNo, pvsnInstGroupCd, plcyPvsnMthdCd, plcyAprvSttsCd, plcyNm, plcyKywdNm, plcyExplnCn, lclsfNm, mclsfNm, plcySprtCn, sprvsnInstCd, sprvsnInstCdNm, sprvsnInstPicNm, operInstCd, operInstCdNm, operInstPicNm, sprtSclLmtYn, aplyPrdSeCd, bizPrdSeCd, bizPrdBgngYmd, bizPrdEndYmd, bizPrdEtcCn, plcyAplyMthdCn, srngMthdCn, aplyUrlAddr, sbmsnDcmntCn, etcMttrCn, refUrlAddr1, refUrlAddr2, sprtSclCnt, sprtArvlSeqYn, sprtTrgtMinAge, sprtTrgtMaxAge, sprtTrgtAgeLmtYn, mrgSttsCd, earnCndSeCd, earnMinAmt, earnMaxAmt, earnEtcCn, addAplyQlfcCndCn, ptcpPrpTrgtCn, inqCnt, rgtrInstCd, rgtrInstCdNm, rgtrUpInstCd, rgtrUpInstCdNm, rgtrHghrkInstCd, rgtrHghrkInstCdNm, zipCd, plcyMajorCd, jobCd, schoolCd, aplyYmd, frstRegDt, lastMdfcnDt, sbizCd`
   - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054002|0054002|0054002 · plcyPvsnMthdCd=0042001|0042001|0042006 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=3450188|3450188|4590116 · operInstCd=3450188|C015295|4590116 · aplyPrdSeCd=0057001|0057001|0057001 · bizPrdSeCd=0056001|0056001|0056001 · mrgSttsCd=0055003|0055003|0055003 · earnCndSeCd=0043001|0043001|0043003 · rgtrInstCd=3450188|3450188|6441553 · rgtrUpInstCd=3450000|3450000|6441552 · rgtrHghrkInstCd=6270000|6270000|6440000 · zipCd=27230|27230|44790 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013010|0013010|0013010 · schoolCd=0049010|0049010|0049010 · sbizCd=0014010|0014010|0014010
