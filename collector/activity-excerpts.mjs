@@ -541,10 +541,12 @@ export function putActivityDocuments(it, docs, from, { thin = false } = {}) {
 }
 /* 이 글을 다시 읽어야 하나 — 수집 로봇의 소급 반복문과 리포트의 「남은」 수가 같은 판단을 쓴다.
    'details' = 자격까지 다시(옛 판) · 'docs' = 서류 칸만 · null = 안 읽는다. API 글은 API 로봇이 채운다(자격이 없는 글만 원문 페이지 — 2026-10-16). */
-/* 다시 읽은 페이지가 이만큼 그 글이 아니었으면 그만 연다(리뷰 3차 M6) — 스크립트로 그리는 글·다른 글로 바뀐 주소는 이레마다 다시 열어도 같았다(마감까지 영영) */
+/* 다시 읽은 페이지가 이만큼 그 글이 아니었으면 그만 연다(리뷰 3차 M6) — 스크립트로 그리는 글·다른 글로 바뀐 주소는 이레마다 다시 열어도 같았다(마감까지 영영).
+   🔴 센 때의 자격 규칙 판(rereadMissV)이 지금 판과 같을 때만 — 판이 올라가면 다시 연다(소급에서 빠지지 않게 · 리뷰 4차 M6) · 그만 연 글은 리포트가 센다(actRereadLeft gaveUp) */
 export const REREAD_MISS_MAX = 2;
+const rereadGaveUp = (it) => (it.rereadMiss || 0) >= REREAD_MISS_MAX && it.rereadMissV === ACT_DETAILS_V;
 export function actRereadNeed(it, today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10)) {
-  if ((it.rereadMiss || 0) >= REREAD_MISS_MAX) return null;
+  if (rereadGaveUp(it)) return null;
   if (it.api && (it.eligibilityLines || []).length) return null;
   if (!(it.excerptsAt && it.detailsV === ACT_DETAILS_V)) return 'details';
   /* 자격을 첨부·요강·브라우저에서 읽은 글은 본문이 껍데기다 — 서류도 그 로봇(activity-docs staleDocs)이 같은 글자에서 읽는다(리뷰 2026-11-15 #7) */
@@ -572,8 +574,8 @@ export function mergeActAttachments(it, found) {
 /** 다시 읽을 글이 얼마나 남았나 — 리포트의 「남은」 수. 마감·발췌·서류를 채울 글(fill)과 첨부만 다시 살필 글(attach)을 따로 센다:
     첨부만 살핀 글을 「마감·발췌를 채웠다」고 적으면 며칠 동안 리포트의 숫자가 사실과 다르다(리뷰 2026-11-25). 판단은 actRereadNeed 한 곳 */
 export function actRereadLeft(items, today) {
-  const left = { fill: 0, attach: 0 };
-  for (const it of items || []) { const need = it ? actRereadNeed(it, today) : null; if (need) left[need === 'attach' ? 'attach' : 'fill'] += 1; }
+  const left = { fill: 0, attach: 0, gaveUp: 0 };   // gaveUp — 다시 읽은 페이지가 두 번 그 글이 아니라 그만 연 글(소리 없이 빠지지 않게 · 리뷰 4차 M6)
+  for (const it of items || []) { if (it && rereadGaveUp(it)) { left.gaveUp += 1; continue; } const need = it ? actRereadNeed(it, today) : null; if (need) left[need === 'attach' ? 'attach' : 'fill'] += 1; }
   return left;
 }
 

@@ -1406,8 +1406,9 @@ const SERVED_SCHOOLS = ['경희대학교', '한국외국어대학교', '서울�
    그래서 **넓히되 `외` 가 붙는 꼴만 뺀다.** ⚠️ `교내 및 교외 …` 처럼 사이에 낱말이 있으면
    교내로 본다 — 둘 다인 공고이고, 게시판이 앞세운 말이 교내다.
    2026-11-26 — `교내/교외`·`교내·교외`·`교내 / 교외` 도 둘 다라는 뜻이라 뺀다(한국외대 글로벌캠퍼스 「… 국가근로 장학생 모집 안내(교내/교외)」 가 교내 칸에 떴다 — verify-explore-sort 가 잡았다).
-   리뷰 3차(M1) — 쉼표로 늘어놓은 `(교내, 교외)` 도 둘 다다(가천대 「일반(교내, 교외) 국가근로장학생」). `/`·`,` 는 **`교외` 앞에서만** 둘 다로 읽는다 — `교내/외국인 …` 은 교내 그대로 */
-const NOTICE_CAMPUS_MARK = /교내(?![·•‧・\s]*외|[·•‧・\s\/,]*교외)/;
+   리뷰 3차(M1) — 쉼표로 늘어놓은 `(교내, 교외)` 도 둘 다다(가천대 「일반(교내, 교외) 국가근로장학생」). 쉼표는 **`교외` 앞에서만** 둘 다로 읽는다.
+   리뷰 4차(M2) — `외` 뒤에 `국` 이 오면 `외국어·외국인` 이라는 딴 낱말이라 교내 그대로(조선대 「교내 외국어 JUMP 장학생」이 교외로 보였다) · `교내/외`·`교내 / 외부` 는 둘 다 · 한글 가운뎃점 `ㆍ`(U+318D)도 구분 기호 */
+const NOTICE_CAMPUS_MARK = /교내(?![·•‧・ㆍ\s\/]*외(?!국)|[·•‧・ㆍ\s\/,]*교외)/;
 
 /* 🔴 **학교가 스스로 운영하는 장학 제도 이름** (2026-09-20 개발자 지시 —
    *"그 셋이 대체 왜 교외에 있었는지 모르겠으며 교내로 바꾸고 재발하지 않도록 해줘"*).
@@ -2554,7 +2555,8 @@ function publishedList(list, doc, today, fixes) {
    ⚠️ 원본 글 객체를 고치지 않는다(새 객체) · 제목·주최는 얹지 않는다 · 제목의 괄호 대상을 자격 줄에 더하는 규칙(app-activities activityAsSch)은 그대로다 */
 function withActRead(n, cr, opts) {
   const o = opts && typeof opts === 'object' ? opts : {};
-  const dropRe = o.dropRe instanceof RegExp ? o.dropRe : null;
+  /* 🔴 `instanceof RegExp` 로 묻지 않는다 — what-shows 는 앱 코드를 칸막이(vm) 안에서 돌려 그 안에서 만든 정규식을 넘기는데, 칸막이가 다르면 답이 '아니오'라 도구에서만 거르기가 꺼졌다(리뷰 4차 I1) */
+  const dropRe = o.dropRe && typeof o.dropRe.test === 'function' ? o.dropRe : null;
   const flat = typeof o.flat === 'function' ? o.flat : null;
   const labelOf = typeof o.label === 'function' ? o.label : (x) => x;
   const arr = (x) => (Array.isArray(x) ? x.filter((l) => typeof l === 'string' && l.trim()) : null);
@@ -2579,7 +2581,14 @@ function withActRead(n, cr, opts) {
       rows.push({ label, body }); if (key) at.set(key, rows.length - 1);
     };
     const seen = flat ? [...(out.eligibilityLines || []), ...out.excerpts.map((x) => x.text)].map((x) => flat(x)).filter((x) => x.length >= 6) : [];   // 시트의 옛 거름과 같은 대상 · 같은 길이 바닥
-    const keep = (l) => !(dropRe && dropRe.test(String(l))) && !seen.some((e) => flat(l).includes(e));
+    /* 되풀이뿐인 줄만 뺀다 — 겹친 글자를 빼고도 이름표 뒤에 남는 말이 20자 이상이면 다른 조건이 함께 있는 줄이라 남긴다(리뷰 4차 M5 · 「…응모할 수 있으며, 미성년자는 보호자 동의서를 함께 내야 합니다」 가 통째로 빠졌다) */
+    const repeatsOnly = (l) => {
+      if (!seen.some((e) => flat(l).includes(e))) return false;
+      let rest = flat(String(l).replace(/^[가-힣A-Za-z0-9\s·()]{1,16}?\s*[:：](?!\d|\/\/)\s*/, ''));
+      for (const e of seen) rest = rest.split(e).join('');
+      return rest.length < 20;
+    };
+    const keep = (l) => !(dropRe && dropRe.test(String(l))) && !repeatsOnly(l);
     for (const x of (Am || []).slice(1).filter(keep)) put('혜택', x);
     for (const l of [...(N || []), ...contact].filter(keep)) {
       /* 이름표: 내용 — 이름표가 글자뿐이면 콜론 뒤가 숫자여도 이름표다(「일정:12.5.」) · 숫자가 든 이름표 자리(「09:00」·「1:1 매칭」)와 주소의 콜론은 아니다(최종 리뷰 2026-11-26) */

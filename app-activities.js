@@ -35,7 +35,7 @@ function loadActivities() {
   ])
     .then(([d, ar]) => {
       tidyData(d); tidyData(ar);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
-      if (d && Array.isArray(d.items)) d.items = typeof publishedActivities === 'function' ? publishedActivities(d.items, ar, undefined, { dropRe: SAYS_UNKNOWN, flat: noticeFlat, label: nsLabel }) : d.items.filter((n) => !n.paidGate || n.paidOpen);
+      if (d && Array.isArray(d.items)) d.items = typeof publishedActivities === 'function' ? publishedActivities(d.items, ar, undefined, { dropRe: SAYS_UNKNOWN, flat: noticeFlat, label: typeof nsLabel === 'function' ? nsLabel : undefined }) : d.items.filter((n) => !n.paidGate || n.paidOpen);
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
       refreshActivitySnaps();
       fillInterestFields();   // 온보딩 관심 분야 칸 — 목록이 이제 왔다(고른 것은 지킨다)

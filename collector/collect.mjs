@@ -673,8 +673,8 @@ for (const it of acts.items) {
   if (it.detailsTriedAt && (Date.parse(todayIso) - Date.parse(it.detailsTriedAt)) < 7 * 86400000) continue;
   if (!budget.hasRoom(20000)) break;
   const detail = await fetchDetail(it);
-  if (detail.text && !rereadIsThisPost(detail.text, it.title)) { it.detailsTriedAt = todayIso; it.rereadMiss = (it.rereadMiss || 0) + 1; actBackfilled += 1; continue; }   // 다시 읽은 페이지가 그 글이 아니다(주소가 다른 글·목록으로 바뀜) — 남의 첨부·서류를 안 붙이고 이레 뒤에 다시 · 두 번이면 그만(actRereadNeed REREAD_MISS_MAX)
-  if (detail.text && it.rereadMiss) delete it.rereadMiss;   // 그 글이 맞았다 — 센 것을 지운다
+  if (detail.text && !rereadIsThisPost(detail.text, it.title)) { it.detailsTriedAt = todayIso; it.rereadMiss = it.rereadMissV === ACT_DETAILS_V ? (it.rereadMiss || 0) + 1 : 1; it.rereadMissV = ACT_DETAILS_V; actBackfilled += 1; continue; }   // 다시 읽은 페이지가 그 글이 아니다(주소가 다른 글·목록으로 바뀜) — 남의 첨부·서류를 안 붙이고 이레 뒤에 다시 · 같은 자격 규칙 판에서 두 번이면 그만(actRereadNeed REREAD_MISS_MAX · 판이 바뀌면 처음부터 센다)
+  if (detail.text && it.rereadMiss) { delete it.rereadMiss; delete it.rereadMissV; }   // 그 글이 맞았다 — 센 것을 지운다
   if (need === 'docs') {
     /* 서류 칸만 — 자격·발췌·마감은 그대로 둔다(같은 판으로 이미 읽었다). 못 받으면 이레 뒤에 다시 · 받은 김에 새 첨부도 합친다(안 합치면 다음 실행에 첨부 갈래로 한 번 더 받는다 · 2026-11-26) */
     if (detail.text) { putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) }); actAttachAdded += mergeActAttachments(it, detail.attachments); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
@@ -855,6 +855,7 @@ lines.push(`### 🎯 대외활동·공모전 새 글 ${freshActs.length}건 → 
 const left = actRereadLeft(acts.items);
 if (actBackfilled - actAttachBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled - actAttachBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (그중 서류 칸만 ${actDocsBackfilled}건 · 남은 ${left.fill}건은 다음 실행에)`);
 if (actAttachBackfilled) lines.push(`- 📎 열려 있는 글 ${actAttachBackfilled}건의 첨부를 다시 살폈습니다 (새로 찾은 파일 ${actAttachAdded}개 · 남은 ${left.attach}건은 다음 실행에)`);
+if (left.gaveUp) lines.push(`- ⏹ 다시 읽은 페이지가 두 번 그 글이 아니라 그만 연 글 ${left.gaveUp}건 — 자격 규칙 판(ACT_DETAILS_V)이 바뀌면 다시 연다(스크립트로 그리는 글·다른 글로 바뀐 주소)`);
 for (const r of actResults) {
   lines.push(`- **${r.name}** — ${r.status}`);
   for (const i of r.items) lines.push(`  - [${i.kind}] [${i.title}](${i.url})${i.deadlineHint ? ` — ⏰ ${i.deadlineHint}` : ''}`);

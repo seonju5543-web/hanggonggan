@@ -347,10 +347,11 @@ export function unborrowNames(atts) {
   const list = atts || [];
   const count = new Map();
   for (const a of list) if (a && a.name) count.set(a.name, (count.get(a.name) || 0) + 1);
+  const oneSpace = (s) => String(s).replace(/\s+/g, ' ').trim();   // 🔴 주인 줄의 원래 이름이 띄어쓰기만 다르면 주인이다 — 바꾸면 그 이름이 목록에서 사라져 PDF 사본 줄(이름으로 짝짓는다)이 떨어졌다(리뷰 4차 M4)
   return list.map((a) => {
     if (!a || !a.name || count.get(a.name) < 2) return a;
     const real = originalNameOf(a.url);
-    return real && real !== a.name ? { ...a, name: real } : a;
+    return real && oneSpace(real) !== oneSpace(a.name) ? { ...a, name: real } : a;
   });
 }
 
