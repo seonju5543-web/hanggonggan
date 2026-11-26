@@ -91,7 +91,7 @@ const isSubHead = (c) => {
 const isDocLike = (c, full = c, inlineHead = false) => {   // full — 80자 넘어 괄호 앞에서 자른 줄의 원래 글자(소제목 판정은 괄호까지 보고 한다 · 리뷰 9차) · inlineHead — 「제출서류: …」 머리줄에 붙은 글자(리뷰 16차)
   const firstWord = DOC_WORD.test(c) || DOC_WORD_FIRST.test(c) || DOC_WORD_FIRST.test(c.split(NOTE_SPLIT)[0].trim()) || MEDIA_DOC.test(c);
   /* 초본·기록부·증빙 낱말로만 들어오는 줄 — 머리줄에 붙은 요약(「제출서류: 증빙자료 일체(아래 표 참조)」 — 아래 진짜 목록을 가렸다)과 「… 시 …」 설명(「주민등록초본 발급 시 …」·「증빙 미제출 시 …」)은 아니다(리뷰 16차) */
-  if (!firstWord && !(DOC_WORD_EXTRA.test(c) && !inlineHead && !/\s시\s/.test(dropBracketed(c)))) return false;   // 공모전 제출물(작품·영상·PPT)도 서류다 · 가름표 앞이 영수증·등록증 이름이어도(「… 납입영수증 - 전액 납부자에 한함」·붙여 쓴 「…: …」·「… | …」 · 리뷰 14·15차) · 초본·기록부·증빙(리뷰 15차)
+  if (!firstWord && !(DOC_WORD_EXTRA.test(c) && !inlineHead && (!/\s시\s/.test(dropBracketed(c)) || docWithNote(c)))) return false;   // 「주민등록초본 - 세대 분리 시 제출」 은 서류(조건 안의 「 시 」 · 리뷰 16차 확인)   // 공모전 제출물(작품·영상·PPT)도 서류다 · 가름표 앞이 영수증·등록증 이름이어도(「… 납입영수증 - 전액 납부자에 한함」·붙여 쓴 「…: …」·「… | …」 · 리뷰 14·15차) · 초본·기록부·증빙(리뷰 15차)
   if (c.replace(/\s/g, '').length < 4 && !DOC_NOUN.test(c)) return false;   // 「신청서」「등본」 같은 짧은 이름은 두고 OCR 조각(「서재다」)만 뺀다
   /* 괄호로 시작하는 줄은 앞 서류의 설명이다 — 단 괄호 뒤에 서류 이름이 오는 줄은 서류다(「(필수) 장학금 신청서 1부」「(해당자만) 수능성적표 사본」 · 2026-11-18 · docs-fill 을 합치며 잃었다) */
   if (/^[(（]/.test(c) && !DOC_NOUN.test(c.replace(/^[(（][^)）]*[)）]\s*/, ''))) return false;
@@ -261,7 +261,7 @@ function listFrom(lines, start, inline, headMark) {
     if (l.length > 120) { if (/^[•·ㆍ\-–※*]/.test(l)) continue; break; }   // 문단이면 끝 — 단 앞 서류에 붙은 긴 곁말 줄(• 인정 불가: …)은 건너뛴다
     if (/^(※|\*|☞|▶|⇒)/.test(l)) continue;                                                   // 주석·지시 줄은 서류가 아니다
     const cl = cleanDoc(l);   // 끊기 판단은 다듬은 줄로 — 영수증·등록증 낱말이 있고 안내 문장이 아니면 긴 줄이라도 목록이 이어진다(「② 외국인등록증 앞·뒤 (외국인 유학생 … 해당자에 한함)」 · 리뷰 10·12·13차)
-    if (!DOC_WORD.test(l) && !(DOC_WORD_LOOSE.test(cl) && !isGuideSentence(cl) && !(DOC_JUNK.test(cl) && !(docWithNote(cl) && /(?:불가|제외함?)\s*$/.test(cl)))) && cl.length > 30) { if (/^[-–·ㆍ*]/.test(l)) continue; break; }   // 서류 낱말 없는 긴 줄 — 목록이 끝났다(앞 서류 아래 「- 선택 제출 … 가산점 부여」 같은 곁말 줄은 건너뛴다 · 2026-11-18) · 영수증 낱말이 든 안내 문장(「… 현금영수증 발급을 원하시는 분은 … 연락 바랍니다」)에서도 끝난다(리뷰 13차 — 넓힌 끊기가 뒤 「준비물: 신분증」 까지 서류로 들였다 · 가름표 꼴 「현금영수증 : … 연락 바랍니다」 도 — 받는 쪽(DOC_JUNK)이 안내로 버리는 줄은 끊기 예외가 아니다 · 리뷰 15차)
+    if (!DOC_WORD.test(l) && !(DOC_WORD_LOOSE.test(cl) && !isGuideSentence(cl) && !(DOC_JUNK.test(cl) && !(NUM_MARK_KINDS.test(leadMark(l).kind) && docWithNote(cl) && /(?:불가|제외함?)\s*$/.test(cl)))) && cl.length > 30) { if (/^[-–·ㆍ*]/.test(l)) continue; break; }   // 서류 낱말 없는 긴 줄 — 목록이 끝났다(앞 서류 아래 「- 선택 제출 … 가산점 부여」 같은 곁말 줄은 건너뛴다 · 2026-11-18) · 영수증 낱말이 든 안내 문장(「… 현금영수증 발급을 원하시는 분은 … 연락 바랍니다」)에서도 끝난다(리뷰 13차 — 넓힌 끊기가 뒤 「준비물: 신분증」 까지 서류로 들였다 · 가름표 꼴 「현금영수증 : … 연락 바랍니다」 도 — 받는 쪽(DOC_JUNK)이 안내로 버리는 줄은 끊기 예외가 아니다 · 리뷰 15차)
     if (inlineHit && !(DOC_NOUN.test(bare) || WRITE_DOC.test(bare) || MEDIA_DOC.test(bare))) continue;   // ④ 한 줄 목록 아래는 서류·제출물 이름만(아닌 줄은 건너뛴다 — 끊으면 「작품(이미지 파일)」 뒤가 사라졌다 · 리뷰)
     push(l);
   }
@@ -272,6 +272,7 @@ function listFrom(lines, start, inline, headMark) {
 /** 원문 글자 → 제출 서류 이름들 (원문 글자 그대로 · 없으면 []) */
 export function extractDocumentList(text) {
   const lines = String(text || '').split(/\n/).map((l) => l.replace(INVISIBLE, '').trim());
+  let weak = null;   // 옛 판단(listNoun)을 못 넘은 첫 목록(리뷰 16차 확인)
   for (let i = 0; i < lines.length; i += 1) {
     const l = lines[i];
     if (!l || (l.length > 80 && !/^[^:：]{0,30}[:：]/.test(l)) || !DOC_HEAD.test(l) || !isDocHeadLabel(l)) continue;   // ① 이름표 줄만(「제출서류 : …」 한 줄 목록은 길어도 읽는다 · 제자사랑 120자)
@@ -285,9 +286,10 @@ export function extractDocumentList(text) {
     const listNoun = (d) => DOC_NOUN.test(d) || WRITE_DOC.test(d) || MEDIA_DOC.test(d) || /\d\s*(?:부|매|통)(?![가-힣])/.test(d) || /서류$/.test(d);   // 머리 하나가 목록인가는 이 판단으로(리뷰 16차 — 등록증 이름 한 줄뿐인 요약 머리가 아래 진짜 목록을 가렸다)
     const isNoun = (d) => listNoun(d) || docHead(d) || docWithNote(d);   // 등록증 이름·「서류 이름 + 조건」 도(맨 끝의 「외국인등록증 앞·뒤」 가 잘렸다 · 리뷰 15차)   // 「…서류」 로 끝나 여기까지 온 줄은 괄호 앞에서 자른 서류다(소제목은 isDocLike 가 이미 뺐다 · 「일시적 가계곤란 입증서류」 · 리뷰 9차)   // 「장학생 신상카드 1부」도 서류
     let last = -1; got.forEach((d, k) => { if (isNoun(d)) last = k; });
-    if (last >= 0 && got.some(listNoun)) return got.slice(0, last + 1);   // 못 건지면 다음 머리 후보로
+    if (last >= 0 && got.some(listNoun)) return got.slice(0, last + 1);
+    if (last >= 0 && !weak) weak = got.slice(0, last + 1);   // 등록증 이름 한 줄뿐인 목록 — 뒤에 진짜 목록이 없으면 이것을 낸다(리뷰 16차 확인 · 「□ 제출서류: 외국인등록증 앞·뒤」 가 통째로 사라졌다)   // 못 건지면 다음 머리 후보로
   }
-  return [];
+  return weak || [];
 }
 
 /* 지정 양식을 말하는 낱말 — 이 말이 든 줄은 '자유 양식'이 아니다(「자기소개서(소정 양식) … 추천서는 자유 양식」 처럼 섞인 줄도 근거가 아니다) */
