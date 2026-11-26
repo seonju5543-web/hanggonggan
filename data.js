@@ -349,7 +349,7 @@ const DOC_SLOTS = [
    🔴 체크리스트 둘·서류 도우미·도우미 답 셋·양식 엔진이 모두 이 함수를 부른다 — 베끼지 말 것(관문이 앱이 싣는 화면 파일 전부를 본다) */
 function docShortName(doc) {
   const s = String(doc == null ? '' : doc);
-  return s.replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '').replace(/\s*[.。]\s*$/, '').trim() || s;
+  return s.replace(/\s*[.。]\s*$/, '').replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '').replace(/\s*[.。]\s*$/, '').trim() || s;   // 마침표 → 끝 괄호 → 마침표(「서약서 1부(붙임양식).」 · 리뷰 12차)
 }
 function slotForDoc(doc) {
   /* 괄호 하나로 된 줄(「(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)」 — 로봇 doc-list 의 조건 괄호 줄)은 서류가 아니라 아래 서류가 **언제** 필요한지 말한다 —

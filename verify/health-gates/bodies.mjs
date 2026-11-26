@@ -729,6 +729,29 @@ export default async function bodies(eq, ctx) {
     }
   }
   {
+    /* 리뷰 12차 — 첨부 로봇이 제 목록(「공고문 첨부」)을 새로 읽은 목록으로 바꾸며 서류 줄이 준 글은 수집 리포트 끝에 남아야 한다(리뷰 11차) —
+       글자 셋만 보던 검사는 모으는 줄(`if (lost) shrunk.push`)을 지워도 초록이었다 → 임시 폴더에서 --apply 를 진짜 돌려 목록이 바뀌고 리포트에 그 절이 생기는지 본다 */
+    const sb3 = sandbox(root, 'hdj-actshrink-');
+    try {
+      const u = 'https://act.example/post/9';
+      sb3.write('collector/extracted/notices-text.json', []);
+      sb3.write('data/registered.json', { items: [] });
+      sb3.write('data/activities.json', { items: [{ title: '청년 공모전 참가자 모집', url: u, documents: ['옛 서류 가 1부', '옛 서류 나 1부', '옛 서류 다 1부'], documentsFrom: '공고문 첨부' }] });
+      sb3.write('collector/act-files/manifest.json', { [u]: ['p9-0.jpg'] });
+      sb3.write('collector/act-files/p9-0.jpg', 'x');
+      sb3.write('collector/act-files/p9-0.jpg.ocr.txt', '청년 공모전 참가자 모집\n모집대상 : 도내 거주 청년 누구나\n제출서류 : 참가신청서 1부\n');
+      sb3.write('collector/report.md', '# 수집 리포트\n');
+      const r = sb3.run('collector/activity-docs.mjs', ['--apply'], {});
+      const rep = sb3.read('collector/report.md') || '';
+      const it = ((sb3.json('data/activities.json') || { items: [] }).items[0]) || {};
+      eq('② ⓔ 첨부에서 다시 읽어 서류 줄이 준 글 — 목록은 새로 읽은 것으로 바뀌고(3→1) 수집 리포트 끝에 이름과 줄 수가 남는다(--apply 를 임시 폴더에서 진짜로)',
+        [r.status, it.documents, it.documentsFrom, /### 📎 대외활동 — 첨부에서 다시 읽어 서류 줄이 준 글 1건/.test(rep), /청년 공모전 참가자 모집 3→1줄/.test(rep)],
+        [0, ['참가신청서 1부'], '공고문 첨부(OCR)', true, true]);
+    } finally {
+      sb3.done();
+    }
+  }
+  {
     /* PaddleOCR 을 까는·부르는 줄 **전부**를 본다(2026-10-05 병합 — 기본 브랜치가 장학 포스터 단계를 새로 달며 `|| true` 로 삼키고 설치 줄은
        경고 없이 두었다: 설치가 실패하면 bash -e 에 끊겨 같은 단계의 주인 확인이 안 돌았다). 파일 목록을 박지 않고 워크플로 전부에서 찾는다. */
     const pins = new Map();
