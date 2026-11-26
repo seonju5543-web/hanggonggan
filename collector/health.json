@@ -31,10 +31,10 @@
   "lastOk": "2026-10-27"
  },
  "서울시립대학교": {
-  "fails": 6,
+  "fails": 7,
   "lastOk": "2026-11-23",
-  "browserFails": 6,
-  "browserWhy": "게시판을 열지 못함"
+  "browserFails": 7,
+  "browserWhy": "열렸지만 장학 공고 0건"
  },
  "건국대학교": {
   "fails": 0,

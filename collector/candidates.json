@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-26",
- "count": 2072,
+ "count": 2094,
  "items": [
   {
    "title": "[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
@@ -145,6 +145,254 @@
    ],
    "deadlineHint": null,
    "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 교육보호장학(새터민 및 새터민 자녀) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767125",
+   "attachments": [
+    {
+     "name": "2027-1학기 교육보호장학 신청서(신규자).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027-1%25ED%2595%2599%25EA%25B8%25B0%20%25EA%25B5%2590%25EC%259C%25A1%25EB%25B3%25B4%25ED%2598%25B8%25EC%259E%25A5%25ED%2595%2599%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C(%25EC%258B%25A0%25EA%25B7%259C%25EC%259E%2590).hwp&filepath=/files/article/JANGHAKNOTICE/26767125/&filerealname=8DAB261F4A4B4C08AD8D616727C4A06B.hwp"
+    },
+    {
+     "name": "2027-1학기 교육보호장학 신청서(신규자).hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767125#n-2027-1%ED%95%99%EA%B8%B0%20%EA%B5%90%EC%9C%A1%EB%B3%B4%ED%98%B8%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%8B%A0%EA%B7%9C%EC%9E%90).hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 재학생 : 2026.12.01.( 화 ) 10:00 ~ 2027.01.06.( 수 ) 16:00 까지 신 ( 편 ) 입생 : 최종합격자",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 동국가족장학 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767126",
+   "attachments": [
+    {
+     "name": "2027-1 동국가족장학 신청서.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027-1%20%25EB%258F%2599%25EA%25B5%25AD%25EA%25B0%2580%25EC%25A1%25B1%25EC%259E%25A5%25ED%2595%2599%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C.hwp&filepath=/files/article/JANGHAKNOTICE/26767126/&filerealname=F247BF0835B54FBE83A461F7F3C725CD.hwp"
+    },
+    {
+     "name": "2027-1 동국가족장학 신청서.hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767126#n-2027-1%20%EB%8F%99%EA%B5%AD%EA%B0%80%EC%A1%B1%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%EC%84%9C.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 보훈장학(본인, (손)자녀) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767128",
+   "attachments": [
+    {
+     "name": "2027-1 보훈장학 신청서(신규자).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027-1%20%25EB%25B3%25B4%25ED%259B%2588%25EC%259E%25A5%25ED%2595%2599%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C(%25EC%258B%25A0%25EA%25B7%259C%25EC%259E%2590).hwp&filepath=/files/article/JANGHAKNOTICE/26767128/&filerealname=3E0C6A95A4874BE7B2F2A4CA5D7FC2DB.hwp"
+    },
+    {
+     "name": "2027-1 보훈장학 신청서(신규자).hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767128#n-2027-1%20%EB%B3%B4%ED%9B%88%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%8B%A0%EA%B7%9C%EC%9E%90).hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 재학생 : 2026.12.01.( 화 ) 10:00 ~ 2027.01.06.( 수 ) 16:00 까지 신 ( 편 ) 입생 : 최종합격자",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 복지장학1(본인장애) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767129",
+   "attachments": [
+    {
+     "name": "2027-1 복지장학1(본인장애) 신청서(신규자).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027-1%20%25EB%25B3%25B5%25EC%25A7%2580%25EC%259E%25A5%25ED%2595%25991(%25EB%25B3%25B8%25EC%259D%25B8%25EC%259E%25A5%25EC%2595%25A0)%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C(%25EC%258B%25A0%25EA%25B7%259C%25EC%259E%2590).hwp&filepath=/files/article/JANGHAKNOTICE/26767129/&filerealname=FB91225B39A64CAA89112411ABEF49E3.hwp"
+    },
+    {
+     "name": "2027-1 복지장학1(본인장애) 신청서(신규자).hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767129#n-2027-1%20%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%991(%EB%B3%B8%EC%9D%B8%EC%9E%A5%EC%95%A0)%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%8B%A0%EA%B7%9C%EC%9E%90).hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 재학생 : 2026.12.01.( 화 ) 10:00 ~ 2027.01.06.( 수 ) 16:00 까지 신 ( 편 ) 입생 : 최종합격자",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 복지장학2(기초생활수급자) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767130",
+   "attachments": [
+    {
+     "name": "2027-1 복지장학2(기초생활수급자) 신청서(신편입생).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027-1%20%25EB%25B3%25B5%25EC%25A7%2580%25EC%259E%25A5%25ED%2595%25992(%25EA%25B8%25B0%25EC%25B4%2588%25EC%2583%259D%25ED%2599%259C%25EC%2588%2598%25EA%25B8%2589%25EC%259E%2590)%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C(%25EC%258B%25A0%25ED%258E%25B8%25EC%259E%2585%25EC%2583%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26767130/&filerealname=28E1CF8A3B5F4F748BB06876697C77C2.hwp"
+    },
+    {
+     "name": "2027-1 복지장학2(기초생활수급자) 신청서(신편입생).hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767130#n-2027-1%20%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%992(%EA%B8%B0%EC%B4%88%EC%83%9D%ED%99%9C%EC%88%98%EA%B8%89%EC%9E%90)%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%8B%A0%ED%8E%B8%EC%9E%85%EC%83%9D).hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 재학생 : 2026.12.01.( 화 ) 10:00 ~ 2027.01.06.( 수 ) 16:00 까지 신 ( 편 ) 입생 : 최종합격자",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 복지장학2(부분) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767131",
+   "attachments": [
+    {
+     "name": "2027-1학기 복지장학2(부분)장학 신청서(신입생).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027-1%25ED%2595%2599%25EA%25B8%25B0%20%25EB%25B3%25B5%25EC%25A7%2580%25EC%259E%25A5%25ED%2595%25992(%25EB%25B6%2580%25EB%25B6%2584)%25EC%259E%25A5%25ED%2595%2599%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C(%25EC%258B%25A0%25EC%259E%2585%25EC%2583%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26767131/&filerealname=A3629A2D17AF4CDABE4AEA4B315A3781.hwp"
+    },
+    {
+     "name": "2027-1학기 복지장학2(부분)장학 신청서(신입생).hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767131#n-2027-1%ED%95%99%EA%B8%B0%20%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%992(%EB%B6%80%EB%B6%84)%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%8B%A0%EC%9E%85%EC%83%9D).hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 재학생 : 2026.12.01.( 화 ) 10:00 ~ 2027.01.06.( 수 ) 16:00 까지 신 ( 편 ) 입생 : 최종합격자",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 전문자격장학 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767132",
+   "attachments": [],
+   "deadlineHint": "신청기간 2026.12.01.( 화 ) 10:00 ~ 2027.01.06.( 수 ) 16:00 까지 ※ 마지막날을 제외하고 17:00 까지 접수",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 종단추천장학 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767133",
+   "attachments": [
+    {
+     "name": "2027-1 종단추천장학 신청서(신편입생).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2027-1%20%25EC%25A2%2585%25EB%258B%25A8%25EC%25B6%2594%25EC%25B2%259C%25EC%259E%25A5%25ED%2595%2599%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C(%25EC%258B%25A0%25ED%258E%25B8%25EC%259E%2585%25EC%2583%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26767133/&filerealname=4952ABB797524B8B9E296897CDF12774.hwp"
+    },
+    {
+     "name": "2027-1 종단추천장학 신청서(신편입생).hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767133#n-2027-1%20%EC%A2%85%EB%8B%A8%EC%B6%94%EC%B2%9C%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%8B%A0%ED%8E%B8%EC%9E%85%EC%83%9D).hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 재학생 : 2026.12.01.( 화 ) 10:00 ~ 2027.01.06.( 수 ) 16:00 까지 신 ( 편 ) 입생 : 최종합격자",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 교내장학(전체) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767135",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2026-2학기 주거안정장학금 지급요청서(11월분) 제출 안내(~12/6(일)까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26767137",
+   "attachments": [
+    {
+     "name": "(붙임3) 2026년 장학생 지급요청서 작성 매뉴얼_Re839a2cb45b1a.pdf",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=(%25EB%25B6%2599%25EC%259E%25843)%202026%25EB%2585%2584%20%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%25A7%2580%25EA%25B8%2589%25EC%259A%2594%25EC%25B2%25AD%25EC%2584%259C%20%25EC%259E%2591%25EC%2584%25B1%20%25EB%25A7%25A4%25EB%2589%25B4%25EC%2596%25BC_Re839a2cb45b1a.pdf&filepath=/files/article/JANGHAKNOTICE/26767137/&filerealname=30634A2892C845459080AB57C3E599EC.pdf"
+    }
+   ],
+   "deadlineHint": "제출기한: 2026. 12. 6(일) 까지 제출사항: 지급요청서 – 한국장학재단 홈페이지 / 모바일에서 작성 ( 붙임 학생매뉴얼 참조 ) 장학금",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 교육보호장학(새터민 및 새터민 자녀) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26767125",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 교육보호장학(새터민 및 새터민 자녀) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26767125",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 동국가족장학 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26767126",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 동국가족장학 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26767126",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 보훈장학(본인, (손)자녀) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26767128",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 보훈장학(본인, (손)자녀) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26767128",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 복지장학1(본인장애) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26767129",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 복지장학1(본인장애) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26767129",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 교내장학(전체) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26767135",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027-1학기 교내장학(전체) 신청안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26767135",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
    "campus": "",
    "foundAt": "2026-11-26"
   },
@@ -393,6 +641,33 @@
     {
      "name": "「TGL_장학금」_추천서_양식.docx",
      "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770709&attachNo=564505"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "두레장학생 모집(학술정보관): 2027-1학기",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770710&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2027년 한국장학재단 창업기숙사 입주생 모집 홍보",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770711&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "(붙임1) 2027년 창업기숙사 입주생 모집 공고문.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770711&attachNo=564511"
+    },
+    {
+     "name": "(붙임2) 제출서류 양식.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770711&attachNo=564512"
     }
    ],
    "deadlineHint": null,
