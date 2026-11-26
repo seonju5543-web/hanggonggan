@@ -50,6 +50,7 @@ const BROWSER = process.argv.includes('--browser');
 const PLAIN_LEDGER = fileURLToPath(new URL('act-docs.json', HERE));       // 수집 로봇(무료 모드)의 장부 — { 주소: { at, tries } }
 const BROWSER_LEDGER = fileURLToPath(new URL('act-browser.json', HERE));  // 원문 받기 로봇(브라우저 모드)의 장부 + 결과
 const LEDGER = BROWSER ? BROWSER_LEDGER : PLAIN_LEDGER;
+const REPORT = fileURLToPath(new URL('report.md', HERE));   // 수집 리포트 — 첨부에서 다시 읽어 서류 줄이 준 글을 끝에 적는다(docs-fill 과 같은 자리 · 리뷰 11차)
 /* 유료 관문(2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-2) — 숨김 표시가 달린 글은 자격 줄이 있든 없든 본문·첨부의 **글자**를 받아 기록한다(AI 가 읽을 원문).
    기록은 모드마다 제 파일(act-text/<id>.json · <id>.browser.json) — 두 워크플로가 같은 파일을 쓰지 않는다. 받은 원본은 지금처럼 커밋하지 않는다 */
 const STORE_DIR = fileURLToPath(new URL('act-text/', HERE));
@@ -90,6 +91,13 @@ export const staleDocs = (n, today = kstToday()) => !n.hidden && /^(?:공고문 
 /* 새로 읽은 서류 목록으로 바꿀 글 — 목록이 없거나, 있는 목록이 이 로봇이 첨부·요강에서 읽어 둔 것일 때(리뷰 10차 — 비었을 때만 채워서 서류 판을 올려 다시 연 글은 판 번호만 바뀌고 새 규칙이 닿지 않았다) ·
    본문이 준 목록(출처 표식 없음 — 본문이 이긴다)·브라우저 장부 목록·관리자 목록은 그대로 */
 export const fileDocsWin = (n) => !(n.documents || []).length || /^(?:공고문 첨부|요강 페이지)/.test(n.documentsFrom || '');
+/** 첨부에서 새로 읽은 서류 목록을 글에 얹는다(바꿀 글만 — fileDocsWin) · 바꾸며 준 줄 수를 돌려준다(리뷰 11차 — 수집 로봇은 리포트에 적는데 이 로봇은 아무 데도 안 남겼다 · 첨부 원문은 저장소에 없어 미리 잴 수 없다) */
+export function takeFileDocs(n, docs, from) {
+  if (!(docs || []).length || !fileDocsWin(n)) return 0;
+  const before = (n.documents || []).length;
+  putActivityDocuments(n, docs, from);
+  return Math.max(0, before - (n.documents || []).length);
+}
 
 /** 받을 후보 — 첨부(공고문·포스터) 먼저, 그다음 본문 그림. 서식·꾸밈 그림은 뺀다. */
 /** 글 제목이 HTML 에 마지막으로 나온 자리부터 (없으면 전체) — activity-excerpts.mjs atTitle 과 같은 생각 */
@@ -475,6 +483,7 @@ export function eligFromFiles(n, files, readText = (p) => (/\.txt$/.test(p) ? fs
 function applyPhase(acts) {
   const manifest = readJson(MANIFEST, {});
   let got = 0;
+  const shrunk = [];   // 첨부에서 다시 읽어 서류 줄이 준 글(리뷰 11차 — 끝에서 수집 리포트에 적는다)
   /* 브라우저 모드는 결과를 제 장부에만 — data/activities.json 은 수집 로봇 몫(위 ④) */
   const bled = BROWSER ? readJson(BROWSER_LEDGER, {}) : null;
   const found = new Set();
@@ -489,7 +498,8 @@ function applyPhase(acts) {
     if (!wantElig) continue;
     found.add(n.url);
     if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from, ...((d.documents || []).length ? { documents: d.documents } : {}) }; got += 1; continue; }
-    if ((d.documents || []).length && fileDocsWin(n)) putActivityDocuments(n, d.documents, d.from);   // 본문이 준 목록이 있으면 본문이 이긴다 · 이 로봇이 읽어 둔 목록은 새로 읽은 것으로(fileDocsWin)
+    const lost = takeFileDocs(n, d.documents, d.from);   // 본문이 준 목록이 있으면 본문이 이긴다 · 이 로봇이 읽어 둔 목록은 새로 읽은 것으로(fileDocsWin)
+    if (lost) shrunk.push(`${String(n.title || '').slice(0, 40)} ${(n.documents || []).length + lost}→${(n.documents || []).length}줄`);
     n.documentsV = ACT_DOCS_V;   // 첨부 글자로 서류를 읽어 봤다 — 다시 열지 않는다(목록이 없어도)
     n.eligibilityLines = d.eligibilityLines;
     if (d.eligibilityExcludes.length) n.eligibilityExcludes = d.eligibilityExcludes; else delete n.eligibilityExcludes;   // 다시 읽은 글 — 옛 제외 줄이 남지 않게
@@ -524,6 +534,8 @@ function applyPhase(acts) {
   if (BROWSER) fs.writeFileSync(BROWSER_LEDGER, JSON.stringify(bled, null, 1) + '\n');
   else got += mergeBrowserResults(acts);
   log(`읽기 — ${BROWSER ? '브라우저로 ' : '첨부·포스터에서 '}자격 ${got}건`);
+  /* 첨부에서 다시 읽어 서류 줄이 준 글은 수집 리포트 끝에 — 첨부 원문은 저장소에 없어 미리 잴 수 없다(리뷰 11차 · 브라우저 모드는 목록을 안 바꾼다) */
+  if (shrunk.length && !BROWSER && fs.existsSync(REPORT)) fs.appendFileSync(REPORT, `\n### 📎 대외활동 — 첨부에서 다시 읽어 서류 줄이 준 글 ${shrunk.length}건\n원문(첨부)을 열어 목록이 맞는지 보세요.\n${shrunk.slice(0, 12).map((x) => `- ${x}`).join('\n')}${shrunk.length > 12 ? '\n- …' : ''}\n`);
   return got;
 }
 

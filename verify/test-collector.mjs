@@ -1462,16 +1462,20 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
 
   /* 체크리스트에 '원문에서 확인하라'는 안내 줄이 **서류처럼** 올라가지 않는다 */
   const ph = new RegExp(appSrc.match(/const DOC_PLACEHOLDER = \/(.*)\/;/)[1]);
-  const cert = new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc',
-    `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => null, (s) => s);
+  /* 서류 이름 짧게는 data.js docShortName 한 곳(리뷰 11차) — 떼어 온 화면 함수에 진짜 함수를 넘긴다 */
+  const dataJs = readText(new URL('../data.js', import.meta.url));
+  const docShortOf = new Function(`${dataJs}\nreturn typeof docShortName === 'function' ? docShortName : null;`)();
+  const shortFn = docShortOf || ((d) => String(d));
+  const cert = new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc', 'docShortName',
+    `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => null, (s) => s, shortFn);
   eq('  자동 등록분의 안내 줄 하나뿐이면 체크리스트를 만들지 않는다',
     cert({ documents: ['지원 자격·제출 서류는 원문 공고에서 확인'] }), '');
   const mixed = cert({ documents: ['재학증명서', '재단 공고문에서 확인', '신청 서류·접수 방법은 원문 공고 확인'] });
   eq('  진짜 서류는 남기고 안내 줄만 뺀다', [/재학증명서/.test(mixed), /확인 —/.test(mixed.replace(/재학증명서[^<]*/, ''))], [true, false]);
   /* 🔴 서류 이름은 수집한 외부 글이다 — 모든 갈래가 esc 를 거친다 (2026-09-23 리뷰: ✓·□·△ 세 갈래가 날것이었다) */
   const escReal = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const certE = (st) => new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc',
-    `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => st, escReal);
+  const certE = (st) => new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc', 'docShortName',
+    `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => st, escReal, shortFn);
   const evil = ['재학증명서 <a href="https://evil.example/">여기서 발급</a>', '<i>x</i> 자동 제출'];
   eq('🔴 보관함 상태가 있는 갈래도 서류 이름의 태그를 그리지 않는다',
     /<a |<i>/.test(certE({ ok: true, text: '<b>파일</b>' })({ documents: evil })), false);
@@ -1481,19 +1485,30 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
   const stMiss = { ok: false, slot: { issue: '발급처' }, text: '아직 안 올렸어요' };
   const trimDocs = ['(서식3) 추천서(선택)', '(선택) 학과(부)장 또는 교수 추천서(해당자만 제출)', '성적증명서 1부(원본)', '주민등록등본(세대원 전원)(원본)', '(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)'];
   const trimWant = ['(서식3) 추천서', '(선택) 학과(부)장 또는 교수 추천서', '성적증명서 1부', '주민등록등본', '(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)'];
-  const dcList = new Function('ESSAY_DEFS', 'docWalletStatus', 'esc', `${take('isUnknownDoc')}\n${take('docChecklistHtml')}\nreturn docChecklistHtml;`)([], () => stMiss, escReal);
+  const dcList = new Function('ESSAY_DEFS', 'docWalletStatus', 'esc', 'docShortName', `${take('isUnknownDoc')}\n${take('docChecklistHtml')}\nreturn docChecklistHtml;`)([], () => stMiss, escReal, shortFn);
   eq('  체크리스트 이름은 끝 괄호만 뗀다 · 다 지워지면 원래 글자(증명서류 체크리스트 · 신청 내역 제출 서류)',
     [[...certE(stMiss)({ documents: trimDocs }).matchAll(/□ ([^<]*?) — /g)].map((m) => m[1]), [...dcList({ documents: trimDocs }).matchAll(/<li class="dc-miss">([^<]*)<em>/g)].map((m) => m[1])],
     [trimWant, trimWant]);
   /* 같은 뿌리(전부터 있던 것 · 리뷰 10차가 찾은 자리의 이웃) — 서류 이름을 줄이는 자리가 다섯 더 있었고 모두 처음 「(」 부터 지웠다: 서류 도우미(essayDefsFor)·도우미 답 셋(chat.js)·
      신청 준비 작성 서류(forms.js prepWriteDocs) — 실린 정식 등록 「(양식) 자기소개서(졸업 후 진로계획 포함/ …)」 의 도우미 이름이 비었다 */
-  const essayFn = new Function('ESSAY_DEFS', `${take('essayDefsFor')}\nreturn essayDefsFor;`)([{ key: 'intro', match: /자기소개서/ }]);
+  const essayFn = new Function('ESSAY_DEFS', 'docShortName', `${take('essayDefsFor')}\nreturn essayDefsFor;`)([{ key: 'intro', match: /자기소개서/ }], shortFn);
   eq('  서류 도우미 이름도 끝 괄호만 뗀다(「(양식) 자기소개서(…)」 → 「(양식) 자기소개서」)',
     essayFn({ documents: ['(양식) 자기소개서(졸업 후 진로계획 포함/ A4용지 2장, 글자 10point, 행간 160)', '자기소개서 1부(자유 양식)'] }).map((d) => d.doc), ['(양식) 자기소개서', '자기소개서 1부']);
+  /* 리뷰 11차 — 끝 괄호만 떼는 규칙이 일곱 자리에 글자 그대로 베껴져 있었다(한 곳만 고치면 화면끼리 말이 갈린다 · 「베끼지 말고 불러 쓴다」) → data.js docShortName 하나를 부른다 ·
+     끝에 남은 마침표도 뗀다(「주임(지도)교수 추천서 1부 .(첨부파일 참조 …)」 → 「… 1부 .」 이 남았다 · 실린 정식 등록) · 서류 칸 원문은 그대로 — 화면의 짧은 이름만 */
+  eq('  서류 이름 짧게(data.js docShortName) — 끝 괄호와 끝에 남은 마침표만 뗀다 · 가운데 괄호는 둔다 · 다 지워지면 원래 글자',
+    docShortOf ? ['(서식3) 추천서(선택)', '주임(지도)교수 추천서 1부 .(첨부파일 참조 : 추천교수 서명 필수)', '재학증명서 1부.', '(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)', '학(과)장 추천서', null].map(docShortOf) : '(함수 없음)',
+    ['(서식3) 추천서', '주임(지도)교수 추천서 1부', '재학증명서 1부', '(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)', '학(과)장 추천서', '']);
   {
-    const greedy = /\.replace\(\/\\s\*\\\(\.\*\\\)\$\/, ''\)/;
-    eq('  처음 「(」 부터 끝까지 지우는 이름 줄이기가 학생 화면 파일에 남지 않았다(app.js · 떼어 낸 화면 · 도우미 · 양식 엔진)',
-      ['app.js', 'app-applications.js', 'app-prep.js', 'app-sheet.js', 'app-my.js', 'app-activities.js', 'chat.js', 'forms.js'].filter((f) => greedy.test(readText(new URL(`../${f}`, import.meta.url)))), []);
+    /* 관문은 앱이 싣는 화면 파일 전부(index.html 의 스크립트 + 도우미·양식 엔진)를 본다 — 그 함수 말고 서류 이름 끝 괄호를 지우는 줄(옛 꼴 「\(.*\)$」 · 새 꼴의 사본)이 없어야 한다 · 일곱 자리가 그 함수를 부른다 */
+    const html = readText(new URL('../index.html', import.meta.url));
+    const screenFiles = [...new Set([...html.matchAll(/<script src="([^"]+\.js)"/g)].map((m) => m[1]).filter((f) => !/^https?:|\//.test(f)).concat(['chat.js', 'forms.js']))];
+    const trims = /\\\(\.\*\\\)\$\/|\[\(（\]\[\^\(\)（）\]\*\[\)）\]\)\+\\s\*\$\//;
+    const offenders = screenFiles.filter((f) => f !== 'data.js').filter((f) => { try { return trims.test(readText(new URL(`../${f}`, import.meta.url))); } catch { return false; } });
+    const callers = { 'app.js': 2, 'app-applications.js': 1, 'chat.js': 3, 'forms.js': 1 };
+    eq('  서류 이름 줄이기는 data.js docShortName 한 곳 — 화면 파일 어디에도 제 줄이기가 없다 · 일곱 자리가 그 함수를 부른다 · 화면 파일을 실제로 셌다',
+      [offenders, Object.entries(callers).filter(([f, n]) => (readText(new URL(`../${f}`, import.meta.url)).match(/docShortName\(/g) || []).length < n).map(([f]) => f), /^function docShortName\(/m.test(dataJs), screenFiles.length > 20],
+      [[], [], true, true]);
   }
   /* 리뷰 10차 — 조건 괄호 줄(「(휴학생의 경우 재학증명서 대신 아래 대체 서류 제출)」)은 서류가 아니라 아래 서류가 **언제** 필요한지 말하는 줄이다 — 보관함 칸을 붙이면
      그 줄에 「아직 안 올렸어요」 가 붙고 「n개 준비 안 됨」 에도 센다 → 괄호 하나로 된 줄은 보관함 칸이 없다(보관함 짝 찾기 slotForDoc 한 곳 — 체크리스트·공유·도우미가 같이 쓴다) */
@@ -2027,7 +2042,8 @@ console.log('\n■ 신청 내역 진행 화면 — 한 흐름 (2026-11-21)');
   eq('  준비 네 줄은 여전히 prepChecklist 한 곳 · 학생이 누르는 줄은 data-prep-toggle', [/pc\.items\.map/.test(step0), /data-prep-toggle="\$\{it\.key\}"/.test(step0)], [true, true]);
   /* 서류 목록(bare) — 머리 없이 · 줄마다 되풀이되던 꼬리말 없이. 머리 있는 목록(신청 준비 시트)은 그대로 */
   const ph = new RegExp(app.match(/const DOC_PLACEHOLDER = \/(.*)\/;/)[1]);
-  const cert = new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc', `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => null, (s) => s);
+  const shortName2 = new Function(`${readText(new URL('../data.js', import.meta.url))}\nreturn typeof docShortName === 'function' ? docShortName : (d) => String(d);`)();   // 서류 이름 짧게 — data.js 한 곳(리뷰 11차)
+  const cert = new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc', 'docShortName', `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => null, (s) => s, shortName2);
   const sch = { documents: ['학업지원 신청서', '재학증명서'] };
   /* 줄 꼬리말(「공식 제출 시 함께 준비하세요」)은 2026-11-21 개발자 지시로 두 목록 모두에서 지웠다 — bare 는 머리만 더 뺀다 */
   eq('  준비 줄 밑 서류 목록은 머리가 없고, 신청 준비 시트의 목록은 머리가 있다 · 둘 다 서류 이름이 그대로 보인다',
@@ -4119,6 +4135,21 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
       [readDocuments('5. 제출서류\n① 장학금 신청서 1부\n② 2026학년도 2학기 등록금 납입영수증(학교 포털 출력본, 직인 날인)\n③ 통장 사본 1부\n6. 문의: 장학팀').docs,
         readDocuments('5. 제출서류\n① 장학금 신청서 1부\no 연말정산 시 기부금 영수증 발행\n페이지(특약사항 포함) 스캔본\n② 외국인등록증 스캔본\n③ 원천징수영수증 1부\n6. 문의: 장학팀').docs],
       [['장학금 신청서 1부', '2026학년도 2학기 등록금 납입영수증(학교 포털 출력본, 직인 날인)', '통장 사본 1부'], ['장학금 신청서 1부', '외국인등록증 스캔본', '원천징수영수증 1부']]);
+    /* 리뷰 11차 — 10차가 영수증·등록증을 「그 이름으로 끝나는 줄」만으로 좁혀 「또는」 으로 두 서류를 묶은 진짜 서류 줄이 빠졌다(「외국인등록증 또는 영주증」·「사업자등록증 또는 고유번호증」 —
+       저장 첨부에 있다 · 지금은 서류 절 밖이라 측정에 안 잡혔다) → 끝에 「또는·혹은·및 + 서류 이름 하나」·「앞·뒷면」·「출력물」·끝의 「등」 도 붙어도 된다 · 안내 문장(「… 영수증 및 감사장 발송」)은 그대로 막는다 */
+    eq('    영수증·등록증 + 「또는」 으로 묶은 서류 · 앞·뒷면 · 출력물 · 끝의 「등」 도 서류다(안내 문장은 아니다)',
+      readDocuments('5. 제출서류\n① 장학금 신청서 1부\n② 외국인등록증 또는 영주증\n③ 사업자등록증 또는 고유번호증\n④ 장애인등록증 또는 복지카드\n⑤ 외국인등록증(앞·뒤) 또는 여권\n⑥ 외국인등록증 앞·뒷면\n⑦ 원천징수영수증 등\n⑧ 등록금 납입영수증 출력물\n기부금 영수증 및 감사장 발송\n⑨ 통장 사본 1부\n6. 문의: 장학팀').docs,
+      ['장학금 신청서 1부', '외국인등록증 또는 영주증', '사업자등록증 또는 고유번호증', '장애인등록증 또는 복지카드', '외국인등록증(앞·뒤) 또는 여권', '외국인등록증 앞·뒷면', '원천징수영수증 등', '등록금 납입영수증 출력물', '통장 사본 1부']);
+    /* 리뷰 11차 — 10차 ② 와 같은 뿌리: 「1)」·「3]」 번호 뒤의 띄어 쓴 날짜에도 때 말 막음이 걸려 번호가 남았다 → 닫는 괄호 번호는 날짜일 수 없어 범위·참조 막음만(「1.」 은 날짜의 앞 숫자일 수 있어 그대로) */
+    eq('    「1)」·「3]」 번호 뒤의 날짜도 번호만 뗀다 · 범위(「1)~3)」)는 그대로',
+      readDocuments('마. 제출서류\n1) 10. 1. 이후 발급분 재학증명서 1부\n2) 12.31. 기준 가족관계증명서 1부\n3] 9. 1. 이후 발급분 주민등록등본 1부\n1)~3) 해당자 증빙서류 1부\n바. 문의: 장학팀').docs,
+      ['10. 1. 이후 발급분 재학증명서 1부', '12.31. 기준 가족관계증명서 1부', '9. 1. 이후 발급분 주민등록등본 1부', '1)~3) 해당자 증빙서류 1부']);
+    /* 전부터 있던 것(리뷰 11차가 찾음) — 번호를 뗀 줄이 「이전 」·「다음 」 으로 시작하면 게시판 아래 「이전 글·다음 글」 로 보고 목록을 끊어 「나. 이전 학기 성적증명서 1부」 와 뒤 서류가 모두 사라졌다 →
+       「학기·학년」 이 이어지면 끊지 않는다 · 이웃 글 제목(「이전글 [장학] …」)에서는 그대로 끊는다(서류 낱말로 넓히면 이웃 글 제목이 서류로 들어온다 — 리뷰어 시험) */
+    eq('    「이전 학기·다음 학기·이전 학년」 서류 줄에서 목록을 끊지 않는다 · 「이전글 …」 이웃 글 제목에서는 끊는다',
+      [readDocuments('마. 제출서류\n가. 장학금 신청서 1부\n나. 이전 학기 성적증명서 1부\n2) 다음 학기 복학 예정 확인서 1부\n- 이전 학년 성적증명서 1부\n다. 통장 사본 1부\n바. 문의: 장학팀').docs,
+        readDocuments('마. 제출서류\n가. 장학금 신청서 1부\n이전글 [장학] 추천서 제출 안내\n다음글 [장학] 국가근로 모집').docs],
+      [['장학금 신청서 1부', '이전 학기 성적증명서 1부', '다음 학기 복학 예정 확인서 1부', '이전 학년 성적증명서 1부', '통장 사본 1부'], ['장학금 신청서 1부']]);
     eq('    &emsp; 로 들여 쓴 ※ 곁말 줄은 서류가 아니다(줄 맨 앞을 보는 판정도 기호를 풀고 빈칸을 깎은 줄로)',
       readDocuments('나. 제출서류\n&emsp;1) (필수) 장학금 신청서\n&emsp;&emsp;※ 가족관계증명서는 부모 기준 상세로 발급\n&emsp;2) (필수) 가족관계증명서 1부\n4. 장학금액').docs,
       ['(필수) 장학금 신청서', '(필수) 가족관계증명서 1부']);
@@ -7684,7 +7715,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
     eq('  서류 칸 쓰기 — 첨부·브라우저에서 읽어 둔 목록(documentsFrom)은 빈 본문이 지우지 않는다 · 본문 목록은 비면 지운다 · 본문이 목록을 주면 본문이 이긴다(출처 표식도 뗀다) · 늘 판을 적는다',
       [kept.documents, kept.documentsV === D, wiped.documents, wiped.documentsV === D, kept.docsV === undefined, put.documents, put.documentsFrom], [['참가신청서'], true, undefined, true, true, ['작품 설명서'], undefined]);
     eq('  서류 칸만 다시 읽는 갈래는 자격·발췌를 건드리지 않고 넘어간다(같은 판으로 이미 읽었다) · 못 받으면 이레 뒤에 다시 · 리포트의 「남은」 수도 같은 판단',
-      [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ (?:const docsBefore = \(it\.documents \|\| \[\]\)\.length; )?putActivityDocuments\(it, activityDocuments\(detail\.text\), null, \{ thin: thinText\(detail\.text\) \}\);(?: actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\);)? delete it\.detailsTriedAt;(?: if \(\(it\.documents \|\| \[\]\)\.length < docsBefore\) actDocsShrunk\.push\([^\n]*?\);)? \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),   // 2026-11-26 — 받은 김에 첨부도 합친다(아래 줄이 잰다) · 자격·발췌는 그대로 · 리뷰 10차 — 서류 줄이 준 글 세기(앞뒤 두 문장)만 더 들어갈 수 있다
+      [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ (?:const docsBefore = \(it\.documents \|\| \[\]\)\.length; )?putActivityDocuments\(it, activityDocuments\(detail\.text\), null, \{ thin: thinText\(detail\.text\) \}\);(?: actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\);)? delete it\.detailsTriedAt;(?: if \(\(it\.documents \|\| \[\]\)\.length < docsBefore\) actDocsShrunk\.push\(`[^`\n]*`\);)? \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),   // 2026-11-26 — 받은 김에 첨부도 합친다(아래 줄이 잰다) · 자격·발췌는 그대로 · 리뷰 10차 — 서류 줄이 준 글 세기(앞뒤 두 문장)만 더 들어갈 수 있다 · 리뷰 11차 — 그 push 는 템플릿 글자 하나로 못 박는다(같은 줄 뒤에 자격 다시 읽기를 붙여도 통과하던 구멍)
         /남은 \$\{left\.fill\}건/.test(cm)], [true, true]);   // 「남은」 은 같은 판단(actRereadNeed)으로 세되 첨부만 다시 살필 글은 따로 적는다(actRereadLeft · 리뷰 2026-11-25)
   }
   /* 다시 읽을 때 첨부를 합친다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ①) — 수집 로봇의 다시 읽기가 상세가 준 첨부를 버려,
@@ -20209,13 +20240,21 @@ module.exports = class Anthropic {
       AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V, documentsV: AX.ACT_DOCS_V - 1, deadline: '2026-11-25' }, '2026-11-26'),
       AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V - 1, documentsV: AX.ACT_DOCS_V, deadline: '2026-11-25' }, '2026-11-26')],
     [true, true, false, true]);
-  /* 리뷰 10차 — 첨부 로봇은 글에 서류가 **없을 때만** 채워서, 서류 판을 올려 다시 연 글 중 이미 첨부에서 읽은 목록이 있는 글(지금 9건)은 판 번호만 바뀌고 새 규칙이 닿지 않았다 →
+  /* 리뷰 10차 — 첨부 로봇은 글에 서류가 **없을 때만** 채워서, 서류 판을 올려 다시 연 글 중 이미 첨부에서 읽은 목록이 있는 글은 판 번호만 바뀌고 새 규칙이 닿지 않았다 →
      이 로봇이 첨부·요강에서 읽어 둔 목록(documentsFrom 「공고문 첨부…」·「요강 페이지…」)은 새로 읽은 목록으로 바꾼다 · 본문이 준 목록(표식 없음 — 본문이 이긴다)·브라우저 장부 목록·관리자 목록은 그대로 */
   const win = AD.fileDocsWin || (() => '없음');
   eq('첨부 로봇이 새로 읽은 서류 목록으로 바꾸는 글 — 빈 글 · 첨부·요강에서 읽어 둔 글 / 안 바꾸는 글 — 본문 목록 · 브라우저 장부 목록 · 관리자 목록 · 읽기 단계가 이 판단을 쓴다',
     [win({}), win({ documents: ['옛'], documentsFrom: '공고문 첨부(OCR)' }), win({ documents: ['옛'], documentsFrom: '요강 페이지' }), win({ documents: ['옛'] }), win({ documents: ['옛'], documentsFrom: '브라우저 본문' }),
-      win({ documents: ['옛'], documentsFrom: '관리자 2026-11-26' }), /if \(\(d\.documents \|\| \[\]\)\.length && fileDocsWin\(n\)\) putActivityDocuments\(n, d\.documents, d\.from\);/.test(docsSrc)],
-    [true, true, true, false, false, false, true]);
+      win({ documents: ['옛'], documentsFrom: '관리자 2026-11-26' })],
+    [true, true, true, false, false, false]);
+  /* 리뷰 11차 — 첨부 로봇이 제 목록을 새로 읽은 목록으로 바꿀 때 서류 줄이 줄어도 아무 데도 남지 않았다(수집 로봇은 리포트에 적는데) — 첨부 원문은 저장소에 없어 미리 잴 수 없다 →
+     얹기는 takeFileDocs 한 곳(바꿀 글인지 fileDocsWin · 준 줄 수를 돌려준다) · 준 글은 수집 리포트 끝에 적는다(docs-fill 과 같은 자리 · 브라우저 모드는 목록을 안 바꾼다) */
+  const takeDocs = AD.takeFileDocs || (() => '없음');
+  const own = { title: '공모전', documents: ['가', '나', '다'], documentsFrom: '공고문 첨부' }, body = { documents: ['본문 목록'] }, empty = {};
+  eq('첨부 로봇 서류 얹기(takeFileDocs) — 제 목록은 새 목록으로 바꾸고 준 줄 수를 돌려준다 · 본문 목록은 안 바꾼다(0) · 빈 글은 채운다(0) · 새 목록이 비면 안 바꾼다 · 읽기 단계가 이 함수를 쓰고 준 글을 리포트에 적는다',
+    [takeDocs(own, ['가'], '공고문 첨부'), own.documents, takeDocs(body, ['새'], '공고문 첨부'), body.documents, takeDocs(empty, ['새', '둘'], '요강 페이지'), empty.documents, takeDocs({ documents: ['가'], documentsFrom: '공고문 첨부' }, [], '공고문 첨부'),
+      /const lost = takeFileDocs\(n, d\.documents, d\.from\);/.test(docsSrc), /첨부에서 다시 읽어 서류 줄이 준 글 \$\{shrunk\.length\}건/.test(docsSrc), /if \(shrunk\.length && !BROWSER && fs\.existsSync\(REPORT\)\) fs\.appendFileSync\(REPORT,/.test(docsSrc)],
+    [2, ['가'], 0, ['본문 목록'], 0, ['새', '둘'], 0, true, true, true]);
 }
 
 console.log('■ 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) — 있을 수 없는 값은 칠 때부터 막는다');

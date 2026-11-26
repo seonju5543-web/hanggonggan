@@ -349,9 +349,11 @@ vm.runInContext(`Object.assign(FORM_TEMPLATES, ${JSON.stringify(JSON.parse(fs.re
   if (!isForm) throw new Error('data.js 에서 isFormAttachment() 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.');
   const isApp = dataSrc.match(/^function isApplicationForm\([\s\S]*?^\}/m);
   if (!isApp) throw new Error('data.js 에서 isApplicationForm() 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.');
+  const shortName = dataSrc.match(/^function docShortName\([\s\S]*?^\}/m);   // 서류 이름 짧게 — 서류 도우미(essayDefsFor)·양식 엔진(prepWriteDocs)이 부른다(리뷰 11차)
+  if (!shortName) throw new Error('data.js 에서 docShortName() 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.');
   /* 6-1 (2026-11-21) — 신청 버튼은 「공고가 올린 신청서 원본이 있는가」(app-live hasOriginalForm)를 본다. 앱이 받는 두 색인을 그대로 싣고 그 이웃도 이름으로 떼어 온다 */
   vm.runInContext(`let formsPdfIndex = ${JSON.stringify(formsIdx)}; let formPagesIndex = ${JSON.stringify(pagesIdx)};`, pressCtx);
-  vm.runInContext([isForm[0], isApp[0], takeBlockConst('ESSAY_DEFS'),
+  vm.runInContext([isForm[0], isApp[0], shortName[0], takeBlockConst('ESSAY_DEFS'),
     ...['essayDefsFor', 'formPdfsFor', 'formPagesFor', 'attIsForm', 'hasOriginalForm', 'formTplIdFor', 'attachPrepTemplate', 'attachPrepTemplates', 'applyTo'].map(takeFn)].join('\n\n'),
     pressCtx, { filename: 'app.js(신청 버튼)' });
 }

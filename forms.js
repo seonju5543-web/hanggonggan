@@ -590,7 +590,7 @@ function prepWriteDocs(sch) {
   const out = [];
   for (const d of prepRealDocs(sch)) {
     const def = PREP_WRITE_DOCS.find((w) => w.match.test(d));
-    if (def && !out.some((o) => o.label === def.label)) out.push({ ...def, doc: d.replace(/(?:\s*[(（][^()（）]*[)）])+\s*$/, '') || d });   // 끝 괄호만 뗀다 · 다 지워지면 원래 글자(리뷰 10차)
+    if (def && !out.some((o) => o.label === def.label)) out.push({ ...def, doc: docShortName(d) });   // 끝 괄호만 뗀다 — data.js 한 곳(리뷰 10·11차 · data.js 가 forms.js 보다 먼저 실린다)
   }
   return out;
 }
