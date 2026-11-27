@@ -40,6 +40,11 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+      # 🔴 파이썬 판 고정 (2026-11-27) — PaddleOCR 바퀴는 cp39~cp313 뿐인데 러너(ubuntu-26.04) 기본 파이썬이 그 밖이라 첫 시험 실행에서
+      #    `paddlepaddle==3.2.0 (from versions: none)` 으로 설치가 실패했고, 포스터·그림 4개를 못 읽어 글 셋이 글자 없이 시험됐다.
+      #    수집·원문 받기 로봇은 10-28 에 고정했는데 이 워크플로만 빠져 있었다(관문 test-collector 「PaddleOCR 앞에 파이썬 …」 — 이제 PaddleOCR 을 까는 워크플로 전부를 잰다).
+      - uses: actions/setup-python@v7
+        with: { python-version: '3.12' }
       - run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
 
       - name: 시험할 글 id 확인
@@ -87,7 +92,7 @@ jobs:
           pip install olefile --quiet
           python3 collector/hwp-bodytext.py collector/act-files || true
           sudo apt-get install -y -qq poppler-utils
-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 그림 글자 없이 계속"
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || { touch /tmp/paddle-install-failed; echo "::warning::PaddleOCR 설치 실패 — 그림 글자 없이 계속"; }   # 표식은 아래 「기록」이 시험 요약에 적는다 — 경고 한 줄만으로는 「시험 성공」에 묻힌다(2026-11-27 첫 시험)
           python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || echo "::warning::PaddleOCR 실패 — 그림 글자 없이 계속"
           node collector/activity-docs.mjs --apply
 
@@ -120,6 +125,7 @@ jobs:
         run: |
           {
             echo "## 대외활동 유료 시험 — ${IDS:-id 없음}"
+            if [ -f /tmp/paddle-install-failed ]; then echo "⚠️ 그림 글자 엔진(PaddleOCR)을 못 깔아 포스터·그림 글자 없이 읽었습니다 — 포스터에 내용이 있는 글은 결과가 실제보다 나쁩니다(실행 로그를 보세요)"; echo; fi
             node collector/card-read.mjs --activities --stats
             echo
             echo '```'

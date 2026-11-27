@@ -15775,8 +15775,14 @@ console.log('\n■ 원문 받기 로봇 (진짜 브라우저) — 장학·대외
   }
   /* 워크플로 */
   const wf = readText(new URL('../.github/workflows/rescue-bodies.yml', import.meta.url));
-  /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */
-  for (const f of ['rescue-bodies.yml', 'collect-scholarships.yml']) {
+  /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다)
+     🔴 잴 워크플로는 손으로 적지 않는다 — PaddleOCR 을 까는 워크플로를 **전부** 찾는다(2026-11-27 · 11-26 에 새로 만든 대외활동 유료 시험 act-paid-probe.yml 이
+        손 목록에 없어 파이썬 고정 없이 깔다가 `from versions: none` 으로 실패했고, 포스터 글 셋이 글자 없이 시험됐다) */
+  const paddleWfs = fs.readdirSync(new URL('../.github/workflows/', import.meta.url)).filter((f) => /\.ya?ml$/.test(f))
+    .filter((f) => /pip install[^\n]*paddlepaddle/.test(readText(new URL('../.github/workflows/' + f, import.meta.url))));
+  eq('  PaddleOCR 을 까는 워크플로를 전부 찾았다(손 목록이 아니라 — 수집·원문 받기 둘은 반드시 든다)',
+    [paddleWfs.length >= 2, ['rescue-bodies.yml', 'collect-scholarships.yml'].every((f) => paddleWfs.includes(f))], [true, true]);
+  for (const f of paddleWfs) {
     const y = readText(new URL('../.github/workflows/' + f, import.meta.url));
     eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, ((ms) => ms.length > 0 && ms.every((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])))([...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)]), true);   // 설치 줄이 여럿이어도(장학
     /* 🔴 파이썬 판도 고정한다 (2026-10-28) — PaddleOCR 바퀴는 cp39~cp313 뿐이라 러너 기본 파이썬이 그 밖이면 `from versions: none` 으로 설치가 조용히 실패한다
