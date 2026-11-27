@@ -2,6 +2,64 @@
  "updatedAt": "2026-11-27",
  "items": [
   {
+   "title": "KC미래장학재단 제10기(2027학년도) 장학생 모집 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-KC%EB%AF%B8%EB%9E%98%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C10%EA%B8%B0(2027%ED%95%99%EB%85%84%EB%8F%84)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-11-27"
+  },
+  {
+   "title": "[학생복지팀] 2026학년도 동계 교내 근로(행정부서) 장학생 신청 안내",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770739&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2. (홈페이지 게시글) 2026학년도 동계 근로(행정부서) 장학생 신청 안내.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770739&attachNo=564563"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-27"
+  },
+  {
+   "title": "[학생복지팀] (2026-동계) 근로장학생(방학중) 배정 및 신청서 제출 안내",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770733&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임.(2026-동계) 근로장학생(방학중) 선발 현황.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564549"
+    },
+    {
+     "name": "붙임.근로장학생 신청서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564550"
+    },
+    {
+     "name": "붙임.근로장학생 포기신청서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564551"
+    },
+    {
+     "name": "붙임.근로장학생(방학중)_선발(학생신청)_안내.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564554"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-27"
+  },
+  {
+   "title": "2026년도 2학기 국가근로장학금 동계방학 집중근로(교외) 일정 안내",
+   "url": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=709",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "부산대학교",
+   "campus": "",
+   "foundAt": "2026-11-27"
+  },
+  {
    "title": "장학 2027년 에몬스 장학회 19기 선발 공고",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2027%EB%85%84-%EC%97%90%EB%AA%AC%EC%8A%A4-%EC%9E%A5%ED%95%99%ED%9A%8C-19%EA%B8%B0-%EC%84%A0%EB%B0%9C-%EA%B3%B5%EA%B3%A0&keyword=%EC%9E%A5%ED%95%99",
    "attachments": [],
@@ -4267,48 +4325,6 @@
    "bodyDeadlineText": "가 . 희망근로지 3차신청기간 : 11.18.(수) ~ 11.20.(금 ) ( 기한 엄수 )"
   },
   {
-   "title": "[학생복지팀] (2026-동계) 근로장학생(방학중) 신청 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770333&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "붙임.근로장학생(방학중)_선발(학생신청)_안내.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770333&attachNo=564000"
-    },
-    {
-     "name": "붙임.근로장학생 신청서.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770333&attachNo=564001"
-    },
-    {
-     "name": "붙임.근로장학생 포기신청서.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770333&attachNo=564002"
-    },
-    {
-     "name": "붙임.샘물근로배정부서 확인.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770333&attachNo=564003"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-11-16"
-  },
-  {
-   "title": "[학생복지팀(천안)] 2026년 국가우수(이공계) 일시지원(한 학기 지원) 유형 신규 장학생 선발 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770332&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "02-02.국가우수(이공계)장학금 대학 자체 선발 기준.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770332&attachNo=563999"
-    }
-   ],
-   "deadlineHint": "신청기간 : 2026.11.16.( 월 )~2026.11.23.( 월 ) 11:00 까지 6. 제출처 : 학생복지팀 ( 학생회관 (H 동 ) 2",
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "bodyDeadline": "2026-11-23",
-   "bodyDeadlineText": "다 . 학자금 지원구간 통지서 ( 해당자 ) 5. 신청기간 : 2026.11.16.( 월 )~2026.11.23.( 월 ) 11:00 까지"
-  },
-  {
    "title": "[교외]2027학년도 강남장학회 장학생 선발 공",
    "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261116&brdSeq=3&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
    "attachments": [],
@@ -7220,17 +7236,6 @@
    "school": "중앙대학교",
    "campus": "",
    "foundAt": "2026-10-29"
-  },
-  {
-   "title": "[2차 안내] 2026학년도 2학기 AI학업장려 학자금대출 관련 안내",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30157&pageNo=2",
-   "attachments": [],
-   "deadlineHint": "신청기간 신청: 2026. 7. 1.(수) 09:00 ~ 11. 17.(화) 18:00 실행: 2026. 7. 1.(수) 09:00 ~ 11.",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-29",
-   "bodyDeadline": "2026-11-17",
-   "bodyDeadlineText": "1. 신청기간 신청: 2026. 7. 1.(수) 09:00 ~ 11. 17.(화) 18:00"
   },
   {
    "title": "[교외-11/23]2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내(재단지원)",

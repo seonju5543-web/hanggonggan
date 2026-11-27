@@ -16,5 +16,17 @@
   "why": "TypeError · fetch failed · UND_ERR_CONNECT_TIMEOUT",
   "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2516453&atch_no=1",
   "n": 1
+ },
+ "[학생복지팀] (2026-동계) 근로장학생(방학중) 배정 및 신청서 제출 안내|붙임.(2026-동계) 근로장학생(방학중) 선발 현황.pdf": {
+  "at": "2026-11-27",
+  "why": "TypeError · fetch failed · UND_ERR_CONNECT_TIMEOUT",
+  "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564549",
+  "n": 1
+ },
+ "[학생복지팀] (2026-동계) 근로장학생(방학중) 배정 및 신청서 제출 안내|붙임.근로장학생 신청서.hwp": {
+  "at": "2026-11-27",
+  "why": "TypeError · fetch failed · UND_ERR_CONNECT_TIMEOUT",
+  "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564550",
+  "n": 1
  }
 }
