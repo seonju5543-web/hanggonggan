@@ -163,7 +163,8 @@ export async function runAlert(opts, api, { log = console.log, sleep = wait } = 
       await sleep(3000);
       const again = planAlert({ mode: 'open', title, match }, await api.openIssues());
       keep = again.comment || result.issue;
-      if (again.close.includes(result.issue) && again.comment) {
+      /* 남는 이슈가 내 것이 아니면 늘 옮긴다 — 다른 실행이 먼저 다시 보고 내 것을 닫았으면 내 이슈는 목록에 없다(「닫을 목록에 내 것이 있을 때만」이면 본문이 닫힌 중복에만 남는다 · 리뷰 2026-11-27) */
+      if (again.comment && again.comment !== result.issue) {
         await api.comment(again.comment, body);   // 내 본문은 남는 이슈로 옮긴다
         result.issue = again.comment;
       }

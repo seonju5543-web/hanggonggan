@@ -434,10 +434,14 @@ const PROFILE = {
       eq('  이름 밑 작은 회색 글씨가 없다(.att-m 0) · PDF 목록이 위, 올린 목록이 맨 밑', s1 && [s1.meta, s1.order], [0, ['pdf', 'orig']]);
       eq('  맨 밑 — 올린 첨부 목록 그대로(원래 PDF 도 다시)', s1 && s1.bottom, ['선발 공고.hwpx', '안내 (2026).pdf']);
       /* 🔴 「열기 ›」 를 눌러도 열린다 (2026-11-27 · 개발자 「삼성 꿈장학 첨부의 PDF 가 열기를 눌러도 안 열린다」) — 이름 글자만 링크였고 「열기 ›」·아이콘은 그냥 글자였다.
-         위 검사는 「열기 ›」 글자가 있는지만 봐서 못 잡았다 → 손가락처럼 그 자리를 눌러(화면 좌표) 새 탭이 그 PDF 로 열리는지 본다 */
+         위 검사는 「열기 ›」 글자가 있는지만 봐서 못 잡았다 → 손가락처럼 그 자리를 눌러(화면 좌표) 새 탭이 그 PDF 로 열리는지 본다.
+         누르기 전에 그 줄을 시트 가운데로 굴린다 — 위 절(지원 자격·접수·공고 안내)은 실데이터로 채워져 길어지면 첨부 줄이 화면 밖으로 밀린다(리뷰 2026-11-27 · 데이터 탓 빨간불을 만들지 않게) */
       const openAt = async (sel) => {
         try {
-          const box = await page.locator(sel).first().boundingBox();
+          const el = typeof sel === 'string' ? page.locator(sel).first() : sel.first();
+          await el.evaluate((e) => e.scrollIntoView({ block: 'center' }));
+          await page.waitForTimeout(150);
+          const box = await el.boundingBox();
           if (!box) return '(자리 없음)';
           const [pop] = await Promise.all([page.waitForEvent('popup', { timeout: 3000 }), page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)]);
           const u = decodeURI(new URL(pop.url()).pathname);
@@ -460,6 +464,9 @@ const PROFILE = {
       eq('지원문서 머리 「선발 공고문」 — 첫 두 줄이 PDF 줄(열기 ›) · 끝 두 줄이 올린 원본(↓) · 작은 글씨·안내 문단 없음',
         [head.rows.slice(0, 2), head.rows.slice(-2), head.meta, head.note],
         [[['PDF', '선발 공고.hwpx', '열기 ›'], ['PDF', '안내 (2026).pdf', '열기 ›']], [['HWPX', '선발 공고.hwpx', '↓'], ['PDF', '안내 (2026).pdf', '↓']], 0, false]);
+      eq('  올린 원본 줄도 — 「↓」 자리를 눌러도 그 파일이 새 탭으로 열린다(줄 전체가 링크 · 리뷰 2026-11-27)',
+        await openAt(page.locator('#detail-sheet li.att-row:not(.att-row-new)').filter({ hasText: '안내 (2026).pdf' }).locator('.att-go')),
+        `/data/kosaf-files/${code}/안내 (2026).pdf`);
       await page.keyboard.press('Escape');
       await page.waitForTimeout(400);
       /* 사본 색인이 없으면(404·오프라인 · 아직 안 바꿈) PDF 줄은 원래 PDF 하나뿐 · 맨 밑 목록은 그대로 */

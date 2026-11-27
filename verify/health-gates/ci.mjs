@@ -273,12 +273,18 @@ export default async function gate(eq, ctx) {
     [slow.rc, slow.ran, slow.out.unrun, slow.out.failed], [1, list.slice(0, 2), list.slice(2).join(' '), '']);
   eq('  ⓚ (돌려 봄) 드라이버 하나의 시한도 남은 예산을 넘지 않는다(첫째 5분 · 둘째는 남은 50초 안)',
     [slow.tl[0], slow.tl[1] > 0 && slow.tl[1] <= 50], [300, true]);
-  const jobCap = Number((/^ {4}timeout-minutes:\s*(\d+)/m.exec(ui) || [])[1]);
+  /* 상한은 화면 검사 작업(ui)의 것만 읽는다 — 파일의 첫 상한을 읽으면 닫기 작업(ui-ok)의 상한을 잴 수 있다(리뷰 2026-11-27 · 순서를 바꾼 꼴이 초록이었다) */
+  const jobAt = ui.indexOf('\n  ui:\n');
+  const jobHead = jobAt < 0 ? '' : ui.slice(jobAt, ui.indexOf('\n    steps:', jobAt));
+  const jobCap = Number((/^ {4}timeout-minutes:\s*(\d+)/m.exec(jobHead) || [])[1]);
   const journeyRun = by('전 여정 회귀 (drive.js)').run || '';
   const journeySec = Number((/\btimeout -k \d+ (\d+) node verify\/drive\.js\b/.exec(journeyRun) || [])[1]);
   eq('  ⓚ 전 여정(drive.js)도 스스로 끝낸다(timeout -k · 5분 이하)', [journeySec > 0, journeySec <= 300], [true, true]);
-  eq('  ⓚ 작업 상한 > 화면 검사 예산 + 전 여정 시한 + 준비·값싼 관문 여유 3분 (넘치면 \'취소\'로 끝나 경보가 안 뜬다)',
-    jobCap > budgetMin + Math.ceil(journeySec / 60) + 3, true);
+  /* 수집기·관리자 규칙 관문은 「3초」라던 단계가 2분 안팎이 됐는데 시한이 없어 「여유 3분」을 혼자 다 썼다(리뷰 2026-11-27) — 스스로 끝내고 셈에 넣는다 */
+  const tcSec = Number((/\btimeout -k \d+ (\d+) node verify\/test-collector\.mjs\b/.exec(by('수집기·관리자 규칙 관문 (브라우저 불필요)').run || '') || [])[1]);
+  eq('  ⓚ 수집기·관리자 규칙 관문도 스스로 끝낸다(timeout -k · 5분 이하)', [tcSec > 0, tcSec <= 300], [true, true]);
+  eq('  ⓚ 화면 검사 작업(ui)의 상한 > 드라이버 예산 + 전 여정 시한 + 규칙 관문 시한 + 준비·값싼 관문 여유 3분 (넘치면 \'취소\'로 끝나 경보가 안 뜬다)',
+    [jobCap > 0, jobCap > budgetMin + Math.ceil(journeySec / 60) + Math.ceil(tcSec / 60) + 3], [true, true]);
   for (const n of ['말투·토큰 관문', '수집기·관리자 규칙 관문 (브라우저 불필요)', '전 여정 회귀 (drive.js)']) {
     eq(`  ⓓ 「${n}」 은 앞 단계가 실패해도 돈다(!cancelled())`, /!cancelled\(\)|always\(\)/.test(by(n).if || ''), true);
   }
@@ -333,20 +339,25 @@ export default async function gate(eq, ctx) {
   /* ⓛ 두 묶음으로 나눠 동시에 돈다 (2026-11-27) — 한 줄로 돌던 드라이버 32개가 26분 예산을 넘겨 맨 뒤 둘(verify-academic-info · verify-input-guard)이
      끊기거나 아예 안 돌았다(11-23 이후 빨간 실행 11번 가운데 9번 · 틀린 화면이 아니라 시간). 11-15 에 예산을 20 → 26분으로 키운 뒤 또 넘쳤다 —
      키우지 않고 같은 작업을 둘로 띄워(matrix) 드라이버를 번갈아 맡긴다. 루프는 PART(0부터)·PARTS 를 받아 제 몫만 돌고, 묶음 정보가 없으면(손으로 돌릴 때) 전부 돈다(위 ⓙⓚ). */
-  const odd = list.filter((_, i) => i % 2 === 0);
-  const even = list.filter((_, i) => i % 2 === 1);
-  const halves = ['0', '1'].map((p) => runDriverLoop(drivers.run || '', { env: { PART: p, PARTS: '2' } }));
-  eq('ⓛ (돌려 봄) 두 묶음이 번갈아 나눠 돈다 — 첫 묶음은 1·3·5…번째 · 둘째는 2·4·6…번째 · 둘 다 통과로 끝난다',
-    [halves[0].ran, halves[1].ran, halves.map((h) => h.rc)], [odd, even, [0, 0]]);
-  eq('  ⓛ 두 묶음을 합치면 목록 전부 · 겹치는 드라이버 없음(빠지거나 두 번 도는 드라이버가 없다)',
-    [[...halves[0].ran, ...halves[1].ran].sort().join(' ') === [...list].sort().join(' '), halves[0].ran.filter((f) => halves[1].ran.includes(f))], [true, []]);
-  const halfSlow = runDriverLoop(drivers.run || '', { step: budgetMin * 60 - 50, env: { PART: '1', PARTS: '2' } });
+  const parts = ((/^ {8}part: \[([^\]]*)\]$/m.exec(jobHead) || [])[1] || '').split(',').filter((x) => x.trim()).length;
+  eq('ⓛ 화면 검사 작업이 여러 묶음이다(matrix 둘 이상) · 한 묶음이 넘어져도 다른 묶음은 끝까지 돈다(fail-fast: false)',
+    [/^ {6}fail-fast: false$/m.test(jobHead), parts >= 2], [true, true]);
+  /* 묶음 수는 워크플로에서 읽는다 — 묶음을 하나 더하면(part 에 하나 · 리뷰 2026-11-27) 루프도 관문도 손대지 않고 따라온다 */
+  const N = Math.max(parts, 2);
+  const shareOf = (n) => [...Array(n).keys()].map((p) => list.filter((_, i) => i % n === p));
+  const runsOf = (n) => [...Array(n).keys()].map((p) => runDriverLoop(drivers.run || '', { env: { PART: String(p), PARTS: String(n) } }));
+  const runs = runsOf(N);
+  eq(`  ⓛ (돌려 봄) ${N} 묶음이 번갈아 나눠 돈다 — 묶음 1 은 1·${1 + N}·${1 + 2 * N}…번째 · 다 통과로 끝난다`,
+    [runs.map((r) => r.ran), runs.map((r) => r.rc)], [shareOf(N), runs.map(() => 0)]);
+  const whole = (rs) => [rs.flatMap((r) => r.ran).sort().join(' ') === [...list].sort().join(' '), rs.flatMap((r) => r.ran).length === list.length];
+  /* 묶음을 하나 더한 꼴은 합만 재면 못 잡는다 — 나눗수를 2 로 박아도 셋째 묶음이 빈 채로 끝나 합은 전부가 된다(실측) · 묶음마다 제 몫까지 잰다 */
+  const more = runsOf(N + 1);
+  eq('  ⓛ 묶음을 합치면 목록 전부 · 겹치는 드라이버 없음(빠지거나 두 번 도는 드라이버가 없다) · 묶음을 하나 더해도 묶음마다 제 몫을 돈다',
+    [whole(runs), whole(more), more.map((r) => r.ran)], [[true, true], [true, true], shareOf(N + 1)]);
+  const second = shareOf(N)[1];
+  const halfSlow = runDriverLoop(drivers.run || '', { step: budgetMin * 60 - 50, env: { PART: '1', PARTS: String(N) } });
   eq('  ⓛ (돌려 봄) 예산은 묶음마다 따로 — 둘째 묶음이 예산을 다 쓰면 제 몫에서 남은 이름만 unrun 으로 넘기고 실패로 끝난다(다른 묶음 몫은 세지 않는다)',
-    [halfSlow.rc, halfSlow.ran, halfSlow.out.unrun], [1, even.slice(0, 2), even.slice(2).join(' ')]);
-  const jobAt = ui.indexOf('\n  ui:\n');
-  const jobHead = jobAt < 0 ? '' : ui.slice(jobAt, ui.indexOf('\n    steps:', jobAt));
-  eq('  ⓛ 화면 검사 작업이 두 묶음이다(matrix 둘) · 한 묶음이 넘어져도 다른 묶음은 끝까지 돈다(fail-fast: false)',
-    [/^ {6}fail-fast: false$/m.test(jobHead), ((/^ {8}part: \[([^\]]*)\]$/m.exec(jobHead) || [])[1] || '').split(',').filter((x) => x.trim()).length], [true, 2]);
+    [halfSlow.rc, halfSlow.ran, halfSlow.out.unrun], [1, second.slice(0, 2), second.slice(2).join(' ')]);
   const envAt = (s, k) => ((new RegExp(`^ {10}${k}:\\s*(.+)$`, 'm').exec(s.raw || '') || [])[1] || '').trim();
   eq('  ⓛ 드라이버 루프와 경보가 제 묶음 번호를 받는다(PART = strategy.job-index · PARTS = strategy.job-total)',
     [envAt(drivers, 'PART'), envAt(drivers, 'PARTS'), envOf('PART'), envOf('PARTS')],
@@ -365,8 +376,13 @@ export default async function gate(eq, ctx) {
   eq('  ⓛ 옛 경보 닫기는 묶음 작업 밖 — 두 묶음이 다 끝난 뒤(needs: ui) 둘 다 초록일 때만(success()) · 묶음(matrix)이 아니다',
     [closeAt > 0, !!closeJob && closeJob[1] !== 'ui', /^ {4}needs: ui$/m.test(closeHead), /^ {4}if: success\(\)/m.test(closeHead), /strategy:/.test(closeHead)], [true, true, true, true, false]);
   const legBody = runAlarm(alarm.run || '', { DRIVERS: 'success', FAILED: '', PART: '1', PARTS: '2' });
-  eq('  ⓛ 경보 본문이 어느 묶음 것인지 적는다(묶음마다 따로 연다 — 「드라이버는 전부 통과」가 다른 묶음까지 말하는 것으로 읽히지 않게) · 묶음 정보가 없으면 그 줄이 없다',
-    [legBody.includes(HEAD), /묶음 2\/2/.test(legBody), /묶음 \d/.test(failed)], [true, true, false]);
+  const leg3 = runAlarm(alarm.run || '', { DRIVERS: 'failure', FAILED: 'verify-x.js', PART: '2', PARTS: '3' });
+  eq('  ⓛ 경보 본문이 어느 묶음 것인지 적는다(묶음마다 따로 연다 — 「드라이버는 전부 통과」가 다른 묶음까지 말하는 것으로 읽히지 않게) · 묶음 수를 글자로 박지 않는다 · 묶음 정보가 없으면 그 줄이 없다',
+    [legBody.includes(HEAD), /묶음 2\/2/.test(legBody), /묶음 3\/3 — 화면 검사를 3개 묶음으로/.test(leg3), /두 묶음/.test(leg3), /묶음 \d/.test(failed)], [true, true, true, false, false]);
+  /* 한 번만 도는 관문(값싼 관문 · 말투·토큰 · 수집기 규칙 · 전 여정)은 첫 묶음에만 있다 — 둘째 묶음 경보가 「빨간 단계는 그 관문들」이라고 가리키면 없는 단계를 찾게 된다(리뷰 2026-11-27) */
+  eq('  ⓛ 드라이버는 다 돈 날의 「빨간 단계는 그 밖」 — 첫 묶음(과 묶음 정보 없음)은 한 번만 도는 관문을 · 둘째 묶음부터는 그 묶음의 준비 단계를 가리킨다',
+    [/그 밖\(앞의 값싼 관문/.test(passed), /그 밖\(앞의 값싼 관문/.test(runAlarm(alarm.run || '', { DRIVERS: 'success', FAILED: '', PART: '0', PARTS: '2' })), /그 밖\(이 묶음의 준비 단계/.test(legBody), /첫 묶음에서만 돈다/.test(legBody)],
+    [true, true, true, true]);
 
   /* ── ③ 작업 브랜치 배포 뒤 화면 검사를 깨운다 ── */
   const dd = read(root, '.github/workflows/device-deploy.yml');

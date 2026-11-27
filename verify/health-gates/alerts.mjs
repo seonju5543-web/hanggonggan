@@ -228,12 +228,13 @@ export default async function gate(eq, ctx) {
   eq('  긴 본문은 한도 안으로 자른다(넘으면 GitHub 이 거절해 경보가 사라진다)', [fitBody('x'.repeat(BODY_LIMIT + 10)).length < 65536, fitBody('짧음')], [true, '짧음']);
   {
     /* 실행부 — 가짜 저장소로 한 바퀴: 담당자 지정이 막히면 담당자 없이 다시 만든다 · 같은 초에 다른 실행이 만든 작은 번호가 있으면 내 것을 닫고 본문을 옮긴다 */
-    const mk = (open, { failAssignee = false, racer = null } = {}) => {
+    /* vanish — 다시 볼 때 내 이슈가 이미 없다(같은 때 연 다른 실행이 먼저 다시 보고 내 것을 닫은 꼴) */
+    const mk = (open, { failAssignee = false, racer = null, vanish = false } = {}) => {
       const log = [];
       let n = 500;
       const api = {
         openIssues: async () => open.slice(),
-        create: async ({ title, assignees }) => { if (failAssignee && assignees.length) throw new Error('담당자 불가'); n += 1; open.push({ number: n, title }); if (racer) open.push(racer); log.push(`create#${n}${assignees.length ? '+담당' : ''}`); return { number: n }; },
+        create: async ({ title, assignees }) => { if (failAssignee && assignees.length) throw new Error('담당자 불가'); n += 1; if (!vanish) open.push({ number: n, title }); if (racer) open.push(racer); log.push(`create#${n}${assignees.length ? '+담당' : ''}`); return { number: n }; },
         comment: async (k) => { log.push(`comment#${k}`); },
         close: async (k, _b, why) => { log.push(`close#${k}:${why}`); },
         ensureLabel: async () => { log.push('label'); },
@@ -246,6 +247,11 @@ export default async function gate(eq, ctx) {
     const b = mk([], { racer: { number: 499, title: 'T' } });
     const r = await runAlert({ mode: 'open', title: 'T', body: 'b' }, b.api, { log: () => {}, sleep: async () => {} });
     eq('  실행부 — 같은 초에 다른 실행이 먼저 만든 경보가 있으면 내 본문을 그쪽에 옮기고 내 것을 닫는다', [b.log, r.issue], [['create#501', 'comment#499', 'close#501:not_planned'], 499]);
+    /* 리뷰 2026-11-27 — 다른 실행이 먼저 다시 보고 내 것을 닫으면, 내가 다시 볼 때 내 이슈가 목록에 없어 「닫을 목록에 내 것이 있을 때만」 옮기던 옛 조건이 거짓이 됐다.
+       그러면 내 본문은 닫힌 중복에만 남는다(화면 검사를 두 묶음으로 나눈 뒤 두 묶음이 같은 때 빨개지면 생긴다) — 남는 이슈가 내 것이 아니면 늘 옮긴다 */
+    const v = mk([], { racer: { number: 499, title: 'T' }, vanish: true });
+    const rv = await runAlert({ mode: 'open', title: 'T', body: 'b' }, v.api, { log: () => {}, sleep: async () => {} });
+    eq('  실행부 — 다른 실행이 내 경보를 먼저 닫아 다시 볼 때 그쪽 것만 남아도 내 본문을 그쪽에 옮긴다(닫힌 중복에만 남지 않게)', [v.log, rv.issue], [['create#501', 'comment#499'], 499]);
     const c = mk([{ number: 350, title: '🚨 앱 반영 점검 실패 (옛)' }, { number: 384, title: '🚨 앱 반영 점검 실패 (옛2)' }]);
     await runAlert({ mode: 'resolve', title: '🚨 앱 반영 점검 실패', match: 'prefix', body: 'ok' }, c.api, { log: () => {} });
     eq('  실행부 — resolve 는 맞는 경보를 전부 닫는다(만들지 않는다)', c.log, ['close#350:completed', 'close#384:completed']);
