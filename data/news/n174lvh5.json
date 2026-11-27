@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-27",
  "items": [
   {
+   "title": "보안 업데이트에 따른 대표 홈페이지 접속 일시 중단 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278292&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-27",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-27",
+   "desc": "최신 보안 업데이트 적용을 위해 서버를 재기동할 예정입니다. 작업 중 가톨릭대학교 대표 홈페이지 접속이 일시적으로 중단될 수 있으니 이용에 참고해 주시기 바랍니다."
+  },
+  {
    "title": "[기숙사운영센터] 2026학년도 동계방학 기숙사(K,A관) 추가모집 공고",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278278&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-27",
@@ -420,17 +430,6 @@
    "foundAt": "2026-11-02",
    "thumb": "data/news/img/04f06225e5e2fdff.webp",
    "desc": "늦가을로 접어드는 11월, 학생 여러분이 26학년도 2학기의 남은 시간들을 의미있게 마무리하길 응원하는 마음으로 [학습클리닉] 프로그램을 안내합니다."
-  },
-  {
-   "title": "[대플-추천채용] 스탠다드인터내셔널 주식회사 - 구매/재무/NPD/Tech/마케팅 채용",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277316&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-30",
-   "desc": "* 전형절차 : 1차면접(실무진) -> 2차면접(임원) -> 최종합격 - 추천채용 지원자 서류 전형 면제"
   }
  ]
 }

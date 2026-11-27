@@ -1115,6 +1115,312 @@
     }
    ],
    "problems": []
+  },
+  "auto-363detailviewdocategory6": {
+   "name": "(끌어올림)[앵커사업단] 근로장학생 모집 안내 (~11/30(월) 모집 마감)",
+   "hash": "d2e1bc3a25cce744",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "da50adfcf002249f",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-zc3cnavcodeknu1619416593-0226qa1": {
+   "name": "2026학년도 동계방학 중 교내 근로장학생 신청 및 선발 안내",
+   "hash": "0f93c9bb8af38c16",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "672b91842a457b33",
+   "summary": "제외 대상 한 줄에 묶인 세 요건(수업연한 초과자·휴학생·학사학위취득유예자)을 한 줄씩 나누었습니다. 합격 확인 기간과 합격확인 버튼 클릭 의무를 원문에 맞게 두 줄로 갈랐고, 나머지는 원문과 일치합니다.",
+   "changes": [
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "add",
+     "text": "2026학년도 2학기 학부 재학생"
+    },
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "remove",
+     "text": "2026. 2학기 학부 재학생"
+    },
+    {
+     "field": "excludes",
+     "label": "받을 수 없는 경우",
+     "kind": "add",
+     "text": "수업연한 초과자"
+    },
+    {
+     "field": "excludes",
+     "label": "받을 수 없는 경우",
+     "kind": "add",
+     "text": "휴학생"
+    },
+    {
+     "field": "excludes",
+     "label": "받을 수 없는 경우",
+     "kind": "add",
+     "text": "학사학위취득유예자"
+    },
+    {
+     "field": "excludes",
+     "label": "받을 수 없는 경우",
+     "kind": "remove",
+     "text": "수업연한 초과자, 휴학생, 학사학위취득유예자"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "합격 확인 기간은 2026. 12. 8.(화) 9시 ~ 2026. 12. 9.(수) 16시까지입니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "확인 기간 내에 '합격확인' 버튼을 반드시 클릭해야 최종합격되며, 클릭하지 않으면 합격이 취소됩니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "합격 확인 기간(2026. 12. 8.(화) 9시 ~ 2026. 12. 9.(수) 16시) 내에 '합격확인' 버튼을 반드시 클릭해야 최종합격되며, 클릭하지 않으면 합격이 취소됩니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "form-lvlfo4-1.hwp",
+     "attach": "통합정보시스템 교내근로장학생 학생 신청 및 근로 합격 확인 방법.hwp",
+     "hash": "56fdbdad045cb994",
+     "role": "content",
+     "formStart": "",
+     "why": "통합정보시스템에서의 신청 방법과 합격 확인 방법을 설명하는 안내문으로, 학생이 채워 내는 서식이 없습니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "doc",
+     "file": "docs-pdf/auto-zc3cnavcodeknu1619416593-0226qa1/1-통합정보시스템_교내근로장학생_학생_신청_및_근로_합격_확인_방법.pdf",
+     "name": "통합정보시스템 교내근로장학생 학생 신청 및 근로 합격 확인 방법.hwp",
+     "bytes": 129501,
+     "verdict": "ok",
+     "why": "원본 첨부 [A1]의 신청 방법·합격 확인 방법 글과 화면 캡처가 두 쪽에 빠짐없이 읽을 수 있게 들어 있습니다."
+    }
+   ],
+   "problems": []
+  },
+  "auto-jukr145237540artclviewdo": {
+   "name": "[자연캠퍼스-교내근로] 2026학년도 동계방학 국가근로장학생 선발 안내",
+   "hash": "1f60c78ec19fe49a",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "c369e59e74ce86bd",
+   "summary": "국가근로장학금 신청자 요건을 두 줄로 나누고, 선발 비보장·배정 불가 유의사항을 분리했으며, 빠진 근로 불가 대상·기간 유의사항을 추가하고 서류 이름을 원문 그대로 고쳤습니다.",
+   "changes": [
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "add",
+     "text": "2026년도 2학기 국가근로장학금 신청자"
+    },
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "add",
+     "text": "1차/2차/추가신청 기간 내 신청을 완료하여 학자금 지원구간이 확정된 학생"
+    },
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "remove",
+     "text": "2026년도 2학기 국가근로장학금 신청자(1차/2차/추가신청 기간 내 신청을 완료하여 학자금 지원구간이 확정된 학생)"
+    },
+    {
+     "field": "documents",
+     "label": "제출 서류",
+     "kind": "add",
+     "text": "2026-2학기 동계방학 교내 국가근로장학생 지원서"
+    },
+    {
+     "field": "documents",
+     "label": "제출 서류",
+     "kind": "remove",
+     "text": "동계방학 교내 국가근로장학생 지원서"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "신청 자격을 충족해도 최종 선발이 보장되지 않습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "신청 인원이 많으면 배정되지 않을 수 있습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "학적 변동자(휴학, 제적, 수료, 졸업), 교환학생은 근로할 수 없으며, 병원 입·퇴원 당일과 해외 입·출국 당일(근로 후 출국 불가, 입국 후 근로 불가)에도 근로할 수 없습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "신청 자격을 충족해도 최종 선발이 보장되지 않으며, 인원이 많으면 배정되지 않을 수 있습니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "form-13opdp-1.hwp",
+     "attach": "2026-동계방학 교내근로 지원서.hwp",
+     "hash": "ac9dd2ad2f85a5a7",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 학번·성명·근로가능시간 등을 채워 내는 교내근로 지원서 양식이며, 뒤의 참고사항은 서식에 딸린 작성 안내입니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-enoticedoarticleno770733": {
+   "name": "[학생복지팀] (2026-동계) 근로장학생(방학중) 배정 및 신청서 제출 안내",
+   "hash": "784e746f4d0f948c",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "d568e6569a3851b1",
+   "summary": "고친 것 없음 — 카드 내용과 첨부 구분이 원문과 일치하여 그대로 두고 각 줄에 원문 근거 문구를 붙였습니다.",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-kxcua2-1.hwp",
+     "attach": "붙임.근로장학생 포기신청서.hwp",
+     "hash": "7a443d74a944fdb3",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 중도 포기 시 직접 작성해 내는 교내근로장학생 포기 신청서 서식만 들어 있습니다."
+    },
+    {
+     "file": "elig-kxcua2-1.pdf",
+     "attach": null,
+     "hash": "e700143b284d601a",
+     "role": "content",
+     "formStart": "",
+     "why": "근로장학생 선발 대상·자격·금액·신청 방법·유의사항을 담은 안내문입니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-skor478127526artclviewdo": {
+   "name": "[글로벌] 2026-동계방학 일반 교내 및 교외 국가근로장학생 모집 안내",
+   "hash": "f09899840aef29d4",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "d0c631ce02f6f64c",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-akfwnw-2.hwp",
+     "attach": "(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp",
+     "hash": "daeb0d2eec628512",
+     "role": "content",
+     "formStart": "",
+     "why": "국가근로장학금 운영계획서 및 자체선발기준으로 선발 기준·시급·지급 방법 등을 담은 읽는 문서이며 학생이 채우는 서식은 없습니다."
+    },
+    {
+     "file": "elig-akfwnw-1.pdf",
+     "attach": null,
+     "hash": "5ff09469936c9b62",
+     "role": "content",
+     "formStart": "",
+     "why": "동계방학 근로지별 모집 인원과 근로내용·우대사항을 정리한 모집 현황표(붙임1)로 읽는 문서입니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-leno278243srcategoryid22": {
+   "name": "[학부대학운영팀] 2026학년도 2학기 Trinity DESIGNer 오픈배지 장학금 신청 안내 (~2026",
+   "hash": "fb632ffea2b34849",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "649bc43d35a9b760",
+   "summary": "포스터에 적힌 장학금 총액(3000만원)을 금액에 추가하고, 배지 신청 안내 줄을 근거 문구에 맞게 두 줄로 나눴습니다.",
+   "changes": [
+    {
+     "field": "amount",
+     "label": "금액",
+     "kind": "add",
+     "text": "장학금 총 3000만원"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "배지는 My Activity-외부비교과 신청에서 신청합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "배지 신청 시 유형구분 설정에 주의해야 하며, 배지 발급은 12/18(금)까지 처리될 예정입니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "배지는 AI 스마트통합지원시스템의 My Activity-외부비교과 신청에서 신청하며, 유형구분 설정에 주의해야 하고 배지 발급은 12/18(금)까지 처리될 예정입니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "elig-1ou8p5-1.png",
+     "attach": null,
+     "hash": "73360f7eff729dd7",
+     "role": "content",
+     "formStart": "",
+     "why": "선발기준·신청기간·금액·신청방법을 담은 안내 포스터 이미지로, 학생이 채우는 서식이 없습니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-15nttno171952searchctgry": {
+   "name": "2027학년도 1학기 학부 교내장학금(복지·특별·법정) 신청 안내",
+   "hash": "c291c7c145896990",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "9a206a0f98810d6a",
+   "summary": "고친 것 없음 (자격제한 12학점 미만·수업연한 초과는 법정면제 장학금에 예외가 있어 공통 제외 조건으로 넣지 않았습니다).",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-264c1l-1.hwp",
+     "attach": "2027-1학기 교내(복지·특별·법정)장학금 신청 안내문.hwp",
+     "hash": "8a5efe2f5a9844e8",
+     "role": "content",
+     "formStart": "",
+     "why": "복지·특별·법정 장학금의 선발개요, 유형별 신청자격·장학등급·제출서류, 신청 방법을 설명하는 안내문입니다."
+    },
+    {
+     "file": "form-264c1l-2.hwp",
+     "attach": "2027-1학기 교내(복지·특별·법정)장학금 신청서 서식.hwp",
+     "hash": "6be986f3c18c236c",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 작성해 제출하는 교내장학금 신청서와 개인정보 수집·이용 동의서 서식만 들어 있습니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
   }
  },
  "updatedAt": "2026-11-27"

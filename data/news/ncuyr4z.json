@@ -3,6 +3,31 @@
  "updatedAt": "2026-11-27",
  "items": [
   {
+   "title": "[전북대학교 창업지원단] 2026 모두의 창업 2차 Modoo. Start-up Festa 개최 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220390/detailView.do",
+   "postedAt": "2026-11-27",
+   "postId": "220390",
+   "kind": "행사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/0fcdf23811093973.webp",
+   "desc": "안녕하세요. 전북대학교 창업지원단입니다. 창업의 즐거움과 열정이 가득한 특별한 축제! 「모두의 창업」 프로젝트의 성과를 함께 나누고, 창업에 관심 있는 분들이 자유롭게 즐기고 교류할 수 있는 자리를 마련했습니다."
+  },
+  {
+   "title": "[AIX-PBL센터] 2026학년도 2학기 AIX-PBL 수업 참여자 만족도 조사 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220379/detailView.do",
+   "postedAt": "2026-11-27",
+   "postId": "220379",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/7a275a1c9fc19a37.webp",
+   "desc": "교육혁신본부 교육혁신부 안녕하세요, 국립대학육성사업 AIX-PBL센터입니다. 2026학년도 2학기 AIX-PBL 교과목의 운영 성과를 점검하고 더 나은 수업 지원 방안을 마련하기 위해 만족도 조사를 진행합니다."
+  },
+  {
    "title": "[법정의무교육 관련] 2026 장애 인식개선 캠페인 운영 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/220367/detailView.do",
    "postedAt": "2026-11-27",
@@ -364,7 +389,7 @@
    "campus": "",
    "src": "e41d3fac",
    "foundAt": "2026-11-20",
-   "desc": "- 영어 의사소통 능력과 AI 이해 활용 역량을 높이고, 어학연수, 기업탐방이 결합된 프로그램"
+   "desc": "(어학연수 + AI 기업탐방 + AI 특강 + 문화체험) 관심있는 학우분들의 많은 지원 바랍니다."
   },
   {
    "title": "제20대 총장임용후보자 공개토론회 온라인 중계 안내",
@@ -400,7 +425,7 @@
    "src": "e41d3fac",
    "foundAt": "2026-11-20",
    "thumb": "data/news/img/94605021ffc3ac32.webp",
-   "desc": "전북국제개발협력센터 안녕하세요, 전북국제개발협력센터입니다 (●'◡'●) KOICA 귀국인재 JB 리크루터 4기 커피챗을 진행합니다!"
+   "desc": "안녕하세요, 전북국제개발협력센터입니다 (●'◡'●) KOICA 귀국인재 JB 리크루터 4기 커피챗을 진행합니다!"
   },
   {
    "title": "[언어교육부] 12월 19일(토) 모의토익 실시 안내",
@@ -422,36 +447,13 @@
    "campus": "",
    "src": "e41d3fac",
    "foundAt": "2026-11-19",
-   "desc": "- 영어 의사소통 능력과 AI 이해 활용 역량을 높이고, 어학연수, 기업탐방이 결합된 프로그램"
+   "desc": "(어학연수 + AI 기업탐방 + AI 특강 + 문화체험) 관심있는 학우분들의 많은 지원 바랍니다."
   },
   {
    "title": "[연금관리학과] 2026학년도 연금관리학과 연계전공 설명회 (간식제공)",
    "url": "https://www.jbnu.ac.kr/web/Board/219989/detailView.do",
    "postedAt": "2026-11-18",
    "postId": "219989",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-18",
-   "desc": "연금관리학과 1. 초청 명사 : 연금관리학과 전공주임교수 전경민 2. 일시/장소 : 2026.11.18(수) 12:30 / 3호관 105호"
-  },
-  {
-   "title": "2027학년도 전기(2차) 대학원 신입생 모집 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/219985/detailView.do",
-   "postedAt": "2026-11-18",
-   "postId": "219985",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-18",
-   "desc": "▷ 모집전형: 신입생 ▷ 모집요강 공지: 11월 말 예정(대학원 홈페이지-공지사항)"
-  },
-  {
-   "title": "[연금관리학과] 2026학년도 전북대학교 연금관리학과 연계전공 설명회 (간식제공)",
-   "url": "https://www.jbnu.ac.kr/web/Board/219982/detailView.do",
-   "postedAt": "2026-11-18",
-   "postId": "219982",
    "kind": "학사",
    "school": "전북대학교",
    "campus": "",
