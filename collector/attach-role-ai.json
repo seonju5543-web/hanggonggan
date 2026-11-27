@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-27",
+ "updatedAt": "2026-11-28",
  "items": {
   "auto-rykeywordpaged1slug20262-0e9iyco": {
    "at": "2026-11-23",
@@ -407,6 +407,32 @@
      "role": "content",
      "formStart": "",
      "why": "근로장학생 선발 대상·자격·금액·신청 방법·유의사항을 담은 안내문입니다."
+    }
+   ]
+  },
+  "auto-0713no2516453sitedvscdkr": {
+   "at": "2026-11-28",
+   "docs": [
+    {
+     "file": "elig-8y5ppz-1.hwpx",
+     "attach": null,
+     "hash": "dcb30fe254698d15",
+     "role": "mixed",
+     "formStart": "[서식 1] 이력서 및 자기소개서 ※ 유의사항: 기재사항이 많을 경우 글자크기, 장평 등을 조절하여 1장으로 작성",
+     "why": "모집 안내문 본문 뒤에 학생이 작성하는 이력서·자기소개서와 개인정보 동의서 서식이 함께 들어 있습니다."
+    }
+   ]
+  },
+  "auto-enoticedoarticleno770739": {
+   "at": "2026-11-28",
+   "docs": [
+    {
+     "file": "elig-1tw91l-1.hwp",
+     "attach": null,
+     "hash": "e8d6c761db0e17ae",
+     "role": "content",
+     "formStart": "",
+     "why": "신청 기간·자격·금액·신청 방법·유의사항을 담은 공고문으로, 학생이 채우는 서식은 없습니다."
     }
    ]
   }
