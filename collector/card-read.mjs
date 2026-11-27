@@ -36,7 +36,7 @@ import { attachmentText, docOrder, readableDoc, loadNoticeDocIndex } from './att
 import { closedForStudents } from './rescue-plan.mjs';
 import { sameTitle } from './detail-url.mjs';
 import { AI_ROLES, fileHash16 } from './attach-role-ai.mjs';
-import { ACT_FILES, ACT_SYSTEM, actGateOn, actItems, makeActSources, actAwaits, actOcrWaiting } from './act-card.mjs';
+import { ACT_FILES, ACT_SYSTEM, actGateOn, actItems, makeActSources, actAwaits, actOcrWaiting, actOcrPendingIn } from './act-card.mjs';
 
 const require = createRequire(import.meta.url);
 const HERE = new URL('.', import.meta.url);
@@ -299,10 +299,11 @@ export function actGateHeldOf(items, partsOf, ledger, paid, today, prevHeld = {}
   }
   return out;
 }
-/* 읽고도 실을 것이 없어 무료 값으로 남은 글(장부 done)은 「멈춘 글」이 아니다 — 세면 그 글이 마감될 때까지 경보가 꺼지지 않는다 */
-export function actGateStalled(items, data, ledger, today, waitDays = 3) {
+/* 읽고도 실을 것이 없어 무료 값으로 남은 글(장부 done)은 「멈춘 글」이 아니다 — 세면 그 글이 마감될 때까지 경보가 꺼지지 않는다.
+   🔴 다만 그 뒤 그림 글자 대기가 된 글(isPending)은 센다(리뷰 2026-11-28) — 그 「읽을 내용 없음」은 포스터 글자가 빠진 채 읽은 것일 수 있고, 넘기지도 않으니(actGateHeldOf) 경보가 있어야 한다 */
+export function actGateStalled(items, data, ledger, today, isPending = () => false, waitDays = 3) {
   const paid = (data && data.items) || {}, held = (data && data.gateHeld) || {};
-  return items.filter((it) => it.paidGate && !it.paidOpen && !it.hidden && !paid[it.id] && !held[it.id] && !((ledger || {})[it.id] || {}).done
+  return items.filter((it) => it.paidGate && !it.paidOpen && !it.hidden && !paid[it.id] && !held[it.id] && (!((ledger || {})[it.id] || {}).done || isPending(it))
     && !actClosed(it, today) && daysSince(it.paidGate, today) > waitDays);
 }
 /* 유료 관문 기록 (2026-11-21 개발자 지시 「위의 두개도 켜서」 — 실제 비용·통과 재기를 켠다) — 이미 저장되는 장부·결과 파일에서 센다(돈 0).
@@ -436,14 +437,14 @@ if (process.argv[1] && ranDirectly()) {
   if (process.argv.includes('--stats')) {   // 유료 관문 기록(돈 0) — 워크플로가 실행 요약 칸에 붙인다
     const led = readJson('card-read-ledger.json', {});
     console.log(gateStatsText(gateStats({ items: reg.items, data, ledger: led, frLedger: readJson('final-review-ledger.json', {}), frResult: readJson('final-review.json', { items: {} }), today: TODAY,
-      stalled: ACT ? actGateStalled(reg.items, data, led, TODAY).length : null }), TODAY, ACT));
+      stalled: ACT ? actGateStalled(reg.items, data, led, TODAY, actOcrPendingIn(P('act-text'))).length : null }), TODAY, ACT));
     /* 그림 글자를 기다리는 글(2026-11-27) — 그림 글자 엔진 고장·시간 부족으로 원문이 덜 와 읽지도 넘기지도 않고 기다리는 글. 요약 칸에 보여야 사흘 경보 전에 안다 */
-    if (ACT) { const w = actOcrWaiting(reg.items, P('act-text')); if (w.length) console.log(`- 그림 글자를 기다리는 글 ${w.length}건(그림 글자 엔진 고장·시간 부족 — 글자가 오면 다음 실행에 읽는다 · 사흘이 지나면 앱이 무료 값으로 올리고 경보가 운다)`); }
+    if (ACT) { const w = actOcrWaiting(reg.items, P('act-text'), { paid: data.items, today: TODAY }); if (w.length) console.log(`- 그림 글자를 기다리는 글 ${w.length}건(그림 글자 엔진 고장·시간 부족 — 글자가 오면 다음 실행에 읽는다 · 사흘이 지나면 앱이 무료 값으로 올리고 경보가 운다)`); }
     process.exit(0);
   }
   if (process.argv.includes('--gate-alarm')) {   // 경보 세기(GITHUB_OUTPUT 꼴 · 읽기만) — 값에 줄바꿈이 들어가지 않게 누른다
     /* 활동 스위치가 꺼져 있으면 0 — 꺼진 동안 표시 글이 사흘 뒤 무료 값으로 오르는 것은 정한 동작이다(멈춤이 아니다 · 경보 문구도 「켜져 있는데…」 · 최종 리뷰 2026-11-26) */
-    const st = ACT ? (cfg.enabled ? actGateStalled(reg.items, data, readJson('card-read-ledger.json', {}), TODAY) : []) : gateStalled(reg.items, data, TODAY), one = (x) => String(x || '').replace(/[\r\n]+/g, ' ').trim();
+    const st = ACT ? (cfg.enabled ? actGateStalled(reg.items, data, readJson('card-read-ledger.json', {}), TODAY, actOcrPendingIn(P('act-text'))) : []) : gateStalled(reg.items, data, TODAY), one = (x) => String(x || '').replace(/[\r\n]+/g, ' ').trim();
     console.log(`count=${st.length}`);
     console.log(`list=${one(st.slice(0, 12).map((it) => `${one(it.name).slice(0, 40)}(${it.id})`).join(' / ')).slice(0, 900)}`);
     process.exit(0);
@@ -529,7 +530,7 @@ if (process.argv[1] && ranDirectly()) {
   const waiting = reg.items.filter((it) => !it.program && (it.paidGate || it.paidRead) && !closedNow(it, data.items[it.id], TODAY) && awaits(it, partsOf(it), TODAY, cfg.waitAttachDays)).length;
   log(`대상 ${targets.length}건 (유료 확인을 기다리는 숨김 등록분 가운데 마감 전이고 · 원문이 있고 · 이 원문을 아직 안 읽은 것) · 첨부를 기다리는 것 ${waiting}건 · 이미 실린 것 ${Object.keys(data.items).length}건 · 내린 것 ${pruned}건`);
   if (ACT) {   // 그림 글자 대기로 읽지 않은 글 — 시험 실행이면 지정한 id 가운데(2026-11-27 · 돈 0)
-    const w = actOcrWaiting(reg.items, P('act-text'), ONLY);
+    const w = actOcrWaiting(reg.items, P('act-text'), { only: ONLY, paid: data.items, today: TODAY });
     if (w.length) log(`그림 글자를 기다려 읽지 않은 글 ${w.length}건(그림 글자 엔진 고장·시간 부족 — 글자가 오면 다음 실행에 읽는다 · 돈 0): ${w.slice(0, 8).map((it) => it.id).join(', ')}`);
   }
   const fake = process.env.CARD_READ_FAKE ? JSON.parse(fs.readFileSync(process.env.CARD_READ_FAKE, 'utf8')) : null;

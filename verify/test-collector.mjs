@@ -18037,20 +18037,38 @@ module.exports = class Anthropic {
         [triedNext, wroteAgain, due('act-c', 'plain', '2026-11-27'), due('act-c', 'plain', '2026-11-28'), JSON.parse(rawOf('act-c', 'plain')).at, sameFormat(rawOf('act-c', 'plain'))], [true, false, false, true, '2026-11-26', true]);
       /* 2026-11-27 유료 시험(개발자 「5건 시험해」) — 그림 글자 엔진이 고장 난 실행에서 포스터 글자가 **조용히 빠진 채** 기록돼, 해커톤은 「원문 없음」·캠프는 서식만 읽혀 「읽을 내용 없음」이 됐다
          (운영이었으면 둘 다 사람에게 넘겨져 학생 화면에서 숨었다 · 본문이 있는 글이면 포스터가 빠진 카드를 샀다). 개발자 「재발하지 않도록 순서도에 확실하게 각인」 —
-         엔진 고장·시간 부족으로 못 읽은 그림은 「그림 글자 대기」(ocrPending · 원본 바이트 지문)로 기록에 남는다 · 본문이 있어도 다음 날 다시 받는다(같은 날은 안 받는다) ·
-         그 그림 글자가 오거나 이 글의 그림을 다 읽은 실행이면 지운다 · 이 글의 그림을 안 다룬 실행(ocrPending 칸 없음)은 표시를 건드리지 않는다 · 두 모드의 표시를 합쳐 읽는다(글자가 온 그림은 뺀다) */
+         글자를 못 읽은 그림은 「그림 글자 대기」(ocrPending)로 기록에 남는다 · 본문이 있어도 다음 날 다시 받는다(같은 날은 안 받는다) · 두 모드의 표시를 합쳐 읽는다(글자가 온 그림은 뺀다).
+         🔴 표시 하나 = {원래 주소(src), 원본 바이트 지문(hash)} · 고칠 때는 **더하고 빼기**다(리뷰 2026-11-28) — 파일 이름은 받은 차례라 앞 그림을 못 받으면 바뀌고, 바이트는 워터마크로 바뀐다.
+            그래서 같은 그림은 주소나 지문 어느 하나로 알아보고, 이번에 다시 받아 읽은 그림(ocrDone)·글자가 온 그림·학교 공통 그림(ocrCommon)만 지운다 — 못 받은 그림의 표시는 남긴다 */
+      const E = (src, hash) => ({ src, hash });
       const BODY_OK = '본문이 있는 글입니다 — 참가 대상과 접수 방법은 포스터에 있습니다';
-      AT.writeStore(dir, 'act-o', 'plain', { url: 'https://x.kr/o', body: BODY_OK, bodyFrom: 'plain', docs: [], ocrPending: ['p1'] }, '2026-11-26');
-      const o1 = [AT.readStore(dir, 'act-o').ocrPending, due('act-o', 'plain', '2026-11-26'), due('act-o', 'plain', '2026-11-27')];
+      const pendH = (id) => (AT.readStore(dir, id).ocrPending || []).map((e) => e.hash);
+      AT.writeStore(dir, 'act-o', 'plain', { url: 'https://x.kr/o', body: BODY_OK, bodyFrom: 'plain', docs: [], ocrPending: [E('https://x.kr/o/p1.jpg', 'p1')] }, '2026-11-26');
+      const o1 = [pendH('act-o'), due('act-o', 'plain', '2026-11-26'), due('act-o', 'plain', '2026-11-27')];
       const keptO = AT.writeStore(dir, 'act-o', 'plain', { url: 'https://x.kr/o', body: BODY_OK, docs: [] }, '2026-11-27');   // 이 글의 그림을 안 다룬 실행
-      const o2 = [keptO, AT.readStore(dir, 'act-o').ocrPending, due('act-o', 'plain', '2026-11-27'), due('act-o', 'plain', '2026-11-28')];
-      AT.writeStore(dir, 'act-o', 'plain', { url: 'https://x.kr/o', body: BODY_OK, docs: [doc('p1', '포스터 글자 — 참가 대상 대학생', { from: 'img', ocr: true, name: '' })], ocrPending: [] }, '2026-11-28');
-      const o3 = [AT.readStore(dir, 'act-o').ocrPending, AT.readStore(dir, 'act-o').docs.map((d) => d.hash), due('act-o', 'plain', '2026-11-29'), JSON.parse(rawOf('act-o', 'plain')).ocrPending];
-      AT.writeStore(dir, 'act-q', 'plain', { url: 'https://x.kr/q', body: '', docs: [], ocrPending: ['q1', 'q2'] }, '2026-11-26');
-      AT.writeStore(dir, 'act-q', 'browser', { url: 'https://x.kr/q', body: '', docs: [doc('q1', '브라우저 실행이 읽은 포스터 글자', { from: 'img', ocr: true, name: '' })], ocrPending: ['q3'] }, '2026-11-26');
-      eq('⑧ 🔴 그림 글자 대기(ocrPending) — 엔진 고장·시간 부족으로 못 읽은 그림은 기록에 남는다 · 본문이 있어도 다음 날 다시 받는다(같은 날은 안 받는다) · 이 글의 그림을 안 다룬 실행은 표시를 그대로 두되 「받아 봤다」는 적는다 · 그림 글자가 오면 지운다 · 두 모드의 표시를 합치고 글자가 온 그림은 뺀다 · 브라우저 기록의 표시도 다음 날 다시 받는다',
-        [o1, o2, o3, AT.readStore(dir, 'act-q').ocrPending, due('act-q', 'browser', '2026-11-26'), due('act-q', 'browser', '2026-11-27')],
-        [[['p1'], false, true], [false, ['p1'], false, true], [undefined, ['p1'], false, undefined], ['q2', 'q3'], false, true]);
+      const o2 = [keptO, pendH('act-o'), due('act-o', 'plain', '2026-11-27'), due('act-o', 'plain', '2026-11-28')];
+      /* 워터마크 — 같은 주소의 그림을 다시 받았는데 바이트가 다르다(p1b) · 이번에 읽었고 글자가 왔다 → 지운다 */
+      AT.writeStore(dir, 'act-o', 'plain', { url: 'https://x.kr/o', body: BODY_OK, docs: [doc('p1b', '포스터 글자 — 참가 대상 대학생', { from: 'img', ocr: true, name: '', src: 'https://x.kr/o/p1.jpg' })], ocrPending: [], ocrDone: [E('https://x.kr/o/p1.jpg', 'p1b')] }, '2026-11-28');
+      const o3 = [AT.readStore(dir, 'act-o').ocrPending, AT.readStore(dir, 'act-o').docs.map((d) => [d.hash, d.src]), due('act-o', 'plain', '2026-11-29'), JSON.parse(rawOf('act-o', 'plain')).ocrPending];
+      /* 다시 받다가 그림 하나를 못 받았다(리뷰 중요 2) — 받아 읽은 그림만 지우고 못 받은 그림의 표시는 남긴다 · 그 그림이 학교 공통 그림으로 드러나면 지운다(리뷰 작은 것 9) */
+      AT.writeStore(dir, 'act-r', 'plain', { url: 'https://x.kr/r', body: '', docs: [], ocrPending: [E('https://x.kr/r/a.jpg', 'ra'), E('https://x.kr/r/b.jpg', 'rb')] }, '2026-11-26');
+      AT.writeStore(dir, 'act-r', 'plain', { url: 'https://x.kr/r', body: '', docs: [doc('ra2', '첫째 포스터 글자', { from: 'img', ocr: true, name: '', src: 'https://x.kr/r/a.jpg' })], ocrPending: [], ocrDone: [E('https://x.kr/r/a.jpg', 'ra2')] }, '2026-11-27');
+      const r1 = (AT.readStore(dir, 'act-r').ocrPending || []).map((e) => e.src);
+      AT.writeStore(dir, 'act-r', 'plain', { url: 'https://x.kr/r', body: '', docs: [], ocrCommon: ['rb'] }, '2026-11-28');
+      const r2 = AT.readStore(dir, 'act-r').ocrPending;
+      /* 이름이 같은 다른 그림(리뷰 작은 것 2) — 기다리던 그림의 글자는 「이름으로 한 번」 거름을 받지 않는다(받으면 글자는 버려지고 표시만 지워졌다) */
+      AT.writeStore(dir, 'act-s', 'plain', { url: 'https://x.kr/s', body: '', docs: [doc('s1', '첫 포스터 글자', { name: '포스터.jpg', from: 'attach', src: 'https://x.kr/s/1' })], ocrPending: [E('https://x.kr/s/2', 's2')] }, '2026-11-26');
+      AT.writeStore(dir, 'act-s', 'plain', { url: 'https://x.kr/s', body: '', docs: [doc('s2b', '둘째 포스터 글자', { name: '포스터.jpg', from: 'attach', src: 'https://x.kr/s/2' })], ocrPending: [], ocrDone: [E('https://x.kr/s/2', 's2b')] }, '2026-11-27');
+      const sCase = [AT.readStore(dir, 'act-s').docs.map((d) => d.text), AT.readStore(dir, 'act-s').ocrPending];
+      /* 두 모드 합치기 — 어느 쪽에서든 글자가 온 그림은 뺀다 · 브라우저 기록의 표시도 다음 날 다시 받는다 */
+      AT.writeStore(dir, 'act-q', 'plain', { url: 'https://x.kr/q', body: '', docs: [], ocrPending: [E('u1', 'q1'), E('u2', 'q2')] }, '2026-11-26');
+      AT.writeStore(dir, 'act-q', 'browser', { url: 'https://x.kr/q', body: '', docs: [doc('q1', '브라우저 실행이 읽은 포스터 글자', { from: 'img', ocr: true, name: '', src: 'u1' })], ocrPending: [E('u3', 'q3')] }, '2026-11-26');
+      /* 페이지를 못 받은 날도 「받아 봤다」(리뷰 작은 것 8) — 기록이 있을 때만(첫 받기 실패는 기록을 만들지 않는다 · 다음 실행에 다시) */
+      const mt = [AT.markTried(dir, 'act-o', 'plain', '2026-11-30'), JSON.parse(rawOf('act-o', 'plain')).tried, AT.markTried(dir, 'act-o', 'plain', '2026-11-30'), AT.markTried(dir, 'act-none2', 'plain', '2026-11-30'), fs.existsSync(AT.storeFile(dir, 'act-none2', 'plain'))];
+      eq('⑧ 🔴 그림 글자 대기(ocrPending) — 못 읽은 그림은 기록에 남는다 · 본문이 있어도 다음 날 다시 받는다(같은 날은 안 받는다) · 그림을 안 다룬 실행은 표시를 그대로 두되 「받아 봤다」는 적는다 · 같은 주소의 그림을 다시 읽으면(워터마크로 바이트가 달라도) 지운다 · 못 받은 그림의 표시는 남기고 공통 그림이 되면 지운다 · 기다리던 그림의 글자는 이름 거름을 받지 않는다 · 두 모드를 합친다 · 페이지를 못 받은 날도 「받아 봤다」',
+        [o1, o2, o3, r1, r2, sCase, pendH('act-q'), due('act-q', 'browser', '2026-11-26'), due('act-q', 'browser', '2026-11-27'), mt],
+        [[['p1'], false, true], [false, ['p1'], false, true], [undefined, [['p1b', 'https://x.kr/o/p1.jpg']], false, undefined], ['https://x.kr/r/b.jpg'], undefined,
+          [['첫 포스터 글자', '둘째 포스터 글자'], undefined], ['q2', 'q3'], false, true, [true, '2026-11-30', false, false, false]]);
 
       /* 받은 파일(act-files) → 기록 한 건 — 첨부 로봇(activity-docs)의 두 모드가 같은 함수를 쓴다 */
       process.env.ACTIVITY_DOCS_AS_LIB = '1';
@@ -18090,20 +18108,24 @@ module.exports = class Anthropic {
       eq('  🔴 본문 분량을 잴 때 두 글자 미만의 제목 조각(「2026년」→「년」)은 빼지 않는다 — 그 글자가 본문 어디에 있든 지워 진짜 본문을 버렸다',
         AD.storeFromFiles(yearPost, [], {}, { ...io, key: 'k6', readText: () => yearBody, mode: 'plain' }).body, yearBody);
       eq('  본문 분량의 문턱은 notice-source MIN_BODY 한 곳을 불러 쓴다(장학금 원문 받기와 같은 100자 — 숫자를 베껴 적지 않는다)', /import \{ MIN_BODY \} from '\.\/notice-source\.mjs'/.test(readText(new URL('../collector/activity-docs.mjs', import.meta.url))), true);
-      /* ⑧ 이어서 — 받기 로봇이 이번 그림 읽기 결과(paddle-status.json)로 그 글의 「그림 글자 대기」를 정한다(ocrPendingOf 한 곳 · 2026-11-27) */
-      const stO = (o) => ({ engineFailed: false, ok: [], failed: [], ...o });
-      const HO = (f) => `H-${f}`;
-      eq('  그림 글자 대기를 정하는 곳(ocrPendingOf) — 엔진 고장으로 못 읽은 그림 · 시간이 모자라 못 본 그림(skipped)은 기다린다 · 엔진이 멀쩡한데 그 그림만 못 읽었으면 안 기다린다(그림 탓 — 기다려도 안 온다) · 다 읽었으면 빈 목록(표시를 지운다) · 이 글의 그림을 안 다룬 읽기·결과 없음은 undefined(표시 그대로)',
-        [AD.ocrPendingOf(['k-1i.png', 'k-0.hwp'], stO({ engineFailed: true, failed: ['k-1i.png', 'z-0i.png'] }), HO),
-          AD.ocrPendingOf(['k-1i.png', 'k-2i.png'], stO({ ok: ['k-1i.png'], skipped: ['k-2i.png'] }), HO),
-          AD.ocrPendingOf(['k-1i.png', 'k-2i.png'], stO({ ok: ['k-2i.png'], failed: ['k-1i.png'] }), HO),
-          AD.ocrPendingOf(['k-1i.png'], stO({ ok: ['k-1i.png'] }), HO),
-          AD.ocrPendingOf(['k-1i.png'], stO({ ok: ['z-0i.png'] }), HO),
-          AD.ocrPendingOf(['k-1i.png'], null, HO)],
-        [['H-k-1i.png'], ['H-k-2i.png'], [], [], undefined, undefined]);
+      /* ⑧ 이어서 — 받기 로봇이 그 글의 「그림 글자 대기」를 정한다(ocrPendingOf 한 곳 · 2026-11-27).
+         🔴 디스크로 정한다(리뷰 2026-11-28 꼭 고칠 것) — 그림 글자 읽기의 결과 파일(paddle-status.json)은 끝까지 돌아야 생긴다: 메모리 부족으로 죽거나 앞 단계가 넘어지면 없다.
+            결과 파일로 정하면 그날 표시가 안 붙어 11-27 사고가 그대로 난다 → 그림·PDF 마다 글자 파일(.ocr.txt)이 있는지로 정하고, 결과 파일은 「그림 자체를 못 연다(bad)」만 알려 준다 */
+      const disk = new Set(['k-1i.png', 'k-2i.png', 'k-2i.png.ocr.txt', 'k-3.pdf', 'k-0.hwp', 'k-4i.jpg']);
+      const ioO = { exists: (f) => disk.has(f), hashOf: (f) => `H-${f}`, srcOf: (f) => `S-${f}` };
+      const pk = (r) => (r ? { pending: r.pending.map((e) => e.hash), done: r.done.map((e) => e.hash) } : r);
+      eq('  그림 글자 대기를 정하는 곳(ocrPendingOf) — 결과 파일이 없어도 디스크로 정한다: 글자 파일이 없는 그림·PDF 는 기다린다 · 있으면 끝 · 그림 자체를 못 여는 것(bad)은 기다려도 안 오니 끝 · 한글·워드·본문 글자는 상관없다 · 디스크에 없는 파일은 안 다룬다 · 이 글의 그림이 하나도 없으면 undefined(표시 그대로) · 표시는 {원래 주소, 바이트 지문}',
+        [pk(AD.ocrPendingOf(['k-1i.png', 'k-2i.png', 'k-0.hwp', 'k-P.txt'], null, ioO)), pk(AD.ocrPendingOf(['k-1i.png', 'k-3.pdf'], { bad: ['k-3.pdf'], engineFailed: false }, ioO)),
+          pk(AD.ocrPendingOf(['k-0.hwp', 'k-9i.png'], { engineFailed: true, failed: ['k-9i.png'] }, ioO)), AD.ocrPendingOf(['k-1i.png'], null, ioO).pending[0]],
+        [{ pending: ['H-k-1i.png'], done: ['H-k-2i.png'] }, { pending: ['H-k-1i.png'], done: ['H-k-3.pdf'] }, undefined, { src: 'S-k-1i.png', hash: 'H-k-1i.png' }]);
+      const pyExt = ((readText(new URL('../collector/paddle-ocr.py', import.meta.url)).match(/^IMAGE_EXT = \(([^)]*)\)/m) || [, ''])[1].match(/'\.(\w+)'/g) || []).map((e) => e.slice(2, -1));
+      eq('  기다릴 파일 종류(OCR_FILE)는 그림 글자 읽기(paddle-ocr.py IMAGE_EXT + .pdf)와 같은 묶음이다 — 어긋나면 읽지도 않을 파일을 기다리거나 읽어야 할 파일을 안 기다린다',
+        [pyExt.length >= 3, [...pyExt, 'pdf'].every((x) => AD.OCR_FILE.test(`a.${x}`)), ['hwp', 'gif', 'txt', 'zip'].some((x) => AD.OCR_FILE.test(`a.${x}`))], [true, true, false]);
+      eq('  받는 차례(textFetchOrder) — 글자 기록이 아직 없는 글(첫 받기)이 먼저 · 다시 받는 글(그림 글자 대기·빈 본문)은 그 뒤 · 그 밖의 글은 맨 뒤(리뷰 작은 것 7 — 그림 글자 엔진이 며칠 고장 나도 새 글의 첫 받기가 밀리지 않게)',
+        AD.textFetchOrder([{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }], (n) => n.id !== 'd', (n) => n.id === 'a').map((n) => n.id), ['b', 'c', 'a', 'd']);
       const adSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
       eq('⑦ 첨부 로봇 — 글자를 받을 글을 지금 대상보다 먼저 돈다 · 🔴 활동 목록 파일을 쓰는 곳은 무료 모드 한 곳뿐(브라우저 모드는 안 쓴다) · 끝에 제 모드 기록만 가지치기 · 시험 워크플로의 id 목록(ACT_TEXT_IDS)',
-        [/const order = \[\.\.\.acts\.items\.filter\(isTextTarget\), \.\.\.acts\.items\.filter\(\(n\) => !isTextTarget\(n\)\)\];/.test(adSrc), (adSrc.match(/writeFileSync\(ACTS/g) || []).length, /if \(changed && !BROWSER\) fs\.writeFileSync\(ACTS/.test(adSrc),
+        [/const order = textFetchOrder\(acts\.items, isTextTarget, /.test(adSrc), (adSrc.match(/writeFileSync\(ACTS/g) || []).length, /if \(changed && !BROWSER\) fs\.writeFileSync\(ACTS/.test(adSrc),
           /pruneStore\(STORE_DIR, [^)]*, BROWSER \? 'browser' : 'plain'\)/.test(adSrc), /process\.env\.ACT_TEXT_IDS/.test(adSrc)], [true, 1, true, true, true]);
       eq('  두 워크플로가 글자 기록 폴더를 저장한다(로봇이 고친 파일은 전부 git add 에)',
         [/\[ -d collector\/act-text \] && git add -A collector\/act-text/.test(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url))),
@@ -18164,13 +18186,27 @@ module.exports = class Anthropic {
         const w2 = (id, gate) => AC.actAwaits({ id, paidGate: gate, attachments: [{ name: '공고문.hwp' }] }, srcB({ id }), plus(0));
         eq('  🔴 무료 받기의 본문이 비었고 진짜 브라우저가 아직 안 돌았으면 본문도 기다린다(이틀까지) — 브라우저가 한 번 돌았으면(못 받았어도) · 무료 본문이 있으면 · 이틀이 지나면 · 표시 없는 글(시험)은 안 기다린다',
           [w2('b1', plus(0)), w2('b1', plus(-1)), w2('b1', plus(-2)), w2('b2', plus(0)), w2('b3', plus(0)), w2('b1', undefined)], [true, true, false, false, false, false]);
-        ATb.writeStore(bdir, 'b4', 'plain', { url: 'u4', body: '무료로 받은 본문 글자입니다', docs: [docA], ocrPending: ['poster1'] }, plus(0));
+        ATb.writeStore(bdir, 'b4', 'plain', { url: 'u4', body: '무료로 받은 본문 글자입니다', docs: [docA], ocrPending: [{ src: 'https://act.kr/b4/poster.jpg', hash: 'poster1' }] }, plus(0));
         eq('  원문을 모으는 곳(makeActSources)이 그 글의 「그림 글자 대기」를 함께 넘긴다(원문 덩어리가 아니라 목록에 붙은 표식 — 원문 지문에 안 든다) · 표시가 없으면 거짓',
           [srcB({ id: 'b4' }).ocrPending, srcB({ id: 'b3' }).ocrPending, CR.sourceHash(CR.sourceText(srcB({ id: 'b4' }))) === CR.sourceHash(CR.sourceText(srcB({ id: 'b3' })))], [true, false, true]);
-        eq('  그림 글자를 기다리는 글 세기(actOcrWaiting) — 표시 글 가운데 기록에 대기가 남은 글 · 시험이면 지정한 id 가운데 · 표시 없는 글은 아니다 · 카드 쓰기 실행 기록과 요약 칸(--stats)이 이 한 곳으로 센다',
-          [AC.actOcrWaiting([{ id: 'b4', paidGate: plus(0) }, { id: 'b3', paidGate: plus(0) }, { id: 'b4x', paidGate: plus(0) }], bdir).map((x) => x.id), AC.actOcrWaiting([{ id: 'b4' }, { id: 'b3' }], bdir, ['b4']).map((x) => x.id),
-            AC.actOcrWaiting([{ id: 'b4' }], bdir).length, (crSrc.match(/actOcrWaiting\(reg\.items, P\('act-text'\)/g) || []).length],
-          [['b4'], ['b4'], 0, 2]);
+        /* 리뷰 작은 것 4 — 본문 기다리기(bodyPending)는 옛 뜻 그대로: 무료 본문이 비었고 브라우저가 아직 안 돈 글만. 브라우저 기록에 그림 글자 대기가 있다고 본문까지 기다리지 않는다(그건 ocrPending 이 본다) */
+        ATb.writeStore(bdir, 'b5', 'plain', { url: 'u5', body: '', docs: [docA] }, plus(0)); ATb.writeStore(bdir, 'b5', 'browser', { url: 'u5', body: '', docs: [], ocrPending: [{ src: 'https://act.kr/b5/p.jpg', hash: 'h5' }] }, plus(0));
+        eq('  본문 기다리기(bodyPending)는 옛 뜻 그대로 — 브라우저 기록에 그림 글자 대기가 있어도 본문을 기다린다고 하지 않는다 · 그림 글자 대기는 따로 넘긴다 · 브라우저가 아직 안 돈 빈 본문 글은 그대로 기다린다',
+          [srcB({ id: 'b5' }).bodyPending, srcB({ id: 'b5' }).ocrPending, srcB({ id: 'b1' }).bodyPending], [false, true, true]);
+        /* 리뷰 작은 것 6 — 셀 때는 지금 기다리는 글만: 카드가 없고 · 마감이 지나지 않았고(앱이 보이는 마감 다음 날까지) · 표시 뒤 사흘 안(그 뒤로는 다시 받지 않는다 — 멈춤 경보 몫) */
+        eq('  그림 글자를 기다리는 글 세기(actOcrWaiting) — 카드가 없고 · 마감 전이고 · 표시 뒤 사흘 안인 글만(지난 글이 몇 주씩 숫자를 부풀리지 않게) · 시험이면 지정한 id 그대로 · 카드 쓰기 실행 기록과 요약 칸(--stats)이 이 한 곳으로 센다',
+          [AC.actOcrWaiting([{ id: 'b4', paidGate: plus(0) }, { id: 'b3', paidGate: plus(0) }, { id: 'b4x', paidGate: plus(0) }], bdir, { today: plus(0) }).map((x) => x.id),
+            AC.actOcrWaiting([{ id: 'b4', paidGate: plus(0) }], bdir, { today: plus(0), paid: { b4: {} } }).length, AC.actOcrWaiting([{ id: 'b4', paidGate: plus(-4) }], bdir, { today: plus(0) }).length,
+            AC.actOcrWaiting([{ id: 'b4', paidGate: plus(0), deadline: plus(-2) }], bdir, { today: plus(0) }).length, AC.actOcrWaiting([{ id: 'b4', paidGate: plus(0), deadline: plus(-1) }], bdir, { today: plus(0) }).length,
+            AC.actOcrWaiting([{ id: 'b4' }, { id: 'b3' }], bdir, { only: ['b4'], today: plus(0) }).map((x) => x.id), AC.actOcrWaiting([{ id: 'b4' }], bdir, { today: plus(0) }).length,
+            (crSrc.match(/actOcrWaiting\(reg\.items, P\('act-text'\)/g) || []).length],
+          [['b4'], 0, 0, 0, 1, ['b4'], 0, 2]);
+        /* 리뷰 작은 것 3 — 읽고 「읽을 내용 없음」(장부 done)이었던 글이 그 뒤 그림 글자 대기가 되면, 넘기지도 않으니(actGateHeldOf) 「멈춘 글」로 세어 경보가 있어야 한다 */
+        eq('  🔴 「읽을 내용 없음」이었다가 그림 글자 대기가 된 글은 「멈춘 글」로 센다(경보 없이 무료 값으로만 남지 않게) · 기다림 판정은 기록을 읽는 한 곳(actOcrPendingIn) · 요약 칸과 경보 세기가 그 판정을 넘긴다',
+          [CR.actGateStalled([AC.actView({ id: 'b4', title: 'b4', url: 'u4', paidGate: plus(-4), deadline: plus(30) })], { items: {}, gateHeld: {} }, { b4: { done: true } }, plus(0), AC.actOcrPendingIn(bdir)).map((x) => x.id),
+            CR.actGateStalled([AC.actView({ id: 'b3', title: 'b3', url: 'u3', paidGate: plus(-4), deadline: plus(30) })], { items: {}, gateHeld: {} }, { b3: { done: true } }, plus(0), AC.actOcrPendingIn(bdir)).map((x) => x.id),
+            (crSrc.match(/actGateStalled\(reg\.items, data, .{1,60}?, TODAY, actOcrPendingIn\(P\('act-text'\)\)\)/g) || []).length],
+          [['b4'], [], 2]);
       } finally { fs.rmSync(bdir, { recursive: true, force: true }); }
     }
     const held = (gateDay, { led, prev = {}, text = '', over = {} } = {}) => CR.actGateHeldOf([{ id: 'n', paidGate: gateDay, deadline: plus(30), ...over }], () => (text ? [{ label: '게시판 본문', text }] : []), led ? { n: led } : {}, {}, plus(0), prev);

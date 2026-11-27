@@ -19,8 +19,13 @@
 # 🔴 엔진이 통째로 고장 나면 **소리 낸다** (2026-10-04 점검 gaps-02) — 첫 클라우드 실행들에서 모든 그림이 같은 오류
 #   (ConvertPirAttribute2RuntimeAttribute)로 '끝 — 0장'이었는데 워크플로의 `|| true` 가 삼켜 초록불이었고, 그 사이 글마다
 #   두 번뿐인 무료 기회(activity-docs.mjs MAX_TRIES)가 하나씩 깎였다. 그래서 ① 읽을 파일이 있었는데 하나도 못 읽고 실패가 있으면
-#   ::warning:: 을 찍고 종료 코드 2 ② 결과를 폴더의 paddle-status.json 에 남긴다 { engineFailed, ok:[파일], failed:[파일], error } —
+#   ::warning:: 을 찍고 종료 코드 2 ② 결과를 폴더의 paddle-status.json 에 남긴다
+#   { engineFailed, ok:[파일], failed:[읽는 엔진 쪽 오류], bad:[그림 자체를 못 연다], skipped:[시간이 모자라 못 봄], error } —
 #   activity-docs.mjs --apply 가 이걸 읽어, OCR 이 실패한 파일 때문에 자격을 못 찾은 글의 기회를 되돌려 준다.
+# 🔴 그림 글자 대기(2026-11-27~28 · 대외활동 유료 관문) — 받기 로봇은 글자 파일(.ocr.txt)이 없는 그림을 「그림 글자 대기」로 둔다(이 파일이 없어도 · 그 단계가 죽은 날).
+#   이 결과 파일은 「그림 자체를 못 연다(bad — 그림이 아닌 파일·깨진 PDF)」만 알려 준다 — 기다려도 글자가 안 오니 그 그림은 기다리지 않는다.
+#   그래서 그림을 여는 오류(PIL·pdftoppm)와 읽는 엔진 오류(predict)를 갈라 적는다 — 예전엔 그림 하나뿐인 실행에서 그 그림이 깨져 있으면 「엔진 고장」이었다.
+#   읽는 차례는 날마다 돌린다(이름 차례 그대로면 시간이 늘 모자랄 때 같은 글의 그림이 매일 맨 뒤에서 못 읽힌다 · PADDLE_DAY 로 날을 줄 수 있다 — 검사용).
 # 실행: python3 collector/paddle-ocr.py collector/act-files --budget-sec=150
 import json
 import os
@@ -61,12 +66,11 @@ def lines_of(result):
 STATUS = 'paddle-status.json'   # 이번 실행 결과 — activity-docs.mjs --apply 가 읽는다(머리말 🔴)
 
 
-def write_status(folder, engine_failed, ok, failed, error='', skipped=None):
-    # skipped — 시간 예산이 바닥나 이번에 못 본 그림(2026-11-27) · 받기 로봇이 그 글을 「그림 글자 대기」로 둔다
-    #   (예전엔 어디에도 안 적혀, 그 그림 글자가 빠진 채 「다 받은」 기록이 됐다 · activity-docs.mjs ocrPendingOf)
+def write_status(folder, engine_failed, ok, failed, error='', skipped=None, bad=None):
+    # skipped — 시간 예산이 바닥나 이번에 못 본 그림 · bad — 그림 자체를 못 연다(2026-11-27~28 · 위 머리말 「그림 글자 대기」)
     try:
         with open(os.path.join(folder, STATUS), 'w', encoding='utf-8') as out:
-            json.dump({'engineFailed': engine_failed, 'ok': ok, 'failed': failed, 'skipped': skipped or [], 'error': error[:200]},
+            json.dump({'engineFailed': engine_failed, 'ok': sorted(ok), 'failed': sorted(failed), 'bad': sorted(bad or []), 'skipped': sorted(skipped or []), 'error': error[:200]},   # 목록은 이름 차례로(읽는 차례는 날마다 돈다)
                       out, ensure_ascii=False, indent=1)
     except OSError:
         pass
@@ -96,6 +100,9 @@ def main():
         write_status(folder, False, [], [])
         print('읽을 그림 없음')
         return 0
+    day = int(os.environ.get('PADDLE_DAY') or time.strftime('%j'))   # 읽는 차례를 날마다 돌린다(위 머리말)
+    k = day % len(todo)
+    todo = todo[k:] + todo[:k]
     deadline = time.time() + budget
     os.environ.setdefault('PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK', 'True')
     try:
@@ -109,7 +116,7 @@ def main():
         warn_engine(todo, err)
         return 2
     ok, failed, first_err = [], [], ''
-    skipped = []
+    skipped, bad = [], []
     for i, f in enumerate(todo):
         if time.time() > deadline:
             skipped = todo[i:]
@@ -125,14 +132,22 @@ def main():
                 subprocess.run(['pdftoppm', '-r', '150', '-l', str(PDF_PAGES), '-png', path, stem], check=True, timeout=60)
                 pages = sorted(os.path.join(tempfile.gettempdir(), n) for n in os.listdir(tempfile.gettempdir())
                                if n.startswith('paddle-' + f + '-') and n.endswith('.png'))
-            lines = []
+            prepared = []
             for pg in pages:
                 im = Image.open(pg).convert('RGB')
                 im.thumbnail((MAX_SIDE, MAX_SIDE))
                 tmp = os.path.join(tempfile.gettempdir(), 'paddle-x-' + os.path.basename(pg) + '.jpg')
                 im.save(tmp, quality=92)
+                prepared.append(tmp)
+        except Exception as e:  # 그림 자체를 못 연다(그림이 아닌 파일·깨진 PDF) — 기다려도 글자가 안 온다(bad)
+            print(f'✕ {f} — 그림을 못 열었다: {str(e)[:120]}')
+            bad.append(f)
+            continue
+        try:
+            lines = []
+            for tmp in prepared:
                 lines += lines_of(ocr.predict(tmp))
-        except Exception as e:  # 그림 하나가 깨져도 나머지는 읽는다
+        except Exception as e:  # 읽는 엔진 쪽 오류 — 그 그림은 다음 실행에 다시(받기 로봇이 그 글을 그림 글자 대기로 둔다)
             print(f'✕ {f} — {str(e)[:120]}')
             failed.append(f)
             first_err = first_err or str(e)
@@ -143,7 +158,7 @@ def main():
         print(f'✓ {f} — {len(lines)}줄')
     print(f'끝 — {len(ok)}장')
     broken = engine_broken(ok, failed)
-    write_status(folder, broken, ok, failed, first_err, skipped)
+    write_status(folder, broken, ok, failed, first_err, skipped, bad)
     if broken:
         warn_engine(failed, first_err)
         return 2

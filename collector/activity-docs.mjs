@@ -37,7 +37,7 @@ import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails, eligLineOk, ACT_DETAILS_V, ACT_DOCS_V, activityDocuments, putActivityDocuments, titleWords, ownsImageText, actClosed } from './activity-excerpts.mjs';
 import { ACT_SIGNAL } from './activity-vocab.mjs';
-import { writeStore, wantsText, textDue, pruneStore } from './act-text.mjs';   // 유료 관문 — 원문 글자 기록(글자만 · 2026-11-25)
+import { writeStore, wantsText, textDue, pruneStore, markTried, hasStore } from './act-text.mjs';   // 유료 관문 — 원문 글자 기록(글자만 · 2026-11-25)
 import { MIN_BODY } from './notice-source.mjs';   // 본문 분량의 문턱 한 곳(장학금 원문 받기와 같은 100자)
 import { detailByRule } from './activity-detail-rules.mjs';   // 온통청년처럼 글·포스터가 JSON 에 있는 게시판 — 수집 로봇과 같은 함수(2026-10-28)
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
@@ -54,6 +54,9 @@ const REPORT = fileURLToPath(new URL('report.md', HERE));   // 수집 리포트 
 /* 유료 관문(2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-2) — 숨김 표시가 달린 글은 자격 줄이 있든 없든 본문·첨부의 **글자**를 받아 기록한다(AI 가 읽을 원문).
    기록은 모드마다 제 파일(act-text/<id>.json · <id>.browser.json) — 두 워크플로가 같은 파일을 쓰지 않는다. 받은 원본은 지금처럼 커밋하지 않는다 */
 const STORE_DIR = fileURLToPath(new URL('act-text/', HERE));
+const SRCS = path.join(DIR, 'srcs.json');                         // 이번 실행이 받은 파일 → 원래 주소 { 파일: 주소 } (그림 글자 대기가 같은 그림을 주소로 알아본다 · 2026-11-28)
+/* 그림 글자를 기다릴 파일 종류 — 그림 글자 읽기(paddle-ocr.py IMAGE_EXT + .pdf)와 같은 묶음(관문이 대조한다) */
+export const OCR_FILE = /\.(pdf|png|jpe?g|webp)$/i;
 const NAMES = path.join(DIR, 'names.json');                      // 이번 실행이 받은 파일 → 첨부 이름 { 파일: 이름 } (페이지에서 주운 그림은 이름이 없다)
 const TEXT_IDS = new Set(String(process.env.ACT_TEXT_IDS || '').split(',').map((s) => s.trim()).filter(Boolean));   // 「유료 시험」 워크플로가 지정한 글 — 표시가 없어도 받는다
 const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 한국 날짜
@@ -238,7 +241,7 @@ async function browserHtml(url) {
 }
 
 /** 글 하나의 파일을 받는다 → act-files 안의 파일 이름들 */
-async function fetchPost(n, until, common = new Set(), owners = new Map(), names = {}) {
+async function fetchPost(n, until, common = new Set(), owners = new Map(), names = {}, srcs = {}) {
   const got = [];
   const key = keyOf(n.url);
   /* 규칙이 있는 게시판(온통청년)은 JSON 에서 본문 + 포스터 대체 글(`-R.txt`)과 포스터 그림을 받는다 — 평문 HTML 은 메뉴뿐이라 후보가 0개였다(2026-10-28) */
@@ -253,6 +256,7 @@ async function fetchPost(n, until, common = new Set(), owners = new Map(), names
         const name = `${key}-${got.length}i.${d.ext}`;
         fs.writeFileSync(path.join(DIR, name), d.buf);
         got.push(name);
+        if (f.url) srcs[name] = f.url;   // 그림의 원래 주소 — 그림 글자 대기가 다음 날 같은 그림을 알아본다(파일 이름은 받은 차례라 바뀐다)
       } catch { /* 이 그림만 건너뛴다 */ }
     }
     return got;
@@ -278,6 +282,7 @@ async function fetchPost(n, until, common = new Set(), owners = new Map(), names
         fs.writeFileSync(path.join(DIR, name), d.buf);
         got.push(name);
         if (f.name) names[name] = f.name;   // 글에 붙은 첨부의 이름 — 원문 글자 기록·AI 의 첨부 구분이 이 이름으로 첨부와 만난다
+        if (f.url) srcs[name] = f.url;      // 원래 주소 — 그림 글자 대기가 다음 날 같은 그림을 알아본다(2026-11-28)
       } catch { /* 이 파일만 건너뛴다 */ }
     }
   };
@@ -353,7 +358,7 @@ export function migrateOcrTries(ledger, v = LEDGER_V) {
 /** 이번 실행의 OCR 이 실패한 파일(paddle-ocr.py 의 paddle-status.json failed) 때문에 자격을 못 찾은 글은 그 시도를 세지 않는다 —
     tries 를 1 되돌린다(날짜는 그대로 — 엔진이 계속 고장이면 매 실행 같은 글을 다시 받지 않게). 되돌린 주소 목록을 돌려준다. */
 export function rollbackOcrTries(ledger, manifest, status, found = new Set()) {
-  const failed = new Set((status && status.failed) || []);
+  const failed = new Set([...((status && status.failed) || []), ...((status && status.skipped) || [])]);   // 시간이 모자라 못 본 그림도(리뷰 2026-11-28 — 그림 글자 대기로 다시 받는 글이 무료 기회를 다 쓰지 않게) · 그림 자체를 못 여는 것(bad)은 아니다
   const back = [];
   if (!failed.size) return back;
   for (const [url, files] of Object.entries(manifest || {})) {
@@ -366,18 +371,27 @@ export function rollbackOcrTries(ledger, manifest, status, found = new Set()) {
   return back;
 }
 const PADDLE_STATUS = path.join(DIR, 'paddle-status.json');
-/** 그림 글자 대기 한 곳 (2026-11-27 대외활동 유료 시험 · 개발자 「재발하지 않도록 순서도에 확실하게 각인」) — 이번 그림 읽기 결과(paddle-status.json)로 이 글의 「그림 글자 대기」를 정한다.
-    기다리는 그림 = **엔진 고장**으로 못 읽은 그림(engineFailed 의 failed) + **시간이 모자라** 못 본 그림(skipped). 엔진이 멀쩡한데 그 그림만 못 읽었으면 그림 탓이라 기다려도 안 온다 — 안 기다린다.
-    돌려주는 것: undefined = 이번 읽기가 이 글의 그림을 안 다뤘다(전 표시 그대로) · [] = 다 다뤘다(표시를 지운다) · [원본 바이트 지문…] = 기다릴 그림.
-    표시는 글자 기록(act-text writeStore)에 남고, 카드 쓰기는 표시가 남은 글을 읽지도 사람에게 넘기지도 않는다(card-read pickTargets·actGateHeldOf) */
-export function ocrPendingOf(files, status, hashOf = (f) => fileHash(path.join(DIR, f))) {
-  if (!status) return undefined;
-  const failed = status.engineFailed ? (status.failed || []) : [];
-  const later = status.skipped || [];
-  const seen = new Set([...(status.ok || []), ...(status.failed || []), ...later]);
-  const mine = (files || []).filter((f) => seen.has(f));
+/** 그림 글자 대기 한 곳 (2026-11-27 대외활동 유료 시험 · 개발자 「재발하지 않도록 순서도에 확실하게 각인」) — 이 글의 그림·PDF 가운데 글자를 아직 못 읽은 것.
+    🔴 **디스크로 정한다**(리뷰 2026-11-28 꼭 고칠 것) — 그림 글자 읽기의 결과 파일(paddle-status.json)은 끝까지 돌아야 생긴다(메모리 부족으로 죽거나 앞 단계가 넘어지면 없다).
+       결과 파일로 정하면 그날 표시가 안 붙어 11-27 사고가 그대로 난다. 그래서 그림·PDF(OCR_FILE)마다 글자 파일(.ocr.txt)이 있는지 보고,
+       결과 파일에서는 「그림 자체를 못 연다(bad — 그림이 아닌 파일·깨진 PDF)」만 받는다(기다려도 글자가 안 온다 → 끝난 것으로).
+    돌려주는 것: undefined = 이 글의 그림·PDF 가 디스크에 하나도 없다(이번에 안 받았다 — 전 표시 그대로) ·
+                 { pending: [{src, hash}] (못 읽은 그림 — 기다린다), done: [{src, hash}] (끝난 그림 — 표시에서 뺀다) }.
+    표시는 글자 기록(act-text writeStore)에서 더하고 빼며, 카드 쓰기는 표시가 남은 글을 읽지도 사람에게 넘기지도 않는다(card-read pickTargets·actGateHeldOf) */
+export function ocrPendingOf(files, status, { exists = (f) => fs.existsSync(path.join(DIR, f)), hashOf = (f) => fileHash(path.join(DIR, f)), srcOf = () => '' } = {}) {
+  const mine = (files || []).filter((f) => OCR_FILE.test(f) && exists(f));
   if (!mine.length) return undefined;
-  return mine.filter((f) => failed.includes(f) || later.includes(f)).map((f) => hashOf(f) || f);
+  const bad = new Set((status && status.bad) || []);
+  const out = { pending: [], done: [] };
+  for (const f of mine) (exists(`${f}.ocr.txt`) || bad.has(f) ? out.done : out.pending).push({ src: String(srcOf(f) || ''), hash: String(hashOf(f) || '') });
+  return out;
+}
+
+/** 받는 차례 — 글자를 받을 글 가운데 **기록이 아직 없는 글(첫 받기)** 이 먼저, 다시 받는 글(그림 글자 대기·빈 본문)은 그 뒤, 그 밖의 글(자격만 찾는 글)은 맨 뒤.
+    그림 글자 엔진이 며칠 고장 나면 다시 받을 글이 쌓여 한 실행의 상한(글 수·시간)을 먹는다 — 새 글의 첫 받기가 밀려 사흘을 넘기면 「원문 없음」으로 숨는다(리뷰 2026-11-28) */
+export function textFetchOrder(items, isTextTarget, hasRecord) {
+  const text = (items || []).filter(isTextTarget);
+  return [...text.filter((n) => !hasRecord(n)), ...text.filter((n) => hasRecord(n)), ...(items || []).filter((n) => !isTextTarget(n))];
 }
 
 /* ── ① 받기 ── */
@@ -397,8 +411,9 @@ async function fetchPhase(acts) {
      받을 차례는 act-text textDue — 무료 모드는 기록이 없거나 본문이 빈 채 날이 바뀐 글 · 브라우저 모드는 무료 모드의 본문이 빈 글만 */
   const kst = kstToday(), mode = BROWSER ? 'browser' : 'plain';
   const isTextTarget = (n) => wantsText(n, kst, TEXT_IDS) && textDue(STORE_DIR, n.id, mode, kst);
-  const order = [...acts.items.filter(isTextTarget), ...acts.items.filter((n) => !isTextTarget(n))];
+  const order = textFetchOrder(acts.items, isTextTarget, (n) => hasStore(STORE_DIR, n.id, mode));
   const names = readJson(NAMES, {});
+  const srcs = readJson(SRCS, {});
   for (const n of order) {
     if (posts >= POSTS_PER_RUN || Date.now() > until) break;
     const forText = isTextTarget(n);
@@ -409,8 +424,11 @@ async function fetchPhase(acts) {
       if (BROWSER && ledger[n.url] && ledger[n.url].lines) continue;   // 이미 찾아 장부에 적었다 — 수집 로봇이 합치기 전까지 다시 열지 않는다
     }
     posts += 1;
-    const got = await fetchPost(n, until, common, owners, names);
-    if (got === null) continue;                              // 글을 못 받았다 — 장부에 안 적는다(잠깐 끊긴 것을 굳히지 않게)
+    const got = await fetchPost(n, until, common, owners, names, srcs);
+    if (got === null) {                                      // 글을 못 받았다 — 장부에 안 적는다(잠깐 끊긴 것을 굳히지 않게)
+      if (forText) markTried(STORE_DIR, n.id, mode, kst);   // 글자 기록이 있는 글은 「오늘 받아 봤다」만(그날 다시 두드리지 않게 · 리뷰 2026-11-28)
+      continue;
+    }
     manifest[n.url] = got;
     /* 자격 장부(무료 기회 두 번)는 자격을 읽으려던 글만 센다 — 글자만 받으러 간 글(자격은 이미 있다)의 기회를 깎지 않는다 */
     if (needsElig(n) || (!BROWSER && staleDocs(n))) ledger[n.url] = { ...(ledger[n.url] || {}), at: today, tries: ((ledger[n.url] || {}).tries || 0) + 1 };
@@ -425,6 +443,7 @@ async function fetchPhase(acts) {
   ledger._common = [...common].slice(-200);
   fs.writeFileSync(MANIFEST, JSON.stringify(manifest, null, 1));
   fs.writeFileSync(NAMES, JSON.stringify(names, null, 1));
+  fs.writeFileSync(SRCS, JSON.stringify(srcs, null, 1));
   fs.writeFileSync(LEDGER, JSON.stringify(ledger, null, 1) + '\n');
   log(`받기 — 글 ${posts}건 · 파일 ${files}개`);
 }
@@ -438,7 +457,7 @@ export { titleWords, ownsImageText };
     · 첨부: 글자를 뽑은 파일만 · 이름은 받을 때 적어 둔 것(names) · 지문은 원본 바이트 · 페이지에서 주운 그림(OCR)과 따라간 요강 페이지는 그 글의 것만(자격 고르기와 같은 거름 ownsImageText) */
 const sha16 = (s) => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 16);
 const BROWSER_MIN_BODY = 40;   // 브라우저 본문의 바닥 — 유료 카드 로봇이 읽는 원문의 바닥(한글 40자)과 같다
-export function storeFromFiles(n, files, names = {}, { key = keyOf(n.url), dir = DIR, readText = (p) => (/\.txt$/.test(p) ? fs.readFileSync(p, 'utf8') : attachmentText(p)), isOcr = isOcrSource, hashOf = fileHash, mode = BROWSER ? 'browser' : 'plain' } = {}) {
+export function storeFromFiles(n, files, names = {}, { key = keyOf(n.url), dir = DIR, readText = (p) => (/\.txt$/.test(p) ? fs.readFileSync(p, 'utf8') : attachmentText(p)), isOcr = isOcrSource, hashOf = fileHash, mode = BROWSER ? 'browser' : 'plain', srcs = {} } = {}) {
   const read = (f) => { try { return String(readText(path.join(dir, f)) || ''); } catch { return ''; } };
   const owns = (text) => !titleWords(n.title).length || ownsImageText(text, n.title);
   const list = files || [];
@@ -464,7 +483,7 @@ export function storeFromFiles(n, files, names = {}, { key = keyOf(n.url), dir =
        같은 자리는 처음 받은 글자 그대로(act-text writeStore) · 첨부는 원본 바이트 지문 그대로 */
     const hash = guide ? `T-${sha16(`${n.url}#${f.replace(/^.*-(L\d*)\.txt$/, '$1')}`)}` : hashOf(p);
     if (!hash) continue;
-    docs.push({ name: guide ? '' : String(names[f] || ''), hash, from: guide ? 'guide' : fromImg ? 'img' : 'attach', ocr, text });
+    docs.push({ name: guide ? '' : String(names[f] || ''), hash, ...(!guide && srcs[f] ? { src: String(srcs[f]) } : {}), from: guide ? 'guide' : fromImg ? 'img' : 'attach', ocr, text });   // src — 그림 글자 대기가 같은 그림을 알아본다(원문 지문에는 안 든다)
   }
   return { body, bodyFrom, docs };
 }
@@ -522,7 +541,6 @@ function applyPhase(acts) {
   }
   /* OCR 이 실패한 파일 때문에 못 읽은 글은 그 시도를 세지 않는다(위 rollbackOcrTries) — 같은 결과로 두 번 되돌리지 않게 표시해 둔다 */
   const status = readJson(PADDLE_STATUS, null);
-  const freshOcr = status && !status.applied ? status : null;   // 이번 실행의 그림 읽기 결과 — 아래 적용 표시를 달기 전에 잡아 둔다(글자 기록의 그림 글자 대기가 쓴다)
   if (status && !status.applied) {
     const led = BROWSER ? bled : readJson(PLAIN_LEDGER, {});
     const back = rollbackOcrTries(led, manifest, status, found);
@@ -535,12 +553,14 @@ function applyPhase(acts) {
   /* 유료 관문 — 이번 실행이 받은 글 가운데 글자를 받을 글의 기록을 쓴다(act-text.mjs · 글자만). 받은 파일이 없어도(본문뿐·빈 본문) 쓴다 — 「무료 받기를 해 봤다」는 표시라 브라우저가 이어받는다.
      🔴 활동 목록 파일(ACTS)과는 상관없다 — 이 기록은 모드마다 제 파일이고, 유료 로봇(card-read --activities)이 읽기만 한다 */
   {
-    const kst = kstToday(), mode = BROWSER ? 'browser' : 'plain', names = readJson(NAMES, {});
+    const kst = kstToday(), mode = BROWSER ? 'browser' : 'plain', names = readJson(NAMES, {}), srcs = readJson(SRCS, {});
+    const commonHashes = (readJson(LEDGER, {})._common || []).map(String);   // 학교 공통 그림 — 기다리던 그림이 공통으로 드러나면 표시에서 뺀다(리뷰 2026-11-28)
     let stored = 0;
     for (const n of acts.items) {
       if (!(n.url in manifest) || !wantsText(n, kst, TEXT_IDS)) continue;
-      const pend = ocrPendingOf(manifest[n.url] || [], freshOcr);   // 그림 글자 대기 — 이번 읽기가 이 글의 그림을 안 다뤘으면 undefined(전 표시 그대로)
-      if (writeStore(STORE_DIR, n.id, mode, { url: n.url, ...storeFromFiles(n, manifest[n.url] || [], names), ...(pend ? { ocrPending: pend } : {}) }, kst)) stored += 1;
+      const ocr = ocrPendingOf(manifest[n.url] || [], status, { srcOf: (f) => srcs[f] });   // 그림 글자 대기 — 디스크로 정한다(결과 파일이 없어도) · 이 글의 그림이 디스크에 없으면 undefined(전 표시 그대로)
+      const rec = { url: n.url, ...storeFromFiles(n, manifest[n.url] || [], names, { srcs }), ...(ocr ? { ocrPending: ocr.pending, ocrDone: ocr.done } : {}), ocrCommon: commonHashes };
+      if (writeStore(STORE_DIR, n.id, mode, rec, kst)) stored += 1;
     }
     const liveIds = new Set(acts.items.map((n) => n.id).filter(Boolean));
     const pruned = pruneStore(STORE_DIR, liveIds, BROWSER ? 'browser' : 'plain');

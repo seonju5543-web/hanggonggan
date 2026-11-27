@@ -12,7 +12,7 @@
    🔴 이 파일은 card-read.mjs 를 불러오지 않는다 — card-read 가 이 파일을 부른다(서로 부르면 지시문 글자가 만들어지기 전에 읽힌다).
    관문: verify/test-collector.mjs 「대외활동 유료 관문 ② 카드 쓰기」
    ============================================================ */
-import { readStore, daysSince, textDue } from './act-text.mjs';
+import { readStore, daysSince, browserBodyDue, TEXT_WAIT_DAYS } from './act-text.mjs';
 import { attachmentText } from './attachment-text.mjs';
 import { fileHash16 } from './attach-role-ai.mjs';
 import { fileNameIn } from './attachment-link.mjs';
@@ -204,9 +204,9 @@ export function makeActSources({ storeDir, formRows = [], extractedDir }) {
       const t = textOf(r.file);
       if (t.replace(/[^가-힣]/g, '').length >= 40) add(r.file, r.attach, hash, r.attach, t);   // 서식은 글자가 적다 — 한글 40자면 가를 수 있다(장학금과 같은 선)
     }
-    /* 본문 대기 — 무료 받기의 본문이 비었고 진짜 브라우저가 아직 그 글을 안 열었다(act-text textDue browser · 최종 리뷰 2026-11-26) → actAwaits 가 본문도 기다린다.
-       원문 덩어리가 아니라 목록에 붙은 표식이다(원문 글자·지문에 안 든다) */
-    out.bodyPending = !!it.id && textDue(storeDir, it.id, 'browser', '');
+    /* 본문 대기 — 무료 받기의 본문이 비었고 진짜 브라우저가 아직 그 글을 안 열었다(act-text browserBodyDue · 최종 리뷰 2026-11-26) → actAwaits 가 본문도 기다린다.
+       원문 덩어리가 아니라 목록에 붙은 표식이다(원문 글자·지문에 안 든다) · 🔴 그림 글자 대기는 따로 본다(아래 ocrPending · 브라우저 기록의 그림 대기로 본문까지 기다리지 않게 — 리뷰 2026-11-28) */
+    out.bodyPending = !!it.id && browserBodyDue(storeDir, it.id);
     /* 그림 글자 대기(act-text ocrPending · 2026-11-27) — 그림 글자 엔진 고장·시간 부족으로 못 읽은 그림이 남았다 = 원문이 덜 왔다.
        card-read 가 이 표식을 보고 읽지 않고(돈 0) 사람에게도 넘기지 않는다 · 원문 덩어리가 아니라 목록에 붙은 표식이다(원문 글자·지문에 안 든다) */
     out.ocrPending = !!(rec.ocrPending && rec.ocrPending.length);
@@ -214,10 +214,17 @@ export function makeActSources({ storeDir, formRows = [], extractedDir }) {
   };
 }
 
-/* 그림 글자를 기다리는 글 — 실행 기록·요약 칸에 「그림 글자를 기다리는 글 n건」으로 보인다(card-read · 2026-11-27). 표시(paidGate)가 달린 글(올린 글·숨긴 글은 actView 가 표시를 뗀다) 또는 시험이 지정한 id.
+/* 그림 글자 대기인가 — 기록을 읽는 한 곳(카드 쓰기의 경보 세기·요약 칸이 같은 판정을 쓴다 · 2026-11-28) */
+export const actOcrPendingIn = (storeDir) => (it) => !!(it && it.id && ((readStore(storeDir, it.id) || {}).ocrPending || []).length);
+/* 그림 글자를 기다리는 글 — 실행 기록·요약 칸에 「그림 글자를 기다리는 글 n건」으로 보인다(card-read · 2026-11-27).
+   지금 기다리는 글만 센다(리뷰 2026-11-28 — 지난 글이 몇 주씩 숫자를 부풀렸다): 표시(paidGate)가 달렸고(올린 글·숨긴 글은 actView 가 표시를 뗀다) · 카드가 없고 ·
+   마감이 지나지 않았고(앱이 보이는 마감 다음 날까지) · 표시 뒤 사흘 안(그 뒤로는 다시 받지 않는다 — 멈춤 경보 몫). 시험이면 지정한 id 그대로.
    ponytail: 셀 때마다 글자 기록을 읽는다 — 표시 글은 하루 수십 건이라 충분하다 */
-export const actOcrWaiting = (items, storeDir, only = []) => (items || []).filter((it) => it && it.id && ((only || []).length ? only.includes(it.id) : it.paidGate)
-  && ((readStore(storeDir, it.id) || {}).ocrPending || []).length);
+export const actOcrWaiting = (items, storeDir, { only = [], paid = {}, today = '' } = {}) => {
+  const pending = actOcrPendingIn(storeDir);
+  return (items || []).filter((it) => it && it.id && pending(it) && ((only || []).length ? only.includes(it.id)
+    : it.paidGate && !(paid || {})[it.id] && !(today && it.deadline && daysSince(it.deadline, today) > 1) && !(today && daysSince(it.paidGate, today) > TEXT_WAIT_DAYS)));
+};
 
 /* ── 첨부 기다리기 — 글에 한글·워드·PDF 첨부가 있는데 그 가운데 글자가 아직 안 온 것이 **하나라도** 있으면 표시 뒤 이틀까지 기다린다 ──
    장학금(card-read awaitsAttach)은 「첨부 글자가 하나도 없을 때」만 기다린다. 활동 글은 공고문이 주운 그 자리에서 오고 신청서는 새벽에 오므로 「하나라도」로 본다 —

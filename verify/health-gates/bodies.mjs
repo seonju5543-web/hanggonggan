@@ -651,12 +651,13 @@ export default async function bodies(eq, ctx) {
           "        return [{'rec_texts': ['모집대상 : 도내 거주 청년'], 'rec_scores': [0.95], 'rec_boxes': [[0, 0, 200, 20]]}]", ''].join('\n'));
         fs.writeFileSync(path.join(fakes, 'PIL', '__init__.py'), '');
         fs.writeFileSync(path.join(fakes, 'PIL', 'Image.py'), [
-          'import builtins', 'class _Im:', '    def convert(self, m):', '        return self', '    def thumbnail(self, s):', '        pass',
-          '    def save(self, p, quality=None):', "        builtins.open(p, 'wb').write(b'x')", 'def open(p):', '    return _Im()', ''].join('\n'));
+          'import builtins, os', 'class _Im:', '    def convert(self, m):', '        return self', '    def thumbnail(self, s):', '        pass',
+          '    def save(self, p, quality=None):', "        builtins.open(p, 'wb').write(b'x')", 'def open(p):',
+          "    bad = os.environ.get('FAKE_PIL_BAD', '')", '    if bad and p.endswith(bad):', "        raise OSError('cannot identify image file (fake)')", '    return _Im()', ''].join('\n'));
         for (const f of ['a.jpg', 'b.png']) fs.writeFileSync(path.join(files, f), 'x');
         const script = fileURLToPath(new URL('collector/paddle-ocr.py', root));
-        const runPy = (mode, budget = 30) => spawnSync('python3', [script, files, `--budget-sec=${budget}`],
-          { encoding: 'utf8', env: cleanEnv({ PYTHONPATH: fakes, PYTHONDONTWRITEBYTECODE: '1', FAKE_PADDLE: mode }) });
+        const runPy = (mode, budget = 30, extra = {}) => spawnSync('python3', [script, files, `--budget-sec=${budget}`],
+          { encoding: 'utf8', env: cleanEnv({ PYTHONPATH: fakes, PYTHONDONTWRITEBYTECODE: '1', FAKE_PADDLE: mode, ...extra }) });
         const status = () => { try { return JSON.parse(fs.readFileSync(path.join(files, 'paddle-status.json'), 'utf8')); } catch { return null; } };
         const r1 = runPy('broken'); const s1 = status() || {};
         eq('② ⓐ 모든 그림이 같은 엔진 오류 — 종료 코드 2 · ::warning:: 한 줄 · 상태 파일에 고장 표시와 실패 파일 (예전엔 \'끝 — 0장\' 에 초록불)',
@@ -669,8 +670,24 @@ export default async function bodies(eq, ctx) {
         eq('  설치가 안 돼 불러오지도 못하면 그것도 엔진 고장(종료 코드 2 · 읽을 그림 전부 실패로)',
           [r3.status, s3.engineFailed, s3.failed, /ImportError/.test(s3.error || '')], [2, true, ['a.jpg', 'b.png'], true]);
         const r4 = runPy('ok', 0); const s4 = status() || {};
-        eq('  시간이 모자라 못 본 그림은 상태 파일에 「다음 실행」(skipped)으로 적는다 — 엔진 고장이 아니다(종료 코드 0) · 받기 로봇이 그 글을 「그림 글자 대기」로 둔다(2026-11-27 · 예전엔 어디에도 안 적혀 조용히 빠졌다)',
+        eq('  시간이 모자라 못 본 그림은 상태 파일에 「다음 실행」(skipped)으로 적는다 — 엔진 고장이 아니다(종료 코드 0) · 받기 로봇은 글자 파일이 없는 그림을 「그림 글자 대기」로 둔다(2026-11-27 · 예전엔 어디에도 안 적혀 조용히 빠졌다)',
           [r4.status, s4.engineFailed, s4.ok, s4.skipped], [0, false, [], ['a.jpg', 'b.png']]);
+        /* 리뷰 작은 것 1 (2026-11-28) — 그림 자체를 못 여는 것(그림이 아닌 파일·깨진 PDF — PIL·pdftoppm 오류)은 엔진 고장이 아니다: bad 로 따로 적는다.
+           예전엔 그림 하나뿐인 실행에서 그 그림이 깨져 있으면 「엔진 고장」으로 읽혔다(이제 이 판정이 돈·보이는가를 정한다) */
+        const r5 = runPy('ok', 30, { FAKE_PIL_BAD: 'b.png' }); const s5 = status() || {};
+        eq('  그림 자체를 못 여는 것은 bad 로 따로 — 엔진 고장이 아니다(종료 코드 0 · 고장 표시 없음) · 나머지는 읽는다 · 그림 하나뿐인 실행에서 그 그림이 깨져도 엔진 고장이 아니다',
+          [r5.status, s5.engineFailed, s5.ok, s5.bad, s5.failed], [0, false, ['a.jpg'], ['b.png'], []]);
+        for (const f of ['a.jpg', 'b.png']) fs.rmSync(path.join(files, `${f}.ocr.txt`), { force: true });
+        fs.rmSync(path.join(files, 'b.png')); const r6 = runPy('ok', 30, { FAKE_PIL_BAD: 'a.jpg' }); const s6 = status() || {};
+        fs.writeFileSync(path.join(files, 'b.png'), 'x');
+        eq('  그림 하나뿐인 실행에서 그 그림이 깨져 있어도 엔진 고장이 아니다(예전 「failed 만 있고 ok 가 없으면 고장」 판정)', [r6.status, s6.engineFailed, s6.bad], [0, false, ['a.jpg']]);
+        /* 리뷰 작은 것 7 — 읽는 차례를 날마다 돌린다: 이름 차례 그대로면 시간이 늘 모자랄 때 같은 글의 그림이 매일 맨 뒤에서 못 읽힌다 */
+        for (const f of ['a.jpg', 'b.png']) fs.rmSync(path.join(files, `${f}.ocr.txt`), { force: true });
+        const d1 = runPy('ok', 30, { PADDLE_DAY: '1' }).stdout || '';
+        for (const f of ['a.jpg', 'b.png']) fs.rmSync(path.join(files, `${f}.ocr.txt`), { force: true });
+        const d2 = runPy('ok', 30, { PADDLE_DAY: '2' }).stdout || '';
+        eq('  읽는 차례를 날마다 돌린다(날짜로 시작 자리를 옮긴다) — 다른 날은 다른 그림이 먼저',
+          [d1.indexOf('✓ b.png') >= 0 && d1.indexOf('✓ b.png') < d1.indexOf('✓ a.jpg'), d2.indexOf('✓ a.jpg') >= 0 && d2.indexOf('✓ a.jpg') < d2.indexOf('✓ b.png')], [true, true]);
       } finally {
         fs.rmSync(dir, { recursive: true, force: true });
       }
@@ -692,6 +709,10 @@ export default async function bodies(eq, ctx) {
       { failed: ['k1-0i.jpg', 'k2-0i.jpg', 'k4-0i.jpg'] }, new Set(['u2']));
     eq('  OCR 이 실패한 파일 때문에 자격을 못 찾은 글만 기회를 되돌린다 — 자격을 찾은 글·실패 파일이 없는 글은 그대로 · 0 아래로 안 간다 · 날짜는 그대로',
       [back, L2.u1.tries, L2.u2.tries, L2.u3.tries, L2.u4.tries, L2.u1.at], [['u1'], 0, 1, 1, 0, '2026-10-04']);
+    /* 리뷰 작은 것 5 (2026-11-28) — 시간이 모자라 못 본 그림(skipped)도 같다: 그림 글자 대기로 다음 날 다시 받는 글이 무료 자격 읽기 기회 두 번을 그 일로 다 써 버렸다 */
+    const L3 = { u5: { at: '2026-11-27', tries: 1 }, u6: { at: '2026-11-27', tries: 1 } };
+    const back3 = AD.rollbackOcrTries(L3, { u5: ['k5-0i.jpg'], u6: ['k6-0i.jpg'] }, { failed: [], skipped: ['k5-0i.jpg'], bad: ['k6-0i.jpg'] });
+    eq('  시간이 모자라 못 본 그림 때문에 못 읽은 글도 기회를 되돌린다 · 그림 자체를 못 여는 것(bad)은 되돌리지 않는다(다시 해도 안 읽힌다)', [back3, L3.u5.tries, L3.u6.tries], [['u5'], 0, 1]);
   }
   {
     const sb2 = sandbox(root, 'hdj-actdocs-');
@@ -742,14 +763,41 @@ export default async function bodies(eq, ctx) {
       sb4.write('data/registered.json', { items: [] });
       sb4.write('data/activities.json', { items: [{ id: 'act-pend1', title: '청년 포스터 공모전', url: u, paidGate: today }] });
       sb4.write('collector/act-files/manifest.json', { [u]: ['pend1-0i.jpg'] });
+      sb4.write('collector/act-files/srcs.json', { 'pend1-0i.jpg': 'https://act.example/img/poster-1.jpg' });
       sb4.write('collector/act-files/pend1-0i.jpg', 'poster-bytes');
-      sb4.write('collector/act-files/paddle-status.json', { engineFailed: true, ok: [], failed: ['pend1-0i.jpg'], error: 'ModuleNotFoundError: paddleocr' });
+      /* 🔴 그림 글자 읽기의 결과 파일(paddle-status.json)이 **없다** — 그 단계가 메모리 부족으로 죽었거나 앞 단계가 넘어진 날(리뷰 2026-11-28 꼭 고칠 것: 결과 파일로 정하면 표시가 안 붙었다) */
       const r = sb4.run('collector/activity-docs.mjs', ['--apply'], {});
       const rec = sb4.json('collector/act-text/act-pend1.json') || {};
-      eq('② ⓕ --apply 를 진짜 돌리면 — 엔진 고장으로 못 읽은 포스터가 그 글의 글자 기록에 「그림 글자 대기」(원본 바이트 지문 하나)로 남는다 · 글자 없는 덩어리는 안 싣는다(예전엔 빠진 줄도 모르고 「다 받은」 기록이 됐다)',
-        [r.status, (rec.ocrPending || []).length, typeof (rec.ocrPending || [])[0], rec.docs], [0, 1, 'string', []]);
+      eq('② ⓕ --apply 를 진짜 돌리면 — 그림 글자 읽기의 결과 파일이 없어도(그 단계가 죽은 날) 글자 파일이 없는 포스터가 그 글의 기록에 「그림 글자 대기」({원래 주소, 바이트 지문})로 남는다 · 글자 없는 덩어리는 안 싣는다(예전엔 빠진 줄도 모르고 「다 받은」 기록이 됐다)',
+        [r.status, (rec.ocrPending || []).length, (rec.ocrPending || [])[0] && rec.ocrPending[0].src, typeof ((rec.ocrPending || [])[0] || {}).hash, rec.docs], [0, 1, 'https://act.example/img/poster-1.jpg', 'string', []]);
+      /* 다음 실행 — 엔진이 고쳐져 그 포스터를 읽었다(같은 주소 · 워터마크로 바이트가 달라졌다) → 글자가 기록에 실리고 표시가 지워진다 */
+      sb4.write('collector/act-files/pend1-0i.jpg', 'poster-bytes-watermarked');
+      sb4.write('collector/act-files/pend1-0i.jpg.ocr.txt', '청년 포스터 공모전\n참가 대상 : 전국 대학생\n');
+      sb4.write('collector/act-files/paddle-status.json', { engineFailed: false, ok: ['pend1-0i.jpg'], failed: [], bad: [], skipped: [] });
+      const r2 = sb4.run('collector/activity-docs.mjs', ['--apply'], {});
+      const rec2 = sb4.json('collector/act-text/act-pend1.json') || {};
+      eq('  그다음 실행에서 그 포스터를 읽으면 — 글자가 기록에 실리고(주소와 함께) 그림 글자 대기가 지워진다(바이트가 달라도 같은 주소)',
+        [r2.status, rec2.ocrPending, (rec2.docs || []).map((d) => [d.from, d.src, /전국 대학생/.test(d.text)])], [0, undefined, [['img', 'https://act.example/img/poster-1.jpg', true]]]);
     } finally {
       sb4.done();
+    }
+  }
+  {
+    /* 리뷰 작은 것 8 (2026-11-28) — 그림 글자 대기인 글의 페이지를 못 받은 날도 「받아 봤다」를 남긴다(안 남기면 그날 수집할 때마다 — 하루 세 번 — 같은 사이트를 다시 두드린다).
+       망 없이 돈다: 닫힌 포트(127.0.0.1:9)라 받기가 곧바로 실패한다 */
+    const sb5 = sandbox(root, 'hdj-acttried-');
+    try {
+      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const yday = new Date(Date.now() + 9 * 3600e3 - 864e5).toISOString().slice(0, 10);
+      sb5.write('collector/extracted/notices-text.json', []);
+      sb5.write('data/registered.json', { items: [] });
+      sb5.write('data/activities.json', { items: [{ id: 'act-down1', title: '청년 포스터 공모전', url: 'http://127.0.0.1:9/post/1', paidGate: today, eligibilityLines: ['대학생'] }] });
+      sb5.write('collector/act-text/act-down1.json', { url: 'http://127.0.0.1:9/post/1', at: yday, tried: yday, body: '본문이 있는 글입니다', bodyFrom: 'plain', docs: [], ocrPending: [{ src: 'http://127.0.0.1:9/img/1.jpg', hash: 'h1' }] });
+      const f = sb5.run('collector/activity-docs.mjs', ['--fetch'], {});
+      const rec = sb5.json('collector/act-text/act-down1.json') || {};
+      eq('  그림 글자 대기인 글의 페이지를 못 받은 날도 「받아 봤다」(tried=오늘)를 남긴다 · 표시·본문은 그대로', [f.status, rec.tried, rec.ocrPending && rec.ocrPending.length, rec.body], [0, today, 1, '본문이 있는 글입니다']);
+    } finally {
+      sb5.done();
     }
   }
   {
