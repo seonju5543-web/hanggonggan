@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -11532,11 +11532,6 @@
     {
      "name": "2026년 (재)순천시인재육성장학회 장학생 모집 공고.pdf",
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276606&attachNo=226399"
-    },
-    {
-     "name": "본문이미지-511x348.png",
-     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276606&article.offset=0&articleLimit=10&srCategoryId=22",
@@ -11692,11 +11687,6 @@
     {
      "name": "2026년 2학기 선원가족장학사업 선발 모집 요강(변경).hwp",
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276603&attachNo=226827"
-    },
-    {
-     "name": "본문이미지-511x348.png",
-     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276603&article.offset=0&articleLimit=10&srCategoryId=22",
@@ -13945,13 +13935,7 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-14 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [
-    {
-     "name": "본문이미지-500x500.png",
-     "url": "https://www.cbnu.ac.kr/site/www/images/common/ai_woowang_glass_new_nova.png",
-     "bodyImage": true
-    }
-   ],
+   "attachments": [],
    "sourceUrl": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=170638&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
    "sourceKind": "auto",
    "openDate": "2026-10-21",
@@ -16189,11 +16173,6 @@
     {
      "name": "붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf",
      "url": "https://www.gachon.ac.kr/bbs/kor/478/157394/download.do"
-    },
-    {
-     "name": "본문이미지-500x500.png",
-     "url": "https://www.cbnu.ac.kr/site/www/images/common/ai_woowang_glass_new_nova.png",
-     "bodyImage": true
     },
     {
      "name": "붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf",
@@ -26917,11 +26896,6 @@
      "name": "본문이미지-891x1260.png",
      "url": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/11/XMvUgvQSYLSdgtphLOLWfZwGpo.png",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-511x348.png",
-     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278243&article.offset=0&articleLimit=10&srCategoryId=22",
@@ -26935,7 +26909,18 @@
     "max": 500000,
     "raw": "나. 장학 금액: 1인 50만원"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "eligibilityLines": [
+    "선발기준:아래 두 요건에 모두 해당하는학생",
+    "1.직전학기15학점이상이수하고,평균평점이2.5학점이상인 자",
+    "2.아래 세가지 유형중 하나의유형을 충족하는학생",
+    "1유형) Trinity DESIGNer 배지 1개 영역(대분류)에서 3개 이상의 배지 취득",
+    "2유형) Trinity DESIGNer 배지 3개 영역(대분류)에서 각 1개 이상 배지 취득",
+    "3유형) Trinity DESIGNer 배지 1개 + Special 배지 2개 이상 취득",
+    "※1인당1개의 유형만 신청 가능",
+    "※오픈배지 장학금 기수혜자는, 기수혜 유형을 제외한 다른유형으로만 신청 가능"
+   ]
   },
   {
    "id": "auto-15nttno171908searchctgry",
@@ -26982,11 +26967,6 @@
     {
      "name": "국가근로장학금 취업연계중점대학 장학생 모집(26동계).jpg",
      "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365392"
-    },
-    {
-     "name": "본문이미지-500x500.png",
-     "url": "https://www.cbnu.ac.kr/site/www/images/common/ai_woowang_glass_new_nova.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=171908&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
@@ -27100,6 +27080,193 @@
    "eligibilityFrom": "공고문 첨부",
    "deadlineFrom": "공고문 첨부",
    "documentsFrom": "공고문 첨부"
+  },
+  {
+   "id": "auto-363detailviewdocategory6",
+   "name": "(끌어올림)[앵커사업단] 근로장학생 모집 안내 (~11/30(월) 모집 마감)",
+   "boardTitle": "(끌어올림)[앵커사업단] 근로장학생 모집 안내 (~11/30(월) 모집 마감)",
+   "type": "교외",
+   "kindEvidence": [
+    "접수 이메일 도메인 jbnu.ac.kr (학교)"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-27",
+   "provider": "주관 기관 원문 확인",
+   "amount": "시급 11,000원",
+   "amountValue": 0,
+   "deadline": "2026-11-30",
+   "deadlineFrom": "공고 원문 · (끌어올림)[앵커사업단] 근로장학생 모집 안내 (~11/30(월) 모집 마감)",
+   "period": "접수 ~2026-11-30",
+   "summary": "전북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "전북대학교"
+   },
+   "documents": [
+    "근로장학생 지원신청서 1부(붙임 1)",
+    "재학증명서 1부",
+    "수업시간표 1부"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-27",
+   "attachments": [],
+   "sourceUrl": "https://www.jbnu.ac.kr/web/Board/220363/detailView.do?category=6",
+   "sourceKind": "auto",
+   "applyEmail": "yds1116@jbnu.ac.kr",
+   "applyEmailSource": "제출방법: 이메일 접수(yds1116@jbnu.ac.kr)",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-11-25",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "지원대상: 전북대학교 앵커 Track Ⅰ-1 참여학과(부) 소속 재학생",
+    "※ 참여학과(부) 명단은 붙임 2 참조",
+    "※ 휴학생, 졸업유예생은 대상이 아님",
+    "근무기간: 2026. 12. 1.(화) ~ 2027. 2. 28.(일)",
+    "근무장소: 전북대 앵커사업단(1-10 건지원 2층)",
+    "근무시간: 기간 중 최대 118시간(세부 근무시간은 협의 후 결정)",
+    "근로장학금",
+    "학사과정: 시간당 11,000원",
+    "석사과정: 시간당 12,500원",
+    "박사과정: 시간당 15,000원",
+    "※ 근무기간 및 근무시간은 사업단 내부 사정에 따라 변경될 수 있음"
+   ],
+   "excerpts": [
+    "접수기간: 2026. 11. 25.(수) ~ 11. 30.(월)",
+    "제출방법: 이메일 접수(yds1116@jbnu.ac.kr)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "학사과정: 시간당 11,000원"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-jukr145237540artclviewdo",
+   "name": "[자연캠퍼스-교내근로] 2026학년도 동계방학 국가근로장학생 선발 안내",
+   "boardTitle": "[자연캠퍼스-교내근로] 2026학년도 동계방학 국가근로장학생 선발 안내",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-27",
+   "provider": "주관 기관 원문 확인",
+   "amount": "시급 10,320원",
+   "amountValue": 0,
+   "deadline": "2026-12-02",
+   "deadlineFrom": "공고 원문 · 1. 모집 개요 가. 신청기간: 2026. 11. 27. (금) ~ 2026. 12. 2. (수) 15:00까지",
+   "period": "접수 ~2026-12-02",
+   "summary": "명지대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "명지대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-27",
+   "attachments": [
+    {
+     "name": "2026-동계방학 교내근로 지원서.hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181993/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.mju.ac.kr/bbs/mjukr/145/237540/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-11-27",
+   "announceDate": "2026-12-07",
+   "eligibilityLines": [
+    "다. 선발 기준: 한국장학재단 학자금 지원구간, 성적, 근로가능 시간 등을 종합적으로 고려하여 선발함."
+   ],
+   "excerpts": [
+    "가. 신청기간: 2026. 11. 27. (금) ~ 2026. 12. 2. (수) 15:00까지",
+    "마. 결과발표: 2026. 12. 7. (월) 발표예정"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "다. 시간당 10,320원 (2026년도 기준)"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "★교내근로 선발 시, 중복 참여 제한에 따라 동계집중근로는 자동 미선발 처리됩니다. 근로 신청 시 참고 바랍니다.★"
+   },
+   "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-skor478127526artclviewdo",
+   "name": "[글로벌] 2026-동계방학 일반 교내 및 교외 국가근로장학생 모집 안내",
+   "boardTitle": "[글로벌] 2026-동계방학 일반 교내 및 교외 국가근로장학생 모집 안내",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-27",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-12-06",
+   "deadlineFrom": "공고 원문 · 2. 신청대상 : 2026학년도 2학기 국가근로장학금 신청 재학생 ( 학자금지원구간 9구간까지 선발 가능) 3. 신청기간 : 2026. 11. 27.(금), 10:30 ~ 12. 6.(일), 23:59 (기한엄수)",
+   "period": "접수 ~2026-12-06",
+   "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-27",
+   "attachments": [
+    {
+     "name": "(붙임1) 2026-동계방학 일반 교내 및 교외 국가근로장학생 모집 현황.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/159541/download.do"
+    },
+    {
+     "name": "(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/159542/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/127526/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-11-27",
+   "announceDate": "2026-12-08",
+   "eligibilityLines": [
+    "2. 신청대상 : 2026학년도 2학기 국가근로장학금 신청 재학생 ( 학자금지원구간 9구간까지 선발 가능)",
+    "5. 선발기준",
+    "가. 학자금지원구간, 직전학기 성적, 근로지 수요 적합도 및 주당 근무가능시간 등 종합적인 점수를 반영하여 선발 (상세내용 붙임2 참조)",
+    "* 2인 이상 근로지인 경우, 기존 근로학생의 시간표를 고려하여 상기 선발기준에 의거 선발",
+    "나. 희망 근로지 신청 순서(선호도)에 따라 선발 및 근로지 배정 예정 (1지망 신청지를 우선적으로 고려)",
+    "다. 일반 교내 및 교외 근로와 동계방학 집중근로를 동시에 신청한 경우, 일반 교내 및 교외 근로를 우선 선발"
+   ],
+   "excerpts": [
+    "3. 신청기간 : 2026. 11. 27.(금), 10:30 ~ 12. 6.(일), 23:59 (기한엄수)",
+    "10. 문의 : ☎031-750-8945~6 (근로지 업무 관련 사항은 해당 근로지로 문의)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }

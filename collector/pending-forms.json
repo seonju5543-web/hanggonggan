@@ -1365,6 +1365,22 @@
    "added": "2026-11-27",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-jukr145237540artclviewdo",
+   "name": "[자연캠퍼스-교내근로] 2026학년도 동계방학 국가근로장학생 선발 안내",
+   "target": "2026학년도 동계방학 국가근로장학생 선발 안내",
+   "added": "2026-11-27",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-skor478127526artclviewdo",
+   "name": "[글로벌] 2026-동계방학 일반 교내 및 교외 국가근로장학생 모집 안내",
+   "target": "2026-동계방학 일반 교내 및 교외 국가근로장학생 모",
+   "added": "2026-11-27",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
