@@ -1049,11 +1049,11 @@
   "attGap": 0
  },
  "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2557&searchgbn=0&searchordersort=0": {
-  "tries": 2,
-  "at": "2026-11-27",
+  "tries": 3,
+  "at": "2026-11-28",
   "minBody": 100,
   "name": "2026학년도 강릉.원주캠퍼스 공로장학금 신청 안내",
-  "att": "2026-11-27",
+  "att": "2026-11-28",
   "attSeen": 3,
   "attGap": 0
  },
@@ -1080,6 +1080,35 @@
  "https://www.smu.ac.kr/kor/life/notice.do?articleno=770709": {
   "att": "2026-11-27",
   "attSeen": 3,
+  "attGap": 0
+ },
+ "https://www.mju.ac.kr/bbs/mjukr/145/237540/artclView.do": {
+  "ok": "2026-11-28",
+  "at": "2026-11-28",
+  "tries": 0,
+  "name": "[자연캠퍼스-교내근로] 2026학년도 동계방학 국가근로장학생 선발 안내",
+  "att": "2026-11-28",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.jbnu.ac.kr/web/Board/220363/detailView.do?category=6": {
+  "att": "2026-11-28",
+  "attSeen": 3,
+  "attGap": 0
+ },
+ "https://www.gachon.ac.kr/bbs/kor/478/127526/artclView.do": {
+  "att": "2026-11-28",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsno=8&key=815&nttno=171952&searchctgry=학사/장학": {
+  "att": "2026-11-28",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.smu.ac.kr/kor/life/notice.do?articleno=770739": {
+  "att": "2026-11-28",
+  "attSeen": 2,
   "attGap": 0
  }
 }

@@ -48,10 +48,6 @@
   "at": "2026-11-23",
   "tries": 2
  },
- "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171439&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
-  "at": "2026-11-23",
-  "tries": 2
- },
  "https://www.youthcenter.go.kr/bbs03View/48/10889": {
   "at": "2026-11-24",
   "tries": 2
@@ -106,26 +102,8 @@
   "tries": 2
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521260": {
-  "at": "2026-11-20",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3515772": {
-  "at": "2026-11-22",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "활동구분",
-   "오프라인",
-   "- 초등학생 기초학습 지도",
-   "- 프로그램 보조",
-   "[봉사장소 지도] 지도 건너뛰기",
-   "봉사활동 장소[1] 주소 : 충청남도 아산시 신창면 남성길 99(샘마을아파트) 상가동 3층",
-   "충청남도 아산시 신창면 남성길 99 샘마을 아파트 상가 3층",
-   "이전 봉사참여",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
+  "at": "2026-11-27",
+  "tries": 2
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/272428/artclView.do": {
   "at": "2026-11-23",
@@ -168,10 +146,6 @@
   "at": "2026-11-24",
   "tries": 1
  },
- "https://www.knou.ac.kr/bbs/knou/51/823353/artclView.do": {
-  "at": "2026-11-24",
-  "tries": 1
- },
  "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142297&article.offset=0&articleLimit=10": {
   "at": "2026-11-24",
   "tries": 1
@@ -188,22 +162,16 @@
   "at": "2026-11-26",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542487": {
+ "https://www.knou.ac.kr/bbs/knou/51/823605/artclView.do": {
   "at": "2026-11-27",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "활동구분",
-   "오프라인",
-   "- 과학원 방문 학생 대상 전시물 체험 안내",
-   "- 과학원 내 안전 지도 및 질서 유지 지원",
-   "- 각종 체험프로그램 운영 및 학습 활동 보조",
-   "- 이외 과학원 방문 학생 교육, 과학문화 확산, 운영 지원과 관련된 다양한 활동",
-   "경상북도 포항시 북구 우미길 93 경상북도교육청과학원",
-   "이전 봉사참여",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
+  "tries": 1
+ },
+ "https://www.sungshin.ac.kr/bbs/main_kor/3181/162167/artclView.do": {
+  "at": "2026-11-27",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12667/view.do?currentPageNo=1": {
+  "at": "2026-11-27",
+  "tries": 1
  }
 }
