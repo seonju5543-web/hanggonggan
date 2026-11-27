@@ -366,6 +366,19 @@ export function rollbackOcrTries(ledger, manifest, status, found = new Set()) {
   return back;
 }
 const PADDLE_STATUS = path.join(DIR, 'paddle-status.json');
+/** 그림 글자 대기 한 곳 (2026-11-27 대외활동 유료 시험 · 개발자 「재발하지 않도록 순서도에 확실하게 각인」) — 이번 그림 읽기 결과(paddle-status.json)로 이 글의 「그림 글자 대기」를 정한다.
+    기다리는 그림 = **엔진 고장**으로 못 읽은 그림(engineFailed 의 failed) + **시간이 모자라** 못 본 그림(skipped). 엔진이 멀쩡한데 그 그림만 못 읽었으면 그림 탓이라 기다려도 안 온다 — 안 기다린다.
+    돌려주는 것: undefined = 이번 읽기가 이 글의 그림을 안 다뤘다(전 표시 그대로) · [] = 다 다뤘다(표시를 지운다) · [원본 바이트 지문…] = 기다릴 그림.
+    표시는 글자 기록(act-text writeStore)에 남고, 카드 쓰기는 표시가 남은 글을 읽지도 사람에게 넘기지도 않는다(card-read pickTargets·actGateHeldOf) */
+export function ocrPendingOf(files, status, hashOf = (f) => fileHash(path.join(DIR, f))) {
+  if (!status) return undefined;
+  const failed = status.engineFailed ? (status.failed || []) : [];
+  const later = status.skipped || [];
+  const seen = new Set([...(status.ok || []), ...(status.failed || []), ...later]);
+  const mine = (files || []).filter((f) => seen.has(f));
+  if (!mine.length) return undefined;
+  return mine.filter((f) => failed.includes(f) || later.includes(f)).map((f) => hashOf(f) || f);
+}
 
 /* ── ① 받기 ── */
 async function fetchPhase(acts) {
@@ -509,6 +522,7 @@ function applyPhase(acts) {
   }
   /* OCR 이 실패한 파일 때문에 못 읽은 글은 그 시도를 세지 않는다(위 rollbackOcrTries) — 같은 결과로 두 번 되돌리지 않게 표시해 둔다 */
   const status = readJson(PADDLE_STATUS, null);
+  const freshOcr = status && !status.applied ? status : null;   // 이번 실행의 그림 읽기 결과 — 아래 적용 표시를 달기 전에 잡아 둔다(글자 기록의 그림 글자 대기가 쓴다)
   if (status && !status.applied) {
     const led = BROWSER ? bled : readJson(PLAIN_LEDGER, {});
     const back = rollbackOcrTries(led, manifest, status, found);
@@ -525,7 +539,8 @@ function applyPhase(acts) {
     let stored = 0;
     for (const n of acts.items) {
       if (!(n.url in manifest) || !wantsText(n, kst, TEXT_IDS)) continue;
-      if (writeStore(STORE_DIR, n.id, mode, { url: n.url, ...storeFromFiles(n, manifest[n.url] || [], names) }, kst)) stored += 1;
+      const pend = ocrPendingOf(manifest[n.url] || [], freshOcr);   // 그림 글자 대기 — 이번 읽기가 이 글의 그림을 안 다뤘으면 undefined(전 표시 그대로)
+      if (writeStore(STORE_DIR, n.id, mode, { url: n.url, ...storeFromFiles(n, manifest[n.url] || [], names), ...(pend ? { ocrPending: pend } : {}) }, kst)) stored += 1;
     }
     const liveIds = new Set(acts.items.map((n) => n.id).filter(Boolean));
     const pruned = pruneStore(STORE_DIR, liveIds, BROWSER ? 'browser' : 'plain');

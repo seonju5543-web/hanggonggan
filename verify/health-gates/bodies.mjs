@@ -655,7 +655,7 @@ export default async function bodies(eq, ctx) {
           '    def save(self, p, quality=None):', "        builtins.open(p, 'wb').write(b'x')", 'def open(p):', '    return _Im()', ''].join('\n'));
         for (const f of ['a.jpg', 'b.png']) fs.writeFileSync(path.join(files, f), 'x');
         const script = fileURLToPath(new URL('collector/paddle-ocr.py', root));
-        const runPy = (mode) => spawnSync('python3', [script, files, '--budget-sec=30'],
+        const runPy = (mode, budget = 30) => spawnSync('python3', [script, files, `--budget-sec=${budget}`],
           { encoding: 'utf8', env: cleanEnv({ PYTHONPATH: fakes, PYTHONDONTWRITEBYTECODE: '1', FAKE_PADDLE: mode }) });
         const status = () => { try { return JSON.parse(fs.readFileSync(path.join(files, 'paddle-status.json'), 'utf8')); } catch { return null; } };
         const r1 = runPy('broken'); const s1 = status() || {};
@@ -668,6 +668,9 @@ export default async function bodies(eq, ctx) {
         const r3 = runPy('noimport'); const s3 = status() || {};
         eq('  설치가 안 돼 불러오지도 못하면 그것도 엔진 고장(종료 코드 2 · 읽을 그림 전부 실패로)',
           [r3.status, s3.engineFailed, s3.failed, /ImportError/.test(s3.error || '')], [2, true, ['a.jpg', 'b.png'], true]);
+        const r4 = runPy('ok', 0); const s4 = status() || {};
+        eq('  시간이 모자라 못 본 그림은 상태 파일에 「다음 실행」(skipped)으로 적는다 — 엔진 고장이 아니다(종료 코드 0) · 받기 로봇이 그 글을 「그림 글자 대기」로 둔다(2026-11-27 · 예전엔 어디에도 안 적혀 조용히 빠졌다)',
+          [r4.status, s4.engineFailed, s4.ok, s4.skipped], [0, false, [], ['a.jpg', 'b.png']]);
       } finally {
         fs.rmSync(dir, { recursive: true, force: true });
       }
@@ -726,6 +729,27 @@ export default async function bodies(eq, ctx) {
         [f1.status, 'https://gone.example/x' in afterF, afterF._ocrV === cur._ocrV, !!afterF._common, !!afterF[u1]], [0, false, true, true, true]);
     } finally {
       sb2.done();
+    }
+  }
+  {
+    /* 2026-11-27 대외활동 유료 시험 — 그림 글자 엔진이 고장 난 실행에서 포스터 글자가 조용히 빠진 채 「다 받은」 기록이 돼 카드 쓰기가 원문이 덜 온 글을 읽었다
+       (개발자 「재발하지 않도록 순서도에 확실하게 각인」). --apply 를 임시 폴더에서 진짜 돌려, 못 읽은 포스터가 그 글의 기록에 「그림 글자 대기」로 남는지 본다 */
+    const sb4 = sandbox(root, 'hdj-actpend-');
+    try {
+      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const u = 'https://act.example/post/7';
+      sb4.write('collector/extracted/notices-text.json', []);
+      sb4.write('data/registered.json', { items: [] });
+      sb4.write('data/activities.json', { items: [{ id: 'act-pend1', title: '청년 포스터 공모전', url: u, paidGate: today }] });
+      sb4.write('collector/act-files/manifest.json', { [u]: ['pend1-0i.jpg'] });
+      sb4.write('collector/act-files/pend1-0i.jpg', 'poster-bytes');
+      sb4.write('collector/act-files/paddle-status.json', { engineFailed: true, ok: [], failed: ['pend1-0i.jpg'], error: 'ModuleNotFoundError: paddleocr' });
+      const r = sb4.run('collector/activity-docs.mjs', ['--apply'], {});
+      const rec = sb4.json('collector/act-text/act-pend1.json') || {};
+      eq('② ⓕ --apply 를 진짜 돌리면 — 엔진 고장으로 못 읽은 포스터가 그 글의 글자 기록에 「그림 글자 대기」(원본 바이트 지문 하나)로 남는다 · 글자 없는 덩어리는 안 싣는다(예전엔 빠진 줄도 모르고 「다 받은」 기록이 됐다)',
+        [r.status, (rec.ocrPending || []).length, typeof (rec.ocrPending || [])[0], rec.docs], [0, 1, 'string', []]);
+    } finally {
+      sb4.done();
     }
   }
   {

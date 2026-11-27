@@ -207,9 +207,17 @@ export function makeActSources({ storeDir, formRows = [], extractedDir }) {
     /* 본문 대기 — 무료 받기의 본문이 비었고 진짜 브라우저가 아직 그 글을 안 열었다(act-text textDue browser · 최종 리뷰 2026-11-26) → actAwaits 가 본문도 기다린다.
        원문 덩어리가 아니라 목록에 붙은 표식이다(원문 글자·지문에 안 든다) */
     out.bodyPending = !!it.id && textDue(storeDir, it.id, 'browser', '');
+    /* 그림 글자 대기(act-text ocrPending · 2026-11-27) — 그림 글자 엔진 고장·시간 부족으로 못 읽은 그림이 남았다 = 원문이 덜 왔다.
+       card-read 가 이 표식을 보고 읽지 않고(돈 0) 사람에게도 넘기지 않는다 · 원문 덩어리가 아니라 목록에 붙은 표식이다(원문 글자·지문에 안 든다) */
+    out.ocrPending = !!(rec.ocrPending && rec.ocrPending.length);
     return out;
   };
 }
+
+/* 그림 글자를 기다리는 글 — 실행 기록·요약 칸에 「그림 글자를 기다리는 글 n건」으로 보인다(card-read · 2026-11-27). 표시(paidGate)가 달린 글(올린 글·숨긴 글은 actView 가 표시를 뗀다) 또는 시험이 지정한 id.
+   ponytail: 셀 때마다 글자 기록을 읽는다 — 표시 글은 하루 수십 건이라 충분하다 */
+export const actOcrWaiting = (items, storeDir, only = []) => (items || []).filter((it) => it && it.id && ((only || []).length ? only.includes(it.id) : it.paidGate)
+  && ((readStore(storeDir, it.id) || {}).ocrPending || []).length);
 
 /* ── 첨부 기다리기 — 글에 한글·워드·PDF 첨부가 있는데 그 가운데 글자가 아직 안 온 것이 **하나라도** 있으면 표시 뒤 이틀까지 기다린다 ──
    장학금(card-read awaitsAttach)은 「첨부 글자가 하나도 없을 때」만 기다린다. 활동 글은 공고문이 주운 그 자리에서 오고 신청서는 새벽에 오므로 「하나라도」로 본다 —

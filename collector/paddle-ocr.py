@@ -61,10 +61,12 @@ def lines_of(result):
 STATUS = 'paddle-status.json'   # 이번 실행 결과 — activity-docs.mjs --apply 가 읽는다(머리말 🔴)
 
 
-def write_status(folder, engine_failed, ok, failed, error=''):
+def write_status(folder, engine_failed, ok, failed, error='', skipped=None):
+    # skipped — 시간 예산이 바닥나 이번에 못 본 그림(2026-11-27) · 받기 로봇이 그 글을 「그림 글자 대기」로 둔다
+    #   (예전엔 어디에도 안 적혀, 그 그림 글자가 빠진 채 「다 받은」 기록이 됐다 · activity-docs.mjs ocrPendingOf)
     try:
         with open(os.path.join(folder, STATUS), 'w', encoding='utf-8') as out:
-            json.dump({'engineFailed': engine_failed, 'ok': ok, 'failed': failed, 'error': error[:200]},
+            json.dump({'engineFailed': engine_failed, 'ok': ok, 'failed': failed, 'skipped': skipped or [], 'error': error[:200]},
                       out, ensure_ascii=False, indent=1)
     except OSError:
         pass
@@ -107,8 +109,10 @@ def main():
         warn_engine(todo, err)
         return 2
     ok, failed, first_err = [], [], ''
-    for f in todo:
+    skipped = []
+    for i, f in enumerate(todo):
         if time.time() > deadline:
+            skipped = todo[i:]
             print(f'예산 바닥 — {len(ok)}/{len(todo)}장 읽음 · 나머지는 다음 실행')
             break
         path = os.path.join(folder, f)
@@ -139,7 +143,7 @@ def main():
         print(f'✓ {f} — {len(lines)}줄')
     print(f'끝 — {len(ok)}장')
     broken = engine_broken(ok, failed)
-    write_status(folder, broken, ok, failed, first_err)
+    write_status(folder, broken, ok, failed, first_err, skipped)
     if broken:
         warn_engine(failed, first_err)
         return 2

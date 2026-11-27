@@ -21,6 +21,10 @@ export const daysSince = (from, today) => Math.round((Date.parse(`${today}T00:00
 /* 파일 이름으로 쓰는 id — 활동 글 id 는 `act-<지문>`·`api-<출처>-<번호>` 꼴이다. 경로 글자가 섞였으면 쓰지 않는다(폴더 밖에 파일을 만들지 않는다) */
 const safeId = (id) => /^[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/.test(String(id || '')) && !String(id).includes('..');
 const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
+/* 그림 글자 대기(ocrPending · 2026-11-27 대외활동 유료 시험 · 개발자 「재발하지 않도록 순서도에 확실하게 각인」) — 그림 글자 엔진이 고장 났거나 시간이 모자라 못 읽은 그림의 원본 바이트 지문.
+   표시가 남은 글은 원문이 덜 왔다: 카드 쓰기가 읽지 않고(돈 0) 사람에게도 넘기지 않는다(card-read pickTargets·actGateHeldOf) · 본문이 있어도 다음 날 다시 받는다(textDue).
+   예전엔 못 읽은 그림이 기록에서 조용히 빠져 「다 받은」 기록이 됐고, 포스터뿐인 글은 「원문 없음」·서식만 읽힌 글은 「읽을 내용 없음」으로 사람에게 넘겨져 숨었다 */
+const pendOf = (rec) => (rec && Array.isArray(rec.ocrPending) ? rec.ocrPending.filter((h) => typeof h === 'string' && h) : []);
 /* 이름이 있는 첨부는 이름으로도 한 번만(최종 리뷰 2026-11-26) — 받을 때마다 워터마크·날짜를 박아 바이트가 바뀌는 사이트는 같은 첨부가 지문마다 한 번씩 실려 원문이 바뀌고 같은 글을 다시 샀다 · 처음 것을 쓴다.
    🔴 이름은 **이미 저장된 첨부(다른 날)와 다른 모드의 기록**에만 견준다 — 한 번 받기 안의 같은 이름은 서로 다른 파일이다(리뷰 3차 I2 · 서울과기대 act-0dyt0rm 의 「멘토링 계획서(양식).hwp」 두 줄 중 하나는 포스터).
    ponytail: 같은 이름의 둘 중 하나가 첫날 못 받아지고 다음 날 받아지면 그것은 빠진다(본문이 빈 글만 다시 받는다 — 드물다) · 잦아지면 열쇠에 첨부 자리(몇째 파일)를 넣는다 */
@@ -46,9 +50,18 @@ export function writeStore(dir, id, mode, rec, today) {
     next.docs.push({ name: String(d.name || ''), hash: String(d.hash), from: ['attach', 'img', 'guide'].includes(d.from) ? d.from : 'attach', ocr: !!d.ocr, text: d.text });
     changed = true;
   }
+  /* 그림 글자 대기 — 이번 받기가 이 글의 그림을 다룬 실행이면(rec.ocrPending 이 배열 · activity-docs ocrPendingOf) 그 목록으로 바꾸고, 안 다룬 실행이면(칸 없음) 전 표시를 그대로 둔다.
+     어느 쪽이든 글자가 이미 온 그림(docs 의 지문)은 뺀다 · 다 빠지면 칸을 지운다 */
+  const docsHave = new Set(next.docs.map((d) => d && d.hash));
+  const prevPend = pendOf(next);
+  const nextPend = [...new Set(rec && Array.isArray(rec.ocrPending) ? pendOf(rec) : prevPend)].filter((h) => !docsHave.has(h));
+  if (JSON.stringify(nextPend) !== JSON.stringify(prevPend)) {
+    if (nextPend.length) next.ocrPending = nextPend; else delete next.ocrPending;
+    changed = true;
+  }
   /* 🔴 바뀐 것이 없어도 「오늘 받아 봤다」(tried)는 남긴다 — 안 남기면 textDue 가 그날 수집할 때마다 본문이 빈 글을 다시 받는다(최종 리뷰 2026-11-26 · 하루에 여러 번 두드리지 말 것).
-     본문이 빈 기록만(본문이 있으면 다시 받을 일이 없다) · 그날 이미 적었으면 쓰지 않는다(빈 커밋 없음) · 내용이 바뀐 날(at)은 바뀐 날만 */
-  if (!changed && (hasText(next.body) || old.tried === today)) return false;
+     본문이 빈 기록과 그림 글자 대기가 남은 기록만(둘 다 아니면 다시 받을 일이 없다) · 그날 이미 적었으면 쓰지 않는다(빈 커밋 없음) · 내용이 바뀐 날(at)은 바뀐 날만 */
+  if (!changed && ((hasText(next.body) && !pendOf(next).length) || old.tried === today)) return false;
   if (changed) next.at = today;
   next.tried = today;
   const bytes = () => Buffer.byteLength(JSON.stringify(next, null, 1));
@@ -78,9 +91,12 @@ export function readStore(dir, id) {
   };
   for (const d of (p && p.docs) || []) add(d, null);
   for (const d of (b && b.docs) || []) add(d, plainNames);
-  if (p && hasText(p.body)) return { body: p.body, bodyFrom: p.bodyFrom || 'plain', docs };
-  if (b && hasText(b.body)) return { body: b.body, bodyFrom: b.bodyFrom || 'browser', docs };
-  return { body: '', bodyFrom: '', docs };
+  /* 그림 글자 대기는 두 모드의 표시를 합친다 — 어느 쪽에서든 글자가 온 그림은 뺀다(한쪽이 읽었으면 기다릴 것이 없다) */
+  const pend = [...new Set([...pendOf(p), ...pendOf(b)])].filter((h) => !seen.has(h));
+  const extra = pend.length ? { ocrPending: pend } : {};
+  if (p && hasText(p.body)) return { body: p.body, bodyFrom: p.bodyFrom || 'plain', docs, ...extra };
+  if (b && hasText(b.body)) return { body: b.body, bodyFrom: b.bodyFrom || 'browser', docs, ...extra };
+  return { body: '', bodyFrom: '', docs, ...extra };
 }
 
 /** 이 글의 글자를 받아야 하나 — 표시(paidGate)가 달린 글만 사흘 동안. 올린 글(paidOpen)·관리자가 숨긴 글·id 없는 글은 아니다.
@@ -99,8 +115,13 @@ export function wantsText(n, today, ids = new Set()) {
 export function textDue(dir, id, mode, today) {
   if (!safeId(id)) return false;
   const p = readOne(storeFile(dir, id, 'plain'));
-  if (mode === 'browser') return !!p && !hasText(p.body) && !readOne(storeFile(dir, id, 'browser'));
+  if (mode === 'browser') {
+    const b = readOne(storeFile(dir, id, 'browser'));
+    if (b && pendOf(b).length) return (b.tried || b.at) !== today;   // 그림 글자 대기 — 다음 날 다시(하루 한 번 · 2026-11-27)
+    return !!p && !hasText(p.body) && !b;
+  }
   if (!p) return true;
+  if (pendOf(p).length) return (p.tried || p.at) !== today;   // 그림 글자 대기 — 본문이 있어도 다음 날 다시 받아 그림을 다시 읽는다(하루 한 번 · 2026-11-27)
   return !hasText(p.body) && (p.tried || p.at) !== today;   // tried — 마지막으로 받아 본 날(바뀐 것이 없던 날도 · 옛 기록은 at)
 }
 

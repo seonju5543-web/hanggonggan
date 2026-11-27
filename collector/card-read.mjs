@@ -36,7 +36,7 @@ import { attachmentText, docOrder, readableDoc, loadNoticeDocIndex } from './att
 import { closedForStudents } from './rescue-plan.mjs';
 import { sameTitle } from './detail-url.mjs';
 import { AI_ROLES, fileHash16 } from './attach-role-ai.mjs';
-import { ACT_FILES, ACT_SYSTEM, actGateOn, actItems, makeActSources, actAwaits } from './act-card.mjs';
+import { ACT_FILES, ACT_SYSTEM, actGateOn, actItems, makeActSources, actAwaits, actOcrWaiting } from './act-card.mjs';
 
 const require = createRequire(import.meta.url);
 const HERE = new URL('.', import.meta.url);
@@ -239,6 +239,9 @@ export function pickTargets(items, partsOf, ledger, { today, giveUpAfter = 3, on
     if (!ids && !it.paidGate && !it.paidRead) continue;   // paidRead = 사람이 등록한 공고(숨기지 않고 읽기만 · admin-apply register)
     if (ids ? !ids.includes(it.id) : closedNow(it, paid[it.id], today)) continue;
     const parts = partsOf(it), text = sourceText(parts);
+    /* 🔴 그림 글자 대기(활동 글 · act-card makeActSources ocrPending · 2026-11-27 개발자 「재발하지 않도록 순서도에 확실하게 각인」) — 그림 글자 엔진 고장·시간 부족으로 못 읽은 포스터가 남았다.
+       원문이 덜 온 글은 읽지 않는다(돈 0) — 시험 실행의 지정 id 도. 그날 유료 시험에서 포스터 글자가 빠진 채 해커톤은 「원문 없음」·캠프는 「읽을 내용 없음」이 됐다 */
+    if (parts && parts.ocrPending) continue;
     if (!ids && awaits(it, parts, today, waitAttachDays)) continue;   // 첨부가 아직 안 왔다 — 내일 다시 본다
     if (text.replace(/[^가-힣]/g, '').length < 40) continue;      // 읽을 원문이 없다 — 사흘 뒤 사람에게(gateHeldOf no-source)
     const hash = sourceHash(text, system), led = ledger[it.id] || {};
@@ -287,8 +290,12 @@ export function actGateHeldOf(items, partsOf, ledger, paid, today, prevHeld = {}
     if (led && led.gradOnly) { out[it.id] = 'grad-only'; continue; }
     const waited = daysSince(it.paidGate, today);
     if (waited > waitDays && !(prevHeld || {})[it.id]) continue;   // 이미 무료 값으로 올랐다 — 다시 숨기지 않는다
+    const parts = partsOf(it);
+    /* 🔴 그림 글자 대기(2026-11-27) — 사람에게 넘기지 않는다(「원문 없음」·「읽을 내용 없음」 둘 다). 그림 글자 엔진 고장은 우리 쪽 고장이라 사람 몫이 아니다 —
+       사흘이 지나면 앱이 무료 값으로 올리고 「유료 확인이 멈췄다」 경보가 운다(actGateStalled · 비상망). 그림 글자가 오면 표시가 지워져 다시 대상이 된다 */
+    if (parts && parts.ocrPending) continue;
     if (led && led.done) { out[it.id] = 'unreadable'; continue; }
-    if (waited >= waitDays && sourceText(partsOf(it)).replace(/[^가-힣]/g, '').length < 40) out[it.id] = 'no-source';
+    if (waited >= waitDays && sourceText(parts).replace(/[^가-힣]/g, '').length < 40) out[it.id] = 'no-source';
   }
   return out;
 }
@@ -430,6 +437,8 @@ if (process.argv[1] && ranDirectly()) {
     const led = readJson('card-read-ledger.json', {});
     console.log(gateStatsText(gateStats({ items: reg.items, data, ledger: led, frLedger: readJson('final-review-ledger.json', {}), frResult: readJson('final-review.json', { items: {} }), today: TODAY,
       stalled: ACT ? actGateStalled(reg.items, data, led, TODAY).length : null }), TODAY, ACT));
+    /* 그림 글자를 기다리는 글(2026-11-27) — 그림 글자 엔진 고장·시간 부족으로 원문이 덜 와 읽지도 넘기지도 않고 기다리는 글. 요약 칸에 보여야 사흘 경보 전에 안다 */
+    if (ACT) { const w = actOcrWaiting(reg.items, P('act-text')); if (w.length) console.log(`- 그림 글자를 기다리는 글 ${w.length}건(그림 글자 엔진 고장·시간 부족 — 글자가 오면 다음 실행에 읽는다 · 사흘이 지나면 앱이 무료 값으로 올리고 경보가 운다)`); }
     process.exit(0);
   }
   if (process.argv.includes('--gate-alarm')) {   // 경보 세기(GITHUB_OUTPUT 꼴 · 읽기만) — 값에 줄바꿈이 들어가지 않게 누른다
@@ -519,6 +528,10 @@ if (process.argv[1] && ranDirectly()) {
   const targets = pickTargets(reg.items, partsOf, ledger, { today: TODAY, giveUpAfter: cfg.giveUpAfter, only: ONLY, paid: data.items, waitAttachDays: cfg.waitAttachDays, system: SYS, awaits });
   const waiting = reg.items.filter((it) => !it.program && (it.paidGate || it.paidRead) && !closedNow(it, data.items[it.id], TODAY) && awaits(it, partsOf(it), TODAY, cfg.waitAttachDays)).length;
   log(`대상 ${targets.length}건 (유료 확인을 기다리는 숨김 등록분 가운데 마감 전이고 · 원문이 있고 · 이 원문을 아직 안 읽은 것) · 첨부를 기다리는 것 ${waiting}건 · 이미 실린 것 ${Object.keys(data.items).length}건 · 내린 것 ${pruned}건`);
+  if (ACT) {   // 그림 글자 대기로 읽지 않은 글 — 시험 실행이면 지정한 id 가운데(2026-11-27 · 돈 0)
+    const w = actOcrWaiting(reg.items, P('act-text'), ONLY);
+    if (w.length) log(`그림 글자를 기다려 읽지 않은 글 ${w.length}건(그림 글자 엔진 고장·시간 부족 — 글자가 오면 다음 실행에 읽는다 · 돈 0): ${w.slice(0, 8).map((it) => it.id).join(', ')}`);
+  }
   const fake = process.env.CARD_READ_FAKE ? JSON.parse(fs.readFileSync(process.env.CARD_READ_FAKE, 'utf8')) : null;
   const paidOn = cfg.enabled === true && process.env.CARD_READ_ENABLE === '1';
   actHoldNew = !!fake || paidOn;

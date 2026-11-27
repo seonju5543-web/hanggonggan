@@ -18035,6 +18035,22 @@ module.exports = class Anthropic {
         [sameBatch, AT.readStore(dir, 'act-n').docs.map((d) => d.hash)], [['n1', 'n2'], ['n1', 'n2', 'n6', 'n7']]);
       eq('  🔴 바뀐 것 없이 다시 받은 날도 「오늘 받아 봤다」를 남긴다 — 본문이 빈 글을 같은 날 수집할 때마다 다시 받지 않는다(하루 한 번) · 다음 날은 다시 차례 · 바뀐 것이 없으니 쓴 글로 세지 않고 내용이 바뀐 날(at)도 그대로',
         [triedNext, wroteAgain, due('act-c', 'plain', '2026-11-27'), due('act-c', 'plain', '2026-11-28'), JSON.parse(rawOf('act-c', 'plain')).at, sameFormat(rawOf('act-c', 'plain'))], [true, false, false, true, '2026-11-26', true]);
+      /* 2026-11-27 유료 시험(개발자 「5건 시험해」) — 그림 글자 엔진이 고장 난 실행에서 포스터 글자가 **조용히 빠진 채** 기록돼, 해커톤은 「원문 없음」·캠프는 서식만 읽혀 「읽을 내용 없음」이 됐다
+         (운영이었으면 둘 다 사람에게 넘겨져 학생 화면에서 숨었다 · 본문이 있는 글이면 포스터가 빠진 카드를 샀다). 개발자 「재발하지 않도록 순서도에 확실하게 각인」 —
+         엔진 고장·시간 부족으로 못 읽은 그림은 「그림 글자 대기」(ocrPending · 원본 바이트 지문)로 기록에 남는다 · 본문이 있어도 다음 날 다시 받는다(같은 날은 안 받는다) ·
+         그 그림 글자가 오거나 이 글의 그림을 다 읽은 실행이면 지운다 · 이 글의 그림을 안 다룬 실행(ocrPending 칸 없음)은 표시를 건드리지 않는다 · 두 모드의 표시를 합쳐 읽는다(글자가 온 그림은 뺀다) */
+      const BODY_OK = '본문이 있는 글입니다 — 참가 대상과 접수 방법은 포스터에 있습니다';
+      AT.writeStore(dir, 'act-o', 'plain', { url: 'https://x.kr/o', body: BODY_OK, bodyFrom: 'plain', docs: [], ocrPending: ['p1'] }, '2026-11-26');
+      const o1 = [AT.readStore(dir, 'act-o').ocrPending, due('act-o', 'plain', '2026-11-26'), due('act-o', 'plain', '2026-11-27')];
+      const keptO = AT.writeStore(dir, 'act-o', 'plain', { url: 'https://x.kr/o', body: BODY_OK, docs: [] }, '2026-11-27');   // 이 글의 그림을 안 다룬 실행
+      const o2 = [keptO, AT.readStore(dir, 'act-o').ocrPending, due('act-o', 'plain', '2026-11-27'), due('act-o', 'plain', '2026-11-28')];
+      AT.writeStore(dir, 'act-o', 'plain', { url: 'https://x.kr/o', body: BODY_OK, docs: [doc('p1', '포스터 글자 — 참가 대상 대학생', { from: 'img', ocr: true, name: '' })], ocrPending: [] }, '2026-11-28');
+      const o3 = [AT.readStore(dir, 'act-o').ocrPending, AT.readStore(dir, 'act-o').docs.map((d) => d.hash), due('act-o', 'plain', '2026-11-29'), JSON.parse(rawOf('act-o', 'plain')).ocrPending];
+      AT.writeStore(dir, 'act-q', 'plain', { url: 'https://x.kr/q', body: '', docs: [], ocrPending: ['q1', 'q2'] }, '2026-11-26');
+      AT.writeStore(dir, 'act-q', 'browser', { url: 'https://x.kr/q', body: '', docs: [doc('q1', '브라우저 실행이 읽은 포스터 글자', { from: 'img', ocr: true, name: '' })], ocrPending: ['q3'] }, '2026-11-26');
+      eq('⑧ 🔴 그림 글자 대기(ocrPending) — 엔진 고장·시간 부족으로 못 읽은 그림은 기록에 남는다 · 본문이 있어도 다음 날 다시 받는다(같은 날은 안 받는다) · 이 글의 그림을 안 다룬 실행은 표시를 그대로 두되 「받아 봤다」는 적는다 · 그림 글자가 오면 지운다 · 두 모드의 표시를 합치고 글자가 온 그림은 뺀다 · 브라우저 기록의 표시도 다음 날 다시 받는다',
+        [o1, o2, o3, AT.readStore(dir, 'act-q').ocrPending, due('act-q', 'browser', '2026-11-26'), due('act-q', 'browser', '2026-11-27')],
+        [[['p1'], false, true], [false, ['p1'], false, true], [undefined, ['p1'], false, undefined], ['q2', 'q3'], false, true]);
 
       /* 받은 파일(act-files) → 기록 한 건 — 첨부 로봇(activity-docs)의 두 모드가 같은 함수를 쓴다 */
       process.env.ACTIVITY_DOCS_AS_LIB = '1';
@@ -18074,6 +18090,17 @@ module.exports = class Anthropic {
       eq('  🔴 본문 분량을 잴 때 두 글자 미만의 제목 조각(「2026년」→「년」)은 빼지 않는다 — 그 글자가 본문 어디에 있든 지워 진짜 본문을 버렸다',
         AD.storeFromFiles(yearPost, [], {}, { ...io, key: 'k6', readText: () => yearBody, mode: 'plain' }).body, yearBody);
       eq('  본문 분량의 문턱은 notice-source MIN_BODY 한 곳을 불러 쓴다(장학금 원문 받기와 같은 100자 — 숫자를 베껴 적지 않는다)', /import \{ MIN_BODY \} from '\.\/notice-source\.mjs'/.test(readText(new URL('../collector/activity-docs.mjs', import.meta.url))), true);
+      /* ⑧ 이어서 — 받기 로봇이 이번 그림 읽기 결과(paddle-status.json)로 그 글의 「그림 글자 대기」를 정한다(ocrPendingOf 한 곳 · 2026-11-27) */
+      const stO = (o) => ({ engineFailed: false, ok: [], failed: [], ...o });
+      const HO = (f) => `H-${f}`;
+      eq('  그림 글자 대기를 정하는 곳(ocrPendingOf) — 엔진 고장으로 못 읽은 그림 · 시간이 모자라 못 본 그림(skipped)은 기다린다 · 엔진이 멀쩡한데 그 그림만 못 읽었으면 안 기다린다(그림 탓 — 기다려도 안 온다) · 다 읽었으면 빈 목록(표시를 지운다) · 이 글의 그림을 안 다룬 읽기·결과 없음은 undefined(표시 그대로)',
+        [AD.ocrPendingOf(['k-1i.png', 'k-0.hwp'], stO({ engineFailed: true, failed: ['k-1i.png', 'z-0i.png'] }), HO),
+          AD.ocrPendingOf(['k-1i.png', 'k-2i.png'], stO({ ok: ['k-1i.png'], skipped: ['k-2i.png'] }), HO),
+          AD.ocrPendingOf(['k-1i.png', 'k-2i.png'], stO({ ok: ['k-2i.png'], failed: ['k-1i.png'] }), HO),
+          AD.ocrPendingOf(['k-1i.png'], stO({ ok: ['k-1i.png'] }), HO),
+          AD.ocrPendingOf(['k-1i.png'], stO({ ok: ['z-0i.png'] }), HO),
+          AD.ocrPendingOf(['k-1i.png'], null, HO)],
+        [['H-k-1i.png'], ['H-k-2i.png'], [], [], undefined, undefined]);
       const adSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
       eq('⑦ 첨부 로봇 — 글자를 받을 글을 지금 대상보다 먼저 돈다 · 🔴 활동 목록 파일을 쓰는 곳은 무료 모드 한 곳뿐(브라우저 모드는 안 쓴다) · 끝에 제 모드 기록만 가지치기 · 시험 워크플로의 id 목록(ACT_TEXT_IDS)',
         [/const order = \[\.\.\.acts\.items\.filter\(isTextTarget\), \.\.\.acts\.items\.filter\(\(n\) => !isTextTarget\(n\)\)\];/.test(adSrc), (adSrc.match(/writeFileSync\(ACTS/g) || []).length, /if \(changed && !BROWSER\) fs\.writeFileSync\(ACTS/.test(adSrc),
@@ -18137,6 +18164,13 @@ module.exports = class Anthropic {
         const w2 = (id, gate) => AC.actAwaits({ id, paidGate: gate, attachments: [{ name: '공고문.hwp' }] }, srcB({ id }), plus(0));
         eq('  🔴 무료 받기의 본문이 비었고 진짜 브라우저가 아직 안 돌았으면 본문도 기다린다(이틀까지) — 브라우저가 한 번 돌았으면(못 받았어도) · 무료 본문이 있으면 · 이틀이 지나면 · 표시 없는 글(시험)은 안 기다린다',
           [w2('b1', plus(0)), w2('b1', plus(-1)), w2('b1', plus(-2)), w2('b2', plus(0)), w2('b3', plus(0)), w2('b1', undefined)], [true, true, false, false, false, false]);
+        ATb.writeStore(bdir, 'b4', 'plain', { url: 'u4', body: '무료로 받은 본문 글자입니다', docs: [docA], ocrPending: ['poster1'] }, plus(0));
+        eq('  원문을 모으는 곳(makeActSources)이 그 글의 「그림 글자 대기」를 함께 넘긴다(원문 덩어리가 아니라 목록에 붙은 표식 — 원문 지문에 안 든다) · 표시가 없으면 거짓',
+          [srcB({ id: 'b4' }).ocrPending, srcB({ id: 'b3' }).ocrPending, CR.sourceHash(CR.sourceText(srcB({ id: 'b4' }))) === CR.sourceHash(CR.sourceText(srcB({ id: 'b3' })))], [true, false, true]);
+        eq('  그림 글자를 기다리는 글 세기(actOcrWaiting) — 표시 글 가운데 기록에 대기가 남은 글 · 시험이면 지정한 id 가운데 · 표시 없는 글은 아니다 · 카드 쓰기 실행 기록과 요약 칸(--stats)이 이 한 곳으로 센다',
+          [AC.actOcrWaiting([{ id: 'b4', paidGate: plus(0) }, { id: 'b3', paidGate: plus(0) }, { id: 'b4x', paidGate: plus(0) }], bdir).map((x) => x.id), AC.actOcrWaiting([{ id: 'b4' }, { id: 'b3' }], bdir, ['b4']).map((x) => x.id),
+            AC.actOcrWaiting([{ id: 'b4' }], bdir).length, (crSrc.match(/actOcrWaiting\(reg\.items, P\('act-text'\)/g) || []).length],
+          [['b4'], ['b4'], 0, 2]);
       } finally { fs.rmSync(bdir, { recursive: true, force: true }); }
     }
     const held = (gateDay, { led, prev = {}, text = '', over = {} } = {}) => CR.actGateHeldOf([{ id: 'n', paidGate: gateDay, deadline: plus(30), ...over }], () => (text ? [{ label: '게시판 본문', text }] : []), led ? { n: led } : {}, {}, plus(0), prev);
@@ -18157,6 +18191,17 @@ module.exports = class Anthropic {
       { items: { s6: {} }, gateHeld: { s4: 'no-source' } }, { s2: { done: true } }, plus(0));
     eq('  유료가 멈춘 글(actGateStalled) — 사흘 넘게 카드도 사람 몫도 아닌 글만 · 🔴 읽고도 실을 것이 없어 무료 값으로 남은 글(장부 done)은 세지 않는다(세면 경보가 꺼지지 않는다) · 올린 글·넘긴 글·카드 있는 글·사흘째·마감 지난 글은 아니다',
       stall.map((it) => it.id), ['s1']);
+    /* 2026-11-27 유료 시험(개발자 「재발하지 않도록 순서도에 확실하게 각인」) — 그림 글자 대기(ocrPending)인 글은 원문이 덜 왔다:
+       읽지 않는다(돈 0 · 시험 실행의 지정 id 도) · 사람에게 넘기지 않는다(「원문 없음」·「읽을 내용 없음」 둘 다 — 엔진 고장은 우리 쪽 고장이다) ·
+       사흘이 넘으면 「멈춘 글」로 세어 경보가 운다(앱은 그 글을 무료 값으로 올린다 · 비상망). 그림 글자가 오면 표시가 지워져 다시 대상이 된다 */
+    const pendParts = (text) => Object.assign(text ? [{ label: '게시판 본문', text }] : [], { ocrPending: true });
+    const pickP = (o = {}) => CR.pickTargets([{ id: 'p', paidGate: plus(0), deadline: plus(9) }], () => pendParts(txt('p')), {}, { today: plus(0), system: AC.ACT_SYSTEM, awaits: AC.actAwaits, ...o }).map((t) => t.it.id);
+    const heldP = (gateDay, led) => CR.actGateHeldOf([{ id: 'p', paidGate: gateDay, deadline: plus(30) }], () => pendParts(''), led ? { p: led } : {}, {}, plus(0), {});
+    eq('④ 🔴 그림 글자 대기인 글은 읽지 않는다(시험 실행의 지정 id 도 — 돈 0) · 사람에게 넘기지 않는다(원문 없음·읽을 내용 없음 둘 다) · 사흘이 넘으면 「멈춘 글」로 세어 경보가 운다(앱은 무료 값으로 올린다) · 표시가 없으면 전처럼 읽는다',
+      [pickP(), pickP({ only: ['p'] }), heldP(plus(-3)), heldP(plus(-1), { done: true }),
+        CR.actGateStalled([AC.actView(A('p', { paidGate: plus(-4) }))], { items: {}, gateHeld: {} }, {}, plus(0)).map((x) => x.id),
+        CR.pickTargets([{ id: 'p', paidGate: plus(0), deadline: plus(9) }], () => [{ label: '게시판 본문', text: txt('p') }], {}, { today: plus(0), system: AC.ACT_SYSTEM, awaits: AC.actAwaits }).map((t) => t.it.id)],
+      [[], [], {}, {}, ['p'], ['p']]);
 
     const sb = paidBox('hdj-act-read-');
     try {
