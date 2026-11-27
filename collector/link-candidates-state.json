@@ -272,6 +272,31 @@
   "round": "2026-11-13",
   "decidedAt": "2026-11-08"
  },
+ "kosaf|2000189006|https://www.cwg.go.kr/www/selectBbsNttView.do?key=1226&bbsNo=25&nttNo=273406": {
+  "ds": "kosaf",
+  "key": "2000189006",
+  "url": "https://www.cwg.go.kr/www/selectBbsNttView.do?key=1226&bbsNo=25&nttNo=273406",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년 다자녀가정 특별지원(대학등록금)사업 공고",
+  "firstAt": "2026-11-27",
+  "lastAt": "2026-11-27",
+  "tries": 1,
+  "status": "suggest",
+  "why": "회차를 가릴 날짜가 안 보임",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "weak",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-12-09",
+  "decidedAt": "2026-11-27",
+  "also": []
+ },
  "kosaf|2000193001|board:https://www.hongcheon.go.kr/mayor2022/selectBbsNttList.do?bbsNo=111&key=2532": {
   "ds": "kosaf",
   "key": "2000193001",
@@ -1407,6 +1432,22 @@
   "decidedAt": "2026-11-16",
   "also": []
  },
+ "kosaf|2703434001|board:https://www.kcffd.org/": {
+  "ds": "kosaf",
+  "key": "2703434001",
+  "url": "",
+  "board": "https://www.kcffd.org/",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-27",
+  "lastAt": "2026-11-27",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2027-01-05",
+  "nextAt": "2026-11-28"
+ },
  "kosaf|2703603001|board:https://www.yuha.or.kr/News_Notice.aspx": {
   "ds": "kosaf",
   "key": "2703603001",
@@ -1504,6 +1545,32 @@
   "checks": {},
   "round": "2027-01-08",
   "nextAt": "2026-11-28"
+ },
+ "kosaf|2704215001|http://www.pyeongnae.co.kr/bbs/board.php?bo_table=notice&wr_id=206": {
+  "ds": "kosaf",
+  "key": "2704215001",
+  "url": "http://www.pyeongnae.co.kr/bbs/board.php?bo_table=notice&wr_id=206",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "★2026년 평내장학회 장학생 모집★",
+  "firstAt": "2026-11-27",
+  "lastAt": "2026-11-27",
+  "tries": 1,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-12-10",
+  "decidedAt": "2026-11-27",
+  "verifiedAt": "2026-11-27",
+  "also": []
  },
  "kosaf|2704219001|board:https://www.ygef.or.kr/board/?board=recruitment&site=ygmirae&mn=213": {
   "ds": "kosaf",
