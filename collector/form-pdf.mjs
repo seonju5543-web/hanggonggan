@@ -96,7 +96,9 @@ const nameDecide = (a, row, nameForm) => ({ form: nameForm, notice: false, role:
  *  roles — 내용 판정이 이름 규칙과 **다른** 첨부만 { [공고 id]: { [첨부 이름]: 'form'|'notice' } } — 앱 신청서 칸이 이것을 먼저 본다(app-live attIsForm)
  *          AI 가 붙은 문서(mixed)·이 공고 문서 아님(other)이라 한 이름이 신청서인 파일도 여기 'notice' 로 적힌다(신청서 칸에 안 선다 · 공고문 PDF 로봇 몫이 된다)
  *  notForm — AI 가 「신청서가 아니다」라고 한 첨부 이름들 { [공고 id]: [첨부 이름] } — 이름도 신청서가 아니라 roles 에 안 적히는 것까지(본편이 그 옛 사본을 지운다) */
-export function pickFormTargets(items, indexRows, { today, isApplicationForm, decide = nameDecide }) {
+/*  aiWants(it, a) — 이름이 공고문이어도 받을 첨부인가(2026-11-25 · 대외활동 유료 관문 5-5): AI 가 서식·붙은 문서라고 한 **활동 글의** 첨부.
+ *          활동 글은 원문을 글자로만 저장해(collector/act-text) 원본이 저장소에 없다 — 붙은 문서에서 서식 쪽을 떼려면 받아 와야 한다. 장학금 공고의 공고문은 자격 로봇이 이미 받는다 */
+export function pickFormTargets(items, indexRows, { today, isApplicationForm, decide = nameDecide, aiWants = () => false }) {
   const out = []; const missing = []; const unread = []; const roles = {}; const notForm = {};
   for (const it of items || []) {
     if (!it || !it.id || it.program || it.hidden || !isOpen(it, today)) continue;
@@ -118,7 +120,7 @@ export function pickFormTargets(items, indexRows, { today, isApplicationForm, de
       /* 안 받은 것 — 이름이 신청서면 missing · 이름이 공고문이면 자격 로봇(--elig-attach)이 받는다 · **어느 쪽도 아닌 이름**(「붙임1.hwp」·「[Form]…」)은
          아무도 안 받았다 → unread(밀린 목록이 받아 내용으로 가른다) */
       /* .doc(옛 워드)는 글자를 못 뽑아(attachmentText) 받아도 내용으로 못 가른다 — unread 에 넣지 않는다(리뷰) */
-      if (!row) { if (nameForm) missing.push({ id: it.id, name: a.name }); else if (!isNoticeDoc(a.name) && !/\.doc$/i.test(cleanAttachName(a.name))) unread.push({ id: it.id, name: a.name }); continue; }
+      if (!row) { if (nameForm) missing.push({ id: it.id, name: a.name }); else if ((!isNoticeDoc(a.name) && !/\.doc$/i.test(cleanAttachName(a.name))) || aiWants(it, a)) unread.push({ id: it.id, name: a.name }); continue; }
       const d = decide(a, row, nameForm, it);
       if (d.form !== nameForm && d.by !== 'name') (roles[it.id] ||= {})[a.name] = d.form ? 'form' : 'notice';
       if (!d.form && d.by === 'ai') (notForm[it.id] ||= []).push(a.name);
@@ -145,8 +147,8 @@ export const isRejected = (index, key, srcBytes) => {
    순서: 마감이 가까운 것부터(마감 모름은 뒤) · 같은 날이면 id 순(실행마다 같은 순서 — 예산에 잘려도 다음 실행이 이어 받는다).
    쉼: 받아 보려 했는데 못 받은 공고(tried[id] = 날짜)는 restDays 동안 다시 안 두드린다(로그인 벽·깨진 주소를 매일 두드리지 않는다).
    돌려주는 것: [{ it, atts }] — atts 는 그 공고의 **신청서 첨부만**(공고문·결과보고서는 자격 로봇 몫 · 받는 로봇이 이 목록만 받는다). */
-export function pickFormBacklog(items, indexRows, { today, isApplicationForm, tried = {}, restDays = 3, max = 12, exclude = new Set() } = {}) {
-  const { missing, unread } = pickFormTargets(items, indexRows, { today, isApplicationForm });
+export function pickFormBacklog(items, indexRows, { today, isApplicationForm, tried = {}, restDays = 3, max = 12, exclude = new Set(), aiWants = () => false } = {}) {
+  const { missing, unread } = pickFormTargets(items, indexRows, { today, isApplicationForm, aiWants });
   /* 🔴 2026-11-20 — 이름이 신청서도 공고문도 아닌 문서 첨부(unread)도 받는다: 받아서 읽어야 신청서인지 공고문인지 안다(attachDecision).
      이름이 신청서인 것(missing)이 있는 공고가 먼저다 — 상한(max)에 잘려도 확실한 신청서부터 받는다 */
   const byId = new Map(); const sure = new Set(missing.map((m) => m.id));

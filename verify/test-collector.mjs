@@ -2475,9 +2475,10 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     /* 2026-10-01 — 공공 API 글만 seenAt(API 가 마지막으로 준 날)으로 잰다 · 게시판 글은 그대로 foundAt (「공공 API 로봇」 I3) */
     /* 2026-10-05 — 그 날짜(seenAt || foundAt)는 open-api-map.mjs actKeepDate 한 곳 · 상한도 같은 날짜로 고른다(capActivities · 점검 api-11) */
     /acts\.items = acts\.items\.filter\(\(n\) => \(actKeepDate\(n\) \|\| '9999'\) >= cutoff\)/.test(cm)
-    && /acts\.items = dedupeNotices\(acts\.items\)/.test(cm)
+    /* 2026-11-25 — 중복 정리는 같은 함수(dedupeNotices)를 숨김 표시 지키기로 감싸 부르고(act-card dedupeActivities), 상한은 「학생에게 보이는 글만」 세도록 판정을 함께 넘긴다(대외활동 유료 관문 ⑤ 절이 잰다) */
+    && /acts\.items = dedupeActivities\(acts\.items, dedupeNotices, /.test(cm)   // 2026-11-26 — 「보이는가」 판정도 함께 넘긴다(⑤ 절이 잰다)
     && /dropUnserved\(acts\.items\.filter\(\(n\) => n\.school\)\)/.test(cm)
-    && /acts\.items = capActivities\(acts\.items, ACT_CAP\)/.test(cm), true);
+    && /acts\.items = capActivities\(acts\.items, ACT_CAP, /.test(cm), true);
   /* 🔴 블록 안에서 끝나야 한다 — 예전 [\s\S]*?continue; 는 파일 어디의 continue 에나 맞아 관문이 빈 채였다(2026-10-01 수리 · 코드는 return 으로 게시판을 마친다) */
   eq('전용 게시판은 장학 피드에 담지 않는다 (actResults 에 담고 return)', /if \(isAct\) \{\s*actResults\.push\(\{\s*name,[\s\S]{0,400}?items: freshA,\s*\}\);\s*return;/.test(cm), true);
   const strip = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
@@ -6747,6 +6748,43 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
         AL.detailAttachments('<span>A요강.hwp</span><a href="./downloadBbsFile.do?atchmnflNo=1">다운로드</a> <a href="./previewBbsFile.do?atchmnflNo=1">미리보기</a> <span>포스터.jpg</span><a href="./downloadBbsFile.do?atchmnflNo=2">다운로드</a>', kgu).map((a) => `${a.name}|${a.url.slice(-12)}`),
         AL.detailAttachments('<a href="/ko/downloads/">양식 다운로드</a>', kgu)],
       [[], ['A요강.hwp|atchmnflNo=1'], []]);
+    /* 사이트가 파일 이름 뒤에 붙인 꼬리 — 용량·내려받은 횟수·미리보기 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ②③).
+       꼬리 때문에 이름이 확장자로 끝나지 않아 ① 동아대 국어문화원 글은 첨부 둘이 아예 안 잡혔고(주소는 `downloadRun.do?qcode=…` 보통 링크 · 2026-11-25 페이지를 받아 확인)
+       ② 농림축산식품부 글은 잡히고도 문서로 읽히지 않았다(`….hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB`). 받을 때 떼고(detailAttachments), 실린 활동 글은 소급한다 */
+    eq('사이트 꼬리 떼기(trimSiteTail) — 용량·내려받은 횟수·미리보기 꼬리만 뗀다 · 닫는 괄호가 없어도 · 본문 문장과 이름 속 괄호·다른 괄호 꼬리는 그대로',
+      ['제안서.hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB', '신청서.hwp (다운로드 : 12회)', '신청서.hwp (71KB)', '요강.pdf [123 KB]', '요강.pdf 미리보기',
+        '공고문.hwp', '2026 안내(최종).pdf', '참가 안내', '신청서.hwp 작성 방법 안내', '공고문.hwp (최종)', ''].map((n) => (AL.trimSiteTail || (() => undefined))(n)),
+      ['제안서.hwp', '신청서.hwp', '신청서.hwp', '요강.pdf', '요강.pdf', '공고문.hwp', '2026 안내(최종).pdf', '참가 안내', '신청서.hwp 작성 방법 안내', '공고문.hwp (최종)', '']);
+    const donga = 'https://korea.donga.ac.kr/korea/CMS/Board/Board.do?mCode=MN032&mode=view&mgr_seq=1002&board_seq=8520208';
+    /* 리뷰 2026-11-25 — 위 표본은 100자에서 잘린 뒤의 글자였다. 페이지가 실제로 주는 글자는 꼬리가 둘이고(용량 + 바로보기) &nbsp; 가 확장자에 바로 붙기도 한다 */
+    eq('  실제 글자 — 꼬리가 여럿 이어져도(용량 괄호 + 바로보기) · &nbsp; 가 확장자에 바로 붙어도 · K 한 글자 단위도 뗀다',
+      ['공고문.hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB) 바로보기', '2027학년도 모집요강.pdf&nbsp; &nbsp;(다운로드 : 4회) 바로보기', '신청서.hwp (71.5K)', '신청서.hwp\u00a0(12KB)', '요강.pdf (1.2MB, 45회)', '요강.pdf 미리보기 (83KB)'].map((n) => AL.trimSiteTail(n)),
+      ['공고문.hwp', '2027학년도 모집요강.pdf', '신청서.hwp', '신청서.hwp', '요강.pdf', '요강.pdf']);
+    eq('  🔴 뜻이 있는 괄호는 꼬리가 아니다 — 회차·건수 뒤에 글자가 이어지는 괄호 · 숫자 없는 「다운로드 …」 안내는 그대로 둔다(이름이 다른 두 파일이 같은 이름이 되지 않는다)',
+      ['신청서.hwp (1회차)', '신청서.hwp (2회차)', '서류.hwp (3건 이상 제출)', '신청서.hwp (다운로드 후 작성)', '요강.pdf (12회 모집)'].map((n) => AL.trimSiteTail(n)),
+      ['신청서.hwp (1회차)', '신청서.hwp (2회차)', '서류.hwp (3건 이상 제출)', '신청서.hwp (다운로드 후 작성)', '요강.pdf (12회 모집)']);
+    eq('  🔴 뷰어 링크는 파일이 아니다 — 「이름 + 미리보기」뿐인 링크는 받는 주소가 분명할 때만 첨부로 센다(뷰어 주소가 같은 이름의 둘째 줄이 되지 않는다) · 용량 꼬리가 붙은 이름은 주소와 상관없이 파일',
+      [AL.detailAttachments('<a href="/synap/doc.html?fn=1">공고문.hwp 미리보기</a>', donga), AL.detailAttachments('<a href="/bbs/1/download.do?f=9">공고문.hwp 미리보기</a>', donga).map((a) => a.name),
+        AL.detailAttachments('<a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Q1">신청서.hwp (71KB) 바로보기</a>', donga).map((a) => a.name),
+        AL.trimSiteTail('공고문.hwp 미리보기', { lonePreview: false }), AL.trimSiteTail('공고문.hwp (71KB) 미리보기', { lonePreview: false })],
+      [[], ['공고문.hwp'], ['신청서.hwp'], '공고문.hwp 미리보기', '공고문.hwp']);
+    eq('  받을 때부터 뗀다 — 동아대 국어문화원 꼴(`<span>신청서.hwp (71KB)</span>` · 주소에 확장자도 내려받기 낱말도 없다): 두 파일이 제 이름과 제 주소로 잡힌다',
+      AL.detailAttachments('<ul class="fileList"><li><a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA1LFk=" title="새창내려받기"><img src="/resources/_Img/Board/default/ico_hwp.gif" alt="hwp 첨부 파일"> <span> 웹툰 공모전 신청서.hwp (71KB) </span></a></li>'
+        + '<li><a href="/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA2LFk=" title="새창내려받기"><span> 웹툰 공모전 신청서.pdf (83KB) </span></a></li></ul>', donga),
+      [{ name: '웹툰 공모전 신청서.hwp', url: 'https://korea.donga.ac.kr/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA1LFk=' },
+        { name: '웹툰 공모전 신청서.pdf', url: 'https://korea.donga.ac.kr/korea/ajx_json/UploadMgr/downloadRun.do?qcode=Qm9hcmQsMTIyNjA2LFk=' }]);
+    eq('  🔴 파일 이름이 없는 링크는 꼬리가 있어도 첨부가 되지 않는다(「공지사항 (12)」·「자료실 [3건]」) · 내려받기 주소의 꼬리 붙은 이름은 다듬은 이름으로 실린다',
+      [AL.detailAttachments('<a href="/bbs/list.do?id=1">공지사항 (12)</a> <a href="/data/list.do">자료실 [3건]</a>', donga),
+        AL.detailAttachments('<a href="/bbs/1/download.do?f=9">장학금 신청서.hwp (다운로드 : 12회)</a>', donga).map((a) => a.name)], [[], ['장학금 신청서.hwp']]);
+    {
+      const tails = [{ id: 'act-a', attachments: [{ name: '제안서.hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB', url: 'https://m.kr/f/1' }, { name: '공고문.hwp', url: 'https://m.kr/f/2' }] },
+        { id: 'act-b', attachments: [{ name: '신청서.hwp (다운로드 : 12회)', url: 'https://m.kr/f/3' }] }, { id: 'act-c' }];
+      const nTrim = (AL.trimActivityTails || (() => undefined))(tails, new Map([['act-b', new Set(['신청서.hwp (다운로드 : 12회)'])]]));
+      eq('  실린 활동 글 소급(trimActivityTails) — 꼬리 붙은 이름만 다듬는다 · 그 이름으로 이미 사본·색인이 있는 줄은 그대로 · 바꾼 수를 돌려준다 · 첨부 없는 글도 지나간다',
+        [nTrim, tails[0].attachments.map((a) => a.name), tails[1].attachments[0].name], [1, ['제안서.hwp', '공고문.hwp'], '신청서.hwp (다운로드 : 12회)']);
+      eq('  수집 로봇이 활동 글을 발행할 때 꼬리를 먼저 다듬고 그다음 같은 파일을 한 줄로 만든다(stripSiteChrome 바로 앞)',
+        /trimActivityTails\(acts\.items, usedAttachNames\(\)\);[^\n]*\nstripSiteChrome\(\[acts\.items\]\);/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
+    }
     /* 🔴 본문이 그림 한 장인 게시판 (2026-11-02 · 홍익대 성취장학·선원가족: `<div class="b-content-box"><img src="/cms/plugin/editorImage.do?$cms$…" data-width="1080" data-height="1920">` —
        헤드리스 브라우저는 봇 차단에 걸려 그림을 못 적고 일반 fetch 물러서기는 글자만 받아 자격이 영영 비었다). 되돌리면 함수가 없다 */
     const hongik = 'https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501';
@@ -7486,7 +7524,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   {
     const V = AX.ACT_DETAILS_V, D = AX.ACT_DOCS_V;
     eq('  다시 읽기 판단 한 곳(actRereadNeed) — 옛 자격 판 → details · 자격 판은 같고 서류 판만 옛것 → docs · 둘 다 최신 → 안 읽음 · API 글(자격 있음)은 안 읽고 서류 판으로는 안 읽는다',
-      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, documentsV: D }),
+      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, documentsV: D, attachV: AX.ACT_ATTACH_V }),
         AX.actRereadNeed({ api: 'k', eligibilityLines: ['a'], excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ api: 'k', excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({})],
       ['details', 'docs', null, null, null, 'details']);
     const kept = AX.putActivityDocuments({ documents: ['참가신청서'], documentsFrom: '브라우저 본문' }, []);
@@ -7496,15 +7534,51 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
       [kept.documents, kept.documentsV === D, wiped.documents, wiped.documentsV === D, kept.docsV === undefined, put.documents, put.documentsFrom], [['참가신청서'], true, undefined, true, true, ['작품 설명서'], undefined]);
     eq('  서류 칸만 다시 읽는 갈래는 자격·발췌를 건드리지 않고 넘어간다(같은 판으로 이미 읽었다) · 못 받으면 이레 뒤에 다시 · 리포트의 「남은」 수도 같은 판단',
       [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ putActivityDocuments\(it, activityDocuments\(detail\.text\), null, \{ thin: thinText\(detail\.text\) \}\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),
-        /남은 \$\{acts\.items\.filter\(\(n\) => actRereadNeed\(n\)\)\.length\}건/.test(cm)], [true, true]);
+        /남은 \$\{left\.fill\}건/.test(cm)], [true, true]);   // 「남은」 은 같은 판단(actRereadNeed)으로 세되 첨부만 다시 살필 글은 따로 적는다(actRereadLeft · 리뷰 2026-11-25)
   }
+  /* 다시 읽을 때 첨부를 합친다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ①) — 수집 로봇의 다시 읽기가 상세가 준 첨부를 버려,
+     강원대 재능봉사 캠프 글은 지금 파일 둘이 보이는데 실린 첨부가 없었다. 있던 줄은 지우지 않고 새 파일만 더한다(같은 파일은 한 줄 — rescue-plan newAttachments).
+     열려 있는 게시판 글은 첨부 판(attachV)으로 한 번 소급해 다시 읽는다 */
+  {
+    const V = AX.ACT_DETAILS_V, D = AX.ACT_DOCS_V, A = AX.ACT_ATTACH_V, T = '2026-11-25';
+    const it = { attachments: [{ name: '공고문.hwp', url: 'https://x.kr/d/1' }, { name: '포스터.png', url: 'https://x.kr/d/2' }] };
+    const added = AX.mergeActAttachments(it, [{ name: '공고문.hwp', url: 'https://x.kr/d/1' }, { name: '신청서.hwp', url: 'https://x.kr/d/3' }, { name: '신청서.hwp (다운로드 : 3회)', url: 'https://x.kr/d/3' }]);
+    eq('다시 읽은 첨부 합치기 — 있던 줄은 그대로(차례도) · 새 파일만 더한다 · 같은 파일은 한 줄 · 읽은 판을 적는다',
+      [added, it.attachments.map((a) => a.name), it.attachV === A], [1, ['공고문.hwp', '포스터.png', '신청서.hwp'], true]);
+    const none = {};
+    eq('  찾은 것이 없어도 판은 적는다(다시 열지 않는다) · 있던 줄을 지우지 않는다',
+      [AX.mergeActAttachments(none, []), none.attachments, none.attachV === A, AX.mergeActAttachments(it, []), it.attachments.length], [0, [], true, 0, 3]);
+    /* 🔴 다시 읽은 글에는 **믿는 첨부만** 더한다 (리뷰 2026-11-25) — 상세가 준 첨부에는 주소에 file·attach 가 든 사이트 메뉴 링크가 섞인다(광운대 글마다 7개 · 성균관대 「부속기관」).
+       새 글은 같은 주소가 세 글 이상이면 걷히지만(stripSiteChrome), 이미 걷혀 깨끗한 글을 한 건씩 다시 읽으면 그 링크가 그 글에만 돌아와 남는다.
+       장학금의 첨부 살피기가 11-17 에 같은 일을 겪어 세운 선(rescue-plan trustedAttachment — 이름이 파일 이름이거나 주소가 분명한 내려받기 꼴)을 그대로 쓴다 */
+    const clean = { attachments: [{ name: '요강.hwp', url: 'https://kw.kr/down?no=1' }] };
+    const addedTrusted = AX.mergeActAttachments(clean, [{ name: '부설연구기관', url: 'https://kw.kr/research_attach.jsp' }, { name: '대학정보공시', url: 'https://kw.kr/info/list.do?filePath=/a/b' },
+      { name: '첨부파일 다운로드', url: 'https://kw.kr/bbs/fileDown.do?fileNo=9' }, { name: '한글뷰어 다운로드', url: 'https://kw.kr/viewer/down.do?fileNo=1' }, { name: '본문이미지-1.jpg', url: 'https://kw.kr/img/1.jpg', bodyImage: true },
+      { name: '신청서.hwp', url: 'https://kw.kr/down?no=2' }, { name: '참가 신청 양식', url: 'https://kw.kr/bbs/fileDown.do?fileNo=3' }]);
+    eq('  🔴 다시 읽은 글에는 믿는 첨부만 더한다 — 사이트 메뉴 링크·단추 글자·뷰어 안내·본문 그림은 적지 않는다 · 이름이 파일 이름이거나 주소가 분명한 내려받기 꼴인 것만',
+      [addedTrusted, clean.attachments.map((a) => a.name)], [2, ['요강.hwp', '신청서.hwp', '참가 신청 양식']]);
+    const cur = { excerptsAt: 'x', detailsV: V, documentsV: D };
+    eq('  리포트의 「남은」 수 — 마감·발췌를 채울 글과 첨부만 다시 살필 글을 따로 센다(첨부만 살핀 글을 「마감·발췌를 채웠다」고 적지 않는다)',
+      [(AX.actRereadLeft || (() => undefined))([cur, { ...cur, attachV: A }, { excerptsAt: 'x', detailsV: V - 1 }, { ...cur, documentsV: D - 1 }, { ...cur, deadline: '2026-11-24' }, null], T),
+        /const left = actRereadLeft\(acts\.items\);/.test(cm), /남은 \$\{left\.fill\}건은 다음 실행에/.test(cm), /첨부를 다시 살폈습니다 \(새로 찾은 파일 \$\{actAttachAdded\}개 · 남은 \$\{left\.attach\}건은 다음 실행에\)/.test(cm),
+        /전에 실린 글 \$\{actBackfilled - actAttachBackfilled\}건의 원문을 다시 읽어 마감·발췌를 채웠습니다/.test(cm)],
+      [{ fill: 2, attach: 1 }, true, true, true, true]);
+    eq('  다시 읽기 판단 — 다른 까닭이 없고 첨부 판이 옛것인 열린 게시판 글만 attach · 적은 뒤에는 안 읽는다 · 마감 당일은 열린 글 · 마감 지난 글·API 글·관리자 숨김 글은 아니다 · 자격 판이 옛것이면 그쪽이 먼저',
+      [AX.actRereadNeed(cur, T), AX.actRereadNeed({ ...cur, attachV: A }, T), AX.actRereadNeed({ ...cur, deadline: T }, T), AX.actRereadNeed({ ...cur, deadline: '2026-11-24' }, T),
+        AX.actRereadNeed({ ...cur, api: 'k', eligibilityLines: ['a'] }, T), AX.actRereadNeed({ ...cur, hidden: true }, T), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }, T)],
+      ['attach', null, 'attach', null, null, null, 'details']);
+    eq('  수집 로봇 — 첨부만 다시 읽는 갈래는 첨부만 합치고 넘어간다(자격·발췌·마감은 그대로 · 못 받으면 이레 뒤에) · 자격까지 다시 읽는 갈래도 첨부를 합친다 · 새 글은 읽은 판을 적는다',
+      [/if \(need === 'attach'\) \{[^}]*?if \(detail\.text\) \{ actAttachAdded \+= mergeActAttachments\(it, detail\.attachments\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actAttachBackfilled \+= 1;\s*continue;\s*\}/.test(cm),
+        /if \(detail\.text\) mergeActAttachments\(it, detail\.attachments\);/.test(cm), /if \(detail\.text\) it\.attachV = ACT_ATTACH_V;/.test(cm)], [true, true, true]);
+  }
+
   /* 리뷰 확정 셋(2026-11-15 #7·#8·#9) — 첨부·브라우저 자격 글은 본문 재읽기를 안 한다 · 껍데기 본문이 읽어 둔 서류를 안 지운다 · API 재구성이 서류를 이어받는다 */
   {
     const V = AX.ACT_DETAILS_V, D = AX.ACT_DOCS_V;
     const shell = '메뉴 홈 로그인'.repeat(3);
     const kept = AX.putActivityDocuments({ documents: ['참가신청서 1부'] }, [], null, { thin: AX.thinText(shell) });
     eq('  #7 자격을 첨부·요강·브라우저에서 읽은 글은 본문 서류 재읽기 대상이 아니다(첨부 로봇이 그 글자에서 읽는다) · #9 껍데기 본문은 읽어 둔 서류를 안 지운다(판만 적는다)',
-      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, eligibilityFrom: '공고문 첨부(OCR)' }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), kept.documents, kept.documentsV === D, AX.thinText(shell), AX.thinText('가'.repeat(400))],
+      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, eligibilityFrom: '공고문 첨부(OCR)', attachV: AX.ACT_ATTACH_V }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), kept.documents, kept.documentsV === D, AX.thinText(shell), AX.thinText('가'.repeat(400))],
       [null, 'docs', ['참가신청서 1부'], true, true, false]);
     const adocs = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
     eq('  #7 첨부 로봇 staleDocs 가 서류 판(documentsV)이 옛것인 첨부 자격 글도 한 번 다시 열고 · 읽은 뒤 판을 적는다',
@@ -9004,6 +9078,21 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     } catch { return true; }
   });
   eq('  서버를 안 쓴다고 적은 드라이버가 정말 주소를 안 연다', fakeNoServer, []);
+
+  /* 🔴 ②-4 **숨은 요소를 「보일 때까지」 기다리면 시한을 다 쓴다** (2026-11-26 · 화면 검사가 26분 예산을 넘겨 main 이 빨갛게 끝났다).
+     `waitForSelector` 의 기본은 state:'visible' 이다 — `#notify-sheet[hidden]` 은 hidden 칸이 달린 요소라 **끝내 보이지 않는다**.
+     그래서 알림 동의 시트를 닫은 뒤 「닫혔나」 기다림이 시트가 이미 닫혔는데도 매번 시한(4초)을 다 채웠다
+     (onboard-helper 의 dismissNotify 와 그 몸을 베낀 드라이버 다섯 · 활동 드라이버 한 번에 7번 = 28초).
+     hidden 칸으로 고르는 기다림은 state 를 적는다('attached' = 그 칸이 붙으면 · 'hidden' = 안 보이면). `:not([hidden])` 은 보일 때까지가 맞다 */
+  const hiddenWaits = [];
+  for (const f of names) {
+    readText(new URL(f, dir)).split('\n').forEach((l, i) => {
+      for (const m of l.matchAll(/waitForSelector\(\s*(['`"])([^'`"]*)\1\s*(?:,\s*\{([^}]*)\})?/g)) {
+        if (/\[hidden\]/.test(m[2].replace(/:not\([^)]*\)/g, '')) && !/state\s*:/.test(m[3] || '')) hiddenWaits.push(`${f}:${i + 1} ${m[2]}`);
+      }
+    });
+  }
+  eq('숨은 요소(hidden 칸)를 기다리는 드라이버는 state 를 적는다 — 기본(보일 때까지)이면 끝내 안 돌아와 시한을 다 쓴다', hiddenWaits, []);
 
   /* 🔴 **화면이 숨기는 학교와 로봇이 수집하는 학교가 갈라지면 안 된다** (2026-09-02 코드 리뷰).
      `match-engine.js` 의 `SERVED_SCHOOLS` 는 `collector/schools.json` 의 활성 학교를
@@ -12105,7 +12194,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
   const unreachable = all.filter((f) => !calls.includes(f));
   eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
-    unreachable.sort(), ['card-read.yml', 'codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'doc-pdf-probe.yml', 'error-watch.yml', 'final-review.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에) · doc-pdf-probe: 11-20 변환 진단 도구(저장 안 함 · 세션이 부른다) · final-review: 11-20 유료 최종 검토(돈이 나가 버튼을 두지 않는다)
+    unreachable.sort(), ['act-paid-probe.yml', 'card-read.yml', 'codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'doc-pdf-probe.yml', 'error-watch.yml', 'final-review.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에) · doc-pdf-probe: 11-20 변환 진단 도구(저장 안 함 · 세션이 부른다) · final-review: 11-20 유료 최종 검토(돈이 나가 버튼을 두지 않는다) · act-paid-probe: 11-25 대외활동 유료 시험(돈이 나간다 — 개발자가 지시할 때만 · 저장 안 함)
 }
 
 console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
@@ -12372,7 +12461,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'cardLine', 'fieldFix', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
+    ['activityGate', 'activityHide', 'activityKind', 'activityReviewDone', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'cardLine', 'fieldFix', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 발췌 주인 표식 · 바닥글 — 사람이 쓴 발췌는 로봇이 안 덮고 · 원문 근거로 안 쓴다 (2026-11-17)');
@@ -13178,6 +13267,10 @@ console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-
       mark('직전학기 취득학점 (계절학기 제외) 이 15학점 (졸업이수학점이 120인 대상학부 (과) 는 14학점 / 최종직전학기는 9학점) 이상'),
       mark('일반 8학기 이내(6년제 의약학계열 12학기 이내)인 학생'),
       mark('2026학년도 2학기 기준 정규학기 2학기~8학기 이내 재학생(건축학부 건축학전공은 2~9학기 이내)')].map((v) => v !== 'no'), [true, true, true, true, true]);   // 넷째 — 2026-11-25 실화면(경희대 Cheer-up · `이내(` 뒤 괄호)
+  eq('  같은 뜻의 쉼표 꼴도 — 「일반 8학기 이내, 6년제 의약학계열 12학기 이내인 학생」(2026-11-26 실화면 · 경희대 Cheer-up 카드가 괄호를 쉼표로 다시 씀)',
+    [mark('일반 8학기 이내, 6년제 의약학계열 12학기 이내인 학생'), mark('8학기 이내, 의약학계열 12학기 이내, 건축학과 10학기 이내 재학생'), mark('8학기 이내, 간호학과 재학생')], ['ok', 'ok', 'no']);   // 셋째는 대조군 — 쉼표 뒤가 제 숫자 없는 학과면 요건
+  eq('  🔴 대조군: 쉼표 앞뒤 숫자가 같으면 학과 요건을 되풀이한 것이다 — 걷으면 아무 학과나 ✓ (리뷰 2026-11-26)',
+    [mark('2학기 이상 재학, 컴퓨터공학과 2학기 이상 재학생'), mark('직전학기 12학점 이상, 체육학과 12학점 이상 재학생')], ['no', 'no']);
   eq('  🔴 대조군: 그 무리로 좁히는 괄호(「…에 한함」·「… 이수자」)는 요건이다 — 걷으면 아무 학과나 ✓ (리뷰 2026-11-25)',
     [mark('정규학기 8학기 이내(간호학과 4학기 이상 이수자에 한함) 재학생'), mark('정규학기 8학기 이내 재학생(간호학과는 4학기 이상 이수자에 한함)')], ['no', 'no']);
   eq('  대조군: 괄호 밖 학과 이름은 여전히 요건이다 · 숫자가 이름에 안 붙은 괄호의 학과도 읽는다',
@@ -14827,7 +14920,9 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   /* 2026-11-15 개발자 지시 — 아랫줄 왼쪽의 회색 「금액 · …」 줄을 뺐다(활동 카드의 「대상 · …」 줄과 한 짝 · 금액은 시트 머리가 말한다). 되돌리면 빨갛다 */
   eq('장학 카드 — 칩 · 주최 · 알약 · 제목 나누기 · 아랫줄 왼쪽은 빈칸(금액 줄 없음 · 2026-11-15)', [/chip: kindChipHtml\(sch\)/.test(sc), /org: cardProviderLine\(sch\)/.test(sc), /badge,/.test(sc), /name: cardTitleParts\(sch\)\.title/.test(sc), /foot: '',/.test(sc), /amountLine\(sch\)/.test(sc), /const amt = amountLine\(sch\)/.test(fnOf('openDetail'))], [true, true, true, true, true, false, true]);
   eq('활동 카드 — 칩 · 주최(호스트만 · 학교 게시판 글은 빈 글자 — 2026-11-02 개발자 결정) · 제목 나누기 · 대상 줄 없음(2026-11-15 개발자 결정) · 혜택·분야 줄 없음', [/chip: kindChipHtml\(n\)/.test(ac), /org: activityHostLine\(n\)/.test(ac) && /const activityHostLine = \(n\) => \(n\.school \? '' : /.test(appV), /name: parts\.title/.test(ac), /foot: '',/.test(ac), /benefitShort|n\.field|대상/.test(ac)], [true, true, true, true, false]);
-  eq('  제목에서 뗀 괄호 대상은 시트 「공고 안내」에 남는다 — 카드에 대상 줄이 없어 여기가 유일한 자리', /const titleWho = parts\.who\.filter/.test(fnOf('openActivityDetail')) && /titleWho\.length \? \[`대상: \$\{titleWho\.join\(' · '\)\}`\]/.test(fnOf('openActivityDetail')), true);
+  /* 2026-11-26 — 시트가 「공고 안내」에 넘기는 줄은 activitySheetNotices 한 곳(what-shows 가 같은 함수를 부른다 · 최종 리뷰 화면 I2).
+     ⚠️ 같은 날 확인 — 시트의 이름표 거름(app-sheet NS_SKIP · `^대상$`)이 「대상: …」 줄을 빼서, 짧은 대상 괄호(「(여성)」처럼 4글자 미만 — 자격 줄로 더하는 titleTargetLines 도 안 잡는다)는 화면 어디에도 안 남는다. 후속 일(개발자 판단) */
+  eq('  제목에서 뗀 괄호 대상은 시트 「공고 안내」에 넘긴다 — 카드에 대상 줄이 없어 여기가 유일한 자리 · 시트는 그 줄을 activitySheetNotices 한 곳에서 받는다', /const titleWho = parts\.who\.filter/.test(fnOf('activitySheetNotices')) && /titleWho\.length \? \[`대상: \$\{titleWho\.join\(' · '\)\}`\]/.test(fnOf('activitySheetNotices')) && /noticeLines: activitySheetNotices\(n\)/.test(fnOf('openActivityDetail')), true);
   eq('  그릇 윗줄 = 칩 + 주최(있을 때만) + 알약 · 마감은 아랫줄(.sch-foot)', [/<div class="sch-top">\s*\$\{chip\}\$\{org \? `<span class="sch-org">/.test(shell), /class="sch-foot">[\s\S]*?sch-due/.test(shell)], [true, true]);
   /* 시트 한 벌 — 절 다섯의 순서 · 알약 없음 · 머리줄 같음 · 단추 한 벌 */
   const sec = fnOf('sheetSectionsHtml'), od = fnOf('openDetail'), oa = fnOf('openActivityDetail');
@@ -15482,7 +15577,7 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     const dfSrc = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
     const body = dfSrc.slice(dfSrc.indexOf('async function downloadForms()'), dfSrc.indexOf('async function downloadEligDocs()'));
     eq('  받는 로봇(deepfetch downloadForms)이 이 목록을 표적 뒤 남는 자리에 넣고(MAX_NOTICES - 표적) · 쉼 장부 forms-tried.json 을 읽고 쓴다 · 등록분 제목(boardTitle 또는 name)으로 색인에 적어 PDF 로봇이 찾는다',
-      [/FP\.pickFormBacklog\(\[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.FP\.loadActivities\(root\)\], rows, \{ today, isApplicationForm, tried, max: Math\.max\(0, MAX_NOTICES - capped\.length\) \}\)/.test(body),
+      [/FP\.pickFormBacklog\(\[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.FP\.loadActivities\(root\)\], rows, \{ today, isApplicationForm, tried, max: Math\.max\(0, MAX_NOTICES - capped\.length\), aiWants: aiWantsOriginal\(loadAiRoles\(fileURLToPath\(HERE\)\), actIds\) \}\)/.test(body),
         /forms-tried\.json/.test(body), /title: it\.boardTitle \|\| it\.name \|\| it\.title, url: it\.sourceUrl \|\| it\.url \|\| '', atts, regId: it\.id/.test(body),
         /if \(n\.regId\) \{ if \(fi > before\) delete tried\[n\.regId\]; else if \(attempted && !budgetHit\) tried\[n\.regId\] = today; \}/.test(body)],
       [true, true, true, true]);
@@ -17457,7 +17552,7 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const FAKE_SDK = `const fs = require('fs'), path = require('path');
 const note = (m) => fs.appendFileSync(path.join(__dirname, '..', '..', '..', 'sdk-called.txt'), m + '\\n');
 module.exports = class Anthropic {
-  constructor() { note('new'); this.beta = { messages: { stream: () => { note('stream'); return { finalMessage: async () => { throw new Error('가짜 SDK — 관문은 유료 API 를 부르지 않는다'); } }; } } }; }
+  constructor() { note('new'); this.beta = { messages: { stream: (req) => { note('stream ' + String((req && req.system) || '').slice(0, 12)); const c0 = (((req && req.messages) || [])[0] || {}).content; note('user ' + String(typeof c0 === 'string' ? c0 : ((c0 || [])[0] || {}).text || '').split('\\n').slice(0, 2).join(' / ')); return { finalMessage: async () => { throw new Error('가짜 SDK — 관문은 유료 API 를 부르지 않는다'); } }; } } }; }
 };`;
   const paidBox = (prefix) => {
     const sb = paidSandbox(new URL('../', import.meta.url), prefix);
@@ -17469,6 +17564,783 @@ module.exports = class Anthropic {
   /* 로봇이 쓰는 파일(저장소 기준) · 워크플로가 저장하는 파일 — 「로봇이 고친 파일은 전부 git add 에」를 두 원본에서 뽑아 견준다 */
   const robotWrites = (robot) => [...new Set([...robot.matchAll(/writeAtomic\('([^']+)'/g)].map((m) => (m[1].startsWith('../') ? m[1].slice(3) : `collector/${m[1]}`)))];
   const gitAdds = (wf) => [...wf.matchAll(/\[ -f (\S+) \] && git add \1(?!\S)/g)].map((m) => m[1]);
+
+  /* ── 대외활동 유료 관문 ⓪ (2026-11-25 · 설계 docs/designs/paid-gate-activities.md) — 활동 목록을 붙이는 동안 장학금 쪽은 한 글자도 달라지지 않는다.
+     🔴 장학금 지시문(SYSTEM·CARD_RULES)이나 해시 셈이 바뀌면 열려 있는 숨김 등록분을 전부 돈 내고 다시 읽는다(card-read sourceHash 가 지시문을 함께 해시한다).
+     아래 값은 활동 목록을 붙이기 **전** 코드에서 뽑았다(2026-11-25) — 장학금 지시문을 일부러 고칠 때만 그 까닭과 함께 새 값으로 바꾼다 */
+  console.log('\n■ 대외활동 유료 관문 ⓪ 장학금은 그대로다 — 지시문·해시 고정');
+  {
+    const { createHash } = await import('node:crypto');
+    const h16 = (s) => createHash('sha256').update(s).digest('hex').slice(0, 16);
+    eq('⓪ 4번 지시문(SYSTEM)과 카드 규칙(CARD_RULES)이 바이트까지 그대로다', [h16(CR.SYSTEM), h16(CR.CARD_RULES)], ['8f0be3fb63149028', 'ecc5622301936bfa']);
+    eq('  6번 지시문(SYSTEM)이 바이트까지 그대로다', h16(FR.SYSTEM), '8d137cec104ef525');
+    eq('  원문 해시(sourceHash) — 인자를 하나만 주면 장학금 지시문으로 센다(조회수 숫자는 뗀다)', CR.sourceHash('고정 원문 — 활동 관문 0\n조회수 12'), '27f7d5167dc8c975');
+    eq('  검토 해시(reviewHash) — 인자 넷이면 장학금 지시문으로 센다',
+      FR.reviewHash('고정 원문', { eligibility: ['a'], hash: 'h' }, [{ file: 'f', hash: 'x', role: 'form', formStart: '' }], [{ kind: 'form', file: 'p.pdf', bytes: 10 }]), '69b219afe7021c30');
+  }
+
+  /* ── 대외활동 유료 관문 ① 원문 글자 저장 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-2) ──
+     활동 글은 본문·첨부 원본을 저장소에 두지 않는다(공고문 원본만 공고당 650KB — 하루 10~15건이면 한 달에 수십 MB). 뽑은 **글자만** 글마다 작은 파일로 둔다.
+     🔴 한 번 쓴 본문은 다시 받아 덮지 않는다 — 본문은 받을 때마다 조회수·옆 목록이 달라져 원문 해시가 바뀌고, 같은 글을 돈 내고 다시 읽게 된다 */
+  console.log('\n■ 대외활동 유료 관문 ① 원문 글자 저장 — 글자만 · 한 번 쓴 본문은 덮지 않는다 · 모드마다 제 파일');
+  {
+    const AT = await import(new URL('../collector/act-text.mjs', import.meta.url));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-text-'));
+    try {
+      const doc = (hash, text, over = {}) => ({ name: `${hash}.hwp`, hash, from: 'attach', ocr: false, text, ...over });
+      const rawOf = (id, mode) => readText(AT.storeFile(dir, id, mode));
+      const w1 = AT.writeStore(dir, 'act-a', 'plain', { url: 'https://x.kr/1', body: '처음 본문 글자', bodyFrom: 'plain', docs: [doc('h1', '공고문 글자')] }, '2026-11-26');
+      const w2 = AT.writeStore(dir, 'act-a', 'plain', { url: 'https://x.kr/1', body: '다시 받은 본문(조회수 13)', bodyFrom: 'plain', docs: [doc('h1', '달라진 글자'), doc('h2', '새 첨부 글자'), doc('h3', '   ')] }, '2026-11-27');
+      const s = AT.readStore(dir, 'act-a');
+      eq('① 🔴 한 번 쓴 본문은 다시 받아 덮지 않는다 · 첨부는 지문이 새것만 더한다(같은 지문의 글자도 처음 것 그대로) · 글자 없는 줄은 안 싣는다',
+        [w1, w2, s.body, s.docs.map((d) => [d.hash, d.text])], [true, true, '처음 본문 글자', [['h1', '공고문 글자'], ['h2', '새 첨부 글자']]]);
+      eq('  바뀐 것이 없으면 다시 쓰지 않는다(빈 커밋이 생기지 않는다) · 파일은 로봇 형식(한 칸 들여쓰기 + 끝 개행)',
+        [AT.writeStore(dir, 'act-a', 'plain', { url: 'https://x.kr/1', body: '또 다른 본문', docs: [doc('h1', 'x')] }, '2026-11-28'), sameFormat(rawOf('act-a', 'plain')), JSON.parse(rawOf('act-a', 'plain')).at], [false, true, '2026-11-27']);
+      AT.writeStore(dir, 'act-b', 'plain', { url: 'https://x.kr/2', body: '', docs: [] }, '2026-11-26');
+      const emptyFirst = AT.readStore(dir, 'act-b');
+      const due = (id, mode, day) => AT.textDue(dir, id, mode, day);
+      const dueBefore = [due('act-b', 'plain', '2026-11-26'), due('act-b', 'plain', '2026-11-27'), due('act-b', 'browser', '2026-11-26'), due('act-a', 'plain', '2026-11-28'), due('act-a', 'browser', '2026-11-28'), due('act-new', 'plain', '2026-11-26'), due('act-new', 'browser', '2026-11-26')];
+      AT.writeStore(dir, 'act-b', 'browser', { url: 'https://x.kr/2', body: '브라우저로 그린 본문', bodyFrom: 'browser', docs: [doc('h9', '그림에서 읽은 글자', { from: 'img', ocr: true, name: '' })] }, '2026-11-26');
+      const sb2 = AT.readStore(dir, 'act-b');
+      eq('② 본문이 비어도 기록은 남긴다(무료 받기를 해 봤다) · 브라우저 모드는 제 파일(<id>.browser.json)에만 쓴다 · 읽을 때 무료 받기 본문이 비었으면 브라우저 본문',
+        [emptyFirst && emptyFirst.body, /act-b\.browser\.json$/.test(AT.storeFile(dir, 'act-b', 'browser')), fs.existsSync(AT.storeFile(dir, 'act-b', 'browser')), JSON.parse(rawOf('act-b', 'plain')).body, sb2.body, sb2.bodyFrom, sb2.docs.map((d) => d.hash)],
+        ['', true, true, '', '브라우저로 그린 본문', 'browser', ['h9']]);
+      eq('  받을 차례(textDue) — 무료 받기: 기록이 없거나 본문이 빈 채 날이 바뀌었을 때(같은 날 다시 두드리지 않는다) · 본문이 있으면 다시 안 받는다 / 브라우저: 무료 받기 본문이 빈 글만 · 이미 받았으면 안 받는다',
+        [...dueBefore, due('act-b', 'browser', '2026-11-27')], [false, true, true, false, false, true, false, false]);
+      AT.writeStore(dir, 'act-a', 'browser', { url: 'https://x.kr/1', body: '브라우저 본문', bodyFrom: 'browser', docs: [doc('h1', '같은 지문'), doc('h4', '브라우저만 본 첨부')] }, '2026-11-27');
+      const s3 = AT.readStore(dir, 'act-a');
+      eq('  두 기록이 다 있으면 — 본문은 무료 받기 것 · 첨부는 지문으로 한 번씩(무료 받기 것이 먼저 · 차례가 늘 같다) · 기록이 없는 글은 null',
+        [s3.body, s3.bodyFrom, s3.docs.map((d) => d.hash), AT.readStore(dir, 'act-none')], ['처음 본문 글자', 'plain', ['h1', 'h2', 'h4'], null]);
+      const T = '2026-11-26';
+      eq('③ 글자를 받을 글(wantsText) — 표시가 달린 글만 사흘 동안 · 올린 글(paidOpen)·관리자 숨김·id 없는 글은 아니다 · 시험 워크플로가 지정한 id 는 표시가 없어도',
+        [{ id: 'a', paidGate: T }, { id: 'a', paidGate: '2026-11-23' }, { id: 'a', paidGate: '2026-11-22' }, { id: 'a' }, { id: 'a', paidGate: T, paidOpen: '관리자 2026-11-26' }, { id: 'a', paidGate: T, hidden: true }, { paidGate: T }, { id: 'z' }]
+          .map((n) => AT.wantsText(n, T, new Set(['z']))), [true, true, false, false, false, false, false, true]);
+      const gone = AT.pruneStore(dir, new Set(['act-a']), 'plain');
+      eq('④ 목록에서 빠진 글의 기록은 제 모드 것만 지운다', [gone, fs.existsSync(AT.storeFile(dir, 'act-b', 'plain')), fs.existsSync(AT.storeFile(dir, 'act-b', 'browser')), fs.existsSync(AT.storeFile(dir, 'act-a', 'plain'))], [1, false, true, true]);
+      const big = 'ㄱ'.repeat(900000);
+      AT.writeStore(dir, 'act-big', 'plain', { url: 'u', body: '본문', docs: [doc('b1', big, { name: '큰 요강.pdf' }), doc('b2', '작은 글자'), doc('b3', big.slice(0, 500000), { name: '중간.pdf' })] }, T);
+      eq('⑤ 한 글의 기록은 2MB 를 넘지 않는다 — 큰 첨부부터 빼고 무엇을 뺐는지 적는다',
+        [fs.statSync(AT.storeFile(dir, 'act-big', 'plain')).size <= AT.MAX_STORE_BYTES, AT.readStore(dir, 'act-big').docs.map((d) => d.hash), JSON.parse(rawOf('act-big', 'plain')).dropped], [true, ['b2', 'b3'], ['큰 요강.pdf']]);
+      eq('  🔴 id 에 경로 글자가 섞였거나 비었으면 쓰지 않는다(폴더 밖에 파일을 만들지 않는다)',
+        [AT.writeStore(dir, '../evil', 'plain', { body: 'x', docs: [] }, T), AT.writeStore(dir, '', 'plain', { body: 'x', docs: [] }, T), fs.readdirSync(path.dirname(dir)).includes('evil.json')], [false, false, false]);
+      /* 최종 리뷰(로봇 I2 · 2026-11-26) — 바뀐 것 없이 다시 받은 날에도 「오늘 받아 봤다」를 남긴다. 안 남기면 textDue 가 그날 수집할 때마다(하루 세 번) 본문이 빈 글을 다시 받았다
+         (학교 사이트를 하루에 여러 번 두드리지 말 것 · Task 4 「하루 한 번」이 첫날만 지켜졌다) */
+      AT.writeStore(dir, 'act-c', 'plain', { url: 'https://x.kr/3', body: '', docs: [] }, '2026-11-26');
+      const triedNext = due('act-c', 'plain', '2026-11-27');
+      const wroteAgain = AT.writeStore(dir, 'act-c', 'plain', { url: 'https://x.kr/3', body: '', docs: [] }, '2026-11-27');
+      eq('  🔴 바뀐 것 없이 다시 받은 날도 「오늘 받아 봤다」를 남긴다 — 본문이 빈 글을 같은 날 수집할 때마다 다시 받지 않는다(하루 한 번) · 다음 날은 다시 차례 · 바뀐 것이 없으니 쓴 글로 세지 않고 내용이 바뀐 날(at)도 그대로',
+        [triedNext, wroteAgain, due('act-c', 'plain', '2026-11-27'), due('act-c', 'plain', '2026-11-28'), JSON.parse(rawOf('act-c', 'plain')).at, sameFormat(rawOf('act-c', 'plain'))], [true, false, false, true, '2026-11-26', true]);
+
+      /* 받은 파일(act-files) → 기록 한 건 — 첨부 로봇(activity-docs)의 두 모드가 같은 함수를 쓴다 */
+      process.env.ACTIVITY_DOCS_AS_LIB = '1';
+      const AD = await import('../collector/activity-docs.mjs');
+      const texts = { 'k-P.txt': '농촌 아이디어 공모전 안내\n접수 기간 11.20 ~ 12.07', 'k-B.txt': '브라우저가 그린 농촌 아이디어 공모전 본문', 'k-0.hwp': '공모전 요강 글자', 'k-1i.png': '농촌 아이디어 공모전 포스터 글자', 'k-2i.png': '다른 행사 홍보물',
+        'k-L0.txt': '농촌 아이디어 공모전 대회 요강\n참가 자격 대학생', 'k-L1.txt': '재단 소개 페이지', 'k-3.pdf': '' };
+      const io = { key: 'k', readText: (p) => texts[path.basename(p)] ?? '', isOcr: (p) => /\.(png|pdf)$/.test(p), hashOf: (p) => `H-${path.basename(p)}` };
+      const post = { url: 'https://x.kr/9', title: '제10회 농촌 아이디어 공모전' };
+      const rec = AD.storeFromFiles(post, ['k-0.hwp', 'k-1i.png', 'k-2i.png', 'k-L0.txt', 'k-L1.txt', 'k-3.pdf'], { 'k-0.hwp': '요강.hwp', 'k-3.pdf': '스캔.pdf' }, { ...io, mode: 'plain' });
+      eq('⑥ 받은 파일 → 기록 — 본문은 페이지 글자 · 첨부는 이름·지문과 함께 · 페이지에서 주운 그림과 요강 페이지는 그 글의 것만(제목 낱말) · 글자를 못 뽑은 파일은 안 싣는다',
+        [rec.body.split('\n')[0], rec.bodyFrom, rec.docs.map((d) => [d.name, d.from, d.ocr, d.hash.slice(0, 2)])], ['농촌 아이디어 공모전 안내', 'plain', [['요강.hwp', 'attach', false, 'H-'], ['', 'img', true, 'H-'], ['', 'guide', false, 'T-']]]);
+      /* 최종 리뷰(로봇 I2 · 2026-11-26) — 따라간 요강 페이지의 지문이 **글자**의 해시라, 방문자 수만 바뀐 페이지를 다시 받을 때마다 새 덩어리가 붙어 원문 지문이 바뀌고 같은 글을 다시 샀다 */
+      const guideAt = (visits) => AD.storeFromFiles(post, ['k-L0.txt'], {}, { ...io, readText: () => `농촌 아이디어 공모전 대회 요강\n참가 자격 대학생\n오늘 방문자 ${visits}`, mode: 'plain' });
+      const gA = guideAt('1,234'), gB = guideAt('1,301');
+      AT.writeStore(dir, 'act-g', 'plain', { url: post.url, ...gA }, '2026-11-26'); AT.writeStore(dir, 'act-g', 'plain', { url: post.url, ...gB }, '2026-11-27');
+      eq('  🔴 따라간 요강 페이지의 지문은 글자가 아니라 그 자리(글 주소 · 몇째 링크)다 — 방문자 수만 바뀐 페이지를 다시 받아도 덩어리가 늘지 않고(처음 글자 그대로) 원문 지문이 그대로다 · 첨부는 그대로 원본 바이트 지문',
+        [gA.docs[0].hash === gB.docs[0].hash, /^T-/.test(gA.docs[0].hash), AT.readStore(dir, 'act-g').docs.map((d) => d.text.split('\n').pop()), rec.docs.filter((d) => d.from !== 'guide').map((d) => d.hash)],
+        [true, true, ['오늘 방문자 1,234'], ['H-k-0.hwp', 'H-k-1i.png']]);
+      const recB = AD.storeFromFiles(post, ['k-B.txt', 'k-0.hwp'], { 'k-0.hwp': '요강.hwp' }, { ...io, mode: 'browser' });
+      const shell = AD.storeFromFiles(post, [], {}, { ...io, key: 'k2', readText: () => '로그인 메뉴 사이트맵 개인정보처리방침', mode: 'plain' });
+      const generic = AD.storeFromFiles({ url: 'u', title: '참가자 모집 안내' }, [], {}, { ...io, key: 'k3', readText: () => '서포터즈를 모집합니다 활동 기간 3개월', mode: 'plain' });
+      eq('  브라우저 모드의 본문은 브라우저가 그린 글자 · 본문에 글 제목의 낱말이 없으면 그 글의 페이지가 아니다(빈 본문 — 브라우저가 이어받는다) · 제목이 흔한 말뿐이면 가릴 수 없어 본문을 받는다',
+        [recB.body, recB.bodyFrom, recB.docs.map((d) => d.name), shell.body, shell.docs, generic.body], ['브라우저가 그린 농촌 아이디어 공모전 본문', 'browser', ['요강.hwp'], '', [], '서포터즈를 모집합니다 활동 기간 3개월']);
+      const adSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+      eq('⑦ 첨부 로봇 — 글자를 받을 글을 지금 대상보다 먼저 돈다 · 🔴 활동 목록 파일을 쓰는 곳은 무료 모드 한 곳뿐(브라우저 모드는 안 쓴다) · 끝에 제 모드 기록만 가지치기 · 시험 워크플로의 id 목록(ACT_TEXT_IDS)',
+        [/const order = \[\.\.\.acts\.items\.filter\(isTextTarget\), \.\.\.acts\.items\.filter\(\(n\) => !isTextTarget\(n\)\)\];/.test(adSrc), (adSrc.match(/writeFileSync\(ACTS/g) || []).length, /if \(changed && !BROWSER\) fs\.writeFileSync\(ACTS/.test(adSrc),
+          /pruneStore\(STORE_DIR, [^)]*, BROWSER \? 'browser' : 'plain'\)/.test(adSrc), /process\.env\.ACT_TEXT_IDS/.test(adSrc)], [true, 1, true, true, true]);
+      eq('  두 워크플로가 글자 기록 폴더를 저장한다(로봇이 고친 파일은 전부 git add 에)',
+        [/\[ -d collector\/act-text \] && git add -A collector\/act-text/.test(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url))),
+          /\[ -d collector\/act-text \] && git add -A collector\/act-text/.test(readText(new URL('../.github/workflows/rescue-bodies.yml', import.meta.url)))], [true, true]);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  }
+
+  /* ── 대외활동 유료 관문 ② 카드 쓰기 — 같은 로봇(card-read.mjs)이 활동 목록을 돈다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-3) ──
+     로봇을 베끼지 않는다: `--activities` 는 **파일 이름만 활동 것으로 바꿔 읽고 쓰고**(act-card ACT_FILES) 목록 모양·원문·지시문·기다리기·넘기는 날만 활동 것을 쓴다.
+     상한·건마다 저장·같은 원문 다시 안 읽기·실패한 호출의 돈·한 번 올린 글 안 내리기는 장학금과 같은 코드다(아래 「유료 카드 읽기」·「유료 관문」 절이 잰다) */
+  console.log('\n■ 대외활동 유료 관문 ② 카드 쓰기 — 같은 로봇이 활동 목록을 돈다 · 스위치 셋 · 보였다가 사라지지 않는다');
+  {
+    const AC = await import(new URL('../collector/act-card.mjs', import.meta.url));
+    const { createHash } = await import('node:crypto');
+    const ACT_OUT = ['data/act-read.json', 'collector/act-read-ledger.json', 'collector/act-read-review.json', 'collector/act-role-ai.json'];
+    const SCH_OUT = ['data/card-read.json', 'collector/card-read-ledger.json', 'collector/card-read-review.json', 'collector/attach-role-ai.json'];
+    const repoPath = (rel) => (rel.startsWith('../') ? rel.slice(3) : `collector/${rel}`);
+    const txt = (id) => `${id} 서포터즈 모집 안내 본문입니다 `.repeat(6);
+    const A = (id, over = {}) => ({ id, title: `${id} 서포터즈 모집`, url: `https://act.kr/${id}`, kind: '대외활동', school: '시험대학교', foundAt: plus(0), paidGate: plus(0), attachments: [], ...over });
+    const card = (name) => ({ ...base, title: name, host: '시험재단', eligibility: [L('대학 재학생')], amount: [L('활동비 월 10만원')], deadline: { date: plus(20), quote: `마감 ${plus(20)}` }, notes: [L('일정: 발대식 12월')] });
+    const F = AC.ACT_FILES || {};
+    eq('① 파일 이름 바꾸기(ACT_FILES) — 활동 목록은 활동 파일만 읽고 쓴다: 로봇이 쓰는 파일 넷이 전부 활동 이름으로 바뀐다 · 엄격히 읽는 파일(목록·결과·장부)도 · 설정 파일은 같이 쓴다',
+      [F['../data/registered.json'], [...crSrc.matchAll(/writeAtomic\('([^']+)'/g)].map((m) => repoPath(F[m[1]] || m[1])), [...crSrc.matchAll(/strictJson\('([^']+)'/g)].map((m) => m[1]).filter((rel) => !F[rel]),
+        F['final-review.json'], F['final-review-ledger.json'], F['card-read-config.json'], Object.values(F).filter((v) => Object.keys(F).includes(v))],
+      ['../data/activities.json', ACT_OUT, [], 'act-final-review.json', 'act-final-review-ledger.json', undefined, []]);
+    eq('  지시문은 활동용이 따로다(장학금 지시문과 다른 글자 · 응답 꼴은 같다) — 자격 칸에는 사람의 조건만 · 안내 줄 이름표 열 가지 · 🔴 바꾸면 열려 있는 활동 글을 전부 돈 내고 다시 읽는다(아래 값은 일부러 고칠 때만 바꾼다)',
+      [AC.ACT_SYSTEM !== CR.SYSTEM && AC.ACT_SYSTEM.includes(AC.ACT_CARD_RULES), /대외활동·공모전/.test(AC.ACT_SYSTEM), /장학금을 주는 곳|장학팀 직원/.test(AC.ACT_SYSTEM), /사람의 조건만/.test(AC.ACT_CARD_RULES),
+        ['주제', '규격', '참가 형태', '일정', '장소', '선발 규모', '활동 내용', '후속 지원', '유의사항', '문의'].filter((w) => !AC.ACT_CARD_RULES.includes(w)),
+        createHash('sha256').update(String(AC.ACT_SYSTEM)).digest('hex').slice(0, 16)],
+      [true, true, false, true, [], '914bbcc586f2ecdd']);
+    eq('  원문 해시는 지시문을 함께 센다 — 같은 원문도 활동 지시문이면 다른 해시 · 지시문을 안 주면 장학금 지시문(위 ⓪ 의 값 그대로)',
+      [CR.sourceHash('같은 글', AC.ACT_SYSTEM) === CR.sourceHash('같은 글'), CR.sourceHash('같은 글', CR.SYSTEM) === CR.sourceHash('같은 글'), CR.sourceHash('같은 글', AC.ACT_SYSTEM) === CR.sourceHash('같은 글', AC.ACT_SYSTEM)], [false, true, true]);
+    eq('  스위치 판정 한 곳(actGateOn) — 설정의 enabled 와 activities.enabled 가 **둘 다** true 일 때만 · 수집 로봇의 표시 달기와 유료 로봇이 같은 함수를 쓴다',
+      [{ enabled: true, activities: { enabled: true } }, { enabled: true }, { enabled: false, activities: { enabled: true } }, { enabled: true, activities: { enabled: false } }, { enabled: true, activities: { enabled: 'true' } }, {}, null].map((c) => AC.actGateOn(c)),
+      [true, false, false, false, false, false, false]);
+    eq('  로봇이 읽는 모양(actView) — 제목을 name 으로 · 「게시한 곳」은 학교, 없으면 주최, 둘 다 없으면 빈 글자(지시문이 「여러 곳」으로 적는다) · 관리자가 숨겼거나 올린 글은 표시를 떼어 대상에서 뺀다(원본은 안 고친다) · id 없는 글은 뺀다',
+      [AC.actView(A('v1')).name, AC.actView(A('v1')).eligibility.schoolOnly, AC.actView(A('v2', { school: '', host: '시험재단' })).eligibility.schoolOnly, AC.actView(A('v3', { school: '', host: '' })).eligibility.schoolOnly,
+        AC.actView(A('v4', { hidden: true })).paidGate, AC.actView(A('v5', { paidOpen: '관리자 2026-11-26' })).paidGate, AC.actView(A('v6')).paidGate === plus(0),
+        (() => { const raw = A('v8', { hidden: true }); AC.actView(raw); return raw.paidGate === plus(0); })(), AC.actItems([A('v7'), { title: 'id 없는 글', url: 'u', paidGate: plus(0) }, null]).map((x) => x.id)],
+      ['v1 서포터즈 모집', '시험대학교', '시험재단', '', undefined, undefined, true, true, ['v7']]);
+    const wait = (atts, parts, gate) => AC.actAwaits({ paidGate: gate, attachments: atts }, parts, plus(0));
+    eq('② 첨부 기다리기(actAwaits) — 한글·워드·PDF 첨부 가운데 글자가 안 온 것이 **하나라도** 있으면 표시 뒤 이틀까지 · 그림·zip·본문 그림은 안 기다린다 · 꼬리 달린 이름도 같은 파일 · 표시 없는 글(시험)은 안 기다린다',
+      [wait([{ name: '공고문.hwp' }, { name: '신청서.hwp' }], [{ tag: 'A1', attach: '공고문.hwp' }], plus(-1)), wait([{ name: '공고문.hwp' }, { name: '신청서.hwp' }], [{ tag: 'A1', attach: '공고문.hwp' }], plus(-2)),
+        wait([{ name: '공고문.hwp' }, { name: '신청서.hwp' }], [{ tag: 'A1', attach: '공고문.hwp' }, { tag: 'A2', attach: '신청서.hwp' }], plus(0)), wait([{ name: '포스터.png' }, { name: '자료.zip' }, { name: '본문이미지-1.jpg', bodyImage: true }], [], plus(0)),
+        wait([{ name: '신청서.hwp (71KB)' }], [{ tag: 'A1', attach: '신청서.hwp' }], plus(0)), wait([{ name: '신청서.hwp' }], [], undefined), wait([{ name: '신청서.pdf' }], [], plus(0)), wait([{ name: '요강.docx' }], [{ label: '게시판 본문', text: '요강.docx' }], plus(0))],
+      [true, false, false, false, false, false, true, true]);
+    /* 최종 리뷰(로봇 I3 · 2026-11-26) — 무료 받기의 본문이 비었고 진짜 브라우저가 아직 안 돌았으면 **본문도** 기다린다(이틀 상한 안). 첨부 글자만 보고 먼저 읽으면
+       몇 시간 뒤 브라우저 본문이 와 원문이 바뀌고 같은 글을 다시 산다(4번 + 6번 — 첨부 기다리기를 만든 까닭과 같은 이중 결제) */
+    {
+      const ATb = await import(new URL('../collector/act-text.mjs', import.meta.url));
+      const bdir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-bodywait-'));
+      try {
+        const docA = { name: '공고문.hwp', hash: 'hb1', from: 'attach', ocr: false, text: '공고문 글자 참가 대상은 전국 대학생입니다 접수는 전자우편으로 받습니다 마감은 이달 말일입니다' };
+        ATb.writeStore(bdir, 'b1', 'plain', { url: 'u1', body: '', docs: [docA] }, plus(0));
+        ATb.writeStore(bdir, 'b2', 'plain', { url: 'u2', body: '', docs: [docA] }, plus(0)); ATb.writeStore(bdir, 'b2', 'browser', { url: 'u2', body: '', docs: [] }, plus(0));
+        ATb.writeStore(bdir, 'b3', 'plain', { url: 'u3', body: '무료로 받은 본문 글자입니다', docs: [docA] }, plus(0));
+        const srcB = AC.makeActSources({ storeDir: bdir, formRows: [], extractedDir: bdir });
+        const w2 = (id, gate) => AC.actAwaits({ id, paidGate: gate, attachments: [{ name: '공고문.hwp' }] }, srcB({ id }), plus(0));
+        eq('  🔴 무료 받기의 본문이 비었고 진짜 브라우저가 아직 안 돌았으면 본문도 기다린다(이틀까지) — 브라우저가 한 번 돌았으면(못 받았어도) · 무료 본문이 있으면 · 이틀이 지나면 · 표시 없는 글(시험)은 안 기다린다',
+          [w2('b1', plus(0)), w2('b1', plus(-1)), w2('b1', plus(-2)), w2('b2', plus(0)), w2('b3', plus(0)), w2('b1', undefined)], [true, true, false, false, false, false]);
+      } finally { fs.rmSync(bdir, { recursive: true, force: true }); }
+    }
+    const held = (gateDay, { led, prev = {}, text = '', over = {} } = {}) => CR.actGateHeldOf([{ id: 'n', paidGate: gateDay, deadline: plus(30), ...over }], () => (text ? [{ label: '게시판 본문', text }] : []), led ? { n: led } : {}, {}, plus(0), prev);
+    eq('③ 🔴 보였다가 사라지지 않는다 — 원문 없는 글은 사흘째에 넘긴다(앱은 나흘째 0시에 무료 값으로 연다) · 사흘째 실행이 없었으면 나흘째에 새로 넘기지 않는다 · 넘긴 글은 넘긴 채로 · 원문이 오면 풀린다',
+      [held(plus(-2)), held(plus(-3)), held(plus(-4)), held(plus(-4), { prev: { n: 'no-source' } }), held(plus(-6), { prev: { n: 'no-source' }, text: txt('n') })],
+      [{}, { n: 'no-source' }, {}, { n: 'no-source' }, {}]);
+    eq('  「읽을 내용 없음」도 같다 — 아직 안 보인 글만 넘긴다 · 이미 무료 값으로 오른 글(나흘째)은 넘기지 않는다 · 올린 글(paidOpen)·마감 지난 글·카드가 실린 글은 넘기지 않는다 / 예외: 대학원생 전용은 이미 보였어도 내린다(장학금 11-25 결정)',
+      [held(plus(-1), { led: { done: true }, text: txt('n') }), held(plus(-4), { led: { done: true }, text: txt('n') }), held(plus(-5), { led: { done: true }, text: txt('n'), prev: { n: 'unreadable' } }),
+        held(plus(-1), { led: { done: true }, text: txt('n'), over: { paidOpen: '관리자' } }), held(plus(-3), { over: { deadline: plus(-1) } }), held(plus(-5), { led: { gradOnly: plus(0) }, text: txt('n') }),
+        CR.actGateHeldOf([{ id: 'n', paidGate: plus(-3), deadline: plus(30) }], () => [], {}, { n: {} }, plus(0), {})],
+      [{ n: 'unreadable' }, {}, { n: 'unreadable' }, {}, {}, { n: 'grad-only' }, {}]);
+    const stall = CR.actGateStalled([A('s1', { paidGate: plus(-4) }), A('s2', { paidGate: plus(-4) }), A('s3', { paidGate: plus(-4), paidOpen: '관리자' }), A('s4', { paidGate: plus(-4) }), A('s5', { paidGate: plus(-3) }), A('s6', { paidGate: plus(-4) }), A('s7', { paidGate: plus(-4), deadline: plus(-1) })].map(AC.actView),
+      { items: { s6: {} }, gateHeld: { s4: 'no-source' } }, { s2: { done: true } }, plus(0));
+    eq('  유료가 멈춘 글(actGateStalled) — 사흘 넘게 카드도 사람 몫도 아닌 글만 · 🔴 읽고도 실을 것이 없어 무료 값으로 남은 글(장부 done)은 세지 않는다(세면 경보가 꺼지지 않는다) · 올린 글·넘긴 글·카드 있는 글·사흘째·마감 지난 글은 아니다',
+      stall.map((it) => it.id), ['s1']);
+
+    const sb = paidBox('hdj-act-read-');
+    try {
+      const out = (list) => list.filter((f) => sb.exists(f));
+      const run = (args, env = {}) => sb.run('collector/card-read.mjs', ['--activities', ...args], { ...NOENV, ...env }, 30000);
+      const fakeRun = (args = ['--write']) => run(args, { CARD_READ_FAKE: sb.abs('fake.json') });
+      const cards = () => (sb.json('data/act-read.json') || {}).items || {};
+      const store = (id, body, docs = []) => sb.write(`collector/act-text/${id}.json`, { url: `https://act.kr/${id}`, at: plus(0), body, bodyFrom: 'plain', docs });
+      const acts = [A('a1', { deadline: plus(5) }), A('a2', { paidGate: undefined }), A('a3', { hidden: true }), A('a4', { deadline: plus(-2) }), A('a5', { paidOpen: '관리자 2026-11-26' }), A('a6', { deadline: plus(9) }), A('a7'), A('a9', { deadline: plus(3), attachments: [{ name: '요강.hwp' }, { name: '신청서.hwp' }] })];
+      sb.write('data/activities.json', { updatedAt: plus(0), items: [...acts, { title: 'id 없는 글', url: 'https://act.kr/x', paidGate: plus(0) }] });
+      for (const id of ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']) store(id, txt(id));
+      store('a9', txt('a9'), [{ name: '요강.hwp', hash: 'h9', from: 'attach', ocr: false, text: 'a9 요강 글자 참가 대상은 전국 대학생입니다 접수는 전자우편으로 받습니다' }]);   // 공고문 글자는 왔고 신청서는 아직 — 장학금 규칙(awaitsAttach)이면 읽고, 활동 규칙(actAwaits)이면 기다린다
+      sb.write('fake.json', Object.fromEntries(['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a9'].map((id) => [id, card(`${id} 서포터즈 모집`)])));
+      const off = run(['--write']);
+      sb.write('collector/card-read-config.json', { enabled: true });
+      const only1 = run(['--write'], { CARD_READ_ENABLE: '1' });
+      sb.write('collector/card-read-config.json', { enabled: false, activities: { enabled: true } });
+      const only2 = run(['--write'], { CARD_READ_ENABLE: '1' });
+      sb.write('collector/card-read-config.json', { enabled: true, activities: { enabled: true } });
+      const noEnv = run(['--write']);
+      eq('④ 🔴 스위치 셋 — 설정의 enabled · activities.enabled · 환경 변수가 **다** 맞아야 부른다: 하나라도 빠지면 유료 SDK 가 한 번도 안 불리고 활동 결과 파일도 안 생긴다',
+        [[off, only1, only2, noEnv].map((r) => [r.status, /부르지 않았습니다/.test(r.out)]), sb.exists('sdk-called.txt'), out(ACT_OUT)], [[[0, true], [0, true], [0, true], [0, true]], false, []]);
+      const allOn = run(['--write'], { CARD_READ_ENABLE: '1' });
+      const called = sb.read('sdk-called.txt') || '';
+      eq('  셋이 다 맞으면 그때는 부른다(가짜 SDK 가 불렸다 — 관문은 진짜 API 에 닿지 않는다) · 🔴 물을 때 보내는 지시문이 활동용이다(장학금 지시문으로 묻지 않는다) · 실패한 실행은 빨갛게 끝난다',
+        [sb.exists('sdk-called.txt'), /부르지 않았습니다/.test(allOn.out), allOn.status, /^stream 대학생이 참가할/m.test(called), /^stream 한국 대학 장학금/m.test(called),
+          /^user 공고 제목: a1 서포터즈 모집 \/ 게시한 곳: 시험대학교$/m.test(called)], [true, false, 1, true, false, true]);   // 제목·게시한 곳이 활동 글의 것(title · school)으로 넘어간다
+      sb.write('collector/card-read-config.json', { enabled: false, maxPerRun: 20, activities: { maxPerRun: 1 } });
+      const r1 = fakeRun();
+      eq('⑤ 대상 — 표시가 달리고 원문이 있는 열린 글만, 마감이 가까운 것부터: 표시 없는 글·관리자가 숨긴 글·마감 지난 글·올린 글(paidOpen)·원문 없는 글·id 없는 글은 안 읽는다 · 첨부가 하나라도 덜 온 글은 마감이 더 가까워도 기다린다 · 상한은 활동 칸의 값(목록마다 따로 — 장학금 상한 20 이 아니라 1) · 결과는 활동 파일에만 · 장부의 해시는 활동 지시문으로 센 값',
+        [r1.status, /상한 1건에 닿아 멈춥니다/.test(r1.out), Object.keys(cards()), out(ACT_OUT), out(SCH_OUT), sameFormat(sb.read('data/act-read.json')), cards().a1 && cards().a1.eligibility,
+          ((sb.json('collector/act-read-ledger.json') || {}).a1 || {}).hash === CR.sourceHash(CR.sourceText(AC.makeActSources({ storeDir: sb.abs('collector/act-text'), formRows: [], extractedDir: sb.abs('collector/extracted') })(AC.actView(acts[0]))), AC.ACT_SYSTEM)],
+        [0, true, ['a1'], ACT_OUT, [], true, ['대학 재학생'], true]);
+      if (r1.status !== 0) console.log(r1.out.slice(-800));
+      sb.write('collector/card-read-config.json', { enabled: false });
+      const r1b = fakeRun(), r2 = fakeRun();
+      eq('  남은 글은 다음 실행이 읽는다 · 같은 원문은 다시 읽지 않는다(해시 장부 — 장학금과 같은 코드)', [Object.keys(cards()).sort(), /대상 0건/.test(r1b.out), /대상 0건/.test(r2.out), /첨부를 기다리는 것 1건/.test(r2.out)], [['a1', 'a6'], false, true, true]);
+      const lost = sb.json('data/act-read.json'); delete lost.items.a1; sb.write('data/act-read.json', lost);
+      const re = fakeRun(['--recheck', '--write']);
+      eq('  잃은 카드는 장부에 남긴 응답으로 다시 만든다(--recheck · 돈 0 · 활동 지시문의 해시로 견준다)', [re.status, Object.keys(cards()).sort(), /1건으로 결과를 다시 만들었습니다/.test(re.out)], [0, ['a1', 'a6'], true]);
+      /* 같은 바이트의 첨부가 나중에 extracted 에 들어와도 원문이 그대로다 */
+      sb.write('collector/extracted/form-a8-1.hwp', 'same-bytes-notice'); sb.write('collector/extracted/form-a8-1.hwp.body.txt', `a8 공모전 요강\n${'참가 자격은 전국 대학생입니다 '.repeat(4)}`);
+      sb.write('collector/extracted/form-a8-2.hwp', 'form-bytes'); sb.write('collector/extracted/form-a8-2.hwp.body.txt', `참가 신청서\n${'성명 학번 학과 연락처 전자우편 주소 '.repeat(3)}`);
+      const h8 = AR.fileHash16(sb.abs('collector/extracted/form-a8-1.hwp'));
+      store('a8', txt('a8'), [{ name: '요강.hwp', hash: h8, from: 'attach', ocr: false, text: `a8 공모전 요강\n${'참가 자격은 전국 대학생입니다 '.repeat(4)}` },
+        { name: '', hash: 'i1', from: 'img', ocr: true, text: '포스터에서 읽은 글자 접수 마감 십이월 칠일' }, { name: '', hash: 'T-g1', from: 'guide', ocr: false, text: '요강 페이지의 글자 참가 대상 전국 대학생' }]);
+      const partsOf = (rows) => AC.makeActSources({ storeDir: sb.abs('collector/act-text'), formRows: rows, extractedDir: sb.abs('collector/extracted') })(AC.actView(A('a8')));
+      const sameRow = { file: 'form-a8-1.hwp', title: 'T', attach: '요강.hwp', id: 'a8' };
+      const before = partsOf([]), same = partsOf([sameRow]);
+      const after = partsOf([sameRow, { file: 'form-a8-2.hwp', title: 'T', attach: '참가 신청서.hwp', id: 'a8' }, { file: 'form-a8-2.hwp', title: 'T', attach: '남의 글 신청서.hwp', id: 'other' }, { file: 'form-없는파일.hwp', title: 'T', attach: '없는 파일.hwp', id: 'a8' }]);
+      const key = (x) => [x.tag || '', x.file || '', x.attach || '', x.hash || ''];
+      eq('⑥ 원문 덩어리 — 본문 + 글자 기록의 첨부(열쇠는 바이트 지문으로 만든 고정 이름 text-<지문> · 본문 그림·요강 페이지는 이름표에 무엇인지 적는다) + 받아 둔 신청서 원본(그 글 id 의 줄만 · 글자가 있는 것만) · 차례는 실행마다 같다',
+        [before.map(key), before.map((x) => x.label), after.slice(4).map(key), JSON.stringify(partsOf([])) === JSON.stringify(before)],
+        [[['', '', '', ''], ['A1', `text-${h8}`, '요강.hwp', h8], ['A2', 'text-i1', '', 'i1'], ['A3', 'text-T-g1', '', 'T-g1']],
+          ['게시판 본문', '첨부 [A1] 요강.hwp', '첨부 [A2] (본문 그림 — 기계가 읽은 글자)', '첨부 [A3] (요강 페이지)'], [['A4', 'form-a8-2.hwp', '참가 신청서.hwp', AR.fileHash16(sb.abs('collector/extracted/form-a8-2.hwp'))]], true]);
+      eq('  🔴 같은 바이트가 나중에 신청서 받기로 extracted 에 들어와도 먼저 저장된 덩어리와 고정 이름 그대로다 — 덩어리도 원문 해시도 안 바뀐다(같은 글을 돈 내고 다시 읽지 않는다)',
+        [JSON.stringify(same) === JSON.stringify(before), CR.sourceHash(CR.sourceText(same), AC.ACT_SYSTEM) === CR.sourceHash(CR.sourceText(before), AC.ACT_SYSTEM), JSON.stringify(after.slice(0, 4)) === JSON.stringify(before)], [true, true, true]);
+      /* 장학금 실행과 서로의 파일을 건드리지 않는다 */
+      const schBody = ['표본재단 장학생 선발 안내', '가. 지원 자격: 2학년 이상 재학생', '나. 지원 금액: 1인당 100만 원', '장학생을 뽑는 까닭과 절차를 적은 본문입니다 '.repeat(12)].join('\n');   // 제목의 낱말을 되풀이하면 본문 분량 재기(notice-source bodyChars)가 그 줄을 제목 줄로 보고 뺀다
+      sb.write('data/registered.json', { items: [{ id: 'x-1', name: '표본재단 장학생 선발 안내', type: '교외', sourceUrl: 'https://s1.example.ac.kr/notice?no=1', deadline: plus(20), listedAt: plus(-1), paidGate: plus(0), amountValue: 0, attachments: [], eligibility: {} }] });
+      sb.write('collector/extracted/notices-text.json', [{ title: '표본재단 장학생 선발 안내', school: '시험대학교', url: 'https://s1.example.ac.kr/notice?no=1', text: schBody }]);
+      sb.write('fake.json', { 'x-1': card('표본재단 장학생 선발 안내'), a1: card('a1 서포터즈 모집'), a6: card('a6 서포터즈 모집') });
+      const actBefore = ACT_OUT.map((f) => sb.read(f));
+      const sch = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+      const schAfter = SCH_OUT.map((f) => sb.read(f));
+      const act2 = fakeRun();
+      eq('⑦ 🔴 서로의 파일을 건드리지 않는다 — 장학금 실행 뒤 활동 파일 넷이 바이트 그대로(활동 글의 카드를 「목록에 없는 공고」로 지우지 않는다) · 활동 실행 뒤 장학금 파일 넷이 바이트 그대로',
+        [sch.status, Object.keys((sb.json('data/card-read.json') || {}).items || {}), ACT_OUT.map((f, i) => sb.read(f) === actBefore[i]), act2.status, SCH_OUT.map((f, i) => !!schAfter[i] && sb.read(f) === schAfter[i])],
+        [0, ['x-1'], [true, true, true, true], 0, [true, true, true, true]]);
+      if (sch.status !== 0) console.log(sch.out.slice(-800));
+      /* 시험 워크플로 — 표시가 없어도 id 로 지정한 글을 읽는다(여러 건) */
+      sb.write('fake.json', { a2: card('a2 서포터즈 모집'), a5: card('a5 서포터즈 모집'), a3: card('a3 서포터즈 모집') });
+      const onlyRun = fakeRun(['--only=a2,a5,없는글', '--write']);
+      const stats = run(['--stats']).out, alarm = run(['--gate-alarm']).out;
+      eq('⑧ 시험 — `--only=a,b` 는 표시가 없는 글도 읽는다(여러 건 · 지정한 글만 — 가짜 응답에 있어도 지정 안 한 글은 안 읽는다) · 꼴 검사·기록·경보 세기도 활동 파일로 돈다(기록의 제목이 활동 것 · 장학금 전용 줄은 없다)',
+        [onlyRun.status, Object.keys(cards()).sort(), run(['--check']).status, /^### 대외활동·공모전 유료 관문 기록/m.test(stats), /관리자가 직접 등록한 공고/.test(stats), /읽은 글 4건/.test(stats), /^count=0$/m.test(alarm)],
+        [0, ['a1', 'a2', 'a5', 'a6'], 0, true, false, true, true]);
+      /* 대학원생만 받는 글 — 같은 코드로 내려가 사람에게 넘어간다 */
+      sb.write('data/activities.json', { items: [A('g1')] }); store('g1', txt('g1'));
+      sb.write('fake.json', { g1: { ...card('g1 연구 공모전'), eligibility: [L('대학원 석사과정 재학생')] } });
+      const gradRun = fakeRun();
+      eq('⑨ 대학원생만 받는 카드는 활동 목록에서도 싣지 않고 사람에게 넘긴다(grad-only · 같은 코드) · 목록에서 빠진 글의 카드·장부는 치운다',
+        [gradRun.status, Object.keys(cards()), (sb.json('data/act-read.json') || {}).gateHeld, Object.keys(sb.json('collector/act-read-ledger.json') || {}), ((sb.json('collector/act-read-review.json') || {}).gateHeld || {}).g1],
+        [0, [], { g1: 'grad-only' }, ['g1'], 'grad-only']);
+    } finally { sb.done(); }
+    const cfgReal = JSON.parse(readText(new URL('../collector/card-read-config.json', import.meta.url)));
+    /* 결과 파일(data/act-read.json)의 꼴은 여기서 재지 않는다 — 실데이터 읽기는 톱니(REAL_READ_ALLOW)가 막는다. 그 파일은 워크플로가 저장 전에 `--activities --check` 로 잰다 */
+    eq('⑩ 저장소의 활동 스위치 칸이 있다 — 상한(20건 · 3달러)이 적혀 있고 enabled 는 참/거짓 값이다(켜는 것은 개발자가 「켜」라고 할 때만 — 값 자체는 여기서 재지 않는다)',
+      [typeof (cfgReal.activities || {}).enabled, (cfgReal.activities || {}).maxPerRun, (cfgReal.activities || {}).maxUsdPerRun], ['boolean', 20, 3]);
+  }
+
+  /* ── 대외활동 유료 관문 ③ 최종 검토 — 같은 로봇(final-review.mjs)이 활동 목록을 돈다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-5·5-6) ──
+     카드 쓰기와 같은 방식이다: `--activities` 는 파일 이름만 활동 것으로 바꿔 읽고 쓰고(act-card ACT_FILES), 지시문만 활동용(ACT_REVIEW_SYSTEM)이다.
+     고친 카드는 `data/act-read.json` 의 그 칸에 통째로 들어가고, 첨부 구분·사본 판정은 `collector/act-final-review.json` 에 적힌다 — 그 답을 5번 변환 로봇이 읽는다(loadAiRoles · loadPdfVerdicts) */
+  console.log('\n■ 대외활동 유료 관문 ③ 최종 검토 — 같은 로봇이 활동 목록을 돈다 · 첨부 구분과 사본 판정을 변환 로봇이 읽는다');
+  {
+    const AC = await import(new URL('../collector/act-card.mjs', import.meta.url));
+    const PV = await import(new URL('../collector/pdf-verdicts.mjs', import.meta.url));
+    const { createHash } = await import('node:crypto');
+    const h16 = (s) => createHash('sha256').update(String(s)).digest('hex').slice(0, 16);
+    const F = AC.ACT_FILES || {};
+    const repoPath = (rel) => (rel.startsWith('../') ? rel.slice(3) : `collector/${rel}`);
+    const ACT_FR = ['data/act-read.json', 'collector/act-final-review.json', 'collector/act-final-review-ledger.json'];
+    const SCH_FR = ['data/card-read.json', 'collector/final-review.json', 'collector/final-review-ledger.json'];
+    eq('① 검토 지시문은 활동용이 따로다(ACT_REVIEW_SYSTEM) — 활동 카드 규칙 한 벌을 담는다(4번과 6번이 같은 말) · 장학금 검토 지시문과 다른 글자 · 🔴 바꾸면 열려 있는 활동 글을 전부 돈 내고 다시 본다(아래 값은 일부러 고칠 때만 바꾼다)',
+      [String(AC.ACT_REVIEW_SYSTEM || '').includes(AC.ACT_CARD_RULES), AC.ACT_REVIEW_SYSTEM !== FR.SYSTEM, /장학금 공고의 최종 검토자/.test(String(AC.ACT_REVIEW_SYSTEM)), /대외활동·공모전/.test(String(AC.ACT_REVIEW_SYSTEM)), h16(AC.ACT_REVIEW_SYSTEM)],
+      [true, true, false, true, '846aa5dc8a4c7a3b']);
+    const rhArgs = ['고정 원문', { eligibility: ['a'], hash: 'h' }, [{ file: 'f', hash: 'x', role: 'form', formStart: '' }], [{ kind: 'form', file: 'p.pdf', bytes: 10 }]];
+    eq('  검토 해시는 지시문 둘(검토 지시문 · 카드 지시문)을 인자로 받는다 — 안 주면 장학금 것(위 ⓪ 의 값) · 활동 것은 장학금 지시문 어느 쪽에도 기대지 않는다(장학금 지시문을 고쳐도 활동 글을 다시 사지 않는다)',
+      [FR.reviewHash(...rhArgs) === FR.reviewHash(...rhArgs, FR.SYSTEM, CR.SYSTEM), FR.reviewHash(...rhArgs, AC.ACT_REVIEW_SYSTEM, AC.ACT_SYSTEM) === FR.reviewHash(...rhArgs),
+        FR.reviewHash(...rhArgs, AC.ACT_REVIEW_SYSTEM, AC.ACT_SYSTEM) === FR.reviewHash(...rhArgs, AC.ACT_REVIEW_SYSTEM), FR.reviewHash(...rhArgs, AC.ACT_REVIEW_SYSTEM, AC.ACT_SYSTEM) === FR.reviewHash(...rhArgs, FR.SYSTEM, AC.ACT_SYSTEM)],
+      [true, false, false, false]);
+    eq('  「4번이 이 원문을 읽고 쓴 카드인가」도 카드 지시문을 받는다 — 활동 카드의 해시는 활동 지시문으로 센 값이다',
+      [FR.readThisSource({ hash: CR.sourceHash('원문', AC.ACT_SYSTEM) }, '원문', AC.ACT_SYSTEM), FR.readThisSource({ hash: CR.sourceHash('원문', AC.ACT_SYSTEM) }, '원문'), FR.readThisSource({ hash: CR.sourceHash('원문') }, '원문')], [true, false, true]);
+    eq('  파일 이름 바꾸기 — 최종 검토가 쓰는 파일 셋이 전부 활동 이름으로 바뀐다 · 엄격히 읽는 파일도 · 변환 로봇이 읽는 두 곳(첨부 구분 · 사본 판정)에 적힌 활동 파일 이름이 그 표와 같다',
+      [[...frSrc.matchAll(/writeAtomic\('([^']+)'/g)].map((m) => repoPath(F[m[1]] || m[1])), [...frSrc.matchAll(/strictJson\('([^']+)'/g)].map((m) => m[1]).filter((rel) => !F[rel]),
+        [F['attach-role-ai.json'], F['final-review.json']].filter((n) => !src('collector/attach-role-ai.mjs').includes(`'${n}'`)), src('collector/pdf-verdicts.mjs').includes(`'${F['final-review.json']}'`)],
+      [ACT_FR, [], [], true]);
+
+    const txt = (id) => `${id} 공모전 모집 안내 본문입니다 `.repeat(6);
+    const A = (id, over = {}) => ({ id, title: `${id} 공모전 모집`, url: `https://act.kr/${id}`, kind: '공모전', school: '시험대학교', foundAt: plus(-1), paidGate: plus(-1), deadline: plus(10), attachments: [{ name: '요강.hwp' }], ...over });
+    const cardOf = (over) => ({ title: '', host: '', eligibility: [], excludes: [], priority: [], amount: [], apply: [], documents: [], notes: [], multi: false, head: 0, deadline: null, hash: 'h4', readAt: plus(-1), ...over });
+    const fixed = { ...base, host: '시험재단', eligibility: [L('전국 대학 재학생')], amount: [L('대상 1팀 300만원')], documents: [L('참가신청서')], notes: [L('일정: 발표 12월 20일')], deadline: { date: plus(10), quote: `접수 마감 ${plus(10)}` },
+      attachments: [{ tag: 'A1', role: 'mixed', formStart: '참가신청서', why: '요강 뒤에 참가신청서가 붙어 있다' }], pdfs: [{ tag: 'P1', verdict: 'broken', why: '2쪽의 표가 무너졌다' }], summary: '자격을 고치고 혜택·서류·일정을 채웠습니다.' };
+    const sb = paidBox('hdj-act-review-');
+    try {
+      const run = (args, env = {}) => sb.run('collector/final-review.mjs', ['--activities', ...args], { ...NOENV, ...env }, 30000);
+      const fakeRun = (args = ['--write']) => run(args, { FINAL_REVIEW_FAKE: sb.abs('fake.json') });
+      const acts = [A('b1'), A('b2', { paidGate: undefined, attachments: [] }), A('b3', { attachments: [] }), A('b4', { hidden: true, attachments: [] })];
+      sb.write('data/activities.json', { updatedAt: plus(0), items: acts });
+      /* 요강.hwp 의 글자는 글자 기록에 있다(원본은 저장소에 없다) — 같은 바이트의 원본은 아래에서 나중에 extracted 에 넣는다 */
+      const bytes = '요강과 참가신청서가 붙은 한글 문서의 바이트';
+      const h1 = createHash('sha1').update(Buffer.from(bytes)).digest('hex').slice(0, 16);
+      const docText = `b1 공모전 요강\n${'참가 자격은 전국 대학 재학생입니다 '.repeat(4)}\n참가신청서\n성명 학교 학과 연락처`;
+      const store = (id, docs = []) => sb.write(`collector/act-text/${id}.json`, { url: `https://act.kr/${id}`, at: plus(-1), body: txt(id), bodyFrom: 'plain', docs });
+      store('b1', [{ name: '요강.hwp', hash: h1, from: 'attach', ocr: false, text: docText }]); store('b2'); store('b3'); store('b4');
+      const partsOf = (id, rows = []) => AC.makeActSources({ storeDir: sb.abs('collector/act-text'), formRows: rows, extractedDir: sb.abs('collector/extracted') })(AC.actView(acts.find((x) => x.id === id)));
+      const srcHash = (id) => CR.sourceHash(CR.sourceText(partsOf(id)), AC.ACT_SYSTEM);
+      const cards = { updatedAt: plus(-1), items: { b1: cardOf({ eligibility: ['전국 대학원생'], hash: srcHash('b1') }), b2: cardOf({ eligibility: ['시험으로 읽은 글'], hash: srcHash('b2') }), b3: cardOf({ eligibility: ['옛 원문으로 쓴 카드'], hash: 'old-source' }), b4: cardOf({ eligibility: ['관리자가 숨긴 글'], hash: srcHash('b4') }) }, gateHeld: {} };
+      const cardText = `${JSON.stringify(cards, null, 1)}\n`;
+      sb.write('data/act-read.json', cardText);
+      sb.write('collector/act-read-ledger.json', { b1: { mode: 'ai', done: true }, b2: { mode: 'ai', done: true }, b3: { mode: 'ai', done: true }, b4: { mode: 'ai', done: true } });
+      const role4 = [{ file: `text-${h1}`, attach: '요강.hwp', hash: h1, role: 'content', formStart: '', why: '요강' }];
+      sb.write('collector/act-role-ai.json', { items: { b1: { at: plus(-1), docs: role4 } } });
+      const pdfBody = '%PDF-1.4 요강 사본';   // 색인 줄의 bytes 가 그 파일의 크기와 같아야 「이 판정이 본 그 사본」으로 내린다(pdf-verdicts applyPdfVerdicts)
+      sb.write('data/docs-pdf/index.json', { items: { b1: [{ file: 'b1/1-요강.pdf', name: '요강.hwp', pages: 2, bytes: Buffer.byteLength(pdfBody) }] } }); sb.write('data/docs-pdf/b1/1-요강.pdf', pdfBody);
+      /* 장학금 파일 — 활동 실행이 건드리면 안 된다(목록에 없는 공고라며 지우지도 않는다) */
+      const schSeed = { 'data/card-read.json': { updatedAt: plus(-1), items: { 'r-1': cardOf({ eligibility: ['장학금 카드'] }) }, gateHeld: {} }, 'collector/final-review.json': { updatedAt: plus(-1), items: { 'r-1': { name: '장학금 공고', roles: [], pdfs: [] } } }, 'collector/final-review-ledger.json': { 'r-1': { hash: 'x', done: true } } };
+      for (const [f, v] of Object.entries(schSeed)) sb.write(f, v);
+      const schBefore = SCH_FR.map((f) => sb.read(f));
+      sb.write('fake.json', { b1: fixed, b2: { ...fixed, attachments: [], pdfs: [], summary: '시험 글' }, b3: fixed, b4: fixed });
+      const off = run(['--write']);
+      sb.write('collector/final-review-config.json', { enabled: true });
+      const only1 = run(['--write'], { FINAL_REVIEW_ENABLE: '1' });
+      sb.write('collector/final-review-config.json', { enabled: false, activities: { enabled: true } });
+      const only2 = run(['--write'], { FINAL_REVIEW_ENABLE: '1' });
+      sb.write('collector/final-review-config.json', { enabled: true, activities: { enabled: true } });
+      const noEnv = run(['--write']);
+      eq('② 🔴 스위치 셋 — 설정의 enabled · activities.enabled · 환경 변수가 **다** 맞아야 부른다: 하나라도 빠지면 유료 SDK 가 한 번도 안 불리고 활동 카드 파일은 한 글자도 안 바뀐다 · 대상은 표시가 달렸거나 4번이 읽은 글 가운데 4번이 이 원문으로 쓴 카드(b1·b2 — 옛 원문의 카드 b3 과 관리자가 숨긴 글 b4 는 안 본다)',
+        [[off, only1, only2, noEnv].map((r) => [r.status, /부르지 않았습니다/.test(r.out)]), sb.exists('sdk-called.txt'), sb.read('data/act-read.json') === cardText, /대상 2건/.test(off.out), /4번이 다시 읽기를 기다리는 것 1건/.test(off.out)],
+        [[[0, true], [0, true], [0, true], [0, true]], false, true, true, true]);
+      const allOn = run(['--write', '--only=b1'], { FINAL_REVIEW_ENABLE: '1' });
+      const called = sb.read('sdk-called.txt') || '';
+      eq('  셋이 다 맞으면 그때는 부른다(가짜 SDK) · 🔴 물을 때 보내는 지시문이 활동 검토용이다 · 실패한 실행은 빨갛게 끝난다',
+        [sb.exists('sdk-called.txt'), allOn.status, /^stream 대학생 대외활동·공모/m.test(called), /^stream 한국 대학 장학금/m.test(called), /^user 공고 제목: b1 공모전 모집 \/ 게시한 곳: 시험대학교$/m.test(called)], [true, 1, true, false, true]);
+      sb.write('collector/final-review-config.json', { enabled: false, maxPerRun: 15, activities: { maxPerRun: 1 } });
+      const r1 = fakeRun();
+      const cr2 = sb.json('data/act-read.json') || { items: {} }, res = (sb.json('collector/act-final-review.json') || {}).items || {}, led = sb.json('collector/act-final-review-ledger.json') || {};
+      const c1 = cr2.items.b1 || {}, v1 = res.b1 || {};
+      if (r1.status !== 0) console.log(r1.out.slice(-800));
+      eq('③ 가짜 응답으로 — 둘째 AI 가 고친 완성본이 활동 카드 파일(data/act-read.json)의 그 칸에 통째로 들어간다 · 4번의 해시·읽은 날은 그대로 · 검토한 날이 찍힌다 · 로봇 형식 · 꼴 검사 통과 · 상한은 활동 칸의 값(목록마다 따로 — 장학금 상한 15 가 아니라 1 · b2 는 다음 실행에)',
+        [r1.status, /멈춘 까닭: 한 실행 상한 1건/.test(r1.out), c1.eligibility, c1.amount, c1.notes, c1.hash === srcHash('b1'), !!c1.reviewedAt, sameFormat(sb.read('data/act-read.json')), CR.checkData(cr2), JSON.stringify(cr2.items.b2) === JSON.stringify(cards.items.b2), Object.keys(res), Object.keys(led)],
+        [0, true, ['전국 대학 재학생'], ['대상 1팀 300만원'], ['일정: 발표 12월 20일'], true, true, true, [], true, ['b1'], ['b1']]);
+      eq('  기록은 활동 파일에만 — 첨부 구분(글자 기록의 고정 이름 text-<지문> 으로 적힌다 · 4번이 「내용 문서」로 본 것을 6번이 「붙은 문서」로 고쳤다) · 사본 판정 · 사람이 볼 것 / 🔴 장학금 파일 셋은 바이트 그대로(목록에 없는 공고라며 지우지 않는다) · 장부의 해시는 활동 지시문으로 센 값',
+        [v1.name, (v1.roles || []).map((d) => [d.file, d.role, d.formStart, d.hash]), (v1.pdfs || []).map((p) => [p.file, p.verdict]), (v1.changes || []).some((c) => c.field === 'attachments' && c.kind === 'role'), (v1.problems || []).map((p) => p.kind), SCH_FR.map((f, i) => sb.read(f) === schBefore[i]),
+          /* 장부의 해시는 활동 지시문 둘(검토 · 카드)로 센 값이다 — 고친 뒤의 카드 · 내린 뒤의 사본 목록(빈 목록)으로 */
+          (led.b1 || {}).hash === FR.reviewHash(CR.sourceText(partsOf('b1')), cr2.items.b1, role4, [], AC.ACT_REVIEW_SYSTEM, AC.ACT_SYSTEM)],
+        ['b1 공모전 모집', [[`text-${h1}`, 'mixed', '참가신청서', h1]], [['docs-pdf/b1/1-요강.pdf', 'broken']], true, ['pdf-broken'], [true, true, true], true]);
+      sb.write('collector/final-review-config.json', { enabled: false });
+      const onlyNone = fakeRun(['--only=b3,없는글', '--write']);
+      eq('  `--only` 는 지정한 글만 본다(유료 시험) — 지정한 글이 대상이 아니면(옛 원문의 카드 · 없는 글) 아무것도 보지 않는다 · 지정하지 않은 남은 대상(b2)도 건드리지 않는다',
+        [onlyNone.status, /대상 0건/.test(onlyNone.out), JSON.stringify(((sb.json('data/act-read.json') || { items: {} }).items || {}).b2) === JSON.stringify(cards.items.b2)], [0, true, true]);
+      /* ④ ok 가 아닌 사본은 앱에서 내리고, 변환 로봇이 그 판정을 다시 읽는다 */
+      const verdicts = PV.loadPdfVerdicts(sb.dir);
+      eq('④ ok 가 아닌 활동 사본은 그 자리에서 앱이 받는 색인에서 내려간다 · 🔴 변환 로봇이 읽는 사본 판정(loadPdfVerdicts)이 활동 쪽 기록도 낸다(안 내면 다음 변환이 그 사본을 다시 올린다) · 장학금 쪽 판정도 그대로 낸다',
+        [(((sb.json('data/docs-pdf/index.json') || {}).items || {}).b1 || []).some((x) => x.file === 'b1/1-요강.pdf'), verdicts.filter((v) => v.id === 'b1').map((v) => [v.file, v.verdict]), (v1.dropped || []).map((d) => [d.kind, d.name, d.verdict])],
+        [false, [['docs-pdf/b1/1-요강.pdf', 'broken']], [['doc', '요강.hwp', 'broken']]]);
+      /* ⑤ 변환 로봇이 읽는 첨부 구분 — 글자 기록의 열쇠로 적힌 답을 받아 둔 원본(같은 바이트)과 첨부 이름으로 찾는다 */
+      sb.write('collector/extracted/form-b1-1.hwp', Buffer.from(bytes)); sb.write('collector/extracted/form-b1-1.hwp.body.txt', docText);
+      const roles = AR.loadAiRoles(sb.abs('collector'));
+      const byFile = AR.aiRoleFor(roles, 'b1', 'form-b1-1.hwp', sb.abs('collector/extracted/form-b1-1.hwp')), byName = AR.aiRoleByName(roles, 'b1', '요강.hwp', h1);
+      eq('⑤ 변환 로봇이 읽는 첨부 구분(loadAiRoles)이 활동 쪽 두 파일도 한 표에 싣는다 — 6번의 답이 4번의 답 앞에 · 🔴 답은 글자 기록의 고정 이름(text-<지문>)에 적혀 있어도 받아 둔 원본(바이트가 같다)과 첨부 이름으로 찾는다 · 바이트가 다른 파일에는 안 쓴다',
+        [AR.fileHash16(sb.abs('collector/extracted/form-b1-1.hwp')) === h1, [byFile && byFile.role, byFile && byFile.by, byFile && byFile.formStart], [byName && byName.role, byName && byName.by], ((roles.b1 || {})[`text-${h1}`] || {}).read && roles.b1[`text-${h1}`].read.role,
+          AR.aiRoleByName(roles, 'b1', '요강.hwp', 'ffffffffffffffff')],
+        [true, ['mixed', 'review', '참가신청서'], ['mixed', 'review'], 'content', null]);
+      sb.write('collector/extracted/forms-index.txt', 'form-b1-1.hwp\tT\t요강.hwp\t10\tb1\n');
+      sb.write('collector/final-review-config.json', { enabled: false });
+      const again = fakeRun(['--only=b1', '--write']);
+      eq('  🔴 같은 바이트의 원본이 나중에 extracted 에 들어와도 다시 보지 않는다 — 원문 덩어리와 열쇠가 그대로라 검토 해시가 같다(같은 글을 돈 내고 또 보지 않는다) · 제 손으로 고친 카드·내린 사본 때문에도 다시 보지 않는다',
+        [again.status, /대상 0건/.test(again.out), JSON.stringify(partsOf('b1', AT.loadNoticeDocIndex(sb.abs('collector/extracted')).forms)) === JSON.stringify(partsOf('b1'))], [0, true, true]);
+      const rest = fakeRun();
+      const cr3 = sb.json('data/act-read.json') || { items: {} };
+      eq('⑥ 지정하지 않으면 남은 대상을 본다 — 표시가 없어도 4번이 읽은 글(시험으로 읽은 b2)은 본다 · 옛 원문의 카드(b3)는 4번이 다시 쓸 때까지 · 관리자가 숨긴 글(b4)은 안 본다',
+        [rest.status, (cr3.items.b2 || {}).eligibility, (cr3.items.b3 || {}).eligibility, (cr3.items.b4 || {}).eligibility, Object.keys((sb.json('collector/act-final-review.json') || {}).items || {}).sort()],
+        [0, ['전국 대학 재학생'], ['옛 원문으로 쓴 카드'], ['관리자가 숨긴 글'], ['b1', 'b2']]);
+      eq('  유료 관문 기록(card-read --activities --stats)이 활동 쪽 6번 기록을 센다 — 본 글 2건 · 사람이 볼 것 1건(파일 이름이 갈리면 조용히 0 이 된다)',
+        /6번 최종 검토\(둘째 AI\): 본 글 2건 · 건당 평균 \$0\.000 · 고친 것 \d+건 · 사람이 볼 것 1건/.test(sb.run('collector/card-read.mjs', ['--activities', '--stats'], NOENV, 30000).out), true);
+    } finally { sb.done(); }
+    const cfgReal = JSON.parse(readText(new URL('../collector/final-review-config.json', import.meta.url)));
+    eq('⑦ 저장소의 활동 스위치 칸이 있다(최종 검토) — 상한(15건 · 3달러)이 적혀 있고 enabled 는 참/거짓 값이다(켜는 것은 개발자가 「켜」라고 할 때만)',
+      [typeof (cfgReal.activities || {}).enabled, (cfgReal.activities || {}).maxPerRun, (cfgReal.activities || {}).maxUsdPerRun], ['boolean', 15, 3]);
+  }
+
+  /* ── 대외활동 유료 관문 ④ 학생 화면 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-4 · 승인 시안 docs/designs/mockups/paid-gate-activities) ──
+     보이는가는 장학금과 같은 함수(match-engine paidGateOpen) 하나다 — 활동 목록은 publishedActivities 가 거르고 AI 카드를 얹는다(withActRead).
+     부르는 곳은 둘: 앱(app-activities loadActivities — 탭·홈·도우미·저장·달력·양식 채우기가 그 목록을 본다)과 verify/what-shows.mjs */
+  console.log('\n■ 대외활동 유료 관문 ④ 학생 화면 — 숨긴 글은 카드가 생겨야 보인다 · AI 카드를 얹는다(승인 시안 그대로)');
+  {
+    const N = (id, over = {}) => ({ id, title: `${id} 공모전`, url: `https://act.kr/${id}`, kind: '공모전', school: '', host: '표본재단', foundAt: plus(-1), attachments: [], ...over });
+    const cardMin = { title: '', host: '', eligibility: ['대학 재학생'], excludes: [], priority: [], amount: [], apply: [], documents: [], notes: [], multi: false, head: 0, deadline: null, hash: 'h', readAt: plus(0) };
+    const list = [N('p1'), N('p2', { paidGate: plus(-1) }), N('p3', { paidGate: plus(-1) }), N('p4', { paidGate: plus(-4) }), N('p5', { paidGate: plus(-1), paidOpen: '관리자 2026-11-26' }), N('p6', { paidGate: plus(-4) }), { title: 'id 없는 글', url: 'https://act.kr/x' }];
+    const ids = (xs) => xs.map((n) => (n && n.id) || '(id 없음)');
+    const PA = ME.publishedActivities || (() => []), WA = ME.withActRead || (() => ({}));
+    eq('① 결과 파일을 못 받으면(null · 꼴이 틀림) 숨김 표시가 달린 글만 안 보인다 — 표시 없는 글·관리자가 올린 글(paidOpen)·id 없는 글은 그대로 · 목록이 없으면 빈 목록',
+      [ids(PA(list, null, plus(0))), ids(PA(list, 'x', plus(0))), PA(null, null, plus(0))], [['p1', 'p5', '(id 없음)'], ['p1', 'p5', '(id 없음)'], []]);
+    const shown = PA(list, { items: { p2: cardMin }, gateHeld: { p6: 'no-source' } }, plus(0));
+    eq('② 결과 파일이 있으면 — 카드가 실린 글은 카드를 얹어 보인다 · 사람에게 넘긴 글은 안 보인다 · 카드도 사람 몫도 아닌 글은 표시 뒤 사흘까지 숨고 나흘째부터 무료 값으로 보인다(장학금과 같은 paidGateOpen) · 올린 글은 보인다',
+      [ids(shown), shown.map((n) => !!(n && n.cardRead)), ids(PA([N('d3', { paidGate: plus(-3) }), N('d4', { paidGate: plus(-4) })], { items: {} }, plus(0)))],
+      [['p1', 'p2', 'p4', 'p5', '(id 없음)'], [false, true, false, false, false], ['d4']]);
+    /* ③ 얹기 — 설계 5-4 의 표 */
+    const n0 = { id: 'q1', title: '제1회 표본 공모전', url: 'https://act.kr/q1', kind: '공모전', school: '', host: '표본재단', paidGate: plus(-1), deadline: plus(3), deadlineHint: '접수 ~ 옛 마감',
+      excerpts: [{ label: '모집기간', text: '11. 1. ~ 11. 30.' }, { label: '대상', text: '무료 규칙이 뽑은 대상' }], eligibilityLines: ['무료 규칙의 자격 줄'], eligibilityFrom: 'ocr',
+      noticeLines: ['무료 규칙의 안내 줄', '문의처: 표본재단 사무국 02-000-0000'], documents: ['무료 규칙의 서류'] };
+    const cr0 = { ...cardMin, eligibility: ['전국 대학 재학생', '만 19세 이상인 사람'], excludes: ['휴학생'], priority: ['관련 전공자'], amount: ['대상 1팀 300만원', '최우수상 2팀 각 100만원', '참가자 전원 수료증'],
+      apply: ['전자우편 접수(sample@example.org)'], documents: ['참가신청서', '작품 파일'],
+      notes: ['일정: 접수 11.18. – 12.7.', '주제: 지역과 청년', '일정: 발표 12.20.', '유의사항: 타 공모전 수상작은 출품 불가', '일정: 발표 12.20.', '이름표 없는 줄'], deadline: { date: plus(12), quote: '12. 7.까지' } };
+    const before = JSON.stringify([n0, cr0]);
+    const w = WA(n0, cr0);
+    eq('③ 얹기 — 자격·제외·우선은 AI 가 쓴 줄 그대로 · 혜택 첫 줄은 발췌 「혜택」(제목 아래 큰 글씨 자리) · 둘째 줄부터는 「혜택:」 한 줄로 · 마감·서류는 카드 것 · 무료 규칙의 발췌·안내 줄은 싣지 않는다(문의처 줄만 남긴다)',
+      [w.eligibilityLines, w.eligibilityExcludes, w.eligibilityPriority, 'eligibilityFrom' in w, w.documents, w.deadline, 'deadlineHint' in w, w.excerpts, w.cardRead === cr0],
+      [['전국 대학 재학생', '만 19세 이상인 사람'], ['휴학생'], ['관련 전공자'], false, ['참가신청서', '작품 파일'], plus(12), false, [{ label: '혜택', text: '대상 1팀 300만원' }], true]);
+    eq('  안내 줄 — 같은 이름표의 줄은 한 줄로 묶는다(「일정: a · b」 · 처음 나온 차례 · 같은 말은 한 번) · 이름표 없는 줄은 그대로 · 문의처는 맨 뒤',
+      w.noticeLines, ['혜택: 최우수상 2팀 각 100만원 · 참가자 전원 수료증', '일정: 접수 11.18. – 12.7. · 발표 12.20.', '주제: 지역과 청년', '유의사항: 타 공모전 수상작은 출품 불가', '이름표 없는 줄', '문의처: 표본재단 사무국 02-000-0000']);
+    /* 최종 리뷰(화면 I1 · 2026-11-26) — 시트 「공고 안내」는 '모름'류 낱말(app.js SAYS_UNKNOWN — 「확인 필요」·「미확인」·「원문 확인」 …)이 든 줄을 **통째로** 뺀다(app-sheet noticeSummaryRows).
+       같은 이름표로 묶은 **뒤에** 빼면 한 줄의 낱말이 형제 줄까지 데려가 지원을 막는 유의사항이 조용히 사라진다 → 묶기 **전에** 줄마다 같은 낱말로 거른다(낱말은 앱의 그 한 곳을 넘겨받는다) */
+    const SAYS = new Function(`${(appSource().match(/^const SAYS_UNKNOWN = .*;$/m) || ['const SAYS_UNKNOWN = null;'])[0]}\nreturn SAYS_UNKNOWN;`)();
+    const notesU = ['일정: 접수 11.18. – 12.7.', '유의사항: 타 공모전 수상작은 출품 불가', '유의사항: 수상 후 표절이 확인되면 수상 취소', '유의사항: 참가비는 입금 후 확인 필요'];
+    const wu = WA(n0, { ...cr0, notes: notesU, amount: ['대상 1팀 300만원', '부상은 추후 확인 필요', '참가자 전원 수료증'] }, SAYS);
+    const pu = (PA([{ ...n0, id: 'q2' }], { items: { q2: { ...cr0, notes: notesU } } }, plus(0), SAYS)[0] || {});
+    eq('  🔴 「모름」류 낱말이 든 줄은 묶기 전에 그 줄만 뺀다 — 같은 이름표의 다른 사실(형제 줄)은 남는다 · 혜택 둘째 줄부터도 같다 · 목록 얹기(publishedActivities)도 같은 낱말을 넘겨받는다 · 앱·도구가 그 낱말(app.js SAYS_UNKNOWN 한 곳)을 넘긴다',
+      [SAYS instanceof RegExp, (wu.noticeLines || []).filter((l) => /^(?:유의사항|혜택):/.test(l)), (pu.noticeLines || []).filter((l) => /^유의사항:/.test(l)),
+        /publishedActivities\(d\.items, ar, undefined, SAYS_UNKNOWN\)/.test(src('app-activities.js')), /ME\.publishedActivities\(actRaw, actDoc, undefined, linkFn\('SAYS_UNKNOWN'\)\)/.test(src('verify/what-shows.mjs'))],
+      [true, ['혜택: 참가자 전원 수료증', '유의사항: 타 공모전 수상작은 출품 불가 · 수상 후 표절이 확인되면 수상 취소'], ['유의사항: 타 공모전 수상작은 출품 불가 · 수상 후 표절이 확인되면 수상 취소'], true, true]);
+    const long = Array.from({ length: 6 }, (_, i) => `${String(i + 1).repeat(2)}일차 일정을 마흔 글자가 되도록 길게 적은 줄입니다 가나다라마바사아`.slice(0, 40));
+    const wl = WA(n0, { ...cr0, notes: long.map((b) => `일정: ${b}`), amount: [] });
+    eq('  한 줄이 170자를 넘으면 같은 이름표로 줄을 나눈다(「공고 안내」 가 180자에서 자른다 — 글자가 잘려 사라지지 않게) · 혜택이 없으면 발췌 「혜택」도 없다',
+      [wl.noticeLines.slice(0, 2).map((l) => [l.startsWith('일정: '), l.length <= 174]), wl.noticeLines[0], wl.noticeLines[1], wl.excerpts],
+      [[[true, true], [true, true]], `일정: ${long.slice(0, 4).join(' · ')}`, `일정: ${long.slice(4).join(' · ')}`, []]);
+    const noDl = WA(n0, { ...cr0, deadline: null });
+    eq('  카드에 마감이 없으면 무료 마감과 「모집기간」 발췌를 남긴다(AI 가 못 읽었다고 비우지 않는다) · 마감 꼴이 날짜가 아니어도 같다',
+      [noDl.deadline, noDl.deadlineHint, noDl.excerpts, WA(n0, { ...cr0, deadline: { date: '12월 7일', quote: '' } }).deadline],
+      [plus(3), '접수 ~ 옛 마감', [{ label: '혜택', text: '대상 1팀 300만원' }, { label: '모집기간', text: '11. 1. ~ 11. 30.' }], plus(3)]);
+    /* ④ 칸의 꼴 — 장학금(withCardRead)과 같은 뜻: 글자 배열일 때만 덮는다 · 빈 배열은 「AI 가 그 칸에 실을 것이 없다고 봤다」 · null·글자가 아닌 값은 무료 값을 그대로 둔다 */
+    const odd = WA(n0, { eligibility: null, excludes: 'x', priority: [1, null, ' '], amount: 'x', documents: 7, notes: null, deadline: { date: 20261207 } });
+    const empty = WA(n0, { ...cardMin, eligibility: [], documents: [], amount: [], notes: [] });
+    eq('④ 칸의 꼴이 틀려도 던지지 않는다 — null·글자가 아닌 값은 그 칸의 무료 값을 그대로 둔다(자격을 안 덮었으면 엔진도 무료 길로 판정한다) · 빈 배열은 「실을 것 없음」이라 그 칸을 비운다 · 글자가 아닌 줄은 걸러 낸다',
+      [odd.eligibilityLines, odd.cardRead.eligibility, odd.documents, odd.deadline, odd.excerpts === n0.excerpts, odd.noticeLines === n0.noticeLines,
+        [empty.eligibilityLines, empty.documents, empty.excerpts, empty.noticeLines], WA(n0, { ...cardMin, eligibility: ['맞는 줄', 3, '', null] }).eligibilityLines, Object.keys(WA(n0, {})).includes('cardRead')],
+      [['무료 규칙의 자격 줄'], null, ['무료 규칙의 서류'], plus(3), true, true, [[], [], [{ label: '모집기간', text: '11. 1. ~ 11. 30.' }], ['문의처: 표본재단 사무국 02-000-0000']], ['맞는 줄'], true]);   // 빈 카드에는 마감도 없다 — 「모집기간」 발췌는 남는다(위 규칙)
+    const broken = PA([N('z1', { paidGate: plus(-1), excerpts: 'not-a-list' }), N('z2', { paidGate: plus(-1) })], { items: { z1: { ...cr0, deadline: null }, z2: 'not-a-card' } }, plus(0));   // z1 — 발췌 칸이 목록이 아니라 얹다가 넘어진다(마감이 없어 「모집기간」을 찾으러 간다)
+    eq('  🔴 한 글의 값이 깨져 있어도 목록 전체가 죽지 않는다 — 얹다가 넘어진 글·카드 꼴이 틀린 글은 무료 값 그대로 보인다(탭이 통째로 비지 않는다)',
+      [ids(broken), broken.map((n) => !!n.cardRead)], [['z1', 'z2'], [false, false]]);
+    eq('⑤ 원본 글 객체와 카드를 고치지 않는다(새 객체를 낸다) — 저장해 둔 글·다른 화면이 같은 객체를 본다', JSON.stringify([n0, cr0]) === before && w !== n0, true);
+    /* ⑥ 부르는 곳 */
+    const aa = src('app-activities.js'), ws = src('verify/what-shows.mjs');
+    eq('⑥ 부르는 곳 — 앱은 활동 파일과 결과 파일을 같이 받아 거르고 얹은 목록을 둔다(결과 파일이 404·깨진 JSON 이어도 null 로 받아 목록을 세운다 · 옛 엔진이 캐시에서 오면 숨김 글을 통째로 감춘다) · what-shows 가 같은 함수를 부른다',
+      [/fetch\('data\/act-read\.json', \{ cache: 'no-store' \}\)\.then\(\(r\) => \(r\.ok \? r\.json\(\) : null\)\)\.catch\(\(\) => null\)/.test(aa), /fetch\('data\/activities\.json', \{ cache: 'no-store' \}\)\.then\(\(r\) => \(r\.ok \? r\.json\(\) : null\)\)\.catch\(\(\) => null\)/.test(aa),
+        /typeof publishedActivities === 'function' \? publishedActivities\(d\.items, ar, undefined, SAYS_UNKNOWN\) : d\.items\.filter\(\(n\) => !n\.paidGate \|\| n\.paidOpen\)/.test(aa), /publishedActivities\(/.test(ws)],
+      [true, true, true, true]);
+    /* 최종 리뷰(화면 I2 · 2026-11-26) — 화면 이야기는 what-shows 로만 한다(CLAUDE.md 「매 세션」 1). 카드가 얹힌 활동 글에서 도구가 시트와 다른 줄을 말했다:
+       제외 줄 ✗ 를 자격 줄에서만 셌고(카드는 제외·우대를 따로 낸다 → 늘 0줄) · 「우선 선발 기준」을 안 말했고 · 「방법」 줄을 '모름'류 낱말로 거르지 않았고 · 「공고 안내」를 저장된 줄로만 만들었다(시트는 긴 혜택·제목 괄호 대상·발췌를 앞에 둔다).
+       표본 파일로 도구를 **실제로 돌려** 시트(같은 앱 함수)와 같은 줄을 말하는지 본다 */
+    {
+      const wsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-ws-act-'));
+      try {
+        const longB = '대상 1팀 상금 300만원과 함께 후속 창업 지원 프로그램 참여 기회를 드립니다';
+        const post = { id: 'ws-act-fixture-1', title: '(대학생) 표본 창업 공모전 참가자 모집', url: 'https://act.kr/ws-act-fixture-1', kind: '공모전', school: '', host: '표본재단', foundAt: plus(-1), paidGate: plus(-1), attachments: [] };
+        const card = { ...cardMin, eligibility: ['만 19세 이상인 사람'], excludes: ['휴학생'], priority: ['관련 전공자'], amount: [longB, '참가자 전원 수료증'], apply: ['온라인 접수(구글 폼)', '접수 방법은 원문에서 확인 필요'],
+          documents: ['참가신청서'], notes: ['일정: 예선 12.5.', '유의사항: 전 일정 참석 필수'], deadline: { date: plus(12), quote: '12. 7.까지' } };
+        const wf = (n, o) => { const p = path.join(wsDir, n); fs.writeFileSync(p, JSON.stringify(o)); return p; };
+        const env = { ...process.env, WHAT_SHOWS_REGISTERED: wf('reg.json', { items: [] }), WHAT_SHOWS_ACTIVITIES: wf('acts.json', { updatedAt: plus(0), items: [post] }), WHAT_SHOWS_ACT_READ: wf('read.json', { updatedAt: plus(0), items: { [post.id]: card }, gateHeld: {} }) };
+        const r = spawnSync(process.execPath, ['verify/what-shows.mjs', post.id], { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8', timeout: 60000, env });
+        const out = String(r.stdout || '') + String(r.stderr || '');
+        const sec = (head) => { const a = out.indexOf(head); if (a < 0) return []; const rest = out.slice(a).split('\n').slice(1); const end = rest.findIndex((l) => /^\s{3}─ /.test(l)); return (end < 0 ? rest : rest.slice(0, end)).map((l) => l.trim()).filter(Boolean); };
+        eq('  ⑦ what-shows 가 카드 얹힌 활동 글을 시트와 같이 말한다 — ✗ 제외 줄(카드의 제외 칸) · 우선 선발 기준 · 「방법」 줄은 \'모름\'류 낱말을 거른다 · 「공고 안내」는 시트와 같은 줄(긴 혜택이 맨 앞 · 같은 앱 함수 activitySheetNotices · noticeSummaryHtml)',
+          [r.status, sec('─ 제외 줄 ✗'), sec('─ 우선 선발 기준'), out.split('\n').filter((l) => /접수 · 방법/.test(l)).map((l) => l.trim()), sec('─ 공고 안내').slice(0, 2), /function activitySheetNotices\(n\)/.test(appSource()) && /noticeLines: activitySheetNotices\(n\)/.test(appSource())],
+          [0, ['✗ 휴학생'], ['· 관련 전공자'], ['접수 · 방법 온라인 접수(구글 폼)'], [`· 혜택 · ${longB}`, '· 혜택 · 참가자 전원 수료증'], true]);   // 제목 괄호 대상(「대상: 대학생」)은 시트가 이름표 거름(NS_SKIP)으로 뺀다 — 도구도 같은 함수라 같다
+      } finally { fs.rmSync(wsDir, { recursive: true, force: true }); }
+    }
+    eq('  활동 글을 엔진에 넘길 때 카드도 넘긴다(AI 가 쓴 자격 줄을 엔진이 다시 거르지 않는다 · 부문이 여럿인 글의 판정) · 🔴 구조화 조건(eligibility)은 지금처럼 비워 둔다 · 시트 「접수」 의 「방법」 줄이 활동 글에도 나온다(시안에서 새로 보이는 것 하나)',
+      [/\.\.\.\(n\.cardRead \? \{ cardRead: n\.cardRead \} : \{\}\)/.test(aa), /id: `act:\$\{n\.url\}`, name: activityTitle\(n\), type: n\.kind \|\| '대외활동', eligibility: \{\},/.test(aa),
+        /!act && sch\.cardRead/.test(src('app-sheet.js')), /const paidApply = \(sch\.cardRead && Array\.isArray\(sch\.cardRead\.apply\)\)/.test(src('app-sheet.js'))],
+      [true, true, false, true]);
+  }
+
+  /* ── 대외활동 유료 관문 ⑤ 숨김 표시 · 상한 · 변환 로봇 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-1 · 5-5) ──
+     표시(paidGate)는 수집 로봇이 **처음 본 게시판 글**에만, 활동 스위치가 켜져 있을 때만 단다. 한 번 보인 글은 숨기지 않는다.
+     피드 상한 200건은 학생에게 보이는 글만 센다(숨김 글이 보이던 글을 밀어내지 않게). 변환 로봇 셋의 대상에 활동 글을 더한다 */
+  console.log('\n■ 대외활동 유료 관문 ⑤ 숨김 표시 · 상한 · 변환 로봇 — 처음 본 글에만 표시 · 한 번 보인 글은 숨기지 않는다 · 상한은 보이는 글만 센다');
+  {
+    process.env.FORM_PDF_AS_LIB = '1'; process.env.FORM_PAGES_AS_LIB = '1';
+    const AC = await import(new URL('../collector/act-card.mjs', import.meta.url));
+    const OM = await import(new URL('../collector/open-api-map.mjs', import.meta.url));
+    const UK = await import(new URL('../collector/url-key.mjs', import.meta.url));
+    const CT = await import(new URL('../collector/clean-title.mjs', import.meta.url));
+    const FPD = await import(new URL('../collector/form-pdf.mjs', import.meta.url));
+    const FPG = await import(new URL('../collector/form-pages.mjs', import.meta.url));
+    const ARR = await import(new URL('../collector/attach-role-read.mjs', import.meta.url));
+    const cm = src('collector/collect.mjs');
+    const ON = { enabled: true, activities: { enabled: true } };
+    const mk = (id, over = {}) => ({ id, title: `${id} 서포터즈 모집`, url: `https://act.kr/${id}`, kind: '대외활동', school: '시험대학교', foundAt: plus(0), attachments: [], ...over });
+    const stamp = AC.stampNewActivity || ((it) => it);
+    eq('① 숨김 표시(stampNewActivity) — 스위치 둘이 켜졌을 때 처음 본 게시판 글에만 한국 날짜로 단다 · 하나라도 꺼져 있으면 안 단다 · 공공 API 글에는 안 단다 · 날짜 꼴이 아니면 안 단다',
+      [stamp(mk('n1'), ON, plus(0)).paidGate, stamp(mk('n2'), { enabled: true }, plus(0)).paidGate, stamp(mk('n3'), { enabled: false, activities: { enabled: true } }, plus(0)).paidGate,
+        stamp(mk('n4', { api: 'youth' }), ON, plus(0)).paidGate, stamp(mk('n5'), ON, '오늘').paidGate, stamp(mk('n6'), null, plus(0)).paidGate],
+      [plus(0), undefined, undefined, undefined, undefined, undefined]);
+    eq('  수집 로봇 — 표시는 처음 본 글을 만드는 자리 **하나**에서만 단다(이미 실린 글·장부에 있던 글에는 달지 않는다) · 스위치는 유료 로봇과 같은 설정 파일·같은 함수 · 날짜는 한국 날짜 · 표시를 제 손으로 적는 줄이 없다',
+      [(cm.match(/stampNewActivity\(/g) || []).length,
+        /it\.foundAt = new Date\(\)\.toISOString\(\)\.slice\(0, 10\);\s*\n\s*stampNewActivity\(it, CARD_CFG, kstDay\(\)\);[^\n]*\n\s*seenAct\[urlKey\(it\.url\)\] = it\.foundAt;\s*\n\s*freshActs\.push\(it\);/.test(cm),
+        /const CARD_CFG = [^\n]*card-read-config\.json/.test(cm), /const kstDay = \(\) => new Date\(Date\.now\(\) \+ 9 \* 3600 \* 1000\)\.toISOString\(\)\.slice\(0, 10\);/.test(cm), /\.paidGate\s*=[^=]/.test(cm)],
+      [1, true, true, true, false]);
+    /* ② 표시가 살아남는 길 */
+    const st = () => mk('s1', { paidGate: plus(0) });
+    const apiNew = { youth: { ok: true, items: [{ title: 'API 로 온 다른 글', url: 'https://api.kr/1', kind: '대외활동', api: 'youth', id: 'api-youth-1', school: '', host: '기관' }] } };
+    const gateOf = (list) => ((list || []).find((x) => x && x.id === 's1') || {}).paidGate;
+    eq('② 표시는 그 뒤의 길에서 살아남는다 — 제목 청소 · 중복 정리 · 상한 · 공공 API 로봇이 게시판 글을 그대로 남기는 길',
+      [gateOf(CT.retitleItems([{ ...st(), title: '공지 s1 서포터즈 모집' }])), gateOf(UK.dedupeNotices([st(), mk('s2')])), gateOf(OM.capActivities([st(), mk('s2')], 5)), gateOf(OM.mergeApi([st()], apiNew, { today: plus(0) }))],
+      [plus(0), plus(0), plus(0), plus(0)]);
+    {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-gate-merge-'));
+      try {
+        const w = (n, items) => { fs.writeFileSync(path.join(dir, n), JSON.stringify({ updatedAt: plus(0), items }, null, 1)); return path.join(dir, n); };
+        const row = (over = {}) => ({ url: 'https://act.kr/m1', title: '합치는 글', kind: '대외활동', ...over });
+        const merge = (base, ours, theirs) => { const o = w('o.json', ours); const r = spawnSync(process.execPath, [fileURLToPath(new URL('../tools/merge-json-union.mjs', import.meta.url)), w('b.json', base), o, w('t.json', theirs), 'data/activities.json'], { encoding: 'utf8' }); return [r.status, JSON.parse(readText(o)).items[0]]; };
+        const [s1, m1] = merge([row({ paidGate: plus(0) })], [row({ paidGate: plus(0), paidOpen: '관리자 2026-11-26' })], [row({ paidGate: plus(0), deadline: plus(9) })]);
+        const [s2, m2] = merge([row({ paidGate: plus(0) })], [row()], [row({ paidGate: plus(0), deadline: plus(9) })]);
+        eq('  병합 도구(merge-json-union)도 표시를 지킨다 — 관리자가 올린 표식(paidOpen)과 로봇이 고친 칸이 함께 남는다 · 🔴 한쪽에서 표시를 **지워도** 다른 쪽에 남아 되살아난다(그래서 「올리기」는 표시를 지우지 않고 paidOpen 을 적는다)',
+          [s1, m1.paidGate, m1.paidOpen, m1.deadline, s2, m2.paidGate], [0, plus(0), '관리자 2026-11-26', plus(9), 0, plus(0)]);
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    }
+    const dedupeAct = AC.dedupeActivities || ((items) => items);
+    const dd = dedupeAct([mk('k2', { title: '같은 제목의 글', url: 'https://act.kr/k2-new', paidGate: plus(0) }), mk('k1', { title: '같은 제목의 글', foundAt: plus(-10) }),
+      mk('k3', { title: '둘 다 새 글', paidGate: plus(0) }), mk('k4', { title: '둘 다 새 글', url: 'https://act.kr/k4-new', paidGate: plus(0) }), mk('k5', { paidGate: plus(0) })], UK.dedupeNotices);
+    eq('  🔴 한 번 보인 글을 숨기지 않는다 — 처음 본 글이 이미 실려 있던 글과 같은 글이면(학교+제목·주소) 합친 뒤에 표시를 뗀다 · 둘 다 새 글이면 표시가 남는다 · 겹치지 않는 새 글은 그대로 · 수집 로봇의 활동 글 중복 정리가 이 함수를 쓴다',
+      [dd.length, dd.map((n) => !!n.paidGate), /acts\.items = dedupeActivities\(acts\.items, dedupeNotices, /.test(cm)], [3, [false, true, true], true]);
+    /* 🔴 최종 리뷰(로봇 C1 · 2026-11-26) — 「보이던 글」은 표시가 **없는** 글만이 아니다. 표시는 한 번 달면 지워지지 않으므로(카드가 실려도 · 사흘이 지나도 · 관리자가 올려도 그대로)
+       켠 뒤 주운 글은 보이든 안 보이든 표시를 단다 → 표시만 보면 보이던 글 A 와 새로 주운 같은 글 B 가 둘 다 「새 글」이 되어, B 가 남으면 A 가 학생 화면에서 사라지고 B 를 다시 돈 내고 읽었다.
+       그래서 수집 로봇이 「보이는가」 판정(앱과 같은 paidGateOpen · 관리자가 올린 paidOpen)을 넘긴다 · 셋이 이어 합쳐져도(A~B~C) 전해진다 · 보이던 글이 남으면 그 글의 표시는 그대로 둔다(카드·검토가 이어진다) */
+    {
+      const MEg = createRequire(import.meta.url)('../match-engine.js');
+      const doc = { updatedAt: plus(0), items: { 'v-card': { eligibility: ['만 19세 이상인 사람'] } }, gateHeld: {} };
+      const seen = (n) => !!n && (!!n.paidOpen || MEg.paidGateOpen(n, doc, plus(0)));
+      const olds = [mk('v-card', { title: '카드가 실린 글', paidGate: plus(-2), foundAt: plus(-2) }), mk('v-open', { title: '관리자가 올린 글', paidGate: plus(-1), paidOpen: `관리자 ${plus(0)}`, foundAt: plus(-1) }),
+        mk('v-old', { title: '사흘이 지나 오른 글', paidGate: plus(-5), foundAt: plus(-5) })];
+      const again = (a, tag) => mk(`${a.id}-${tag}`, { title: a.title, url: `${a.url}-${tag}`, paidGate: plus(0) });
+      const runs = olds.map((a) => dedupeAct([again(a, 'b'), { ...a }], UK.dedupeNotices, seen));
+      const chain = dedupeAct([again(olds[0], 'b'), again(olds[0], 'c'), { ...olds[0] }], UK.dedupeNotices, seen);
+      const keep = dedupeAct([{ ...olds[0] }, again(olds[0], 'b')], UK.dedupeNotices, seen);
+      eq('  🔴 보이던 글(카드가 실림 · 관리자가 올림 · 사흘이 지나 오름)이 새 주소로 다시 올라와도 합친 글은 보인다 — 셋이 이어 합쳐져도 · 보이던 글이 남으면 그 표시는 그대로(카드가 이어진다) · 수집 로봇이 앱과 같은 판정을 넘긴다',
+        [runs.map((o) => [o.length, seen(o[0])]), [chain.length, seen(chain[0])], [keep.length, keep[0].id, keep[0].paidGate],
+          /acts\.items = dedupeActivities\(acts\.items, dedupeNotices, \(n\) => !!n && \(!!n\.paidOpen \|\| paidGateOpen\(n, ACT_READ, todayIsoAct\)\)\);/.test(cm)],
+        [[[1, true], [1, true], [1, true]], [1, true], [1, 'v-card', plus(-2)], true]);
+    }
+    /* ③ id 없는 글 */
+    const noId = [mk('i1', { paidGate: plus(0) }), { title: 'id 없는 글', url: 'https://act.kr/x', paidGate: plus(0) }, { title: '표시도 id 도 없는 글', url: 'https://act.kr/y' }, null];
+    eq('③ id 를 받지 못한 글은 표시를 뗀다(AI 카드와 id 로 만난다 — 그 글은 지금처럼 바로 보인다) · 뗀 수를 돌려준다 · 수집 로봇은 id 를 준 뒤 · 상한을 걸기 전에 부른다',
+      [(AC.dropStampWithoutId || (() => -1))(noId), noId.filter(Boolean).map((n) => n.paidGate),
+        cm.indexOf('dropStampWithoutId(acts.items);') > cm.indexOf('n.id = activityId(n.url)') && cm.indexOf('dropStampWithoutId(acts.items);') < cm.indexOf('capActivities(acts.items, ACT_CAP')],
+      [1, [plus(0), undefined, undefined], true]);
+    /* ④ 상한 */
+    const vis = (n) => !n.paidGate;   // 표본의 「보이는가」 — 표시가 달린 글은 아직 안 보인다
+    const many = (nVis, nHid) => [...Array.from({ length: nHid }, (_, i) => mk(`h${i}`, { paidGate: plus(0) })), ...Array.from({ length: nVis }, (_, i) => mk(`v${i}`, { foundAt: plus(-1 - i) }))];
+    const c1 = OM.capActivities(many(200, 30), 200, vis), c2 = OM.capActivities(many(205, 30), 200, vis);
+    eq('④ 🔴 상한 200건은 학생에게 보이는 글만 센다 — 보이는 글 200 + 숨김 글 30 은 230건이 다 남는다(숨김 글이 보이던 글을 밀어내지 않는다) · 보이는 글 205 + 숨김 30 은 보이는 글 가운데 가장 오래된 5건만 빠진다 · 차례는 넘겨받은 그대로 · 판정을 안 주면 예전처럼 전부 센다',
+      [c1.length, c2.length, c2.filter((n) => n.paidGate).length, many(205, 30).filter((n) => !c2.includes(n) && !c2.some((x) => x.id === n.id)).map((n) => n.id), JSON.stringify(c1.map((n) => n.id)) === JSON.stringify(many(200, 30).map((n) => n.id)), OM.capActivities(many(205, 30), 200).length],
+      [230, 230, 30, ['v200', 'v201', 'v202', 'v203', 'v204'], true, 200]);
+    eq('  수집 로봇 — 보이는가는 앱과 같은 함수(match-engine paidGateOpen)와 결과 파일로 가린다(관리자가 올린 글은 보이는 글) · 결과 파일은 읽기만 한다',
+      [/capActivities\(acts\.items, ACT_CAP, \(n\) => !!n\.paidOpen \|\| paidGateOpen\(n, ACT_READ, todayIsoAct\)\)/.test(cm), /const \{ paidGateOpen \} = createRequire\(import\.meta\.url\)\('\.\.\/match-engine\.js'\);/.test(cm),
+        /const ACT_READ = [^\n]*act-read\.json/.test(cm), /writeFileSync\([^)]*act-read/.test(cm)],
+      [true, true, true, false]);
+    /* ⑤ 감사 */
+    const AG = (() => { try { return createRequire(import.meta.url)('./act-gate-audit.cjs'); } catch { return { actGateWarnings: () => null }; } })();
+    const au = src('verify/audit-data.js');
+    eq('⑤ 감사 — 표시가 날짜 꼴이 아니거나 id 없는 글에 달려 있으면 **경고**한다(오류가 아니다 — 오류면 수집 로봇의 저장이 통째로 되돌려진다) · 멀쩡한 표시·표시 없는 글에는 말이 없다',
+      [((w) => [w.length, /날짜 꼴\(YYYY-MM-DD\)이 아닌 글 2건/.test(w[0] || ''), /id 가 없는 글 1건/.test(w[1] || '')])(AG.actGateWarnings([mk('g1', { paidGate: '11월 26일' }), mk('g2', { paidGate: true }), { title: 'id 없는 글', url: 'u', paidGate: plus(0) }]) || []),
+        AG.actGateWarnings([mk('g3', { paidGate: plus(0) }), mk('g4'), null]), /warns\.push\(\.\.\.require\('\.\/act-gate-audit\.cjs'\)\.actGateWarnings\(acts\.items \|\| \[\]\)\);/.test(au), /errors\.push\([^\n]*actGateWarnings/.test(au)],
+      [[2, true, true], [], true, false]);
+    /* ⑥ 서식 쪽 떼기 */
+    const tp = FPG.pickPageTargets({ registered: [], activities: [mk('pa', { deadline: plus(5) }), mk('ph', { hidden: true }), mk('pz', { deadline: plus(-1) }), { title: 'id 없는 글', url: 'u' }], kosaf: [], today: plus(0), extractedDir: '/x', kosafDir: '/k',
+      filesFor: (it) => ({ pa: ['form-pa-1.hwp', 'form-pa-2.png'], ph: ['form-ph-1.hwp'], pz: ['form-pz-1.hwp'] }[it.id] || []), exists: (p) => /form-p[ahz]-\d\.(?:hwp|png)$/.test(p), readdir: () => [] });
+    const fpgSrc5 = src('collector/form-pages.mjs');
+    eq('⑥ 서식 쪽 떼기의 대상(pickPageTargets)에 활동 글도 — 받아 둔 원본이 있는 열린 글만 · 관리자가 숨긴 글·마감 지난 글·id 없는 글은 아니다 · 이름은 글 제목 · 본편이 활동 피드를 읽어 넘기고 그 글의 색인 줄도 활동 글에서 찾는다',
+      [tp.map((t) => [t.id, t.name, t.files.map((f) => f.name)]), /pickPageTargets\(\{ registered: reg, activities: acts, kosaf,/.test(fpgSrc5), /const regById = new Map\(\[\.\.\.reg, \.\.\.acts\]\.map\(/.test(fpgSrc5)],
+      [[['pa', 'pa 서포터즈 모집', ['form-pa-1.hwp']]], true, true]);
+    /* ⑦ 신청서 받기 */
+    const isApp5 = (a) => /신청서|지원서/.test(String(a && a.name));
+    const items7 = [mk('fa', { attachments: [{ name: '모집 공고문.hwp', url: 'https://act.kr/f/1' }, { name: '포스터.png', url: 'https://act.kr/f/2' }] }),
+      { id: 'reg-1', name: '표본 장학금 공고', deadline: plus(9), attachments: [{ name: '선발 공고문.hwp', url: 'https://s.kr/f/1' }] }];
+    const roles7 = { fa: { 'text-h1': { file: 'text-h1', attach: '모집 공고문.hwp', hash: 'h1', role: 'mixed', by: 'review' } }, fb: { 'text-h2': { file: 'text-h2', attach: '안내문.hwp', hash: 'h2', role: 'content', by: 'read' } },
+      'reg-1': { 'elig-1.hwp': { file: 'elig-1.hwp', attach: '선발 공고문.hwp', hash: 'h3', role: 'mixed', by: 'review' } } };
+    const wants = (AR.aiWantsOriginal || (() => () => false))(roles7, new Set(['fa', 'fb']));
+    const names7 = (o) => FPD.pickFormBacklog(items7, [], { today: plus(0), isApplicationForm: isApp5, ...o }).map(({ it, atts }) => [it.id, atts.map((a) => a.name)]);
+    eq('⑦ 신청서 받기(pickFormBacklog) — 이름이 공고문인 첨부는 원래 안 받는다 · AI 가 서식·붙은 문서라고 한 **활동 글의** 첨부는 받는다(붙은 문서에서 서식 쪽을 떼려면 원본이 저장소에 있어야 한다) · 장학금 공고의 공고문은 AI 가 붙은 문서라 해도 지금처럼 안 받는다(그 원본은 자격 로봇이 이미 받는다)',
+      [names7({}), names7({ aiWants: wants }), [wants(items7[0], items7[0].attachments[0]), wants(items7[0], items7[0].attachments[1]), wants({ id: 'fb' }, { name: '안내문.hwp' }), wants(items7[1], items7[1].attachments[0]), wants(null, null)]],
+      [[], [['fa', ['모집 공고문.hwp']]], [true, false, false, false, false]]);
+    eq('  받는 로봇(deepfetch) — 밀린 목록을 고를 때 AI 의 답(첨부 구분 표)과 활동 글 id 로 만든 판정을 넘긴다',
+      [/aiWants: aiWantsOriginal\(loadAiRoles\(fileURLToPath\(HERE\)\), actIds\) \}\)/.test(src('collector/deepfetch.mjs')), /const actIds = new Set\(FP\.loadActivities\(root\)\.map\(\(n\) => n\.id\)\);/.test(src('collector/deepfetch.mjs')),
+        /import \{ loadAiRoles, aiWantsOriginal \} from '\.\/attach-role-ai\.mjs';/.test(src('collector/deepfetch.mjs'))], [true, true, true]);
+    /* ⑧ 유료 첨부 판정 */
+    const roleItems = ARR.roleItems || (() => []);
+    eq('⑧ 유료 첨부 판정의 대상(roleItems) — 활동 스위치가 켜져 있을 때만 표시가 달린 활동 글을 더한다(관리자가 올린 글·숨긴 글은 아니다) · 🔴 꺼져 있으면 장학금 공고만(활동 글에 돈을 쓰지 않는다)',
+      [roleItems([{ id: 'r1' }], [mk('ra', { paidGate: plus(0) }), mk('rb'), mk('rc', { paidGate: plus(0), paidOpen: '관리자' }), mk('rd', { paidGate: plus(0), hidden: true })], ON).map((x) => x.id),
+        roleItems([{ id: 'r1' }], [mk('ra', { paidGate: plus(0) })], { enabled: true }).map((x) => x.id), roleItems([{ id: 'r1' }], [mk('ra', { paidGate: plus(0) })], {}).map((x) => x.id)],
+      [['r1', 'ra'], ['r1'], ['r1']]);
+    {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-role-'));
+      try {
+        fs.writeFileSync(path.join(dir, 'form-ra-1.pdf'), '%PDF-1.4\n1 0 obj << /Type /Page >> endobj\n%%EOF');   // 글자 없는(스캔) PDF 한 쪽
+        const act = mk('ra', { paidGate: plus(0), attachments: [{ name: '포스터 겸 요강.pdf', url: 'https://act.kr/f/9' }] });
+        const t = ARR.pickRoleTargets(roleItems([], [act], ON), [{ file: 'form-ra-1.pdf', title: act.title, attach: '포스터 겸 요강.pdf', bytes: 40, id: 'ra' }], { today: plus(0), extractedDir: dir, ledger: {}, findRow: FPD.findRow, isOpen: FPD.isOpen });
+        eq('  그 대상에서 글자 없는 원본(스캔 PDF)이 물을 파일로 뽑힌다(고르는 함수는 장학금과 같은 것) · 본편이 그 목록을 쓴다',
+          [t.map((x) => [x.it.id, x.row.file, x.media]), /const items = roleItems\(reg, acts, cfg\);/.test(src('collector/attach-role-read.mjs')), /const targets = pickRoleTargets\(items, rows, \{/.test(src('collector/attach-role-read.mjs'))],
+          [[['ra', 'form-ra-1.pdf', 'application/pdf']], true, true]);
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    }
+  }
+
+  /* ── 대외활동 유료 관문 ⑥ 관리자 「할 일」 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-7) ──
+     사람에게 넘어온 숨김 글 → 「올리기」(무료 값으로 · paidOpen) · 「숨기기」(있던 activityHide) / 둘째 AI 가 못 고쳐 넘긴 문제 → 「확인했어요」(활동용 기록 파일)
+     🔴 「올리기」는 표시(paidGate)를 지우지 않는다 — 병합 도구가 같은 글의 칸을 두 쪽에서 합쳐 지운 칸이 되살아난다(위 ⑤ ②). 「보이는가」는 paidOpen 을 먼저 본다 */
+  console.log('\n■ 대외활동 유료 관문 ⑥ 관리자 「할 일」 — 넘어온 숨김 글을 올리거나 숨긴다 · 둘째 AI 가 넘긴 문제는 「확인했어요」로 내린다');
+  {
+    const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
+    const U = (id) => `https://ex.ac.kr/act/${id}`;
+    const seedActs = () => [
+      { id: 'g1', title: '사람에게 넘어온 글', url: U('g1'), kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: plus(-3), paidGate: plus(-3) },
+      { id: 'g2', title: '표시가 없는 글', url: U('g2'), kind: '대외활동', school: '경희대학교', campus: '', foundAt: plus(-3) },
+    ];
+    const runAct = (action, payload, extra = {}) => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-admin-'));
+      try {
+        fs.mkdirSync(path.join(dir, 'data'), { recursive: true }); fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+        const w = (rel, obj) => fs.writeFileSync(path.join(dir, rel), `${JSON.stringify(obj, null, 1)}\n`);
+        w('data/registered.json', { items: [] }); w('data/forms.json', { forms: {}, templates: {} });
+        w('data/activities.json', { updatedAt: plus(0), items: seedActs() });
+        w('collector/activity-config.json', { hideUrls: [] }); w('collector/activity-sources.json', { sources: [], parked: [] });
+        for (const [rel, obj] of Object.entries(extra)) w(rel, obj);
+        const before = readText(path.join(dir, 'data/activities.json'));
+        const r = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8', env: { ...process.env, ACTION: action, ACTOR: 'gate', PAYLOAD: JSON.stringify(payload) } });
+        const read = (rel) => { try { return JSON.parse(readText(path.join(dir, rel))); } catch { return null; } };
+        const rawActs = readText(path.join(dir, 'data/activities.json'));
+        return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, acts: JSON.parse(rawActs).items, rawActs, same: rawActs === before, done: read('collector/act-read-done.json'), fixes: fs.existsSync(path.join(dir, 'data/card-read-fixes.json')) };
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    };
+    const op = runAct('activityGate', { urls: [U('g1')], op: 'open' });
+    if (op.status !== 0) console.log(op.out.slice(-400));
+    eq('① 올리기(activityGate) — 그 글에 paidOpen(관리자 · 날짜)을 적는다 · 🔴 표시(paidGate)는 지우지 않는다 · 다른 글은 그대로 · 로봇 형식 · 올린 글은 엔진이 바로 보인다(결과 파일이 없어도 · 무료 값으로)',
+      [op.status, /^관리자 \d{4}-\d{2}-\d{2}$/.test((op.acts[0] || {}).paidOpen || ''), (op.acts[0] || {}).paidGate, 'paidOpen' in (op.acts[1] || {}), sameFormat(op.rawActs), ME.publishedActivities(op.acts, null, plus(0)).map((n) => n.id)],
+      [0, true, plus(-3), false, true, ['g1', 'g2']]);
+    eq('  막는 것 — 목록에 없는 주소 · 표시가 없는(이미 보이는) 글 · 모르는 처리 · 빈 주소: 멈추고 활동 파일을 건드리지 않는다',
+      [runAct('activityGate', { urls: ['https://ex.ac.kr/none'], op: 'open' }), runAct('activityGate', { urls: [U('g2')], op: 'open' }), runAct('activityGate', { urls: [U('g1')], op: 'close' }), runAct('activityGate', { urls: [], op: 'open' })].map((r) => [r.status !== 0, r.same]),
+      [[true, true], [true, true], [true, true], [true, true]]);
+    const dn = runAct('activityReviewDone', { items: [{ id: 'g1', key: 'final|pdf-broken|요강.hwp' }, { id: 'g1', key: 'final|unreadable|공고 카드' }] }, { 'collector/act-read-done.json': { v: 1, items: { gone: { done: ['x'], by: 'a', at: plus(-9) } } } });
+    if (dn.status !== 0) console.log(dn.out.slice(-400));
+    eq('② 확인했어요(activityReviewDone) — 활동용 기록(collector/act-read-done.json)에만 적는다: 그 글의 내린 줄 · 누가 · 언제 · 목록에서 빠진 글의 기록은 치운다 / 🔴 장학금의 기록(data/card-read-fixes.json — 앱이 받는 파일)은 만들지도 않는다 · 활동 목록도 그대로',
+      [dn.status, (dn.done || {}).v, Object.keys((dn.done || {}).items || {}), (((dn.done || {}).items || {}).g1 || {}).done, [(((dn.done || {}).items || {}).g1 || {}).by, (((dn.done || {}).items || {}).g1 || {}).at], dn.fixes, dn.same],
+      [0, 1, ['g1'], ['final|pdf-broken|요강.hwp', 'final|unreadable|공고 카드'], ['gate', plus(0)], false, true]);
+    eq('  막는 것 — 활동 목록에 없는 글 · 줄 열쇠 없음 · 빈 요청',
+      [((r) => r.status !== 0 && /활동 목록에 그 글이 없습니다/.test(r.out))(runAct('activityReviewDone', { items: [{ id: 'none', key: 'k' }] })), ((r) => r.status !== 0 && /어느 줄인지/.test(r.out))(runAct('activityReviewDone', { items: [{ id: 'g1', key: '' }] })),
+        ((r) => r.status !== 0 && /내릴 줄이 없습니다/.test(r.out))(runAct('activityReviewDone', { items: [] }))], [true, true, true]);   // 넘어져서가 아니라 까닭을 말하고 멈춘다
+    /* ③ 관리자 화면의 묶음 — admin.js 의 함수를 글자 그대로 떼어 표본 데이터로 돌린다(베끼지 않는다) */
+    const adminJs = src('_admin/admin.js');
+    const takeFn = (name) => { const m = adminJs.match(new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm')); return m ? m[0] : `function ${name}() { return []; }`; };
+    const takeConst = (name) => (adminJs.match(new RegExp(`^const ${name} = .*$`, 'm')) || [''])[0];
+    const mkAdmin = (D) => new Function('D', 'dday', `${['openForStudents', 'finalKey', 'isLegacyLine', 'PDF_KIND_KO', 'PDF_VERDICT_KO'].map(takeConst).join('\n')}
+      ${['paidReviewTodo', 'finalReviewTodo', 'gateHeldTodo', 'actHeldTodo', 'actFinalTodo', 'actChangesList', 'paidReviewCard'].map(takeFn).join('\n')}
+      return { actHeldTodo, actFinalTodo, actChangesList, paidReviewCard };`)(D, (d) => (d ? Math.round((Date.parse(d) - Date.parse(plus(0))) / 86400000) : null));
+    const act = (id, over = {}) => ({ id, title: `${id} 글`, url: U(id), kind: '공모전', paidGate: plus(-3), deadline: plus(9), ...over });
+    const D9 = { reg: [], paidReview: { items: {}, gateHeld: {} }, cardFixes: {}, finalReview: {},
+      activities: [act('h1'), act('h2', { paidOpen: `관리자 ${plus(0)}` }), act('h3', { hidden: true }), act('h4', { deadline: plus(-1) }), act('f1'), act('f2', { hidden: true }), { title: 'id 없는 글', url: U('x') }],
+      actReview: { gateHeld: { h1: 'no-source', h2: 'no-source', h3: 'unreadable', h4: 'no-source', gone: 'no-source' } },
+      actFinal: { f1: { summary: '자격을 고쳤습니다', changes: [{ field: 'eligibility', label: '지원 자격', kind: 'add', text: '대학 재학생' }], dropped: [{ kind: 'doc', name: '요강.hwp', verdict: 'broken', why: '표가 무너짐' }],
+        problems: [{ kind: 'pdf-broken', doc: '요강.hwp', reason: 'r', check: 'c' }, { kind: 'unreadable', doc: '공고 카드', reason: 'r2', check: 'c2' }] },
+        f2: { problems: [{ kind: 'pdf-empty', doc: 'x', reason: 'r', check: 'c' }] }, gone: { problems: [{ kind: 'pdf-empty', doc: 'x', reason: 'r', check: 'c' }] } },
+      actDone: { f1: { done: ['final|unreadable|공고 카드'] } } };
+    const AD9 = mkAdmin(D9);
+    eq('③ 「할 일」 묶음 — 사람에게 넘긴 활동 글은 아직 학생 화면에 없는 열린 글만(올린 글·숨긴 글·마감 지난 글·목록에서 빠진 글은 아니다) · 둘째 AI 가 넘긴 문제는 「확인했어요」 한 줄을 뺀 나머지 · 묶음의 숫자가 둘을 센다 · 고친 기록(내린 사본 포함)은 따로 — 할 일이 아니다',
+      [AD9.actHeldTodo().map((x) => [x.it.id, x.why]), AD9.actFinalTodo().map((x) => [x.it.id, x.problems.map((p) => p.kind)]), AD9.paidReviewCard().n, AD9.actChangesList().map((x) => [x.it.id, x.changes.length])],
+      [[['h1', 'no-source']], [['f1', ['pdf-broken']]], 2, [['f1', 2]]]);
+    /* ④ 배선 */
+    const ay = src('.github/workflows/admin-apply.yml'), pv = src('tools/build-admin-preview.mjs');
+    eq('④ 배선 — 화면이 활동 쪽 세 파일을 읽는다(미리보기도) · 단추 셋이 제 동작을 보낸다(올리기 activityGate · 숨기기 activityHide · 확인했어요 activityReviewDone) · 워크플로의 작업 목록에 두 동작이 있고 새 기록 파일을 저장한다',
+      [['collector/act-read-review.json', 'collector/act-final-review.json', 'collector/act-read-done.json'].filter((f) => !adminJs.includes(`readJson('${f}'`) || !pv.includes(`'${f}': readJson('${f}')`)),
+        /applyAction\('activityGate', \{ urls: \[url\], op: 'open' \}/.test(adminJs), /applyAction\('activityHide', \{ urls: \[url\] \}/.test(adminJs), /applyAction\('activityReviewDone', \{ items: \[\{ id: [^}]*key: [^}]*\}\] \}/.test(adminJs),
+        ['activityGate', 'activityReviewDone'].filter((a) => !new RegExp(`description: '작업 \\([^)]*\\b${a}\\b`).test(ay)), /\[ -f collector\/act-read-done\.json \] && git add collector\/act-read-done\.json/.test(ay)],
+      [[], true, true, true, [], true]);
+    eq('  화면의 말 — 로봇 말(gateHeld·no-source·unreadable·paidGate)을 그대로 보이지 않는다: 넘어온 까닭 셋을 사람 말로 적어 둔다',
+      [['no-source', 'grad-only', 'unreadable'].filter((k) => !new RegExp(`^const ACT_GATE_WHY = \\{[\\s\\S]*?'?${k}'?: '[^']{12,}'`, 'm').test(adminJs)), /data-act-gate-op="open">올리기\(무료 값으로\)<\/button>/.test(adminJs), /data-act-gate-op="hide">숨기기<\/button>/.test(adminJs)],
+      [[], true, true]);
+  }
+
+  /* ── 대외활동 유료 관문 ⑦ 워크플로 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-8) ──
+     두 유료 워크플로(card-read.yml · final-review.yml)에 활동 단계를 장학금 단계 뒤에 넣는다 — 단계마다 제 시한 · 로봇이 쓰는 활동 파일은 전부 저장 목록에 ·
+     활동 쪽 「유료 확인이 멈췄어요」 경보는 따로(여는 것·닫는 것 한 짝). 「유료 시험」(act-paid-probe.yml)은 사람이 눌러야만 돌고 저장하지 않는다 */
+  console.log('\n■ 대외활동 유료 관문 ⑦ 워크플로 — 활동 단계 · 저장 목록 · 멈춤 경보 짝 · 저장하지 않는 「유료 시험」');
+  {
+    const AC = await import(new URL('../collector/act-card.mjs', import.meta.url));
+    const F = AC.ACT_FILES || {};
+    const repoPath = (rel) => (rel.startsWith('../') ? rel.slice(3) : `collector/${rel}`);
+    const noComment = (wf) => wf.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+    const wc = noComment(wfc), wr = noComment(wff);
+    const probe = (() => { try { return noComment(src('.github/workflows/act-paid-probe.yml')); } catch { return ''; } })();
+    const actWrites = (robot) => [...robot.matchAll(/writeAtomic\('([^']+)'/g)].map((m) => repoPath(F[m[1]] || m[1]));
+    eq('① 로봇이 활동 목록에서 쓰는 파일은 전부 그 워크플로의 저장 목록(git add)에 있다 — 빠지면 돈 주고 쓴 카드·검토가 그 실행과 함께 사라진다 · 저장 못 한 날 남기는 장부 묶음에도 있다',
+      [actWrites(crSrc), actWrites(crSrc).filter((f) => !gitAdds(wc).includes(f)), actWrites(frSrc), actWrites(frSrc).filter((f) => !gitAdds(wr).includes(f)),
+        ['data/act-read.json', 'collector/act-read-ledger.json'].filter((f) => !new RegExp(`name: card-read-ledger[\\s\\S]*?\\n\\s+${f.replace(/[.\/]/g, '\\$&')}\\n`).test(wc)),
+        ['data/act-read.json', 'collector/act-final-review-ledger.json'].filter((f) => !new RegExp(`name: final-review-ledger[\\s\\S]*?\\n\\s+${f.replace(/[.\/]/g, '\\$&')}\\n`).test(wr))],
+      [['data/act-read.json', 'collector/act-read-ledger.json', 'collector/act-read-review.json', 'collector/act-role-ai.json'], [], ['data/act-read.json', 'collector/act-final-review.json', 'collector/act-final-review-ledger.json'], [], [], []]);
+    const stepById = (wf, id) => (wf.match(new RegExp(`\\n {6}- id: ${id}\\n[\\s\\S]*?(?=\\n {6}- |\\n*$)`)) || [''])[0];
+    const actC = stepById(wc, 'act'), actR = stepById(wr, 'act');
+    eq('② 활동 글 카드 쓰기 — 장학금 읽기 뒤 · 꼴 검사와 저장 앞에 돈다 · 제 시한(12분) · 일부 실패해도 읽은 것은 저장한다(continue-on-error) · 유료 스위치 환경 변수 · 장학금 한 건만 다시 읽는 실행(only)에서는 돌지 않는다',
+      [wc.indexOf('node collector/card-read.mjs --write') > 0 && wc.indexOf('node collector/card-read.mjs --activities --write') > wc.indexOf('node collector/card-read.mjs --write'),
+        wc.indexOf('node collector/card-read.mjs --activities --write') < wc.lastIndexOf('node collector/card-read.mjs --activities --check') && wc.lastIndexOf('node collector/card-read.mjs --activities --check') < wc.indexOf('git add data/card-read.json'),
+        /timeout-minutes: 12\n/.test(actC), /continue-on-error: true\n/.test(actC), /CARD_READ_ENABLE: '1'/.test(actC) && /ANTHROPIC_API_KEY: \$\{\{ secrets\.ANTHROPIC_API_KEY \}\}/.test(actC),
+        /if: \$\{\{ !inputs\.only \}\}\n/.test(actC), /set -o pipefail\n\s+node collector\/card-read\.mjs --activities --write \| tee \/tmp\/act-read\.txt/.test(actC)],
+      [true, true, true, true, true, true, true]);
+    eq('  활동 글 최종 검토 — 장학금 검토 뒤 · 꼴 검사와 저장 앞에 · 제 시한 · continue-on-error · 유료 스위치 환경 변수',
+      [wr.indexOf('node collector/final-review.mjs --activities --write') > wr.indexOf('node collector/final-review.mjs --write'), wr.indexOf('node collector/final-review.mjs --activities --write') < wr.lastIndexOf('node collector/card-read.mjs --activities --check')
+        && wr.lastIndexOf('node collector/card-read.mjs --activities --check') < wr.indexOf('git add data/card-read.json'),
+        /timeout-minutes: 12\n/.test(actR), /continue-on-error: true\n/.test(actR), /FINAL_REVIEW_ENABLE: '1'/.test(actR), /set -o pipefail\n\s+node collector\/final-review\.mjs --activities --write \| tee \/tmp\/act-final-review\.txt/.test(actR)],
+      [true, true, true, true, true, true]);
+    const stepSum = (wf) => [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].reduce((a, m) => a + Number(m[1]), 0);
+    const jobLimit = (wf) => Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1] || 0);
+    eq('  작업 시한이 단계 시한의 합보다 길다(세 워크플로) — 활동 단계가 늘어난 만큼 작업 시한도 늘렸다',
+      [jobLimit(wc) > stepSum(wc), jobLimit(wr) > stepSum(wr), jobLimit(probe) > stepSum(probe), stepSum(wc) >= 70, stepSum(wr) >= 58], [true, true, true, true, true]);
+    eq('③ 활동 쪽 멈춤 경보는 장학금 것과 **다른 제목**으로 여는 것·닫는 것 한 짝이다(제목이 같아야 닫힌다 · 제목에 날짜 없음) · 세기는 `--activities --gate-alarm` · 장학금 경보 짝은 그대로 둘',
+      [(wc.match(/--title '🧾 대외활동 유료 확인이 멈췄어요'/g) || []).length, /--mode open --match exact --title '🧾 대외활동 유료 확인이 멈췄어요'/.test(wc), /--mode resolve --match exact --title '🧾 대외활동 유료 확인이 멈췄어요'/.test(wc),
+        /- id: actstall\n[\s\S]{0,220}run: node collector\/card-read\.mjs --activities --gate-alarm >> "\$GITHUB_OUTPUT"/.test(wc),
+        /if: always\(\) && steps\.actstall\.outputs\.count != '' && steps\.actstall\.outputs\.count != '0'/.test(wc), /if: always\(\) && steps\.actstall\.outputs\.count == '0'/.test(wc), (wc.match(/--title '🧾 유료 확인이 멈췄어요'/g) || []).length],
+      [2, true, true, true, true, true, 2]);
+    eq('④ 활동 단계의 실패도 알린다(실패 알림의 조건에 든다) · 실패가 남아 있으면 알림을 닫지 않는다 · 실행 요약에 활동 기록도 적는다(두 워크플로)',
+      [/if: failure\(\) \|\| cancelled\(\) \|\| steps\.read\.outcome == 'failure' \|\| steps\.role\.outcome == 'failure' \|\| steps\.act\.outcome == 'failure'/.test(wc), /if: success\(\) && steps\.read\.outcome == 'success' && steps\.role\.outcome == 'success' && steps\.act\.outcome != 'failure'/.test(wc),
+        /if: failure\(\) \|\| cancelled\(\) \|\| steps\.read\.outcome == 'failure' \|\| steps\.act\.outcome == 'failure'/.test(wr), /if: success\(\) && steps\.read\.outcome == 'success' && steps\.act\.outcome != 'failure'/.test(wr),
+        [wc, wr].map((w) => (w.match(/card-read\.mjs --activities --stats >> "\$GITHUB_STEP_SUMMARY"/g) || []).length)],
+      [true, true, true, true, [1, 1]]);
+    /* 최종 리뷰(로봇 I1 · 2026-11-26) — 결과 파일이 깨져 있으면 저장 앞 꼴 검사가 빨개 읽은 것을 저장하지 못하고, 다음 실행이 같은 글을 **또 산다**(사람이 고칠 때까지 하루 두세 번).
+       그래서 두 꼴 검사(장학금 · 활동)를 돈을 쓰기 **전** 사전 관문에도 둔다(한쪽 파일이 깨져도 저장이 통째로 막히므로 둘 다) — 뒤쪽 검사는 로봇이 쓴 결과를 재는 그대로 */
+    const preGate = (wf) => (wf.match(/- name: 사전 관문 \(가짜 응답 — 돈 0\)\n[\s\S]*?(?=\n {6}- )/) || [''])[0];
+    eq('⑥ 결과 파일 꼴 검사(장학금 · 활동)를 돈을 쓰기 전 사전 관문에서도 돈다 — 깨진 결과 파일이면 유료 단계 앞에서 멈춘다 · 뒤쪽 꼴 검사도 그대로(두 워크플로)',
+      [wc, wr].map((w) => [/\n\s+node collector\/card-read\.mjs --check\n/.test(preGate(w)), /\n\s+node collector\/card-read\.mjs --activities --check\n/.test(preGate(w)),
+        w.indexOf('- name: 사전 관문') > 0 && w.indexOf('- name: 사전 관문') < w.indexOf('- id: read'), (w.match(/node collector\/card-read\.mjs --activities --check/g) || []).length]),
+      [[true, true, true, 2], [true, true, true, 2]]);
+    /* ⑤ 유료 시험 */
+    eq('⑤ 「유료 시험」(act-paid-probe.yml) — 🔴 사람이 눌러야만 돈다(예약·push 없음) · 읽기 권한만 · 저장하지 않는다(git add·commit·push 없음) · 기본 브랜치에서만 · 작업 시한 · 입력은 env 로만 · 결과는 묶음으로(항상 올린다)',
+      [/^on:\n {2}workflow_dispatch:/m.test(probe) && !/^ {2}(?:push|schedule|workflow_run):/m.test(probe), /^permissions:\n {2}contents: read$/m.test(probe), /git (?:add|commit|push)/.test(probe),
+        /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(probe), /^ {4}timeout-minutes:\s*\d+/m.test(probe), /PROBE_IDS: \$\{\{ inputs\.ids \}\}/.test(probe) && !/run:[^\n]*\$\{\{\s*inputs\./.test(probe) && !/^\s{10,}.*\$\{\{\s*inputs\./m.test(probe),
+        /if: always\(\)\n\s+uses: actions\/upload-artifact@v\d+\n\s+with:\n\s+name: act-paid-probe/.test(probe), ['data/act-read.json', 'collector/act-read-ledger.json', 'collector/act-role-ai.json', 'collector/act-final-review.json', 'collector/act-text'].filter((f) => !probe.includes(`            ${f}\n`))],
+      [true, true, false, true, true, true, true, []]);
+    eq('  차례 — id 확인 → 스위치(이 실행 안에서만) → 글자 받기(지정한 글만) → 카드 쓰기 → 최종 검토 · 유료 열쇠는 유료 두 단계에만 · 두 로봇에 지정한 글만 넘긴다(--only) · 유료 단계가 실패하면 빨갛게 끝낸다',
+      [['IDS=$ids', 'activities.enabled', 'export ACT_TEXT_IDS="$IDS"', 'node collector/card-read.mjs --activities "--only=$IDS" --write', 'node collector/final-review.mjs --activities "--only=$IDS" --write'].map((x) => probe.indexOf(x)).every((v, i, a) => v > 0 && (i === 0 || v > a[i - 1])),
+        (probe.match(/ANTHROPIC_API_KEY: \$\{\{ secrets\.ANTHROPIC_API_KEY \}\}/g) || []).length, /CARD_READ_ENABLE: '1'/.test(stepById(probe, 'card')), /FINAL_REVIEW_ENABLE: '1'/.test(stepById(probe, 'review')),
+        /if: steps\.card\.outcome == 'failure' \|\| steps\.review\.outcome == 'failure'\n[\s\S]{0,80}run: exit 1/.test(probe)],
+      [true, 2, true, true, true]);
+    /* 최종 리뷰(로봇 I4 · 2026-11-26) — 글자 받기에 한 실행의 글 수·시간을 주지 않으면 받기 로봇의 기본값(글 15건 · 80초)에서 멈춰, 설계 8절의 시험(20건쯤)에서 상당수가 「원문 없음」으로 나온다.
+       또 시험은 장부를 저장하지 않아 같은 id 로 다시 돌리면 그 글을 다시 산다 — 입력 안내가 그 둘(한 번에 몇 건 · 되풀이 금지)을 말한다 */
+    {
+      const txtStep = (probe.match(/- name: 원문 글자 받기 \(무료\)\n[\s\S]*?(?=\n {6}- )/) || [''])[0];
+      const num = (k) => Number((txtStep.match(new RegExp(`${k}: '(\\d+)'`)) || [])[1] || 0);
+      const stepMin = Number((txtStep.match(/timeout-minutes: (\d+)/) || [])[1] || 0);
+      const ocrSec = Number((txtStep.match(/paddle-ocr\.py collector\/act-files --budget-sec=(\d+)/) || [])[1] || 0);
+      const desc = ((src('.github/workflows/act-paid-probe.yml').match(/ids:\n\s+description: '([^']*)'/) || [])[1]) || '';
+      eq('  ⑦ 시험의 글자 받기는 한 실행의 글 수·시간을 준다(받기 로봇의 기본값 15건·80초에서 멈추지 않게) · 받기 시간 + 그림 글자 읽기 시간이 그 단계 시한 안이다 · 입력 안내가 한 번에 몇 건인지와 「같은 id 를 다시 돌리면 다시 산다」를 말한다',
+        [num('ACT_DOCS_POSTS') >= 20, num('ACT_DOCS_BUDGET_MS') > 80000, num('ACT_DOCS_BUDGET_MS') / 1000 + ocrSec + 120 <= stepMin * 60, /한 번에 \d+건/.test(desc), /다시 산다/.test(desc)],
+        [true, true, true, true, true]);
+    }
+    /* 셸을 실제로 돌려 본다 — id 확인과 스위치 켜기(가짜 저장소 폴더에서) */
+    {
+      const runOf = (name) => { const m = probe.match(new RegExp(`- name: ${name}\\n(?:\\s+[a-z-]+: .*\\n)*\\s+run: \\|\\n((?: {10}.*\\n?|\\n)+)`)); return m ? m[1].split('\n').map((l) => l.replace(/^ {10}/, '')).join('\n') : 'exit 97'; };
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-probe-'));
+      try {
+        fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+        const sh = (script, env = {}) => { const envFile = path.join(dir, 'gh-env.txt'); fs.writeFileSync(envFile, ''); const r = spawnSync('bash', ['-e', '-c', script], { cwd: dir, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME || '', GITHUB_ENV: envFile, ...env } }); return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, env: readText(envFile) }; };
+        const idStep = runOf('시험할 글 id 확인');
+        eq('  셸 — id 가 비었거나(빈칸뿐이어도) 꼴이 틀리면(명령 글자·빈 조각) 멈추고 아무것도 넘기지 않는다 · 맞으면 빈칸을 뗀 id 목록을 다음 단계로 넘긴다',
+          [sh(idStep, { PROBE_IDS: '' }), sh(idStep, { PROBE_IDS: '   ' }), sh(idStep, { PROBE_IDS: 'act-1;rm -rf /' }), sh(idStep, { PROBE_IDS: 'act-1,,act-2' }), sh(idStep, { PROBE_IDS: '$(whoami)' })].map((r) => [r.status !== 0, r.env])
+            .concat([sh(idStep, { PROBE_IDS: ' act-15a4xen, api-youth-12 ' })].map((r) => [r.status, r.env.trim()]))
+            .concat([[/시험할 활동 글 id 가 없습니다/.test(sh(idStep, { PROBE_IDS: '' }).out), /id 꼴이 아닙니다/.test(sh(idStep, { PROBE_IDS: 'a;b' }).out)]]),   // 까닭을 말하고 멈춘다
+          [[true, ''], [true, ''], [true, ''], [true, ''], [true, ''], [0, 'IDS=act-15a4xen,api-youth-12'], [true, true]]);
+        const cfgC = { enabled: true, maxPerRun: 20, activities: { enabled: false, maxPerRun: 20, maxUsdPerRun: 3 }, _무엇인가: '표본' }, cfgF = { enabled: false, maxPerRun: 15 };
+        fs.writeFileSync(path.join(dir, 'collector/card-read-config.json'), `${JSON.stringify(cfgC, null, 1)}\n`); fs.writeFileSync(path.join(dir, 'collector/final-review-config.json'), `${JSON.stringify(cfgF, null, 1)}\n`);
+        const sw = sh(runOf('활동 스위치 켜기 \\(이 실행 안에서만\\)'));
+        const c2 = JSON.parse(readText(path.join(dir, 'collector/card-read-config.json'))), f2 = JSON.parse(readText(path.join(dir, 'collector/final-review-config.json')));
+        eq('  셸 — 스위치 켜기는 두 설정 파일의 activities.enabled 만 켠다: 위쪽 enabled(유료 전체 스위치)는 그대로(꺼져 있으면 시험도 부르지 않는다) · 상한·다른 칸도 그대로 · 활동 칸이 없던 파일에는 칸을 만든다',
+          [sw.status, c2.activities, c2.enabled, c2.maxPerRun, c2._무엇인가, f2.enabled, f2.activities, AC.actGateOn(c2), AC.actGateOn(f2)],
+          [0, { enabled: true, maxPerRun: 20, maxUsdPerRun: 3 }, true, 20, '표본', false, { enabled: true }, true, false]);
+      } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    }
+    eq('  글자 받기 — 시험이 글을 지정하면(ACT_TEXT_IDS) **그 글만** 받는다(다른 글의 사이트를 두드리지 않는다) · 있던 받기 조건 줄은 그대로',
+      [/if \(!forText\) \{\s*\n\s*if \(TEXT_IDS\.size\) continue;/.test(src('collector/activity-docs.mjs')), /if \(!\(needsElig\(n\) \|\| \(!BROWSER && staleDocs\(n\)\)\) \|\| !dueFree\(ledger\[n\.url\], today\)\) continue;/.test(src('collector/activity-docs.mjs'))], [true, true]);
+  }
 
   /* ── 유료 카드 읽기 (4번 · 2026-11-15 개발자 지시 · 11-21 개정) — AI 하나가 공고를 통째로 읽어 카드 칸을 쓰고 첨부를 가른다. 로봇은 꼴만 다듬어 그대로 싣는다 ── */
   console.log('\n■ 유료 카드 읽기 — AI 하나가 쓴 카드를 그대로 싣는다 · 첨부 구분 · 스위치 (2026-11-15 · 11-21 기계 검사 없음)');
@@ -17511,7 +18383,9 @@ module.exports = class Anthropic {
     eq('  🔴 조회수만 바뀐 원문은 같은 원문이다(다시 읽히지 않는다 — 본문을 다시 받을 때마다 숫자만 바뀐다 · 나흘에 839건 중 27건) · 내용의 숫자가 바뀌면 다른 원문',
       [CR.sourceHash('작성일\n2026.10.26\n조회수\n235\n평점 3.0 이상') === CR.sourceHash('작성일\n2026.10.26\n조회수\n236\n평점 3.0 이상'), CR.sourceHash('2026-09-07 조회수 307\n작성자') === CR.sourceHash('2026-09-07 조회수 1,312\n작성자'),
         CR.sourceHash('조회수\n235\n평점 3.0 이상') === CR.sourceHash('조회수\n235\n평점 3.5 이상'), CR.sourceHash('조회수\n235\n2026.11.23') === CR.sourceHash('조회수\n235\n2026.11.30')], [true, true, false, false]);
-    eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'), /update\(SYSTEM\)/.test(crSrc)], [true, false, true]);
+    eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'),
+      /* 지시문을 인자로 받는다(2026-11-25 · 활동 목록은 제 지시문으로 센다) — 안 주면 장학금 지시문 · 지시문이 한 글자만 달라도 다른 해시(글자 맞추기가 아니라 실제 값으로 잰다) */
+      CR.sourceHash('가') === CR.sourceHash('가', CR.SYSTEM) && CR.sourceHash('가', `${CR.SYSTEM} `) !== CR.sourceHash('가') && /update\(system\)/.test(crSrc) && /sourceHash = \(text, system = SYSTEM\)/.test(crSrc)], [true, false, true]);
     eq('  🔴 내려갔는지는 유료가 읽은 마감으로 잰다 — 무료 길 마감(접수 시작일)이 지났어도 바로잡은 마감 전이면 내려간 것이 아니다',
       [CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, { deadline: { date: '2026-11-26', quote: 'x' } }, '2026-11-19'), CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, null, '2026-11-19')], [false, true]);
     eq('  결과 파일 꼴 검사 — 줄 칸은 글자 배열 또는 null(옛 두 읽기에서 갈려 안 실은 칸) · 마감은 날짜 · 금액은 0 이상의 정수',
@@ -17944,7 +18818,10 @@ module.exports = class Anthropic {
     const H = (o = {}) => FR.reviewHash(o.source ?? '원문', o.entry ?? entry, o.roles4 ?? roles4, o.pdfs ?? copies);
     eq('③ 다시 보지 않게(reviewHash) — 같은 원문·카드·4번의 구분·사본이면 같은 해시 · 검토 도장(reviewedAt)만 다르면 같다 · 카드 줄 · 원문 · 4번이 정한 갈래(나 그 파일의 바이트) · 사본의 크기(다시 변환됨) · 사본이 새로 생김 — 어느 하나라도 바뀌면 다시 본다 · 지시문이 바뀌어도',
       [H() === H(), H({ entry: { ...entry, reviewedAt: '2026-11-21' } }) === H(), H({ entry: { ...entry, eligibility: ['다문화가정의 자녀인 학부 재학생'] } }) === H(), H({ source: '바뀐 원문' }) === H(),
-        H({ roles4: [roles4[0], { ...roles4[1], role: 'form' }] }) === H(), H({ roles4: [roles4[0], { ...roles4[1], hash: 'b9' }] }) === H(), H({ pdfs: copies.map((p, i) => (i ? p : { ...p, bytes: 1001 })) }) === H(), H({ pdfs: copies.slice(1) }) === H(), /update\(SYSTEM\)/.test(frSrc)],
+        H({ roles4: [roles4[0], { ...roles4[1], role: 'form' }] }) === H(), H({ roles4: [roles4[0], { ...roles4[1], hash: 'b9' }] }) === H(), H({ pdfs: copies.map((p, i) => (i ? p : { ...p, bytes: 1001 })) }) === H(), H({ pdfs: copies.slice(1) }) === H(),
+        /* 지시문을 인자로 받는다(활동 목록은 제 지시문으로 센다) — 안 주면 장학금 지시문 · 한 글자만 달라도 다른 해시 */
+        /update\(system\)/.test(frSrc) && /export function reviewHash\(source, entry, roles4, pdfs, system = SYSTEM, cardSystem\)/.test(frSrc)
+          && FR.reviewHash('원문', { hash: 'h' }, [], []) === FR.reviewHash('원문', { hash: 'h' }, [], [], FR.SYSTEM) && FR.reviewHash('원문', { hash: 'h' }, [], [], `${FR.SYSTEM} `) !== FR.reviewHash('원문', { hash: 'h' }, [], [])],
       [true, true, false, false, false, false, false, false, true]);
     const before = { title: '옛 제목', host: '재단', eligibility: ['가  나', '다'], excludes: null, priority: [], amount: [], apply: [], documents: ['신청서 1부'], notes: [], deadline: { date: '2026-11-10', quote: 'x' } };
     const after = { title: '옛  제목', host: '시험재단', eligibility: ['가 나', '라'], excludes: ['휴학생'], priority: [], amount: [], apply: [], documents: ['신청서 1부'], notes: [], deadline: { date: '2026-11-26', quote: 'y' } };
@@ -18749,7 +19626,7 @@ module.exports = class Anthropic {
       [FR.reviewHash(srcA, ent, [], []) === FR.reviewHash(srcB, ent, [], []), FR.reviewHash(srcA, ent, [], []) === FR.reviewHash(`${srcA}\n평점 3.0 이상`, ent, [], [])], [true, false]);
     eq('🔴 6번은 4번이 **지금 원문을** 읽고 쓴 카드만 본다 — 첨부가 새로 도착해 원문이 바뀌었으면 4번이 다시 쓴 뒤에 본다(곧 덮일 카드를 돈 내고 보지 않는다) · 조회수만 바뀐 것은 같은 원문',
       [FR.readThisSource(ent, srcA), FR.readThisSource(ent, srcB), FR.readThisSource(ent, `${srcA}\n===== 첨부 [A1] 신청서.hwp =====\n장학금 신청서`), FR.readThisSource(null, srcA),
-        /if \(!readThisSource\(cr\.items\[it\.id\], source\)\) \{ stale \+= 1; continue; \}/.test(frSrc)], [true, true, false, false, true]);
+        /if \(!readThisSource\(cr\.items\[it\.id\], source, CARD_SYS\)\) \{ stale \+= 1; continue; \}/.test(frSrc)], [true, true, false, false, true]);
 
     const gave = { hash: 'h', tries: 3, failedAt: plus(-1) };
     eq('🔴 6번의 포기는 그날 하루만 — 어제 세 번 실패한 공고는 오늘 다시 해 본다(영영 안 보면 아무 검토 없는 카드가 남는다) · 오늘 이미 세 번 실패했으면 쉰다 · 끝난 것·다른 원문은 해당 없음',

@@ -9,6 +9,7 @@ import { attachExt } from './form-rules.mjs';
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { isNoticeDoc, zipNoticeDocs } from './attachment-text.mjs';
+import { loadAiRoles, aiWantsOriginal } from './attach-role-ai.mjs';   // AI 가 서식·붙은 문서라고 한 활동 첨부의 원본을 받는다(2026-11-25 · 대외활동 유료 관문 5-5)
 import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, fillCounts, hasText } from './notice-source.mjs';
 import { makeBudget } from './harvest-budget.mjs';
 
@@ -344,7 +345,8 @@ async function downloadForms() {
     const rows = FP.parseFormsIndex(fs.existsSync(new URL('forms-index.txt', OUT)) ? fs.readFileSync(new URL('forms-index.txt', OUT), 'utf8') : '');
     const { isApplicationForm } = FP.loadFormRules(root);
     const manualTitles = new Set(capped.map((n) => n.title));
-    backlog = FP.pickFormBacklog([...(reg.items || []), ...FP.loadActivities(root)], rows, { today, isApplicationForm, tried, max: Math.max(0, MAX_NOTICES - capped.length) })
+    const actIds = new Set(FP.loadActivities(root).map((n) => n.id));   // 활동 글 id — AI 가 서식·붙은 문서라고 한 활동 첨부는 이름이 공고문이어도 원본을 받는다(aiWants · 2026-11-25)
+    backlog = FP.pickFormBacklog([...(reg.items || []), ...FP.loadActivities(root)], rows, { today, isApplicationForm, tried, max: Math.max(0, MAX_NOTICES - capped.length), aiWants: aiWantsOriginal(loadAiRoles(fileURLToPath(HERE)), actIds) })
       .filter(({ it }) => !manualTitles.has(it.boardTitle || it.name || it.title));
   } catch (e) { console.log('신청서 밀린 목록을 못 골랐다 (표적만 받는다):', e.message); }
   console.log(process.env.FORMS_BACKLOG === '1' ? `아직 못 받은 신청서 원본 — 이번에 ${backlog.length}건 (쉬는 중 ${Object.keys(tried).length}건)` : '밀린 신청서 목록은 심층 수집 워크플로만 받는다(FORMS_BACKLOG 없음)');

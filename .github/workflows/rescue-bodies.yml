@@ -173,6 +173,7 @@ jobs:
           [ -f collector/rescue-ledger.json ] && git add collector/rescue-ledger.json
           [ -f collector/rescue-report.md ] && git add collector/rescue-report.md
           [ -f collector/act-browser.json ] && git add collector/act-browser.json   # 대외활동 브라우저 장부·결과 (2026-10-04)
+          [ -d collector/act-text ] && git add -A collector/act-text   # 대외활동 유료 관문 — 원문 글자 기록(글자만 · 브라우저 몫 <id>.browser.json · 2026-11-25)
           # 첨부 목록을 새로 받아 적으면 registered.json 이 바뀐다 — 빠뜨리면
           # 애써 찾은 공고문 첨부가 조용히 버려진다 (이슈 #79와 같은 유형)
           git add data/registered.json

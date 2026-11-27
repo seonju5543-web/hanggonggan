@@ -1,7 +1,39 @@
 {
  "school": "영남대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "2027년 1학기 농림축산식품부 청년창업농 장학금 신청 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232685050&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "[붙임]2. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232685050&attachNo=382303"
+    },
+    {
+     "name": "[붙임]3. 2027년 1학기 청년창업농장학금 선발안내.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232685050&attachNo=382304"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "2026-2학기 주거안정장학금 11월분 지급요청서 제출 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232685040&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "주거안정장학금 학생매뉴얼(지급요청서 작성).pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232685040&attachNo=382291"
+    }
+   ],
+   "deadlineHint": "제출기간 : 2026. 12. 1.(화) ~ 12. 7.(월) 까지 제출(기간 내 미제출 시 지 급 제외 ) - 입력 저장 후 반드시 제출 버튼",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
   {
    "title": "2027년도 에몬스 장학생(19기) 모집 안내",
    "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232656694&article.offset=0&articleLimit=10",

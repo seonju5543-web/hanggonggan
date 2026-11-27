@@ -1,7 +1,33 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "[학부] 2027-2028 중국 정부초청 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=368171&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "(붙임 1) 2027-2028 중국 정부초청 장학생 모집요강.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=368171&attachNo=354058"
+    },
+    {
+     "name": "(붙임 2) 중국유학관리정보시스템 이용안내 (1).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=368171&attachNo=354059"
+    },
+    {
+     "name": "(붙임 3) 2027-2028 지원자 제출 자료 목록.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=368171&attachNo=354060"
+    },
+    {
+     "name": "(붙임 4) 제출서류 지정서식(서식 1~4).zip",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=368171&attachNo=354061"
+    }
+   ],
+   "deadlineHint": "마감 일시: 2027. 2. 5.(금) 24:00까지 (한국 시간 기준) ※ 선발요강 등 세부사항은 [붙임] 문서 참조 붙임 1. (붙임 1)",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
   {
    "title": "한국장학재단 학자금 지원 구간 개편 안내(2027년 1학기~)",
    "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=368119&article.offset=0&articleLimit=10",

@@ -1,6 +1,6 @@
 {
  "v": 1,
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-27",
  "hosts": {
   "jntle.kr": {
    "checkedAt": "2026-10-23",
@@ -309,7 +309,7 @@
    "why": ""
   },
   "namwon.go.kr": {
-   "checkedAt": "2026-11-24",
+   "checkedAt": "2026-11-27",
    "why": "홈페이지 못 엶 (응답 400 → 브라우저도 실패(응답 400))",
    "targets": 1
   },
@@ -1014,8 +1014,8 @@
    "why": "게시판도 글도 못 찾음"
   },
   "busanjin.go.kr": {
-   "checkedAt": "2026-11-24",
-   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "checkedAt": "2026-11-27",
+   "why": "홈페이지 못 엶 (TimeoutError: 23 → 브라우저도 실패(page.goto: Timeout 20000ms exceeded.\nCall log:\n  - n)",
    "targets": 2
   },
   "hscf.co.kr": {
@@ -1035,7 +1035,7 @@
    "why": "글은 못 고르고 게시판만"
   },
   "emons.co.kr": {
-   "checkedAt": "2026-11-24",
+   "checkedAt": "2026-11-27",
    "pages": 5,
    "found": 0,
    "lines": 1,
@@ -1046,16 +1046,64 @@
    "checkedAt": "2026-11-24",
    "why": "홈페이지 못 엶 (TypeError: DEPTH_ZERO_SELF_SIGNED_CERT → 브라우저도 실패(page.goto: net::ERR_CERT_AUTHO)",
    "targets": 1
+  },
+  "bsjunggu.go.kr": {
+   "checkedAt": "2026-11-27",
+   "pages": 10,
+   "found": 0,
+   "lines": 0,
+   "targets": 3,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "bohae-scholarship.kr": {
+   "checkedAt": "2026-11-27",
+   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "targets": 1
+  },
+  "cwg.go.kr": {
+   "checkedAt": "2026-11-27",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "kcffd.org": {
+   "checkedAt": "2026-11-27",
+   "pages": 4,
+   "found": 0,
+   "lines": 1,
+   "targets": 1,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "puac.go.kr": {
+   "checkedAt": "2026-11-27",
+   "pages": 7,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "pyeongnae.co.kr": {
+   "checkedAt": "2026-11-27",
+   "pages": 4,
+   "found": 1,
+   "lines": 1,
+   "targets": 1,
+   "why": ""
   }
  },
  "searched": {
-  "2000425003": "2026-11-25",
-  "2000438004": "2026-11-25",
-  "2700542002": "2026-11-25",
-  "2700542004": "2026-11-25",
-  "2704065001": "2026-11-25",
-  "2704173001": "2026-11-25",
-  "2704387001": "2026-11-25",
-  "2704387002": "2026-11-25"
+  "2000189006": "2026-11-27",
+  "2000438004": "2026-11-27",
+  "2703434001": "2026-11-27",
+  "2703436001": "2026-11-27",
+  "2703436002": "2026-11-27",
+  "2703436003": "2026-11-27",
+  "2704065001": "2026-11-27",
+  "2704387001": "2026-11-27",
+  "2704387002": "2026-11-27",
+  "2704388001": "2026-11-27",
+  "2704389001": "2026-11-27"
  }
 }

@@ -149,8 +149,9 @@ vm.runInContext([
   /* 카드가 쓰는 한 줄 const 는 **전부** 여기에 — 하나라도 빠지면 그 꼴의 카드(기간 한 줄·학교 사진)에서만 이 도구가 넘어진다
      (리뷰 G3 · 기간 한 줄 달린 게시판 글에서 `hintText is not defined`). 관문 「원문 링크 정직성」 app 갈래가 실제 글 꼴로 돌려 본다. */
   ...['ENTITIES', 'ENTITY_RE', 'PARTIAL_ENTITY_END', 'hintText', 'NEWS_THUMB_RE', 'SCHOOL_PHOTO_RE', 'PHOTO_FOCUS_RE',
-    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'BOARD_HEAD_ANY', 'BOARD_HEAD_BY_HOST', 'JUNK_CHARS', 'OCR_URL_GARBLE', 'TIDY_SKIP_KEY', 'OCR_TEXT_KEY', 'OCR_MARK'].map(takeConst),
-  ...['isDateBit', 'splitTitleDates', 'trimStars', 'stripBoardHead', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
+    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'BOARD_HEAD_ANY', 'BOARD_HEAD_BY_HOST', 'JUNK_CHARS', 'OCR_URL_GARBLE', 'TIDY_SKIP_KEY', 'OCR_TEXT_KEY', 'OCR_MARK',
+    'ACT_TAG', 'activityBenefit', 'WHO_PAREN', 'NOT_WHO_PAREN'].map(takeConst),   // 활동 시트 「공고 안내」 줄(activitySheetNotices · 2026-11-26)이 쓴다
+  ...['isDateBit', 'splitTitleDates', 'trimStars', 'stripBoardHead', 'hintShort', 'shortDay', 'splitTitleWho', 'activityTitle', 'activitySheetNotices'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
   ...['esc', 'unent', 'tidyOcr', 'tidyText', 'tidyData', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // knownValue: 층2 공고 안내 칸 값이 부른다 · attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy',
     'formPdfsFor', 'docPdfsFor', 'pdfRowHtml', 'attachPdfRowsHtml', 'sheetAttachments'].map(takeFn),   // 「첨부」 칸 — 위 PDF 줄 · 맨 밑 올린 목록(2026-11-20 승인 시안)
@@ -229,18 +230,24 @@ function linkLines(it, where) {
     /* 시트의 칸들이 무엇을 그리는가(2026-10-19 개발자 "자격요건이 공고 안내에 들어가 있다") — 자격·모집 안내·공고 안내는 이 세 칸의 글자를 그대로 그린다(없으면 칸을 접는다) */
     const raw = it.eligibilityLines || [], ex = it.excerpts || [], nl = it.noticeLines || [];
     /* 시트는 저장된 줄을 그대로 찍지 않고 match-engine 이 절(자격/제외)로 가른 것을 그린다 — 같은 함수로 가른 결과를 보인다(2026-10-27 「라참여배제자」) */
-    const el = ME.requirementLines(it, raw, { all: true }), exl = ME.requirementLines(it, raw, { onlyExclude: true });
+    const el = ME.requirementLines(it, raw, { all: true });
+    /* 제외·우선 — 앱 시트(eligibilityRowsHtml)와 같이 **두 목록을 따로** 거르고 자격 칸에 이미 보인 줄은 뺀다. 카드가 얹힌 글은 제외·우대를 따로 칸으로 낸다(최종 리뷰 2026-11-26 —
+       자격 줄에서만 세면 카드 글의 ✗ 줄이 늘 0줄이었다 · 정식 등록 갈래와 같은 블록) */
+    const shownReq = new Set(el);
+    const exl = [...new Set([...ME.requirementLines(it, it.eligibilityExcludes || [], { onlyExclude: true }), ...ME.requirementLines(it, raw, { onlyExclude: true })])].filter((t) => !shownReq.has(t));
+    const pri = [...new Set([...ME.requirementLines(it, it.eligibilityPriority || [], { keepPriority: true }), ...ME.requirementLines(it, raw, { keepPriority: true, onlyPriority: true })])].filter((t) => !shownReq.has(t));
     out.push(`   ─ 지원 자격 (${el.length}줄${el.length ? '' : ' · 「원문에서 확인 — 공고가 자격을 따로 적지 않았어요」 한 줄'} · 저장된 줄 ${raw.length})`);   // 칸은 늘 있다(승인 시안 2026-11-02)
     for (const l of el) out.push(`       · ${String(l).slice(0, 84)}`);
     out.push(`   ─ 제외 줄 ✗ — 「지원 자격」 칸 안 (${exl.length}줄)`);
     for (const l of exl) out.push(`       ✗ ${String(l).slice(0, 84)}`);
+    out.push(`   ─ 우선 선발 기준 (${pri.length}줄${pri.length ? '' : ' · 칸 없음'} · 판정하지 않는다)`);
+    for (const l of pri) out.push(`       · ${String(l).slice(0, 84)}`);
     out.push(`   ─ 발췌 이름표 (${ex.length}줄 · 모집기간은 「접수 · 기간」 · 나머지는 「공고 안내」 줄)`);
     for (const x of ex) out.push(`       · ${x.label} · ${String(x.text).slice(0, 70)}`);
     /* 「공고 안내」는 저장된 줄 그대로가 아니다 — 시트(openActivityDetail)가 모집 안내·자격에 이미 나온 문장을 빼고 noticeSummaryHtml 이 조각·머리글을 거른다.
        그 두 단계를 **앱 함수로** 다시 밟는다(2026-10-28 개발자 "자격요건이 공고 안내에 들어가고 있는데" — 이 도구가 저장된 줄을 찍어 화면과 다르게 말했다) */
-    const flat = linkFn('noticeFlat');   // 비교 열쇠는 앱의 함수 그대로(베끼지 않는다)
-    const seenText = [...ex.map((x) => flat(x.text)), ...raw.map(flat)].filter((x) => x.length >= 6);
-    const noticeHtml = linkFn('noticeSummaryHtml')(nl.filter((l) => !seenText.some((e) => flat(l).includes(e))));
+    /* 시트가 「공고 안내」에 넘기는 줄은 앱의 activitySheetNotices 하나(긴 혜택 → 제목 괄호 대상 → 발췌 → 원문 안내 · 2026-11-26) — 같은 함수를 부른다(베끼지 않는다) */
+    const noticeHtml = linkFn('noticeSummaryHtml')(linkFn('activitySheetNotices')(it));
     const nrows = [...String(noticeHtml).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => stripTags(m[1].replace(/<b class="ns-k">([^<]*)<\/b>/, '$1 · ')));
     out.push(`   ─ 공고 안내 (${nrows.length}줄${nrows.length ? '' : ' · 칸 접힘'} · 저장된 줄 ${nl.length})`);
     for (const l of nrows.slice(0, 8)) out.push(`       · ${String(l).slice(0, 84)}`);
@@ -279,11 +286,32 @@ function showFeedLinks(query) {
   const read = (p) => { try { return linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8'))).items || []; } catch (e) { return []; } };   // 앱처럼 씻는다(2026-11-17)
   const dir = (p) => fs.readdirSync(new URL(p, import.meta.url)).filter((f) => /\.json$/.test(f) && f !== 'index.json').flatMap((f) => read(`${p}${f}`));
   linkCtx.kosafList = read('../data/kosaf-open.json');
+  /* 대외활동·공모전은 앱과 같은 함수(match-engine publishedActivities)로 거르고 AI 카드를 얹는다(2026-11-25 · 유료 관문 · 설계 docs/designs/paid-gate-activities.md 5-4) —
+     학생 화면에 없는 글을 물으면 「없다」가 아니라 **왜 없는지**(카드를 기다림 · 사람에게 넘김 · 결과 파일을 못 읽음)를 말한다. 찾기는 날것 목록에서 한다(숨긴 글도 찾아야 말할 수 있다) */
+  /* WHAT_SHOWS_ACTIVITIES · WHAT_SHOWS_ACT_READ — 관문 표본용(2026-11-26 · WHAT_SHOWS_REGISTERED 와 같은 뜻): 실데이터 대신 표본 활동 목록·결과 파일로 돈다. 평소에는 쓰지 않는다 */
+  const actRaw = read(process.env.WHAT_SHOWS_ACTIVITIES || '../data/activities.json');
+  let actDoc = null; try { actDoc = linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(process.env.WHAT_SHOWS_ACT_READ || '../data/act-read.json', import.meta.url), 'utf8'))); } catch (e) { /* 못 읽음 — 앱도 숨김 표시가 달린 글을 감춘다 */ }
+  const actShown = new Map(ME.publishedActivities(actRaw, actDoc, undefined, linkFn('SAYS_UNKNOWN')).map((x) => [x.url, x]));
+  const HELD_KO = { 'no-source': '읽을 원문이 없다', unreadable: 'AI 가 읽었는데 실을 내용이 없었다', 'grad-only': '대학원생만 받는 글이다' };
+  const actGateLines = (it) => {
+    const on = actShown.get(it.url);
+    if (!on) {
+      if (it.paidGate && !actDoc) return ['   🔒 학생 화면에 없음 — 유료 확인 결과 파일(data/act-read.json)을 못 읽었다(숨김 표시가 달린 글은 전부 감춘다)'];
+      const held = it.paidGate && actDoc && actDoc.gateHeld && actDoc.gateHeld[it.id];
+      if (held) return [`   🔒 학생 화면에 없음 — 유료 확인에서 사람에게 넘긴 글이다(${HELD_KO[held] || held}) · 관리자 「할 일」에서 올리거나 숨긴다`];
+      if (it.paidGate) return [`   🔒 학생 화면에 없음 — 유료 확인 전이다(AI 카드를 기다리는 중 · 숨김 표시 ${it.paidGate} · 사흘이 지나도 카드가 없으면 무료 값으로 오른다)`];
+      return [];
+    }
+    if (!on.cardRead) return it.paidGate ? [`   ⏱ 유료 확인 없이 무료 값으로 보인다 — ${it.paidOpen ? `관리자가 올렸다(${it.paidOpen})` : `숨김 표시(${it.paidGate}) 뒤 사흘이 지났다`}`] : [];
+    /* 얹힌 값(자격·발췌·안내·서류·마감)은 아래 시트 줄들이 그대로 말한다(얹은 뒤의 글을 넘긴다) — 여기서는 통과 사실과, 시트에 새로 보이는 「접수 · 방법」 줄만 */
+    const how = Array.isArray(on.cardRead.apply) ? on.cardRead.apply.filter((l) => typeof l === 'string' && linkFn('knownValue')(l)) : [];   // 앱 시트와 같이 '모름'류 낱말이 든 줄은 통째로 뺀다(applySectionHtml)
+    return ['   🧾 AI 카드가 얹혔다(유료 확인 통과) — 아래 칸들은 얹은 뒤의 값이다', ...how.map((l) => `       접수 · 방법 ${String(l).slice(0, 84)}`)];
+  };
   const sets = [
     ['층2(한국장학재단 등록 재단)', linkFn('kosafAsScholarships')(), 'sch', (x) => x.name],
     ['학교 게시판 새 공고', dir('../data/notices/'), 'card', (x) => x.title],
     ['재단·지자체 새 공고', read('../data/external.json'), 'card', (x) => x.title],
-    ['대외활동·공모전', read('../data/activities.json'), 'activity', (x) => x.title],
+    ['대외활동·공모전', actRaw, 'activity', (x) => x.title],
     ['우리 학교 소식', dir('../data/news/'), 'card', (x) => x.title],
   ];
   let shown = 0;
@@ -292,7 +320,8 @@ function showFeedLinks(query) {
     for (const it of found.slice(0, CAP)) {
       console.log(`\n■ [${label}] ${String(nameOf(it) || '').slice(0, 80)}`);
       if (where === 'sch') for (const l of kosafFitLines(it)) console.log(l);
-      for (const l of linkLines(it, where)) console.log(l);
+      if (where === 'activity') { for (const l of actGateLines(it)) console.log(l); if (!actShown.has(it.url)) { shown += 1; continue; } }   // 학생 화면에 없는 글 — 까닭만 말한다(링크 줄은 그릴 것이 없다)
+      for (const l of linkLines(where === 'activity' ? actShown.get(it.url) : it, where)) console.log(l);
       shown += 1;
     }
     if (found.length > CAP) console.log(`   … ${label}에서 ${found.length}건이 걸렸습니다 — 앞 ${CAP}건만 보여 줍니다.`);

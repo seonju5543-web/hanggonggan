@@ -427,11 +427,15 @@ export const actKeepDate = (n) => (n && ((n.api && n.seenAt) || n.foundAt)) || '
 /* 활동 피드 상한 — actKeepDate 가 늦은 cap 건만 남기되 **넘겨받은 순서**(foundAt 내림차순 · 화면의 '새 글' 순서)는 그대로 둔다.
    예전엔 foundAt 순으로 잘라, 몇 달 열린 API 글(foundAt 옛날 · seenAt 오늘)이 상한에서 잘렸다가 다음 API 실행에 처음 본 날을
    못 찾고(mergeApi firstSeen 은 이전 파일에서만 찾는다) 오늘 수집한 '새 글'로 맨 위에 다시 올라왔다(리뷰 I3 의 깜빡임). */
-export function capActivities(items, cap) {
+/* 🔴 상한은 **학생에게 보이는 글만** 센다 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-1) — isVisible 이 거짓인 글(유료 확인을 기다리는 숨김 글 · 사람에게 넘긴 글)은 전부 남긴다.
+   피드는 상한에 닿아 있다: 숨김 글까지 세면 새 글이 들어올 때마다 보이던 글이 하나씩 밀려나고, 새 글은 이틀 뒤에야 보인다. 판정을 안 주면 예전처럼 전부 센다(60일 규칙은 숨김 글에도 그대로 — 부르는 쪽) */
+export function capActivities(items, cap, isVisible = () => true) {
   const list = Array.isArray(items) ? items : [];
-  if (list.length <= cap) return list;
-  const keep = new Set([...list].sort((a, b) => String(actKeepDate(b)).localeCompare(String(actKeepDate(a)))).slice(0, cap));
-  return list.filter((n) => keep.has(n));
+  const seen = list.filter((n) => isVisible(n));
+  if (seen.length <= cap) return list;
+  const keep = new Set([...seen].sort((a, b) => String(actKeepDate(b)).localeCompare(String(actKeepDate(a)))).slice(0, cap));
+  const shown = new Set(seen);
+  return list.filter((n) => !shown.has(n) || keep.has(n));
 }
 
 export function mergeApi(prevItems, results, { today, hideUrls = new Set() }) {

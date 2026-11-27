@@ -1,7 +1,20 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[교수학습센터] 2026 CTL Festival 개최 안내",
+   "url": "https://www.sogang.ac.kr/ko/detail/551927?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551927",
+   "postedAt": "2026-11-25",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-25",
+   "thumb": "data/news/img/3e8b8c489f4d31ba.webp"
+  },
   {
    "title": "[아트&테크놀로지] Art & Technology Conference(11/26-29)",
    "url": "https://www.sogang.ac.kr/ko/detail/551880?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",

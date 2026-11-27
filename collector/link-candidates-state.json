@@ -127,13 +127,13 @@
   "source": "board",
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "firstAt": "2026-11-16",
-  "lastAt": "2026-11-20",
-  "tries": 3,
+  "lastAt": "2026-11-27",
+  "tries": 4,
   "status": "pending",
   "why": "게시판 목록(5줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-04",
-  "nextAt": "2026-11-27"
+  "nextAt": "2026-12-04"
  },
  "kosaf|0774003|board:https://www.kspo.or.kr/kspo/bbs/B0000056/list.do?menuNo=200047": {
   "ds": "kosaf",
@@ -272,6 +272,31 @@
   "round": "2026-11-13",
   "decidedAt": "2026-11-08"
  },
+ "kosaf|2000189006|https://www.cwg.go.kr/www/selectBbsNttView.do?key=1226&bbsNo=25&nttNo=273406": {
+  "ds": "kosaf",
+  "key": "2000189006",
+  "url": "https://www.cwg.go.kr/www/selectBbsNttView.do?key=1226&bbsNo=25&nttNo=273406",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년 다자녀가정 특별지원(대학등록금)사업 공고",
+  "firstAt": "2026-11-27",
+  "lastAt": "2026-11-27",
+  "tries": 1,
+  "status": "suggest",
+  "why": "회차를 가릴 날짜가 안 보임",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "weak",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-12-09",
+  "decidedAt": "2026-11-27",
+  "also": []
+ },
  "kosaf|2000193001|board:https://www.hongcheon.go.kr/mayor2022/selectBbsNttList.do?bbsNo=111&key=2532": {
   "ds": "kosaf",
   "key": "2000193001",
@@ -350,8 +375,8 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "2026년 다자녀가정 특별지원(대학등록금 지원) 사업안내",
   "firstAt": "2026-11-16",
-  "lastAt": "2026-11-20",
-  "tries": 3,
+  "lastAt": "2026-11-27",
+  "tries": 4,
   "status": "pending",
   "why": "못 엶(본문이 안 그려짐(59자 — 판정 불가)) — 다시 봅니다",
   "checks": {
@@ -359,7 +384,7 @@
    "L": "unread"
   },
   "round": "2026-12-31",
-  "nextAt": "2026-11-27"
+  "nextAt": "2026-12-04"
  },
  "kosaf|2000204008|board:https://council.wonju.go.kr/content/news/photoGallery.html": {
   "ds": "kosaf",
@@ -417,40 +442,22 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "2026년 다자녀가정 특별지원（대학등록금） 신청 안내",
   "firstAt": "2026-11-16",
-  "lastAt": "2026-11-20",
-  "tries": 3,
-  "status": "pending",
-  "why": "못 엶(다른 글로 보이나 기대 제목이 앱 이름뿐(판정 보류)) — 다시 봅니다",
+  "lastAt": "2026-11-27",
+  "tries": 4,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
   "checks": {
    "C": "ok",
-   "L": "unread"
-  },
-  "round": "2026-12-11",
-  "nextAt": "2026-11-27"
- },
- "kosaf|2000279001|https://www.hampyeong.go.kr/boardView.do?pageId=www272&boardId=NOTICE&seq=5706153": {
-  "ds": "kosaf",
-  "key": "2000279001",
-  "url": "https://www.hampyeong.go.kr/boardView.do?pageId=www272&boardId=NOTICE&seq=5706153",
-  "source": "board",
-  "by": "로봇(층2 글 사냥꾼)",
-  "title": "[재안내] 2026년 하반기 함평군 인재양성기금 장학생 모집 안내(대학생 대상)",
-  "firstAt": "2026-10-27",
-  "lastAt": "2026-10-27",
-  "tries": 1,
-  "status": "rejected",
-  "why": "재단 이름이 화면에 없음",
-  "checks": {
-   "C": "ok",
-   "L": "weak",
+   "L": "ok",
    "H": "ok",
    "T": "ok",
    "R": "ok",
-   "X": "fail",
-   "P": "weak"
+   "X": "ok",
+   "P": "ok"
   },
-  "round": "2026-10-29",
-  "decidedAt": "2026-10-27",
+  "round": "2026-12-11",
+  "decidedAt": "2026-11-27",
+  "verifiedAt": "2026-11-27",
   "also": []
  },
  "kosaf|2000307005|https://sw.ac.kr/sw/promotion/scholarship.do?mode=view&articleNo=5326": {
@@ -512,16 +519,23 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "2026년도 귀농인 대학생 자녀 학자금 지원사업 신청안내",
   "firstAt": "2026-11-16",
-  "lastAt": "2026-11-20",
-  "tries": 3,
-  "status": "pending",
-  "why": "못 엶(다른 글로 보이나 기대 제목이 앱 이름뿐(판정 보류)) — 다시 봅니다",
+  "lastAt": "2026-11-27",
+  "tries": 4,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
   "checks": {
    "C": "ok",
-   "L": "unread"
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
   },
   "round": "2026-12-31",
-  "nextAt": "2026-11-27"
+  "decidedAt": "2026-11-27",
+  "verifiedAt": "2026-11-27",
+  "also": []
  },
  "kosaf|2000347003|board:https://gcdream.kr/bbs/board.php?bo_table=notice": {
   "ds": "kosaf",
@@ -735,16 +749,23 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "2026년 워킹홀리데이 지원사업 신청자 모집 공고",
   "firstAt": "2026-11-16",
-  "lastAt": "2026-11-20",
-  "tries": 3,
-  "status": "pending",
-  "why": "못 엶(다른 글로 보이나 기대 제목이 앱 이름뿐(판정 보류)) — 다시 봅니다",
+  "lastAt": "2026-11-27",
+  "tries": 4,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
   "checks": {
    "C": "ok",
-   "L": "unread"
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
   },
   "round": "2026-11-30",
-  "nextAt": "2026-11-27"
+  "decidedAt": "2026-11-27",
+  "verifiedAt": "2026-11-27",
+  "also": []
  },
  "kosaf|2000425003|board:https://www.boeun.go.kr/janghak/selectBbsNttList.do?bbsNo=243&key=1036": {
   "ds": "kosaf",
@@ -902,22 +923,6 @@
   "decidedAt": "2026-11-18",
   "verifiedAt": "2026-11-18",
   "also": []
- },
- "kosaf|2500058003|board:https://www.jiles.or.kr/community/notice/othernews.htm": {
-  "ds": "kosaf",
-  "key": "2500058003",
-  "url": "",
-  "board": "https://www.jiles.or.kr/community/notice/othernews.htm",
-  "source": "board",
-  "by": "로봇(층2 글 사냥꾼)",
-  "firstAt": "2026-10-23",
-  "lastAt": "2026-10-27",
-  "tries": 3,
-  "status": "pending",
-  "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름",
-  "checks": {},
-  "round": "2026-10-30",
-  "nextAt": "2026-11-03"
  },
  "kosaf|2513450002|board:https://www.gimje.go.kr/board/list.gimje?boardId=BBS_0000045&menuCd=DOM_000000104004000000&contentsSid=197&cpath=": {
   "ds": "kosaf",
@@ -1284,22 +1289,6 @@
   "round": "2026-11-30",
   "nextAt": "2026-11-22"
  },
- "kosaf|2701048001|board:https://sanhak.duksung.ac.kr/support/board/inside": {
-  "ds": "kosaf",
-  "key": "2701048001",
-  "url": "",
-  "board": "https://sanhak.duksung.ac.kr/support/board/inside",
-  "source": "board",
-  "by": "로봇(층2 글 사냥꾼)",
-  "firstAt": "2026-10-23",
-  "lastAt": "2026-10-27",
-  "tries": 3,
-  "status": "pending",
-  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
-  "checks": {},
-  "round": "2026-11-01",
-  "nextAt": "2026-11-03"
- },
  "kosaf|2701096002|https://www.jincheon.go.kr/home/sub.do?menukey=406&mode=view&no=1090368397": {
   "ds": "kosaf",
   "key": "2701096002",
@@ -1334,13 +1323,13 @@
   "source": "board",
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "firstAt": "2026-11-16",
-  "lastAt": "2026-11-20",
-  "tries": 3,
+  "lastAt": "2026-11-27",
+  "tries": 4,
   "status": "pending",
   "why": "게시판 목록(0줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-26",
-  "nextAt": "2026-11-27"
+  "nextAt": "2026-12-04"
  },
  "kosaf|2701277003|board:https://enter.pcu.ac.kr/enter": {
   "ds": "kosaf",
@@ -1443,6 +1432,22 @@
   "decidedAt": "2026-11-16",
   "also": []
  },
+ "kosaf|2703434001|board:https://www.kcffd.org/": {
+  "ds": "kosaf",
+  "key": "2703434001",
+  "url": "",
+  "board": "https://www.kcffd.org/",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-27",
+  "lastAt": "2026-11-27",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2027-01-05",
+  "nextAt": "2026-11-28"
+ },
  "kosaf|2703603001|board:https://www.yuha.or.kr/News_Notice.aspx": {
   "ds": "kosaf",
   "key": "2703603001",
@@ -1541,6 +1546,32 @@
   "round": "2027-01-08",
   "nextAt": "2026-11-28"
  },
+ "kosaf|2704215001|http://www.pyeongnae.co.kr/bbs/board.php?bo_table=notice&wr_id=206": {
+  "ds": "kosaf",
+  "key": "2704215001",
+  "url": "http://www.pyeongnae.co.kr/bbs/board.php?bo_table=notice&wr_id=206",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "★2026년 평내장학회 장학생 모집★",
+  "firstAt": "2026-11-27",
+  "lastAt": "2026-11-27",
+  "tries": 1,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-12-10",
+  "decidedAt": "2026-11-27",
+  "verifiedAt": "2026-11-27",
+  "also": []
+ },
  "kosaf|2704219001|board:https://www.ygef.or.kr/board/?board=recruitment&site=ygmirae&mn=213": {
   "ds": "kosaf",
   "key": "2704219001",
@@ -1549,13 +1580,13 @@
   "source": "board",
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "firstAt": "2026-11-16",
-  "lastAt": "2026-11-20",
-  "tries": 3,
+  "lastAt": "2026-11-27",
+  "tries": 4,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-27",
-  "nextAt": "2026-11-27"
+  "nextAt": "2026-12-04"
  },
  "kosaf|2704219001|https://www.ygef.or.kr/board/?board=recruitment&site=ygmirae&mn=213&type=view&post_idx=2394": {
   "ds": "kosaf",
@@ -1565,8 +1596,8 @@
   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
   "title": "영광군미래교육재단 모집 공고(최근 글)",
   "firstAt": "2026-11-16",
-  "lastAt": "2026-11-20",
-  "tries": 3,
+  "lastAt": "2026-11-27",
+  "tries": 4,
   "status": "pending",
   "why": "못 엶(글 표지도 제목도 없음(판정 불가)) — 다시 봅니다",
   "checks": {
@@ -1574,7 +1605,7 @@
    "L": "unread"
   },
   "round": "2026-11-27",
-  "nextAt": "2026-11-27"
+  "nextAt": "2026-12-04"
  },
  "kosaf|2704228001|board:https://www.busan.go.kr/nbnews": {
   "ds": "kosaf",
@@ -1727,26 +1758,24 @@
   "verifiedAt": "2026-11-18",
   "also": []
  },
- "notices|https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88|https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260909&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&": {
-  "ds": "notices",
-  "key": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88",
-  "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260909&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
-  "source": "twin",
-  "by": "로봇(같은 사이트·같은 제목 — 수집 검수 후보)",
-  "title": "[교외] 2026년 2학기 푸른등대 기부장학금 장..",
-  "firstAt": "2026-10-27",
-  "lastAt": "2026-10-27",
-  "tries": 1,
-  "status": "suggest",
-  "why": "제목 자리에서 우리 공고 제목을 통째로 찾지 못함(앞부분만 같을 수 있음)",
+ "kosaf|2704387001|https://www.busanjin.go.kr/go06/board/view.busanjin?boardId=DONGNOTICE&menuCd=DOM_000002403001000000&dataSid=3980525": {
+  "ds": "kosaf",
+  "key": "2704387001",
+  "url": "https://www.busanjin.go.kr/go06/board/view.busanjin?boardId=DONGNOTICE&menuCd=DOM_000002403001000000&dataSid=3980525",
+  "source": "search",
+  "by": "Claude 세션 (2026-11-25 · 부산진구 사이트가 세션의 curl·브라우저 모두에서 502·연결 끊김 — 로봇이 다른 망에서 확인)",
+  "title": "2026년도 가야2동장학회 장학생 모집 안내",
+  "firstAt": "2026-11-26",
+  "lastAt": "2026-11-27",
+  "tries": 2,
+  "status": "pending",
+  "why": "못 엶(열기 실패: page.goto: Timeout 20000ms exceeded.) — 다시 봅니다",
   "checks": {
    "C": "ok",
-   "L": "weak",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
+   "L": "unread"
   },
-  "decidedAt": "2026-10-27"
+  "round": "2026-11-27",
+  "nextAt": "2026-11-30"
  },
  "notices|https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%ED%86%B5%5D%20%E2%94%94%20RE%3A(%EC%83%9D%ED%99%9C%EB%B9%84)2026-2%ED%95%99%EA%B8%B0%20(%EC%A3%BC)%EC%95%84%EC%9D%B4%EC%98%A4%EC%95%8C%EC%BD%94%EB%A6%AC%EC%95%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0|https://www.gachon.ac.kr/bbs/kor/478/125811/artclView.do": {
   "ds": "notices",

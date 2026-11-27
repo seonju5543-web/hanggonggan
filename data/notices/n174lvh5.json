@@ -1,7 +1,57 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "[학부대학운영팀] 2026학년도 2학기 Trinity DESIGNer 오픈배지 장학금 신청 안내 (~2026.12.16.)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278243&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "붙임. Trinity DESIGNer 배지 리스트(2025.11.20.).pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278243&attachNo=227827"
+    }
+   ],
+   "deadlineHint": "신청 기간 2026.11.26.(목) ~ 2026.12.16.(수) 7. 장학금 신청 방법 TRINITY 접속 ▷ 학사정보 ▷ 등록/장학 ▷ 장",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "[학생지원팀][한국농어촌희망재단]2027년 1학기 청년창업농 장학생 모집 관련 선발안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278221&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "[붙임]3. 2027년 1학기 청년창업농장학금 선발안내.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278221&attachNo=227807"
+    },
+    {
+     "name": "[붙임]2. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278221&attachNo=227808"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-26"
+  },
+  {
+   "title": "[학생지원팀] [미래의동반자재단] 2027년 1학기 CHUBB Innovation Fund 7기 장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278164&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "CHUBB Innovation Fund 7기_신청서 (학생용).docx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278164&attachNo=227775"
+    },
+    {
+     "name": "외부장학금 신청 및 추천을 위한 개인정보 수집 및 이용 동의서.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278164&attachNo=227776"
+    }
+   ],
+   "deadlineHint": "신청기간 및 방법 가. 트리니티 신청 - 신청기간: 2026. 11. 25.(수) ~ 11. 26.(목)까지 - 신청경로: 트리니티 → 학사정보",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-25"
+  },
   {
    "title": "[학생지원팀][한국장학재단] 2027년도 1학기 국가장학금 1차 신청 안내(2026. 11. 24.(화) 9시 ~ 2027. 1. 7.(목) 18시까지)",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278103&article.offset=0&articleLimit=10&srCategoryId=22",

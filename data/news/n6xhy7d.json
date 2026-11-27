@@ -1,7 +1,49 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(교육대학원 교학팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53753&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-26",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-26",
+   "desc": "채용 부서 모집인원 1. 지원 자격 및 우대사항 담당업무 교육대학원 교학팀 행정업무 등 지원 자격"
+  },
+  {
+   "title": "[일반] ※신청기간변경 [HUSS-글로벌공생] 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53731&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-23",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-25",
+   "thumb": "data/news/img/1d602483b3208a2d.webp",
+   "desc": "모집 안내 포스타\"> 글로벌 공생 HUSS사업단X경실련X현대자동차가 함께하는 ESG 상생캠퍼스 프로그램 안내드립니다."
+  },
+  {
+   "title": "[학사] 2027학년도 전기 대학원 학석사연계과정 지원 학생 모집(12.14~12.28)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53750&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-25",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-25",
+   "desc": "(2027.9 월 또는 2028.3 월 입학 예정 ) 1. 대학원 학 ․ 석사연계과정에 지원 학생 모집사항 안내 학 ․ 석사연계과정 : 학사과정과 석사과정을 연계하여 학사 및 석사과정 수업연한을 각각 1 학기씩 단축"
+  },
+  {
+   "title": "[병무] 2026년 12월 각 군 현역병 모집 계획 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53749&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-25",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-25",
+   "thumb": "data/news/img/af2adc89e95c7edc.webp"
+  },
   {
    "title": "[일반] [현장실습] 2026학년도 동계방학 단기 현장실습 참가자 사전신고 및 최종제출서류 안내 (최종합격자 대상)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53743&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -123,7 +165,7 @@
    "campus": "",
    "src": "b09cb042",
    "foundAt": "2026-11-20",
-   "desc": "학사일정 계절학기 수업운영 기준 [SELC LMS (selc.or.kr)에서 온라인으로 진행] 수업은 총 3주(강의 14회)로 운영되며, 지각제도는 운영하지 않음 1주차: 2026. 12. 21.(월) 강의 5회차…"
+   "desc": "2026학년도 동계계절수업 서울권역e-러닝 개설교과목 및 학사일정을 다음과 같이 알려드리오니 수업에 참고하시기 바랍니다."
   },
   {
    "title": "[일반] [광운대학교 창업보육센터] 광운창업지원센터 신규 입주기업 모집(~12.07(월))",
@@ -157,7 +199,7 @@
    "src": "b09cb042",
    "foundAt": "2026-11-18",
    "thumb": "data/news/img/73a785e4be00628b.webp",
-   "desc": "- 장소: 서울 SETEC 제3전시관 (온라인 생중계 병행) - 대상: 대학(원)생 및 청년 누구나"
+   "desc": "산업의 미래를 이끌어갈 혁신인재(학·석·박사)와 산업계가 함께하는 통합 교류 및 우수성과 공유의 장을 마련하고자 2026 청년 뉴턴[NEW:TURN] 개최합니다."
   },
   {
    "title": "[일반] [채용공고]광운대학교 산학협력단 [도봉구 청년창업센터] 직원 채용 공고",
@@ -168,7 +210,7 @@
    "campus": "",
    "src": "b09cb042",
    "foundAt": "2026-11-18",
-   "desc": "1. 채용분야 및 지원자격 2. 응시자격 및 우대조건 가. 일반사항 1) 성별, 학력, 거주지 제한 없음"
+   "desc": "직원 채용 공고 광운대학교 산학협력단「도봉구 청년창업센터」 에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다."
   },
   {
    "title": "[외부] [외교부] 정년 해외안전여행 안내 \" 영사안전 콜센터와 함께하는 안전한 해외여행\"",
@@ -220,7 +262,7 @@
    "campus": "",
    "src": "b09cb042",
    "foundAt": "2026-11-16",
-   "desc": "2026 학년도 2 학기 졸업 예정인 외국인 유학생을 대상으로 아래와 같이 한국어능력평가시험을 시행하오니 , 해당 학생들은 기간 내 반드시 신청해 주시기 바랍니다 ."
+   "desc": "2026-2 학기 졸업예정자 2026 학년도 2 학기 졸업 예정인 외국인 유학생을 대상으로 아래와 같이 한국어능력평가시험을 시행하오니 , 해당 학생들은 기간 내 반드시 신청해 주시기 바랍니다 ."
   },
   {
    "title": "[일반] [광운대학교 로봇특성화대학사업단] 2026학년도 동계 계절수업 (KW-IC) AI로봇회로설계 수강신청 안내",
@@ -381,48 +423,6 @@
    "src": "b09cb042",
    "foundAt": "2026-11-11",
    "desc": "안녕하세요. 지능형로봇사업단입니다. 2026학년도 동계 계절학기 국민대학교 미래자동차전공 학점교류 신청과 관련하여 아래와 같이 안내드립니다."
-  },
-  {
-   "title": "[일반] [앵커사업] 2026 AI 티키타카 프로젝트 전시회 개최! (프로젝트 관람하고 커피쿠폰 1만원 받아가세요!)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53662&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-10",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-11",
-   "thumb": "data/news/img/ff578410cfa0ef8a.webp",
-   "desc": "AI 티키타카 발표평가 전시회 프로젝트 구경하고, AI 전공도 알아보고, 커피쿠폰 받아가자! 앵커사업 (RISE 사업 ) AI 관련 학과 지원 단위과제에서는 비전공자 학생들과 인공지능융합대학 멘토가 한 팀을 이루어…"
-  },
-  {
-   "title": "[외부] [BTF푸른나무재단(청소년폭력예방재단)] 2027년도 UN청소년 대표단 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53664&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-10",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-11",
-   "thumb": "data/news/img/10b5538ca11e50ca.webp"
-  },
-  {
-   "title": "[봉사] [동방사회복지회] 위기아동 지원 기부마라톤 2026 허그런(HUG RUN) 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53655&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-10",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-11",
-   "thumb": "data/news/img/713579ab97950c56.webp"
-  },
-  {
-   "title": "[일반] [교육혁신원] 2026학년도 2학기 다전공 수요조사 참여 안내 (참여시, 생성형 AI 크레딧 제공 | ~11/29(일))",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53648&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-10",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-10",
-   "desc": "2026학년도 2학기 다전공 수요조사 참여 안내 설문 참여 혜택 참여 시 ‘광운AI메이트’에서 사용 가능한 생성형 AI 크레딧 제공 우리 대학에서는 학생들의 다전공에 대한 인식과 수요를 파악하고, 향후 다전공 제도…"
   }
  ]
 }

@@ -27,8 +27,6 @@ const readJson = (p, d) => { try { return JSON.parse(fs.readFileSync(p, 'utf8'))
     🔴 4번의 답을 버리지 않는다(6번 줄의 read 칸에 남긴다 · 2026-11-22) — 파일을 다시 받아 바이트가 바뀐 뒤 4번만 다시 읽었으면, 옛 바이트를 본 6번의 답이
        새 답을 가려 그 파일은 「AI 답 없음」이 된다(aiRoleFor 가 바이트가 맞는 쪽을 고른다) */
 export function loadAiRoles(collectorDir) {
-  const read = readJson(path.join(collectorDir, 'attach-role-ai.json'), { items: {} }).items || {};
-  const review = readJson(path.join(collectorDir, 'final-review.json'), { items: {} }).items || {};
   const out = {};
   const put = (id, docs, by) => {
     for (const d of Array.isArray(docs) ? docs : []) {
@@ -37,8 +35,14 @@ export function loadAiRoles(collectorDir) {
       out[id][d.file] = { ...d, by, ...(was && was.by === 'read' && by === 'review' ? { read: was } : {}) };
     }
   };
-  for (const [id, e] of Object.entries(read)) put(id, e && e.docs, 'read');
-  for (const [id, e] of Object.entries(review)) put(id, e && e.roles, 'review');
+  /* 장학금의 두 파일 → 대외활동·공모전의 두 파일(2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-5 · 이름은 act-card ACT_FILES 와 같다 — 관문이 견준다).
+     글 id 가 서로 겹치지 않아 한 표에 싣는다 — 그것으로 변환 로봇 셋은 활동 글에도 AI 의 답을 쓴다 */
+  for (const [readFile, reviewFile] of [['attach-role-ai.json', 'final-review.json'], ['act-role-ai.json', 'act-final-review.json']]) {
+    const read = readJson(path.join(collectorDir, readFile), { items: {} }).items || {};
+    const review = readJson(path.join(collectorDir, reviewFile), { items: {} }).items || {};
+    for (const [id, e] of Object.entries(read)) put(id, e && e.docs, 'read');
+    for (const [id, e] of Object.entries(review)) put(id, e && e.roles, 'review');
+  }
   return out;
 }
 /* 그 공고의 답 전부 — 파일마다 6번의 답, 바로 뒤에 4번의 답 */
@@ -64,6 +68,9 @@ export function aiRoleByName(roles, id, attachName, hash = '') {
   if (!hash) return named[0] || null;
   return named.find((d) => !d.hash || d.hash === hash) || rows.find((d) => d.hash === hash) || null;
 }
+/** 원본을 받아 와야 하는 활동 첨부인가 — AI 가 그 첨부를 서식(form)·붙은 문서(mixed)라고 한 **활동 글**(ids)의 첨부 (2026-11-25 · 대외활동 유료 관문 5-5).
+    신청서 받기(form-pdf pickFormBacklog 의 aiWants)가 쓴다: 이름이 공고문이어도 받아야 서식 쪽을 뗄 수 있다. 장학금 공고(ids 밖)는 늘 거짓 — 그 원본은 자격 로봇이 받는다 */
+export const aiWantsOriginal = (roles, ids) => (it, a) => !!it && !!a && ids.has(it.id) && ['form', 'mixed'].includes((aiRoleByName(roles, it.id, a.name) || {}).role);
 /* 색인 줄에 적어 두는 「이 답으로 만들었다」 표시 — 답이 바뀌면(갈래·서식이 시작되는 줄) 변환 로봇이 다시 만든다 · 답이 없으면 빈 글자(예전 줄과 같다).
    🔴 서식이 시작되는 줄은 빈칸을 전부 걷고 견준다(2026-11-22) — 같은 줄을 띄어쓰기만 달리 적은 답에 다시 떼고 다시 받지 않게(쪽 찾기 formStartPage 도 빈칸을 걷고 찾는다 · 같은 쪽이 나온다) */
 export const aiSig = (d) => (d && d.role ? `${d.role}|${String(d.formStart || '').replace(/\s+/g, '')}` : '');

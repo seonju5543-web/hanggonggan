@@ -146,10 +146,12 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
     const hashOnly = /^#/.test(raw);
     if ((!raw || hashOnly || JS_NOT_DOWNLOAD.test(raw)) && oc) raw = `javascript:${decode(oc[1] ?? oc[2] ?? '').trim()}`;
     if (!raw || raw.startsWith('#') || JS_NOT_DOWNLOAD.test(raw)) continue;
-    let name = cleanAttachName(m[5].replace(/<[^>]+>/g, ' '));
+    let name = trimSiteTail(cleanAttachName(m[5].replace(/<[^>]+>/g, ' ')), { lonePreview: false });   // 사이트 꼬리(「(71KB)」·「(다운로드 : 12회)」)는 받을 때부터 뗀다(2026-11-25)
     let url = /^javascript:/i.test(raw) ? resolveJsDownload(raw, pageUrl) || raw : null;
     if (hashOnly && url === raw && !ATTACH_EXT.test(name)) continue;   // 모르는 동작 + 파일 이름 아님 = 화면 단추
     if (!url) { try { url = new URL(raw, pageUrl).href; } catch { continue; } }
+    /* 「이름 + 미리보기」뿐인 링크는 받는 주소가 분명할 때만 꼬리를 뗀다 — 뷰어 링크(`/synap/doc.html?…`)가 파일 이름을 얻어 같은 이름의 둘째 첨부가 되지 않게(리뷰 2026-11-25) */
+    if (ATTACH_EXT.test(url) || DOWNLOAD_URL.test(url)) name = trimSiteTail(name);
     /* 단추 글자(`다운로드`)뿐이면 파일 이름은 바로 앞 요소에 있다 — 태그를 줄로 바꿔 마지막 파일 이름 줄을 쓴다(지어내지 않는다 · 없으면 그대로).
        스크립트 호출(과기정통부)뿐 아니라 보통 내려받기 주소의 단추(경기대·충북대 · 2026-11-02)도 같다 */
     if (!ATTACH_EXT.test(name) && ((/^javascript:/i.test(raw) && url !== raw) || (BUTTON_WORD.test(name) && DOWNLOAD_URL.test(url)))) {
@@ -217,6 +219,46 @@ const FILE_NAME = new RegExp(FILE_NAME_SRC, 'i');
 export function fileNameIn(text) {
   const m = String(text || '').replace(/\s+/g, ' ').trim().match(FILE_NAME);
   return m ? m[1].trim() : '';
+}
+/* 사이트가 파일 이름 뒤에 붙인 꼬리 — 용량·내려받은 횟수·미리보기 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 6절 ②③).
+   꼬리 때문에 이름이 확장자로 끝나지 않으면 로봇이 그 줄을 문서로 보지 않는다 — 동아대 국어문화원 글(`신청서.hwp (71KB)` · 주소에 확장자도 내려받기 낱말도 없다)은 첨부 둘이
+   아예 안 잡혔고, 농림축산식품부 글(`….hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB`)은 잡히고도 문서로 안 읽혔다.
+   🔴 파일 이름이 맨 앞에 있고 그 뒤가 **전부 이 꼴의 꼬리**일 때만 뗀다 — 본문 문장(「신청서.hwp 작성 방법 안내」)·다른 괄호(「공고문.hwp (최종)」)는 건드리지 않는다.
+      꼬리가 없는 이름은 받은 글자 그대로 돌려준다(빈칸도 안 다듬는다 — 실린 이름이 까닭 없이 바뀌지 않게).
+   리뷰 2026-11-25 — 페이지가 실제로 주는 글자로 다시 맞췄다:
+     · 꼬리는 여럿 이어진다(「(파일 용량 : 1449 KB) 바로보기」) · `&nbsp;` 가 확장자에 바로 붙는다(「….pdf&nbsp; &nbsp;(다운로드 : 4회) 바로보기」) · 단위가 K 한 글자다(「(71.5K)」)
+     · 🔴 뜻이 있는 괄호는 꼬리가 아니다 — 단위 뒤에 글자가 이어지면(「(1회차)」) 수가 아니고, 숫자+단위 뒤에 다른 말이 오면(「(3건 이상 제출)」) 안내 문구다.
+       이름표로 시작하는 괄호(「(다운로드 …)」)는 숫자가 들어 있을 때만 꼬리다(「(다운로드 후 작성)」은 그대로). 떼면 이름이 다른 두 파일이 같은 이름이 된다 */
+const TAIL_SP = String.raw`(?:\s|&nbsp;)`;
+const TAIL_NUM = String.raw`\d[\d.,]*\s?(?:KB|MB|GB|K|M|G|bytes?|B|바이트|회|건)(?![가-힣A-Za-z])`;
+const TAIL_BRACKET = String.raw`[(（\[【]\s*(?:(?:파일\s?(?:용량|크기)|용량|크기|size|다운로드|내려받기|download)(?=[^)）\]】]*\d)[^)）\]】]{0,40}|${TAIL_NUM}(?:[\s,·/|]*${TAIL_NUM})*\s*)[)）\]】]?`;
+const TAIL_PREVIEW = String.raw`(?:미리\s?보기|바로\s?보기)`;
+const SITE_TAIL = new RegExp(String.raw`^(?:${TAIL_SP}*(?:${TAIL_BRACKET}|${TAIL_PREVIEW}))+${TAIL_SP}*$`, 'i');
+const LONE_PREVIEW = new RegExp(String.raw`^(?:${TAIL_SP}*${TAIL_PREVIEW})+${TAIL_SP}*$`, 'i');
+/** lonePreview: false — 꼬리가 「미리보기」·「바로보기」뿐이면 떼지 않는다(받을 때 쓴다 — 그런 링크는 뷰어 주소일 수 있어, 받는 주소가 분명한지 본 뒤에 뗀다 · detailAttachments) */
+export function trimSiteTail(name, { lonePreview = true } = {}) {
+  const raw = String(name ?? '');
+  const s = raw.replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
+  const f = fileNameIn(s);
+  if (!f || !s.startsWith(f)) return raw;
+  const rest = s.slice(f.length);
+  if (!rest || !SITE_TAIL.test(rest)) return raw;
+  return !lonePreview && LONE_PREVIEW.test(rest) ? raw : f;
+}
+/** 실린 활동 글의 첨부 이름에서 사이트 꼬리를 뗀다(소급 — 수집 로봇이 발행할 때 · 같은 파일 한 줄 만들기 stripSiteChrome 앞). 바꾼 줄 수를 돌려준다.
+    used = 글 id → 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부 이름들 — 🔴 든 이름은 건드리지 않는다(이름이 바뀌면 그 사본이 주인을 잃는다) */
+export function trimActivityTails(items, used = new Map()) {
+  let n = 0;
+  for (const it of items || []) {
+    if (!it || !Array.isArray(it.attachments)) continue;
+    const keep = (it.id && used.get(it.id)) || null;
+    for (const a of it.attachments) {
+      if (!a || typeof a.name !== 'string' || (keep && keep.has(a.name))) continue;
+      const t = trimSiteTail(a.name);
+      if (t !== a.name) { a.name = t; n += 1; }
+    }
+  }
+  return n;
 }
 
 /* ── 같은 파일이 이름만 달리 여러 번 실린 줄 (2026-11-20 · 개발자 지시 *"정리하고 재발하지 않도록"*) ─────────────

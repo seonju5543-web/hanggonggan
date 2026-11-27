@@ -48,6 +48,7 @@
 - `verify/verify-activities.js` — 진짜 브라우저: 탭 다섯 · 학교 범위 · 칩·검색 · 카드 윗줄 · 받아오기 실패 시 '없어요'.
   🔴 서비스워커를 `serviceWorkers: 'block'` 으로 막는다 — 새로고침 뒤에는 워커가 데이터를 받아 `page.route` 픽스처가 안 닿는다(만들며 실제로 겪었다).
 - `verify/audit-data.js` — activities.json 의 중복·kind·서비스 학교(로봇이 저장 직전에 돈다 · 실패면 되돌린다).
+- `verify/test-collector.mjs` 「대외활동 유료 관문」 ⓪~⑦ — 아래 2026-11-25 절의 여덟 조각(장학금은 그대로다 · 원문 글자 저장 · 카드 쓰기 · 최종 검토 · 학생 화면 · 숨김 표시와 상한 · 관리자 화면 · 워크플로).
 
 ## 개발자가 정할 것 (이 세션이 손대지 않은 것)
 
@@ -127,6 +128,21 @@
 - 온보딩 「봉사활동 실적」 질문이 걸리는 공고가 9곳 → 2곳이 되어(잣대 「4곳 이상」 아래) **질문 목록에서 뺐다** (같은 날 개발자 결정 *"빼 주세요"* · `elig-ask.js` `ONBOARD_TRAITS`). 그 두 공고에서는 공고 안 「미확인 자격」이 그대로 묻고, 이미 답해 둔 답은 지우지 않는다.
 - 남은 같은 계열(안 고쳤다): `검정고시 합격자 등`·`자격증 소지자(토익 800점 이상 등)` 처럼 `등` 이 같은 처지의 예시를 닫는 줄은 이제 「아니요」가 ✕ 대신 모름이 된다(맞는 미달을 잃는 쪽 — 틀린 미달보다 낫다).
 - 관문: `test-collector.mjs` 「활동 글의 틀린 미달 — 처지 낱말 · 열거 속 처지 · 「참가제한」 절」 (고치기 전 코드로 되돌리면 10건이 빨개진다).
+
+## 2026-11-25 — 유료 관문 (스위치를 꺼 둔 채 지었다 · 설계 `docs/designs/paid-gate-activities.md`)
+
+개발자 지시 *"똑같은 프로세스를 대외활동과 공모전에도 이식할 방법을 고안해보자"* → 「전부」 · 「숨김으로」 · 「1 — 승인하고 진행」. 장학금의 유료 관문(숨김 → 원문 받기 → AI 카드 → 둘째 AI 검토)을 같은 로봇으로 활동 글에 돌린다.
+
+- **표시**: 수집 로봇이 처음 본 글에만 `paidGate` 를 단다(`stampNewActivity` · 두 스위치 `actGateOn` 이 켜져 있을 때만). 이미 보이던 글·같은 글의 재게시(`dedupeActivities`)·id 없는 글(`dropStampWithoutId`)에는 달지 않는다. 피드 상한은 보이는 글만 센다(`capActivities`).
+- **원문**: 글자만 글마다 작은 파일로(`collector/act-text.mjs` `writeStore`·`readStore` — 본문은 한 번 쓰면 덮지 않는다 · 덮으면 같은 글을 돈 내고 다시 읽는다).
+- **두 로봇**: `collector/card-read.mjs`·`collector/final-review.mjs` 에 `--activities`. 본편의 글자는 그대로 두고 파일 이름만 바꾼다(`ACT_FILES`) — 목록 모양(`actItems`)·원문(`makeActSources`)·지시문(`ACT_SYSTEM`·`ACT_REVIEW_SYSTEM`)·기다리기(`actAwaits`)·사람에게 넘기기(`actGateHeldOf`)만 활동 것이다. 🔴 `collector/act-card.mjs` 는 `card-read.mjs` 를 불러오지 않는다(서로 부르게 된다).
+- **학생 화면**: `match-engine.js` `publishedActivities`(숨김 거르기 + `withActRead` 로 카드 얹기) — 승인 시안 `docs/designs/mockups/paid-gate-activities/` 그대로(안내 줄을 이름표로 묶는다). `node verify/what-shows.mjs` 가 같은 함수로 말한다.
+- **관리자 「할 일」**: 넘어온 숨김 글을 올리거나(`activityGate` — `paidOpen` 을 더한다) 숨긴다(`activityHide`) · 둘째 AI 가 넘긴 문제는 「확인했어요」(`activityReviewDone`).
+- **스위치 셋**: 설정 파일의 `enabled` · 그 안 `activities.enabled` · 워크플로의 환경 변수. 상한도 `activities` 칸의 값(장학금과 따로 센다). 🔴 켜는 것은 개발자가 채팅에서 지시할 때만.
+- **최종 리뷰에서 고친 것(11-26)**: 중복 정리는 앱과 같은 「보이는가」(`paidOpen` · `paidGateOpen`)로 보이던 글을 가린다(표시는 한 번 달면 안 지워진다) · 본문이 빈 글은 하루 한 번만 다시 받는다(`tried`) · 요강 페이지 지문은 글자가 아니라 그 자리 · 무료 본문이 비고 브라우저가 아직이면 본문도 기다린다(`bodyPending`) · 묶기 전에 '모름'류 낱말 줄을 뺀다(`dropRe` — 앱의 `SAYS_UNKNOWN`) · 시트 「공고 안내」 줄은 `activitySheetNotices` 한 곳(what-shows 가 같은 함수를 부른다).
+- **시험**: `act-paid-probe.yml` — 사람이 눌러야만 돌고(예약·push 없음), 적어 준 글 id 만 읽고, **저장하지 않는다**(결과는 내려받는 묶음). 작업 폴더 안에서만 활동 스위치를 켠다.
+- **같이 고친 첨부 수리 셋**: 다시 읽을 때 사이트 메뉴 링크를 첨부로 붙이지 않는다(`mergeActAttachments`) · 이름 꼬리(`(71KB)`·`미리보기`)를 뗀다(`trimSiteTail`) · 남은 다시 읽기 수를 리포트에(`actRereadLeft`). 이 셋의 검사는 「대외활동·공모전 — 제출 서류 · 신청서 원본 PDF」 절과 「공고문 첨부에서 자격 읽기」 절에 있다.
+- 관문: `verify/test-collector.mjs` 「대외활동 유료 관문」 ⓪~⑦ · 드라이버 `verify/verify-activities.js` ⑧ 절 · `verify/verify-admin.js`.
 
 ## CLAUDE.md 에서 옮긴 규칙 (2026-11-18)
 

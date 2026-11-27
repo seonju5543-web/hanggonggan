@@ -1,7 +1,60 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "[도서관] 신축도서관(가칭: 중앙도서관 신관) 건립을 위한 기금모금 [네이밍 캠페인] 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898213&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-26",
+   "kind": "생활",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/554113448590fa4a.webp"
+  },
+  {
+   "title": "2026년 ST창업오디션(패자부활전) 모집",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898188&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-26",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/b25aaba79a5eee65.webp",
+   "desc": "창업지원단에서는 ST창업오디션 참가자들의 도전을 응원하고자 서류 및 발표에 미선정된 팀을 대상으로 패자부활전을 개최합니다."
+  },
+  {
+   "title": "2026년 \"상상톡톡\" SeoulTech 제안제도 심사결과 알림",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898186&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-26",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-26",
+   "desc": "1. 심사결과: 접수된 8건의 제안 중 2건 선정(은상1, 장려상1) 포상등급 저학년(1, 2학년) AI·창업 ‘3주 완주 트랙’ 신설 제안 (총장표창) 학내 자원 예약 시스템 일원화 (총장표창) ※수상자 개별…"
+  },
+  {
+   "title": "인공지능혁신융합대학사업단 RE:Local 참가 수요조사 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898171&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-26",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-26",
+   "desc": "인공지능혁신융합대학사업단에서 2026 AICOSS 제주 Re:Local 참가 수요조사를 아래와 같이 시행하오니, 관심있는 학생들은 참여하여 주시기 바랍니다."
+  },
+  {
+   "title": "[교육혁신원] 생성형 AI 활용 교수전략 개발을 위한 학생 요구 설문조사 안내 (100명 경품 증정)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898176&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-26",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-26",
+   "thumb": "data/news/img/2cd0ce8b83d8df1c.webp",
+   "desc": "안녕하세요. 서울과학기술대학교 교육혁신원입니다. 교육혁신원에서는 학생들의 생성형 AI 활용 경험과 요구를 파악하여 보다 효과적인 교수방법을 개발하고자 설문조사를 실시합니다."
+  },
   {
    "title": "[앵커사업단] 카카오톡 채널 추가 이벤트(2026년 12월 11까지, 테크뇽 텀블러 추첨 증정)",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898101&qidx=4691&cate=10&allboard=false&nowpage=1",
@@ -103,8 +156,7 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "src": "4da0b96f",
-   "foundAt": "2026-11-19",
-   "desc": "2026 동계 인공지능 SCI 부트캠프 참가자 모집 안내"
+   "foundAt": "2026-11-19"
   },
   {
    "title": "또래상담사와 함께하는 2026년 마음건증진콘텐츠 '미리 메리 크리스마스' 안내",
@@ -157,7 +209,8 @@
    "campus": "",
    "src": "4da0b96f",
    "foundAt": "2026-11-17",
-   "thumb": "data/news/img/14e9c99cac3d6dd1.webp"
+   "thumb": "data/news/img/14e9c99cac3d6dd1.webp",
+   "desc": "1. 투표 링크 학우 여러분의 소중한 한 표를 행사해 주시기 바랍니다. 2. 투표 기간"
   },
   {
    "title": "IXLab 학부 연구인턴 모집",
@@ -178,7 +231,7 @@
    "campus": "",
    "src": "4da0b96f",
    "foundAt": "2026-11-16",
-   "desc": "- 선정 결과: 붙임파일 참조 - 선정 대상: PRE, MINI, IC-JOINT, Global-JOINT 신청팀"
+   "desc": "안녕하세요. 서울과학기술대학교 앵커사업단입니다. 먼저, 2026학년도 확장형 캡스톤디자인 지원사업 추가모집에 관심을 가지고 신청해 주신 모든 학생 여러분께 감사드립니다."
   },
   {
    "title": "2026 동계 비교과 자격증 취득 프로그램 수요조사 안내",
@@ -254,7 +307,7 @@
    "src": "4da0b96f",
    "foundAt": "2026-11-10",
    "thumb": "data/news/img/c22fa018ecc1a612.webp",
-   "desc": "서류 내용 미흡시 후순위로 선발 됨 ( 서명 누락, 작성 누락 등 ) 이전 내용이 없습니다."
+   "desc": "서류 내용 미흡시 후순위로 선발 됨 ( 서명 누락, 작성 누락 등 )"
   },
   {
    "title": "[대외협력처] 공릉동 소상공인 스탬프 투어 이벤트 경품 추첨 당첨자 발표",
@@ -369,61 +422,6 @@
    "campus": "",
    "src": "4da0b96f",
    "foundAt": "2026-11-08"
-  },
-  {
-   "title": "[앵커사업단] 2026학년도 확장형 캡스톤디자인(MINI, PRE, JOINT) 지원사업 추가모집 안내",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897452&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-11-03",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-11-08",
-   "desc": "□ 사업기간: 2026. 11. ~ 2027. 2. □ 지원대상: 서울과학기술대학교 1~4학년 재학생으로 구성된 2명 이상의 팀",
-   "thumb": "data/news/img/70bd65be6f38a791.webp"
-  },
-  {
-   "title": "[학생상담센터] 2026학년도 2학기 대학원생들을 위한 마음나눔 카페 '오늘, 커피한잔' 사전예약 중! (국립대학육성사업)",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897428&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-11-03",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-11-08",
-   "desc": "· 그냥 누군가와 소소한 일상을 공유하고 싶을 때 · 따뜻한 차 한잔과 고급 디저트가 필요할 때 · 바쁜 대학원 생활 중 가볍게 들러서 에너지를 채우고 싶을 때 · 마음 맞는 친구들과 편하게 수다 떨면서 힐링하고…",
-   "thumb": "data/news/img/cbc5a4fde5d3b187.webp"
-  },
-  {
-   "title": "🎁 도서관 첫 대출자를 찾습니다~ 이벤트 안내 (50명에게 문화상품권 2만원권 추첨 증정, ~11/30)",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897342&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-11-02",
-   "kind": "생활",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/9c94d481caa41a63.webp",
-   "desc": "※ 당첨자 발표 : 12월 중 도서관 홈페이지 ※ 문의 : 도서관 970-9041 [국제교류처] 2026학년도 하반기 무료 영어 클리닉(English Clinic) 참여자 모집(재학생/교직원, 그룹상담 가능)…"
-  },
-  {
-   "title": "[학생상담센터] 2026학년도 2학기 마음나눔 카페 '오늘, 커피한잔' 사전 모집 중!",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897275&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-30",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-11-08",
-   "desc": "\"오늘 공강인데 누구랑 가볍게 수다 떨 사람~?“ \"집단상담? 심리치료? 너무 무겁고 내 깊은 이야기 하기 부담스러웠다면?\" 마음나눔카페로 오세요!"
-  },
-  {
-   "title": "[홍보실] 가을愛 문을 열다 - SeoulTech Autumn Music Night",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897059&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-26",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/06d528e92b9b9c31.webp",
-   "desc": "깊어가는 가을, 서울과기대에서 펼쳐지는 특별한 음악 쉼표, 서울과학기술대학교 모든 구성원과 함께 하는 가을 미니콘서트에 초대합니다."
   }
  ]
 }

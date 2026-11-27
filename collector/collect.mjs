@@ -17,14 +17,15 @@ import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mj
 import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, readHuntMoves, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
-import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
+import { isAttachmentEntry, detailAttachments, stripSiteChrome, trimActivityTails } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, actRereadLeft, mergeActAttachments, ACT_ATTACH_V, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
 import { tidyExternal, dropReason as externalDropReason, fillDeadlineFromHint } from './external-clean.mjs';
+import { actGateOn, stampNewActivity, dropStampWithoutId, dedupeActivities } from './act-card.mjs';   // 대외활동 유료 관문의 숨김 표시(2026-11-25) — 스위치 판정은 유료 로봇과 같은 함수
 import { actKeepDate, capActivities } from './open-api-map.mjs';   // 활동 피드 60일·상한이 같은 날짜를 쓴다 (순수 모듈 — 불러도 아무것도 실행하지 않는다)
 import { canonUrl, activityId } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
@@ -92,6 +93,13 @@ let acts = { updatedAt: null, items: [] };
 try { acts = JSON.parse(fs.readFileSync(actsPath, 'utf8')); } catch { /* 첫 실행 */ }
 const FRESH_PER_BOARD = Number(process.env.FRESH_PER_BOARD || 20);   // 장학 게시판 하나에서 한 실행에 상세까지 읽는 새 글 상한 (2026-09-30 40 → 20)
 const ACT_FRESH_MAX = 20;    // 게시판 하나에서 한 실행에 상세까지 읽는 새 글 상한 (장학도 20 · FRESH_PER_BOARD)
+/* 대외활동 유료 관문 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-1) — 활동 스위치(card-read-config.json 의 enabled 와 activities.enabled 둘 다)가 켜져 있으면
+   처음 본 게시판 활동 글에 숨김 표시(paidGate · 한국 날짜)를 단다. 그 글은 AI 카드가 실려야 학생 화면에 보인다(앱 match-engine publishedActivities).
+   「보이는가」는 앱과 같은 함수(paidGateOpen)와 결과 파일(data/act-read.json — 🔴 읽기만 한다 · 쓰는 것은 유료 로봇)로 가린다 — 피드 상한이 보이는 글만 세려고 */
+const CARD_CFG = (() => { try { return JSON.parse(fs.readFileSync(new URL('card-read-config.json', HERE), 'utf8')); } catch { return {}; } })();
+const ACT_READ = (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/act-read.json', HERE), 'utf8')); } catch { return null; } })();
+const { paidGateOpen } = createRequire(import.meta.url)('../match-engine.js');
+const kstDay = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 const ACT_CAP = 200;         // 폰이 통째로 받는 파일 — 상한을 두어 작게 유지한다
 /* 관리자가 숨긴 글 (activity-config.json hideUrls · 2026-09-29) — 지우지 않고 hidden 표식을 붙인다(되살리기가 된다) */
 let actHide = new Set();
@@ -389,10 +397,12 @@ async function harvestBoard(s, ctx = { dead: false }) {
         const field = activityField(it.title, it.kind);
         if (field) it.field = field;
         it.excerptsAt = new Date().toISOString().slice(0, 10);   // 원문을 읽은 날 — 아래 소급 보강이 다시 읽지 않게
+        if (detail.text) it.attachV = ACT_ATTACH_V;   // 첨부도 이 판으로 읽었다(readDetailInto) — 못 받은 날은 적지 않는다(다음 실행이 다시 읽는다)
         it.school = s.school || '';
         it.campus = s.campus === '공통' ? '' : (s.campus || '');
         if (!it.school && s.host) it.host = s.host;   // 전국 글은 주최를 설정에서 받는다(제목으로 짐작하지 않는다)
         it.foundAt = new Date().toISOString().slice(0, 10);
+        stampNewActivity(it, CARD_CFG, kstDay());   // 유료 관문 — 스위치가 켜져 있으면 숨김 표시를 단다(처음 본 글을 만드는 이 자리 하나에서만 · act-card.mjs)
         seenAct[urlKey(it.url)] = it.foundAt;
         freshActs.push(it);
       }
@@ -623,6 +633,7 @@ acts.items = acts.items.filter((n) => !notActivity(n.title) && !unreadableSource
     usedIds.set(n.id, n.url);
   }
 }
+dropStampWithoutId(acts.items);   // id 를 받지 못한 글은 숨김 표시를 뗀다 — AI 카드와 id 로 만난다(그 글은 지금처럼 바로 보인다)
 const todayIsoAct = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);   // 한국 날짜 — 결과 발표가 지났는지 잰다(deadlineFromNotice ④)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
 acts.items.forEach(sanitizeSteps);   // 「1. 2. 3.」 단계 번호 떼기 — 연락처 단계가 빠지면 「3.」부터 남던 1365 글(2026-11-02 · activity-excerpts.mjs stripStepNumber) · 소급
@@ -631,10 +642,10 @@ acts.items.forEach(sanitizeDocs);   // 서류 칸의 사이트 맨 아래 줄·�
 acts.items.forEach(sanitizeForeign);   // 칸 안에 딸려 온 다른 글 제목 걷기(activity-excerpts.mjs otherPostTitle · 2026-11-17) · 소급
 acts.items.forEach((n) => deadlineFromNotice(n, todayIsoAct));   // 마감이 빈 글은 원문 기간 줄·제목 「(~11/23)」에서 마감을 읽는다 · 결과 발표가 지난 글은 닫힌다 — 끝난 모집이 '진행 중'으로 뜨지 않게(2026-11-17) · 소급
 acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
-acts.items = dedupeNotices(acts.items);
+acts.items = dedupeActivities(acts.items, dedupeNotices, (n) => !!n && (!!n.paidOpen || paidGateOpen(n, ACT_READ, todayIsoAct)));   // 같은 글은 하나로 — 학생에게 보이던 글(앱과 같은 판정)과 합쳐진 새 글은 숨김 표시를 뗀다(한 번 보인 글을 숨기지 않는다 · act-card.mjs)
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
-acts.items = capActivities(acts.items, ACT_CAP);   // 상한은 살아 있는 날(actKeepDate)로 고르고 순서는 foundAt 그대로 — 오래 열린 API 글이 잘렸다 '새 글'로 돌아오지 않게(점검 api-11)
+acts.items = capActivities(acts.items, ACT_CAP, (n) => !!n.paidOpen || paidGateOpen(n, ACT_READ, todayIsoAct));   // 🔴 상한은 학생에게 보이는 글만 센다 — 숨김 글이 보이던 글을 밀어내지 않게 ·   // 상한은 살아 있는 날(actKeepDate)로 고르고 순서는 foundAt 그대로 — 오래 열린 API 글이 잘렸다 '새 글'로 돌아오지 않게(점검 api-11)
 /* 관리자가 숨긴 표식(hiddenBy)이 있는 글은 주소가 바뀌어도 숨김을 지킨다 — 공공 API 글은 주소 칸 고르기가 바뀌면 주소가 달라진다(리뷰 2026-10-04 ·
    번호로 이어받은 숨김을 여기서 풀면 숨긴 글이 다시 뜬다). 되살리기는 관리자 버튼이 hidden·hiddenBy 를 함께 지운다 */
 acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; else if (n.hidden && !n.hiddenBy && !actHide.has(canonUrl(n.url))) delete n.hidden; });
@@ -643,7 +654,7 @@ acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; e
    (못 읽었어도 적는다 — 없는 이름표를 매일 다시 찾지 않는다). */
 const todayIso = new Date().toISOString().slice(0, 10);
 const ACT_BACKFILL = 40;   // 2026-10-01 20→40 — 자격 판(detailsV) 소급으로 다시 읽을 글이 130건이다. 예산(budget.hasRoom) 안에서만 돈다
-let actBackfilled = 0, actDocsBackfilled = 0;
+let actBackfilled = 0, actDocsBackfilled = 0, actAttachBackfilled = 0, actAttachAdded = 0;
 for (const it of acts.items) {
   /* 🔴 자격 판(detailsV)이 옛것인 글도 다시 읽는다 (2026-10-01 · 소급 — 원칙 7). API 글은 API 로봇이 채우므로 건너뛴다 */
   /* API 글은 API 본문으로 읽었으니 건너뛴다 — 단 거기서 자격이 안 나온 글은 원문 페이지를 읽어 본다(제주 청년정책 「체인지메이커」: API 칸은 한 줄, 페이지엔 자격 표 · 2026-10-16) */
@@ -660,12 +671,19 @@ for (const it of acts.items) {
     actBackfilled += 1; actDocsBackfilled += 1;
     continue;
   }
+  if (need === 'attach') {
+    /* 첨부만 — 자격·발췌·마감은 그대로 둔다(2026-11-25 · 열려 있는 글의 첨부를 한 번 소급해 다시 읽는다). 못 받으면 이레 뒤에 다시 */
+    if (detail.text) { actAttachAdded += mergeActAttachments(it, detail.attachments); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
+    actBackfilled += 1; actAttachBackfilled += 1;
+    continue;
+  }
   const ex = activityExcerpts(detail.text);
   if (ex.deadline) it.deadline = ex.deadline;
   if (ex.excerpts.length) it.excerpts = ex.excerpts;
   if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
   if (detail.text) putActivityDetails(it, activityDetails(detail.text, it.title));
   if (detail.text) putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) });
+  if (detail.text) mergeActAttachments(it, detail.attachments);   // 다시 읽은 김에 새로 보이는 첨부를 더한다(있던 줄은 그대로 · 2026-11-25)
   if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
   if (detail.text) delete it.detailsTriedAt; else it.detailsTriedAt = todayIso;   // 못 받았으면 이레 뒤에 다시
   actBackfilled += 1;
@@ -674,6 +692,17 @@ acts.updatedAt = notices.updatedAt;
 /* 분야 목록 원본을 함께 싣는다 (2026-10-04 · 프로필 「관심 분야」 칸) — 앱은 빌드가 없어 activity-kind.mjs 를 못 들여온다.
    앱에 목록을 따로 적으면 두 벌이 되어 수집기가 갈래를 늘려도 화면은 모른다(분야 칩과 같은 이유) */
 acts.fields = ACTIVITY_FIELDS;
+/* 그 이름으로 이미 받은 원본·만든 사본이 있는 첨부 이름 — 글 id → 이름들(읽기만). 꼬리를 다듬어 이름이 바뀌면 그 사본이 주인을 잃으므로 그런 줄은 그대로 둔다 */
+function usedAttachNames() {
+  const used = new Map();
+  const put = (id, name) => { if (!id || !name) return; if (!used.has(id)) used.set(id, new Set()); used.get(id).add(name); };
+  try { for (const line of fs.readFileSync(new URL('extracted/forms-index.txt', HERE), 'utf8').split('\n')) { const c = line.split('\t'); put(c[4], c[2]); } } catch { /* 색인 없음 */ }
+  for (const dir of ['forms-pdf', 'docs-pdf']) {
+    try { for (const [id, rows] of Object.entries(JSON.parse(fs.readFileSync(new URL(`../data/${dir}/index.json`, HERE), 'utf8')).items || {})) for (const r of rows || []) put(id, r && r.name); } catch { /* 색인 없음 */ }
+  }
+  return used;
+}
+trimActivityTails(acts.items, usedAttachNames());   // 첨부 이름의 사이트 꼬리(용량·내려받은 횟수) 떼기 — 꼬리 때문에 문서로 안 읽히던 줄(2026-11-25 · attachment-link.mjs trimSiteTail) · 소급
 stripSiteChrome([acts.items]);   // 게시판 공통 링크 걷기(attachment-link.mjs) — 활동 글은 활동끼리 센다
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 
@@ -812,7 +841,14 @@ if (chronic.length) {
 
 /* 대외활동·공모전 — 컨펌 대상이 아니다(제목+링크만 앱 '대외활동' 탭에 실린다). 상태와 새 글만 적는다. */
 lines.push(`### 🎯 대외활동·공모전 새 글 ${freshActs.length}건 → 앱 '대외활동' 탭 (data/activities.json · ${acts.items.length}건 게재 중)`);
-if (actBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (그중 서류 칸만 ${actDocsBackfilled}건 · 남은 ${acts.items.filter((n) => actRereadNeed(n)).length}건은 다음 실행에)`);
+{ /* 유료 관문 — 숨겨 둔 새 글은 아직 앱에 보이지 않는다(위 줄의 「앱 탭」이 사실과 다르지 않게 따로 적는다) */
+  const gatedNew = freshActs.filter((n) => n.paidGate).length, gatedAll = acts.items.filter((n) => n.paidGate && !n.paidOpen && !paidGateOpen(n, ACT_READ, todayIsoAct)).length;
+  if (gatedNew || gatedAll) lines.push(`- 🔒 유료 확인 전이라 숨겨 둔 글 ${gatedAll}건 (오늘 새 글 가운데 ${gatedNew}건 · AI 카드가 실리면 보입니다 · 사흘이 지나도 카드가 없으면 무료 값으로 보입니다)${actGateOn(CARD_CFG) ? '' : ' · 지금은 활동 스위치가 꺼져 있어 새 글에는 표시를 달지 않습니다'}`);
+}
+/* 첨부만 다시 살핀 글은 따로 적는다 — 「마감·발췌를 채웠다」에 섞으면 숫자가 사실과 다르다(리뷰 2026-11-25) */
+const left = actRereadLeft(acts.items);
+if (actBackfilled - actAttachBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled - actAttachBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (그중 서류 칸만 ${actDocsBackfilled}건 · 남은 ${left.fill}건은 다음 실행에)`);
+if (actAttachBackfilled) lines.push(`- 📎 열려 있는 글 ${actAttachBackfilled}건의 첨부를 다시 살폈습니다 (새로 찾은 파일 ${actAttachAdded}개 · 남은 ${left.attach}건은 다음 실행에)`);
 for (const r of actResults) {
   lines.push(`- **${r.name}** — ${r.status}`);
   for (const i of r.items) lines.push(`  - [${i.kind}] [${i.title}](${i.url})${i.deadlineHint ? ` — ⏰ ${i.deadlineHint}` : ''}`);

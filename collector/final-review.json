@@ -428,92 +428,694 @@
   },
   "auto-oardid323654menuno200318": {
    "name": "서울 2026학년도 2학기 교외 주거비 지원장학 'Cheer-up 장학' 신청 안내(2026.11.25...",
-   "hash": "7225a95b2b2491e6",
+   "hash": "83fd12c269c6ef08",
    "at": "2026-11-25",
    "readAt": "2026-11-25",
-   "cardHash": "5701f07a70e7fdc3",
-   "summary": "우선순위 첫 줄을 '1,000명 초과 시 순위별 우선 선발' 줄과 1순위 줄로 나누고, 사유서 병합 위치·주민등록등본 마스킹 및 주소 일치·사실확인서 동일 직인 요건을 추가했으며 전화 문의 줄에서 문의 안내를 덜어냈습니다.",
+   "cardHash": "33ffd9b5fb1e2adb",
+   "summary": "카드 내용은 원문과 대체로 맞아 그대로 두고, 빠진 유의사항(실제 월세 지출 요건, 주소지 일치, 계약서 날짜 수기 수정 시 탈락, 간이영수증·현금 불인정)을 추가했습니다. P1 사본은 원본의 제목과 안내 문단이 빠져 broken 으로 판정했습니다.",
    "changes": [
     {
-     "field": "priority",
-     "label": "먼저 뽑는 기준",
+     "field": "documents",
+     "label": "제출 서류",
      "kind": "add",
-     "text": "신청인원이 1,000명을 초과할 경우 아래 순위별로 우선 선발"
-    },
-    {
-     "field": "priority",
-     "label": "먼저 뽑는 기준",
-     "kind": "add",
-     "text": "1순위: 동대문구 거주자(주민등록등본상 본인 거주지 기준)"
-    },
-    {
-     "field": "priority",
-     "label": "먼저 뽑는 기준",
-     "kind": "remove",
-     "text": "신청인원이 1,000명을 초과할 경우 1순위: 동대문구 거주자(주민등록등본상 본인 거주지 기준)"
-    },
-    {
-     "field": "apply",
-     "label": "접수 방법",
-     "kind": "add",
-     "text": "자유양식 사유서(해당자만)는 PDF 맨 마지막(3-1번 다음)에 병합"
+     "text": "임대차계약서 전체 사본"
     },
     {
      "field": "documents",
      "label": "제출 서류",
      "kind": "add",
-     "text": "입실확인서(또는 재사증명서) 1부(하숙집·고시원·레지던스·교외기숙사 등 일반 계약서가 없는 경우)"
+     "text": "입실확인서(또는 재사증명서)"
+    },
+    {
+     "field": "documents",
+     "label": "제출 서류",
+     "kind": "add",
+     "text": "자유양식 사유서(해당자)"
     },
     {
      "field": "documents",
      "label": "제출 서류",
      "kind": "remove",
-     "text": "입실확인서 1부(하숙집·고시원·레지던스·교외기숙사 등 일반 계약서가 없는 경우)"
+     "text": "임대차계약서 전체 사본(또는 입실확인서 1부)"
+    },
+    {
+     "field": "documents",
+     "label": "제출 서류",
+     "kind": "remove",
+     "text": "입실확인서(하숙집·고시원·레지던스·교외기숙사 해당자)"
+    },
+    {
+     "field": "documents",
+     "label": "제출 서류",
+     "kind": "remove",
+     "text": "자유양식 사유서(월세+관리비 일괄 이체 등 해당자)"
     },
     {
      "field": "notes",
      "label": "유의사항",
      "kind": "add",
-     "text": "본인 주민등록등본은 주민등록번호 뒷자리 미포함(마스킹)으로 발급해야 합니다."
+     "text": "부모님 명의 계약서는 학생 본인이 전입신고를 완료하고 부모님이 서울·경기 외 지역에 거주하는 경우에만 인정됩니다."
     },
     {
      "field": "notes",
      "label": "유의사항",
      "kind": "add",
-     "text": "원칙적으로 임대차계약서상 주소지와 본인 주민등록등본상 주소지가 일치해야 합니다."
+     "text": "묵시적 갱신의 경우 원계약서에 찍힌 것과 동일한 임대인 직인이 날인되어야 합니다."
     },
     {
      "field": "notes",
      "label": "유의사항",
      "kind": "add",
-     "text": "임대차계약 사실확인서에는 원계약서에 찍힌 것과 동일한 임대인 직인 날인이 필수입니다."
+     "text": "기존 계약서의 날짜를 손으로 수정하면 탈락합니다."
     },
     {
      "field": "notes",
      "label": "유의사항",
      "kind": "add",
-     "text": "전화 문의는 운영하지 않습니다."
+     "text": "실제 월세 지출이 있는 경우에만 신청할 수 있습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "임대차계약서상 주소지와 본인 주민등록등본상 주소지가 일치해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "월세 납부 증빙으로 간이영수증이나 현금 지급은 인정되지 않습니다."
     },
     {
      "field": "notes",
      "label": "유의사항",
      "kind": "remove",
-     "text": "전화 문의는 운영하지 않으며, 문의는 학생지원센터(장학) 홈페이지 질의응답 게시판을 이용해야 합니다."
+     "text": "부모님 명의 계약서는 부모님 주소지가 서울·경기 이외 지역이고 학생 본인이 전입신고를 완료한 경우에만 인정됩니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "묵시적 갱신의 경우 기존 계약서와 동일한 임대인 직인이 날인되어야 합니다."
     }
    ],
    "roles": [
+    {
+     "file": "form-13cgcf-2.hwp",
+     "attach": "임대차계약 사실 확인서.hwp",
+     "hash": "b12b90ddcb225b55",
+     "role": "content",
+     "formStart": "",
+     "why": "임대인이 작성·날인해 주는 임대차계약 사실 확인서 양식으로, 학생이 직접 채우는 서식이 아닙니다."
+    },
     {
      "file": "elig-13cgcf-1.pdf",
      "attach": null,
      "hash": "e49da1b459d4abf8",
      "role": "content",
      "formStart": "",
-     "why": "Cheer-Up 장학 시행계획 공고문으로 자격·금액·신청기간·서류·유의사항을 담은 읽는 글이며 학생이 채우는 서식은 들어 있지 않다."
+     "why": "Cheer-Up 장학의 자격·금액·신청기간·제출서류 등을 담은 시행계획 공고문입니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-oardid323654menuno200318/1-임대차계약_사실_확인서.pdf",
+     "name": "임대차계약 사실 확인서.hwp",
+     "bytes": 66893,
+     "verdict": "broken",
+     "why": "원본 A1 맨 위의 제목 「임대차계약 사실 확인서」와 안내 문단 1·2번이 사본 1쪽에서 빠져 있습니다."
+    }
+   ],
+   "problems": [
+    {
+     "kind": "pdf-broken",
+     "doc": "임대차계약 사실 확인서.hwp",
+     "reason": "앱에 올렸던 신청서 사본 「임대차계약 사실 확인서.hwp」의 변환이 잘못됐습니다 — 원본 A1 맨 위의 제목 「임대차계약 사실 확인서」와 안내 문단 1·2번이 사본 1쪽에서 빠져 있습니다.. 이 사본은 앱에서 내렸습니다 — 학생에게는 올린 원본 파일만 보입니다.",
+     "check": "원본 첨부를 열어 확인해 주세요(원본이 바뀌거나 변환 방법을 고치면 로봇이 사본을 다시 만듭니다)."
+    }
+   ],
+   "dropped": [
+    {
+     "kind": "form",
+     "name": "임대차계약 사실 확인서.hwp",
+     "verdict": "broken",
+     "why": "원본 A1 맨 위의 제목 「임대차계약 사실 확인서」와 안내 문단 1·2번이 사본 1쪽에서 빠져 있습니다.",
+     "at": "2026-11-25"
+    }
+   ]
+  },
+  "auto-bbssc58944731artclviewdo": {
+   "name": "2027년도 제35기 세아해암장학생 추천(신촌캠퍼스)",
+   "hash": "d2b8a8d90ae46215",
+   "at": "2026-11-26",
+   "readAt": "2026-11-25",
+   "cardHash": "0ec8776b3ff7834b",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-12ojwz-6.docx",
+     "attach": "2-(서식) 자기소개서.docx",
+     "hash": "59f1bc6dd1f65189",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 성명과 문항 답변을 직접 작성하는 자기소개서 서식만 들어 있습니다."
+    },
+    {
+     "file": "form-12ojwz-7.docx",
+     "attach": "3-(서식) 포토에세이.docx",
+     "hash": "80fa70992986ef2f",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 사진과 부가설명을 채워 내는 포토에세이 서식만 들어 있습니다."
+    },
+    {
+     "file": "form-12ojwz-8.docx",
+     "attach": "4-(서식) 과학탐구활동 실행 이력서.docx",
+     "hash": "68462b0a87832802",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 활동 내용을 채워 내는 과학탐구활동 실행 이력서 서식과 그 서식의 작성 가이드만 들어 있습니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-bbssc58944731artclviewdo/1-2-_서식_자기소개서.pdf",
+     "name": "2-(서식) 자기소개서.docx",
+     "bytes": 52405,
+     "verdict": "ok",
+     "why": "A1 자기소개서 서식의 머리칸과 Q1~Q3 문항, 작성 안내가 2쪽에 걸쳐 빠짐없이 읽힙니다."
+    },
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-bbssc58944731artclviewdo/2-3-_서식_포토에세이.pdf",
+     "name": "3-(서식) 포토에세이.docx",
+     "bytes": 43130,
+     "verdict": "ok",
+     "why": "A2 포토에세이 서식의 머리칸, 사진 첨부란, 부가설명 안내가 그대로 들어 있습니다."
+    },
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-bbssc58944731artclviewdo/3-4-_서식_과학탐구활동_실행_이력서.pdf",
+     "name": "4-(서식) 과학탐구활동 실행 이력서.docx",
+     "bytes": 106832,
+     "verdict": "ok",
+     "why": "A3 이력서 서식의 실행활동 1~3 표와 4쪽의 작성 가이드까지 원본 내용이 모두 읽힙니다."
+    },
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-bbssc58944731artclviewdo/4-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf",
+     "name": "6-(서식) 개인정보 제공 및 사용 동의서_학교 추천 지원자.pdf",
+     "bytes": 94932,
+     "verdict": "ok",
+     "why": "원문에 같은 내용의 첨부는 없으나, 사본 자체가 세아해암학술장학재단 제35기 지원자용 개인정보 수집 및 사용 동의서로 글자와 표가 온전히 읽힙니다."
+    }
+   ],
+   "problems": []
+  },
+  "auto-ghaknoticedetail26767096": {
+   "name": "2026-2학기 SOS두드림장학 신청 안내",
+   "hash": "753a3d698873e5ce",
+   "at": "2026-11-25",
+   "readAt": "2026-11-25",
+   "cardHash": "b6ed754ae8b3103a",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-amepagescholarshipnotice-1tlg7ak": {
+   "name": "[교외] 농림축산식품부 농어촌희망재단 청년창업농장학생 선발 안내(1/5 마감, 등록금 전액 및 학업장려금 2",
+   "hash": "cd1a387e72084b96",
+   "at": "2026-11-25",
+   "readAt": "2026-11-25",
+   "cardHash": "df0cd9d428e6b407",
+   "summary": "나이 요건 줄에서 근거가 다른 계속장학생 40세 이상 가능 문구를 떼어 유의사항으로 옮기고, 신규장학생 의무교육 시간과 최대지원횟수 유의사항을 채웠습니다.",
+   "changes": [
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "add",
+     "text": "(신규) 시행년도(2027.1.1.) 기준 만 40세 미만인 학생"
+    },
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "remove",
+     "text": "(신규) 시행년도(2027.1.1.) 기준 만 40세 미만인 학생(계속장학생은 40세 이상도 가능)"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "신규장학생은 의무교육 25시간(오리엔테이션 5시간, 현장 및 온라인 교육 20시간)을 이수해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "계속장학생은 40세 이상도 신청할 수 있습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "최대지원횟수는 농업계대학 농식품계열학과 7회, 비농업계대학 4회입니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "elig-1g99jp-1.hwp",
+     "attach": null,
+     "hash": "6f7dac3a6e519797",
+     "role": "content",
+     "formStart": "",
+     "why": "한국농어촌희망재단의 장학생 선발 공고문으로 학생이 채워 내는 서식 없이 읽는 글만 들어 있습니다."
+    },
+    {
+     "file": "elig-1g99jp-2.pdf",
+     "attach": null,
+     "hash": "c6e33e909a20637e",
+     "role": "content",
+     "formStart": "",
+     "why": "선발안내서 본문(지원 대상·지원 내용·의무사항·선발절차)으로, 붙임 서식은 목차에만 이름이 나올 뿐 서식 자체는 들어 있지 않습니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "doc",
+     "file": "docs-pdf/auto-amepagescholarshipnotice-1tlg7ak/1-_붙임_2._2027년_1학기_농림축산식품부_청년창업농장학금_장학생_선발공고.pdf",
+     "name": "[붙임]2. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "bytes": 123279,
+     "verdict": "ok",
+     "why": "A1 공고문과 내용이 같으며 1~3쪽에 자격요건·신청기간·유의사항부터 이사장 명의까지 빠짐없이 읽을 수 있게 들어 있습니다."
+    }
+   ],
+   "problems": []
+  },
+  "auto-amepagescholarshipnotice-06jvrmz": {
+   "name": "[교외] 에몬스 장학생 선발 안내(1/8 마감, 생활비 500만원)",
+   "hash": "0fd56182160a17d0",
+   "at": "2026-11-25",
+   "readAt": "2026-11-25",
+   "cardHash": "01f7b07870bb1b93",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "elig-1h39ae-1.jpg",
+     "attach": null,
+     "hash": "8970fd49302a52dc",
+     "role": "content",
+     "formStart": "",
+     "why": "모집 정보·지원 자격·지원 방법을 담은 장학생 모집 포스터로, 학생이 채우는 서식이 없습니다."
     }
    ],
    "pdfs": [],
    "problems": []
+  },
+  "auto-8bnum57138cate0qidx57138-0bjhkqt": {
+   "name": "[미래융합대학] 2026학년도 2학기 국가 근로장학생 모집(교체 선발)",
+   "hash": "f6b975455595119a",
+   "at": "2026-11-27",
+   "readAt": "2026-11-26",
+   "cardHash": "b13fca8166079c04",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-1n554h-2.hwp",
+     "attach": "(붙임1) 국가근로장학생 지원서.hwp",
+     "hash": "8103ff43c4f0d45a",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 직접 작성해 제출하는 국가근로장학생 지원서 서식(하단 추천서 칸 포함)만 들어 있고 읽는 공고문은 없습니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-8bnum57138cate0qidx57138-0bjhkqt/1-_붙임1_국가근로장학생_지원서.pdf",
+     "name": "(붙임1) 국가근로장학생 지원서.hwp",
+     "bytes": 71257,
+     "verdict": "ok",
+     "why": "1쪽에 원본 지원서의 표와 추천서 칸, 이중근무 불가 안내까지 모두 온전히 들어 있으며 2쪽은 빈 쪽일 뿐 빠진 내용은 없습니다."
+    }
+   ],
+   "problems": []
+  },
+  "auto-ent2431273181artclviewdo": {
+   "name": "[글로벌] 2026학년도 2학기(동계방학) 국가근로 장학생 모집 안내(교내/교외)",
+   "hash": "0d34509b45388e44",
+   "at": "2026-11-27",
+   "readAt": "2026-11-26",
+   "cardHash": "b1ebd0c162a494c1",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-yu94q5-1.hwp",
+     "attach": "(서식)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+     "hash": "26ef732582080dcd",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 소속·성명·학번·지원부서·지원동기 등을 직접 채워 내는 지원서 서식만 들어 있습니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-ent2431273181artclviewdo/1-_서식_2026학년도_2학기_동계방학_국가근로장학생_지원서.pdf",
+     "name": "(서식)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+     "bytes": 48842,
+     "verdict": "ok",
+     "why": "1쪽에 원본 지원서의 제목·소속·성명·학번·연락처·이메일·지원부서/기관·지원 동기 칸과 서명란이 깨짐 없이 표 형태 그대로 들어 있습니다."
+    }
+   ],
+   "problems": []
+  },
+  "auto-oarticleno160764nocat501": {
+   "name": "[국제언어교육원] 2026년 겨울 학기 유학생활도우미 봉사장학생 모집",
+   "hash": "9b9df684ed2c42af",
+   "at": "2026-11-26",
+   "readAt": "2026-11-26",
+   "cardHash": "6c0aaee66a916f6c",
+   "summary": "외국어 급수 줄에서 원문에 없는 「점수」 표기를 빼고, 서로 떨어진 원문을 합쳤던 활동기간·OT 줄을 원문 근거별로 나누었습니다. 나머지는 원문과 일치해 그대로 두었습니다.",
+   "changes": [
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "add",
+     "text": "학기 초과자 중 등록금을 전액 납부한 학생(신청 가능)"
+    },
+    {
+     "field": "eligibility",
+     "label": "지원 자격",
+     "kind": "remove",
+     "text": "학기 초과자 중 등록금 전액 납부자는 신청 가능"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "외국어 능력을 기재하는 경우 본인 실력을 공인된 급수로 명확히 기재해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "활동 기간은 12월 24일(목)~1월 24일(일) 약 4주입니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "활동 기간 동안 5회 이상 만나 한국생활 및 한국어 학습 등을 돕습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "OT는 12월 23일(수) 오후 6시 Google Meet로 진행됩니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "OT에 불참하면 자동 탈락됩니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "외국어 능력을 기재하는 경우 공인된 급수(점수)를 명확히 기재해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "활동 기간은 12월 24일(목)~1월 24일(일) 약 4주이며, 기간 중 5회 이상 만나야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "12월 23일(수) 오후 6시 Google Meet로 진행되는 OT에 불참하면 자동 탈락됩니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "elig-qlp1z6-1.jpg",
+     "attach": null,
+     "hash": "4afdb226dede85c9",
+     "role": "content",
+     "formStart": "",
+     "why": "유학생활도우미 봉사장학생 모집 자격·신청 방법·일정을 안내하는 포스터 공고문으로 학생이 채우는 서식이 없습니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-jong659274854artclviewdo": {
+   "name": "[교내]☆★2026학년도 2학기 학생복지처 특별장학금 신청 안내(~12/7)",
+   "hash": "aa7cfbfd51ee3e3c",
+   "at": "2026-11-27",
+   "readAt": "2026-11-26",
+   "cardHash": "3e83ec8fd928b40b",
+   "summary": "고친 것 없음",
+   "changes": [
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "마감시간 내에 신청서 작성 및 제출을 완료해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "마감 이후 제출 시 오류로 접수되지 않을 수 있으니 시간을 엄수해야 합니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "마감시간 내에 신청서 작성 및 제출을 완료해야 하며, 마감 이후 제출 시 오류로 접수되지 않을 수 있으니 시간을 엄수해야 합니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "form-1gicjt-1.hwp",
+     "attach": "2026년 2학기 학생복지처 특별장학금 학업계획서.hwp",
+     "hash": "0eb37de01e81b00c",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 인적 사항과 학업 계획을 직접 작성해 제출하는 학업계획서 서식만 들어 있습니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-jong659274854artclviewdo/1-2026년_2학기_학생복지처_특별장학금_학업계획서.pdf",
+     "name": "2026년 2학기 학생복지처 특별장학금 학업계획서.hwp",
+     "bytes": 37698,
+     "verdict": "ok",
+     "why": "1쪽에 원본 학업계획서의 제목·인적 사항 표·작성 안내가 그대로 읽히게 들어 있고, 2쪽은 빈 쪽이지만 원본 내용이 빠진 것은 없습니다."
+    }
+   ],
+   "problems": []
+  },
+  "auto-enoticedoarticleno770709": {
+   "name": "「TGL 장학금」 제1기 외국인 유학생 장학생 선발 안내",
+   "hash": "b81b51927cd3ed68",
+   "at": "2026-11-27",
+   "readAt": "2026-11-26",
+   "cardHash": "e757513b01f97a8e",
+   "summary": "고친 것 없음",
+   "changes": [
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "추천서는 추천인이 직접 작성하고 서명해야 합니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "form-tqldc7-3.docx",
+     "attach": "「TGL_장학금」_추천서_양식.docx",
+     "hash": "e8d70fd5de1f509d",
+     "role": "content",
+     "formStart": "",
+     "why": "추천인이 직접 작성·서명하는 추천서 양식으로, 학생이 채워 내는 서식이 아니다."
+    },
+    {
+     "file": "elig-tqldc7-1.pdf",
+     "attach": null,
+     "hash": "00a4b9117883fb2c",
+     "role": "content",
+     "formStart": "",
+     "why": "지원 자격·우대 사항·장학금액·접수 방법·제출 서류·모집기간이 담긴 공고 포스터이다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "doc",
+     "file": "docs-pdf/auto-enoticedoarticleno770709/1-_TGL_장학금__추천서_양식.pdf",
+     "name": "「TGL_장학금」_추천서_양식.docx",
+     "bytes": 166596,
+     "verdict": "ok",
+     "why": "원본 [A1] 추천서 양식의 안내문·지원자/추천인 정보·개인정보 동의·추천 사유·서명란이 두 쪽에 깨짐 없이 모두 들어 있다."
+    }
+   ],
+   "problems": []
+  },
+  "auto-spxboardid5cate8key71122": {
+   "name": "[장학안내] [한국농수산식품유통공사] 「aT 꿈씨앗 장학금」 장학생 선발 ...",
+   "hash": "f419bc0a4f21ad72",
+   "at": "2026-11-26",
+   "readAt": "2026-11-26",
+   "cardHash": "2ab74797db557eeb",
+   "summary": "선발 결과 공고라 신청 관련 칸은 비워 두는 것이 맞으며, 기존 유의사항 한 줄에 원문 근거만 붙였습니다. 고친 내용은 없습니다.",
+   "changes": [],
+   "roles": [],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-0713no2516453sitedvscdkr": {
+   "name": "「2026년 동기 국가근로장학금 취업연계 중점대학」 학생 추가모집 안내",
+   "hash": "b64238bec8c9bbaf",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "54a99d928a3f91ad",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [],
+   "pdfs": [],
+   "problems": []
+  },
+  "auto-15nttno171908searchctgry": {
+   "name": "26학년도 동계 국가근로장학금 취업연계중점대학사업 장학생 모집",
+   "hash": "53f76dd313e05188",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "87a9f5575f008e99",
+   "summary": "카드 내용이 원문과 일치하여 고친 것 없음.",
+   "changes": [
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "근로 기관은 지역 내 공공기관 및 중소기업 8개사입니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "기업 사정에 따라 희망하는 기업으로 배정되지 않을 수 있습니다."
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "지원 현황 및 기업 사정에 따라 희망 기업 배정이 어려울 수 있습니다."
+    }
+   ],
+   "roles": [
+    {
+     "file": "form-eiuss5-3.hwp",
+     "attach": "(학생용) 국가근로장학금 취업연계 중점대학 장학생 지원서.hwp",
+     "hash": "e02326f9c650db0a",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 작성하는 지원서·자기소개서·개인정보 동의서 서식만 들어 있습니다."
+    },
+    {
+     "file": "elig-eiuss5-1.pdf",
+     "attach": null,
+     "hash": "4714f334150bc621",
+     "role": "content",
+     "formStart": "",
+     "why": "사업 개요, 선발 기준, 유의사항을 담은 신청 안내문입니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-15nttno171908searchctgry/1-_학생용_국가근로장학금_취업연계_중점대학_장학생_지원서.pdf",
+     "name": "(학생용) 국가근로장학금 취업연계 중점대학 장학생 지원서.hwp",
+     "bytes": 161459,
+     "verdict": "ok",
+     "why": "원본 [A1]의 지원서·자기소개서·개인정보 동의서가 모두 읽을 수 있게 들어 있고, 2쪽이 빈 쪽이지만 빠진 내용은 없습니다."
+    }
+   ],
+   "problems": []
+  },
+  "auto-archgbn0searchordersort0-0ty595g": {
+   "name": "2026학년도 강릉.원주캠퍼스 공로장학금 신청 안내",
+   "hash": "dff01c47d94bf816",
+   "at": "2026-11-27",
+   "readAt": "2026-11-27",
+   "cardHash": "1f5b9c2430b5e40e",
+   "summary": "고친 것 없음",
+   "changes": [],
+   "roles": [
+    {
+     "file": "form-13jwrp-1.hwp",
+     "attach": "2026학년도 공로장학금 선발 계획 및 신청.접수 안내.hwp",
+     "hash": "4506e6a3b921928b",
+     "role": "other",
+     "formStart": "",
+     "why": "뽑힌 글자가 상위 버전 배포용 문서 안내 문구뿐이라 읽을 내용이 없습니다."
+    },
+    {
+     "file": "form-13jwrp-2.hwpx",
+     "attach": "2026학년도 공로장학금 선발 계획(안).hwpx",
+     "hash": "0569e678dcbd25ba",
+     "role": "content",
+     "formStart": "",
+     "why": "신청자격·신청서류·평가기준·지급 상한액·일정이 담긴 선발 계획 공고문입니다."
+    },
+    {
+     "file": "form-13jwrp-3.hwpx",
+     "attach": "(서식) 공로장학금 신청서 및 추천서 등.hwpx",
+     "hash": "4027750ae477e82b",
+     "role": "form",
+     "formStart": "",
+     "why": "장학생 신청서와 추천서·공적조서 서식만 들어 있고 읽는 공고 글은 없는 서식 파일입니다."
+    }
+   ],
+   "pdfs": [
+    {
+     "kind": "form",
+     "file": "forms-pdf/auto-archgbn0searchordersort0-0ty595g/1-_서식_공로장학금_신청서_및_추천서_등.pdf",
+     "name": "(서식) 공로장학금 신청서 및 추천서 등.hwpx",
+     "bytes": 170668,
+     "verdict": "ok",
+     "why": "A3의 붙임1~5 신청서·추천서·공적조서 서식이 5쪽에 빠짐없이 표 형태로 읽을 수 있게 들어 있습니다."
+    },
+    {
+     "kind": "doc",
+     "file": "docs-pdf/auto-archgbn0searchordersort0-0ty595g/1-2026학년도_공로장학금_선발_계획_및_신청.접수_안내.pdf",
+     "name": "2026학년도 공로장학금 선발 계획 및 신청.접수 안내.hwp",
+     "bytes": 173126,
+     "verdict": "ok",
+     "why": "A1 원본 글자 추출은 실패했지만 사본에는 이 공고의 강원대학교 공문(추천대상·제출서류·추천기한·제출부서)이 2쪽에 온전히 읽히게 들어 있습니다."
+    },
+    {
+     "kind": "doc",
+     "file": "docs-pdf/auto-archgbn0searchordersort0-0ty595g/2-2026학년도_공로장학금_선발_계획_안_.pdf",
+     "name": "2026학년도 공로장학금 선발 계획(안).hwpx",
+     "bytes": 231486,
+     "verdict": "ok",
+     "why": "A2 선발 계획(안)의 관련·자격·평가기준 표·상한액·예산·일정이 3쪽에 그대로 들어 있고 표도 정상입니다."
+    }
+   ],
+   "problems": []
   }
  },
- "updatedAt": "2026-11-25"
+ "updatedAt": "2026-11-27"
 }

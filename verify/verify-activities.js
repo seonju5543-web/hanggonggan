@@ -514,6 +514,91 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.context().close();
   }
 
+  /* ── 유료 관문 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-4 · 승인 시안 docs/designs/mockups/paid-gate-activities) ──
+     숨김 표시(paidGate)가 달린 글은 AI 카드(data/act-read.json)가 실려야 보인다 · 카드가 얹힌 글의 시트는 시안의 해커톤 글과 같은 꼴 ·
+     결과 파일이 404·깨진 JSON 이어도 다른 글은 그대로 뜬다. 보이는가는 match-engine publishedActivities 하나(탭·홈·저장·달력이 그 목록을 본다) */
+  {
+    const G = (id, title, over = {}) => ({ id, title, url: `https://dep.hufs.ac.kr/bbs/g/${id}`, kind: '공모전', field: '창업', school: '한국외국어대학교', campus: '', foundAt: iso(-1), attachments: [], paidGate: iso(-1), ...over });
+    const GATE_ACTS = { updatedAt: iso(0), items: [
+      G('g-wait', '카드를 기다리는 글 — 보이면 안 된다'), G('g-held', '사람에게 넘긴 글 — 보이면 안 된다'),
+      G('g-card', '2026 캠퍼스 창업 해커톤 참가자 모집', { deadline: iso(9), eligibilityLines: ['무료 규칙이 뽑은 자격 줄'], excerpts: [{ label: '대상', text: '무료 규칙이 뽑은 대상' }],
+        noticeLines: ['무료 규칙이 뽑은 안내 줄입니다.', '문의처: 창업지원단 02-000-0000'], documents: ['무료 규칙이 뽑은 서류'] }),
+      G('g-old', '사흘이 지나 무료 값으로 오른 글', { paidGate: iso(-6), eligibilityLines: ['만 19~34세 대한민국 국민'] }),
+      G('g-open', '관리자가 올린 글', { paidOpen: `관리자 ${iso(0)}` }),
+      G('g-plain', '표시가 없는 글', { paidGate: undefined }),
+    ] };
+    const GATE_READ = { updatedAt: iso(0), gateHeld: { 'g-held': 'no-source' }, items: { 'g-card': { title: '2026 캠퍼스 창업 해커톤', host: '창업지원단', eligibility: ['만 19~34세 대한민국 국민'], excludes: ['휴학생'], priority: [],
+      amount: ['대상 1팀 300만원', '참가자 전원 수료증', '우수팀 후속 지원'], apply: ['온라인 접수(구글 폼)'], documents: ['참가신청서', '개인정보 수집·이용 동의서'],
+      notes: ['일정: 예선 12.5.', '참가 형태: 2~4인 팀', '일정: 본선 12.12.', '유의사항: 전 일정 참석 필수', '유의사항: 숙박 지원 여부는 추후 확인 필요'], multi: false, head: 0, deadline: { date: iso(12), quote: '접수 마감' }, hash: 'h', readAt: iso(0) } } };
+    const gate = async (readMode) => {
+      const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, serviceWorkers: 'block' });
+      await ctx.addInitScript((pr) => { if (!localStorage.getItem('handaejang.v1')) localStorage.setItem('handaejang.v1', JSON.stringify({ profile: pr, applications: [], docs: {}, notify: {} })); }, PROFILE);
+      const page = await ctx.newPage(); const errors = [];
+      page.on('pageerror', (e) => errors.push(e.message));
+      await page.route('**/data/activities.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(GATE_ACTS) }));
+      await page.route('**/data/act-read.json*', (route) => (readMode === '404' ? route.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' })
+        : readMode === 'broken' ? route.fulfill({ status: 200, contentType: 'application/json', body: '{"items": {' })
+          : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(GATE_READ) })));
+      await page.route('**/data/external.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(EXT_FIXTURE) }));
+      await page.route('**/data/forms-pdf/index.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ updatedAt: iso(0), items: {} }) }));
+      await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
+      await page.waitForTimeout(1200);
+      await dismissNotify(page);
+      return { page, errors };
+    };
+    const names = (page, sel) => page.$$eval(`${sel} [data-activity] .sch-name`, (els) => els.map((e) => e.textContent.trim()).sort());
+    {
+      const { page, errors } = await gate('ok');
+      const hiddenTitles = ['카드를 기다리는 글 — 보이면 안 된다', '사람에게 넘긴 글 — 보이면 안 된다'];
+      eq('⑧ 홈 「나에게 맞는 대외활동·공모전」·앱이 든 목록(저장·달력·도우미가 보는 것)에도 숨긴 글이 없다',
+        await page.evaluate((hid) => [[...document.querySelectorAll('#home-activity-list [data-activity] .sch-name')].some((e) => hid.includes(e.textContent.trim())),
+          liveActivities.items.map((n) => n.id).sort(), activitiesForMe().some((n) => hid.includes(n.title))], hiddenTitles),
+        [false, ['g-card', 'g-old', 'g-open', 'g-plain'], false]);
+      await page.click('.nav-item[data-nav="activities"]'); await page.waitForTimeout(400);
+      eq('⑧ 유료 관문 — 탭: 카드가 실린 글·사흘이 지난 글·관리자가 올린 글·표시 없는 글만 뜬다(카드를 기다리는 글·사람에게 넘긴 글은 없다)',
+        await names(page, '#activities-list'), ['2026 캠퍼스 창업 해커톤 참가자 모집', '관리자가 올린 글', '사흘이 지나 무료 값으로 오른 글', '표시가 없는 글'].sort());
+      eq('⑧ 카드가 얹힌 글의 목록 카드 — 적합도 배지(AI 가 쓴 자격 줄로 판정) · 마감은 카드가 읽은 날짜',
+        await page.$$eval('#activities-list [data-activity]', (els) => { const e = els.find((x) => x.querySelector('.sch-name').textContent.trim() === '2026 캠퍼스 창업 해커톤 참가자 모집');
+          return e ? [((e.querySelector('.sch-top .sch-fit, .sch-top .badge:not(.badge-kind)') || {}).textContent || '').trim().replace(/\d+%/, 'N%'), (e.querySelector('.sch-foot .sch-due') || {}).textContent.trim()] : null; }),
+        ['적합도 N%', 'D-12']);
+      await page.evaluate(() => { const e = [...document.querySelectorAll('#activities-list [data-activity]')].find((x) => x.querySelector('.sch-name').textContent.trim() === '2026 캠퍼스 창업 해커톤 참가자 모집'); e.click(); });
+      await page.waitForTimeout(500);
+      const sheet = await page.$eval('#detail-sheet', (e) => ({
+        open: !e.hidden && e.classList.contains('show'), title: e.querySelector('.sheet-title').textContent.trim(), amount: (e.querySelector('.sheet-amount') || {}).textContent || '',
+        apply: [...e.querySelectorAll('.apply-rows li')].map((li) => [(li.querySelector('.ns-k') || {}).textContent, li.textContent.replace((li.querySelector('.ns-k') || {}).textContent || '', '').trim().replace(/\s+/g, ' ')]),
+        reasons: [...e.querySelectorAll('.reason-list li')].map((li) => li.textContent.trim()),
+        notice: [...e.querySelectorAll('.notice-summary:not(.apply-rows) li')].map((li) => li.textContent.trim().replace(/\s+/g, ' ')),
+        text: e.textContent.replace(/\s+/g, ' '),
+      }));
+      eq('⑧ 시트(시안의 해커톤 글과 같은 꼴) — 제목은 그대로 · 혜택 첫 줄이 제목 아래 큰 글씨',
+        [sheet.open, sheet.title, sheet.amount.trim()], [true, '2026 캠퍼스 창업 해커톤 참가자 모집', '대상 1팀 300만원']);
+      eq('⑧ 「접수」 — 기간(카드가 읽은 마감) · 🔴 방법(시안에서 새로 보이는 줄 하나 — AI 가 쓴 접수 방법) · 서류(카드의 서류 · 점으로 잇는다)',
+        [sheet.apply.map((r) => r[0]), sheet.apply.filter((r) => r[0] !== '기간')], [['기간', '방법', '서류'], [['방법', '온라인 접수(구글 폼)'], ['서류', '참가신청서 · 개인정보 수집·이용 동의서']]]);
+      eq('⑧ 「지원 자격」 — AI 가 쓴 줄로 판정한다(✓ 나이) · 제외 줄이 같은 칸에 · 무료 규칙이 뽑은 자격 줄은 없다',
+        [sheet.reasons[0], sheet.reasons.some((l) => /휴학생/.test(l)), /무료 규칙이 뽑은 자격 줄/.test(sheet.text)], ['✓ 만 19~34세 대한민국 국민', true, false]);
+      eq('⑧ 「공고 안내」 — 같은 이름표끼리 한 줄(혜택 둘째 줄부터 · 일정 둘) · 문의처는 남는다 · 무료 규칙이 뽑은 발췌·안내 줄은 싣지 않는다 · 「확인 필요」 줄은 그 줄만 빠지고 같은 이름표의 형제 줄은 남는다',
+        [sheet.notice.some((l) => /^혜택/.test(l) && l.includes('참가자 전원 수료증 · 우수팀 후속 지원')), sheet.notice.some((l) => /^일정/.test(l) && l.includes('예선 12.5. · 본선 12.12.')),
+          sheet.notice.some((l) => l.includes('2~4인 팀')), sheet.notice.some((l) => l.includes('창업지원단 02-000-0000')), /무료 규칙이 뽑은 (?:안내 줄|대상|서류)/.test(sheet.text),
+          /* 최종 리뷰(화면 I1 · 2026-11-26) — '모름'류 낱말(「확인 필요」)이 든 줄은 그 줄만 빠지고, 같은 이름표의 형제 줄(「전 일정 참석 필수」)은 남는다 · 시트는 「유의사항」을 「참고」 이름표로 그린다(app-sheet NS_LABELS) */
+          sheet.notice.some((l) => /^참고/.test(l) && l.includes('전 일정 참석 필수')), /확인 필요/.test(sheet.text)],
+        [true, true, true, true, false, true, false]);
+      /* 담아 두면 그 글의 사본에도 얹은 값이 들어간다 — 피드에서 빠진 뒤에 쓰이는 사본이 무료 값으로 돌아가지 않게 */
+      eq('⑧ 담아 둔 글의 사본 — 얹은 값(AI 가 쓴 자격 줄 · 마감 · 카드)이 그대로 들어간다',
+        await page.evaluate(() => { const u = 'https://dep.hufs.ac.kr/bbs/g/g-card'; toggleSave(`act:${u}`); const sv = state.saved.find((x) => x.id === `act:${u}`); const sn = (sv && sv.snap) || {};
+          return [sn.eligibilityLines, !!(sn.cardRead && Array.isArray(sn.cardRead.apply)), sn.deadline === liveActivities.items.find((n) => n.id === 'g-card').deadline]; }),
+        [['만 19~34세 대한민국 국민'], true, true]);
+      eq('⑧ 페이지 오류 없음', errors, []);
+      await page.context().close();
+    }
+    for (const [mode, label] of [['404', '결과 파일이 없을 때(404)'], ['broken', '결과 파일이 깨진 JSON 일 때']]) {
+      const { page, errors } = await gate(mode);
+      await page.click('.nav-item[data-nav="activities"]'); await page.waitForTimeout(400);
+      eq(`⑧ ${label} — 숨김 표시가 달린 글만 안 보이고(카드가 있던 글도 · 통과했는지 모른다) 표시 없는 글·관리자가 올린 글은 그대로 뜬다 · 뼈대가 굳지 않는다 · 오류 0`,
+        [await names(page, '#activities-list'), errors], [['관리자가 올린 글', '표시가 없는 글'].sort(), []]);
+      await page.context().close();
+    }
+  }
+
   await browser.close();
   console.log(fail ? `\n✕ ${fail}건 실패` : '\n✓ 대외활동·공모전 탭 · 재단·지자체 새 공고 검사 통과');
   process.exit(fail ? 1 : 0);

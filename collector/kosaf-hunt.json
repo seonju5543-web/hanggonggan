@@ -1,19 +1,8 @@
 {
  "v": 1,
  "note": "층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-27",
  "items": [
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000425003"
-   },
-   "board": "https://www.boeun.go.kr/janghak/selectBbsNttList.do?bbsNo=243&key=1036",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-11-24",
-   "note": "게시판처럼 보이는 쪽(공고 10건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
   {
    "target": {
     "ds": "kosaf",
@@ -24,6 +13,42 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-11-24",
    "note": "게시판처럼 보이는 쪽(공고 10건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2703434001"
+   },
+   "board": "https://www.kcffd.org/",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-27",
+   "note": "게시판처럼 보이는 쪽(공고 4건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704215001"
+   },
+   "url": "http://www.pyeongnae.co.kr/bbs/board.php?bo_table=notice&wr_id=206",
+   "title": "★2026년 평내장학회 장학생 모집★",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-27",
+   "note": "http://www.pyeongnae.co.kr/ 목록에서 고름 — 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000189006"
+   },
+   "url": "https://www.cwg.go.kr/www/selectBbsNttView.do?key=1226&bbsNo=25&nttNo=273406",
+   "title": "2026년 다자녀가정 특별지원(대학등록금)사업 공고",
+   "source": "search",
+   "query": "강원도 철원군청 다자녀가정 특별지원(대학등록금) 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-27",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 사업 이름 +1 · 마감 해 +1"
   }
  ]
 }

@@ -184,7 +184,12 @@ export default async function gate(eq, ctx) {
     const calls = new Set();
     for (const src of fns.map(body)) for (const f of topFn) if (new RegExp(`\\b${f.replace(/\$/g, '\\$')}\\(`).test(src)) calls.add(f);
     const stubbed = [...linkBlock.matchAll(/function ([A-Za-z_$][\w$]*)\(/g)].map((m) => m[1]);   // 도구가 자리에 직접 둔 대역(isSaved 등)
-    const missingFns = [...calls].filter((f) => !fns.includes(f) && !stubbed.includes(f));
+    /* 앱 소스의 한 구간을 **통째로** 싣는 것(「공고 안내」 블록 — appSrc.slice(appSrc.indexOf('…'), appSrc.indexOf('…')))의 최상위 함수도 실린 것으로 센다
+       (2026-11-26 — 떼어 온 activitySheetNotices 가 그 블록의 noticeFlat 을 부른다). 구간 표지는 도구 글자에서 읽는다 — 못 읽으면 블록 함수가 없는 셈이라 빨갛게 남는다 */
+    const blockFns = [...linkBlock.matchAll(/appSrc\.slice\(appSrc\.indexOf\('([^']+)'\), appSrc\.indexOf\('([^']+)'\)\)/g)]
+      .map((m) => { const [a, b] = [m[1], m[2]].map((x) => appSrc.indexOf(x.replace(/\\n/g, '\n'))); return a >= 0 && b > a ? appSrc.slice(a, b) : ''; })
+      .flatMap((blk) => [...blk.matchAll(/^function ([A-Za-z_$][\w$]*)\(/gm)].map((m) => m[1]));
+    const missingFns = [...calls].filter((f) => !fns.includes(f) && !stubbed.includes(f) && !blockFns.includes(f));
     eq('⑧ what-shows.mjs 링크 자리 — 떼어 오는 앱 함수가 부르는 앱 함수도 빠짐없이 같이 온다',
       missingFns, []);
   }

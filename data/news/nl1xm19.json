@@ -1,7 +1,16 @@
 {
  "school": "충남대학교",
- "updatedAt": "2026-11-25",
+ "updatedAt": "2026-11-26",
  "items": [
+  {
+   "title": "2027년도 상반기 정심화국제문화회관 정기대관 신청 안내",
+   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516481&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "postedAt": "2026-11-26",
+   "school": "충남대학교",
+   "campus": "",
+   "src": "fb93d66a",
+   "foundAt": "2026-11-26"
+  },
   {
    "title": "2026학년도 동계방학 학생생활관 입주 신청 안내",
    "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516334&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
@@ -126,8 +135,7 @@
    "campus": "",
    "src": "fb93d66a",
    "foundAt": "2026-11-03",
-   "thumb": "data/news/img/1379f568ef3d03e2.webp",
-   "desc": "※ 프로그램은 상시 업데이트 되오니, 자세한 사항은 CNU With U+( https://with.cnu.ac.kr)에서 확인"
+   "thumb": "data/news/img/1379f568ef3d03e2.webp"
   },
   {
    "title": "2026년 기업 맞춤형 미래 인재 수요 조사 안내",
@@ -137,8 +145,7 @@
    "campus": "",
    "src": "fb93d66a",
    "foundAt": "2026-11-03",
-   "thumb": "data/news/img/01076c1840d45c68.webp",
-   "desc": "나. 추진기간: 2026. 11. 2.(월)~11. 13.(금) 다. 대 상: 지역 내외 기업 및 공공기관 임직원"
+   "thumb": "data/news/img/01076c1840d45c68.webp"
   },
   {
    "title": "2026년 DSC공유대학 글로벌 PBL 프로그램 안내",
@@ -170,8 +177,7 @@
    "campus": "",
    "src": "fb93d66a",
    "foundAt": "2026-10-30",
-   "thumb": "data/news/img/da89bbb007562812.webp",
-   "desc": "나. 일 시: 2026. 11. 3.(화) 14:00~15:30 다. 장 소: 인재개발원(E5) 2층 시너지실"
+   "thumb": "data/news/img/da89bbb007562812.webp"
   },
   {
    "title": "2027년도 충남대학교 어린이집 원아모집 안내",
@@ -240,16 +246,6 @@
    "foundAt": "2026-10-28",
    "thumb": "data/news/img/7b36144848c68c93.webp",
    "desc": "3) 장소: 인재개발원 2층 시너지실, JOB CAFE 및 3층 마루빌 4) 대상: 재학생, 졸업생, 지역청년 60명"
-  },
-  {
-   "title": "「도로·광장·공원 다중운집인파재난」 위기경보 '주의' 단계 발령 알림",
-   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515947&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
-   "postedAt": "2026-10-26",
-   "kind": "생활",
-   "school": "충남대학교",
-   "campus": "",
-   "src": "fb93d66a",
-   "foundAt": "2026-10-26"
   }
  ]
 }

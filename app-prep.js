@@ -74,7 +74,7 @@ function renderApplyPrep(sch) {
     <div class="sheet-handle"></div>
     <div class="sheet-body" id="apply-prep">
       <h3 class="sheet-title">신청 준비</h3>
-      <p class="sheet-provider">${esc(sch.name)}${/* 2026-11-21 개발자 지시로 줄임(학생이 읽지 않는 안내 — 맨 아래 「담기」 단추가 같은 말) */ ''}</p>
+      <p class="sheet-provider">${esc(cardTitleParts(sch).title)}${/* 상세 시트와 같은 제목(게시판 머리말·마감 조각을 뗀 것 · 2026-11-26 화면 점검) · 2026-11-21 개발자 지시로 줄임(학생이 읽지 않는 안내 — 맨 아래 「담기」 단추가 같은 말) */ ''}</p>
       ${(formAtts.length || (!kosaf && pageRows)) ? `
       <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
       ${listOf(formAtts, kosaf ? '' : pageRows)}` : ''}

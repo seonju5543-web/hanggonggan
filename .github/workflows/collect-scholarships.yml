@@ -380,6 +380,7 @@ jobs:
           [ -f data/activities.json ] && git add data/activities.json
           [ -f collector/seen-activities.json ] && git add collector/seen-activities.json
           [ -f collector/act-docs.json ] && git add collector/act-docs.json   # 대외활동 첨부·포스터 '해 봤다' 장부 (2026-10-03)
+          [ -d collector/act-text ] && git add -A collector/act-text   # 대외활동 유료 관문 — 원문 글자 기록(글자만 · 무료 받기 몫 <id>.json · 2026-11-25)
           # 재단·지자체 게시판 (2026-09-26) — 찾기 로봇이 고친 출처 목록·리포트와 발행 파일·장부
           [ -f collector/external-sources.json ] && git add collector/external-sources.json
           [ -f collector/find-boards-report.md ] && git add collector/find-boards-report.md

@@ -7,7 +7,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://haeseok.or.kr/",
@@ -21,7 +21,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://gachon.or.kr/",
@@ -32,15 +32,17 @@
   {
    "host": "울진군장학재단",
    "home": "http://www.uljinsf.kr/",
-   "boardUrl": null,
+   "boardUrl": "http://www.uljinsf.kr/albino/",
    "seed": "kosaf-open",
-   "probe": {
-    "checkedAt": "2026-11-11",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "http://www.uljinsf.kr/",
-     "signals": 0
-    }
+   "autoFound": {
+    "date": "2026-11-25",
+    "signals": 5,
+    "menu": "(홈)",
+    "sample": [
+     "2026 울진사랑 특기장학금 신청 공고",
+     "2026년 울진군 대학생장학금(2차) 선정자 명단",
+     "2026년 우리珍(진)봉사단 장학기금 전달식 10-07"
+    ]
    }
   },
   {
@@ -49,7 +51,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yangcheon.go.kr/site/yangcheon/main.do",
@@ -63,7 +65,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.mpva.go.kr/",
@@ -109,7 +111,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.mincho.or.kr/",
@@ -123,7 +125,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "홈페이지 못 엶 (TimeoutError: 23)",
     "best": null
    }
@@ -134,7 +136,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.pc.go.kr/",
@@ -164,7 +166,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.kwangsankim.co.kr/",
@@ -194,7 +196,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://injae.gwd.go.kr/",
@@ -208,7 +210,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "홈페이지 못 엶 (TypeError: UND_ERR_SOCKET)",
     "best": null
    }
@@ -219,7 +221,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.ewp.co.kr/kor/main/",
@@ -233,7 +235,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.chungju.go.kr/",
@@ -263,7 +265,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
@@ -290,7 +292,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
     "best": null
    }
@@ -301,7 +303,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-25",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://dalseoij.org/",
@@ -315,12 +317,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://hmg-scholar.recruiter.co.kr/career/home",
-     "signals": 0
-    }
+    "checkedAt": "2026-11-26",
+    "why": "홈페이지 못 엶 (TypeError: ECONNRESET)",
+    "best": null
    }
   },
   {
@@ -345,7 +344,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TypeError: EAI_AGAIN)",
     "best": null
    }
@@ -356,7 +355,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TimeoutError: 23)",
     "best": null
    }
@@ -367,7 +366,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yanggu.go.kr/",
@@ -381,12 +380,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://www.jinan.go.kr/index.jinan",
-     "signals": 0
-    }
+    "checkedAt": "2026-11-26",
+    "why": "홈페이지 못 엶 (HTTP 416)",
+    "best": null
    }
   },
   {
@@ -395,7 +391,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-11",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
     "best": null
    }
@@ -406,7 +402,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.dooeul.or.kr/home/main/index.do",
@@ -420,7 +416,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.sri.re.kr/nuri/",
@@ -434,7 +430,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TypeError: UNABLE_TO_VERIFY_LEAF_SIGNATURE)",
     "best": null
    }
@@ -445,7 +441,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (HTTP 404)",
     "best": null
    }
@@ -472,8 +468,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
-    "why": "홈페이지 못 엶 (TypeError: ERR_TLS_CERT_ALTNAME_INVALID)",
+    "checkedAt": "2026-11-26",
+    "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
   },
@@ -483,7 +479,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.namgu.gwangju.kr/",
@@ -497,7 +493,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.gyeongnam.go.kr/",
@@ -511,7 +507,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.buan.go.kr/index.buan",
@@ -541,7 +537,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
@@ -552,7 +548,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://top.cafe.daum.net/",
@@ -598,7 +594,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "홈페이지 못 엶 (HTTP 403)",
     "best": null
    }
@@ -609,7 +605,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.bsbukgu.go.kr/index.bsbukgu",
@@ -639,7 +635,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.mariners.or.kr/",
@@ -653,7 +649,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 1건 ((홈))",
     "best": {
      "url": "https://www.britishcouncil.kr/",
@@ -667,7 +663,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://pjdjkjscholarship.or.kr/",
@@ -681,7 +677,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-12",
+    "checkedAt": "2026-11-26",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.surim.or.kr/",
@@ -1131,6 +1127,22 @@
      "'2026 에몬스 장학생 (18기)' 장학금 및 장학증서 수여식",
      "'2026 에몬스 장학생 (18기)' 최종 선발자 발표",
      "'2025 에몬스 장학생 (17기)' 장학금 및 장학증서 수여식"
+    ]
+   }
+  },
+  {
+   "host": "KC미래장학재단",
+   "home": "http://www.kcffd.org/",
+   "boardUrl": "https://www.kcffd.org/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-11-27",
+    "signals": 4,
+    "menu": "층2 글 사냥꾼 · 공고 3건 이상 · 2027년도 10기 장학생 선발안내 포스터 › 케이씨미래장학재단",
+    "sample": [
+     "2027년도 10기 장학생 선발안내 포스터",
+     "2027년도 제10기 장학생 선발 안내",
+     "2026년도 제 9기 신규장학생 선발 최종결과 조회 안…"
     ]
    }
   }

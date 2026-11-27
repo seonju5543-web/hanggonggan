@@ -23,46 +23,6 @@
   "at": "2026-11-14",
   "tries": 1
  },
- "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/790?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=991": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=980": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=978": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=971&page=2": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=970&page=2": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=959&page=3": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=957&page=3": {
-  "at": "2026-11-22",
-  "tries": 2
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=954&page=3": {
-  "at": "2026-11-22",
-  "tries": 2
- },
  "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11441": {
   "at": "2026-11-23",
   "tries": 2
@@ -212,20 +172,20 @@
   "tries": 2
  },
  "https://youth.chungnam.go.kr/web/main/customSupp/M030-02/view?bizId=A20260309CT000000000003021": {
-  "at": "2026-11-18",
-  "tries": 1
+  "at": "2026-11-25",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53706&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-11-18",
   "tries": 1
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521245": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.inha.ac.kr/bbs/kr/8/46177/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://apac.spectory.net/tcs15kr": {
   "at": "2026-11-19",
@@ -236,16 +196,16 @@
   "tries": 1
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161847/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161583/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161878/artclView.do": {
-  "at": "2026-11-19",
-  "tries": 1
+  "at": "2026-11-26",
+  "tries": 2
  },
  "https://www.sungshin.ac.kr/bbs/main_kor/3181/161676/artclView.do": {
   "at": "2026-11-19",
@@ -269,10 +229,6 @@
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171774&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
   "at": "2026-11-20",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546101": {
-  "at": "2026-11-21",
   "tries": 1
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3515772": {
@@ -329,6 +285,18 @@
  },
  "https://www.knou.ac.kr/bbs/knou/51/823353/artclView.do": {
   "at": "2026-11-24",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142357&article.offset=0&articleLimit=10": {
+  "at": "2026-11-25",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542487": {
+  "at": "2026-11-26",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17596&commonMenuNo=180_35": {
+  "at": "2026-11-26",
   "tries": 1
  }
 }

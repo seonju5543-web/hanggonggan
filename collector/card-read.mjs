@@ -22,6 +22,10 @@
                                                           🔴 결과가 있는 공고는 건드리지 않는다: 6번이 고친 카드를 4번의 답으로 되돌리지 않는다 · 2026-11-22)
          node collector/card-read.mjs --check          (결과 파일의 꼴을 잰다 — 워크플로가 저장 전에)
          node collector/card-read.mjs --stats | --gate-alarm   (기록 · 경보 세기 — 돈 0)
+         node collector/card-read.mjs --activities …   (대외활동·공모전 목록 — 위의 모든 꼴에 붙여 쓴다 · 2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-3)
+            같은 로봇이 **파일 이름만 활동 것으로 바꿔** 읽고 쓴다(collector/act-card.mjs ACT_FILES) · 목록 모양·원문·지시문·첨부 기다리기·넘기는 날만 활동 것.
+            스위치는 셋 — 설정의 enabled · activities.enabled · 환경 변수 CARD_READ_ENABLE=1 (상한은 activities 칸의 값 · 목록마다 따로 센다)
+         node collector/card-read.mjs --activities --only=<id>,<id> --write   (표시가 없는 글도 지정하면 읽는다 — 유료 시험 워크플로)
    ============================================================ */
 import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -32,12 +36,16 @@ import { attachmentText, docOrder, readableDoc, loadNoticeDocIndex } from './att
 import { closedForStudents } from './rescue-plan.mjs';
 import { sameTitle } from './detail-url.mjs';
 import { AI_ROLES, fileHash16 } from './attach-role-ai.mjs';
+import { ACT_FILES, ACT_SYSTEM, actGateOn, actItems, makeActSources, actAwaits } from './act-card.mjs';
 
 const require = createRequire(import.meta.url);
 const HERE = new URL('.', import.meta.url);
-const P = (rel) => fileURLToPath(new URL(rel, HERE));
+/* 대외활동·공모전 목록(`--activities` · 2026-11-25) — 파일 이름만 활동 것으로 바꿔 읽고 쓴다. 아래 본편에 적힌 파일 이름은 장학금 것 그대로다:
+   장학금 실행은 한 글자도 달라지지 않고, 두 목록은 서로의 파일을 건드릴 수 없다(관문 「대외활동 유료 관문 ② 카드 쓰기」 ①·⑦) */
+const ACT = process.argv.includes('--activities');
+const P = (rel) => fileURLToPath(new URL((ACT && ACT_FILES[rel]) || rel, HERE));
 const readJson = (rel, dflt) => { try { return JSON.parse(fs.readFileSync(P(rel), 'utf8')); } catch { return dflt; } };
-const log = (m) => console.log(`[card-read] ${m}`);
+const log = (m) => console.log(`[card-read${ACT ? ' 활동' : ''}] ${m}`);
 
 export const MODELS = { a: 'claude-opus-5-5', b: 'claude-sonnet-5-5' };
 export const PRICE = { 'claude-opus-5-5': [4, 20], 'claude-sonnet-5-5': [2, 10] };   // 달러 / 100만 토큰 (입력, 출력) — 2026-11 요금
@@ -171,7 +179,7 @@ export function sourceText(parts) { return parts.map((x) => `===== ${x.label} ==
 /* 🔴 조회수는 원문이 아니다 — 본문을 다시 받을 때마다 그 숫자만 바뀌어 같은 공고를 돈 내고 또 읽힌다(2026-11-18 실측: 나흘에 839건 중 27건 · 전부 조회수뿐).
    ponytail: 이름표(「조회수」) 붙은 숫자만 뗀다 — 이름표 없이 숫자만 한 줄인 조회수(dep.hufs 브라우저 본문)는 못 잡는다. 숫자뿐인 줄을 다 떼면 표 칸(「300」)이 바뀐 것을 놓친다. 새는 돈이 보이면 게시판별 머리 줄을 자르는 쪽으로 */
 const hashText = (text) => String(text).replace(/(조회\s?수)\s*:?\s*\d[\d,]*(?![\d,.\-/~%가-힣A-Za-z])/g, '$1');   // 뒤에 글자·기호가 붙은 숫자(「2027학년도」·「300만원」·「11.26까지」)는 조회수가 아니라 내용이다(리뷰)
-export const sourceHash = (text) => crypto.createHash('sha256').update(SYSTEM).update('\n').update(hashText(text)).digest('hex').slice(0, 16);   // 지시문이 바뀌어도 다시 읽는다
+export const sourceHash = (text, system = SYSTEM) => crypto.createHash('sha256').update(system).update('\n').update(hashText(text)).digest('hex').slice(0, 16);   // 지시문이 바뀌어도 다시 읽는다 · 활동 목록은 활동 지시문으로 센다(act-card ACT_SYSTEM)
 /* 덩어리 = 게시판 본문 + 받아 둔 첨부 원본 **전부**(2026-11-21 · 4-1 첨부 구분) — 첨부마다 꼬리표([A1]…)와 이름을 붙여 AI 가 하나씩 가를 수 있게 한다.
    · 신청서 로봇이 받은 원본(forms-index 줄 = formRows · 이름을 안다)이 먼저, 그다음 자격 로봇이 받은 공고문류(elig-docs · 이름 모름) — 바이트가 같은 사본은 한 번만.
    · 글자를 못 뽑은 파일(스캔 PDF·그림)은 여기 없다 — 그 파일은 유료 첨부 판정(attach-role-read)이 파일째 본다 */
@@ -221,17 +229,20 @@ export const awaitsAttach = (it, parts, today, days = 2) => days > 0
   && (it.attachments || []).some((a) => a && !a.bodyImage)
   && !(parts || []).some((x) => x && x.tag)
   && daysSince(it.paidGate || it.paidRead || today, today) < days;
-export function pickTargets(items, partsOf, ledger, { today, giveUpAfter = 3, only = null, paid = {}, waitAttachDays = 2 } = {}) {
+/* only = 지정한 공고만(한 건의 id 또는 여러 건의 목록 — 유료 시험 워크플로 · 표시가 없어도, 이미 읽었어도 읽는다) ·
+   system·awaits = 활동 목록이 제 지시문과 제 기다리기 규칙을 넘긴다(act-card ACT_SYSTEM·actAwaits) — 안 주면 장학금 것 */
+export function pickTargets(items, partsOf, ledger, { today, giveUpAfter = 3, only = null, paid = {}, waitAttachDays = 2, system = SYSTEM, awaits = awaitsAttach } = {}) {
+  const ids = only && only.length ? [].concat(only) : null;
   const out = [];
   for (const it of items) {
     if (it.program) continue;
-    if (!only && !it.paidGate && !it.paidRead) continue;   // paidRead = 사람이 등록한 공고(숨기지 않고 읽기만 · admin-apply register)
-    if (only ? it.id !== only : closedNow(it, paid[it.id], today)) continue;
+    if (!ids && !it.paidGate && !it.paidRead) continue;   // paidRead = 사람이 등록한 공고(숨기지 않고 읽기만 · admin-apply register)
+    if (ids ? !ids.includes(it.id) : closedNow(it, paid[it.id], today)) continue;
     const parts = partsOf(it), text = sourceText(parts);
-    if (!only && awaitsAttach(it, parts, today, waitAttachDays)) continue;   // 첨부가 아직 안 왔다 — 내일 다시 본다
+    if (!ids && awaits(it, parts, today, waitAttachDays)) continue;   // 첨부가 아직 안 왔다 — 내일 다시 본다
     if (text.replace(/[^가-힣]/g, '').length < 40) continue;      // 읽을 원문이 없다 — 사흘 뒤 사람에게(gateHeldOf no-source)
-    const hash = sourceHash(text), led = ledger[it.id] || {};
-    if (!only && led.hash === hash && (led.done || (led.tries || 0) >= giveUpAfter)) continue;
+    const hash = sourceHash(text, system), led = ledger[it.id] || {};
+    if (!ids && led.hash === hash && (led.done || (led.tries || 0) >= giveUpAfter)) continue;
     out.push({ it, parts, text, hash });
   }
   const key = (t) => t.it.deadline || '9999';
@@ -258,10 +269,35 @@ export function gateStalled(items, data, today, waitDays = 3) {
   const paid = (data && data.items) || {}, held = (data && data.gateHeld) || {};
   return items.filter((it) => it.paidGate && !paid[it.id] && !held[it.id] && !closedNow(it, null, today) && daysSince(it.paidGate, today) > waitDays);
 }
+/* ── 활동 목록의 사람 몫 · 멈춘 글 (2026-11-25 · 설계 docs/designs/paid-gate-activities.md 5-3) — 까닭 셋은 위와 같고 **넘기는 때**만 다르다 ──
+   🔴 아직 한 번도 학생에게 보이지 않은 글만 넘긴다. 앱은 표시 뒤 나흘째 0시에 그 글을 무료 값으로 올린다(match-engine paidGateOpen — 사흘 초과).
+      위 gateHeldOf 는 원문 없는 공고를 나흘째 실행에서 넘겨, 반나절 보였다가 사라진다 — 장학금은 그 사이 「실시간 공고」 줄이 자리를 채우지만 활동 탭에는 그런 줄이 없다.
+      그래서 활동 글은 **사흘째**(표시한 날 = 0일)에 넘기고, 나흘째부터는 전에 넘긴 글(prevHeld — 지난 실행의 gateHeld)만 넘긴 채로 둔다.
+      사흘째 실행이 없었던 글은 무료 값으로 남는다(보였다가 사라지지 않는다). 넘긴 글도 원문이 오면 풀려 다시 대상이 된다.
+   예외 하나 — 대학원생 전용으로 드러난 글은 이미 보였어도 내린다(장학금 2026-11-25 결정과 같다). 장학금 쪽 동작은 바꾸지 않는다(위 함수 그대로) */
+export function actGateHeldOf(items, partsOf, ledger, paid, today, prevHeld = {}, waitDays = 3) {
+  const out = {};
+  for (const it of items) {
+    if (!it.paidGate || it.paidOpen || it.hidden || paid[it.id] || closedNow(it, null, today)) continue;
+    const led = ledger[it.id];
+    if (led && led.gradOnly) { out[it.id] = 'grad-only'; continue; }
+    const waited = daysSince(it.paidGate, today);
+    if (waited > waitDays && !(prevHeld || {})[it.id]) continue;   // 이미 무료 값으로 올랐다 — 다시 숨기지 않는다
+    if (led && led.done) { out[it.id] = 'unreadable'; continue; }
+    if (waited >= waitDays && sourceText(partsOf(it)).replace(/[^가-힣]/g, '').length < 40) out[it.id] = 'no-source';
+  }
+  return out;
+}
+/* 읽고도 실을 것이 없어 무료 값으로 남은 글(장부 done)은 「멈춘 글」이 아니다 — 세면 그 글이 마감될 때까지 경보가 꺼지지 않는다 */
+export function actGateStalled(items, data, ledger, today, waitDays = 3) {
+  const paid = (data && data.items) || {}, held = (data && data.gateHeld) || {};
+  return items.filter((it) => it.paidGate && !it.paidOpen && !it.hidden && !paid[it.id] && !held[it.id] && !((ledger || {})[it.id] || {}).done
+    && !closedNow(it, null, today) && daysSince(it.paidGate, today) > waitDays);
+}
 /* 유료 관문 기록 (2026-11-21 개발자 지시 「위의 두개도 켜서」 — 실제 비용·통과 재기를 켠다) — 이미 저장되는 장부·결과 파일에서 센다(돈 0).
    유료 로봇이 돌 때마다 실행 요약 칸에 적힌다(card-read.yml · final-review.yml 의 `--stats` 단계). 비용은 장부의 usd(실패한 시도까지 실제로 쓴 돈).
    「6번이 고친 것」 = 최종 검토가 카드·첨부 구분에서 바꾼 줄 수(collector/final-review.json changes) — 4번 AI 가 얼마나 틀렸는지를 이 숫자로 본다 */
-export function gateStats({ items = [], data = {}, ledger = {}, frLedger = {}, frResult = {}, today }) {
+export function gateStats({ items = [], data = {}, ledger = {}, frLedger = {}, frResult = {}, today, stalled = null }) {   // stalled = 활동 목록이 제 셈(actGateStalled)을 넘긴다
   const paid = (data && data.items) || {}, held = (data && data.gateHeld) || {};
   const gated = items.filter((it) => it.paidGate);
   const open = gated.filter((it) => !closedNow(it, paid[it.id], today));
@@ -273,19 +309,20 @@ export function gateStats({ items = [], data = {}, ledger = {}, frLedger = {}, f
   const count = (k) => frItems.reduce((a, r) => a + ((r && r[k]) || []).length, 0);
   return {
     gated: gated.length, open: open.length, passed, toPerson, waiting: open.length - passed - toPerson,
-    stalled: gateStalled(items, data, today).length, manual: items.filter((it) => it.paidRead).length,
+    stalled: stalled != null ? stalled : gateStalled(items, data, today).length, manual: items.filter((it) => it.paidRead).length,
     read: ai.length, usdPerNotice: ai.length ? sum(ai) / ai.length : null,
     frRead: fr.length, frUsdPerNotice: fr.length ? sum(fr) / fr.length : null,
     frChanges: count('changes'), frProblems: count('problems'),
   };
 }
-export function gateStatsText(st, today) {
+export function gateStatsText(st, today, act = false) {   // act = 활동 목록의 기록(제목·낱말만 다르다 · 직접 등록 줄은 장학금에만 있다)
   const usd = (v) => (v == null ? '—' : `$${v.toFixed(3)}`);
-  return [`### 유료 관문 기록 (${today})`,
-    `- 숨김 등록 공고 ${st.gated}건(마감 전 ${st.open}건): 학생 화면에 오름 ${st.passed} · 사람에게 넘김 ${st.toPerson} · 기다리는 중 ${st.waiting}(그중 사흘 넘어 무료 값으로 오른 것 ${st.stalled})`,
-    `- 관리자가 직접 등록한 공고(숨기지 않고 읽기만) ${st.manual}건`,
-    `- 4번 카드 쓰기(AI 하나 · 기계 검사 없음): 읽은 공고 ${st.read}건 · 건당 평균 ${usd(st.usdPerNotice)}`,
-    `- 6번 최종 검토(둘째 AI): 본 공고 ${st.frRead}건 · 건당 평균 ${usd(st.frUsdPerNotice)} · 고친 것 ${st.frChanges}건 · 사람이 볼 것 ${st.frProblems}건`].join('\n');
+  const noun = act ? '글' : '공고';
+  return [`### ${act ? '대외활동·공모전 ' : ''}유료 관문 기록 (${today})`,
+    `- ${act ? '숨겨 둔 활동 글' : '숨김 등록 공고'} ${st.gated}건(마감 전 ${st.open}건): 학생 화면에 오름 ${st.passed} · 사람에게 넘김 ${st.toPerson} · 기다리는 중 ${st.waiting}(그중 사흘 넘어 무료 값으로 오른 것 ${st.stalled})`,
+    ...(act ? [] : [`- 관리자가 직접 등록한 공고(숨기지 않고 읽기만) ${st.manual}건`]),
+    `- 4번 카드 쓰기(AI 하나 · 기계 검사 없음): 읽은 ${noun} ${st.read}건 · 건당 평균 ${usd(st.usdPerNotice)}`,
+    `- 6번 최종 검토(둘째 AI): 본 ${noun} ${st.frRead}건 · 건당 평균 ${usd(st.frUsdPerNotice)} · 고친 것 ${st.frChanges}건 · 사람이 볼 것 ${st.frProblems}건`].join('\n');
 }
 /* 관리자 「할 일」에 보일 말 — **옛 두 읽기(11-20 전에 읽은 공고)의 장부에 남은 줄**을 사람 말로 푼다(그 공고들이 마감되면 사라진다).
    새 공고에는 기계 검사가 없어 이런 줄이 생기지 않는다(2026-11-21) — 새 공고에서 사람이 볼 것은 6번 최종 검토가 collector/final-review.json 에 적는다.
@@ -335,13 +372,13 @@ export function checkData(data) {
 }
 
 /* ── 모델 부르기 ── */
-export async function ask(client, model, item, source, effort) {
+export async function ask(client, model, item, source, effort, system = SYSTEM) {
   /* 🔴 thinking 을 끄지 않는다(오퍼스 5.5 는 끄면 400) · 강제 tool_choice 도 안 쓴다 — 꼴은 output_config.format 이 지킨다.
      안전 거절은 날 일이 없지만 5.5 계열 기본대로 서버 쪽 대체 모델을 켜 둔다(fallbacks: "default") */
   const stream = client.beta.messages.stream({
     model, max_tokens: 16000,
     betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
-    system: SYSTEM,
+    system,
     output_config: { effort, format: { type: 'json_schema', schema: SCHEMA } },
     messages: [{ role: 'user', content: `공고 제목: ${item.name}\n게시한 곳: ${(item.eligibility && item.eligibility.schoolOnly) || '(여러 곳)'}\n\n${source}` }],
   });
@@ -364,11 +401,15 @@ const ranDirectly = () => { try { return fs.realpathSync(process.argv[1]) === fs
 if (process.argv[1] && ranDirectly()) {
   const WRITE = process.argv.includes('--write');
   const RECHECK = process.argv.includes('--recheck');   // 결과 파일에서 빠진 공고만 장부에 남긴 4번 응답으로 다시 만든다(결과를 잃었을 때 · 돈 0 · 있는 결과는 안 건드린다)
-  const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7) || null;
+  const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').map((x) => x.trim()).filter(Boolean);   // 한 건 또는 쉼표로 여러 건(유료 시험) — 없으면 빈 목록
+  const SYS = ACT ? ACT_SYSTEM : SYSTEM;                // 활동 목록은 제 지시문
+  const awaits = ACT ? actAwaits : awaitsAttach;        // · 제 기다리기 규칙
   const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // KST
   /* 있는 파일이 깨져 있으면 멈춘다 — 빈 것으로 읽고 이어 가면 전부 다시 읽는다(돈) · 없는 파일만 기본값 (리뷰 I10) */
   const strictJson = (rel, dflt) => { if (!fs.existsSync(P(rel))) return dflt; try { return JSON.parse(fs.readFileSync(P(rel), 'utf8')); } catch (e) { console.error(`[card-read] ${rel} 을 읽지 못했습니다(깨진 파일) — 멈춥니다: ${e.message}`); process.exit(1); } };
   const cfg = { enabled: false, maxPerRun: 20, maxUsdPerRun: 3, giveUpAfter: 3, effort: 'medium', maxMs: 8 * 60 * 1000, waitAttachDays: 2, ...readJson('card-read-config.json', {}) };   // 단계 시한 12분 안에 진행 중인 한 건까지 끝나게
+  /* 활동 목록 — 스위치는 위쪽 enabled 와 activities.enabled 둘 다(actGateOn) · 상한은 activities 칸의 값(목록마다 따로 센다 — 활동 글이 몰려도 장학금 몫을 먹지 않는다) */
+  if (ACT) Object.assign(cfg, cfg.activities || {}, { enabled: actGateOn(cfg) });
   const data = strictJson('../data/card-read.json', { items: {} });
   if (!data.items) data.items = {};
   if (process.argv.includes('--check')) {
@@ -379,19 +420,24 @@ if (process.argv[1] && ranDirectly()) {
   }
   /* 등록 목록도 깨져 있으면 멈춘다 — 빈 목록으로 읽고 이어 가면 결과·장부·첨부 구분이 「목록에서 빠진 공고」로 전부 지워진다(리뷰 2026-11-22) */
   const reg = strictJson('../data/registered.json', { items: [] });
-  if (!Array.isArray(reg.items)) { console.error('[card-read] data/registered.json 에 items 목록이 없습니다 — 멈춥니다'); process.exit(1); }
+  if (!Array.isArray(reg.items)) { console.error(`[card-read] ${ACT ? 'data/activities.json' : 'data/registered.json'} 에 items 목록이 없습니다 — 멈춥니다`); process.exit(1); }
+  if (ACT) reg.items = actItems(reg.items);   // 활동 글을 로봇이 읽는 모양으로(id 없는 글은 빠진다 · 저장하지 않는다 — 이 로봇은 목록 파일을 쓰지 않는다)
   if (process.argv.includes('--stats')) {   // 유료 관문 기록(돈 0) — 워크플로가 실행 요약 칸에 붙인다
-    console.log(gateStatsText(gateStats({ items: reg.items, data, ledger: readJson('card-read-ledger.json', {}), frLedger: readJson('final-review-ledger.json', {}), frResult: readJson('final-review.json', { items: {} }), today: TODAY }), TODAY));
+    const led = readJson('card-read-ledger.json', {});
+    console.log(gateStatsText(gateStats({ items: reg.items, data, ledger: led, frLedger: readJson('final-review-ledger.json', {}), frResult: readJson('final-review.json', { items: {} }), today: TODAY,
+      stalled: ACT ? actGateStalled(reg.items, data, led, TODAY).length : null }), TODAY, ACT));
     process.exit(0);
   }
   if (process.argv.includes('--gate-alarm')) {   // 경보 세기(GITHUB_OUTPUT 꼴 · 읽기만) — 값에 줄바꿈이 들어가지 않게 누른다
-    const st = gateStalled(reg.items, data, TODAY), one = (x) => String(x || '').replace(/[\r\n]+/g, ' ').trim();
+    const st = ACT ? actGateStalled(reg.items, data, readJson('card-read-ledger.json', {}), TODAY) : gateStalled(reg.items, data, TODAY), one = (x) => String(x || '').replace(/[\r\n]+/g, ' ').trim();
     console.log(`count=${st.length}`);
     console.log(`list=${one(st.slice(0, 12).map((it) => `${one(it.name).slice(0, 40)}(${it.id})`).join(' / ')).slice(0, 900)}`);
     process.exit(0);
   }
   const docIdx = loadNoticeDocIndex(P('extracted'));   // 받아 둔 첨부 원본의 두 색인(자격 로봇 elig-docs.json · 신청서 로봇 forms-index.txt) — attachment-text 한 곳
-  const partsOf = makeSources({ texts: readJson('extracted/notices-text.json', {}), browserBodies: readJson('extracted/browser-bodies.json', {}), eligDocs: docIdx.elig, formRows: docIdx.forms, extractedDir: P('extracted') });
+  const partsOf = ACT
+    ? makeActSources({ storeDir: P('act-text'), formRows: docIdx.forms, extractedDir: P('extracted') })   // 활동 글의 원문 = 글자 기록(collector/act-text) + 받아 둔 신청서 원본
+    : makeSources({ texts: readJson('extracted/notices-text.json', {}), browserBodies: readJson('extracted/browser-bodies.json', {}), eligDocs: docIdx.elig, formRows: docIdx.forms, extractedDir: P('extracted') });
   const roles = readJson('attach-role-ai.json', { items: {} });   // 4-1 첨부 갈래(이 로봇이 쓴다 · collector/attach-role-ai.mjs 가 읽는다)
   if (!roles.items || typeof roles.items !== 'object') roles.items = {};
   const ledger = strictJson('card-read-ledger.json', {});
@@ -413,7 +459,8 @@ if (process.argv[1] && ranDirectly()) {
   };
   const save = () => {
     sweepGrad();
-    data.updatedAt = TODAY; data.gateHeld = gateHeldOf(reg.items, partsOf, ledger, data.items, TODAY);
+    data.updatedAt = TODAY;
+    data.gateHeld = ACT ? actGateHeldOf(reg.items, partsOf, ledger, data.items, TODAY, data.gateHeld || {}) : gateHeldOf(reg.items, partsOf, ledger, data.items, TODAY);
     writeAtomic('../data/card-read.json', data); writeAtomic('card-read-ledger.json', ledger);
     writeAtomic('card-read-review.json', { updatedAt: TODAY, ...reviewOf(ledger, data.gateHeld) });
     roles.updatedAt = TODAY; writeAtomic('attach-role-ai.json', roles);
@@ -453,7 +500,7 @@ if (process.argv[1] && ranDirectly()) {
       if (led.gradOnly) continue;   // 대학원생 전용으로 내린 공고는 「잃은 결과」가 아니다 — 되살리면 6번이 고치기 전의 카드로 돌아가고 표시도 지워진다(리뷰 2026-11-25)
       if (data.items[it.id]) continue;   // 🔴 결과가 있는 공고는 건드리지 않는다(2026-11-22) — 6번 최종 검토가 고친 카드일 수 있다(다시 만들면 4번의 답으로 되돌아간다). 잃은 것만 되살린다
       const parts = partsOf(it);
-      if (sourceHash(sourceText(parts)) !== led.hash) continue;   // 원문이 바뀌었다 — 다음 유료 실행이 다시 읽는다
+      if (sourceHash(sourceText(parts), SYS) !== led.hash) continue;   // 원문이 바뀌었다 — 다음 유료 실행이 다시 읽는다
       const r = put(it, parts, led.hash, led.raw); n += 1; if (r.entry) filled += 1;
     }
     if (WRITE) save();
@@ -461,13 +508,13 @@ if (process.argv[1] && ranDirectly()) {
     process.exit(0);
   }
 
-  const targets = pickTargets(reg.items, partsOf, ledger, { today: TODAY, giveUpAfter: cfg.giveUpAfter, only: ONLY, paid: data.items, waitAttachDays: cfg.waitAttachDays });
-  const waiting = reg.items.filter((it) => !it.program && (it.paidGate || it.paidRead) && !closedNow(it, data.items[it.id], TODAY) && awaitsAttach(it, partsOf(it), TODAY, cfg.waitAttachDays)).length;
+  const targets = pickTargets(reg.items, partsOf, ledger, { today: TODAY, giveUpAfter: cfg.giveUpAfter, only: ONLY, paid: data.items, waitAttachDays: cfg.waitAttachDays, system: SYS, awaits });
+  const waiting = reg.items.filter((it) => !it.program && (it.paidGate || it.paidRead) && !closedNow(it, data.items[it.id], TODAY) && awaits(it, partsOf(it), TODAY, cfg.waitAttachDays)).length;
   log(`대상 ${targets.length}건 (유료 확인을 기다리는 숨김 등록분 가운데 마감 전이고 · 원문이 있고 · 이 원문을 아직 안 읽은 것) · 첨부를 기다리는 것 ${waiting}건 · 이미 실린 것 ${Object.keys(data.items).length}건 · 내린 것 ${pruned}건`);
   const fake = process.env.CARD_READ_FAKE ? JSON.parse(fs.readFileSync(process.env.CARD_READ_FAKE, 'utf8')) : null;
   const paidOn = cfg.enabled === true && process.env.CARD_READ_ENABLE === '1';
   if (!WRITE) { targets.slice(0, 30).forEach((t) => log(`  · ${t.it.id} · ${String(t.it.name).slice(0, 40)} · 원문 ${t.text.length}자`)); log('미리보기 — 부르지 않았습니다 (--write 로 반영)'); process.exit(0); }
-  if (!fake && !paidOn) { if (pruned) save(); log(`유료 스위치가 꺼져 있어 부르지 않았습니다 (card-read-config.json enabled: ${cfg.enabled} · CARD_READ_ENABLE: ${process.env.CARD_READ_ENABLE || '없음'})`); process.exit(0); }
+  if (!fake && !paidOn) { if (pruned) save(); log(`유료 스위치가 꺼져 있어 부르지 않았습니다 (card-read-config.json ${ACT ? 'enabled 와 activities.enabled 둘 다' : 'enabled'}: ${cfg.enabled} · CARD_READ_ENABLE: ${process.env.CARD_READ_ENABLE || '없음'})`); process.exit(0); }
 
   let client = null;
   if (!fake) { const { default: Anthropic } = await import('@anthropic-ai/sdk'); client = new Anthropic(); }
@@ -486,7 +533,7 @@ if (process.argv[1] && ranDirectly()) {
       if (led.hash !== t.hash) { led.hash = t.hash; led.tries = 0; led.done = false; delete led.raw; }
       let out = null, err = null;
       try {
-        const r = fake ? { out: fake[t.it.id], usd: 0 } : await ask(client, MODELS.a, t.it, t.text, cfg.effort);
+        const r = fake ? { out: fake[t.it.id], usd: 0 } : await ask(client, MODELS.a, t.it, t.text, cfg.effort, SYS);
         usd += r.usd; led.usd = Math.round(((led.usd || 0) + r.usd) * 10000) / 10000; out = r.out;
       } catch (e) {
         err = e;
