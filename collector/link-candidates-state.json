@@ -940,22 +940,6 @@
   "round": "2026-11-27",
   "decidedAt": "2026-11-18"
  },
- "kosaf|2518026001|board:https://gjmed.or.kr/bbs/board.php?bo_table=notice2": {
-  "ds": "kosaf",
-  "key": "2518026001",
-  "url": "",
-  "board": "https://gjmed.or.kr/bbs/board.php?bo_table=notice2",
-  "source": "board",
-  "by": "로봇(층2 글 사냥꾼)",
-  "firstAt": "2026-10-27",
-  "lastAt": "2026-10-28",
-  "tries": 2,
-  "status": "pending",
-  "why": "게시판을 못 엶(page.goto: net::ERR_SSL_PROTOCOL_ERROR at https://gjmed.or.…)",
-  "checks": {},
-  "round": "2026-11-06",
-  "nextAt": "2026-10-31"
- },
  "kosaf|2518026001|https://gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516": {
   "ds": "kosaf",
   "key": "2518026001",
@@ -1448,6 +1432,61 @@
   "round": "2027-01-05",
   "nextAt": "2026-11-28"
  },
+ "kosaf|2703434001|https://www.kcffd.org/bbs/board.php?bo_table=notice&wr_id=34": {
+  "ds": "kosaf",
+  "key": "2703434001",
+  "url": "https://www.kcffd.org/bbs/board.php?bo_table=notice&wr_id=34",
+  "source": "match",
+  "by": "로봇(재단 게시판 글과 짝 — 마감 같음 +2 · 마감 해 +1 · 장학 낱말 +1)",
+  "title": "2027년도 제10기 장학생 선발 안내",
+  "firstAt": "2026-11-28",
+  "lastAt": "2026-11-28",
+  "tries": 1,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2027-01-05",
+  "decidedAt": "2026-11-28",
+  "verifiedAt": "2026-11-28",
+  "also": []
+ },
+ "kosaf|2703436001|https://www.bsjunggu.go.kr/tour/board/view.junggu?boardId=BBS_0000086&menuCd=DOM_000000704008000000&dataSid=261543": {
+  "ds": "kosaf",
+  "key": "2703436001",
+  "url": "https://www.bsjunggu.go.kr/tour/board/view.junggu?boardId=BBS_0000086&menuCd=DOM_000000704008000000&dataSid=261543",
+  "source": "search",
+  "by": "Claude 정기 세션 (2026-11-27 · 이 컴퓨터에서 해당 관공서 사이트가 curl·브라우저 모두 502·연결 끊김 — 로봇이 다른 망에서 확인)",
+  "title": "2027년도 제14회 중구장학회 장학생 선발 안내",
+  "firstAt": "2026-11-28",
+  "lastAt": "2026-11-28",
+  "tries": 1,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2027-01-08",
+  "decidedAt": "2026-11-28",
+  "verifiedAt": "2026-11-28",
+  "also": [
+   "2703436002",
+   "2703436003"
+  ]
+ },
  "kosaf|2703603001|board:https://www.yuha.or.kr/News_Notice.aspx": {
   "ds": "kosaf",
   "key": "2703603001",
@@ -1538,13 +1577,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-24",
-  "lastAt": "2026-11-25",
-  "tries": 2,
+  "lastAt": "2026-11-28",
+  "tries": 3,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2027-01-08",
-  "nextAt": "2026-11-28"
+  "nextAt": "2026-12-05"
  },
  "kosaf|2704215001|http://www.pyeongnae.co.kr/bbs/board.php?bo_table=notice&wr_id=206": {
   "ds": "kosaf",
