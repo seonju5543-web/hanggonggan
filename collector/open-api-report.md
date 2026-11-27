@@ -1,6 +1,6 @@
 ## 🛰 공공 API 로봇 리포트 (2026-11-27)
 
-- ✅ **K-Startup 사업공고** — 받은 행 132 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 109 · 상한 15건 초과 7 · 마감 지남 1
+- ✅ **K-Startup 사업공고** — 받은 행 125 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 103 · 상한 15건 초과 7
   - 자격 줄 있는 글 15/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `aply_excl_trgt_ctnt, aply_mthd_eml_rcpt_istc, aply_mthd_etc_istc, aply_mthd_fax_rcpt_istc, aply_mthd_onli_rcpt_istc, aply_mthd_pssr_rcpt_istc, aply_mthd_vst_rcpt_istc, aply_trgt, aply_trgt_ctnt, biz_aply_url, biz_enyy, biz_gdnc_url, biz_pbanc_nm, biz_prch_dprt_nm, biz_trgt_age, detl_pg_url, eval_method, intg_pbanc_biz_nm, intg_pbanc_yn, pbanc_ctnt, pbanc_ntrp_nm, pbanc_rcpt_bgng_dt, pbanc_rcpt_end_dt, pbanc_sn, prch_cnpl_no, prfn_matr, rcrt_prgs_yn, sprv_inst, support_ctnt, supt_biz_clsfc, supt_regin`
   - 대외활동 · 예비, 초기 창업자가 반드시 알아야 할 스타트업 마케팅 방법론 - 제11차 DDM 벤처스타트업 아카데미 (~2026-11-27) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179835
@@ -22,10 +22,10 @@
     - 179834 · 2027년 상반기「IBK창공(創工) UNIST캠프」모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179834 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179834(2)
     - 179814 · 2027년 상반기 「IBK창공(創工) 서울대캠프」 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179814 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179814(2)
     - 179860 · 2026년 3차 포텐셜씨드(Potential Seed) → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179860 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179860(2)
-- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 421 · 상한 15건 초과 57 · 마감 지남 5 · 같은 글 2
+- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 418 · 상한 15건 초과 65 · 같은 글 2
   - 자격 줄 있는 글 11/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
-  - 코드 칸 값(첫 세 행): gugunCd=4090000|4060000|3860000 · sidoCd=6410000|6410000|6410000
+  - 코드 칸 값(첫 세 행): gugunCd=3090000|3370000|3780000 · sidoCd=6110000|6260000|6410000
   - 대외활동 · [건국대학교병원] 병원 업무 보조 및 환자 안내 봉사자 모집 (※이메일 신청만 가능※ / 1365 신청X) (~2026-11-27) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3511651
   - 대외활동 · ［대학생,대학원생］초등 기초학습 지도 자원봉사 모집 (~2026-11-27) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3515772
   - 대외활동 · 대학생 봉사자를 모집합니다 (~2026-11-27) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3534036

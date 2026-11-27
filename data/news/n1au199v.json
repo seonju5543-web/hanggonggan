@@ -1,7 +1,28 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "2026학년도 2학기 <대학글쓰기> 교과목 감독자 추가 모집 재안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31922&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-27",
+   "postId": "31922",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-27",
+   "desc": "근무일시 모집대상 ○ 서울시립대학교 대학원생 및 졸업생 ( ※ 학부생 및 교직원 지원불가 ) 모집인원 시험감독"
+  },
+  {
+   "title": "서울시립대학교 학칙 및 학사내규 일부개정(안) 사전예고",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31923&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-27",
+   "postId": "31923",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-27"
+  },
   {
    "title": "서울시립대학교 성과관리 관련 규정 제정(안) 및 폐지(안) 사전예고",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31921&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -436,7 +457,7 @@
    "src": "80d7d3bc",
    "foundAt": "2026-11-18",
    "thumb": "data/news/img/ba2e1314556ae41d.webp",
-   "desc": "차세대운영형인공지능부트캠프사업단 ■메타넷그룹 채용연계형 교육과정■ ■ 채용기업 : 메타넷그룹 (16개 계열사 중 RockPLACE 중심 채용 예정) 메타넷 그룹(舊 대우정보시스템) - 2,000년 설립, 임직원…"
+   "desc": "■메타넷그룹 채용연계형 교육과정■ ■ 채용기업 : 메타넷그룹 (16개 계열사 중 RockPLACE 중심 채용 예정) 메타넷 그룹(舊 대우정보시스템) - 2,000년 설립, 임직원 2,000명 이상, 24년 매출액…"
   },
   {
    "title": "[고시반] 2026년 공인노무사 2차 시험 합격자 조사",
@@ -448,31 +469,6 @@
    "src": "80d7d3bc",
    "foundAt": "2026-11-18",
    "desc": "- 서울시립대학교 졸업생, 재학생, 휴학생 모두 응답해주시면 됩니다. (11.20.(금)까지) https://forms.gle/7Exa5KtSggu88XZB9 (주소를 복사해주세요.)"
-  },
-  {
-   "title": "2026년도 제23회 UOS 연구 콜로키움 개최 안내(2026.11.19.(목) 11:00, 창의혁신관 SI 아레나)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31865&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-17",
-   "postId": "31865",
-   "kind": "행사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-17",
-   "thumb": "data/news/img/81faf42c069aff5d.webp",
-   "desc": "📌 발표주제 및 발표자 - 「녹지형평성을 위한 도시숲 정책 전환: 건물 단위 3-30-300 진단과 구도심 조성 전략」 도시과학대학 조경학과 이재호 교수"
-  },
-  {
-   "title": "FEDS 금융경제 토론대회 신청 기간 연장 안내 (~11.18까지)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31783&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-11-17",
-   "postId": "31783",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-11-17",
-   "thumb": "data/news/img/e8a950fe05708ff4.webp",
-   "desc": "경제학부 <지원자 추가모집으로 인한 기간 연장> 2026-2 금융경제 토론대회 안내 서울시립대 금융경제학회 FEDS와 서울시립대 경제학부에서 금융경제 토론대회를 개최합니다."
   }
  ]
 }

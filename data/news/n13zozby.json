@@ -1,7 +1,19 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "[경성대학교] 2026 캠퍼스 AI 단편 영화제: 콘텐츠 오디세이 개최 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512493",
+   "postedAt": "2026-11-27",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/42ba5b9549cc84fb.webp",
+   "desc": "경성대학교 앵커사업단에서 다음과 같이 \"2026 캠퍼스 AI 단편 영화제: 콘텐츠 오디세이\"를 개최하오니, 학생 여러분의 많은 관심과 참여 바랍니다."
+  },
   {
    "title": "[효원상담원] 누적된 내 스트레스 지수는? 손끝으로 확인해 보세요!",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512467",
@@ -394,7 +406,8 @@
    "school": "부산대학교",
    "campus": "",
    "src": "2d0d4013",
-   "foundAt": "2026-11-18"
+   "foundAt": "2026-11-18",
+   "desc": "부산대학교 국제처에서 2027 학년도 전기 외국인특별전형 운영 관련 아르바이트생을 모집하고자 합니다 . 아래 내용을 참고하여 지원하시기 바랍니다 ."
   },
   {
    "title": "[외교부] 청년의 안전한 해외진출 ! 외교부 해외안전여행 앱, 영사안전콜센터와 ...",
@@ -415,17 +428,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-11-18",
    "desc": "7 차 주제 신체감각 및 이완을 통한 심리안정화 기술 익히기 7 차 일정 : 2026.11.20. ( 금 ) 10:30 &sim; 11:30 7 차 신청기한 : 2026.10.19.~ 2026.11.19. 18시까지"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동신대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512297",
-   "postedAt": "2026-11-18",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-18",
-   "desc": "2026학년도 겨울계절수업 동신대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
   }
  ]
 }

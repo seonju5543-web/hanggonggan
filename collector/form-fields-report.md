@@ -1,16 +1,13 @@
-## 🧾 신청서 쪽 그림 · 빈칸 자리 리포트 (2026-11-26)
+## 🧾 신청서 쪽 그림 · 빈칸 자리 리포트 (2026-11-27)
 
 원본 PDF 사본(data/forms-pdf)의 쪽 그림(WebP)과 이름표 옆 빈칸 자리(fields.json)를 만듭니다 — 앱의 「양식 채우기」가 그 위에 학생 답을 얹습니다. 🔴 칸을 지어내지 않습니다(못 찾은 파일은 빈 배열).
 
-파일 71개 — 이번에 만듦 5 · 그대로 66 · 실패 0 · 빈칸 합 116(프로필로 채울 수 있는 것 102) · 빈칸 0개 파일 56 · 표 머리글 아래 칸(학생이 적는 칸) 2 · 선 없는 쪽에서 머리글로 건너뛴 줄 0
-이름표별: 이름 6 · 생년월일 4 · 학교 3 · 주소 2 · 학년 1 · 연락처 1
+파일 72개 — 이번에 만듦 5 · 그대로 67 · 실패 0 · 빈칸 합 116(프로필로 채울 수 있는 것 102) · 빈칸 0개 파일 57 · 표 머리글 아래 칸(학생이 적는 칸) 0 · 선 없는 쪽에서 머리글로 건너뛴 줄 0
+이름표별: 이름 13 · 연락처 9 · 학번 5 · 주소 4 · 학과 3 · 학년 2 · 생년월일 2 · 은행 2 · 계좌번호 2 · 이메일 1
 
 ### 빈칸을 하나도 못 찾은 파일 (학생은 원본을 받아 손으로 쓴다 · 관리자가 칸을 지정하는 길은 다음 조각)
 - auto-orykeywordpaged1slug2026-0ezoyxo · 2-2026년-숭실대-노동조합-직원-추천-장학생-선발관련-개인정보제공-동의서.pdf
 - auto-amepagescholarshipnotice-0d1tyil · 2-첨부2-1._양식_삼성꿈장학재단_글로벌_희망장학_신청서_학부_.pdf
-- auto-ent2431271834artclviewdo · 1-2026-2학기_외대비전HUFSDorm_장학금_신청서_및_추천서.pdf
-- auto-ent2431271834artclviewdo · 2-개인정보수집이용동의서.pdf
-- act-0qcoq7g · 1-미래사회문제와_인문사회_융합세미나_수업계획서_.pdf
 - auto-0005009002000000seq31571 · 1-성과형_장학금_자격증_신청서_및_개인정보활용서.pdf
 - auto-amepagescholarshipnotice-1p6dyle · 1-개인정보_수집_및_활용_동의서.pdf
 - act-1pk75lo · 1-26회_융합기초프로젝트_팀_신청서.pdf
@@ -18,7 +15,6 @@
 - act-0slj2js · 1-3._양식_예비언론인캠프_참가신청서_제29기_최종_.pdf
 - act-1t6tf7v · 1-_AIxSeoul_지원신청서_작품명_지원자_팀_명.pdf
 - auto-sknou51815772artclviewdo · 1-_붙임2_공적활동확인서_활동사진_포함__신규서식_2026-2학기.pdf
-- auto-ent2431269444artclviewdo · 1-붙임2._생활비_온라인_체크리스트.pdf
 - auto-0713no2516266sitedvscdkr · 1-_서식_1_3.pdf
 - auto-ent2431272166artclviewdo · 1-HUFS_Dream_장학금_신청서.pdf
 - auto-pnoticedoarticleno368050 · 1-붙임._아이소이아묻따생활장학금_신청서_양식.pdf
@@ -46,6 +42,11 @@
 - auto-bbssc58944731artclviewdo · 2-3-_서식_포토에세이.pdf
 - auto-bbssc58944731artclviewdo · 3-4-_서식_과학탐구활동_실행_이력서.pdf
 - auto-bbssc58944731artclviewdo · 4-6-_서식_개인정보_제공_및_사용_동의서_학교_추천_지원자.pdf
+- auto-ent2431273181artclviewdo · 1-_서식_2026학년도_2학기_동계방학_국가근로장학생_지원서.pdf
+- auto-jong659274854artclviewdo · 1-2026년_2학기_학생복지처_특별장학금_학업계획서.pdf
+- auto-8bnum57138cate0qidx57138-0bjhkqt · 1-_붙임1_국가근로장학생_지원서.pdf
+- auto-15nttno171908searchctgry · 1-_학생용_국가근로장학금_취업연계_중점대학_장학생_지원서.pdf
+- auto-archgbn0searchordersort0-0ty595g · 1-_서식_공로장학금_신청서_및_추천서_등.pdf
 - kosaf-2000429013 · 1-_공고문_2026년_전입장학금_지원_공고_p5-6.pdf
 - auto-ent2431269128artclviewdo · 1-elig-1qi88m-1_p5-8.pdf
 - kosaf-2000204008 · 1-다자녀가정_특별지원_대학등록금_지원신청서_p1-3.pdf
@@ -67,8 +68,8 @@
 아직 채점한 파일이 없습니다 — 아래 표본을 한 번 채점해 주세요(칸마다 맞음·놓침·틀림 · 파일 sha 를 열쇠로):
 - auto-orykeywordpaged1slug2026-0ezoyxo · 2-2026년-숭실대-노동조합-직원-추천-장학생-선발관련-개인정보제공-동의서.pdf — 지금 찾은 칸 0 · sha 7aa8ec1e325a
 - auto-amepagescholarshipnotice-0d1tyil · 2-첨부2-1._양식_삼성꿈장학재단_글로벌_희망장학_신청서_학부_.pdf — 지금 찾은 칸 0 · sha 756e79424f0d
-- auto-ent2431271834artclviewdo · 1-2026-2학기_외대비전HUFSDorm_장학금_신청서_및_추천서.pdf — 지금 찾은 칸 0 · sha 67fb3d1ee368
-- auto-ent2431271834artclviewdo · 2-개인정보수집이용동의서.pdf — 지금 찾은 칸 0 · sha 3072a6e9e87f
+- auto-0005009002000000seq31571 · 1-성과형_장학금_자격증_신청서_및_개인정보활용서.pdf — 지금 찾은 칸 0 · sha 0d845f5806f0
+- auto-amepagescholarshipnotice-1p6dyle · 1-개인정보_수집_및_활용_동의서.pdf — 지금 찾은 칸 0 · sha a0840b0b6ecd
 - auto-amepagescholarshipnotice-0d1tyil · 1-_양식_삼성꿈장학재단_글로벌_희망장학_신청서_학부_.pdf — 지금 찾은 칸 14 · sha e0cc15da855f
 - auto-otice06doarticleno140764 · 1-장학금_신청서_사업참여확약서_개인정보제공활용동의서.pdf — 지금 찾은 칸 13 · sha cc58daaaf31e
 - act-0r96zru · 1-2._2026년_제주-유네스코_청년_연수_프로그램_신청서식.pdf — 지금 찾은 칸 12 · sha 4172d6c50b7c

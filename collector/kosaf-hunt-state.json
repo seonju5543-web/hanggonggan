@@ -1046,12 +1046,64 @@
    "checkedAt": "2026-11-24",
    "why": "홈페이지 못 엶 (TypeError: DEPTH_ZERO_SELF_SIGNED_CERT → 브라우저도 실패(page.goto: net::ERR_CERT_AUTHO)",
    "targets": 1
+  },
+  "bsjunggu.go.kr": {
+   "checkedAt": "2026-11-27",
+   "pages": 10,
+   "found": 0,
+   "lines": 0,
+   "targets": 3,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "bohae-scholarship.kr": {
+   "checkedAt": "2026-11-27",
+   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "targets": 1
+  },
+  "cwg.go.kr": {
+   "checkedAt": "2026-11-27",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "kcffd.org": {
+   "checkedAt": "2026-11-27",
+   "pages": 4,
+   "found": 0,
+   "lines": 1,
+   "targets": 1,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "puac.go.kr": {
+   "checkedAt": "2026-11-27",
+   "pages": 7,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "pyeongnae.co.kr": {
+   "checkedAt": "2026-11-27",
+   "pages": 4,
+   "found": 1,
+   "lines": 1,
+   "targets": 1,
+   "why": ""
   }
  },
  "searched": {
+  "2000189006": "2026-11-27",
   "2000438004": "2026-11-27",
+  "2703434001": "2026-11-27",
+  "2703436001": "2026-11-27",
+  "2703436002": "2026-11-27",
+  "2703436003": "2026-11-27",
   "2704065001": "2026-11-27",
   "2704387001": "2026-11-27",
-  "2704387002": "2026-11-27"
+  "2704387002": "2026-11-27",
+  "2704388001": "2026-11-27",
+  "2704389001": "2026-11-27"
  }
 }

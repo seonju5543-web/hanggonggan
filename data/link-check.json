@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-26T19:36:38.191Z",
+ "updatedAt": "2026-11-27T03:39:38.888Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -135,6 +135,13 @@
    "src": "robot",
    "title": "2026년 전입장학금 지원 공고",
    "round": "2026-11-30"
+  },
+  "id:kosaf-2704215001": {
+   "url": "http://www.pyeongnae.co.kr/bbs/board.php?bo_table=notice&wr_id=206",
+   "at": "2026-11-27",
+   "src": "robot",
+   "title": "★2026년 평내장학회 장학생 모집★",
+   "round": "2026-12-10"
   },
   "id:kosaf-2704378001": {
    "url": "https://www.cheongro.org/bbs/board.php?tbl=bbs41&mode=VIEW&num=30&",

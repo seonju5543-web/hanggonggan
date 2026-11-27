@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": {
   "auto-otice06doarticleno140764": [
    {
@@ -199,40 +199,6 @@
     "at": "2026-11-17"
    }
   ],
-  "auto-ent2431271834artclviewdo": [
-   {
-    "file": "auto-ent2431271834artclviewdo/1-2026-2학기_외대비전HUFSDorm_장학금_신청서_및_추천서.pdf",
-    "name": "2026-2학기 외대비전HUFSDorm 장학금 신청서 및 추천서.hwp",
-    "pages": 2,
-    "bytes": 74683,
-    "srcBytes": 59904,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   },
-   {
-    "file": "auto-ent2431271834artclviewdo/2-개인정보수집이용동의서.pdf",
-    "name": "개인정보수집이용동의서.hwp",
-    "pages": 1,
-    "bytes": 78123,
-    "srcBytes": 50688,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
-  "act-0qcoq7g": [
-   {
-    "file": "act-0qcoq7g/1-미래사회문제와_인문사회_융합세미나_수업계획서_.pdf",
-    "name": "미래사회문제와_인문사회_융합세미나_수업계획서_.hwp",
-    "pages": 3,
-    "bytes": 204359,
-    "srcBytes": 124416,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-18"
-   }
-  ],
   "auto-0005009002000000seq31571": [
    {
     "file": "auto-0005009002000000seq31571/1-성과형_장학금_자격증_신청서_및_개인정보활용서.pdf",
@@ -312,18 +278,6 @@
     "pages": 2,
     "bytes": 275099,
     "srcBytes": 851456,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-20"
-   }
-  ],
-  "auto-ent2431269444artclviewdo": [
-   {
-    "file": "auto-ent2431269444artclviewdo/1-붙임2._생활비_온라인_체크리스트.pdf",
-    "name": "붙임2.[생활비] 온라인 체크리스트.pdf",
-    "pages": 1,
-    "bytes": 65312,
-    "srcBytes": 65312,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-20"
@@ -632,14 +586,71 @@
     "fonts": "ko-nanum-1",
     "at": "2026-11-26"
    }
+  ],
+  "auto-ent2431273181artclviewdo": [
+   {
+    "file": "auto-ent2431273181artclviewdo/1-_서식_2026학년도_2학기_동계방학_국가근로장학생_지원서.pdf",
+    "name": "(서식)2026학년도 2학기(동계방학) 국가근로장학생 지원서.hwp",
+    "pages": 1,
+    "bytes": 48842,
+    "srcBytes": 28672,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-27"
+   }
+  ],
+  "auto-jong659274854artclviewdo": [
+   {
+    "file": "auto-jong659274854artclviewdo/1-2026년_2학기_학생복지처_특별장학금_학업계획서.pdf",
+    "name": "2026년 2학기 학생복지처 특별장학금 학업계획서.hwp",
+    "pages": 2,
+    "bytes": 37698,
+    "srcBytes": 26624,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-27"
+   }
+  ],
+  "auto-8bnum57138cate0qidx57138-0bjhkqt": [
+   {
+    "file": "auto-8bnum57138cate0qidx57138-0bjhkqt/1-_붙임1_국가근로장학생_지원서.pdf",
+    "name": "(붙임1) 국가근로장학생 지원서.hwp",
+    "pages": 2,
+    "bytes": 71257,
+    "srcBytes": 93696,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-27"
+   }
+  ],
+  "auto-15nttno171908searchctgry": [
+   {
+    "file": "auto-15nttno171908searchctgry/1-_학생용_국가근로장학금_취업연계_중점대학_장학생_지원서.pdf",
+    "name": "(학생용) 국가근로장학금 취업연계 중점대학 장학생 지원서.hwp",
+    "pages": 4,
+    "bytes": 161459,
+    "srcBytes": 40448,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-27"
+   }
+  ],
+  "auto-archgbn0searchordersort0-0ty595g": [
+   {
+    "file": "auto-archgbn0searchordersort0-0ty595g/1-_서식_공로장학금_신청서_및_추천서_등.pdf",
+    "name": "(서식) 공로장학금 신청서 및 추천서 등.hwpx",
+    "pages": 5,
+    "bytes": 170668,
+    "srcBytes": 57261,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-27"
+   }
   ]
  },
  "roles": {
   "auto-sknou51815772artclviewdo": {
    "★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp": "form"
-  },
-  "auto-ent2431269444artclviewdo": {
-   "붙임2.[생활비] 온라인 체크리스트.pdf": "form"
   },
   "auto-2570viewdocurrentpageno1": {
    "[서식]글로벌여성리더장학금.hwp": "form"

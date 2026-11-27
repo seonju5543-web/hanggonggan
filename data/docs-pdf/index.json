@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": {
   "auto-sknou51815772artclviewdo": [
    {
@@ -21,28 +21,6 @@
     "fonts": "ko-nanum-1",
     "kept": 1,
     "at": "2026-11-20"
-   }
-  ],
-  "auto-dmodeviewduid53536tpage1": [
-   {
-    "file": "auto-dmodeviewduid53536tpage1/1-20261021_인석장학금_유형_온라인접수_체크리스트1.pdf",
-    "name": "20261021 인석장학금 유형Ⅰ 온라인접수 체크리스트1.hwp",
-    "pages": 3,
-    "bytes": 208096,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "mk": 4,
-    "at": "2026-11-21"
-   },
-   {
-    "file": "auto-dmodeviewduid53536tpage1/2-20261021_인석장학금_유형_온라인접수_체크리스트1.pdf",
-    "name": "20261021 인석장학금 유형Ⅱ 온라인접수 체크리스트1.hwp",
-    "pages": 2,
-    "bytes": 189525,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "mk": 4,
-    "at": "2026-11-21"
    }
   ],
   "auto-2582viewdocurrentpageno1": [
@@ -245,28 +223,6 @@
     "name": "2026 KAU_리빙랩_제출양식.hwp",
     "pages": 1,
     "bytes": 62556,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "kosaf-2000446027": [
-   {
-    "file": "kosaf-2000446027/1-2026년_영호남_상생_장학생_모집_공고문.pdf",
-    "name": "2026년_영호남_상생_장학생_모집_공고문.hwp",
-    "pages": 7,
-    "bytes": 266657,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "kosaf-2701180001": [
-   {
-    "file": "kosaf-2701180001/1-_공고_2026년장학회선발계획_공고_대학생_.pdf",
-    "name": "(공고)2026년장학회선발계획 공고(대학생).hwp",
-    "pages": 8,
-    "bytes": 367316,
     "fonts": "ko-nanum-1",
     "kept": 1,
     "at": "2026-11-20"
@@ -542,21 +498,71 @@
     "srcHash": "5fa0db2ee5ac2fac",
     "at": "2026-11-26"
    }
+  ],
+  "auto-zc3cnavcodeknu1619416593-0226qa1": [
+   {
+    "file": "auto-zc3cnavcodeknu1619416593-0226qa1/1-통합정보시스템_교내근로장학생_학생_신청_및_근로_합격_확인_방법.pdf",
+    "name": "통합정보시스템 교내근로장학생 학생 신청 및 근로 합격 확인 방법.hwp",
+    "pages": 2,
+    "bytes": 129501,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "56fdbdad045cb994",
+    "at": "2026-11-27"
+   }
+  ],
+  "auto-enoticedoarticleno770709": [
+   {
+    "file": "auto-enoticedoarticleno770709/1-_TGL_장학금__추천서_양식.pdf",
+    "name": "「TGL_장학금」_추천서_양식.docx",
+    "pages": 2,
+    "bytes": 166596,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "e8d70fd5de1f509d",
+    "at": "2026-11-27"
+   }
+  ],
+  "auto-archgbn0searchordersort0-0ty595g": [
+   {
+    "file": "auto-archgbn0searchordersort0-0ty595g/1-2026학년도_공로장학금_선발_계획_및_신청.접수_안내.pdf",
+    "name": "2026학년도 공로장학금 선발 계획 및 신청.접수 안내.hwp",
+    "pages": 2,
+    "bytes": 173126,
+    "fonts": "ko-nanum-1",
+    "kept": null,
+    "mk": 4,
+    "srcHash": "4506e6a3b921928b",
+    "at": "2026-11-27"
+   },
+   {
+    "file": "auto-archgbn0searchordersort0-0ty595g/2-2026학년도_공로장학금_선발_계획_안_.pdf",
+    "name": "2026학년도 공로장학금 선발 계획(안).hwpx",
+    "pages": 3,
+    "bytes": 231486,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "0569e678dcbd25ba",
+    "at": "2026-11-27"
+   }
   ]
  },
  "tried": {
   "auto-tegory1moddocumentuid432|★-2027학년도-1학기-해외수학장학생-신청안내.hwp": {
-   "at": "2026-11-24",
+   "at": "2026-11-27",
    "why": "HTTP 500",
    "mk": 4
   },
   "auto-tegory1moddocumentuid431|1.-2027학년도-1학기-학부생-교내장학금-신청-안내.hwp": {
-   "at": "2026-11-24",
+   "at": "2026-11-27",
    "why": "HTTP 500",
    "mk": 4
   },
   "auto-tegory1moddocumentuid431|2.-2027학년도-1학기-대학원생-교내장학금-신청-안내.hwp": {
-   "at": "2026-11-24",
+   "at": "2026-11-27",
    "why": "HTTP 500",
    "mk": 4
   },

@@ -190,11 +190,6 @@
   "lastV": "unread",
   "why": "HTTP 403"
  },
- "http://www.kwangnam.co.kr/ab-1923-19": {
-  "lastAt": "2026-11-21",
-  "lastV": "unread",
-  "why": "HTTP 403"
- },
  "http://www.sjjh.or.kr/page.do?mid=8&ArticleId=150": {
   "lastAt": "2026-11-15",
   "lastV": "post",
@@ -13744,15 +13739,6 @@
   "n": 38,
   "firstAt": "2026-10-14",
   "confirmed": true
- },
- "https://www.jntle.kr/main/board/2/read/2686": {
-  "lastAt": "2026-11-21",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-21",
-  "n": 0,
-  "confirmed": false
  },
  "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70181&cate=8": {
   "lastAt": "2026-11-02",

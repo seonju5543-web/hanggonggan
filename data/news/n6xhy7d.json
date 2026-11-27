@@ -1,7 +1,17 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "[학생] 장소사용 신청 안내(2026년 12월)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53754&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-27",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-27",
+   "desc": "2026 년 12 월 장소 ( 풋살구장 , 농구장 ) 사용을 아래와 같이 안내 및 신청 , 접수하오니 사용을 원하시는 교내 구성원은 기간 내에 신청해 주시기 바랍니다 ."
+  },
   {
    "title": "[일반] 기간제 계약직원 채용 공고(교육대학원 교학팀)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53753&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -347,7 +357,7 @@
    "campus": "",
    "src": "b09cb042",
    "foundAt": "2026-11-13",
-   "desc": "아래와 같이 공고합니다. 세부전공 변경 희망자 및 1차 기간 내 미선택 학생은 후속 일정에 따라 기간 내에 신청하시기 바랍니다."
+   "desc": "학부제 입학생 아래와 같이 공고합니다. 세부전공 변경 희망자 및 1차 기간 내 미선택 학생은 후속 일정에 따라 기간 내에 신청하시기 바랍니다."
   },
   {
    "title": "[일반] [원격교육지원센터] 2026년 광운대학교 모집",
@@ -412,17 +422,6 @@
    "src": "b09cb042",
    "foundAt": "2026-11-11",
    "desc": "채용 부서 공과대학 환경공학과 모집인원 1. 지원 자격 및 우대사항 담당업무 환경공학과 행정사무업무 등 지원 자격"
-  },
-  {
-   "title": "[일반] [지능형로봇혁신융합대학사업단]2026학년도 동계 계절학기 학점교류 안내(본교→국민대학교)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53665&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-10",
-   "kind": "학사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-11",
-   "desc": "안녕하세요. 지능형로봇사업단입니다. 2026학년도 동계 계절학기 국민대학교 미래자동차전공 학점교류 신청과 관련하여 아래와 같이 안내드립니다."
   }
  ]
 }

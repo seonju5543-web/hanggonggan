@@ -1,7 +1,18 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "상명대, 연극 『굿닥터』로 안서동 청년문화 활성화 나선다",
+   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770729&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-27",
+   "school": "상명대학교",
+   "campus": "",
+   "src": "f8a29ec6",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/66d0db618ef60225.webp",
+   "desc": "상명대학교는 오는 11월 29일부터 12월 1일까지 3일간 천안캠퍼스 계당관 중극장에서 「제2회 안서 유니브시티 청년 공연제」의 일환으로 연극 『굿닥터』를 선보인다."
+  },
   {
    "title": "글로벌인문사회융합연구사업단, 산·학·연 성과공유회 성료",
    "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770636&article.offset=0&articleLimit=10",
@@ -168,17 +179,6 @@
    "foundAt": "2026-10-29",
    "thumb": "data/news/img/4127a241f2c32ac9.webp",
    "desc": "우리 대학 바이오헬스 혁신융합대학 사업단은 지난 27일 ㈜모빅셀(대표이사 이연태)과 상호협력을 위한 업무협약(MOU)을 체결했다."
-  },
-  {
-   "title": "상명대-천안시, 건축·도시디자인 기반 관·학 협약 체결",
-   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769757&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-27",
-   "school": "상명대학교",
-   "campus": "",
-   "src": "f8a29ec6",
-   "foundAt": "2026-10-27",
-   "desc": "상명대학교(총장 김종희)는 27일 천안시청 소회의실에서 천안시와 '건축·도시디자인 기반 시민공간 혁신과 지역가치 창출을 위한 관·학 협약'을 체결했다고 밝혔다.",
-   "thumb": "data/news/img/be7a20760a321f85.webp"
   }
  ]
 }

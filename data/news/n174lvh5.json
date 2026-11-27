@@ -1,7 +1,29 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "[기숙사운영센터] 2026학년도 동계방학 기숙사(K,A관) 추가모집 공고",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278278&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-27",
+   "kind": "생활",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/43c2e7b759aef10e.webp"
+  },
+  {
+   "title": "[학생지원팀] 천원의 아침밥 12월 메뉴 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278282&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-27",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/b49c6b5712fe3038.webp",
+   "desc": "★12월 1일(화)~12월 17일(목) ★ 학생여러분의 많은 관심과 참여로 2학기 천원의 아침밥이 마지막 12월을 맞이해습니다."
+  },
   {
    "title": "[시설건축팀] 다솔관 일부 난방공급 중지 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278231&article.offset=0&articleLimit=10",
@@ -341,7 +363,7 @@
    "src": "5d85d287",
    "foundAt": "2026-11-03",
    "thumb": "data/news/img/9cbb9499ec9bd6d7.webp",
-   "desc": "자세한 내용은 아래와 첨부파일을 참고해주시기 바랍니다. 감사합니다. 1. 프로그램명: 국취연계형 공공행정 5차 인턴(미래내일 일경험(인턴형))"
+   "desc": "안녕하세요, 대학일자리플러스센터입니다. 자세한 내용은 아래와 첨부파일을 참고해주시기 바랍니다. 감사합니다."
   },
   {
    "title": "[학생지원팀] 부천시장님과 가톨릭대 청년이 함께하는 '영톡스클럽' 행사 개최 안내(사전신청링크)",
@@ -409,29 +431,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-30",
    "desc": "* 전형절차 : 1차면접(실무진) -> 2차면접(임원) -> 최종합격 - 추천채용 지원자 서류 전형 면제"
-  },
-  {
-   "title": "[김수환추기경연구소] 체험형 전시 ‘사색의 운동회 - 말씀이 몸이 되는 순간’ 개최",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277314&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "kind": "행사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/04b9e51118acea94.webp",
-   "desc": "종교가 있든 없든, 신앙과 관계없이 누구나 즐겁게 참여할 수 있는 참여형 전시회가 열립니다!"
-  },
-  {
-   "title": "[중앙도서관] 11월 학술정보이용교육 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277293&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "kind": "생활",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/d41b64c36abf4908.webp"
   }
  ]
 }

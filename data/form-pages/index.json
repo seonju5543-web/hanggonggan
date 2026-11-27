@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": {
   "auto-o2432actionviewno9994682": [
    {
@@ -203,19 +203,6 @@
     "src": "elig-3xuqnv-1.pdf",
     "srcBytes": 180337,
     "none": true,
-    "at": "2026-11-04"
-   }
-  ],
-  "kosaf-2701180001": [
-   {
-    "file": "kosaf-2701180001/1-_공고_2026년장학회선발계획_공고_대학생__p3-8.pdf",
-    "name": "공고문 안 신청서 서식 (3, 6, 8쪽)",
-    "pages": 3,
-    "bytes": 536770,
-    "src": "(공고)2026년장학회선발계획 공고(대학생).hwp",
-    "srcBytes": 128000,
-    "srcPages": "3, 6, 8",
-    "from": "공고문 서식 쪽 떼기",
     "at": "2026-11-04"
    }
   ],
@@ -440,14 +427,6 @@
     "at": "2026-11-20"
    }
   ],
-  "auto-bbssc58944388artclviewdo": [
-   {
-    "src": "form-xjufyc-2.pdf",
-    "srcBytes": 637609,
-    "none": true,
-    "at": "2026-11-20"
-   }
-  ],
   "auto-amepagescholarshipnotice-0ywblu5": [
    {
     "src": "elig-10zmzq-1.pdf",
@@ -459,19 +438,6 @@
     "src": "elig-10zmzq-2.pdf",
     "srcBytes": 1906185,
     "none": true,
-    "at": "2026-11-20"
-   }
-  ],
-  "kosaf-2000446027": [
-   {
-    "file": "kosaf-2000446027/1-2026년_영호남_상생_장학생_모집_공고문_p4-7.pdf",
-    "name": "공고문 안 신청서 서식 (4, 6~7쪽)",
-    "pages": 3,
-    "bytes": 429381,
-    "src": "2026년_영호남_상생_장학생_모집_공고문.hwp",
-    "srcBytes": 71168,
-    "srcPages": "4, 6~7",
-    "from": "공고문 서식 쪽 떼기",
     "at": "2026-11-20"
    }
   ],
@@ -542,14 +508,6 @@
     "ai": "content|"
    }
   ],
-  "kosaf-2500029003": [
-   {
-    "src": "(재)양천장학회 2026학년도 후기 학업지원 특별장학금 수급계획 안내.pdf",
-    "srcBytes": 332512,
-    "none": true,
-    "at": "2026-11-25"
-   }
-  ],
   "kosaf-2000425003": [
    {
     "file": "kosaf-2000425003/1-2026년_학교장_추천_장학금_장학생_선발_공고문_p4-8.pdf",
@@ -603,6 +561,74 @@
     "at": "2026-11-26",
     "why": "AI: 서식 없는 내용 문서",
     "ai": "content|"
+   }
+  ],
+  "auto-enoticedoarticleno770709": [
+   {
+    "src": "form-tqldc7-3.docx",
+    "srcBytes": 69973,
+    "none": true,
+    "at": "2026-11-27",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   },
+   {
+    "src": "elig-tqldc7-1.pdf",
+    "srcBytes": 470160,
+    "none": true,
+    "at": "2026-11-27",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   },
+   {
+    "src": "elig-tqldc7-2.pdf",
+    "srcBytes": 444000,
+    "none": true,
+    "at": "2026-11-27"
+   }
+  ],
+  "auto-15nttno171908searchctgry": [
+   {
+    "src": "elig-eiuss5-1.pdf",
+    "srcBytes": 213631,
+    "none": true,
+    "at": "2026-11-27",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   }
+  ],
+  "auto-archgbn0searchordersort0-0ty595g": [
+   {
+    "src": "elig-13jwrp-1.hwp",
+    "srcBytes": 212992,
+    "none": true,
+    "at": "2026-11-27",
+    "why": "AI: 이 공고의 문서가 아님",
+    "ai": "other|"
+   },
+   {
+    "src": "elig-13jwrp-2.hwpx",
+    "srcBytes": 93793,
+    "none": true,
+    "at": "2026-11-27",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   }
+  ],
+  "act-03xr7pr": [
+   {
+    "src": "form-1ffxv8-4.pdf",
+    "srcBytes": 1761188,
+    "none": true,
+    "at": "2026-11-27"
+   }
+  ],
+  "act-1354f33": [
+   {
+    "src": "form-h10vgo-2.pdf",
+    "srcBytes": 80687,
+    "none": true,
+    "at": "2026-11-27"
    }
   ]
  }

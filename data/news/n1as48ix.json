@@ -1,7 +1,17 @@
 {
  "school": "한국항공대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "대학 캠퍼스 방송 촬영 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11528",
+   "postedAt": "2026-11-27",
+   "school": "한국항공대학교",
+   "campus": "",
+   "src": "9c5122cb",
+   "foundAt": "2026-11-27",
+   "desc": "07:00 - 20:00 교직원 식당 08:00 - 00:00 강의동 리프레시 스포츠 라운지 10:00 - 12:00 강의동 107호 13:00 - 15:00 강의동 앞 * 기타사항 : 방송 관련 차량 다수 출입…"
+  },
   {
    "title": "[의료지원실] 2026.11.30.(월) 에이즈 및 성매개감염병 예방 홍보 캠페인 안내",
    "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11517",
@@ -189,26 +199,6 @@
    "foundAt": "2026-10-28",
    "thumb": "data/news/img/8c66db327374da87.webp",
    "desc": "국내 저궤도 위성통신 서비스 개시 , 6G 표준 기반 저궤도 위성통신 개발 등 우주 경쟁 시대의 위성통신 산업 강국 실현을 위한 「 제 5 회 위성전파 및 위성 기술 컨퍼런스 」 를 다음과 같이 개최하오니 홍보 및…"
-  },
-  {
-   "title": "대학 구내전화 불통 안내",
-   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11387",
-   "postedAt": "2026-10-27",
-   "school": "한국항공대학교",
-   "campus": "",
-   "src": "9c5122cb",
-   "foundAt": "2026-10-27",
-   "desc": "대학 구내전화 교환기 전원(전기) 교체공사로 인하여 아래와 같이 구내전화가 불통되오니 대학 구성원들의 많은 양해 바랍니다."
-  },
-  {
-   "title": "[인권센터] 2026년도 인권실태조사 참여 안내 인권",
-   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11386",
-   "postedAt": "2026-10-27",
-   "school": "한국항공대학교",
-   "campus": "",
-   "src": "9c5122cb",
-   "foundAt": "2026-10-27",
-   "desc": "본교 인권센터에서는 학내 구성원의 인권 및 차별 경험과 인권 인식 수준을 파악하고, 인권 친화적인 대학문화 조성을 위한 기초자료를 마련하고자 「2026학년도 인권실태조사」를 실시하오니, 대학원생들의 많은 참여…"
   }
  ]
 }
