@@ -98,12 +98,12 @@
   "from": "공고문 첨부(OCR)"
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/272294/artclView.do": {
-  "at": "2026-11-20",
-  "tries": 1
+  "at": "2026-11-27",
+  "tries": 2
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171774&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
-  "at": "2026-11-20",
-  "tries": 1
+  "at": "2026-11-27",
+  "tries": 2
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521260": {
   "at": "2026-11-20",
@@ -187,5 +187,23 @@
  "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17596&commonMenuNo=180_35": {
   "at": "2026-11-26",
   "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542487": {
+  "at": "2026-11-27",
+  "tries": 1,
+  "lines": [
+   "아동·청소년",
+   "활동구분",
+   "오프라인",
+   "- 과학원 방문 학생 대상 전시물 체험 안내",
+   "- 과학원 내 안전 지도 및 질서 유지 지원",
+   "- 각종 체험프로그램 운영 및 학습 활동 보조",
+   "- 이외 과학원 방문 학생 교육, 과학문화 확산, 운영 지원과 관련된 다양한 활동",
+   "경상북도 포항시 북구 우미길 93 경상북도교육청과학원",
+   "이전 봉사참여",
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  }
 }
