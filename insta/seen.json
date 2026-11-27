@@ -3419,7 +3419,7 @@
    "expiredAt": "2026-10-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-ent2431269128artclviewdo",
    "org": "한국외국어대학교",
    "name": "2026학년도 창업장학금 신청 안내",
@@ -3429,7 +3429,9 @@
    "cards": 5,
    "dir": "insta/pub/auto-ent2431269128artclviewdo",
    "at": "2026-10-14",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
    "status": "expired",
@@ -4292,7 +4294,7 @@
    "expiredAt": "2026-11-11"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704364001",
    "org": "강북구 꿈나무키움 장학재단",
    "name": "재능장학생",
@@ -4302,7 +4304,9 @@
    "cards": 4,
    "dir": "insta/pub/2704364001",
    "at": "2026-10-30",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
    "status": "prepared",
@@ -4391,7 +4395,7 @@
    "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704219001",
    "org": "(재)영광군미래교육재단",
    "name": "대학생 등록금 지원사업",
@@ -4401,10 +4405,12 @@
    "cards": 5,
    "dir": "insta/pub/2704219001",
    "at": "2026-10-30",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-ent2431270591artclviewdo",
    "org": "한국외국어대학교",
    "name": "[글로벌] 2026-2학기 글로벌캠퍼스 HUFS Dream 장학금 신청 안내",
@@ -4414,7 +4420,9 @@
    "cards": 5,
    "dir": "insta/pub/auto-ent2431270591artclviewdo",
    "at": "2026-11-02",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
    "status": "expired",
@@ -4801,7 +4809,7 @@
    "expiredAt": "2026-11-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704372001",
    "org": "일신문화재단",
    "name": "형남장학금",
@@ -4811,7 +4819,9 @@
    "cards": 4,
    "dir": "insta/pub/2704372001",
    "at": "2026-11-10",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
    "status": "expired",
@@ -4977,7 +4987,7 @@
    "expiredAt": "2026-11-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701277003",
    "org": "배재장학재단",
    "name": "모범학생장학금(자립지원)",
@@ -4987,10 +4997,12 @@
    "cards": 4,
    "dir": "insta/pub/2701277003",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701277006",
    "org": "배재장학재단",
    "name": "모범학생장학금(특기자)",
@@ -5000,10 +5012,12 @@
    "cards": 4,
    "dir": "insta/pub/2701277006",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701277007",
    "org": "배재장학재단",
    "name": "인재육성장학생",
@@ -5013,7 +5027,9 @@
    "cards": 4,
    "dir": "insta/pub/2701277007",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
    "status": "prepared",
@@ -5169,7 +5185,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2513450002",
    "org": "김제시청",
    "name": "대학생 생활안정비",
@@ -5179,7 +5195,9 @@
    "cards": 5,
    "dir": "insta/pub/2513450002",
    "at": "2026-11-17",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
    "status": "prepared",
@@ -5446,7 +5464,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704389001",
    "org": "민주평통 의료봉사단(민주평화통일자문회의)",
    "name": "북한이탈주민 가정 모범 학생 장학금",
@@ -5456,7 +5474,9 @@
    "cards": 5,
    "dir": "insta/pub/2704389001",
    "at": "2026-11-27",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-28"
   },
   {
    "status": "prepared",
