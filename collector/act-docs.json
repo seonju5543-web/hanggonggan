@@ -119,10 +119,6 @@
   "at": "2026-11-23",
   "tries": 2
  },
- "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171439&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
-  "at": "2026-11-23",
-  "tries": 2
- },
  "https://www.youthcenter.go.kr/bbs03View/48/10890": {
   "at": "2026-11-17",
   "tries": 1
@@ -212,34 +208,26 @@
   "tries": 1
  },
  "https://form.naver.com/response/JsbhhcPWUcK": {
-  "at": "2026-11-20",
-  "tries": 1
+  "at": "2026-11-27",
+  "tries": 2
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521260": {
-  "at": "2026-11-20",
-  "tries": 1
+  "at": "2026-11-27",
+  "tries": 2
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/272294/artclView.do": {
-  "at": "2026-11-20",
-  "tries": 1
+  "at": "2026-11-27",
+  "tries": 2
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/272293/artclView.do": {
   "at": "2026-11-20",
   "tries": 1
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171774&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
-  "at": "2026-11-20",
-  "tries": 1
+  "at": "2026-11-27",
+  "tries": 2
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3515772": {
-  "at": "2026-11-21",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3539116": {
-  "at": "2026-11-21",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3551779": {
   "at": "2026-11-21",
   "tries": 1
  },
@@ -283,10 +271,6 @@
   "at": "2026-11-24",
   "tries": 1
  },
- "https://www.knou.ac.kr/bbs/knou/51/823353/artclView.do": {
-  "at": "2026-11-24",
-  "tries": 1
- },
  "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142357&article.offset=0&articleLimit=10": {
   "at": "2026-11-25",
   "tries": 1
@@ -297,6 +281,22 @@
  },
  "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17596&commonMenuNo=180_35": {
   "at": "2026-11-26",
+  "tries": 1
+ },
+ "https://www.knou.ac.kr/bbs/knou/51/823605/artclView.do": {
+  "at": "2026-11-27",
+  "tries": 1
+ },
+ "https://www.sungshin.ac.kr/bbs/main_kor/3181/162163/artclView.do": {
+  "at": "2026-11-27",
+  "tries": 1
+ },
+ "https://www.sungshin.ac.kr/bbs/main_kor/3181/162167/artclView.do": {
+  "at": "2026-11-27",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12667/view.do?currentPageNo=1": {
+  "at": "2026-11-27",
   "tries": 1
  }
 }

@@ -3,6 +3,38 @@
  "updatedAt": "2026-11-27",
  "schools": 45,
  "files": {
+  "동국대학교": {
+   "file": "n1or8oiw.json",
+   "count": 60
+  },
+  "숭실대학교": {
+   "file": "nmljo8t.json",
+   "count": 44
+  },
+  "이화여자대학교": {
+   "file": "n1tk2q9m.json",
+   "count": 57
+  },
+  "전북대학교": {
+   "file": "ncuyr4z.json",
+   "count": 34
+  },
+  "전남대학교": {
+   "file": "nwqmwga.json",
+   "count": 53
+  },
+  "성균관대학교": {
+   "file": "n1x6ubj9.json",
+   "count": 47
+  },
+  "명지대학교": {
+   "file": "ntyl0r5.json",
+   "count": 27
+  },
+  "가천대학교": {
+   "file": "nzzc8bm.json",
+   "count": 60
+  },
   "가톨릭대학교": {
    "file": "n174lvh5.json",
    "count": 41
@@ -27,10 +59,6 @@
    "file": "n1ozjjw8.json",
    "count": 37
   },
-  "동국대학교": {
-   "file": "n1or8oiw.json",
-   "count": 60
-  },
   "한국외국어대학교": {
    "file": "n19cz03g.json",
    "count": 47
@@ -38,10 +66,6 @@
   "고려대학교 세종캠퍼스": {
    "file": "n1ch7t87.json",
    "count": 33
-  },
-  "성균관대학교": {
-   "file": "n1x6ubj9.json",
-   "count": 46
   },
   "동국대학교 WISE캠퍼스": {
    "file": "n2we95k.json",
@@ -63,10 +87,6 @@
    "file": "n12kfbyt.json",
    "count": 40
   },
-  "전남대학교": {
-   "file": "nwqmwga.json",
-   "count": 52
-  },
   "고려대학교": {
    "file": "n1lw6ycq.json",
    "count": 33
@@ -82,10 +102,6 @@
   "홍익대학교": {
    "file": "nv8pha4.json",
    "count": 31
-  },
-  "이화여자대학교": {
-   "file": "n1tk2q9m.json",
-   "count": 56
   },
   "인하대학교": {
    "file": "nkeh7pq.json",
@@ -107,10 +123,6 @@
    "file": "ntxxf09.json",
    "count": 27
   },
-  "전북대학교": {
-   "file": "ncuyr4z.json",
-   "count": 33
-  },
   "충남대학교": {
    "file": "nl1xm19.json",
    "count": 30
@@ -123,10 +135,6 @@
    "file": "nmpm6i7.json",
    "count": 60
   },
-  "명지대학교": {
-   "file": "ntyl0r5.json",
-   "count": 26
-  },
   "계명대학교": {
    "file": "n1nel147.json",
    "count": 58
@@ -138,14 +146,6 @@
   "서강대학교": {
    "file": "n14n199r.json",
    "count": 58
-  },
-  "가천대학교": {
-   "file": "nzzc8bm.json",
-   "count": 60
-  },
-  "숭실대학교": {
-   "file": "nmljo8t.json",
-   "count": 43
   },
   "부산대학교": {
    "file": "n13zozby.json",

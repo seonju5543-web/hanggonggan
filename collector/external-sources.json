@@ -691,7 +691,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-13",
+    "checkedAt": "2026-11-27",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.jntle.kr/",
@@ -705,11 +705,11 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-13",
-    "why": "최고 0건 ((홈))",
+    "checkedAt": "2026-11-27",
+    "why": "최고 1건 ((홈))",
     "best": {
      "url": "https://www.koswec.or.kr/",
-     "signals": 0
+     "signals": 1
     }
    }
   },
@@ -719,10 +719,10 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-13",
-    "why": "최고 1건 ((홈))",
+    "checkedAt": "2026-11-27",
+    "why": "최고 1건 (장애인미술가 경력관리 온라인 특강_프로포절 관리에서 작품판매 계약까지)",
     "best": {
-     "url": "https://www.jw-foundation.or.kr/",
+     "url": "https://www.jw-foundation.or.kr/notice/229",
      "signals": 1
     }
    }
@@ -733,7 +733,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-13",
+    "checkedAt": "2026-11-27",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.icheon.go.kr/main.do",
@@ -763,7 +763,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-13",
+    "checkedAt": "2026-11-27",
     "why": "홈페이지 못 엶 (HTTP 400)",
     "best": null
    }
@@ -785,7 +785,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-13",
+    "checkedAt": "2026-11-27",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.inje.go.kr/",
@@ -799,7 +799,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-13",
+    "checkedAt": "2026-11-27",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.wonju.go.kr/www/index.do",
@@ -813,7 +813,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-11-13",
+    "checkedAt": "2026-11-27",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yeongju.go.kr/open_content/main/index.do",

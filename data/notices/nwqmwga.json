@@ -3,14 +3,23 @@
  "updatedAt": "2026-11-27",
  "items": [
   {
-   "title": "[장학안내] [한국농수산식품유통공사] 「aT 꿈씨앗 장학금」 장학생 선발 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71122&cate=8",
+   "title": "[장학안내] [한국농어촌희망재단] 2027학년도 1학기 농림축산식품부 대학...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71128&cate=8",
    "attachments": [
     {
-     "name": "교육기본시설/부속시설",
-     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+     "name": "[붙임]2. 2027년 1학기 농림축산식품부(청년창업농장학금) 장학생 선발공고.hwp",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2592951"
     }
    ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-27"
+  },
+  {
+   "title": "[장학안내] [한국농수산식품유통공사] 「aT 꿈씨앗 장학금」 장학생 선발 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71122&cate=8",
+   "attachments": [],
    "deadlineHint": null,
    "school": "전남대학교",
    "campus": "",
@@ -19,12 +28,7 @@
   {
    "title": "[장학안내] 2026학년도 미래성장 장학 1단계 평가대상자 공고",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71117&cate=8",
-   "attachments": [
-    {
-     "name": "교육기본시설/부속시설",
-     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
-    }
-   ],
+   "attachments": [],
    "deadlineHint": null,
    "school": "전남대학교",
    "campus": "",
