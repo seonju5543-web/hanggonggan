@@ -1,4 +1,88 @@
 {
- "items": {},
- "updatedAt": "2026-11-27"
+ "items": {
+  "act-1bp53i8": {
+   "name": "2026 청년인문교실 <오늘, 인생쉼표> 참여자 모집 지원대상 일반인",
+   "hash": "8ecf80d890d4d783",
+   "at": "2026-11-28",
+   "readAt": "2026-11-28",
+   "cardHash": "27740d30d78c7cef",
+   "summary": "활동 내용이 아닌 사업유형(프로그램·행사)을 적은 줄과 구체적인 문의처가 없는 안내 줄을 notes에서 뺐습니다.",
+   "changes": [
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "활동 내용: 프로그램·행사"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "문의: 사업 관련 자세한 문의는 해당 사업 주관기관으로 합니다."
+    }
+   ],
+   "roles": [],
+   "pdfs": [],
+   "problems": []
+  },
+  "act-1eedsey": {
+   "name": "[ 온라인 실험 참가자 모집 (보상 5,000원) ] 생성형 AI와 상호작용 연구",
+   "hash": "bfb6ae83a2f5e27a",
+   "at": "2026-11-28",
+   "readAt": "2026-11-28",
+   "cardHash": "03183be82b73cad6",
+   "summary": "보상 발송 시기(실험 종료 후 4주 이내)는 혜택 자체가 아니므로 amount 에서 notes 의 일정으로 옮기고, 활동 내용을 원문 단위로 나눴으며, 연구설명문·동의 확인 후 참여 결정 가능하다는 유의사항을 보탰습니다.",
+   "changes": [
+    {
+     "field": "amount",
+     "label": "금액",
+     "kind": "remove",
+     "text": "보상은 실험 종료 후 4주 이내에 발송"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "활동 내용: 간단한 사전 설문에 응답한 뒤 주어진 상황에서 생성형 AI와 대화하며 함께 의사결정을 내리는 과제 수행"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "활동 내용: 이후 AI와의 상호작용 경험에 관한 사후 설문 응답"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "일정: 보상은 실험 종료 후 4주 이내에 발송"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "add",
+     "text": "유의사항: 연구참여 링크에서 연구설명문과 동의 내용을 확인한 뒤 참여 여부를 결정할 수 있습니다"
+    },
+    {
+     "field": "notes",
+     "label": "유의사항",
+     "kind": "remove",
+     "text": "활동 내용: 사전 설문 응답 → 생성형 AI와 대화를 통한 공동 의사결정 과제 수행 → 사후 설문 응답"
+    }
+   ],
+   "roles": [
+    {
+     "file": "text-8003be0d859a80b4",
+     "attach": null,
+     "hash": "8003be0d859a80b4",
+     "role": "content",
+     "formStart": "",
+     "why": "연구 내용·참여 대상·기간·보상·참여 방법을 안내하는 모집 포스터 그림으로, 학생이 채우는 서식은 없습니다."
+    }
+   ],
+   "pdfs": [],
+   "problems": []
+  }
+ },
+ "updatedAt": "2026-11-28"
 }
