@@ -1,7 +1,7 @@
 {
  "v": 1,
  "note": "관리자가 넣은 원문 공고 주소 — 관리자 화면 「원문 링크」가 적는다(tools/admin-apply.mjs linkFix). 앱은 source-link.js 가 읽는다. 열쇠: id:<공고 id> · u:<지금 주소>",
- "updatedAt": "2026-11-25 13:24 KST",
+ "updatedAt": "2026-11-27 13:26 KST",
  "fix": {
   "id:reg-khu-uiam": {
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415",
@@ -616,6 +616,22 @@
    "round": "2027-01-04",
    "title": "[2027 협성장학생 선발] 선발계획안 및 제출 서류 양식",
    "note": "협성문화재단 공지사항 글(2026-11-23) · 새 요청으로 열어 제목과 첨부((붙임1-1)2027 건설노동자 자녀 협성장학생 선발계획안.pdf)를 확인 — 글 본문은 틀(iframe) 안에 뜬다 · 두 전형이 한 글 · 2026-11-25"
+  },
+  "id:kosaf-2703434001": {
+   "url": "https://www.kcffd.org/bbs/board.php?bo_table=notice&wr_id=34",
+   "by": "Claude 정기 세션",
+   "at": "2026-11-27",
+   "round": "2027-01-05",
+   "title": "2027년도 제10기 장학생 선발 안내",
+   "note": "KC미래장학재단 홈페이지 공지사항 글 · 직접 열어 제목(제10기)·지원서류 접수 2027. 1. 5(화)까지·등록일 26-11-24 확인 · 2026-11-27"
+  },
+  "id:kosaf-2704388001": {
+   "url": "https://bohae-scholarship.kr/bbs/board.php?bo_table=notice&wr_id=265",
+   "by": "Claude 정기 세션",
+   "at": "2026-11-27",
+   "round": "2026-12-13",
+   "title": "2026년도 (재)보해장학회 장학생 분야별 선발 모집 요강",
+   "note": "보해장학회 홈페이지 공지사항 글 · 직접 열어 제목·접수 기간 2026년 11월 20일(금)~12월 13일(일)·모집 분야 5개 부문·작성일 26-11-18 확인 · 2026-11-27"
   }
  }
 }
