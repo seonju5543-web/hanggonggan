@@ -3,13 +3,21 @@
  "updatedAt": "2026-11-27",
  "schools": 45,
  "files": {
+  "숭실대학교": {
+   "file": "nmljo8t.json",
+   "count": 45
+  },
+  "충북대학교": {
+   "file": "n16l2078.json",
+   "count": 26
+  },
+  "명지대학교": {
+   "file": "ntyl0r5.json",
+   "count": 28
+  },
   "동국대학교": {
    "file": "n1or8oiw.json",
    "count": 60
-  },
-  "숭실대학교": {
-   "file": "nmljo8t.json",
-   "count": 44
   },
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
@@ -27,10 +35,6 @@
    "file": "n1x6ubj9.json",
    "count": 47
   },
-  "명지대학교": {
-   "file": "ntyl0r5.json",
-   "count": 27
-  },
   "가천대학교": {
    "file": "nzzc8bm.json",
    "count": 60
@@ -46,10 +50,6 @@
   "경북대학교": {
    "file": "nf097dk.json",
    "count": 30
-  },
-  "충북대학교": {
-   "file": "n16l2078.json",
-   "count": 25
   },
   "강원대학교": {
    "file": "nlzhvsh.json",
