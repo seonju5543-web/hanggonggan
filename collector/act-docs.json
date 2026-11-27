@@ -302,5 +302,9 @@
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3551742": {
   "at": "2026-11-27",
   "tries": 1
+ },
+ "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156791247&pWise=sub&pWiseSub=C2": {
+  "at": "2026-11-27",
+  "tries": 1
  }
 }

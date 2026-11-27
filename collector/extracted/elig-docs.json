@@ -1516,12 +1516,14 @@
    "elig-1g99jp-1.hwp",
    "elig-1g99jp-2.pdf"
   ],
-  "at": "2026-11-25"
+  "at": "2026-11-28"
  },
  "auto-0713no2516453sitedvscdkr": {
   "slug": "8y5ppz",
-  "files": [],
-  "at": "2026-11-25"
+  "files": [
+   "elig-8y5ppz-1.hwpx"
+  ],
+  "at": "2026-11-28"
  },
  "auto-oarticleno160764nocat501": {
   "slug": "qlp1z6",
@@ -1580,5 +1582,12 @@
    "elig-kxcua2-1.pdf"
   ],
   "at": "2026-11-27"
+ },
+ "auto-enoticedoarticleno770739": {
+  "slug": "1tw91l",
+  "files": [
+   "elig-1tw91l-1.hwp"
+  ],
+  "at": "2026-11-28"
  }
 }
