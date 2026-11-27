@@ -1,7 +1,28 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
+  {
+   "title": "(서비스 중단 안내) 통합정보시스템, 스마트캠퍼스앱, 홈페이지",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898238&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-27",
+   "kind": "생활",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-27",
+   "desc": "보안 취약점 개선을 위한 클라우드 서비스 플랫폼 업그레이드로 인해 다음과 같이 정보시스템 서비스가 중단됩니다."
+  },
+  {
+   "title": "[생활협동조합] '테크뇽 텀블러' 출시 안내(구매 시 커피 쿠폰 증정)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898236&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-27",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/82e0ba2c8d2031b5.webp"
+  },
   {
    "title": "[도서관] 신축도서관(가칭: 중앙도서관 신관) 건립을 위한 기금모금 [네이밍 캠페인] 안내",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=898213&qidx=4691&cate=10&allboard=false&nowpage=1",
@@ -402,26 +423,6 @@
    "src": "4da0b96f",
    "foundAt": "2026-11-08",
    "desc": "- 훈련기간 : 12.7(월)~10(목) - 대상 : 동원훈련II형(이월자) 중 무단불참 및 미참석 대상자"
-  },
-  {
-   "title": "기술사업화 수요발굴 트랙(ST-STARTLINE) 참여연구자 모집",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897475&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-11-04",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/20279e779953a270.webp",
-   "desc": "※ 기술의 사업화 트랙, 「ST-STARTLINE」에서 출발하여 「ST-GRANT(Pre-Track, Fast-Track)」로 연계하여 지원합니다."
-  },
-  {
-   "title": "서울과학기술대학교 학칙 일부개정학칙안 공고",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897462&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-11-03",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-11-08"
   }
  ]
 }

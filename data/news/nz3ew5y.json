@@ -1,6 +1,6 @@
 {
  "school": "연세대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
   {
    "title": "Treasure Island Ideathon & Demo Day Application 모집",
@@ -125,16 +125,6 @@
    "src": "d66b0482",
    "foundAt": "2026-11-03",
    "desc": "연세대학교 윤동주기념사업회는 연세의 시인 윤동주의 시 정신을 기리고 그 뜻을 널리 전파하기 위해 전국의 대학(원)생을 대상으로 윤동주 시문학상을 개최합니다."
-  },
-  {
-   "title": "Node.js 취약점 조치 안내",
-   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944486/artclView.do",
-   "postedAt": "2026-10-27",
-   "school": "연세대학교",
-   "campus": "",
-   "src": "d66b0482",
-   "foundAt": "2026-10-27",
-   "desc": "1. 안내 개요 최근 웹서비스 개발에 사용되는 서버 실행 환경인 Node.js에서 접근제어 미흡 및 인증서 미흡 관련 보안 취약점(CVE-2026-105482, CVE-2026-105483,…"
   }
  ]
 }

@@ -1,6 +1,6 @@
 {
  "school": "숙명여자대학교",
- "updatedAt": "2026-11-26",
+ "updatedAt": "2026-11-27",
  "items": [
   {
    "title": "[학부] 2026-2 기말시험 시행 안내",
@@ -64,17 +64,6 @@
    "src": "72128af9",
    "foundAt": "2026-11-10",
    "desc": "학사팀에서는 2027학년도 1학기 전공선택을 아래와 같이 실시하오니, 기한내에 신청 바랍니다."
-  },
-  {
-   "title": "[2026-겨울계절학기] 본수강신청 및 수강료 납부 안내",
-   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95713&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-27",
-   "kind": "학사",
-   "school": "숙명여자대학교",
-   "campus": "",
-   "src": "72128af9",
-   "foundAt": "2026-10-27",
-   "desc": "교무처 학사팀은 2026학년도 겨울계절학기 본수강신청 및 수강료 납부를 실시합니다. 아래 내용 및 붙임파일을 숙지하여 참여하시기 바랍니다."
   }
  ]
 }
