@@ -87,7 +87,16 @@ jobs:
     #    회귀(drive.js · 2~3분)를 더하며 25 → 30 으로 키웠다. 시간 초과는 '실패'가 아니라
     #    '취소'라 아래 `if: failure()` 경보가 안 뜬다 — 그래서 넉넉히 둔다.
     #    🔴 그릇을 키워 때우지 않는다 — 오래 걸리는 두 단계가 **스스로 끝낸다**(화면 검사 루프 예산 20분 · 전 여정 5분 · 2026-10-04).
-    timeout-minutes: 36
+    #    ⏱ 2026-11-27 두 묶음으로 나누며 36 → 30(묶음마다 예산 20분 · 아래 「화면 검사 (관문)」 머리말).
+    timeout-minutes: 30
+    # 🔴 **두 묶음이 동시에 돈다** (2026-11-27) — 드라이버는 번갈아 나눠 맡고(PART·PARTS), 한 번만 돌면 되는 관문(값싼 관문 일곱 ·
+    #    말투·토큰 · 수집기 규칙 · 전 여정)은 첫 묶음에서만 돈다(strategy.job-index == 0 — 두 번 돌면 같은 빨간불이 경보 둘이 된다).
+    #    한 묶음이 넘어져도 다른 묶음은 끝까지 돈다(fail-fast: false — 그물이 걷히지 않게). 옛 경보 닫기는 두 묶음이 다 끝난 뒤 맨 아래 ui-ok 작업에서.
+    #    묶음을 늘리려면 part 에 하나를 더하면 된다(루프가 strategy.job-total 로 나눈다). 관문 verify/health-gates/ci.mjs ②ⓛ.
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [1, 2]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -110,7 +119,7 @@ jobs:
       #    최대 일주일 뒤에 안다. 관문은 밀어 넣는 그 순간 막아야 한다.
       #    브라우저가 필요 없어 몇 초면 끝난다.
       - name: 제출 관문 판정 검사 (순수 모듈)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         run: node verify/verify-essay-submit.mjs
 
       # 🔴 접수 대행 — 보내기 전 서버 재검증 (2026-09-25 · 고문 보고서 Q4).
@@ -118,7 +127,7 @@ jobs:
       #    자격을 조작한 신청서가 그대로 나가는 것. 지금은 mailto: 라 안 터지지만,
       #    Resend 를 켜는 순간 우리가 보내는 주체가 된다 — 그때 이 관문이 서 있어야 한다.
       - name: 접수 대행 재검증 관문 (순수 모듈)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         run: node verify/verify-apply-guard.mjs
 
       # 🔴 아래 셋은 오랫동안 **어떤 워크플로에도 안 걸려 있었다**(2026-09-09 전수 조사에서 발견).
@@ -127,15 +136,15 @@ jobs:
       #    · push-server   — 발송 서버가 폰 주소·학교·캠퍼스 말고 아무것도 저장하지 않는가
       #    · form-snapshot — 질문을 줄여도 **문서는 한 글자도 안 바뀐다**는 증명 (운영 원칙 4)
       - name: 알림 규칙 관문 (순수 모듈)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         run: node verify/verify-notify-rules.js
 
       - name: 푸시 발송 서버 관문
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         run: node verify/verify-push-server.mjs
 
       - name: 양식 문서 동일성 관문 (원칙 4)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         run: node verify/form-snapshot.mjs
 
       # 🔴 인스타 카드 사실 관문 — 145건 전수. 브라우저가 필요 없다(파일·JSON 만 읽는다).
@@ -143,7 +152,7 @@ jobs:
       #    '모집 중'·저작자 표시 누락)을 잡는다. 규칙은 render.mjs 에서 **이름으로 떼어 온다** —
       #    베끼면 코드를 되돌려도 초록불로 남는다(실제로 그랬다).
       - name: 인스타 카드 사실 관문
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         run: node verify/verify-insta.js
 
       # 🔴 관리자 화면 빠진 이웃 — 브라우저가 필요 없다(파일만 읽는다). 몇 초면 끝난다.
@@ -152,7 +161,7 @@ jobs:
       #    이 단계가 부르는 build.sh 안에서 같은 관문이 돈다(규칙은 한 파일 — 베끼지 않는다).
       #    Cloudflare 빌드 때도 같은 것이 돌지만, 그건 배포 직전이라 여기서 먼저 잡는다.
       - name: 관리자 화면 빠진 이웃 관문
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         run: |
           bash _admin/build.sh
 
@@ -184,17 +193,26 @@ jobs:
       #       드라이버별 시각을 run 693(11-13) → 701 → 709 로 대 보니 **매달린 하나가 없고** 29개가 고루 5~15% 늘었다(합 1054 → 1140 → 1200초) —
       #       큰 몫은 새 검사 항목(verify-resume ⑩ +26초 · verify-elig-ask +29초 · verify-academic-info ⑦ 다시 열기 +24초)이다.
       #       다음에 또 걸리면 예산을 다시 키우지 말고 드라이버를 두 작업(job)으로 나눈다(경보·닫기 단계는 모으는 작업 하나에).
+      #    ⏱ 2026-11-27 **두 묶음으로 나눴다**(예산 26 → 묶음마다 20분 · 작업 상한 36 → 30). 32개가 한 줄로 26분을 넘겨 맨 뒤 verify-academic-info 가 끊기고
+      #       verify-input-guard 는 아예 안 돌았다(11-23 이후 빨간 실행 11번 가운데 9번 — 틀린 화면이 아니라 시간 · 한 매달림이 아니라 32개 합 1403초).
+      #       드라이버는 번갈아 맡는다(1·3·5… 번째는 첫 묶음 · 2·4·6… 번째는 둘째) — 새 드라이버는 목록 끝에 더하면 저절로 갈린다. 한 묶음 13분 안팎.
+      #       경보는 묶음마다 연다(본문에 어느 묶음인지 적는다 · 같은 이슈 하나에 모인다) · 닫기는 두 묶음이 다 초록일 때만(맨 아래 ui-ok).
+      #       다음에 또 걸리면 예산을 키우지 말고 묶음을 하나 더한다(위 matrix 의 part).
       # 🔴 **앞의 값싼 관문이 넘어져도 돈다**(`!cancelled()` · 2026-10-04 코드 리뷰 — 조건이 없으면 일곱 가운데 하나만 빨개도
       #    드라이버 전부와 전 여정이 통째로 건너뛰어졌다). 서버를 못 띄웠거나 브라우저를 못 깔았을 때만 건너뛴다 —
       #    그때 경보는 '드라이버가 돌지 않았다'고 적는다(아래 경보의 DRIVERS).
       - name: 화면 검사 (관문)
         id: drivers
         if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' }}
+        env:
+          PART: ${{ strategy.job-index }}
+          PARTS: ${{ strategy.job-total }}
         run: |
-          budget=$((26*60))
+          budget=$((20*60))
           end=$((SECONDS + budget))
           fails=""
           unrun=""
+          i=0
           for f in verify-fit-badge.js verify-explore-sort.js verify-onboard-gaps.js \
                    verify-registered.js verify-chat.js verify-apps-manage.js \
                    verify-supabase.js verify-error-report.js verify-essay-ui.js verify-forms-data.js \
@@ -206,6 +224,8 @@ jobs:
                    verify-card-read.js \
                    verify-apply-prep.js verify-formfill.js verify-activities.js verify-news.js \
                    verify-region-city.js verify-academic-info.js verify-input-guard.js; do
+            i=$((i + 1))
+            if [ -n "${PARTS:-}" ] && [ $(( (i - 1) % PARTS )) -ne "${PART:-0}" ]; then continue; fi   # 제 묶음 몫만(번갈아) — 묶음 정보가 없으면(손으로 돌릴 때) 전부
             left=$((end - SECONDS))
             if [ "$left" -le 0 ]; then unrun="$unrun $f"; continue; fi
             if [ "$left" -gt 300 ]; then left=300; fi
@@ -231,7 +251,7 @@ jobs:
       #    ⚠️ 다시 앞으로 옮기지 말 것 — 옮기는 순간 뒤 단계가 또 통째로 사라진다.
       #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 화면 검사가 빨간 날 통째로 건너뛰었다).
       - name: 말투·토큰 관문
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         run: node verify/ui-tone.mjs
 
       # 수집기·관리자 규칙 관문 (2026-09-14 신설) — 브라우저가 필요 없어 3초면 끝난다.
@@ -249,7 +269,7 @@ jobs:
       #    브라우저 검사 20개가 통째로 안 돌아 그물이 걷힌 줄 아무도 모른다.
       #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 앞이 빨간 날 통째로 건너뛰었다).
       - name: 수집기·관리자 규칙 관문 (브라우저 불필요)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && strategy.job-index == 0 }}
         # DOC_GATES: CLAUDE.md 부피·참조 대조는 **여기(코드 검사)와 로컬에서만** 실패시킨다.
         #   수집 로봇도 이 파일을 데이터 관문으로 돌리는데, 거기서 문서 오타가 실패하면
         #   그날 자동 등록분이 되돌려진다 — 문서 문제로 수집이 멈추면 안 된다(2026-09-23).
@@ -293,7 +313,7 @@ jobs:
       #    🔴 5분에 끊는다(`timeout -k 10 300` · 2026-10-04 코드 리뷰) — 매달리면 30분 그릇이 넘쳐 '취소'로 끝나 경보가 안 뜬다.
       #       끊기면 이 단계가 실패로 끝나 아래 경보가 뜬다. 위 화면 검사 예산(20분)과 합쳐 작업 상한 안에 들어가야 한다(관문 ci.mjs ②).
       - name: 전 여정 회귀 (drive.js)
-        if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' && strategy.job-index == 0 }}
         run: PORT=8123 timeout -k 10 300 node verify/drive.js
       - name: 🚨 화면 검사가 빨간불이다
         id: alarm
@@ -310,8 +330,14 @@ jobs:
           DRIVERS: ${{ steps.drivers.outcome }}
           # 시간 예산을 다 써서 **시작도 못 한** 드라이버 — '실패한 드라이버'와 섞지 않는다(돌지 않은 것을 넘어졌다고 적지 않는다).
           UNRUN: ${{ steps.drivers.outputs.unrun }}
+          # 어느 묶음의 경보인가 (2026-11-27 · 묶음마다 따로 연다 — 「드라이버는 전부 통과」가 다른 묶음까지 말하는 것으로 읽히지 않게)
+          PART: ${{ strategy.job-index }}
+          PARTS: ${{ strategy.job-total }}
         run: |
           set -u
+          leg=""
+          if [ -n "${PART:-}" ]; then leg="
+          · 묶음 $((PART + 1))/${PARTS:-?} — 화면 검사를 두 묶음으로 나눠 동시에 돌립니다. 이 경보는 이 묶음에서 돈 것만 말합니다(다른 묶음은 따로 알립니다)."; fi
           case "${DRIVERS:-}" in
             success) drv="화면 검사 드라이버는 **전부 통과했습니다.** 빨간 단계는 그 밖(앞의 값싼 관문 · 말투·토큰 · 수집기 규칙 · 전 여정 등)에 있으니, 로그에서 빨간 표시가 붙은 단계를 찾으세요." ;;
             failure)
@@ -330,7 +356,7 @@ jobs:
 
           · 브랜치: \`${BRANCH}\`
           · 시각: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST
-          · 실행 로그: ${RUN_URL}
+          · 실행 로그: ${RUN_URL}${leg}
 
           ${drv}
 
@@ -359,6 +385,15 @@ jobs:
           label-description: 앱 화면 검사(verify-ui)가 빨간불
           body: ${{ steps.alarm.outputs.body }}
 
+  # 다시 초록불이면 옛 경보를 닫는다 — 두 묶음이 **다 끝나고 둘 다 초록일 때만** (2026-11-27 두 묶음으로 나누며 이 작업을 뗐다).
+  #   묶음 안에 두면 먼저 끝난 초록 묶음이 다른 묶음이 방금 연 경보를 닫는다(경보가 조용히 사라진다 · 관문 ci.mjs ②ⓛ).
+  #   needs 의 success() 는 묶음 둘이 모두 성공했을 때만 참이다 — 취소·실패·건너뜀이면 이 작업이 아예 안 돈다.
+  ui-ok:
+    needs: ui
+    if: success()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
       # 다시 초록불이면 스스로 닫는다 (admin-lock-check 와 같은 방식).
       # 🔴 '취소'는 닫는 근거가 못 된다 — 못 읽은 것을 '해결됐다'로 읽으면 경보가 조용히 사라진다.
       #    그래서 success() 일 때만 닫는다.

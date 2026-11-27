@@ -112,7 +112,7 @@ async function runDriveAny(src, { visible, list, tpl, outcome }) {
    가짜 timeout: `node` 앞의 마지막 인자(그 드라이버의 시한)를 적고 뒤를 그대로 부른다.
    🔴 진짜 드라이버를 절대 부르지 않는다: 같은 이름의 셸 함수가 먼저 잡히고, 빈 임시 폴더에서 돌아 함수가 빠져도 verify/ 가 없다.
       GITHUB_OUTPUT 은 임시 파일 — 이 관문이 Actions 안에서 돌 때 진짜 출력을 더럽히지 않게 환경을 새로 만든다. */
-function runDriverLoop(script, { fail = [], step = 0 } = {}) {
+function runDriverLoop(script, { fail = [], step = 0, env = {} } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-loop-'));
   const f = (n) => path.join(dir, n);
   for (const n of ['out', 'ran', 'tl']) fs.writeFileSync(f(n), '');
@@ -123,7 +123,7 @@ function runDriverLoop(script, { fail = [], step = 0 } = {}) {
   try {
     const r = spawnSync('bash', ['--noprofile', '--norc', '-eo', 'pipefail', '-c', `${fake}\n${script}`], {
       cwd: dir, encoding: 'utf8', timeout: 20000,
-      env: { PATH: process.env.PATH || '/usr/bin:/bin', HOME: dir, GITHUB_OUTPUT: f('out'), GATE_RAN: f('ran'), GATE_TL: f('tl'), GATE_FAIL: fail.join(' '), GATE_STEP: String(step) },
+      env: { PATH: process.env.PATH || '/usr/bin:/bin', HOME: dir, GITHUB_OUTPUT: f('out'), GATE_RAN: f('ran'), GATE_TL: f('tl'), GATE_FAIL: fail.join(' '), GATE_STEP: String(step), ...env },
     });
     const lines = (n) => fs.readFileSync(f(n), 'utf8').split('\n').filter(Boolean);
     const out = {};
@@ -329,6 +329,44 @@ export default async function gate(eq, ctx) {
   const noList = runAlarm(alarm.run || '', { DRIVERS: 'failure', FAILED: '' });
   eq('  ⓘ 실패했는데 목록이 비면 「없음」이 아니라 목록을 못 받았다고 적는다',
     [noList.includes(HEAD), /목록을 받지 못했습니다/.test(noList), OLD_LIE.test(noList)], [true, true, false]);
+
+  /* ⓛ 두 묶음으로 나눠 동시에 돈다 (2026-11-27) — 한 줄로 돌던 드라이버 32개가 26분 예산을 넘겨 맨 뒤 둘(verify-academic-info · verify-input-guard)이
+     끊기거나 아예 안 돌았다(11-23 이후 빨간 실행 11번 가운데 9번 · 틀린 화면이 아니라 시간). 11-15 에 예산을 20 → 26분으로 키운 뒤 또 넘쳤다 —
+     키우지 않고 같은 작업을 둘로 띄워(matrix) 드라이버를 번갈아 맡긴다. 루프는 PART(0부터)·PARTS 를 받아 제 몫만 돌고, 묶음 정보가 없으면(손으로 돌릴 때) 전부 돈다(위 ⓙⓚ). */
+  const odd = list.filter((_, i) => i % 2 === 0);
+  const even = list.filter((_, i) => i % 2 === 1);
+  const halves = ['0', '1'].map((p) => runDriverLoop(drivers.run || '', { env: { PART: p, PARTS: '2' } }));
+  eq('ⓛ (돌려 봄) 두 묶음이 번갈아 나눠 돈다 — 첫 묶음은 1·3·5…번째 · 둘째는 2·4·6…번째 · 둘 다 통과로 끝난다',
+    [halves[0].ran, halves[1].ran, halves.map((h) => h.rc)], [odd, even, [0, 0]]);
+  eq('  ⓛ 두 묶음을 합치면 목록 전부 · 겹치는 드라이버 없음(빠지거나 두 번 도는 드라이버가 없다)',
+    [[...halves[0].ran, ...halves[1].ran].sort().join(' ') === [...list].sort().join(' '), halves[0].ran.filter((f) => halves[1].ran.includes(f))], [true, []]);
+  const halfSlow = runDriverLoop(drivers.run || '', { step: budgetMin * 60 - 50, env: { PART: '1', PARTS: '2' } });
+  eq('  ⓛ (돌려 봄) 예산은 묶음마다 따로 — 둘째 묶음이 예산을 다 쓰면 제 몫에서 남은 이름만 unrun 으로 넘기고 실패로 끝난다(다른 묶음 몫은 세지 않는다)',
+    [halfSlow.rc, halfSlow.ran, halfSlow.out.unrun], [1, even.slice(0, 2), even.slice(2).join(' ')]);
+  const jobAt = ui.indexOf('\n  ui:\n');
+  const jobHead = jobAt < 0 ? '' : ui.slice(jobAt, ui.indexOf('\n    steps:', jobAt));
+  eq('  ⓛ 화면 검사 작업이 두 묶음이다(matrix 둘) · 한 묶음이 넘어져도 다른 묶음은 끝까지 돈다(fail-fast: false)',
+    [/^ {6}fail-fast: false$/m.test(jobHead), ((/^ {8}part: \[([^\]]*)\]$/m.exec(jobHead) || [])[1] || '').split(',').filter((x) => x.trim()).length], [true, 2]);
+  const envAt = (s, k) => ((new RegExp(`^ {10}${k}:\\s*(.+)$`, 'm').exec(s.raw || '') || [])[1] || '').trim();
+  eq('  ⓛ 드라이버 루프와 경보가 제 묶음 번호를 받는다(PART = strategy.job-index · PARTS = strategy.job-total)',
+    [envAt(drivers, 'PART'), envAt(drivers, 'PARTS'), envOf('PART'), envOf('PARTS')],
+    ['${{ strategy.job-index }}', '${{ strategy.job-total }}', '${{ strategy.job-index }}', '${{ strategy.job-total }}']);
+  /* 관문 구간(ⓖ)에서 묶음마다 돌아야 하는 것은 서버와 드라이버뿐 — 나머지(값싼 관문 일곱 · 말투·토큰 · 수집기 규칙 · 전 여정)는 첫 묶음에서만.
+     두 묶음이 같은 관문을 돌리면 같은 빨간불이 경보 둘이 되고 시간만 두 번 쓴다. 새 단계를 더하면 여기서 어느 쪽인지 정하게 된다. */
+  const PER_PART = ['로컬 서버 띄우기', '화면 검사 (관문)'];
+  eq('  ⓛ 한 번만 돌면 되는 관문 단계는 전부 첫 묶음에서만(strategy.job-index == 0) — 조건 없는 단계 이름',
+    guarded.filter((s) => !PER_PART.includes(s.name) && !/strategy\.job-index == 0\b/.test(s.if || '')).map((s) => s.name || s.id || s.run), []);
+  eq('  ⓛ 서버·드라이버·경보는 묶음마다 돈다(묶음 조건이 없다)',
+    [...PER_PART, '🚨 화면 검사가 빨간불이다', '🚨 화면 검사 경보 이슈 (한 곳에 모은다)'].filter((n) => /job-index/.test(by(n).if || '')), []);
+  /* 닫기는 묶음 밖에서 — 묶음 안에 두면 초록인 묶음이 다른 묶음이 방금 연 경보를 닫는다(ⓘ 의 '조용히 사라지는 경보'와 같은 꼴) */
+  const closeAt = ui.indexOf('- name: 다시 초록불이면 옛 경보를 닫는다');
+  const closeJob = [...ui.matchAll(/^ {2}([\w-]+):\s*$/gm)].filter((m) => m.index > ui.indexOf('\njobs:') && m.index < closeAt).pop();
+  const closeHead = closeJob ? ui.slice(closeJob.index, ui.indexOf('\n    steps:', closeJob.index)) : '';
+  eq('  ⓛ 옛 경보 닫기는 묶음 작업 밖 — 두 묶음이 다 끝난 뒤(needs: ui) 둘 다 초록일 때만(success()) · 묶음(matrix)이 아니다',
+    [closeAt > 0, !!closeJob && closeJob[1] !== 'ui', /^ {4}needs: ui$/m.test(closeHead), /^ {4}if: success\(\)/m.test(closeHead), /strategy:/.test(closeHead)], [true, true, true, true, false]);
+  const legBody = runAlarm(alarm.run || '', { DRIVERS: 'success', FAILED: '', PART: '1', PARTS: '2' });
+  eq('  ⓛ 경보 본문이 어느 묶음 것인지 적는다(묶음마다 따로 연다 — 「드라이버는 전부 통과」가 다른 묶음까지 말하는 것으로 읽히지 않게) · 묶음 정보가 없으면 그 줄이 없다',
+    [legBody.includes(HEAD), /묶음 2\/2/.test(legBody), /묶음 \d/.test(failed)], [true, true, false]);
 
   /* ── ③ 작업 브랜치 배포 뒤 화면 검사를 깨운다 ── */
   const dd = read(root, '.github/workflows/device-deploy.yml');
