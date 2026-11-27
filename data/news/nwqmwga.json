@@ -3,6 +3,35 @@
  "updatedAt": "2026-11-27",
  "items": [
   {
+   "title": "[채용공고] 제12회 앵커사업단 직원 채용 서류전형 합격자 및 면접 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71131",
+   "postedAt": "2026-11-27",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-27"
+  },
+  {
+   "title": "[취업정보] [주식회사 식스파이버시스템즈]광섬유레이저 및 광학센서 시스템 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71130",
+   "postedAt": "2026-11-27",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-27"
+  },
+  {
+   "title": "[채용공고] 전남대학교 생물재료공학연구실 박사급연구원 상시 채용 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71129",
+   "postedAt": "2026-11-27",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-27"
+  },
+  {
    "title": "[채용공고] 2026년도 제2회 전남대학교 대학회계직원(공보전문) 경력경쟁...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71127",
    "postedAt": "2026-11-27",
@@ -367,35 +396,6 @@
    "src": "b7347301",
    "foundAt": "2026-11-23",
    "thumb": "data/news/img/568190416c7d48c8.webp"
-  },
-  {
-   "title": "[채용공고] 2026년 제3회 전남대학교 패키지 지원대학 사업 전문 및 사...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71061",
-   "postedAt": "2026-11-20",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-20"
-  },
-  {
-   "title": "[학사안내] 2026학년도 2학기 재학생 분할납부 고지서 출력(최종)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71059",
-   "postedAt": "2026-11-20",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-20"
-  },
-  {
-   "title": "[공모전] 2026 디지털경제 컨소시엄 캐릭터 공모전 1차 심사 결과 및...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=71058",
-   "postedAt": "2026-11-20",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-20"
   }
  ]
 }

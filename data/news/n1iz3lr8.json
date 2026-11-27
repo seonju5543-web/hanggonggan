@@ -3,6 +3,41 @@
  "updatedAt": "2026-11-27",
  "items": [
   {
+   "title": "2026학년도 12월 건강센터 (다빈치) 행사 안내 캘린더",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30374&pageNo=1",
+   "postId": "30374",
+   "postedAt": "2026-11-27",
+   "kind": "행사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/c7d308c2e40cfcd5.webp"
+  },
+  {
+   "title": "2026학년도 12월 건강센터 (서울) 행사 안내 캘린더",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30373&pageNo=1",
+   "postId": "30373",
+   "postedAt": "2026-11-27",
+   "kind": "행사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-27",
+   "thumb": "data/news/img/4c22f812de17f08d.webp"
+  },
+  {
+   "title": "2026학년도 2학기 강의평가 시행 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30372&pageNo=1",
+   "postId": "30372",
+   "postedAt": "2026-11-27",
+   "kind": "학사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-27"
+  },
+  {
    "title": "[중앙대학교] IEEE ICCE 2027 국제학술대회 지원 안내(~11/30)",
    "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30368&pageNo=1",
    "postId": "30368",
@@ -418,28 +453,6 @@
    "src": "f4f8bc8f",
    "foundAt": "2026-10-29",
    "thumb": "data/news/img/7b7561298e5fc939.webp"
-  },
-  {
-   "title": "[CAU 가상융합대학원] 2026 CIVF 중앙대학교 국제가상융합페스티벌 개최 및 초청",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30295&pageNo=1",
-   "postId": "30295",
-   "postedAt": "2026-10-28",
-   "kind": "행사",
-   "school": "중앙대학교",
-   "campus": "",
-   "src": "f4f8bc8f",
-   "foundAt": "2026-10-28"
-  },
-  {
-   "title": "2026-2 취득학점 포기제도 신청 공지",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30290&pageNo=1",
-   "postId": "30290",
-   "postedAt": "2026-10-28",
-   "kind": "학사",
-   "school": "중앙대학교",
-   "campus": "",
-   "src": "f4f8bc8f",
-   "foundAt": "2026-10-28"
   }
  ]
 }
