@@ -5253,6 +5253,9 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .att-row { display: flex; align-items: center; gap: var(--sp-1); padding: var(--space-8) var(--space-12); border: 1px solid var(--line); border-radius: var(--radius-sm);
            background: var(--surface-2); margin-bottom: var(--space-8); }
 .att-row::before { display: none; }
+/* 줄 전체가 그 링크다 — 「열기 ›」·아이콘을 눌러도 열린다(2026-11-27 · 개발자 「첨부의 PDF 가 열기를 눌러도 안 열린다」 — 이름 글자만 링크였다) · 꼴은 그대로(링크의 보이지 않는 덮개만 줄 크기로) */
+.att-row { position: relative; }
+.att-row .att-t a::after { content: ''; position: absolute; inset: 0; }
 .att-row-new { background: var(--surface); border-color: var(--accent-line); }
 .att-ic { flex: none; width: 34px; height: 36px; border-radius: var(--radius-hair); background: var(--surface); border: 1px solid var(--rule);
           display: flex; align-items: center; justify-content: center; font-size: var(--t-2xs); font-weight: 700; color: var(--text-sub); letter-spacing: 0; }

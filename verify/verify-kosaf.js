@@ -433,6 +433,21 @@ const PROFILE = {
         ['PDF', '안내 (2026).pdf', `/data/kosaf-files/${code}/안내 (2026).pdf`, '_blank', '열기 ›']]);
       eq('  이름 밑 작은 회색 글씨가 없다(.att-m 0) · PDF 목록이 위, 올린 목록이 맨 밑', s1 && [s1.meta, s1.order], [0, ['pdf', 'orig']]);
       eq('  맨 밑 — 올린 첨부 목록 그대로(원래 PDF 도 다시)', s1 && s1.bottom, ['선발 공고.hwpx', '안내 (2026).pdf']);
+      /* 🔴 「열기 ›」 를 눌러도 열린다 (2026-11-27 · 개발자 「삼성 꿈장학 첨부의 PDF 가 열기를 눌러도 안 열린다」) — 이름 글자만 링크였고 「열기 ›」·아이콘은 그냥 글자였다.
+         위 검사는 「열기 ›」 글자가 있는지만 봐서 못 잡았다 → 손가락처럼 그 자리를 눌러(화면 좌표) 새 탭이 그 PDF 로 열리는지 본다 */
+      const openAt = async (sel) => {
+        try {
+          const box = await page.locator(sel).first().boundingBox();
+          if (!box) return '(자리 없음)';
+          const [pop] = await Promise.all([page.waitForEvent('popup', { timeout: 3000 }), page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)]);
+          const u = decodeURI(new URL(pop.url()).pathname);
+          await pop.close().catch(() => {});
+          return u;
+        } catch { return '(안 열림)'; }
+      };
+      eq('  「열기 ›」·PDF 아이콘 자리를 눌러도 그 PDF 가 새 탭으로 열린다(줄 전체가 링크 · 꼴은 그대로)',
+        [await openAt('#detail-sheet li.att-row-new .att-go'), await openAt('#detail-sheet li.att-row-new .att-ic')],
+        [`/data/docs-pdf/${id}/1-선발_공고.pdf`, `/data/docs-pdf/${id}/1-선발_공고.pdf`]);
       /* 지원문서 작성 화면 머리 「선발 공고문」 — PDF 줄 → (서식 쪽) → 올린 원본(↓) · 안내 문단 없음 */
       await page.evaluate((sid) => applyTo(findSch(sid)), id);
       await page.waitForTimeout(700);
