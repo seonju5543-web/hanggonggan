@@ -25435,8 +25435,7 @@
    "period": "접수 ~2026-12-23",
    "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "서강대학교"
+    "selective": true
    },
    "documents": [
     "장학생지원서(첨부)",
@@ -25499,7 +25498,15 @@
     "scope": "external",
     "raw": "타 교외 장학재단으로부터 학업장려(생활비성) 장학금 중복수혜 불가"
    },
-   "exclusivityFrom": "공고 원문"
+   "exclusivityFrom": "공고 원문",
+   "alsoPostedAt": [
+    {
+     "school": "중앙대학교",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-KC%EB%AF%B8%EB%9E%98%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C10%EA%B8%B0(2027%ED%95%99%EB%85%84%EB%8F%84)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",
+     "id": "notice:https://www.cau.ac.kr/cms/FR_CON/index.do?contents_no=5&menu_id=100&p_tab_no=5#n-KC%EB%AF%B8%EB%9E%98%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C10%EA%B8%B0(2027%ED%95%99%EB%85%84%EB%8F%84)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4"
+    }
+   ],
+   "scopeFrom": "같은 사업이 중앙대학교 게시판에도 올라옴(자동) — 중앙대학교 게시판 https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-KC%EB%AF%B8%EB%9E%98%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C10%EA%B8%B0(2027%ED%95%99%EB%85%84%EB%8F%84)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4"
   },
   {
    "id": "auto-pnoticedoarticleno368050",
@@ -27285,6 +27292,152 @@
     "10. 문의 : ☎031-750-8945~6 (근로지 업무 관련 사항은 해당 근로지로 문의)"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-15nttno171952searchctgry",
+   "name": "2027학년도 1학기 학부 교내장학금(복지·특별·법정) 신청 안내",
+   "boardTitle": "2027학년도 1학기 학부 교내장학금(복지·특별·법정) 신청 안내",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-27",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-12-31",
+   "deadlineFrom": "공고 원문 · 1. 선발대상: 복지(희망), 특별(공로·외국인·개신가족), 법정면제(국가유공자·새터민 및 자녀) 장학생 2. 신청기간: 2026. 12. 1.(화) ~ 12. 31.(목) 18:00",
+   "period": "접수 ~2026-12-31",
+   "summary": "충북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충북대학교"
+   },
+   "documents": [
+    "공통서류: 교내장학금 신청서 1부",
+    "개인정보 수집․이용 동의서 1부",
+    "본인일 경우: 교육지원대상자 증명서",
+    "자녀일 경우: 대학수업료 등 면제대상자 증명서"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-27",
+   "attachments": [
+    {
+     "name": "2027-1학기 교내(복지·특별·법정)장학금 신청 안내문.hwp",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365439"
+    },
+    {
+     "name": "2027-1학기 교내(복지·특별·법정)장학금 신청서 서식.hwp",
+     "url": "https://www.cbnu.ac.kr/www/downloadBbsFile.do?atchmnflNo=365440"
+    }
+   ],
+   "sourceUrl": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=171952&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
+   "sourceKind": "auto",
+   "openDate": "2026-12-01",
+   "documentsFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "1. 선발대상: 복지(희망), 특별(공로·외국인·개신가족), 법정면제(국가유공자·새터민 및 자녀) 장학생",
+    "3. 신청대상",
+    "가. 신규 신청자 및 복학 예정자",
+    "나. 직전학기(2026-2학기) 동 장학금 수혜자 중 증빙내용 변동자",
+    "※ (예시) 개신가족: 장학금 수혜자 변경, 외국인: TOPIK 등급, 유효기간 갱신 등"
+   ],
+   "excerpts": [
+    "2. 신청기간: 2026. 12. 1.(화) ~ 12. 31.(목) 18:00"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-enoticedoarticleno770739",
+   "name": "[학생복지팀] 2026학년도 동계 교내 근로(행정부서) 장학생 신청 안내",
+   "boardTitle": "[학생복지팀] 2026학년도 동계 교내 근로(행정부서) 장학생 신청 안내",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-27",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-27",
+   "period": "접수 기간 원문 확인",
+   "summary": "상명대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "상명대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-27",
+   "attachments": [
+    {
+     "name": "2. (홈페이지 게시글) 2026학년도 동계 근로(행정부서) 장학생 신청 안내.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770739&attachNo=564563"
+    }
+   ],
+   "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770739&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-enoticedoarticleno770733",
+   "name": "[학생복지팀] (2026-동계) 근로장학생(방학중) 배정 및 신청서 제출 안내",
+   "boardTitle": "[학생복지팀] (2026-동계) 근로장학생(방학중) 배정 및 신청서 제출 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-27",
+   "period": "접수 기간 원문 확인",
+   "summary": "상명대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "상명대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "paidGate": "2026-11-27",
+   "attachments": [
+    {
+     "name": "붙임.(2026-동계) 근로장학생(방학중) 선발 현황.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564549"
+    },
+    {
+     "name": "붙임.근로장학생 신청서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564550"
+    },
+    {
+     "name": "붙임.근로장학생 포기신청서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564551"
+    },
+    {
+     "name": "붙임.근로장학생(방학중)_선발(학생신청)_안내.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564554"
+    }
+   ],
+   "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770733&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
   }
  ]
 }

@@ -2,6 +2,123 @@
  "updatedAt": "2026-11-27",
  "items": [
   {
+   "title": "한국기술교육대학교 오픈이노베이션 프로그램 참여기업 모집 통합 공고",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179662",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-11-27",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-29 ~ 2026-11-27 21:00"
+    }
+   ],
+   "eligibilityLines": [
+    "대상 : 일반기업, 1인 창조기업",
+    "1년미만, 2년미만, 3년미만, 5년미만, 7년미만",
+    "한국기술교육대학교 앵커사업단",
+    "신청대상 : 충청남도 지역 내 신성장동력산업 분야 창업기업 중 과제별 수요기술에 적합한 기술 또는 솔루션을 보유한 기업"
+   ],
+   "detailsV": 7,
+   "documents": [
+    "공급기업 제안서",
+    "개인정보 수집 및 이용동의서",
+    "사업자등록증",
+    "최근 3년 재무제표 또는 부가가치세표준증명원"
+   ],
+   "documentsV": 2,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-27",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-27",
+   "id": "act-1nl91gv"
+  },
+  {
+   "title": "취약분야 상시 컨설팅 11월 참가자 모집 공고",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179514",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-11-29",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-14 ~ 2026-11-29 23:59"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 예비창업자, 기창업자"
+   ],
+   "detailsV": 7,
+   "documents": [
+    "온라인 : 신청 일시에 ZOOM 접속 후 멘토링 진행 (참여 링크는 멘토링 확정 문자 하단에 기재)",
+    "오프라인 : 신청 일시에 센터 방문하여 멘토링 진행",
+    "창업준비, 경영일반, 마케팅, 영업, 자금확보, 사업계획서, 정부지원사업"
+   ],
+   "documentsV": 2,
+   "excerptsAt": "2026-11-27",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-27",
+   "id": "act-1f4ymc3"
+  },
+  {
+   "title": "모두의 창업 등 정부지원사업 완벽 대비! 「1:1 창업 멘토링」 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179797",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026.11.10(화) ~ 2026년 11월 29일(일) 24:00까지 - 선정발표 : 2026년 12월 2일(수) 개별연락 -",
+   "deadline": "2026-11-29",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-12 ~ 2026-11-29 23:59"
+    },
+    {
+     "label": "일시",
+     "text": "2026.12.10(목) 14:00~14:50 / 15:00~15:50 / 16:00~16:50 (1:1 맞춤형, 50분 진행)"
+    },
+    {
+     "label": "대상",
+     "text": "3개월 이내 창업 예정자, 6개월 미만 기창업자"
+    }
+   ],
+   "eligibilityLines": [
+    "대상 : 대학생, 일반인, 대학, 일반기업, 1인 창조기업",
+    "예비창업자, 1년미만",
+    "공고 제 2026-2호",
+    "강남구여성능력개발센터",
+    "신청대상 : 3개월 이내 창업 예정자, 6개월 미만 기창업자"
+   ],
+   "noticeLines": [
+    "- 신청기간 : 2026.11.10(화) ~ 2026년 11월 29일(일) 24:00까지"
+   ],
+   "detailsV": 7,
+   "documents": [
+    "구글폼 신청",
+    "기창업자 : 사업자등록증명원 1부(필수)",
+    "사업계획서 1부(필수)",
+    "창업예정자 : 사업계획서 1부(필수)",
+    "창업관련 정부지원사업(모두의 창업 등) 선정 증빙 캡쳐본(우대)",
+    "(공통) 신청서 접수 시 '창업 아이템 소개 및 멘토에게 하고 싶은 질문 3가지 이상' 필수 작성"
+   ],
+   "documentsV": 2,
+   "field": "멘토링",
+   "excerptsAt": "2026-11-27",
+   "attachV": 1,
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-27",
+   "id": "act-0yqalg4"
+  },
+  {
    "title": "[한양대학교] AI 창업 인사이트 특강 참가자 모집(12/2(수) 18:00)",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179899",
    "kind": "대외활동",
@@ -32,7 +149,7 @@
     "- 신청 방법: 구글폼 온라인 신청(https://forms.gle/2TpLW1W7JRFPecYKA)"
    ],
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "field": "교육·캠프",
    "excerptsAt": "2026-11-27",
    "attachV": 1,
@@ -71,7 +188,10 @@
    "campus": "",
    "host": "창업진흥원 K-Startup",
    "foundAt": "2026-11-27",
-   "id": "act-08y344j"
+   "id": "act-08y344j",
+   "detailsTriedAt": "2026-11-27",
+   "rereadMiss": 1,
+   "rereadMissV": 7
   },
   {
    "title": "2026년 3차 포텐셜씨드(Potential Seed) 경작형 프로그램 참여기업 모집 공고",
@@ -335,6 +455,52 @@
    "excerptsAt": "2026-11-27"
   },
   {
+   "title": "[학생지원팀] 2027년도 서부공감 위피스쿨 18기 대학생 멘토 모집",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278289&article.offset=0&articleLimit=10&srCategoryId=22",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "서부공감 위피스쿨 18기 멘토 모집요강 및 지원서 안내.zip",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=278289&attachNo=227852"
+    }
+   ],
+   "deadlineHint": "모집기한 : 2026.11.23.(월) ~ 12.11.(금), 23:59 나. 모집대상 : 재학생 및 휴학생 (졸업예정 및 유예자 등 지원 제한",
+   "deadline": "2026-12-11",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026.11.23.(월) ~ 12.11.(금), 23:59"
+    },
+    {
+     "label": "대상",
+     "text": "재학생 및 휴학생 (졸업예정 및 유예자 등 지원 제한)"
+    },
+    {
+     "label": "혜택",
+     "text": "장학금 150만원 (활동 수료시)"
+    },
+    {
+     "label": "모집인원",
+     "text": "8명"
+    }
+   ],
+   "eligibilityLines": [
+    "나. 모집대상 : 재학생 및 휴학생 (졸업예정 및 유예자 등 지원 제한)"
+   ],
+   "noticeLines": [
+    "라. 신청방법 : KOMEA 홈페이지(komea.org) 내 \"참여하기->지원하기\""
+   ],
+   "detailsV": 7,
+   "documentsV": 2,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-27",
+   "attachV": 1,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-27",
+   "id": "act-09h9m7e"
+  },
+  {
    "title": "[일반] 제33차 정기학술세미나 \"이야기의 새로운 풍경:플랫폼 시대의 웹툰, 웹소설&quo",
    "url": "https://www.knou.ac.kr/bbs/knou/51/823605/artclView.do",
    "kind": "대외활동",
@@ -360,7 +526,7 @@
     }
    ],
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "field": "교육·캠프",
    "excerptsAt": "2026-11-27",
    "attachV": 1,
@@ -421,7 +587,7 @@
     }
    ],
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "field": "해외·교류",
    "excerptsAt": "2026-11-27",
    "attachV": 1,
@@ -437,7 +603,7 @@
    "attachments": [],
    "deadlineHint": null,
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "field": "해외·교류",
    "excerptsAt": "2026-11-27",
    "attachV": 1,
@@ -565,7 +731,7 @@
     }
    ],
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "excerptsAt": "2026-11-26",
    "attachV": 1,
    "school": "",
@@ -2639,45 +2805,6 @@
    "excerptsAt": "2026-11-27"
   },
   {
-   "title": "취약분야 상시 컨설팅 11월 참가자 모집 공고",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179514",
-   "kind": "대외활동",
-   "deadline": "2026-11-29",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-14 ~ 2026-11-29"
-    },
-    {
-     "label": "대상",
-     "text": "예비창업자, 기창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "강동구 청년해냄센터",
-   "api": "kstartup",
-   "apiId": "179514",
-   "id": "api-kstartup-179514",
-   "eligibilityLines": [
-    "예비창업자, 기창업자"
-   ],
-   "noticeLines": [
-    "강동구 청년해냄센터에서 10월 취약 분야 상시 컨설팅 계획을 다음과 같이 공고하니 참여 희망자는 안내에 따라 신청하시기 바랍니다.",
-    "온라인 접수 : http://www.gdhaenaem.com/?c=169"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-20",
-   "seenAt": "2026-11-27",
-   "excerptsAt": "2026-11-27"
-  },
-  {
    "title": "[무료 세미나] 글로벌 진출 초기 챙겨야 할 GEO 전략",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179711",
    "kind": "대외활동",
@@ -2816,7 +2943,7 @@
    ],
    "deadlineHint": null,
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "excerptsAt": "2026-11-20",
    "school": "한국외국어대학교",
    "campus": "",
@@ -3044,46 +3171,6 @@
    "id": "act-1swq1aj"
   },
   {
-   "title": "모두의 창업 등 정부지원사업 완벽 대비! 「1:1 창업 멘토링」 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179797",
-   "kind": "대외활동",
-   "field": "멘토링",
-   "deadline": "2026-11-29",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-12 ~ 2026-11-29"
-    },
-    {
-     "label": "대상",
-     "text": "3개월 이내 창업 예정자, 6개월 미만 기창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "서울"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "강남구여성능력개발센터",
-   "api": "kstartup",
-   "apiId": "179797",
-   "id": "api-kstartup-179797",
-   "eligibilityLines": [
-    "3개월 이내 창업 예정자, 6개월 미만 기창업자"
-   ],
-   "noticeLines": [
-    "강남구여성능력개발센터에서는 정부지원사업(모두의 창업 등) 도전 및 성공적인 창업 준비를 지원하기 위해 분야별 전문 멘토와 함께하는 1:1 맞춤형 창업 멘토링을 운영합니다. 창업의 첫걸음부터 비즈니스 모델 구체화, 서비스 고도화까지 개별 맞춤 솔루션을 받아보실 기회이니 역량 있는 예비·초기 창업자분들의 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : buly.kr/5qARl5u"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-19",
-   "seenAt": "2026-11-27",
-   "excerptsAt": "2026-11-27"
-  },
-  {
    "title": "2026년 12월 현장실습 지원금 지급 일정 안내",
    "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21505",
    "kind": "대외활동",
@@ -3127,7 +3214,7 @@
    "attachments": [],
    "deadlineHint": null,
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "field": "디자인·미술",
    "excerptsAt": "2026-11-19",
    "school": "",
@@ -3486,7 +3573,7 @@
    ],
    "deadlineHint": null,
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "field": "인턴·일경험",
    "excerptsAt": "2026-11-19",
    "school": "성신여자대학교",
@@ -3690,7 +3777,7 @@
    "attachments": [],
    "deadlineHint": null,
    "detailsV": 7,
-   "documentsV": 1,
+   "documentsV": 2,
    "field": "봉사",
    "excerptsAt": "2026-11-18",
    "school": "광운대학교",
@@ -3988,7 +4075,6 @@
    ],
    "detailsV": 7,
    "documents": [
-    "본 게시물에 첨부된 참가서식을 내려받아 작성한 후 , 작품 파일과 함께 제출해 주세요 .",
     "참가신청서 1부",
     "참가서약서 1부",
     "개인정보 수집 · 이용 및 수상자 정보 공개 동의서 1부",
@@ -4794,7 +4880,7 @@
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=67F1412581A24509973B7B69069BC307_.hwp&ogrfname=2.+2026%EB%85%84+%EC%A0%9C%EC%A3%BC-%EC%9C%A0%EB%84%A4%EC%8A%A4%EC%BD%94+%EC%B2%AD%EB%85%84+%EC%97%B0%EC%88%98+%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8+%EC%8B%A0%EC%B2%AD%EC%84%9C%EC%8B%9D.hwp"
     },
     {
-     "name": "2. 2026년 제주-유네스코 청년 연수 프로그램 신청서식.hwp",
+     "name": "★제주-유네스코 청년 연수 프로그램 직무기술서.zip",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=461B970F28A44D2EBAA9C966A70DF8DF_.zip&ogrfname=%E2%98%85%EC%A0%9C%EC%A3%BC-%EC%9C%A0%EB%84%A4%EC%8A%A4%EC%BD%94+%EC%B2%AD%EB%85%84+%EC%97%B0%EC%88%98+%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8+%EC%A7%81%EB%AC%B4%EA%B8%B0%EC%88%A0%EC%84%9C.zip"
     },
     {
@@ -4835,7 +4921,7 @@
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=4E25B623128743739FB643970D261921_.pdf&ogrfname=1.+2026+%EC%A0%88%EC%A3%BC%EC%84%9C%ED%8F%AC%ED%84%B0%EC%A6%88+%EB%AA%A8%EC%A7%91+%EC%95%88%EB%82%B4.pdf"
     },
     {
-     "name": "1. 2026 절주서포터즈 모집 안내.pdf",
+     "name": "3. (양식) 2026 절주서포터즈 신청서류.zip",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=3A0EE507CD584C0ABAE0E1F99C52FC6A_.zip&ogrfname=3.+%28%EC%96%91%EC%8B%9D%29+2026+%EC%A0%88%EC%A3%BC%EC%84%9C%ED%8F%AC%ED%84%B0%EC%A6%88+%EC%8B%A0%EC%B2%AD%EC%84%9C%EB%A5%98.zip"
     }
    ],
@@ -5126,7 +5212,7 @@
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=33793368CF2740BAB9240EEE30D5090A_.hwp&ogrfname=%EB%A9%98%ED%86%A0%EB%A7%81+%EA%B3%84%ED%9A%8D%EC%84%9C%28%EC%96%91%EC%8B%9D%29.hwp"
     },
     {
-     "name": "멘토링 계획서(양식).hwp",
+     "name": "대학생멘토 모집 포스터.png",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F6302&fname=52F88153B9C94535A3430A8E4919BFCC_.png&ogrfname=%EB%8C%80%ED%95%99%EC%83%9D%EB%A9%98%ED%86%A0+%EB%AA%A8%EC%A7%91+%ED%8F%AC%EC%8A%A4%ED%84%B0.png"
     }
    ],
@@ -6297,74 +6383,6 @@
    "documentsV": 1,
    "deadline": "2026-08-18",
    "deadlineFrom": "원문 기간 · 모집기간 : 8/3 (월)~8/18 (화) 오전 10시마감"
-  },
-  {
-   "title": "[모집] [시립마포청소년센터] 2026년 장애·비장애 청소년 통합활동 '라온:Round On' 참가자 모집",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=view&articleNo=150177&article.offset=0&articleLimit=10&srCategoryId=85",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "excerptsAt": "2026-11-16",
-   "school": "홍익대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-0mt8ixi",
-   "noticeLines": [
-    "신청기간 : 2026년 4월 6일(월)까지"
-   ],
-   "noticeFrom": "공고문 첨부(OCR)",
-   "eligibilityLines": [
-    "모집대상 : 봉사활동에 관심이 많은",
-    "함께 활동하며 친구가 되어",
-    "17세~24세 청소년 10명",
-    "나들이,플로깅,체육활동을 하며"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7,
-   "deadline": "2026-04-06",
-   "deadlineFrom": "공고 안내 · 신청기간 : 2026년 4월 6일(월)까지",
-   "documentsV": 1
-  },
-  {
-   "title": "[2026 모두의 창업] 리부트(Reboot) 캠프 참여자 모집 안내",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171577&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "모집기간 : 2026. 11. 9.( 월 ) ~ 12. 11.( 금 ) - 모집대상 : 모두의 창업 프로젝트 1·2 기 도전 탈락자 및 차년도",
-   "deadline": "2026-12-11",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026. 11. 9.( 월 ) ~ 12. 11.( 금 )"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026. 12. 17.( 목 ) ~ 12. 18.( 금 ) / 1 박 2 일"
-    },
-    {
-     "label": "대상",
-     "text": "모두의 창업 프로젝트 1·2 기 도전 탈락자 및 차년도 신청을 희망하는 자 누구나 ( 선착순 모집 )"
-    }
-   ],
-   "eligibilityLines": [
-    "- 모집대상 : 모두의 창업 프로젝트 1·2 기 도전 탈락자 및 차년도 신청을 희망하는 자 누구나 ( 선착순 모집 )",
-    "- AI 활용 창업아이디어 발상 교육 : 생성형 AI 를 활용한 창업아이디어 구체화 및 시장 · 고객 분석",
-    "- 창업아이디어 고도화 멘토링 : 전문가 1 멘토링을 통한 아이디어 고도화 및 도전신청서 보완",
-    "- 창업아이디어 3 분 스피치 : 아이디어 발표 및 전문가 피드백을 통한 발표 역량 강화와 재도전 준비",
-    "※ 세부 프로그램 및 운영사항은 참가자를 대상으로 별도 안내 예정입니다 ."
-   ],
-   "noticeLines": [
-    "- 신청방법 : 홍보 포스터 내 참가모집 QR 코드 및 구글폼 URL을 통한 온라인 신청 및 접수( https://forms.gle/q8henr6YoxRWZSM99 )"
-   ],
-   "detailsV": 7,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-11-16",
-   "school": "충북대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-1wu6s3v",
-   "documentsV": 1
   },
   {
    "title": "(주)데이톤 - 프로젝트 기반 UXUI 디자인 실전 캠프 과정 7기",

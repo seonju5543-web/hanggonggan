@@ -1381,6 +1381,22 @@
    "added": "2026-11-27",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-15nttno171952searchctgry",
+   "name": "2027학년도 1학기 학부 교내장학금(복지·특별·법정) 신청 안내",
+   "target": "2027학년도 1학기 학부 교내장학금(복지·특별·법정)",
+   "added": "2026-11-27",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-enoticedoarticleno770733",
+   "name": "[학생복지팀] (2026-동계) 근로장학생(방학중) 배정 및 신청서 제출 안내",
+   "target": "(2026-동계) 근로장학생(방학중) 배정 및 신청서 ",
+   "added": "2026-11-27",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

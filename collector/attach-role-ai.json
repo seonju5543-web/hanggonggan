@@ -307,6 +307,108 @@
      "why": "학생이 작성하는 장학생 신청서와 추천서·공적조서 서식만 들어 있는 서식 파일입니다."
     }
    ]
+  },
+  "auto-zc3cnavcodeknu1619416593-0226qa1": {
+   "at": "2026-11-27",
+   "docs": [
+    {
+     "file": "form-lvlfo4-1.hwp",
+     "attach": "통합정보시스템 교내근로장학생 학생 신청 및 근로 합격 확인 방법.hwp",
+     "hash": "56fdbdad045cb994",
+     "role": "content",
+     "formStart": "",
+     "why": "통합정보시스템에서의 신청 방법과 합격 확인 방법을 설명하는 안내문입니다."
+    }
+   ]
+  },
+  "auto-jukr145237540artclviewdo": {
+   "at": "2026-11-27",
+   "docs": [
+    {
+     "file": "form-13opdp-1.hwp",
+     "attach": "2026-동계방학 교내근로 지원서.hwp",
+     "hash": "ac9dd2ad2f85a5a7",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 학번·성명·근로가능시간 등을 채워 제출하는 교내근로 지원서 양식이며, 뒤의 참고사항은 서식에 딸린 안내입니다."
+    }
+   ]
+  },
+  "auto-skor478127526artclviewdo": {
+   "at": "2026-11-27",
+   "docs": [
+    {
+     "file": "form-akfwnw-2.hwp",
+     "attach": "(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp",
+     "hash": "daeb0d2eec628512",
+     "role": "content",
+     "formStart": "",
+     "why": "국가근로장학금 운영계획서 및 자체선발기준으로 선발 기준·시급 등을 담은 읽는 문서입니다."
+    },
+    {
+     "file": "elig-akfwnw-1.pdf",
+     "attach": null,
+     "hash": "5ff09469936c9b62",
+     "role": "content",
+     "formStart": "",
+     "why": "동계방학 근로지별 모집 인원과 근로내용·우대사항을 정리한 모집 현황표입니다."
+    }
+   ]
+  },
+  "auto-leno278243srcategoryid22": {
+   "at": "2026-11-27",
+   "docs": [
+    {
+     "file": "elig-1ou8p5-1.png",
+     "attach": null,
+     "hash": "73360f7eff729dd7",
+     "role": "content",
+     "formStart": "",
+     "why": "장학금 선발기준·신청기간·금액·신청방법을 담은 안내 포스터 이미지입니다."
+    }
+   ]
+  },
+  "auto-15nttno171952searchctgry": {
+   "at": "2026-11-27",
+   "docs": [
+    {
+     "file": "form-264c1l-1.hwp",
+     "attach": "2027-1학기 교내(복지·특별·법정)장학금 신청 안내문.hwp",
+     "hash": "8a5efe2f5a9844e8",
+     "role": "content",
+     "formStart": "",
+     "why": "복지·특별·법정 장학금의 신청 자격, 제출서류, 신청 방법을 설명하는 안내문입니다."
+    },
+    {
+     "file": "form-264c1l-2.hwp",
+     "attach": "2027-1학기 교내(복지·특별·법정)장학금 신청서 서식.hwp",
+     "hash": "6be986f3c18c236c",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 작성해 제출하는 교내장학금 신청서와 개인정보 수집·이용 동의서 서식만 들어 있습니다."
+    }
+   ]
+  },
+  "auto-enoticedoarticleno770733": {
+   "at": "2026-11-27",
+   "docs": [
+    {
+     "file": "form-kxcua2-1.hwp",
+     "attach": "붙임.근로장학생 포기신청서.hwp",
+     "hash": "7a443d74a944fdb3",
+     "role": "form",
+     "formStart": "",
+     "why": "학생이 중도 포기 시 직접 작성해 내는 교내근로장학생 포기 신청서 서식만 들어 있습니다."
+    },
+    {
+     "file": "elig-kxcua2-1.pdf",
+     "attach": null,
+     "hash": "e700143b284d601a",
+     "role": "content",
+     "formStart": "",
+     "why": "근로장학생 선발 대상·자격·금액·신청 방법·유의사항을 담은 안내문입니다."
+    }
+   ]
   }
  }
 }
