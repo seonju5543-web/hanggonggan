@@ -1,7 +1,18 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-11-27",
+ "updatedAt": "2026-11-28",
  "items": [
+  {
+   "title": "[언어교육부] 12월 19일(토) 모의토익 실시 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/220397/detailView.do",
+   "postedAt": "2026-11-28",
+   "postId": "220397",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-28",
+   "desc": "언어교육부 언어교육부에서 아래와 같이 모의토익을 실시하오니, 많은 관심 부탁드립니다."
+  },
   {
    "title": "[전북대학교 창업지원단] 2026 모두의 창업 2차 Modoo. Start-up Festa 개최 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/220390/detailView.do",
@@ -448,18 +459,6 @@
    "src": "e41d3fac",
    "foundAt": "2026-11-19",
    "desc": "(어학연수 + AI 기업탐방 + AI 특강 + 문화체험) 관심있는 학우분들의 많은 지원 바랍니다."
-  },
-  {
-   "title": "[연금관리학과] 2026학년도 연금관리학과 연계전공 설명회 (간식제공)",
-   "url": "https://www.jbnu.ac.kr/web/Board/219989/detailView.do",
-   "postedAt": "2026-11-18",
-   "postId": "219989",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-18",
-   "desc": "연금관리학과 1. 초청 명사 : 연금관리학과 전공주임교수 전경민 2. 일시/장소 : 2026.11.18(수) 12:30 / 3호관 105호"
   }
  ]
 }
