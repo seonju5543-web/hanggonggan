@@ -738,9 +738,10 @@
    "desc": "우리 대학 산학협력단 컨소시엄(사업책임자 박흥국 교수)은 지난 19일부터 26일까지 나이지리아 정보통신·디지털정부 관련 고위급 공무원 대상 방한 초청 연수를 진행했다."
   },
   "post:고려대학교:000060000000061565": {
-   "at": "2026-10-30",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
+   "at": "2026-11-28",
+   "v": 3,
+   "err": "글 화면에 그 글의 제목이 없음",
+   "tries": 1
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141105&mode=view": {
    "at": "2026-10-30",
@@ -1731,9 +1732,10 @@
    "tries": 3
   },
   "post:고려대학교:000060000000061613": {
-   "at": "2026-11-02",
-   "v": 2,
-   "none": "본문 첫 문장을 확신할 수 없음"
+   "at": "2026-11-28",
+   "v": 3,
+   "err": "글 화면에 그 글의 제목이 없음",
+   "tries": 1
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=726818": {
    "at": "2026-11-02",
@@ -3341,8 +3343,10 @@
    "desc": "2. 일시 : 11.26(목) ~ 11.28(토) (23시간) ※ 공결요청서는 발급 가능하나, 무조건 공결 처리가 되는 서류가 아니므로 교육 신청할 경우 사전에 수업 담당 교수님께 확인 후 신청 바랍니다."
   },
   "url:https://www.inha.ac.kr/bbs/kr/8/46059/artclView.do": {
-   "at": "2026-11-08",
-   "v": 2,
+   "at": "2026-11-28",
+   "v": 3,
+   "err": "글 화면에 그 글의 제목이 없음",
+   "tries": 1,
    "desc": "인하대학교 창업지원단에서는 계약직 사무원 ( 휴직 대체인력 ) 을 아래와 같이 채용하고자 하오니 관심있는 분들의 많은 지원 바랍니다 ."
   },
   "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%EA%B5%90%EC%88%98%ED%95%99%EC%8A%B5%ED%98%81%EC%8B%A0%EC%84%BC%ED%84%B0-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-xr-%EC%BD%98%ED%85%90%EC%B8%A0-%ED%99%9C%EC%9A%A9-%EC%8B%A4%EA%B0%90-2": {
@@ -3454,8 +3458,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.inha.ac.kr/bbs/kr/8/46048/artclView.do": {
-   "at": "2026-11-08",
-   "v": 2,
+   "at": "2026-11-28",
+   "v": 3,
+   "err": "글 화면에 그 글의 제목이 없음",
+   "tries": 1,
    "desc": "취업 준비, 어디서부터 시작해야 할지 막막하신가요? 실무 경험과 직무 스펙을 동시에 쌓을 수 있는 '일학습병행' 프로그램의 직무별 학생모집 설명회를 개최합니다."
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=726856": {
@@ -11035,10 +11041,10 @@
    "desc": "1. 근무기간 : 2026. 12. 21. ~ 2027. 02. 28. 2. 모집직종 및 인원 : 식당 외 00명 근무요일 선불카드 발행 평일(월~금) 선불카드 발행 평일(월~금) 한빛식당 세척 및 퇴식구 담당…"
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368137&mode=view&no=350": {
-   "at": "2026-11-27",
+   "at": "2026-11-28",
    "v": 3,
    "err": "글 HTTP 404",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368138&mode=view&no=340": {
    "at": "2026-11-27",
@@ -11094,6 +11100,47 @@
    "at": "2026-11-28",
    "v": 3,
    "desc": "1. 중복교과목 선택입력 마감 : ~ 2026년 12월 14일(월) 23:59 까지"
+  },
+  "post:서울시립대학교:31929": {
+   "at": "2026-11-28",
+   "v": 3,
+   "desc": "뉴스에서 만나는 과학기술, 방송에서는 어떻게 쉽고 정확하게 전할까요? 🎙️ 서울시립대학교 조기취업형 계약학과 사업단에서는 오승훈 MBC 아나운서를 초청해「미디어와 과학기술」을 주제로 특강을 개최합니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368133&mode=view&no=338": {
+   "at": "2026-11-28",
+   "v": 3,
+   "desc": "나 . 입찰서류제출 마감일시 및 장소 : 2026. 12 1.( 화 ) 11:00, 이비즈포유 (http://www.ebiz4u.co.kr)"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368132&mode=view&no=337": {
+   "at": "2026-11-28",
+   "v": 3,
+   "desc": "해저드리터러시융합교육연구소에서 근무할 계약직원을 다음과 같이 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368131&mode=view&no=338": {
+   "at": "2026-11-28",
+   "v": 3,
+   "err": "글 HTTP 404",
+   "tries": 1
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368093&mode=view&no=342": {
+   "at": "2026-11-28",
+   "v": 3,
+   "desc": "반드시 인증제 학점을 통하여 졸업학점이 충족되는 학생 은 아래 내용을 참고하여 기간 내 신청하시기 바랍니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368084&mode=view&no=342": {
+   "at": "2026-11-28",
+   "v": 3,
+   "desc": "※ 최근 외국인 유학생이 광고로 접한 불법 사설 환전소나 타인(지인을 사칭한 브로커)를 통하여 등록금을 납부하여, 보이스피싱 범죄에 연루되는 사례가 증가 하고 있습니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368127&mode=view&no=336": {
+   "at": "2026-11-28",
+   "v": 3,
+   "desc": "나 . 입찰서류제출 마감일시 및 장소 : 2026. 12 1.( 화 ) 11:00, 이비즈포유 (http://www.ebiz4u.co.kr)"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368126&mode=view&no=336": {
+   "at": "2026-11-28",
+   "v": 3,
+   "desc": "Web of Science RA, DBpia AI 를 직접 사용해 본 경험을 들려주세요."
   }
  }
 }

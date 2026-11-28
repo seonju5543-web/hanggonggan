@@ -1,12 +1,13 @@
 ## 🗞 교내 소식 수집 리포트 (2026-11-28)
 
-새 글 **13건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 45개교 · 게시판 아는 학교 45/45 · 둘째 게시판 3곳)
+새 글 **1건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 45개교 · 게시판 아는 학교 45/45 · 둘째 게시판 3곳)
 
-⏱ 게시판 48곳을 3분 15초에 다 돌았습니다(예산 4분).
+⏰ **시간 예산(4분)에 걸려 게시판 6곳을 이번 실행에서 못 봤습니다** — 국민대학교 · 숭실대학교 · 세종대학교 · 이화여자대학교 · 인하대학교 · 부산대학교
+  → 이번에 본 게시판 42/48곳 · 다음 실행은 **국민대학교**부터 시작합니다.
 
 ### 🚨 연속 실패 — 게시판 주소 확인 필요
-- 한양대학교 (63회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
-- 아주대학교 (76회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+- 한양대학교 (64회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
+- 아주대학교 (77회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 🙋 열리지만 글을 못 읽는 게시판 2곳 — 개발자에게 학생이 보는 공지 목록 주소를 요청합니다
 - 계명대학교
@@ -40,8 +41,7 @@
 상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
 
 ### 전북대학교
-상태: ✅ 정상 (공지 글 5건 감지 · 새 글 1)
-- [[언어교육부] 12월 19일(토) 모의토익 실시 안내](https://www.jbnu.ac.kr/web/Board/220397/detailView.do) — 2026-11-28
+상태: ✅ 정상 (공지 글 5건 감지 · 새 글 0)
 
 ### 충남대학교
 상태: ✅ 정상 (공지 글 7건 감지 · 새 글 0)
@@ -107,7 +107,8 @@
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
 
 ### 서울시립대학교
-상태: ✅ 정상 (공지 글 8건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 1)
+- [[조기취업형계약학과사업단]📢MBC 오승훈 아나운서와 만나는「미디어와 과학기술」🎁 기념품 증정](https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31929&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&) — 2026-11-28
 
 ### 건국대학교
 상태: ✅ 정상 (공지 글 20건 감지 · 새 글 0)
@@ -134,40 +135,28 @@
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
 
 ### 가천대학교
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
+상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 아주대학교
 상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 국민대학교
-상태: ✅ 정상 (공지 글 13건 감지 · 새 글 0)
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ### 숭실대학교
-상태: ✅ 정상 (공지 글 5건 감지 · 새 글 0)
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ### 세종대학교
-상태: ✅ 정상 (공지 글 7건 감지 · 새 글 0)
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ### 이화여자대학교
-상태: ✅ 정상 (공지 글 16건 감지 · 새 글 12)
-- [[창업지원단] 2026 이화 창업 페스타 모집: 이화에 찾아온 크리스마스 (~12/7)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368200&article.offset=0&articleLimit=10&no=342) — 2026-11-26
-- [[학부] 마이크로전공 간 중복교과목 선택입력 마감 및 이수 승인결과 조회 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368158&article.offset=0&articleLimit=10&no=342) — 2026-11-25
-- [학사] [[학부] 2026학년도 전기(2027년 2월) 졸업/졸업유예/과정수료 예정자 대상 인증제 추가 신청 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368093&article.offset=0&articleLimit=10&no=342) — 2026-11-23
-- [학사] [[회계팀] 2026학년도 겨울 계절학기 등록금 납부 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368084&article.offset=0&articleLimit=10&no=342) — 2026-11-23
-- [2027학년도 수시모집 논술고사 시행에 따른 교내 차량 전면 통제 안내 (11.28.(토)~29.(일))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367962&article.offset=0&articleLimit=10&no=342) — 2026-11-16
-- [학사] [[학부] 2026학년도 겨울 계절학기 수강안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=342) — 2026-10-27
-- [행사] [[자연과학대학 변리사반] 2026 합격선배와 함께하는 변리사시험 설명회 신청 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368232&article.offset=0&articleLimit=10&no=341) — 2026-11-27
-- [[학부] 영문 졸업증서 수여 관련 영문성명 확인 및 변경 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368227&article.offset=0&articleLimit=10&no=340) — 2026-11-27
-- [행사] [2027학년도 전기 외국어교육특수대학원 입학설명회(온라인) 일정 안내 / Spring 2027 Online Admission Info Session](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368199&article.offset=0&articleLimit=10&no=337) — 2026-11-26
-- [[기계/일반경쟁]유창현 교수/서버 1식 구입](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368198&article.offset=0&articleLimit=10&no=336) — 2026-11-26
-- [[기계/일반경쟁]황의원 교수/서버 1식 구입](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368196&article.offset=0&articleLimit=10&no=334) — 2026-11-26
-- [[기계/일반경쟁]김영구 교수/전자기식 충격 유발 장치 1식 구입](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=368194&article.offset=0&articleLimit=10&no=333) — 2026-11-26
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ### 인하대학교
-상태: ✅ 정상 (공지 글 14건 감지 · 새 글 0)
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ### 부산대학교
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ---
 ⚙️ 설정: `collector/news-sources.json` · 발행: `data/news/<학교키>.json` · 로봇: `collector/collect-news.mjs` · 판정: `collector/news-kind.mjs`

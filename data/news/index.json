@@ -3,12 +3,16 @@
  "updatedAt": "2026-11-28",
  "schools": 45,
  "files": {
-  "전북대학교": {
-   "file": "ncuyr4z.json",
+  "서울시립대학교": {
+   "file": "n1au199v.json",
    "count": 40
   },
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
+   "count": 40
+  },
+  "전북대학교": {
+   "file": "ncuyr4z.json",
    "count": 40
   },
   "부산대학교": {
@@ -38,10 +42,6 @@
   "한국항공대학교": {
    "file": "n1as48ix.json",
    "count": 18
-  },
-  "서울시립대학교": {
-   "file": "n1au199v.json",
-   "count": 40
   },
   "고려대학교 세종캠퍼스": {
    "file": "n1ch7t87.json",

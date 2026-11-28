@@ -27137,15 +27137,6 @@
    "v": 2,
    "side": 360
   },
-  "post:서울시립대학교:31914": {
-   "at": "2026-11-25",
-   "school": "서울시립대학교",
-   "file": "data/news/img/31a369e70f62bd3e.webp",
-   "src": "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261125170507.png",
-   "from": "body",
-   "v": 2,
-   "side": 360
-  },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=142385&mode=view": {
    "at": "2026-11-25",
    "school": "성균관대학교",
@@ -28410,6 +28401,46 @@
    "at": "2026-11-28",
    "school": "이화여자대학교",
    "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368194&mode=view&no=333": {
+   "at": "2026-11-28",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368158&mode=view&no=342": {
+   "at": "2026-11-28",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:서울시립대학교:31929": {
+   "at": "2026-11-28",
+   "school": "서울시립대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(같은 파일 · 1글))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368093&mode=view&no=342": {
+   "at": "2026-11-28",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=368084&mode=view&no=342": {
+   "at": "2026-11-28",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:서울시립대학교:31914": {
+   "at": "2026-11-28",
+   "school": "서울시립대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(같은 파일) · attach: 여러 글에 같은 그림(같은 파일))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367962&mode=view&no=342": {
+   "at": "2026-11-28",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367643&mode=view&no=342": {
+   "at": "2026-11-28",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
   }
  },
  "srcSeen": {
@@ -29204,12 +29235,6 @@
     "post:서울시립대학교:31874",
     "post:서울시립대학교:31917"
    ],
-   "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261119173830.jpg": [
-    "post:서울시립대학교:31875"
-   ],
-   "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31875&fSeq=1": [
-    "post:서울시립대학교:31875"
-   ],
    "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261120112113.jpg": [
     "post:서울시립대학교:31879"
    ],
@@ -29338,6 +29363,9 @@
    ],
    "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261127154051.jpg": [
     "post:서울시립대학교:31925"
+   ],
+   "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261128182319.png": [
+    "post:서울시립대학교:31929"
    ]
   },
   "세종대학교": {
@@ -32028,7 +32056,8 @@
   "서울시립대학교": [
    "data/news/img/73113c44c7fd2c85.webp",
    "data/news/img/50efb4eec59c7f43.webp",
-   "data/news/img/52d1fc0d08949e79.webp"
+   "data/news/img/52d1fc0d08949e79.webp",
+   "data/news/img/31a369e70f62bd3e.webp"
   ],
   "부경대학교": [
    "data/news/img/5967391c35334bfd.webp"
