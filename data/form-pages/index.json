@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-27",
+ "updatedAt": "2026-11-28",
  "items": {
   "auto-o2432actionviewno9994682": [
    {
@@ -70,19 +70,6 @@
     "at": "2026-10-27"
    }
   ],
-  "auto-ent2431269128artclviewdo": [
-   {
-    "file": "auto-ent2431269128artclviewdo/1-elig-1qi88m-1_p5-8.pdf",
-    "name": "공고문 안 신청서 서식 (5, 8쪽)",
-    "pages": 2,
-    "bytes": 356253,
-    "src": "elig-1qi88m-1.hwp",
-    "srcBytes": 70144,
-    "srcPages": "5, 8",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-28"
-   }
-  ],
   "kosaf-2000204008": [
    {
     "file": "kosaf-2000204008/1-다자녀가정_특별지원_대학등록금_지원신청서_p1-3.pdf",
@@ -141,27 +128,6 @@
     "srcPages": "9~11",
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-10-28"
-   }
-  ],
-  "kosaf-2704219001": [
-   {
-    "file": "kosaf-2704219001/1-2026년_2학기_영광군_대학생등록금_지원사업_공고_안__p7-7.pdf",
-    "name": "공고문 안 신청서 서식 (7쪽)",
-    "pages": 1,
-    "bytes": 130005,
-    "src": "2026년_2학기_영광군_대학생등록금_지원사업_공고(안).hwpx",
-    "srcBytes": 72455,
-    "srcPages": "7",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-31"
-   }
-  ],
-  "kosaf-2704364001": [
-   {
-    "src": "제15기 재능장학생 선발 공고문.hwp",
-    "srcBytes": 85504,
-    "none": true,
-    "at": "2026-10-31"
    }
   ],
   "kosaf-2000423012": [
@@ -270,30 +236,6 @@
     "srcBytes": 2764328,
     "none": true,
     "at": "2026-11-12"
-   }
-  ],
-  "kosaf-2701277003": [
-   {
-    "src": "1.배재장학재단 선발 요강 (15).hwp",
-    "srcBytes": 15360,
-    "none": true,
-    "at": "2026-11-14"
-   }
-  ],
-  "kosaf-2701277006": [
-   {
-    "src": "1.배재장학재단 선발 요강 (15).hwp",
-    "srcBytes": 15360,
-    "none": true,
-    "at": "2026-11-14"
-   }
-  ],
-  "kosaf-2701277007": [
-   {
-    "src": "1.배재장학재단 선발 요강 (15).hwp",
-    "srcBytes": 15360,
-    "none": true,
-    "at": "2026-11-14"
    }
   ],
   "kosaf-2700003009": [
@@ -446,19 +388,6 @@
     "src": "form-1mxo4j-4.pdf",
     "srcBytes": 910295,
     "none": true,
-    "at": "2026-11-21"
-   }
-  ],
-  "auto-698detailviewdocategory6": [
-   {
-    "file": "auto-698detailviewdocategory6/1-elig-1azvuv-1_p3-5.pdf",
-    "name": "공고문 안 신청서 서식 (3, 5쪽)",
-    "pages": 2,
-    "bytes": 250039,
-    "src": "elig-1azvuv-1.hwp",
-    "srcBytes": 139776,
-    "srcPages": "3, 5",
-    "from": "공고문 서식 쪽 떼기",
     "at": "2026-11-21"
    }
   ],
@@ -629,6 +558,121 @@
     "srcBytes": 80687,
     "none": true,
     "at": "2026-11-27"
+   }
+  ],
+  "auto-0713no2516453sitedvscdkr": [
+   {
+    "file": "auto-0713no2516453sitedvscdkr/1-elig-8y5ppz-1_p14-16.pdf",
+    "name": "공고문 안 신청서 서식 (14, 16쪽)",
+    "pages": 2,
+    "bytes": 440825,
+    "src": "elig-8y5ppz-1.hwpx",
+    "srcBytes": 116561,
+    "srcPages": "14, 16",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-28",
+    "ai": "mixed|[서식1]이력서및자기소개서※유의사항:기재사항이많을경우글자크기,장평등을조절하여1장으로작성"
+   }
+  ],
+  "auto-zc3cnavcodeknu1619416593-0226qa1": [
+   {
+    "src": "form-lvlfo4-1.hwp",
+    "srcBytes": 372224,
+    "none": true,
+    "at": "2026-11-28",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   }
+  ],
+  "auto-skor478127526artclviewdo": [
+   {
+    "src": "form-akfwnw-2.hwp",
+    "srcBytes": 150016,
+    "none": true,
+    "at": "2026-11-28",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   },
+   {
+    "src": "elig-akfwnw-1.pdf",
+    "srcBytes": 413093,
+    "none": true,
+    "at": "2026-11-28",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   }
+  ],
+  "auto-15nttno171952searchctgry": [
+   {
+    "src": "elig-264c1l-1.hwp",
+    "srcBytes": 107008,
+    "none": true,
+    "at": "2026-11-28",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   }
+  ],
+  "auto-enoticedoarticleno770739": [
+   {
+    "src": "elig-1tw91l-1.hwp",
+    "srcBytes": 57856,
+    "none": true,
+    "at": "2026-11-28",
+    "why": "AI: 서식 없는 내용 문서",
+    "ai": "content|"
+   }
+  ],
+  "act-08sceq5": [
+   {
+    "src": "form-1rg5ka-2.pdf",
+    "srcBytes": 80687,
+    "none": true,
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2704215001": [
+   {
+    "file": "kosaf-2704215001/1-장학생선발계획_공고문2026_p3-5.pdf",
+    "name": "공고문 안 신청서 서식 (3~5쪽)",
+    "pages": 3,
+    "bytes": 346416,
+    "src": "장학생선발계획 공고문2026.hwp",
+    "srcBytes": 170496,
+    "srcPages": "3~5",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2703434001": [
+   {
+    "src": "[붙임1] 「KC 미래장학금」 제10기 장학생 모집안내 상세안내.pdf",
+    "srcBytes": 119243,
+    "none": true,
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2703436001": [
+   {
+    "src": "2027년제14회(재)중구장학회장학생선발공고.hwpx",
+    "srcBytes": 82862,
+    "none": true,
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2703436002": [
+   {
+    "src": "2027년제14회(재)중구장학회장학생선발공고.hwpx",
+    "srcBytes": 82862,
+    "none": true,
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2703436003": [
+   {
+    "src": "2027년제14회(재)중구장학회장학생선발공고.hwpx",
+    "srcBytes": 82862,
+    "none": true,
+    "at": "2026-11-28"
    }
   ]
  }

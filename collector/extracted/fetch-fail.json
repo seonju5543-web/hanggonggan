@@ -1,9 +1,9 @@
 {
  "auto-scho332282297artclviewdo|(예시) 전체성적 캡쳐본.pdf": {
-  "at": "2026-11-25",
+  "at": "2026-11-28",
   "why": "TypeError · fetch failed · ECONNRESET",
   "url": "https://www3.chosun.ac.kr/bbs/scho/332/379628/download.do",
-  "n": 3
+  "n": 4
  },
  "act-1flnnjr|해커톤 홍보물.pdf": {
   "at": "2026-11-22",
@@ -21,6 +21,12 @@
   "at": "2026-11-27",
   "why": "TypeError · fetch failed · UND_ERR_CONNECT_TIMEOUT",
   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770733&attachNo=564550",
+  "n": 1
+ },
+ "act-0dtydwi|붙임2. 2026학년도 현장실습 지원금 FAQ.pdf": {
+  "at": "2026-11-28",
+  "why": "스크립트 주소를 못 풀었음",
+  "url": "javascript:fileDown('HP.BRD.UPLOAD', '21505', '2'); return false;",
   "n": 1
  }
 }

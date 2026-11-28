@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-27",
+ "updatedAt": "2026-11-28",
  "items": {
   "auto-otice06doarticleno140764": [
    {
@@ -11,18 +11,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-28"
-   }
-  ],
-  "auto-ent2431270591artclviewdo": [
-   {
-    "file": "auto-ent2431270591artclviewdo/1-2026학년도_2학기_HUFS_Dream_장학금_신청서_공고용_.pdf",
-    "name": "2026학년도 2학기 HUFS Dream 장학금 신청서(공고용).hwp",
-    "pages": 1,
-    "bytes": 103226,
-    "srcBytes": 132096,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-03"
    }
   ],
   "auto-3bnum57138cate0qidx57138": [
@@ -307,18 +295,6 @@
     "at": "2026-11-20"
    }
   ],
-  "auto-pnoticedoarticleno368050": [
-   {
-    "file": "auto-pnoticedoarticleno368050/1-붙임._아이소이아묻따생활장학금_신청서_양식.pdf",
-    "name": "붙임. 아이소이아묻따생활장학금 신청서 양식.hwp",
-    "pages": 4,
-    "bytes": 156718,
-    "srcBytes": 18432,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-20"
-   }
-  ],
   "auto-2570viewdocurrentpageno1": [
    {
     "file": "auto-2570viewdocurrentpageno1/1-_서식_글로벌여성리더장학금.pdf",
@@ -533,18 +509,6 @@
     "at": "2026-11-24"
    }
   ],
-  "act-11sr4wq": [
-   {
-    "file": "act-11sr4wq/1-붙임_지원서_양식_.pdf",
-    "name": "붙임+지원서(양식).hwp",
-    "pages": 6,
-    "bytes": 303915,
-    "srcBytes": 132096,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-25"
-   }
-  ],
   "auto-bbssc58944731artclviewdo": [
    {
     "file": "auto-bbssc58944731artclviewdo/1-2-_서식_자기소개서.pdf",
@@ -611,18 +575,6 @@
     "at": "2026-11-27"
    }
   ],
-  "auto-8bnum57138cate0qidx57138-0bjhkqt": [
-   {
-    "file": "auto-8bnum57138cate0qidx57138-0bjhkqt/1-_붙임1_국가근로장학생_지원서.pdf",
-    "name": "(붙임1) 국가근로장학생 지원서.hwp",
-    "pages": 2,
-    "bytes": 71257,
-    "srcBytes": 93696,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-27"
-   }
-  ],
   "auto-15nttno171908searchctgry": [
    {
     "file": "auto-15nttno171908searchctgry/1-_학생용_국가근로장학금_취업연계_중점대학_장학생_지원서.pdf",
@@ -645,6 +597,64 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-27"
+   }
+  ],
+  "auto-jukr145237540artclviewdo": [
+   {
+    "file": "auto-jukr145237540artclviewdo/1-2026-동계방학_교내근로_지원서.pdf",
+    "name": "2026-동계방학 교내근로 지원서.hwp",
+    "pages": 2,
+    "bytes": 97018,
+    "srcBytes": 60928,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-28"
+   }
+  ],
+  "auto-15nttno171952searchctgry": [
+   {
+    "file": "auto-15nttno171952searchctgry/1-2027-1학기_교내_복지_특별_법정_장학금_신청서_서식.pdf",
+    "name": "2027-1학기 교내(복지·특별·법정)장학금 신청서 서식.hwp",
+    "pages": 4,
+    "bytes": 121204,
+    "srcBytes": 92672,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-28"
+   }
+  ],
+  "act-08sceq5": [
+   {
+    "file": "act-08sceq5/1-_붙임1_신청서_및_개인정보_수집활용_동의서_주제1_.pdf",
+    "name": "[붙임1] 신청서 및 개인정보 수집활용 동의서(주제1).hwp",
+    "pages": 2,
+    "bytes": 128982,
+    "srcBytes": 51712,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-28"
+   }
+  ],
+  "act-0mgjdhu": [
+   {
+    "file": "act-0mgjdhu/1-쉽고_바른_정보통신기술_공공언어_웹툰_공모전_신청서.pdf",
+    "name": "쉽고 바른 정보통신기술 공공언어 웹툰 공모전 신청서.hwp",
+    "pages": 2,
+    "bytes": 119047,
+    "srcBytes": 73216,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-28"
+   },
+   {
+    "file": "act-0mgjdhu/2-쉽고_바른_정보통신기술_공공언어_웹툰_공모전_신청서.pdf",
+    "name": "쉽고 바른 정보통신기술 공공언어 웹툰 공모전 신청서.pdf",
+    "pages": 0,
+    "bytes": 85855,
+    "srcBytes": 85855,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-28"
    }
   ]
  },

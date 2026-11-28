@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-27",
+ "updatedAt": "2026-11-28",
  "items": {
   "auto-sknou51815772artclviewdo": [
    {
@@ -7,17 +7,6 @@
     "name": "★붙임1_(공지사항) 2026. 2학기 교외장학생(발전기금재단, 출판문화원, 아시아발전재단) 선발 안내.hwp",
     "pages": 7,
     "bytes": 400770,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "auto-ent2431269128artclviewdo": [
-   {
-    "file": "auto-ent2431269128artclviewdo/1-창업장학금_공고문.pdf",
-    "name": "창업장학금 공고문.hwp",
-    "pages": 8,
-    "bytes": 498019,
     "fonts": "ko-nanum-1",
     "kept": 1,
     "at": "2026-11-20"
@@ -93,17 +82,6 @@
     "name": "문우림 제6기 장학생 선발 공고문.hwp",
     "pages": 1,
     "bytes": 85305,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "auto-698detailviewdocategory6": [
-   {
-    "file": "auto-698detailviewdocategory6/1-2026년_문화예술_장학금_선발_요강_261109.pdf",
-    "name": "2026년 문화예술 장학금 선발 요강_261109.hwp",
-    "pages": 6,
-    "bytes": 239291,
     "fonts": "ko-nanum-1",
     "kept": 1,
     "at": "2026-11-20"
@@ -212,73 +190,6 @@
     "name": "2026년 전국과학경진대회 개요.hwpx",
     "pages": 4,
     "bytes": 182269,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "act-0soneuq": [
-   {
-    "file": "act-0soneuq/1-2026_KAU_리빙랩_제출양식.pdf",
-    "name": "2026 KAU_리빙랩_제출양식.hwp",
-    "pages": 1,
-    "bytes": 62556,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "kosaf-2701277003": [
-   {
-    "file": "kosaf-2701277003/1-1.배재장학재단_선발_요강_15_.pdf",
-    "name": "1.배재장학재단 선발 요강 (15).hwp",
-    "pages": 2,
-    "bytes": 121837,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "kosaf-2701277006": [
-   {
-    "file": "kosaf-2701277006/1-1.배재장학재단_선발_요강_15_.pdf",
-    "name": "1.배재장학재단 선발 요강 (15).hwp",
-    "pages": 2,
-    "bytes": 121837,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "kosaf-2701277007": [
-   {
-    "file": "kosaf-2701277007/1-1.배재장학재단_선발_요강_15_.pdf",
-    "name": "1.배재장학재단 선발 요강 (15).hwp",
-    "pages": 2,
-    "bytes": 121837,
-    "fonts": "ko-nanum-1",
-    "kept": 1,
-    "at": "2026-11-20"
-   }
-  ],
-  "kosaf-2704219001": [
-   {
-    "file": "kosaf-2704219001/1-2026년_2학기_영광군_대학생등록금_지원사업_공고_안_.pdf",
-    "name": "2026년_2학기_영광군_대학생등록금_지원사업_공고(안).hwpx",
-    "pages": 8,
-    "bytes": 300261,
-    "fonts": "ko-nanum-1",
-    "kept": 0.995,
-    "mk": 4,
-    "at": "2026-11-21"
-   }
-  ],
-  "kosaf-2704364001": [
-   {
-    "file": "kosaf-2704364001/1-제15기_재능장학생_선발_공고문.pdf",
-    "name": "제15기 재능장학생 선발 공고문.hwp",
-    "pages": 5,
-    "bytes": 359576,
     "fonts": "ko-nanum-1",
     "kept": 1,
     "at": "2026-11-20"
@@ -445,8 +356,9 @@
     "fonts": "ko-nanum-1",
     "kept": 1,
     "mk": 4,
+    "ai": "mixed|[서식1]이력서및자기소개서※유의사항:기재사항이많을경우글자크기,장평등을조절하여1장으로작성",
     "srcHash": "dcb30fe254698d15",
-    "at": "2026-11-26"
+    "at": "2026-11-28"
    }
   ],
   "act-1cyhkb9": [
@@ -548,6 +460,119 @@
     "srcHash": "0569e678dcbd25ba",
     "at": "2026-11-27"
    }
+  ],
+  "auto-363detailviewdocategory6": [
+   {
+    "file": "auto-363detailviewdocategory6/1-붙임1._근로장학_관련_안내자료_학부생용_.pdf",
+    "name": "붙임1. 근로장학 관련 안내자료(학부생용).hwp",
+    "pages": 7,
+    "bytes": 313304,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "4a38b869fab3def0",
+    "at": "2026-11-28"
+   },
+   {
+    "file": "auto-363detailviewdocategory6/2-붙임1._근로장학_관련_안내자료_대학원생용_.pdf",
+    "name": "붙임1. 근로장학 관련 안내자료(대학원생용).hwp",
+    "pages": 9,
+    "bytes": 364306,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "3bbc9e4503e64f3e",
+    "at": "2026-11-28"
+   },
+   {
+    "file": "auto-363detailviewdocategory6/3-붙임2._앵커사업_Track_-1_참여학부_과_목록.pdf",
+    "name": "붙임2. 앵커사업 TrackⅠ-1 참여학부(과) 목록.hwp",
+    "pages": 1,
+    "bytes": 148464,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "ce83deedde64b351",
+    "at": "2026-11-28"
+   }
+  ],
+  "auto-15nttno171952searchctgry": [
+   {
+    "file": "auto-15nttno171952searchctgry/1-2027-1학기_교내_복지_특별_법정_장학금_신청_안내문.pdf",
+    "name": "2027-1학기 교내(복지·특별·법정)장학금 신청 안내문.hwp",
+    "pages": 4,
+    "bytes": 271314,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "8a5efe2f5a9844e8",
+    "at": "2026-11-28"
+   }
+  ],
+  "auto-enoticedoarticleno770739": [
+   {
+    "file": "auto-enoticedoarticleno770739/1-2._홈페이지_게시글_2026학년도_동계_근로_행정부서_장학생_신청_안내.pdf",
+    "name": "2. (홈페이지 게시글) 2026학년도 동계 근로(행정부서) 장학생 신청 안내.hwp",
+    "pages": 2,
+    "bytes": 95431,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "e8d6c761db0e17ae",
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2704215001": [
+   {
+    "file": "kosaf-2704215001/1-장학생선발계획_공고문2026.pdf",
+    "name": "장학생선발계획 공고문2026.hwp",
+    "pages": 5,
+    "bytes": 194278,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "1803b1e1412fcdc7",
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2703436001": [
+   {
+    "file": "kosaf-2703436001/1-2027년제14회_재_중구장학회장학생선발공고.pdf",
+    "name": "2027년제14회(재)중구장학회장학생선발공고.hwpx",
+    "pages": 7,
+    "bytes": 290863,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "e39ecc8ff33c8ab0",
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2703436002": [
+   {
+    "file": "kosaf-2703436002/1-2027년제14회_재_중구장학회장학생선발공고.pdf",
+    "name": "2027년제14회(재)중구장학회장학생선발공고.hwpx",
+    "pages": 7,
+    "bytes": 290863,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "e39ecc8ff33c8ab0",
+    "at": "2026-11-28"
+   }
+  ],
+  "kosaf-2703436003": [
+   {
+    "file": "kosaf-2703436003/1-2027년제14회_재_중구장학회장학생선발공고.pdf",
+    "name": "2027년제14회(재)중구장학회장학생선발공고.hwpx",
+    "pages": 7,
+    "bytes": 290863,
+    "fonts": "ko-nanum-1",
+    "kept": 1,
+    "mk": 4,
+    "srcHash": "e39ecc8ff33c8ab0",
+    "at": "2026-11-28"
+   }
   ]
  },
  "tried": {
@@ -569,6 +594,21 @@
   "auto-oardid323654menuno200318|임대차계약 사실 확인서.hwp": {
    "at": "2026-11-26",
    "why": "글자 빠짐(65%)",
+   "mk": 4
+  },
+  "auto-skor478127526artclviewdo|(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp": {
+   "at": "2026-11-28",
+   "why": "HTTP 404",
+   "mk": 4
+  },
+  "act-1eifjdd|261127 즉시 (배포) 대학(원)생이 설계한 반도체, 실제 칩으로 선보여- 과기정통부, 「제2회 내 칩(My Chip) 경진대회」 개최 - (1).hwpx": {
+   "at": "2026-11-28",
+   "why": "크기 밖(43965KB)",
+   "mk": 4
+  },
+  "kosaf-2000189006|2026년 다자녀가정 특별지원(대학등록금) 사업 공고(2차).hwpx": {
+   "at": "2026-11-28",
+   "why": "변환기가 못 읽음(hwpx) · 종료 134 · 변환기 말: warning for callers in this module WARNING: Restricted methods will be blocked in a future release unless native access is enabled Unspecified Application Error",
    "mk": 4
   }
  }
