@@ -173,5 +173,9 @@
  "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12667/view.do?currentPageNo=1": {
   "at": "2026-11-27",
   "tries": 1
+ },
+ "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156791247&pWise=sub&pWiseSub=C2": {
+  "at": "2026-11-28",
+  "tries": 1
  }
 }
