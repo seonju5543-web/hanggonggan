@@ -178,6 +178,48 @@
    "excerptsAt": "2026-11-28"
   },
   {
+   "title": "[한양대학교] AI 창업 인사이트 특강 참가자 모집(12/2(수) 18:00)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179899",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-01",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-26 ~ 2026-12-01"
+    },
+    {
+     "label": "대상",
+     "text": "수도권 내 (예비)창업자 누구나"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "한양대학교 창업지원단",
+   "api": "kstartup",
+   "apiId": "179899",
+   "id": "api-kstartup-179899",
+   "eligibilityLines": [
+    "수도권 내 (예비)창업자 누구나"
+   ],
+   "noticeLines": [
+    "다양한 산업 분야의 AI 활용 사례를 살펴보고, 그 안에서 발견할 수 있는 새로운 비즈니스 기회와 현실에 대해 이야기 나누고자 합니다.",
+    "AI 기업을 직접 운영하며 경험한 사례를 바탕으로, 창업을 준비하거나 AI 비즈니스에 관심 있는 분들과 유익한 시간을 함께할 예정입니다.",
+    "관심 있는 분들의 많은 참여 바랍니다.",
+    "온라인 접수 : https://forms.gle/2TpLW1W7JRFPecYKA"
+   ],
+   "detailsV": 7,
+   "foundAt": "2026-11-27",
+   "seenAt": "2026-11-28",
+   "excerptsAt": "2026-11-28"
+  },
+  {
    "title": "[ART-AI ACADEMY] AI 숏폼 워크숍",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179849",
    "kind": "대외활동",
@@ -215,46 +257,6 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-24",
-   "seenAt": "2026-11-28",
-   "excerptsAt": "2026-11-28"
-  },
-  {
-   "title": "2026년도 스타트업 및 중소기업 성장전략 세미나 참가기업 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179684",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-02",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-01 ~ 2026-12-02"
-    },
-    {
-     "label": "대상",
-     "text": "스타트업 및 중소기업 대표자, 임원"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "사단법인 한국스타트업육성협회",
-   "api": "kstartup",
-   "apiId": "179684",
-   "id": "api-kstartup-179684",
-   "eligibilityLines": [
-    "스타트업 및 중소기업 대표자, 임원"
-   ],
-   "noticeLines": [
-    "스타트업 및 중소기업이 경영역량을 강화하고 지속가능한 성장기반을 마련할 수 있도록 특허·기업인증·세무·노무·법무·법률 등 6개 분야 전문가의 실무 중심 교육과 맞춤형 상담을 지원하는 세미나를 다음과 같이 안내드립니다. 참여를 희망하시는 스타트업 및 중소기업 대표님께서는 아래 내용을 확인하신 후, 기한 내 신청해 주시기 바랍니다.",
-    "온라인 접수 : https://forms.gle/ASU4BHV52mtiE3Xc9"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-23",
    "seenAt": "2026-11-28",
    "excerptsAt": "2026-11-28"
   },
@@ -579,6 +581,46 @@
    "excerptsAt": "2026-11-28"
   },
   {
+   "title": "2026년도 스타트업 및 중소기업 성장전략 세미나 참가기업 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179684",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-15",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-01 ~ 2026-12-15"
+    },
+    {
+     "label": "대상",
+     "text": "스타트업 및 중소기업 대표자, 임원"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "사단법인 한국스타트업육성협회",
+   "api": "kstartup",
+   "apiId": "179684",
+   "id": "api-kstartup-179684",
+   "eligibilityLines": [
+    "스타트업 및 중소기업 대표자, 임원"
+   ],
+   "noticeLines": [
+    "스타트업 및 중소기업이 경영역량을 강화하고 지속가능한 성장기반을 마련할 수 있도록 특허·기업인증·세무·노무·법무·법률 등 6개 분야 전문가의 실무 중심 교육과 맞춤형 상담을 지원하는 세미나를 다음과 같이 안내드립니다. 참여를 희망하시는 스타트업 및 중소기업 대표님께서는 아래 내용을 확인하신 후, 기한 내 신청해 주시기 바랍니다.",
+    "온라인 접수 : https://forms.gle/ASU4BHV52mtiE3Xc9"
+   ],
+   "detailsV": 7,
+   "foundAt": "2026-11-23",
+   "seenAt": "2026-11-28",
+   "excerptsAt": "2026-11-28"
+  },
+  {
    "title": "[강동구 청년해냄센터] 취약분야 상시 컨설팅 12월 참가자 모집 공고",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179853",
    "kind": "대외활동",
@@ -611,47 +653,6 @@
    "noticeLines": [
     "강동구 청년해냄센터에서 12월 취약 분야 상시 컨설팅 계획을 다음과 같이 공고하니 참여 희망자는 안내에 따라 신청하시기 바랍니다.",
     "온라인 접수 : http://www.gdhaenaem.com/?c=169"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-28",
-   "seenAt": "2026-11-28",
-   "excerptsAt": "2026-11-28"
-  },
-  {
-   "title": "2026년 서울 기후테크 기업 및 예비창업자를 위한 멘토링 지원사업 안내",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=178445",
-   "kind": "대외활동",
-   "field": "멘토링",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-07-07 ~ 2026-12-31"
-    },
-    {
-     "label": "대상",
-     "text": "서울시 소재 녹색분야 중소기업 및 예비창업자 ① 「중소기업기본법」 제2조의 중소기업으로서, 본사 또는 지사 (예비창업자의 경우 주소지) 의 서울시 소재 ② 기업 보유 기술 혹은 아이디어가 기후기술 38 대 분류체계에 포함되어야 하며, 기획 (개발)/ 판매 중인 제품(기술)의 에너지 절…"
-    },
-    {
-     "label": "활동지역",
-     "text": "서울"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "서울기후테크산업지원센터장",
-   "api": "kstartup",
-   "apiId": "178445",
-   "id": "api-kstartup-178445",
-   "eligibilityLines": [
-    "서울시 소재 녹색분야 중소기업 및 예비창업자",
-    "① 「중소기업기본법」 제2조의 중소기업으로서, 본사 또는 지사 (예비창업자의 경우 주소지) 의 서울시 소재",
-    "② 기업 보유 기술 혹은 아이디어가 기후기술 38 대 분류체계에 포함되어야 하며, 기획 (개발)/ 판매 중인 제품(기술)의 에너지 절감, 온실가스 저감 등 환경 관련성 필요"
-   ],
-   "noticeLines": [
-    "국가녹색기술연구소 서울기후테크산업지원센터는 서울시 내 중소기업 및 예비창업자를 위하여 다음과 같이 다양한 전문가 풀을 활용한 맞춤형 멘토링을 무료로 진행하고자 합니다. 많은 참여 부탁드립니다."
    ],
    "detailsV": 7,
    "foundAt": "2026-11-28",
@@ -2128,47 +2129,6 @@
    "host": "창업진흥원 K-Startup",
    "foundAt": "2026-11-27",
    "id": "act-1nl91gv"
-  },
-  {
-   "title": "[한양대학교] AI 창업 인사이트 특강 참가자 모집(12/2(수) 18:00)",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179899",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "접수기간 2026-11-26 ~ 2026-12-01 23:59 주관기관명 한양대학교 대상 대학생, 일반인, 대학, 연구기관, 일반기업, 1인 창",
-   "deadline": "2026-12-01",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-26 ~ 2026-12-01 23:59"
-    },
-    {
-     "label": "일시",
-     "text": "2026. 12. 2.(수) 18:00~20:00"
-    },
-    {
-     "label": "대상",
-     "text": "수도권 내 (예비)창업자 누구나"
-    }
-   ],
-   "eligibilityLines": [
-    "대상 : 대학생, 일반인, 대학, 연구기관, 일반기업, 1인 창조기업",
-    "한양대학교 창업지원단",
-    "신청대상 : 수도권 내 (예비)창업자 누구나"
-   ],
-   "noticeLines": [
-    "- 신청 기간: 2026. 12. 1.(화)까지",
-    "- 신청 방법: 구글폼 온라인 신청(https://forms.gle/2TpLW1W7JRFPecYKA)"
-   ],
-   "detailsV": 7,
-   "documentsV": 2,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-11-27",
-   "attachV": 1,
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-11-27",
-   "id": "act-1wmdyov"
   },
   {
    "title": "[창업보육센터]K-Tech 창업성장아카데미 교육프로그램 수강생 모집(~11월)",
