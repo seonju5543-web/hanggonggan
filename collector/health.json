@@ -6,7 +6,7 @@
  },
  "경희대학교": {
   "fails": 0,
-  "lastOk": "2026-11-27",
+  "lastOk": "2026-11-28",
   "browserFails": 0
  },
  "서울대학교": {
@@ -31,9 +31,9 @@
   "lastOk": "2026-10-27"
  },
  "서울시립대학교": {
-  "fails": 9,
+  "fails": 10,
   "lastOk": "2026-11-23",
-  "browserFails": 9,
+  "browserFails": 10,
   "browserWhy": "열렸지만 장학 공고 0건"
  },
  "건국대학교": {
@@ -43,7 +43,7 @@
  },
  "동국대학교": {
   "fails": 0,
-  "lastOk": "2026-11-27",
+  "lastOk": "2026-11-28",
   "browserFails": 0
  },
  "홍익대학교": {
@@ -65,7 +65,7 @@
  },
  "상명대학교": {
   "fails": 0,
-  "lastOk": "2026-11-27",
+  "lastOk": "2026-11-28",
   "browserFails": 0
  },
  "가천대학교": {
@@ -152,23 +152,23 @@
  },
  "중앙대학교": {
   "fails": 0,
-  "lastOk": "2026-11-27",
+  "lastOk": "2026-11-28",
   "browserFails": 0
  },
  "고려대학교": {
   "fails": 0,
-  "lastOk": "2026-11-27",
+  "lastOk": "2026-11-28",
   "browserFails": 0
  },
  "계명대학교": {
-  "fails": 1,
+  "fails": 2,
   "lastOk": "2026-11-27",
-  "browserFails": 1,
+  "browserFails": 2,
   "browserWhy": "열렸지만 장학 공고 0건"
  },
  "부산대학교": {
   "fails": 0,
-  "lastOk": "2026-11-27",
+  "lastOk": "2026-11-28",
   "browserFails": 0
  },
  "부경대학교": {
