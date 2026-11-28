@@ -47,10 +47,6 @@
   "at": "2026-11-23",
   "tries": 2
  },
- "https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=view&articleNo=154825&article.offset=0&articleLimit=10&srCategoryId=85": {
-  "at": "2026-11-23",
-  "tries": 2
- },
  "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=888344&qidx=6302&cate=10&allboard=false&nowpage=2": {
   "at": "2026-11-23",
   "tries": 2
@@ -223,10 +219,6 @@
   "at": "2026-11-27",
   "tries": 2
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3515772": {
-  "at": "2026-11-21",
-  "tries": 1
- },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12646/view.do?currentPageNo=1": {
   "at": "2026-11-23",
   "tries": 1
@@ -271,10 +263,6 @@
   "at": "2026-11-25",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542487": {
-  "at": "2026-11-26",
-  "tries": 1
- },
  "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17596&commonMenuNo=180_35": {
   "at": "2026-11-26",
   "tries": 1
@@ -295,16 +283,16 @@
   "at": "2026-11-27",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545517": {
-  "at": "2026-11-27",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3551742": {
-  "at": "2026-11-27",
-  "tries": 1
- },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156791247&pWise=sub&pWiseSub=C2": {
   "at": "2026-11-27",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3539000": {
+  "at": "2026-11-28",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3536534": {
+  "at": "2026-11-28",
   "tries": 1
  }
 }
