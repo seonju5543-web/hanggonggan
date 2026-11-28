@@ -1,6 +1,6 @@
-## 🖥 브라우저형 수집 리포트 (2026-11-28 13:42 KST)
+## 🖥 브라우저형 수집 리포트 (2026-11-28 20:36 KST)
 
-🚨 **여러 번 연속 공고를 못 읽은 학교**: 서울시립대학교(10회 연속 · 열렸지만 장학 공고 0건) — 게시판 주소 확인이 필요해요(정찰: collector/run-probe.txt). 일반 로봇이 같은 학교를 정상으로 읽고 있으면 browser-targets.json 의 보관(parked)으로 옮기면 됩니다(schools.json _collector 규칙).
+🚨 **여러 번 연속 공고를 못 읽은 학교**: 서울시립대학교(11회 연속 · 열렸지만 장학 공고 0건) · 계명대학교(3회 연속 · 열렸지만 장학 공고 0건) — 게시판 주소 확인이 필요해요(정찰: collector/run-probe.txt). 일반 로봇이 같은 학교를 정상으로 읽고 있으면 browser-targets.json 의 보관(parked)으로 옮기면 됩니다(schools.json _collector 규칙).
 
 ### 한국외국어대학교
 - ✅ 링크 80 · 장학 공고 11 · https://dep.hufs.ac.kr/student/12767/subview.do
@@ -36,11 +36,11 @@
 - ⚪ 링크 0 · 장학 공고 0 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ### 부산대학교
-  - 📄 2페이지에서 장학 공고 11건 더 읽음
-- ✅ 링크 91 · 장학 공고 3 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
+  - 📄 2페이지에서 장학 공고 10건 더 읽음
+- ✅ 링크 90 · 장학 공고 2 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ⚪ 링크 372 · 장학 공고 0 · 이미 아는 공고 13건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ⚪ 링크 375 · 장학 공고 0 · 이미 아는 공고 13건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 서울과학기술대학교
 - ✅ 링크 295 · 장학 공고 18 · https://www.seoultech.ac.kr/service/info/janghak/
@@ -53,7 +53,7 @@
 
 ---
 이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 2분 / 예산 22분 · 학교 14/14곳 처리
+⏱ 소요 1분 / 예산 22분 · 학교 14/14곳 처리
 ⚪ **열렸지만 장학 공고를 하나도 못 알아본 학교 2곳**: 서울시립대학교 · 계명대학교 — 게시판 화면은 열렸는데 장학 공고로 보이는 줄이 없었어요(무엇을 봤는지는 위 학교 줄의 '본 링크'·'본 글자').
 **⏳ 스키마화 대기 중 138건** (원본 확보됨 — collector/pending-forms.json)
 
