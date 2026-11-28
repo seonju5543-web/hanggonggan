@@ -562,15 +562,11 @@
   ],
   "auto-0713no2516453sitedvscdkr": [
    {
-    "file": "auto-0713no2516453sitedvscdkr/1-elig-8y5ppz-1_p14-16.pdf",
-    "name": "공고문 안 신청서 서식 (14, 16쪽)",
-    "pages": 2,
-    "bytes": 440825,
     "src": "elig-8y5ppz-1.hwpx",
     "srcBytes": 116561,
-    "srcPages": "14, 16",
-    "from": "공고문 서식 쪽 떼기",
+    "none": true,
     "at": "2026-11-28",
+    "verdict": "wrong",
     "ai": "mixed|[서식1]이력서및자기소개서※유의사항:기재사항이많을경우글자크기,장평등을조절하여1장으로작성"
    }
   ],
